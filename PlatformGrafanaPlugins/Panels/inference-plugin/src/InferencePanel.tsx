@@ -37,8 +37,8 @@ export class InferencePanel extends React.Component<Props>{
             inferenceLists = "No Records found!";
         }else{
            inferenceLists = data[0].data.map(link => {
-            return link.color === 'green' ? <div onMouseEnter={() => { this.getInference(link,options) }}><img src="public/img/satisfied.png" />{link.inference}</div> :
-                <div onMouseEnter={() => { this.getInference(link,options) }}><img src="public/img/dissatisfied.png" />{link.inference}</div>
+            return link.color === 'green' ? <div style={{display:'flex',alignItems:'center'}} onMouseEnter={() => { this.getInference(link,options) }}><img src="public/img/satisfied.png" /><span style={{padding:'5px'}}>{link.inference}</span></div> :
+                <div style={{display:'flex',alignItems:'center'}} onMouseEnter={() => { this.getInference(link,options) }}><img src="public/img/dissatisfied.png" /><span style={{padding:'5px'}}>{link.inference}</span></div>
          });
         }
         return (
