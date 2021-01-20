@@ -35,7 +35,7 @@ public class InsightsReportTemplateConfigFiles implements Serializable {
 	@Column(name = "id")
 	private Integer id;
 	
-	@Column(name = "fileData", columnDefinition = "BLOB")
+	@Column(name = "fileData")
 	private byte[] fileData;
 
 	@Column(name = "fileType")

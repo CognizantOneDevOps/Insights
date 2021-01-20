@@ -36,7 +36,7 @@ public class InsightsConfigFiles implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 
-	@Column(name = "fileData", columnDefinition = "BLOB")
+	@Column(name = "fileData")
 	private byte[] fileData;
 
 	@Column(name = "fileModule")

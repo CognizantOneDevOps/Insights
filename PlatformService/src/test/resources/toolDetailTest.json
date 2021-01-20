@@ -2,30 +2,5 @@
 {
 "toolName" : "GIT",
 "label" : "SCM:GIT:DATA"
-},
-{
-"toolName" : "PIVOTALTRACKER",
-"label" : "ALM:PIVOTALTRACKER:DATA"
-},
-{
-"toolName" : "JENKINS",
-"label" : "CI:JENKINS:DATA"
-},
-{
-"toolName" : "RUNDECK",
-"label" : "DEPLOYMENT:RUNDECK:DATA"
-},
-{
-"toolName" : "JIRA",
-"label" : "DEFECTS:JIRA:DATA"
-},
-{
-"toolName" : "SONAR",
-"label" : "CODEQUALITY:SONAR:DATA"
-},
-{
-"toolName" : "PRODUCTIVITY",
-"label" : "INFERENCE:PRODUCTIVITY:DATA"
 }
-
 ]

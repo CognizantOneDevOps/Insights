@@ -75,7 +75,7 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 		}
 	}
 
-	@Test(priority = 1)
+	@Test(priority = 1,enabled=false)
 	public void dataModelFileExists() {
 		JsonObject dataModel = null;
 		try {
@@ -91,19 +91,19 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 		Assert.assertNotEquals(null, dataModel);
 	}
 
-	@Test(priority = 2)
+	@Test(priority = 2,enabled=false)
 	public void testAvailableTools() throws InsightsCustomException {
 		testTools = service.getAvailableTools();
 		Assert.assertNotEquals(0, service.getAvailableTools().size());
 	}
 
-	@Test(priority = 3)
+	@Test(priority = 3,enabled=false)
 	public void testToolKeySet() throws InsightsCustomException {
 		Assert.assertNotEquals(0, service.getToolKeyset(TreceabilityTestData.toolName).size());
 	}
 
 	
-	@Test(priority = 4)
+	@Test(priority = 4,enabled=false)
 	public void testPipelineResponse() throws InsightsCustomException {
 		JsonObject resp = new JsonObject();
 		try {
@@ -120,7 +120,7 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 		Assert.assertNotEquals(0, resp.get("pipeline").getAsJsonArray().size());
 	}
 	
-	@Test(priority =5)
+	@Test(priority =5,enabled=false)
 	public void testSummaryResponse() throws InsightsCustomException
 	{
 		JsonObject resp = new JsonObject();
@@ -138,12 +138,13 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 		Assert.assertNotEquals(0, resp.get("summary").getAsJsonArray().size());
 	}
 
-	@Test(priority = 6)
+	@Test(priority = 6,enabled=false)
 	public void testPipelineResponseWithIncorrectData() throws InsightsCustomException {
 		JsonObject resp = service.getPipeline(TreceabilityTestData.toolName, TreceabilityTestData.fieldName,
 				TreceabilityTestData.incorrectFieldVal,false);
 		Assert.assertEquals(0, resp.get("pipeline").getAsJsonArray().size());
 	}
+	
 	
 	@AfterClass
 	public void cleanUp() throws InsightsCustomException {
