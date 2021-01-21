@@ -15,6 +15,12 @@
  *******************************************************************************/
 package com.cognizant.devops.platformservice.test.testngInitializer;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
 
@@ -28,12 +34,18 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformdal.assessmentreport.InsightsReportTemplateConfigFiles;
+import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
+import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
+
+import javassist.ClassMap;
 
 @Test
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
@@ -49,6 +61,8 @@ public class TestngInitializerTest extends AbstractTestNGSpringContextTests{
 
 	@Resource
 	private FilterChainProxy springSecurityFilterChain;
+	
+	
 
 //	static {
 //		try {
@@ -65,8 +79,9 @@ public class TestngInitializerTest extends AbstractTestNGSpringContextTests{
 	public void testOnStartup() throws ServletException {
 		try {
 			ApplicationConfigCache.loadConfigCache();
+			changeAnnotationValue();
 			loadDBDetails();
-		} catch (InsightsCustomException e) {
+		} catch (InsightsCustomException | NoSuchFieldException | SecurityException | ClassNotFoundException e) {
 			log.error(e);
 		}
 		log.debug("Testng initializer class to load Config Cache");
@@ -77,5 +92,35 @@ public class TestngInitializerTest extends AbstractTestNGSpringContextTests{
 		ApplicationConfigProvider.getInstance().getPostgre().setDriver(UnitTestConstant.H2_DRIVER);
 		ApplicationConfigProvider.getInstance().getPostgre().setDialect(UnitTestConstant.H2_DIALECT);
 		ApplicationConfigProvider.updateConfig(ApplicationConfigProvider.getInstance());
+	}
+	
+	
+	public void changeAnnotationValue() throws NoSuchFieldException, SecurityException, ClassNotFoundException {
+		Map<Object,String> classMap = new HashMap<>();
+		classMap.put(new InsightsConfigFiles(),"fileData");
+		classMap.put(new InsightsReportTemplateConfigFiles(),"fileData");
+		classMap.put(new InsightsReportVisualizationContainer(),"attachmentData");
+		for(Map.Entry<Object, String> entry : classMap.entrySet()) {
+		Field field = entry.getKey().getClass().getDeclaredField(entry.getValue());
+		Annotation annotations = field.getAnnotations()[0];
+		Object handler = Proxy.getInvocationHandler(annotations);
+		System.out.println("Field : "+ field.getName());
+		field.setAccessible(true);
+        Field f;
+        try {
+            f = handler.getClass().getDeclaredField("memberValues");
+        } catch (NoSuchFieldException | SecurityException e) {
+            throw new IllegalStateException(e);
+        }
+        f.setAccessible(true);
+        Map<String, Object> memberValues;
+        try {
+            memberValues = (Map<String, Object>) f.get(handler);
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
+        Object oldValue = memberValues.get("columnDefinition");
+        memberValues.put("columnDefinition","BLOB");
+		}
 	}
 }

@@ -65,7 +65,7 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 		saveReportTemplate(reportTemplatekpis, reportIdkpisRT);
 		
 		//save report template design files in db
-		//uploadReportTemplateDesignFiles(reportIdProdRT);
+		uploadReportTemplateDesignFiles(reportIdProdRT);
 
 		typeId=saveWorkflowType("SYSTEM");
 		
@@ -103,7 +103,7 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 
 	}
 
-	@Test(priority = 1,enabled=false)
+	@Test(priority = 1)
 	public void testExecutionHistoryUpdateProd() throws InterruptedException {
 		try {
 			if(fusionExportUrl == null || fusionExportUrl.isEmpty()) {
@@ -292,7 +292,7 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 		}
 	}
 
-	@Test(priority = 13,enabled=false)
+	@Test(priority = 13)
 	public void testSaveInsightsEmailExecutionHistory() throws InterruptedException, InsightsCustomException {
 		try {
 			if(fusionExportUrl == null || fusionExportUrl.isEmpty() || smtpHostServer == null || smtpHostServer.isEmpty()) {
@@ -309,7 +309,7 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 		}
 	}
 
-	@Test(priority = 14,enabled=false)
+	@Test(priority = 14)
 	public void testPDFRecordInEmailExecutionHistory() throws InterruptedException, InsightsCustomException {
 		try {	
 			log.debug(" fusionExportUrl {} Insights_Home ====  {}  ", fusionExportUrl,
@@ -330,7 +330,7 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 		}
 	}
 	
-	@Test(priority = 15,enabled=false)
+	@Test(priority = 15)
 	public void testAgentHealthRecordInEmailExecutionHistory() throws InterruptedException, InsightsCustomException {
 		try {
 			if(fusionExportUrl == null || fusionExportUrl.isEmpty() || smtpHostServer == null || smtpHostServer.isEmpty()) {

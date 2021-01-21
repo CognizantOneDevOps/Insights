@@ -128,7 +128,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 			PlatformServiceStatusProvider.getInstance().createPlatformServiceStatusNode(
 					"Error while loading Traceability.json", PlatformServiceConstants.FAILURE);
 			LOG.error("Error while loading Traceability.json");
-			throw new InsightsCustomException("Error while loading Traceability.json");
+			throw new InsightsCustomException("Could not load Traceability.json. Please check whether the file has been uploaded in Configuration File Management.");
 		}
 	}
 

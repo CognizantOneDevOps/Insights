@@ -336,7 +336,7 @@ public class BulkUploadService implements IBulkUpload {
 			log.error("Error in loading ToolDetail.json {}", ex.getMessage());
 			PlatformServiceStatusProvider.getInstance().createPlatformServiceStatusNode(
 					"Error in loading ToolDetail.json.", PlatformServiceConstants.FAILURE);
-			throw new InsightsCustomException("Error in loading ToolDetail.json");
+			throw new InsightsCustomException("Could not load ToolDetail.json. Please check whether the file has been uploaded in Configuration File Management.");
 		}
 		return config;
 	}

@@ -174,7 +174,7 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 		}
 	}
 
-	@Test(priority = 11,enabled=false)
+	@Test(priority = 11)
 	public void testUploadReportTemplateDesignFiles() throws InsightsCustomException, IOException {
 		try {
 			String response = assessmentService.uploadReportTemplateDesignFiles(readReportTemplateDesignFiles(), reportId);
