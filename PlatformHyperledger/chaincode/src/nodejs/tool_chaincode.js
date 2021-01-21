@@ -222,7 +222,7 @@ let Chaincode = class {
 		return false
 	else{
 		for(var elem in inputObj){
-			if(inputObj[elem]!=ledgerObj[elem])
+			if(JSON.stringify(inputObj[elem])!=JSON.stringify(ledgerObj[elem]))
 				return false
 		}
 		return true
