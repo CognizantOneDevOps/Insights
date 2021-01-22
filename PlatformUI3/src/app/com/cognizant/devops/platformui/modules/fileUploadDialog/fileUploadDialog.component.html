@@ -10,9 +10,9 @@
     </div>
   </div>
   <div style="display:inline-block;padding-top: 6%;padding-left: 6%;">
-    <input *ngIf="multipleFileAllowed" class="form-class" id="file" type="file" multiple="multiple"
+    <input *ngIf="multipleFileAllowed" class="form-class" id="file"  onClick="value = null"  type="file" multiple="multiple"
       (change)="onFileChanged($event)" />
-    <input *ngIf="!multipleFileAllowed" class="form-class" id="file" accept=".json" type="file"
+    <input *ngIf="!multipleFileAllowed" class="form-class" id="file"  onClick="value = null"  accept=".json" type="file"
       (change)="onFileChanged($event)" />
     <div class="btnStyle">
       <button mat-icon-button (click)="upload()">

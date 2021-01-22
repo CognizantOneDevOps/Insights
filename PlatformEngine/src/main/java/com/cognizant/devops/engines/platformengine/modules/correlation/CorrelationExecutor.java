@@ -320,6 +320,7 @@ public class CorrelationExecutor {
 				correlations = Arrays.asList(correlationArray);
 				EngineStatusLogger.getInstance().createEngineStatusNode("Correlation.json is successfully loaded.",
 						PlatformServiceConstants.SUCCESS);
+				log.debug("Correlation.json is successfully loaded.");
 			} else {
 				log.error("Correlation.json not found in DB.");
 				EngineStatusLogger.getInstance().createEngineStatusNode("Correlation.json not found in DB.",

@@ -25,10 +25,10 @@ export class FileSystemService {
     constructor(private restCallHandlerService: RestCallHandlerService) {
     }
 
-    uploadFileWithDetails(file: File, fileName: string, fileType: string, module: string): Observable<any> {
+    uploadFileWithDetails(file: File, fileName: string, fileType: string, module: string, isEdit: boolean): Observable<any> {
         const fd: FormData = new FormData();
         fd.append('file',file);
-        return this.restCallHandlerService.postFormDataWithParameter("UPLOAD_CONFIG_FILE", fd, { fileName:fileName, fileType:fileType, module:module });
+        return this.restCallHandlerService.postFormDataWithParameter("UPLOAD_CONFIG_FILE", fd, { fileName:fileName, fileType:fileType, module:module, isEdit:isEdit });
     }
 
     loadFileType(): Promise<any> {

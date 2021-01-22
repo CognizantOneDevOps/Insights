@@ -102,7 +102,7 @@ public class FileManagementServiceImpl {
 	 * @return String
 	 * @throws InsightsCustomException
 	 */
-	public String uploadConfigurationFile(MultipartFile multipartfile, String fileName, String fileType, String module)
+	public String uploadConfigurationFile(MultipartFile multipartfile, String fileName, String fileType, String module, boolean isEdit)
 			throws InsightsCustomException {
 		try {
 			InsightsConfigFiles configFileRecord = configFilesDAL.getConfigurationFile(fileName);
@@ -127,12 +127,14 @@ public class FileManagementServiceImpl {
 				} else {
 					throw new InsightsCustomException("One file upload allowed for " + module+". Please delete the existing file to upload a new file.");
 				}
-			} else {
+			} else if(isEdit) {
 				configFileRecord.setFileName(fileName);
 				configFileRecord.setFileType(fileType);
 				configFileRecord.setFileModule(module);
 				configFileRecord.setFileData(FileUtils.readFileToByteArray(file));
 				configFilesDAL.updateConfigurationFile(configFileRecord);
+			} else {
+				throw new InsightsCustomException("File already exists in database.");
 			}
 			return "File uploaded";
 

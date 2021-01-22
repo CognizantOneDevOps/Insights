@@ -67,7 +67,7 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 		FileInputStream input = new FileInputStream(traceabilityFile);
 		MultipartFile multipartTraceabilityFile = new MockMultipartFile("file", traceabilityFile.getName(), "text/plain",
 					IOUtils.toByteArray(input));
-		String response = fileManagementServiceImpl.uploadConfigurationFile(multipartTraceabilityFile, traceabilityFileName, "JSON", "TRACEABILITY");
+		String response = fileManagementServiceImpl.uploadConfigurationFile(multipartTraceabilityFile, traceabilityFileName, "JSON", "TRACEABILITY", false);
 		if(response.equals("File uploaded"))
 			isDeleteFile=true;
 		}catch(Exception e) {

@@ -49,7 +49,7 @@ public class BulkUploadTest extends BulkUploadTestData {
 		FileInputStream input = new FileInputStream(toolDetailsFile);
 		MultipartFile multipartToolDetailsFile = new MockMultipartFile("file", toolDetailsFile.getName(), "text/plain",
 					IOUtils.toByteArray(input));
-		String response = fileManagementServiceImpl.uploadConfigurationFile(multipartToolDetailsFile, toolDetailFileName, "JSON", "TOOLDETAIL");
+		String response = fileManagementServiceImpl.uploadConfigurationFile(multipartToolDetailsFile, toolDetailFileName, "JSON", "TOOLDETAIL", false);
 		if(response.equals("File uploaded"))
 			isDeleteFile=true;
 		}catch(Exception e) {

@@ -95,7 +95,7 @@ export class FileSystemConfigComponent implements OnInit {
     const dialogRef = this.messageDialog.showConfirmationMessage(title, dialogmessage, '', 'ALERT', '40%');
     dialogRef.afterClosed().subscribe(result => {
       if (result == 'yes') {
-        this.fileSystemService.uploadFileWithDetails(this.file, this.fileName, this.fileType, this.module)
+        this.fileSystemService.uploadFileWithDetails(this.file, this.fileName, this.fileType, this.module, this.disableInputFields)
           .subscribe(response => {
             if (response.status == 'success') {
               this.messageDialog.showApplicationsMessage('<b>' + this.fileName + '</b> saved successfully.', "SUCCESS");

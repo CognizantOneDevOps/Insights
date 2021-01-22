@@ -87,9 +87,9 @@ public class FileManagementController {
 
 	@PostMapping(value = "/uploadConfigurationFile", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject saveConfigurationFile(@RequestParam("file") MultipartFile file,
-			@RequestParam String fileName, @RequestParam String fileType, @RequestParam String module) {
+			@RequestParam String fileName, @RequestParam String fileType, @RequestParam String module, @RequestParam boolean isEdit) {
 		try {
-			String message = fileManagementService.uploadConfigurationFile(file, fileName, fileType, module);
+			String message = fileManagementService.uploadConfigurationFile(file, fileName, fileType, module, isEdit);
 			return PlatformServiceUtil.buildSuccessResponseWithData(message);
 		} catch (Exception e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());

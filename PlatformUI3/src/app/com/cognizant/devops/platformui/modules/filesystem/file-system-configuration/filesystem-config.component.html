@@ -112,7 +112,7 @@
                 </td>
                 <td class="columnComponent">
                   <input  #fileInput id="file" type="file" accept=''
-                  (change)="onFileChanged($event)" class="form-control"/>
+                  (change)="onFileChanged($event)" onClick="value = null" class="form-control"/>
                 </td>
                 <td>
                     <span class="infoText">{{fileUploadMsg}}</span>

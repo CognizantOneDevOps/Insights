@@ -65,7 +65,7 @@ public class FileManagementTest extends FileManagementTestData {
 		FileInputStream input = new FileInputStream(file);
 		MultipartFile multipartConfigFile = new MockMultipartFile("file", file.getName(), "text/plain",
 				IOUtils.toByteArray(input));
-		String message = fileManagementService.uploadConfigurationFile(multipartConfigFile, fileName, fileType, module);
+		String message = fileManagementService.uploadConfigurationFile(multipartConfigFile, fileName, fileType, module, false);
 		InsightsConfigFiles configFile = configFilesDAL.getConfigurationFile(fileName);
 		Assert.assertEquals("File uploaded", message);
 		Assert.assertNotNull(configFile);
@@ -89,7 +89,7 @@ public class FileManagementTest extends FileManagementTestData {
 		FileInputStream input = new FileInputStream(file);
 		MultipartFile multipartConfigFile = new MockMultipartFile("file", file.getName(), "text/plain",
 				IOUtils.toByteArray(input));
-		String message = fileManagementService.uploadConfigurationFile(multipartConfigFile, fileName, fileType, module);
+		String message = fileManagementService.uploadConfigurationFile(multipartConfigFile, fileName, fileType, module, true);
 		InsightsConfigFiles configFile = configFilesDAL.getConfigurationFile(fileName);
 		Assert.assertEquals("File uploaded", message);
 		Assert.assertNotNull(configFile);
