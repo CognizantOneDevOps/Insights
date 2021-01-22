@@ -316,8 +316,10 @@ public class WorkflowDataHandler {
 		workflowConfig.setRunImmediate(Boolean.FALSE);
 		if (isUpdateLastRunTime) {
 			long workflowlastRunTime = InsightsUtils.getCurrentTimeInSeconds();
+			log.debug(" Worlflow Detail ==== Last nextruntime: {} ",workflowConfig.getNextRun());
 			long nextRunTime = InsightsUtils.getNextRunTime(workflowConfig.getNextRun(),
 					workflowConfig.getScheduleType(), false);
+			log.debug(" Worlflow Detail ==== Next nextruntime: {} ",nextRunTime);
 			workflowConfig.setNextRun(nextRunTime);
 			workflowConfig.setLastRun(workflowlastRunTime);
 		}

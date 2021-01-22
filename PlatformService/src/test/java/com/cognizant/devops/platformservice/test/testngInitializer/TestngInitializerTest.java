@@ -43,6 +43,7 @@ import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportTemplateConfigFiles;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
+import com.cognizant.devops.platformdal.autoML.AutoMLConfig;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
 
 import javassist.ClassMap;
@@ -54,26 +55,10 @@ public class TestngInitializerTest extends AbstractTestNGSpringContextTests{
 	
 	static Logger log = LogManager.getLogger(TestngInitializerTest.class);
 	
-	@Autowired
-	private WebApplicationContext wac;
-
-	private MockMvc mockMvc;
 
 	@Resource
 	private FilterChainProxy springSecurityFilterChain;
 	
-	
-
-//	static {
-//		try {
-//			ApplicationConfigCache.loadConfigCache();
-//			loadDBDetails();
-//		} catch (InsightsCustomException e) {
-//			log.error(e);
-//		}
-//		log.debug("Testng initializer class to load Config Cache .... static");
-//
-//	}
 
 	@BeforeSuite
 	public void testOnStartup() throws ServletException {
@@ -100,11 +85,14 @@ public class TestngInitializerTest extends AbstractTestNGSpringContextTests{
 		classMap.put(new InsightsConfigFiles(),"fileData");
 		classMap.put(new InsightsReportTemplateConfigFiles(),"fileData");
 		classMap.put(new InsightsReportVisualizationContainer(),"attachmentData");
+		classMap.put(new AutoMLConfig(),"FILE");
+		classMap.put(new AutoMLConfig(),"MOJO_DEPLOYED_ZIP");
+		
 		for(Map.Entry<Object, String> entry : classMap.entrySet()) {
 		Field field = entry.getKey().getClass().getDeclaredField(entry.getValue());
 		Annotation annotations = field.getAnnotations()[0];
 		Object handler = Proxy.getInvocationHandler(annotations);
-		System.out.println("Field : "+ field.getName());
+		log.debug("Field :{} ", field.getName());
 		field.setAccessible(true);
         Field f;
         try {

@@ -38,7 +38,7 @@ public class AutoMLConfig {
 	@Column(name = "USECASENAME", unique = true, nullable = false)
 	private String useCaseName;
 	
-	@Column(name = "FILE", columnDefinition = "BLOB")
+	@Column(name = "FILE")
 	private byte[] file;
 
 	public byte[] getFile() {
@@ -81,7 +81,7 @@ public class AutoMLConfig {
 	@Column(name = "MOJO_DEPLOYED")
 	private String mojoDeployed="";
 	
-	@Column(name="MOJO_DEPLOYED_ZIP", columnDefinition = "BLOB")
+	@Column(name="MOJO_DEPLOYED_ZIP")
 	private byte[] mojoDeployedZip;
 
 	@Column(name = "STATUS")
