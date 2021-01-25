@@ -18,6 +18,7 @@ package com.cognizant.devops.platformcommons.core.util;
 import java.util.Base64;
 import java.nio.charset.StandardCharsets;
 import java.security.DigestException;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -124,9 +125,12 @@ public class AES256Cryptor {
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
 			cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"), new IvParameterSpec(iv));
 			byte[] recoveredPlaintextBytes = cipher.doFinal(ciphertextBytes);
-
 			return new String(recoveredPlaintextBytes);
-		} catch (Exception e) {
+			} 
+		catch (InvalidKeyException k) {
+			log.error("Invalid java version encountered make sure java version must be greater than 1.8_181");
+		}
+		catch (Exception e) {
 			log.error(" Error while extracting token {}", e.getMessage());
 		}
 
