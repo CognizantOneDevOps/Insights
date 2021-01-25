@@ -134,7 +134,7 @@ export class ContentConfigAddition implements OnInit {
               this.messageDialog.showApplicationsMessage("Action should be Count,Percentage or Average", "ERROR");
             }
           } else {
-            this.messageDialog.showApplicationsMessage('Message should be in JSON Format', 'ERROR');
+            this.messageDialog.showApplicationsMessage('Threshold value is in incorrect json format', 'ERROR');
           }
           break;
         case 'THRESHOLD_RANGE':
@@ -147,7 +147,7 @@ export class ContentConfigAddition implements OnInit {
               this.messageDialog.showApplicationsMessage("Action should be either Count or Percentage", "ERROR");
             }
           } else {
-            this.messageDialog.showApplicationsMessage('Message should be in JSON Format', 'ERROR');
+            this.messageDialog.showApplicationsMessage('Threshold value is in incorrect json format', 'ERROR');
           }
           break;
         case 'MINMAX':
