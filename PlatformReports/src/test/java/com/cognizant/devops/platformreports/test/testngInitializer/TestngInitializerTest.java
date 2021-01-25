@@ -32,6 +32,7 @@ import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportTemplateConfigFiles;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
+import com.cognizant.devops.platformdal.autoML.AutoMLConfig;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
 
 @Test
@@ -67,7 +68,7 @@ public class TestngInitializerTest{
 		Field field = entry.getKey().getClass().getDeclaredField(entry.getValue());
 		Annotation annotations = field.getAnnotations()[0];
 		Object handler = Proxy.getInvocationHandler(annotations);
-		System.out.println("Field : "+ field.getName());
+		log.debug("Field : {}", field.getName());
 		field.setAccessible(true);
         Field f;
         try {

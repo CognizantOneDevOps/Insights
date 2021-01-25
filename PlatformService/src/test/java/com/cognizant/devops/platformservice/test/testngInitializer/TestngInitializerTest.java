@@ -85,8 +85,8 @@ public class TestngInitializerTest extends AbstractTestNGSpringContextTests{
 		classMap.put(new InsightsConfigFiles(),"fileData");
 		classMap.put(new InsightsReportTemplateConfigFiles(),"fileData");
 		classMap.put(new InsightsReportVisualizationContainer(),"attachmentData");
-		classMap.put(new AutoMLConfig(),"FILE");
-		classMap.put(new AutoMLConfig(),"MOJO_DEPLOYED_ZIP");
+		classMap.put(new AutoMLConfig(),"file");
+		classMap.put(new AutoMLConfig(),"mojoDeployedZip");
 		
 		for(Map.Entry<Object, String> entry : classMap.entrySet()) {
 		Field field = entry.getKey().getClass().getDeclaredField(entry.getValue());

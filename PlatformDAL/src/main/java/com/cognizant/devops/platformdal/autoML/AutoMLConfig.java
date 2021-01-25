@@ -39,23 +39,7 @@ public class AutoMLConfig {
 	private String useCaseName;
 	
 	@Column(name = "FILE")
-	private byte[] file;
-
-	public byte[] getFile() {
-		return file;
-	}
-
-	public void setFile(byte[] file) {
-		this.file = file;
-	}
-
-	public String getUseCaseFile() {
-		return useCaseFile;
-	}
-
-	public void setUseCaseFile(String useCaseFile) {
-		this.useCaseFile = useCaseFile;
-	}
+	private byte[] file;	
 
 	@Column(name = "CONFIG_JSON", length = 10000)
 	private String configJson;
@@ -218,6 +202,22 @@ public class AutoMLConfig {
 
 	public void setPredictionType(String predictionType) {
 		this.predictionType = predictionType;
+	}
+
+	public byte[] getFile() {
+		return file;
+	}
+
+	public void setFile(byte[] file) {
+		this.file = file;
+	}
+
+	public String getUseCaseFile() {
+		return useCaseFile;
+	}
+
+	public void setUseCaseFile(String useCaseFile) {
+		this.useCaseFile = useCaseFile;
 	}
 	
 
