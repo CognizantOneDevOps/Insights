@@ -18,85 +18,92 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import "../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css";
-@import "../node_modules/bootstrap/dist/css/bootstrap.css"; 
-
-body { 
-   font-family: Open Sans, Tahoma, San Serif, Helvitica;
-   background-color: #f0f0f0;
-   margin: 0;
+@import "../node_modules/bootstrap/dist/css/bootstrap.css";
+body {
+  font-family: Open Sans, Tahoma, San Serif, Helvitica;
+  background-color: #f0f0f0;
+  margin: 0;
 }
+
 .healthcheck-show-details-dialog-container .mat-dialog-container {
   padding: 0px !important;
   margin: 0px !important;
-  border-radius:15px;
+  border-radius: 15px;
   overflow: hidden;
 }
+
 .workflow-history-details-dialog-container .mat-dialog-container {
   padding: 0px !important;
   margin: 0px !important;
-  border-radius:15px;
+  border-radius: 15px;
   overflow: hidden;
 }
+
 .data-archive-details-dialog-container .mat-dialog-container {
   padding: 0px !important;
   margin: 0px !important;
-  border-radius:15px;
+  border-radius: 15px;
   overflow: hidden;
 }
+
 .data-archive-configureurl-dialog-container .mat-dialog-container {
   padding: 0px !important;
   margin: 0px !important;
-  border-radius:15px;
+  border-radius: 15px;
   overflow: hidden;
 }
+
 .traceablity-show-details-dialog-container .mat-dialog-container {
   padding: 0px !important;
   margin: 0px !important;
-  border-radius:15px;
+  border-radius: 15px;
   overflow: hidden;
   overflow-y: hidden !important;
   background-color: #dedbdb;
 }
+
 .traceablity-timelag-dialog-container .mat-dialog-container {
   padding: 0px !important;
   margin: 0px !important;
-  border-radius:15px;
+  border-radius: 15px;
   overflow: hidden;
   overflow-y: hidden !important;
   background-color: #dedbdb;
   max-height: fit-content;
 }
-.head_class{
+
+.head_class {
   background-color: #f0f0f0
 }
+
 .AssetDetailsDialog .mat-dialog-container {
   padding: 0px !important;
   margin: 0px !important;
-  border-radius:15px;
+  border-radius: 15px;
   overflow: hidden;
 }
-.DialogBox  .mat-dialog-container{
-      
-    border-radius: 10px !important ;
-    overflow: hidden;
-    outline: 0;
-    width: 100%;
-    height: 100%;
-    min-height: inherit;
-    max-height: inherit;
-    background: #fff;
-    padding: 0px;
-    color: rgba(0,0,0,.87);
 
+.DialogBox .mat-dialog-container {
+  border-radius: 10px !important;
+  overflow: hidden;
+  outline: 0;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  max-height: inherit;
+  background: #fff;
+  padding: 0px;
+  color: rgba(0, 0, 0, .87);
 }
 
 .showjson-dialog-container .mat-dialog-container {
   padding: 0px !important;
   margin: 0px !important;
-  border-radius:15px;
-  background-color: #e1e3e7  !important;
+  border-radius: 15px;
+  background-color: #e1e3e7 !important;
   overflow: hidden !important;
 }
+
 .showrelationship-dialog-container .mat-dialog-container {
   padding: 0px !important;
   margin: 0px !important;
@@ -104,7 +111,9 @@ body {
   overflow: hidden !important;
 }
 
-
-
-
-
+.mat-drawer-inner-container {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+}

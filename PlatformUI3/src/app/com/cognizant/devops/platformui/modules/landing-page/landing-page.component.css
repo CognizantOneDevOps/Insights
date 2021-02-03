@@ -16,9 +16,7 @@
  */
 
 .mat-grid-tile:nth-child(odd):hover {
-	width: 130px !important;
-	height: 5% !important;
-	padding-top: 130px !important;
+	border: 1px solid #a38d8d;
 	cursor: move;
 	cursor: grab;
 	cursor: -moz-grab;
@@ -28,8 +26,53 @@
 	cursor: -webkit-grabbing;
 }
 
+.mat-grid-tile:nth-child(even):hover {
+	border: 1px solid #a38d8d;
+	cursor: move;
+	cursor: grab;
+	cursor: -moz-grab;
+	cursor: -webkit-grab;
+	cursor: grabbing;
+	cursor: -moz-grabbing;
+	cursor: -webkit-grabbing;
+}
+
+.mat-grid-tile .mat-figure {
+	text-align: center !important;
+	font-size: 12px !important;
+	justify-content: left !important;
+	margin-left: 1% !important;
+}
+
+::ng-deep .listView .mat-figure {
+	text-align: center !important;
+	font-size: 12px !important;
+	justify-content: left !important;
+	margin-left: 1% !important;
+}
+
+.mat-grid-tile:nth-child(odd) {
+	background: #cccccc!important;
+	box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.3);
+}
+
+.mat-grid-tile:nth-child(even) {
+	background: #e7ebeb !important;
+	box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.3);
+}
+
+.mat-grid-tile:nth-child(even) .mat-grid-tile-footer {
+	height: 68px;
+	background-color: #99A09E;
+}
+
+.mat-grid-tile:nth-child(odd) .mat-grid-tile-footer {
+	height: 68px;
+	background-color: #0033A0;
+}
+
 .marginCss {
-	margin-top: 2%;
+	margin-top: 0%;
 }
 
 .withoutMarginCss {
@@ -65,19 +108,6 @@
 	margin-left: -5px;
 }
 
-.mat-grid-tile:nth-child(even):hover {
-	width: 130px!important;
-	height: 5% !important;
-	padding-top: 130px !important;
-	cursor: move;
-	cursor: grab;
-	cursor: -moz-grab;
-	cursor: -webkit-grab;
-	cursor: grabbing;
-	cursor: -moz-grabbing;
-	cursor: -webkit-grabbing;
-}
-
 p {
 	font-family: inherit;
 	font-size: 120%;
@@ -92,19 +122,6 @@ p {
 	/* padding-top: 10px; */
 }
 
-.mat-grid-tile .mat-figure {
-	text-align: center !important;
-	font-size: 12px !important;
-}
-
-.mat-grid-tile:nth-child(odd) {
-	background: #cccccc!important;
-	/* padding-top: 130px !important;
-	width: 130px!important; */
-	width: 120px!important;
-	box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.3);
-}
-
 .marginforCol {
 	margin-top: -120px
 }
@@ -113,29 +130,8 @@ p {
 	margin-top: -120px
 }
 
-.mat-grid-tile:nth-child(even) {
-	/* padding-top: 130px !important;
-	width: 130px!important; */
-	width: 120px!important;
-	background: #fafcfc !important;
-	box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.3);
-}
-
-.mat-grid-tile:nth-child(even) .mat-grid-tile-footer {
-	height: 68px;
-	background-color: #99A09E;
-}
-
-.mat-grid-tile:nth-child(odd) .mat-grid-tile-footer {
-	height: 68px;
-	background-color: #0033A0;
-}
-
 table, th, td {
 	padding: 1%;
-	/* border: 1px solid black;
-border-collapse: collapse; */
-	/* width: 40px; */
 }
 
 .short-desc {
@@ -157,9 +153,8 @@ border-collapse: collapse; */
 	text-align: center;
 }
 
-.landingpageCss {
-	overflow-x: hidden;
-	overflow-y: hidden;
+.mat-expansion-panel-header-title, .mat-expansion-panel-header-description {
+	display: unset;
 }
 
 .landingpageCssExpand {
@@ -168,6 +163,11 @@ border-collapse: collapse; */
 }
 
 .landingpageCssCollapse {
+	overflow-x: hidden;
+	overflow-y: hidden;
+}
+
+.landingpageCss {
 	overflow-x: hidden;
 	overflow-y: hidden;
 }
@@ -262,8 +262,6 @@ ul li::before {
 	color: #00B140;
 	font-size: 13pt;
 	text-align: center;
-	/*margin-top: -100px;
-	 margin-bottom: 500px; */
 	overflow: hidden;
 }
 
@@ -376,7 +374,6 @@ sup {
 	padding: 0;
 	opacity: 0.8;
 	display: block;
-	/* Add this */
 }
 
 .iframeCss {
@@ -395,4 +392,40 @@ sup {
 	width: 100%;
 	padding: 0;
 	overflow: hidden;
+}
+
+.mat-expansion-panel {
+	background: #cac3c3 !important;
+}
+
+.sub-toolbar-allignment {
+	position: relative;
+	float: right;
+	right: 30px;
+	display: flex;
+	justify-content: center;
+}
+
+.filterDashboardGroupCSS {
+	display: inline;
+	width: 40% !important;
+	margin-left: 1%;
+	background: #ffffff;
+	padding-left: 1%
+}
+
+.search-divCSS {
+	margin-top: 1.5%;
+}
+
+.mat-button-toggle-checked {
+	background-color: #ffffff !important;
+}
+
+.mat-button-toggle {
+	background-color: #dedbdb;
+}
+
+.dashboardLabelText {
+	font-size: 18px;
 }

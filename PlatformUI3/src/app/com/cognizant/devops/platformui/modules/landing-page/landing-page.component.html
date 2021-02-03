@@ -20,105 +20,172 @@
     </mat-progress-spinner>
   </div>
 </div>
-<div *ngIf="!showThrobber">
-  <div *ngIf="showDashboards">
+<div class="gridListdemoDynamicTiles search-divCSS" *ngIf="showDashboards">
+  <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search Dashboard"
+    class="filterDashboardGroupCSS form-control">
+  <mat-button-toggle-group #group="matButtonToggleGroup" class="sub-toolbar-allignment" value="list">
+    <mat-button-toggle value="list" title="List View" aria-label="List View"
+      (change)="gridListToggleLoad($event.value)">
+      <mat-icon>list</mat-icon>
+    </mat-button-toggle>
+    <mat-button-toggle value="grid" title="Grid view" aria-label="All Grid view"
+      (change)="gridListToggleLoad($event.value)">
+      <mat-icon>grid_on</mat-icon>
+    </mat-button-toggle>
+
+  </mat-button-toggle-group>
+
+  <div *ngIf=!isListView>
     <table>
       <tr>
-        <td *ngIf="!isRecentEmpty">
-          <div [ngClass]="{'greaterMarginforCol': isStarredMore}">
-            <mat-icon class="mat-icon material-icons mainText">
-              access_time
-            </mat-icon>
-            <label class="mainText"> Recent Dashboards</label>
-            <mat-grid-list cols="3" rowHeight="120px" [gutterSize]="'10px'" style="width: 80%">
-              <mat-grid-tile *ngFor="let item of recentDashboardLists" [colspan]="1" [rowspan]="1" (click)="onRowClicked(item)">
-                <mat-icon class="dashboardIcon" svgIcon="dashboard"></mat-icon>
-                <mat-grid-tile-footer class="short-desc">
-                  <h3>{{item.title}}</h3>
-                </mat-grid-tile-footer>
-              </mat-grid-tile>
-            </mat-grid-list>
-          </div>
-        </td>
-        <td *ngIf="checkEmptyColRequirements()" style="width: 520px">
-        </td>
-        <td *ngIf="checkEmptyColForRecent()">
+        <td *ngIf="getDashboardList('recent').length > 0">
           <div>
-            <mat-icon class="mat-icon material-icons mainText">
-              star
-            </mat-icon>
-            <label class="mainText"> Favorite Dashboards</label>
-            <mat-grid-list cols="3" rowHeight="120px" [gutterSize]="'10px'" style="width: 80%">
-              <mat-grid-tile *ngFor="let item of starredDashboardLists" [colspan]="1" [rowspan]="1" (click)="onRowClicked(item)">
-                <mat-icon class="dashboardIcon" svgIcon="dashboard"></mat-icon>
-                <mat-grid-tile-footer class="short-desc">
-                  <h3>{{item.title}}</h3>
-                </mat-grid-tile-footer>
-              </mat-grid-tile>
-            </mat-grid-list>
+            <mat-expansion-panel [expanded]="isExpand">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <mat-icon class="mat-icon material-icons mainText">
+                    access_time
+                  </mat-icon>
+                  <label class="mainText"> Recent Dashboards</label>
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <mat-grid-list cols="8" rowHeight="120px" [gutterSize]="'10px'">
+                <mat-grid-tile *ngFor="let item of getDashboardList('recent')" [colspan]="1" [rowspan]="1"
+                  (click)="onRowClicked(item)">
+                  <mat-icon class="dashboardIcon" svgIcon="dashboard"></mat-icon>
+                  <mat-grid-tile-footer class="short-desc">
+                    <h3>{{item.title}}</h3>
+                  </mat-grid-tile-footer>
+                </mat-grid-tile>
+              </mat-grid-list>
+            </mat-expansion-panel>
           </div>
-        </td>
-        <td *ngIf="checkNonEmpty()">
-          <div [ngClass]="{'greaterMarginforCol': isRecentMore}">
-            <mat-icon class="mat-icon material-icons mainText">
-              star
-            </mat-icon>
-            <label class="mainText"> Favorite Dashboards</label>
-            <mat-grid-list cols="4" rowHeight="120px" [gutterSize]="'10px'">
-              <mat-grid-tile *ngFor="let item of starredDashboardLists" [colspan]="1" [rowspan]="1" (click)="onRowClicked(item)">
-                <mat-icon class="dashboardIcon" svgIcon="dashboard"></mat-icon>
-                <mat-grid-tile-footer class="short-desc">
-                  <h3>{{item.title}}</h3>
-                </mat-grid-tile-footer>
-              </mat-grid-tile>
-            </mat-grid-list>
-          </div>
-        </td>
-        <td *ngIf="checkEmptyColForRecent()" style="width: 520px">
         </td>
       </tr>
-
-    </table>
-    <table *ngIf="!isGeneralEmpty" [ngClass]="{ 'marginCss' : !checkEmptyStarredRecent(),'withoutMarginCss': checkEmptyStarredRecent()}">
       <tr>
-        <td>
-          <mat-icon class="mat-icon material-icons mainText">
-            folder
-          </mat-icon>
-          <label class="mainText"> General Dashboards</label>
-          <label>{{itemNew}}</label>
-          <mat-grid-list cols="8" rowHeight="120px" [gutterSize]="'10px'">
-            <mat-grid-tile *ngFor="let item of generalDashboardLists" [colspan]="1" [rowspan]="1" (click)="onRowClicked(item)">
-              <mat-icon class="dashboardIcon" svgIcon="dashboard"></mat-icon>
-              <mat-grid-tile-footer class="short-desc">
-                <h3>{{item.title}}</h3>
-              </mat-grid-tile-footer>
-            </mat-grid-tile>
-          </mat-grid-list>
+        <td *ngIf="getDashboardList('starred').length > 0">
+          <mat-expansion-panel [expanded]="isExpand">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <mat-icon class="mat-icon material-icons mainText">
+                  star
+                </mat-icon>
+                <label class="mainText"> Favorite Dashboards</label>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <mat-grid-list cols="8" rowHeight="120px" [gutterSize]="'10px'">
+              <mat-grid-tile *ngFor="let item of getDashboardList('starred')" (click)="onRowClicked(item)">
+                <mat-icon class="dashboardIcon" svgIcon="dashboard"></mat-icon>
+                <mat-grid-tile-footer class="short-desc">
+                  <h3>{{item.title}}</h3>
+                </mat-grid-tile-footer>
+              </mat-grid-tile>
+            </mat-grid-list>
+          </mat-expansion-panel>
         </td>
       </tr>
     </table>
-    <table *ngIf="!isFolderListEmpty">
-      <tr *ngFor="let folder of folderListArray">
-        <td>
-          <mat-icon class="mat-icon material-icons mainText">
-            folder
-          </mat-icon>
-          <label class="mainText"> {{folder.key}}</label>
-          <mat-grid-list cols="8" rowHeight="120px" [gutterSize]="'10px'">
-            <mat-grid-tile *ngFor="let item of folder.value" (click)="onRowClicked(item)">
-              <mat-icon class="dashboardIcon" svgIcon="dashboard"></mat-icon>
-              <mat-grid-tile-footer class="short-desc">
-                <h3>{{item.title}}</h3>
-              </mat-grid-tile-footer>
-            </mat-grid-tile>
-          </mat-grid-list>
+    <table>
+      <tr *ngFor="let folder of getDashboardList('all') | keyvalue">
+        <td *ngIf="showAllDashbordKey(folder)">
+          <mat-expansion-panel [expanded]="isExpand">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <mat-icon class="mat-icon material-icons mainText">
+                  folder
+                </mat-icon>
+                <label class="mainText"> {{folder.key}}</label>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-grid-list cols="8" rowHeight="120px" [gutterSize]="'10px'">
+              <mat-grid-tile [style.width.px]="gridWidth" *ngFor="let item of folder.value"
+                (click)="onRowClicked(item)">
+                <mat-icon class="dashboardIcon" svgIcon="dashboard"></mat-icon>
+                <mat-grid-tile-footer class="short-desc">
+                  <h3>{{item.title}}</h3>
+                </mat-grid-tile-footer>
+              </mat-grid-tile>
+            </mat-grid-list>
+          </mat-expansion-panel>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div *ngIf="isListView && !isFolderListEmpty">
+    <table>
+      <tr>
+        <td *ngIf="getDashboardList('recent').length > 0">
+          <div>
+            <mat-expansion-panel [expanded]="isExpand">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <mat-icon class="mat-icon material-icons mainText">
+                    access_time
+                  </mat-icon>
+                  <label class="mainText"> Recent Dashboards</label>
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <mat-grid-list cols=8 [rowHeight]="gridHeight" [gutterSize]="'10px'">
+                <mat-grid-tile colspan=8 [style.width.px]="gridWidth" *ngFor="let item of getDashboardList('recent')"
+                  (click)="onRowClicked(item)">
+                  <figure class="mat-figure listView">
+                    <span class="dashboardLabelText">{{item.title}}</span>
+                  </figure>
+                </mat-grid-tile>
+              </mat-grid-list>
+            </mat-expansion-panel>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td *ngIf="getDashboardList('starred').length > 0">
+          <mat-expansion-panel [expanded]="isExpand">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <mat-icon class="mat-icon material-icons mainText">
+                  star
+                </mat-icon>
+                <label class="mainText"> Favorite Dashboards</label>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-grid-list cols=8 [rowHeight]="gridHeight" [gutterSize]="'10px'">
+              <mat-grid-tile colspan=8 [style.width.px]="gridWidth" *ngFor="let item of getDashboardList('starred')"
+                (click)="onRowClicked(item)">
+                <figure class="mat-figure listView">
+                  <span class="dashboardLabelText">{{item.title}}</span>
+                </figure>
+              </mat-grid-tile>
+            </mat-grid-list>
+          </mat-expansion-panel>
+        </td>
+      </tr>
+      <tr *ngFor="let folder of getDashboardList('all') | keyvalue">
+        <td *ngIf="showAllDashbordKey(folder)">
+          <mat-expansion-panel [expanded]="isExpand">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <mat-icon class="mat-icon material-icons mainText">
+                  folder
+                </mat-icon>
+                <label class="mainText"> {{folder.key}}</label>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-grid-list cols=8 [rowHeight]="gridHeight" [gutterSize]="'10px'">
+              <mat-grid-tile colspan=8 [style.width.px]="gridWidth" *ngFor="let item of folder.value"
+                (click)="onRowClicked(item)" style="justify-content: left !important" class="listView">
+                <figure class="mat-figure listView">
+                  <span class="dashboardLabelText">{{item.title}}</span>
+                </figure>
+              </mat-grid-tile>
+            </mat-grid-list>
+          </mat-expansion-panel>
         </td>
       </tr>
     </table>
   </div>
 </div>
-
 <div *ngIf="showLandingPage">
   <div class="overflow1">
     <div [ngClass]="landingpageCss">
@@ -210,7 +277,7 @@
         For more information - please refer to our detailed help section.
         <br>
         <p class="ClickHereCss"><b>Do you want to create a dashboard?
-            <b class="hyperlink" (click)="onClickHere()">
+            <b class="hyperlink" (click)="onClickNoDashboard()">
               <u> Click Here</u>
             </b>
           </b></p>

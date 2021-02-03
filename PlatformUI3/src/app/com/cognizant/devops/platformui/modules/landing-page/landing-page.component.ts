@@ -21,6 +21,8 @@ import { InsightsInitService } from '@insights/common/insights-initservice';
 import { LandingPageService } from './landing-page.service';
 import { NavigationExtras, Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { DataSharedService } from '@insights/common/data-shared-service';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 @Component({
   selector: 'app-landing-page',
@@ -28,69 +30,44 @@ import { DataSharedService } from '@insights/common/data-shared-service';
   styleUrls: ['./landing-page.component.css', './../home.module.css']
 })
 export class LandingPageComponent implements OnInit {
-  @Input() isExpanded: boolean = false;
-  breakpoint: number;
   recentdashIds: number[]
   orgId: string;
-  dataArrayMasterList: any = {};
-  generalDashboardLists = [];
-  starredDashboardLists = [];
   recentDashboardLists = [];
-  routeParameter: Observable<any>;
-  dashboardUrl: SafeResourceUrl;
-  iSightDashboards = [];
-  dashboardTitle: string;
-  selectedOrgUrl: string;
-  grafanaEnable: boolean = false;
   showLandingPage: boolean = false;
-  defaultOrg: number;
-  selectedApp: string;
-  framesize: any;
-  selectedDashboardUrl: string = '';
-  selectedDashboard: GrafanaDashboardMode;
-  dashboards = [];
-  isGeneralEmpty: boolean = false;
-  isStarredEmpty: boolean = false;
-  isRecentEmpty: boolean = false;
   isFolderListEmpty: boolean = false;
   showThrobber: boolean = false;
-  enableMarginForStarred: boolean = false;
-  enableMarginForRecent: boolean = false;
   dashboardslist: any;
   repsonseFromGrafana: any;
-  isStarredMore: boolean = false;
-  isRecentMore: boolean = false;
   folderList: any = {};
   showDashboards: boolean = true;
-  folderListArray = [];
+  folderListArrayMasterData = new Map<string, any>();
+  folderListArrayFiltered = [];
+  folderListArrayFilteredMap = new Map<string, any>();
   allData = [];
-  recentDashboardResponse: any;
-  rowCountOfStarred: number;
-  rowCountOfRecent: number;
-  itemNew: any;
-  constructor(private activeroute: ActivatedRoute, public router: Router, private grafanadashboardservice: LandingPageService, private dataShare: DataSharedService) {
+  starredDashbaordKey: string = 'starred';
+  recentDashboardKey: string = 'recent';
+  gridWidth: any;
+  gridHeight: any;
+  isListView: boolean = false;
+  isExpand: boolean = false;
+
+  constructor(private activeroute: ActivatedRoute, public router: Router,
+    private grafanadashboardservice: LandingPageService, private dataShare: DataSharedService) {
   }
 
   ngOnInit() {
     var self = this;
     self.activeroute.paramMap.subscribe(async (params: ParamMap) => {
       self.orgId = params.get('id');
-      self.parseDashboards();
+      self.parseDashboards(false);
     });
   }
 
-  onResize(event) {
-    this.breakpoint = (event.target.innerWidth <= 400) ? 1 : 6;
-  }
-  async parseDashboards() {
+  async parseDashboards(isReload: Boolean) {
     this.queryForRecentDashboards();
     this.showThrobber = true;
-    this.isStarredEmpty = false;
-    this.isRecentEmpty = false;
-    this.isGeneralEmpty = false;
     this.isFolderListEmpty = false;
-    this.isStarredMore = false;
-    this.isRecentMore = false;
+    this.isExpand = false;
     this.repsonseFromGrafana = await this.grafanadashboardservice.searchDashboard();
     if (this.repsonseFromGrafana.status == "success") {
       this.dashboardslist = this.repsonseFromGrafana.data;
@@ -98,55 +75,87 @@ export class LandingPageComponent implements OnInit {
         this.showDashboards = false;
         this.showLandingPage = true;
         this.showThrobber = false;
-      }
-      else {
+      } else {
         this.showDashboards = true;
         this.showLandingPage = false;
         this.showThrobber = false;
-        this.generalDashboardLists = this.dashboardslist.general;
-        this.starredDashboardLists = this.dashboardslist.starred;
-        if (this.starredDashboardLists.length > 6) {
-          this.starredDashboardLists.splice(6, this.starredDashboardLists.length - 1)
-        }
-        this.dataArrayMasterList = this.dashboardslist;
-        this.folderList = JSON.parse(JSON.stringify(this.dataArrayMasterList));
+        this.folderList = JSON.parse(JSON.stringify(this.dashboardslist));
         if (Object.keys(this.folderList).length == 0) {
           this.isFolderListEmpty = true;
         } else {
-          delete this.folderList['general']
-          delete this.folderList['starred']
-          this.folderListArray = [];
+          this.folderListArrayMasterData = new Map<string, any>();
           this.allData = [];
           for (let key in this.folderList) {
-            this.folderListArray.push({ key: key, value: this.folderList[key] });
+            if (key == 'general') {
+              key = 'General Dashboards';
+              this.folderListArrayMasterData.set(key, this.folderList['general']);
+            } else {
+              this.folderListArrayMasterData.set(key, this.folderList[key]);
+            }
             this.allData.push(this.folderList[key]);
           }
         }
         this.recentDashboardLists = [];
         if (this.recentdashIds.length != 0) {
-          this.allData.push(this.generalDashboardLists);
-          if (this.recentdashIds.length > 6) {
-            this.recentdashIds.splice(6, this.recentdashIds.length - 1)
-          }
           for (let i of this.recentdashIds) {
-            for (let data of this.allData) {
-              var existingValue;
-              existingValue = data.find(x => x.id == i);
-              if (existingValue != undefined) {
+            this.folderListArrayMasterData.forEach((value: any, key: string) => {
+              let existingValue = value.find(x => x.id == i);
+              if (existingValue != undefined && this.recentDashboardLists.filter(e => e.id == i).length == 0) {
                 this.recentDashboardLists.push(existingValue)
-                break;
               }
-            }
+            });
           }
         }
-        this.checkList();
+        if (this.recentDashboardLists.length > 0) {
+          this.folderListArrayMasterData.set('recent', this.recentDashboardLists);
+        }
+        //console.log(this.folderListArrayMasterData);
+        this.folderListArrayFilteredMap = new Map(this.folderListArrayMasterData);
+        this.gridListToggleLoad('list');
       }
-
     }
     else {
       this.showLandingPage = true;
       this.showDashboards = false;
       this.showThrobber = false;
+    }
+  }
+
+  gridListToggleLoad(value) {
+    if (value == 'grid') {
+      this.gridWidth = "130px";
+      this.gridHeight = "68px";
+      this.isListView = false
+    } else {
+      this.gridWidth = "800px";
+      this.gridHeight = "40px";
+      this.isListView = true;
+    }
+  }
+
+  getDashboardList(dashboardType: any) {
+    //console.log(this.folderListArrayFilteredMap);
+    if (!this.folderListArrayFilteredMap.has(dashboardType) && dashboardType != 'all') {
+      return [];
+    }
+    if (dashboardType == this.starredDashbaordKey) {
+      let key = Array.from(this.folderListArrayFilteredMap.keys()).filter(item => item == this.starredDashbaordKey);
+      let starredArray = this.folderListArrayFilteredMap.get(key[0]);
+      return starredArray;
+    } else if (dashboardType == this.recentDashboardKey) {
+      let key = Array.from(this.folderListArrayFilteredMap.keys()).filter(item => item == this.recentDashboardKey);
+      let recentArray = this.folderListArrayFilteredMap.get(key[0]);
+      return recentArray;
+    } else if (dashboardType == 'all') {
+      return this.folderListArrayFilteredMap;
+    }
+  }
+
+  showAllDashbordKey(folder): boolean {
+    if (folder.key == this.starredDashbaordKey || folder.key == this.recentDashboardKey || folder.value.length == 0) {
+      return false;
+    } else {
+      return true;
     }
   }
 
@@ -169,49 +178,8 @@ export class LandingPageComponent implements OnInit {
     return 'dashboard_impressions-' + this.dataShare.getOrgId();
   }
 
-  calculateRowsForStarred(rowCountArray) {
-    var myArray = JSON.parse(JSON.stringify(rowCountArray))
-    var results = [];
-    while (myArray.length) {
-      results.push(myArray.splice(0, 4));
-    }
-    return results.length;
-  }
-  calculateRowsForRecent(rowCountArray) {
-    var myArray = JSON.parse(JSON.stringify(rowCountArray))
-    var results = [];
-    while (myArray.length) {
-      results.push(myArray.splice(0, 3));
-    }
-    return results.length;
-  }
-  checkList() {
-    this.rowCountOfStarred = this.calculateRowsForStarred(this.starredDashboardLists);
-    this.rowCountOfRecent = this.calculateRowsForRecent(this.recentDashboardLists);
-    if (this.rowCountOfStarred > this.rowCountOfRecent) {
-      this.isStarredMore = true;
-      this.isRecentMore = false;
-    }
-    else if (this.rowCountOfStarred < this.rowCountOfRecent) {
-      this.isRecentMore = true;
-      this.isStarredMore = false;
-    }
-    if (this.generalDashboardLists == undefined || this.generalDashboardLists.length == 0) {
-      this.isGeneralEmpty = true;
-    }
-    if (this.starredDashboardLists == undefined || this.starredDashboardLists.length == 0) {
-      this.isStarredEmpty = true;
-    }
-    if (this.recentDashboardLists == undefined || this.recentDashboardLists.length == 0) {
-      this.isRecentEmpty = true;
-    }
-    if (this.folderListArray == undefined || this.folderListArray.length == 0) {
-      this.isFolderListEmpty = true;
-    }
 
-  }
-
-  onClickHere() {
+  onClickNoDashboard() {
     this.showLandingPage = false;
     this.showDashboards = false;
     this.orgId = this.dataShare.getOrgId();
@@ -223,14 +191,13 @@ export class LandingPageComponent implements OnInit {
         "dashboardURL": url
       }
     };
-    //console.log(navigationExtras);
     this.router.navigate([route], navigationExtras);
   }
+
   onRowClicked(item) {
-    this.grafanaEnable = true;
+    //this.grafanaEnable = true;
     this.showDashboards = false;
     this.showLandingPage = false;
-    //window.open(item.url, '_blank'); 
     var route = 'InSights/Home/grafanadashboard';
     let navigationExtras: NavigationExtras = {
       skipLocationChange: true,
@@ -241,37 +208,20 @@ export class LandingPageComponent implements OnInit {
     this.router.navigate([route], navigationExtras);
   }
 
-  checkEmptyColRequirements() {
-    if (this.isStarredEmpty && !this.isRecentEmpty) {
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
-  checkEmptyColForRecent() {
-    if (!this.isStarredEmpty && this.isRecentEmpty) {
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
-  checkNonEmpty() {
-    if (!this.isStarredEmpty && !this.isRecentEmpty) {
-      return true;
-    }
-    else {
-      return false;
+  applyFilter(filterValue: string) {
+    if (filterValue != '' && filterValue != undefined) {
+      console.log(filterValue);
+      this.isExpand = true;
+      this.folderListArrayFilteredMap = new Map(this.folderListArrayMasterData);
+      this.folderListArrayFilteredMap.forEach((value: any, key: string) => {
+        let filterList = value.filter(o => {
+          return Object.keys(o).some(k => { if (typeof (o[k]) === 'string' && k === 'title') return o[k].toLowerCase().includes(filterValue.toLowerCase()); })
+        });
+        this.folderListArrayFilteredMap.set(key, filterList);
+      });
+    } else {
+      this.isExpand = false;
+      this.folderListArrayFilteredMap = new Map(this.folderListArrayMasterData);
     }
   }
-  checkEmptyStarredRecent() {
-    if (this.isStarredEmpty && this.isRecentEmpty) {
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
-
 }

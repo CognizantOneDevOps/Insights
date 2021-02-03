@@ -32,24 +32,34 @@ class NexusAgent(BaseAgent):
         FirstEndPoint = self.config.get("firstEndPoint", '')
         nexIDs = self.getResponse(FirstEndPoint, 'GET', self.userid, self.passwd, None)
         previousname = nexIDs["items"][0]["repository"]
-        for artifacts in range(len(nexIDs["items"])):
-            if nexIDs["items"][artifacts]["repository"] == previousname and artifacts != 0:
-                continue
-            else:
-                repoid = nexIDs["items"][artifacts]["repository"]
-                artifactid = nexIDs["items"][artifacts]["name"]
-                previousname = repoid
-                groupid = nexIDs["items"][artifacts]["group"].replace(".", "/", 3)
-                request = urllib.request.Request(self.config.get("baseUrl", '')+"repository/"+repoid+"/"+groupid+"/"+nexIDs["items"][artifacts]["name"]+"/maven-metadata.xml")
-                request.add_header('Authorization', 'Basic %s' % self.getBase64Value(self.userid,self.passwd))
-                mavenmetafile = urllib.request.urlopen(request)#reading base mavenmetadata file to fetch main version
-                #mavenmetafile = urllib2.urlopen(self.config.get("baseUrl", '')+"repository/"+repoid+"/"+groupid+"/"+nexIDs["items"][artifacts]["name"]+"/maven-metadata.xml")#reading base mavenmetadata file to fetch main version
-                mavenmetadata = xmltodict.parse(mavenmetafile.read())
-                mavenmetafile.close()
-                lastupdated = mavenmetadata["metadata"]["versioning"]["lastUpdated"]
-                tracking = self.trackingUpdation(repoid, lastupdated)
-                self.prepareAndPublish(nexIDs["items"][artifacts], tracking)
-
+        fetchNextPage = True           
+        while fetchNextPage:  
+            for artifacts in range(len(nexIDs["items"])):
+                if nexIDs["items"][artifacts]["repository"] == previousname and artifacts != 0:
+                    continue
+                else:
+                    repoid = nexIDs["items"][artifacts]["repository"]
+                    artifactid = nexIDs["items"][artifacts]["name"]
+                    previousname = repoid
+                    groupid = nexIDs["items"][artifacts]["group"].replace(".", "/", 3)
+                    request = urllib.request.Request(self.config.get("baseUrl", '')+"repository/"+repoid+"/"+groupid+"/"+nexIDs["items"][artifacts]["name"]+"/maven-metadata.xml")
+                    request.add_header('Authorization', 'Basic %s' % self.getBase64Value(self.userid,self.passwd))
+                    mavenmetafile = urllib.request.urlopen(request)#reading base mavenmetadata file to fetch main version
+                    #mavenmetafile = urllib2.urlopen(self.config.get("baseUrl", '')+"repository/"+repoid+"/"+groupid+"/"+nexIDs["items"][artifacts]["name"]+"/maven-metadata.xml")#reading base mavenmetadata file to fetch main version
+                    mavenmetadata = xmltodict.parse(mavenmetafile.read())
+                    mavenmetafile.close()
+                    lastupdated = mavenmetadata["metadata"]["versioning"]["lastUpdated"]
+                    tracking = self.trackingUpdation(repoid, lastupdated)
+                    self.prepareAndPublish(nexIDs["items"][artifacts], tracking)
+            
+            continuationToken = nexIDs["continuationToken"]
+            if continuationToken is None:
+                fetchNextPage= False;                    
+            else :
+                fetchNextPage= True;
+                newFirstEndPoint = FirstEndPointURL+'&continuationToken='+str(continuationToken)
+                nexIDs = self.getResponse(newFirstEndPoint, 'GET', self.userid, self.passwd, None)
+                
     def prepareAndPublish(self, nexIDs, tracking):
         repoid = nexIDs["repository"]
         artifactid = nexIDs["name"]

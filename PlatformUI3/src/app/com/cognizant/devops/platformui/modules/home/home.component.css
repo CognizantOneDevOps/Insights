@@ -216,7 +216,7 @@
   padding-left: 10px;
   padding-right: 10px;
   align-content: center;
- /* margin-bottom: 55px;*/
+
 }
 
 .customerLogoImage {
@@ -311,7 +311,6 @@
   background: #383737;
   overflow-x: hidden;
   overflow-y: hidden;
-  /*bottom: -150px;*/
 }
 
 .mat-drawer-content, mat-sidenav-content {

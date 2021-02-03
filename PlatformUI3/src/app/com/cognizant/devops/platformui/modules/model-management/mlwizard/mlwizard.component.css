@@ -267,7 +267,7 @@ tr.mat-footer-row, tr.mat-row-webhook {
 
 .form-control {
     display: block;
-    width: 85%;
+    width: 95%;
     padding: 6px 12px;
     font-size: 13px;
     background-color: white;
@@ -380,7 +380,7 @@ td.mat-cell {
 }
 
 .extraColCss {
-    width: 2%;
+    width: 5%;
 }
 
 ::ng-deep .mat-slider-thumb-label {

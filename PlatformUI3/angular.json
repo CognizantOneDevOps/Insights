@@ -32,8 +32,14 @@
               "node_modules/crypto-js/crypto-js.js"
             ],
             "allowedCommonJsDependencies": [
-              "crypto.js", "uuid", "rxjs/Rx", "xlsx", "file-saver", "crypto-js", "dragula"
-           ]
+              "crypto.js",
+              "uuid",
+              "rxjs/Rx",
+              "xlsx",
+              "file-saver",
+              "crypto-js",
+              "dragula"
+            ]
           },
           "configurations": {
             "production": {

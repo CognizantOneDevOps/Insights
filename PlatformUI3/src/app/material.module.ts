@@ -42,6 +42,9 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+
 @NgModule({
     imports: [],
     exports: [
@@ -70,7 +73,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
         ClipboardModule,
         MatSlideToggleModule,
         DragulaModule,
-
+        MatExpansionModule,
+        MatButtonToggleModule
 
     ],
     declarations: []
