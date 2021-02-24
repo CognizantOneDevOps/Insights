@@ -78,7 +78,7 @@ public class AuthenticationUtils {
 
 	public static final String CSRF_COOKIE_NAME = "XSRF-TOKEN";
 	public static final List<String> CSRF_IGNORE = Collections.unmodifiableList(Arrays.asList("/login/**", "/user/insightsso/authenticateSSO/**",
-			"/user/authenticate/**", "/user/insightsso/**", "/saml/**"));
+			"/user/authenticate/**", "/user/insightsso/**", "/saml/**", "/externalApi/**"));
 
 	public static final List<String> SET_VALUES = Collections.unmodifiableList(Arrays.asList(GRAFANA_COOKIES_ORG, "grafana_user", GRAFANA_ROLE_KEY,
 			"grafana_remember", "grafana_sess", CSRF_COOKIE_NAME , "JSESSIONID",  GRAFANA_SESSION_KEY, GRAFANA_WEBAUTH_HTTP_REQUEST_HEADER,

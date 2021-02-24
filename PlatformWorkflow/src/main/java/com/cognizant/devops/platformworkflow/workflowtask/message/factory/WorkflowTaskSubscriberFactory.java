@@ -23,15 +23,13 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
-import com.cognizant.devops.platformworkflow.workflowtask.utils.MQMessageConstants;
-import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
 public class WorkflowTaskSubscriberFactory {
 	private static final Logger log = LogManager.getLogger(WorkflowTaskSubscriberFactory.class);
-	private Connection connection;
-	private static WorkflowTaskSubscriberFactory instance = null;
+	private Connection connection = null;
+	private static WorkflowTaskSubscriberFactory instance = new WorkflowTaskSubscriberFactory();
 
 	/**
 	 * Initilize Rabbitmq subscriber connetion factory
@@ -44,9 +42,6 @@ public class WorkflowTaskSubscriberFactory {
 			factory.setUsername(messageQueueConfig.getUser());
 			factory.setPassword(messageQueueConfig.getPassword());
 			connection = factory.newConnection();
-			try (Channel channel = connection.createChannel()) {
-				channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE, true);
-			}
 		} catch (IOException e) {
 			log.error("Unable to create MQ connection", e);
 
@@ -60,8 +55,7 @@ public class WorkflowTaskSubscriberFactory {
 	}
 
 	public static WorkflowTaskSubscriberFactory getInstance() {
-		if (instance == null) {
-			instance = new WorkflowTaskSubscriberFactory();
+		if (instance.connection == null) {
 			instance.initConnectionFactory();
 		}
 		return instance;

@@ -27,11 +27,7 @@
 										"format": "epoch_millis"
 									}
 								}
-							}
-						],
-
-						"must": 
-						[
+							},
 							{
 								"range": 
 								{

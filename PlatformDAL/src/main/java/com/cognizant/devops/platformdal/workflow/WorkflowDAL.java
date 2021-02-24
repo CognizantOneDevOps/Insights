@@ -267,7 +267,7 @@ public class WorkflowDAL extends BaseDAL {
 	public List<InsightsWorkflowConfiguration> getAllActiveWorkflowConfiguration() {
 		try (Session session = getSessionObj()) {
 			Query<InsightsWorkflowConfiguration> createQuery = session.createQuery(
-					"FROM InsightsWorkflowConfiguration WC WHERE WC.isActive = true ",
+					"FROM InsightsWorkflowConfiguration WC WHERE WC.isActive = true and WC.reoccurence = true",
 					InsightsWorkflowConfiguration.class);
 			return createQuery.getResultList();
 		} catch (Exception e) {

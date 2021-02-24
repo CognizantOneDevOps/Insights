@@ -219,8 +219,11 @@ public class RestApiHandler {
 					errorResponse.addProperty("data", data);
 					throw new RestAPI404Exception(errorResponse.toString());
 				} else if (!(response.getStatus() == 200 || response.getStatus() == 204)) {
-					throw new InsightsCustomException(
-							"Failed : HTTP error code. : " + response.getStatus() + " message " + data);
+					JsonObject errorResponse = new JsonObject();
+					errorResponse.addProperty("status", response.getStatus());
+					errorResponse.addProperty("data", data);
+					log.error(" HTTP response has issue for URL {} response {} ", url, errorResponse);
+					throw new InsightsCustomException(errorResponse.toString());
 				}
 			}
 		} catch (ProcessingException e) {

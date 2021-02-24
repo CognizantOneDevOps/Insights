@@ -72,6 +72,7 @@ public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInter
 			for (InsightsWorkflowConfiguration workflowConfig : readyToRunWorkflow) {
 				try {
 					long executionId = System.currentTimeMillis();
+					System.out.println(workflowConfig.getWorkflowId());
 					log.debug(" Worlflow Detail ==== WorkflowImmediateJobExecutor workflowId {} executionId {}  ",
 							workflowConfig.getWorkflowId(), executionId);
 					InsightsWorkflowTaskSequence firstworkflowTask = workflowProcessing

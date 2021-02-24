@@ -239,11 +239,11 @@ public class SystemNotificationDetailSubscriber extends WorkflowTaskSubscriberHa
 	private void setDetailsInEmailHistory(JsonObject incomingTaskMessageJson, String mailBody) {
 		try {
 			InsightsReportVisualizationContainer emailHistoryConfig = new InsightsReportVisualizationContainer();
-			emailHistoryConfig.setAttachmentPath("");
 			emailHistoryConfig.setExecutionId(incomingTaskMessageJson.get("executionId").getAsLong());
 			emailHistoryConfig.setStatus(WorkflowTaskEnum.EmailStatus.NOT_STARTED.name());
 			emailHistoryConfig.setWorkflowConfig(incomingTaskMessageJson.get("workflowId").getAsString());
 			emailHistoryConfig.setMailBody(mailBody);
+			emailHistoryConfig.setMailAttachmentName("");
 			workflowDAL.saveEmailExecutionHistory(emailHistoryConfig);
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== Error setting Email details in Email History table");

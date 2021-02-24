@@ -21,7 +21,7 @@ public interface QueryCachingConstants {
 
     String ES_HOST = ApplicationConfigProvider.getInstance().getEndpointData().getElasticSearchEndpoint();
 	String ES_CACHE_INDEX = ApplicationConfigProvider.getInstance().getQueryCache().getEsCacheIndex();
-	String DEFAULT_ES_CACHE_INDEX = "neo4j-cached-results/querycacheresult";
+	String DEFAULT_ES_CACHE_INDEX = "neo4j-cached-results";
 	String METADATA = "metadata";
 	String STATEMENT = "statement";
 	String STATEMENTS = "statements";
@@ -56,4 +56,6 @@ public interface QueryCachingConstants {
 	String START_TIME_IN_MS = "startTimeInMs";
 	String END_TIME_IN_MS = "endTimeInMs";
 	String CYPHER_QUERY = "cypherQuery";
+	String ES_STATUS = "status";
+	String ES_HITS = "hits";
 }

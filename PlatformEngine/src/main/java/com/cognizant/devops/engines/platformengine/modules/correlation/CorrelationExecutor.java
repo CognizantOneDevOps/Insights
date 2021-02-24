@@ -217,9 +217,9 @@ public class CorrelationExecutor {
 		correlationCypher.append("MATCH (source:DATA:").append(correlation.getSourceLabelName()).append(") ");
 		correlationCypher.append("WHERE source.").append(sourceField).append(" IN properties.values ")
 				.append("with source , destination ");
-		correlationCypher.append("CREATE UNIQUE (source) -[r:").append(correlation.getRelationName())
-				.append("]-> (destination) ");
-
+		 correlationCypher.append("MERGE (source) -[r:").append(correlation.getRelationName())
+		 .append(" {uuid:(source.uuid+'.'+destination.uuid)} ]-> (destination) ");
+	
 		String propertyVal = appendRelationshipProperties(correlation);
 		if (!propertyVal.isEmpty()) {
 			correlationCypher.append("set ").append(propertyVal).append(" ");

@@ -95,7 +95,6 @@ public class LedgerPDFChartHandler implements BasePDFProcessor {
 	private void saveToVisualizationContaner(InsightsAssessmentConfigurationDTO assessmentReportDTO) {
 		try {
             InsightsReportVisualizationContainer emailHistoryConfig = new InsightsReportVisualizationContainer();
-            emailHistoryConfig.setAttachmentPath(assessmentReportDTO.getPdfExportedFilePath());
             emailHistoryConfig.setExecutionId(assessmentReportDTO.getExecutionId());
             JsonObject incomingTaskMessageJson = new JsonParser().parse(assessmentReportDTO.getIncomingTaskMessageJson()).getAsJsonObject();
             if (incomingTaskMessageJson.get("nextTaskId").getAsInt() == -1) {
@@ -105,6 +104,7 @@ public class LedgerPDFChartHandler implements BasePDFProcessor {
                 emailHistoryConfig.setStatus(WorkflowTaskEnum.EmailStatus.NOT_STARTED.name());
             }
             emailHistoryConfig.setWorkflowConfig(assessmentReportDTO.getWorkflowId());
+			emailHistoryConfig.setMailAttachmentName(assessmentReportDTO.getAsseementreportname());
             workflowDAL.saveEmailExecutionHistory(emailHistoryConfig);
         } catch (Exception e) {
             log.error("Worlflow Detail ==== Error setting PDF details in Email History table");

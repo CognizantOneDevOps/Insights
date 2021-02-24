@@ -32,10 +32,11 @@ from ....core.BaseAgent3 import BaseAgent
 
 class GitAgent(BaseAgent):
     trackingCachePath = None
-    jiraRegEx = r"([A-Z]{1}[A-Z0-9]+\s?-\s?\d+)"
+    #almRegEx = r"([A-Z]{1}[A-Z0-9]+\s?-\s?\d+)"
 
     def process(self):
         timeStampNow = lambda: dateTime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+        self.almRegEx=str(self.config.get("almKeyRegEx",''))
         getReposUrl = self.config.get("getRepos", '')
         accessToken = self.getCredential("accessToken")
         headers = {"Authorization": "token " + accessToken}
@@ -223,25 +224,25 @@ class GitAgent(BaseAgent):
                                             isOrphanCommit = not pullReq.get('isMerged',True) and not pullReq.get('isForked', True)
                                             if isOrphanCommit:
                                                 orphanCommitInjectData['branchName']= originBranch
-                                                branchJiraKeyIter = re.finditer(self.jiraRegEx, originBranch)
-                                                branchJiraKeys = [key.group(0) for key in branchJiraKeyIter]
-                                                if branchJiraKeys:
-                                                    orphanCommitInjectData['branchJiraKeys'] = branchJiraKeys
+                                                branchAlmKeyIter = re.finditer(self.almRegEx, originBranch)
+                                                branchAlmKeys = [key.group(0) for key in branchAlmKeyIter]
+                                                if branchAlmKeys:
+                                                    orphanCommitInjectData['branchAlmKeys'] = branchAlmKeys
                                                 else :
-                                                    orphanCommitInjectData.pop('branchJiraKeys','')
+                                                    orphanCommitInjectData.pop('branchAlmKeys','')
                                             while fetchNextCommitsPage:
                                                 try:
                                                     commits =self.getResponse(getCommitDetailsUrl + '&page=' +str(commitsPageNum),'GET', None, None,None, reqHeaders=headers)
                                                     for commit in commits:
                                                         commitId = commit.get('sha', None)
                                                         commitMessage= commit.get('commit',dict()).get('message','')
-                                                        jiraKeyIter = re.finditer(self.jiraRegEx, commitMessage)
-                                                        jiraKeys = [key.group(0) for key in jiraKeyIter]
-                                                        if jiraKeys:
-                                                            injectData['jiraKeys'] = jiraKeys
+                                                        almKeyIter = re.finditer(self.almRegEx, commitMessage)
+                                                        almKeys = [key.group(0) for key in almKeyIter]
+                                                        if almKeys:
+                                                            injectData['almKeys'] = almKeys
                                                         else:
-                                                            injectData.pop('jiraKeys','')
-                                                            injectData['jiraKeyProcessed'] = True
+                                                            injectData.pop('almKeys','')
+                                                            injectData['almKeyProcessed'] = True
                                                             injectData['consumptionTime'] = timeStampNow()
                                                             data += self.parseResponse(responseTemplate, commit, injectData)
                                                             commitDict[commitId] = True
@@ -308,13 +309,13 @@ class GitAgent(BaseAgent):
                                         if since is not None or startFrom < parser.parse(commit["commit"]["author"]["date"], ignoretz=True):
                                             if commitId not in commitDict:
                                                 commitMessage = commit.get('commit', dict()). get('message', '')
-                                                jiraKeyIter = re.finditer(self.jiraRegEx, commitMessage)
-                                                jiraKeys = [key.group(0) for key in jiraKeyIter]
-                                                if jiraKeys:
-                                                    injectData['jiraKeys'] = jiraKeys
+                                                almKeyIter = re.finditer(self.almRegEx, commitMessage)
+                                                almKeys = [key.group(0) for key in almKeyIter]
+                                                if almKeys:
+                                                    injectData['almKeys'] = almKeys
                                                 else:
-                                                    injectData.pop('jiraKeys','')
-                                                injectData['jiraKeyProcessed'] =True
+                                                    injectData.pop('almKeys','')
+                                                injectData['almKeyProcessed'] =True
                                                 injectData['consumptionTime'] = timeStampNow()
                                                 data += self.parseResponse(responseTemplate, commit, injectData)
                                                 commitDict[commitId] = False
@@ -343,10 +344,10 @@ class GitAgent(BaseAgent):
                                     'commit': orphanCommitIdList,
                                     'consumptionTime': timeStampNow()
                                 }
-                                branchJiraKeyIter = re.finditer(self.jiraRegEx, branch)
-                                branchJiraKeys = [key.group(0) for key in branchJiraKeyIter]
-                                if branchJiraKeys:
-                                    orphanBranch['branchJiraKeys'] = branchJiraKeys
+                                branchAlmKeyIter = re.finditer(self.almRegEx, branch)
+                                branchAlmKeys = [key.group(0) for key in branchAlmKeyIter]
+                                if branchAlmKeys:
+                                    orphanBranch['branchAlmKeys'] = branchAlmKeys
                                 timestamp = branchesinsighstTimeX.get('timefield',None)
                                 timeformat = branchesinsighstTimeX.get('timeformat',None)
                                 isEpoch = branchesinsighstTimeX.get('isEpoch',False)
@@ -428,13 +429,13 @@ class GitAgent(BaseAgent):
                 else:
                     isForked = True
                 originBranch = originBranchDetails.get('ref', None)
-                branchJiraKeyIter = re.finditer(self.jiraRegEx, originBranch)
-                branchJiraKeys = [key.group(0) for key in branchJiraKeyIter]
-                if branchJiraKeys:
-                    pullReq['originBranchJiraKeys']= branchJiraKeys
-                    orphanCommitInjectData['branchJiraKeys']= branchJiraKeys
+                branchAlmKeyIter = re.finditer(self.almRegEx, originBranch)
+                branchAlmKeys = [key.group(0) for key in branchAlmKeyIter]
+                if branchAlmKeys:
+                    pullReq['originbranchAlmKeys']= branchAlmKeys
+                    orphanCommitInjectData['branchAlmKeys']= branchAlmKeys
                 else:
-                    orphanCommitInjectData.pop('branchJiraKeys','')
+                    orphanCommitInjectData.pop('branchAlmKeys','')
                 orphanCommitInjectData['branchName'] = originBranch
                 commitPage = 1
                 nextPullReqCommitPage = True
@@ -450,13 +451,13 @@ class GitAgent(BaseAgent):
                     for commit in commitDetails:
                         commitId = commit.get('sha', '')
                         commitMessage = commit.get('commit', dict()).get('message', '')
-                        jiraKeyIter = re.finditer(self.jiraRegEx, commitMessage)
-                        jiraKeys = [key.group(0) for key in jiraKeyIter]
-                        if jiraKeys:
-                            injectData['jiraKeys'] = jiraKeys
+                        almKeyIter = re.finditer(self.almRegEx, commitMessage)
+                        almKeys = [key.group(0) for key in almKeyIter]
+                        if almKeys:
+                            injectData['almKeys'] = almKeys
                         else:
-                            injectData.pop('jiraKeys', '')
-                        injectData['jiraKeyProcessed'] = True
+                            injectData.pop('almKeys', '')
+                        injectData['almKeyProcessed'] = True
                         injectData['consumptionTime'] = timeStampNow()
                         commitList += self.parseResponse(commitsResponseTemplate, commit, injectData)
                         if not pullReq['isMerged'] and not isForked:
@@ -481,7 +482,7 @@ class GitAgent(BaseAgent):
                 baseOriginPullReqDict[str(pullReqNumber)] = {
                     "pullReqId": pullReqNumber,
                     "originBranch": originBranch,
-                    "originBranchJiraKeys": branchJiraKeys,
+                    "originbranchAlmKeys": branchAlmKeys,
                     "baseBranch": baseBranch,
                     "mergedAt": pullReq.get('merged_at', None),
                     "closedAt": pullReq.get('closed_at', None),

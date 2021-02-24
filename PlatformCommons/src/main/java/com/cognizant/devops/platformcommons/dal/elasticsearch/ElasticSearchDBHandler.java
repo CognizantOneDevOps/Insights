@@ -15,12 +15,19 @@
  ******************************************************************************/
 package com.cognizant.devops.platformcommons.dal.elasticsearch;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.cognizant.devops.platformcommons.dal.RestApiHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformcommons.exception.RestAPI404Exception;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 public class ElasticSearchDBHandler {
+	private static Logger log = LogManager.getLogger(ElasticSearchDBHandler.class);
 
 
 	/**
@@ -41,9 +48,19 @@ public class ElasticSearchDBHandler {
 	public JsonObject queryES(String sourceESUrl, String query) throws InsightsCustomException {
 
 		JsonObject data = null;
-		JsonObject requestJson = new JsonParser().parse(query).getAsJsonObject();
-		String response = RestApiHandler.doPost(sourceESUrl, requestJson, null);
-		data = new JsonParser().parse(response).getAsJsonObject();
+		String response = "{}";
+		try {
+			JsonObject requestJson = new JsonParser().parse(query).getAsJsonObject();
+			response = RestApiHandler.doPost(sourceESUrl, requestJson, null);
+			data = new JsonParser().parse(response).getAsJsonObject();
+		} catch (InsightsCustomException e) {
+			log.error(e);
+			try {
+				data = new JsonParser().parse(e.getMessage()).getAsJsonObject();
+			} catch (JsonParseException e1) {
+				data = new JsonObject();
+			}
+		}
 		return data;
 	}
 }

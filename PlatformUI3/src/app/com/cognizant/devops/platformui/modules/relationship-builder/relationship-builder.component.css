@@ -655,6 +655,7 @@ th {
 	margin-top: 15%;
 	margin-bottom: 6px;
 	text-align: left;
+	position: relative;
 	/* width: 100vh; */
 }
 
@@ -769,4 +770,15 @@ button[disabled] {
 
 .flagFalse {
 	color: red
+}
+
+.paginationBar {
+	position: absolute;
+	top: 205px;
+	width: 100%;
+}
+
+.colClass {
+	position: absolute;
+	height: 100%;
 }
