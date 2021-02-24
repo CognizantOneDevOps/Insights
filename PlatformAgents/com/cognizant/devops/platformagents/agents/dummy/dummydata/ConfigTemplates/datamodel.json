@@ -1,0 +1,171 @@
+{
+	"JIRA": {
+		"uuid": "uuid",
+		"order": 1,
+		"category": "ALM",
+		"issueKey":"key",
+		"epicKey":"epicKey",		
+		"toolName": "toolName",
+		"creationDate": "creationDate",
+		"resolutionsdate": "resolutionsdate",
+		"toolstatus": "status",
+		"author": "reporter",
+		"projectName": "projectName",
+		"priority": "priority",
+		"inSightsTimeX": "inSightsTimeX",
+		"uptool": [
+			"null"
+		],
+		"downtool": [
+			"GIT"
+		],
+		"uifilter": [
+			"key",
+			"projectName"
+		]
+	},
+	"GIT": {
+		"uuid": "uuid",
+		"category": "SCM",
+		"order": 2,
+		"inSightsTimeX": "inSightsTimeX",
+		"commitId": "commitId",
+		"property": "categoryame",
+		"toolName": "toolName",
+		"toolstatus": "Committed",
+		"author": "authorName",
+		"repositoryName": "repoName",
+		"timestamp": "inSightsTime",
+		"uptool": [
+			"JIRA"
+		],
+		"downtool": [
+			"JENKINS"
+		],
+		"gitCommiTime": "gitCommitTime",
+		
+		"uifilter": [
+			"commitId",
+			"repoName"
+		]
+	},
+	"JENKINS": {
+		"uuid": "uuid",
+		"category": "CI",
+		"inSightsTimeX": "inSightsTimeX",
+		"order": 3,		
+		"buildNumber": "buildNumber",
+		"property": "categoryName",
+		"resourcekey": "resourcekey",
+		"toolName": "toolName",
+		"toolstatus": "status",
+		"projectName": "projectName",
+		"timestamp": "inSightsTime",
+		"environment":"environment",
+		"buildUrl":"buildUrl",
+		"jobName":"jobName",
+		"uptool": [
+			"GIT"
+		],
+		"downtool": [
+			"SONAR",
+			"RUNDECK"
+		],
+		"timelagParam": [
+			"startTime",
+			"endTime"
+		],
+		
+		"uifilter": [
+			"buildNumber",
+			"projectName"
+		]
+	},
+	"SONAR": {
+		"uuid": "uuid",
+		"category": "CODEQUALITY",
+		"inSightsTimeX": "inSightsTimeX",
+		"order": 4,
+		"analysisId": "analysisId",
+		"property": "categoryName",
+		"toolName": "toolName",
+        "jenkinsBuildNumber": "jenkinsBuildNumber",
+		"toolstatus": "sonarQualityGateStatus",
+		"projectName": "projectname",
+		"resourcekey": "resourcekey",
+		"complexity": "sonarComplexity",
+		"coverage": "sonarCoverage",
+		"timestamp": "inSightsTime",
+		"sonarDuplicateCode":"sonarDuplicateCode",
+		"sonarKey":"sonarKey",
+		"uptool": [
+			"JENKIS"
+		],
+		"downtool": [
+			"null"
+		],
+		"timelagParam": [
+			"startTime",
+			"endTime"
+		]
+	},
+    "NEXUS": {
+		"uuid": "uuid",
+		"category": "ARTIFACTMANAGEMENT",
+		"inSightsTimeX": "inSightsTimeX",
+		"order": 5,
+		"executionId": "nexus_ExecutionId",
+		"jenkinsBuildNumber": "jenkinsBuildNumber",
+		"property": "categoryName",
+		"projectName": "projectName",
+        "artifactName": "artifactName",
+        "artifactId":"artifactId",
+		"phase": "Deployment",
+		"toolName": "toolName",
+		"toolstatus": "status",		
+		"timestamp": "inSightsTime",
+		"environment":"environment",
+		"uptool": [
+			"JENKINS"
+		],
+		"downtool": [
+			"null"
+		],		
+	
+		"uifilter": [
+			"jenkinsBuildNumber"
+		]
+	},
+	"RUNDECK": {
+		"uuid": "uuid",
+		"category": "DEPLOYMENT",
+		"inSightsTimeX": "inSightsTimeX",
+		"order": 6,
+		"executionId": "run_ExecutionId",
+		"jenkinsBuildNumber": "jenkinsBuildNumber",
+		"property": "categoryName",
+		"projectName": "run_ProjectName",
+		"phase": "Deployment",
+		"toolName": "toolName",
+		"toolstatus": "status",
+		"author": "run_User",
+		"timestamp": "inSightsTime",
+		"environment":"environment",
+		"uptool": [
+			"JENKINS"
+		],
+		"downtool": [
+			"null"
+		],
+		"startTime": "startTime",
+		"endTime": "endTime",
+		"timelagParam": [
+			"startTime",
+			"endTime"
+		],
+	
+		"uifilter": [
+			"jenkinsBuildNumber"
+		]
+	}
+}

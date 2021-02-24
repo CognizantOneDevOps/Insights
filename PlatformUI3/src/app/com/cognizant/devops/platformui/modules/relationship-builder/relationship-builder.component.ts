@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-import { Component, OnInit, Injector } from '@angular/core';
+import { Component, OnInit, Injector, ViewChild } from '@angular/core';
 import { RelationshipBuilderService } from '@insights/app/modules/relationship-builder/relationship-builder.service';
 import { ShowJsonDialog } from '@insights/app/modules/relationship-builder/show-correlationjson';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -22,6 +22,8 @@ import { Router } from "@angular/router";
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { DataSharedService } from '@insights/common/data-shared-service';
 import { AddPropertyDialog } from './add-propertydialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
   selector: 'app-relationship-builder',
@@ -38,6 +40,7 @@ export class RelationshipBuilderComponent implements OnInit {
   enableDropDown: boolean = false;
   deleteRelationArray = [];
   relationmappingLabels: RelationLabel[] = [];
+  dataSource = new MatTableDataSource(this.relationmappingLabels);
   prefixname: string = '';
   sourcepropertySeleted: boolean = false;
   searchValue: string = '';
@@ -101,6 +104,7 @@ export class RelationshipBuilderComponent implements OnInit {
   relData: any;
   displayDataSource = [];
   toolsDatasource = [];
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   toolSourceDataSource = [];
   radioRefresh: boolean = true;
   correaltionFlag: boolean = true;
@@ -118,6 +122,9 @@ export class RelationshipBuilderComponent implements OnInit {
   ngOnInit() {
   }
 
+  ngAfterViewInit(){
+    this.dataSource.paginator = this.paginator;
+  }
   async dataDictionaryInfo() {
     try {
       this.dictResponse = await this.relationshipBuilderService.loadToolsAndCategories();
@@ -261,10 +268,12 @@ export class RelationshipBuilderComponent implements OnInit {
         var flag = (element.enableCorrelation);
         //var detailProp = '<b>' + element.sourceToolName + '</b>:' + element.sourceFields + ':<b>' + element.destinationToolName + '</b>:' + element.destinationFields;
         let relationLabel = new RelationLabel(destinationToolName, sourceToolName, element.relationName, element.sourceFields, element.destinationFields, element.relationship_properties, flag, element.isSelfRelation);
-        this.relationmappingLabels.push(relationLabel);
+        this.relationmappingLabels.push(relationLabel);        
         this.sourcecheck.push(sourceToolName);
       }
+      this.dataSource.data = this.relationmappingLabels;
       this.dataComponentColumns = ['radio', 'relationName'];
+
     }
     catch (error) {
       console.log(error);

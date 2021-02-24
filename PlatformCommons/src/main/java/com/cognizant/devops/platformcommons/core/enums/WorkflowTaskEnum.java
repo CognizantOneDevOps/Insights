@@ -27,7 +27,9 @@ public class WorkflowTaskEnum {
 	public enum WorkflowType {
 		REPORT("Report"),
 		AUTOML("AUTOML"),
-		SYSTEM("SYSTEM");
+		SYSTEM("SYSTEM"),
+		GRAFANADASHBOARDPDFREPORT("GRAFANADASHBOARDPDFREPORT"),
+		VSMREPORT("VSMREPORT");
 
 		private String value;
 
@@ -86,4 +88,7 @@ public class WorkflowTaskEnum {
 		NOT_STARTED, IN_PROGRESS, COMPLETED, ERROR
 	}
 
+	public enum VsmReportStatus {
+		NOT_STARTED, COMPLETED, NODE_CREATED, ERROR
+	}
 }

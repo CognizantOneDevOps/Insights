@@ -53,6 +53,7 @@ export class ReportManagementComponent implements OnInit {
   detailedRecords = [];
   showThrobber: boolean = false;
   isActive: boolean;
+  reoccurence : boolean;
   reportSourceList = { data: [] };
   changeState: boolean;
   dateObj: Date;
@@ -86,6 +87,7 @@ export class ReportManagementComponent implements OnInit {
       'lastRun',
       'nextRun',
       'status',
+      'reoccurence',
       'active',
       'details'
     ];

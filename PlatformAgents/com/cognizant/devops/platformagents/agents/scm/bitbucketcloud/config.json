@@ -6,8 +6,8 @@
 		"vaultUrl": "http://Vault_Host:port/v1/"
 	},
 	"mqConfig": {
-		"user": "",
-		"password": "",
+		"user": "username for RabbitMq",
+		"password": "Password for RabbitMq",
 		"host": "127.0.0.1",
 		"exchange": "iSight",
 		"agentControlXchg": "iAgent"

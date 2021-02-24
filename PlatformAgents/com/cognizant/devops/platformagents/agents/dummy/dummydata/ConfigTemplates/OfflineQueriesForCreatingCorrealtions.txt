@@ -1,0 +1,26 @@
+<Author:- Surbhi Gupta -666973>
+
+<FROM JENKINS--->
+
+match(n:NEXUS:DATA) where not exists(n.processedNodeForBuild) and n.jenkinsBuildNumber<>'' with n limit 100 set n.processedNodeForBuild=true with n match(build:JENKINS:DATA) where build.buildNumber IN split(n.jenkinsBuildNumber,',') CREATE  unique (build)-[r:FROM_JENKINS_TO_NEXUS]->(n) return count(n)
+
+
+match(n:RUNDECK:DATA) where not exists(n.processedNodeForBuild) and n.jenkinsBuildNumber<>'' with n limit 100 set n.processedNodeForBuild=true with n match(build:JENKINS:DATA) where build.buildNumber IN split(n.jenkinsBuildNumber,',') CREATE  unique (build)-[r:FROM_JENKINS_TO_RUNDECK]->(n) return count(n)
+
+match(n:SONAR:DATA) where not exists(n.processedNodeForBuild) and n.jenkinsBuildNumber<>'' with n limit 100 set n.processedNodeForBuild=true with n match(build:JENKINS:DATA) where build.buildNumber IN split(n.jenkinsBuildNumber,',') CREATE  unique (build)-[r:FROM_JENKINS_TO_SONAR]->(n) return count(n)
+
+
+<FROM GIT-->
+
+
+match(n:JENKINS:DATA) where not exists(n.processedNodeForgit) and n.scmcommitId<>'' with n limit 100 set n.processedNodeForgit=true with n match(commit:GIT:DATA) where commit.commitId IN split(n.scmcommitId,',') CREATE  unique (commit)-[r:FROM_GIT_TO_JENKINS]->(n) return count(n)
+
+
+
+
+<FROM JIRA--->
+
+match(n:QTEST:DATA) where not exists(n.processedNodeForjira) and n.jiraKey<>'' with n limit 100 set n.processedNodeForjira=true with n match(story:JIRA:DATA) where story.key IN split(n.jiraKey,',') CREATE  unique (story)-[r:FROM_JIRA_TO_QTEST]->(n) return count(n)
+
+match(n:GIT:DATA) where not exists(n.processedNodeForjira) and n.jiraKeys<>'' with n limit 100 set n.processedNodeForjira=true with n match(story:JIRA:DATA) where story.key IN split(n.jiraKeys,',') CREATE  unique (story)-[r:FROM_JIRA_TO_GIT]->(n) return count(n)
+

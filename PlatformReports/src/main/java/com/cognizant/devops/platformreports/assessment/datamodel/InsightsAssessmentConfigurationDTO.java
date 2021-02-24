@@ -187,7 +187,7 @@ public class InsightsAssessmentConfigurationDTO {
 	public void setKpiContentMap(Map<String, List<String>> kpiContentMap) {
 		this.kpiContentMap = kpiContentMap;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "InsightsAssessmentConfigurationDTO [reportId=" + reportId + ", configId=" + configId

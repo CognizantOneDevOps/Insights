@@ -29,8 +29,8 @@ import uuid
 from apscheduler.schedulers.blocking import BlockingScheduler
 from pytz import timezone
 
-from .CommunicationFacade import CommunicationFacade
-from .MessageQueueProvider import MessageFactory
+from CommunicationFacade import CommunicationFacade
+from MessageQueueProvider import MessageFactory
 
 
 class BaseAgent(object):
@@ -69,14 +69,14 @@ class BaseAgent(object):
                 os.makedirs(logDirPath)
         else:
             logDirPath = agentDir
-	if filePresent:
+        if filePresent:
             self.configFilePath = 'config.json'
             self.trackingFilePath = 'tracking.json'
             #self.logFilePath = logDirPath +'/'+ 'log_'+type(self).__name__+'.log'            
         else:
             self.configFilePath = agentDir+'config.json'
             self.trackingFilePath = agentDir+'tracking.json' 
-	    #self.logFilePath = logDirPath + '/'+'log_'+type(self).__name__+'.log'	    
+        #self.logFilePath = logDirPath + '/'+'log_'+type(self).__name__+'.log'	    
         trackingFilePresent = os.path.isfile(self.trackingFilePath)
         if not trackingFilePresent:
             self.updateTrackingJson({})

@@ -44,23 +44,24 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 			QueryCachingConstants.LOAD_CACHEVARIANCE_QUERY_FROM_RESOURCES);
 	private final ElasticSearchDBHandler esDbHandler = new ElasticSearchDBHandler();
 	private static Logger log = LogManager.getLogger(QueryCachingServiceImpl.class);
+	JsonParser parser = new JsonParser();
 
 	@Override
 	public JsonObject getCacheResults(String requestPayload) {
 
 		JsonObject resultJson = null;
-		JsonParser parser = new JsonParser();
 		JsonObject requestJson = parser.parse(requestPayload).getAsJsonObject();
 		String isTestDBConnectivity = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray()
 				.get(QueryCachingConstants.ZEROTH_INDEX).getAsJsonObject().get(QueryCachingConstants.TEST_DATABASE)
 				.toString();
 		try {
 			if (isTestDBConnectivity.equals("true")) {
-				log.debug("\n\nQuery Caching Test Request For Data Source Connectivity Found.");
+				log.debug("Query Caching Test Request For Data Source Connectivity Found. ");
 				resultJson = getNeo4jDatasourceResults(requestPayload);
 			} else {
-				log.debug("\n\nFetching Query Cache Results.");
+				log.debug("Fetching Query Cache Results.");
 				resultJson = getEsCachedResults(requestPayload);
+				log.debug("Returned Query Cache record =====");
 			}
 		} catch (InsightsCustomException e) {
 			log.error("Error caught - ", e);
@@ -73,26 +74,20 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 
 		GraphDBHandler GraphDBHandler = new GraphDBHandler();
 		GraphResponse response = null;
-		JsonParser parser = new JsonParser();
 		JsonObject json = parser.parse(queryjson).getAsJsonObject();
 
 		try {
 			StringBuilder stringBuilder = new StringBuilder();
 			Iterator<JsonElement> iterator = json.get(QueryCachingConstants.STATEMENTS).getAsJsonArray().iterator();
-			//boolean checkModifier = false;
 			while (iterator.hasNext()) {
 				stringBuilder = stringBuilder
 						.append(iterator.next().getAsJsonObject().get(QueryCachingConstants.STATEMENT).getAsString())
 						.append(QueryCachingConstants.NEW_STATEMENT);
-				/*checkModifier = validateModifierKeywords(stringBuilder.toString());
-				if (checkModifier) {
-					return null;
-				}*/
 			}
 			String[] queriesArray = stringBuilder.toString().split(QueryCachingConstants.NEW_STATEMENT);
 			response = GraphDBHandler.executeCypherQueryMultiple(queriesArray);
 		} catch (InsightsCustomException e) {
-			log.error("\n\nException in neo4j query execution", e);
+			log.error("Exception in neo4j query execution", e);
 			throw new InsightsCustomException(e.getMessage());
 		}
 		return response.getJson();
@@ -101,52 +96,26 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 	private JsonObject getEsCachedResults(String requestPayload) {
 
 		try {
-			log.debug("\n\nInside Get Query Caching Results Method Call.");
-			JsonParser parser = new JsonParser();
 			JsonObject requestJson = parser.parse(requestPayload).getAsJsonObject();
 			boolean isCacheResult = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray()
 					.get(QueryCachingConstants.ZEROTH_INDEX).getAsJsonObject().get(QueryCachingConstants.RESULT_CACHE)
 					.getAsBoolean();
 
 			if (isCacheResult) {
+
+				log.debug("Inside Get Query isCacheResult Caching Results Method Call.");
 				String esCacheIndex = QueryCachingConstants.ES_CACHE_INDEX;
-				if (esCacheIndex == null)
-					esCacheIndex = QueryCachingConstants.DEFAULT_ES_CACHE_INDEX;
-				else
-					esCacheIndex = esCacheIndex + "/querycacheresults";
+
+				esCacheIndex = esCacheIndex == null ? QueryCachingConstants.DEFAULT_ES_CACHE_INDEX
+						: esCacheIndex + "/querycacheresults";
+
 				String sourceESCacheUrl = QueryCachingConstants.ES_HOST + "/" + esCacheIndex;
-				log.debug("\n\nQuery Caching Index Found As: {}", sourceESCacheUrl);
 				String cachingType = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray()
 						.get(QueryCachingConstants.ZEROTH_INDEX).getAsJsonObject()
 						.get(QueryCachingConstants.CACHING_TYPE).getAsString();
-				log.debug("Selected Caching Type Found As:{} ", cachingType);
 				int cachingValue = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray()
 						.get(QueryCachingConstants.ZEROTH_INDEX).getAsJsonObject()
 						.get(QueryCachingConstants.CACHING_VALUE).getAsInt();
-				log.debug("Selected Caching Value Found As:{} ", cachingValue);
-				String startTimeStr = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray()
-						.get(QueryCachingConstants.ZEROTH_INDEX).getAsJsonObject().get(QueryCachingConstants.START_TIME)
-						.getAsString();
-				String endTimeStr = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray()
-						.get(QueryCachingConstants.ZEROTH_INDEX).getAsJsonObject().get(QueryCachingConstants.END_TIME)
-						.getAsString();
-				String statement = "";
-				StringBuilder tempStatementsCombination = new StringBuilder();
-
-				Iterator<JsonElement> iterator = requestJson.get(QueryCachingConstants.STATEMENTS).getAsJsonArray()
-						.iterator();
-				//boolean checkModifier = false;
-				while (iterator.hasNext()) {
-					statement = iterator.next().getAsJsonObject().get(QueryCachingConstants.STATEMENT).getAsString();
-					/*checkModifier = validateModifierKeywords(statement);
-					if (checkModifier) {
-						return null;
-					}*/
-					String statementWithoutTime = getStatementWithoutTime(statement, startTimeStr, endTimeStr);
-					tempStatementsCombination.append(statementWithoutTime);
-				}
-
-				statement = tempStatementsCombination.toString();
 				Long startTime = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray()
 						.get(QueryCachingConstants.ZEROTH_INDEX).getAsJsonObject().get(QueryCachingConstants.START_TIME)
 						.getAsLong();
@@ -155,75 +124,120 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 						.getAsLong();
 				Long currentTime = InsightsUtils.getCurrentTimeInSeconds();
 
-				String cacheDetailsHash = getCacheDetailsHash(cachingType, cachingValue);
-				String queryHash = DigestUtils.md5Hex(statement + cacheDetailsHash).toUpperCase();
-				String esQuery = "";
+				log.debug(
+						"Query Caching Index {}  Caching Type {} Caching Value {}  startTimeStr {} endTimeStr {} currentTime {}",
+						sourceESCacheUrl, cachingType, cachingValue, String.valueOf(startTime),
+						String.valueOf(endTime), currentTime);
+				String queryHash = getQueryHash(requestJson, cachingType, cachingValue, startTime, endTime);
 
-				if (cachingType.equalsIgnoreCase(QueryCachingConstants.FIXED_TIME)) {
-					esQuery = esQueryWithFixedTime(LOAD_CACHETIME_QUERY_FROM_RESOURCES, currentTime, cachingValue,
-							queryHash);
-				} else {
-					esQuery = esQueryTemplateWithVariance(LOAD_CACHEVARIANCE_QUERY_FROM_RESOURCES, cachingValue,
-							startTime, endTime, queryHash);
-				}
+				String esQuery = getESQueryBasedonCacheType(cachingType, cachingValue, startTime, endTime, currentTime,
+						queryHash);
 
 				JsonObject esResponse = esDbHandler.queryES(sourceESCacheUrl + "/_search", esQuery);
-				JsonArray esResponseArray = new JsonArray();
 
-				if (esResponse.has("status") && esResponse.get("status").getAsInt() == 404)
-					log.debug("\n\nNo such elasticsearch index is found. Creating a new index {} - ", sourceESCacheUrl);
-				else
-					esResponseArray = esResponse.get("hits").getAsJsonObject().get("hits").getAsJsonArray();
 
-				if (esResponseArray.size() != 0) {
-					log.debug("\n\nQuery Caching Response Found At Index:{} ", sourceESCacheUrl);
-					esResponse = esResponseArray.get(0).getAsJsonObject().get("_source").getAsJsonObject();
-				} else {
-					log.debug(
-							"\n\nNo Query Cached Results Found In Elasticsearch. Redirecting & Fetching Results From Neo4j.");
-					JsonObject saveCache = new JsonObject();
-
-					JsonObject graphResponse = null;
-					Long beforeQueryExecutionTime = InsightsUtils.getSystemTimeInNanoSeconds();
-					graphResponse = getNeo4jDatasourceResults(requestPayload);
-					String statements = requestJson.get(QueryCachingConstants.STATEMENTS).getAsJsonArray().toString();
-					Long afterQueryExecutionTime = InsightsUtils.getSystemTimeInNanoSeconds();
-					Long queryExecutionTimeInNanoSec = (afterQueryExecutionTime - beforeQueryExecutionTime);
-					saveCache.addProperty(QueryCachingConstants.QUERY_HASH, queryHash);
-					saveCache.addProperty(QueryCachingConstants.CACHING_TYPE, cachingType);
-					saveCache.addProperty(QueryCachingConstants.CACHING_VALUE, cachingValue);
-					saveCache.addProperty(QueryCachingConstants.START_TIME_RANGE, startTime);
-					saveCache.addProperty(QueryCachingConstants.END_TIME_RANGE, endTime);
-					saveCache.addProperty(QueryCachingConstants.START_TIME_IN_MS, startTime * 1000);
-					saveCache.addProperty(QueryCachingConstants.END_TIME_IN_MS, endTime * 1000);
-					saveCache.addProperty(QueryCachingConstants.CYPHER_QUERY, statements);
-					saveCache.addProperty(QueryCachingConstants.CACHE_RESULT, graphResponse.toString());
-					saveCache.addProperty(QueryCachingConstants.CREATION_TIME, InsightsUtils.getCurrentTimeInSeconds());
-					saveCache.addProperty(QueryCachingConstants.QUERY_EXECUTION_TIME, queryExecutionTimeInNanoSec);
-					saveCache.addProperty(QueryCachingConstants.NEO4J_RESULT_CREATION_TIME,
-							InsightsUtils.getCurrentTimeInEpochMilliSeconds());
-
-					esDbHandler.queryES(sourceESCacheUrl, saveCache.toString());
-					log.debug("\n\nSaving Fetched Neo4j Results Into Elasticsearch!");
-					return parser.parse(saveCache.get(QueryCachingConstants.CACHE_RESULT).getAsString())
-							.getAsJsonObject();
+				if (esResponse.has(QueryCachingConstants.ES_HITS)) {
+					JsonArray esResponseArray = esResponse.get("hits").getAsJsonObject().get("hits").getAsJsonArray();
+					if (esResponseArray.size() > 0) {
+						log.debug("Query Caching Record found in ES, returning record =====");
+						JsonObject esSource = esResponse.get("hits").getAsJsonObject().get("hits").getAsJsonArray()
+								.get(0)
+							.getAsJsonObject().get("_source").getAsJsonObject();
+						return parser.parse(esSource.get(QueryCachingConstants.CACHE_RESULT).getAsString())
+								.getAsJsonObject();
+					} else {
+						log.debug("Index present in ES and record not found, adding new record for queryHash {} ",
+								queryHash);
+						return fetchRecordFromGraphDBAndsaveInES(requestPayload, requestJson, sourceESCacheUrl,
+								cachingType, cachingValue, startTime, endTime, queryHash);
+					}
+				} else if (esResponse.has(QueryCachingConstants.ES_STATUS)
+						&& (esResponse.get(QueryCachingConstants.ES_STATUS).getAsInt() == 404
+								|| esResponse.get(QueryCachingConstants.ES_STATUS).getAsInt() == 400)) {
+					log.debug("Index not found adding new index and record in ES, queryHash {} ", queryHash);
+					return fetchRecordFromGraphDBAndsaveInES(requestPayload, requestJson, sourceESCacheUrl, cachingType,
+							cachingValue, startTime, endTime, queryHash);
 				}
-				return parser.parse(esResponse.get(QueryCachingConstants.CACHE_RESULT).getAsString()).getAsJsonObject();
 			} else {
-				log.debug("\n\nQuery Caching Option Is Not Selected. Fetching Results From Neo4j.");
+				log.debug("Query Caching Option Is Not Selected. Fetching Results From Neo4j.");
 				return getNeo4jDatasourceResults(requestPayload);
 			}
 
 		} catch (Exception e) {
-			log.error("\n\nQuery Caching - Error in capturing Elasticsearch response", e);
+			log.error("Query Caching - Error in capturing Elasticsearch response", e);
 			try {
 				return getNeo4jDatasourceResults(requestPayload);
 			} catch (InsightsCustomException graphDBEx) {
-				log.error("\n\nQuery Caching - Exception in neo4j query execution", graphDBEx);
+				log.error("Query Caching - Exception in neo4j query execution", graphDBEx);
 			}
 		}
 
 		return null;
+	}
+
+	private String getESQueryBasedonCacheType(String cachingType, int cachingValue, Long startTime, Long endTime,
+			Long currentTime, String queryHash) {
+		String esQuery;
+		if (cachingType.equalsIgnoreCase(QueryCachingConstants.FIXED_TIME)) {
+			esQuery = esQueryWithFixedTime(LOAD_CACHETIME_QUERY_FROM_RESOURCES, currentTime, cachingValue,
+					queryHash);
+		} else {
+			esQuery = esQueryTemplateWithVariance(LOAD_CACHEVARIANCE_QUERY_FROM_RESOURCES, cachingValue,
+					startTime, endTime, queryHash);
+		}
+		return esQuery;
+	}
+
+	private String getQueryHash(JsonObject requestJson, String cachingType, int cachingValue, Long startTime,
+			Long endTime) {
+		String statement = "";
+		StringBuilder tempStatementsCombination = new StringBuilder();
+
+		Iterator<JsonElement> iterator = requestJson.get(QueryCachingConstants.STATEMENTS).getAsJsonArray().iterator();
+		//boolean checkModifier = false;
+		while (iterator.hasNext()) {
+			statement = iterator.next().getAsJsonObject().get(QueryCachingConstants.STATEMENT).getAsString();
+
+			String statementWithoutTime = getStatementWithoutTime(statement, String.valueOf(startTime),
+					String.valueOf(endTime));
+			tempStatementsCombination.append(statementWithoutTime);
+		}
+
+		statement = tempStatementsCombination.toString();
+		String cacheDetailsHash = getCacheDetailsHash(cachingType, cachingValue);
+		String queryHash = DigestUtils.md5Hex(statement + cacheDetailsHash).toUpperCase();
+		return queryHash;
+	}
+
+	private JsonObject fetchRecordFromGraphDBAndsaveInES(String requestPayload,
+			JsonObject requestJson, String sourceESCacheUrl, String cachingType, int cachingValue, Long startTime,
+			Long endTime, String queryHash) throws InsightsCustomException {
+		JsonObject saveCache = new JsonObject();
+
+		JsonObject graphResponse = null;
+		Long beforeQueryExecutionTime = InsightsUtils.getSystemTimeInNanoSeconds();
+		graphResponse = getNeo4jDatasourceResults(requestPayload);
+		String statements = requestJson.get(QueryCachingConstants.STATEMENTS).getAsJsonArray().toString();
+		Long afterQueryExecutionTime = InsightsUtils.getSystemTimeInNanoSeconds();
+		Long queryExecutionTimeInNanoSec = (afterQueryExecutionTime - beforeQueryExecutionTime);
+		saveCache.addProperty(QueryCachingConstants.QUERY_HASH, queryHash);
+		saveCache.addProperty(QueryCachingConstants.CACHING_TYPE, cachingType);
+		saveCache.addProperty(QueryCachingConstants.CACHING_VALUE, cachingValue);
+		saveCache.addProperty(QueryCachingConstants.START_TIME_RANGE, startTime);
+		saveCache.addProperty(QueryCachingConstants.END_TIME_RANGE, endTime);
+		saveCache.addProperty(QueryCachingConstants.START_TIME_IN_MS, startTime * 1000);
+		saveCache.addProperty(QueryCachingConstants.END_TIME_IN_MS, endTime * 1000);
+		saveCache.addProperty(QueryCachingConstants.CYPHER_QUERY, statements);
+		saveCache.addProperty(QueryCachingConstants.CACHE_RESULT, graphResponse.toString());
+		saveCache.addProperty(QueryCachingConstants.CREATION_TIME, InsightsUtils.getCurrentTimeInSeconds());
+		saveCache.addProperty(QueryCachingConstants.QUERY_EXECUTION_TIME, queryExecutionTimeInNanoSec);
+		saveCache.addProperty(QueryCachingConstants.NEO4J_RESULT_CREATION_TIME,
+				InsightsUtils.getCurrentTimeInEpochMilliSeconds());
+
+		esDbHandler.queryES(sourceESCacheUrl, saveCache.toString());
+		log.debug("Saving Fetched Neo4j Results Into Elasticsearch!");
+		return parser.parse(saveCache.get(QueryCachingConstants.CACHE_RESULT).getAsString())
+				.getAsJsonObject();
 	}
 
 	private static String getCacheDetailsHash(String cacheType, int cachingValue) {
@@ -272,33 +286,33 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 		 * BufferedReader reader = null; InputStream in = null;
 		 */
 		log.debug(
-				"\n\nInside loadEsQueryFromJsonFile method. Loading Elasticsearch - Query Caching Query From Resources!");
+				"Inside loadEsQueryFromJsonFile method. Loading Elasticsearch - Query Caching Query From Resources!");
 		try (InputStream in = getClass().getClassLoader().getResourceAsStream(fileName);
 				BufferedReader reader = new BufferedReader(new InputStreamReader(in));) {
 			return org.apache.commons.io.IOUtils.toString(reader);
 		} catch (Exception e) {
-			log.error("\n\nError in reading file!", e);
+			log.error("Error in reading file!", e);
 		}
 		return null;
 	}
 
-	private boolean validateModifierKeywords(String query) {
-		boolean isModifier = false;
-		try {
-			String queryToLowerChars = query.toLowerCase();
-			String[] modifierKeywords = { " update ", " update(", ")update ", " delete ", " delete(", ")delete ",
-					" detach ", " detach(", ")detach ", " set ", " set(", ")set ", " create ", " create(", ")create " };
-			for (int i = 0; i < modifierKeywords.length; i++) {
-				if (queryToLowerChars.contains(modifierKeywords[i])) {
-					log.debug("Datasource modifier keyword found!");
-					isModifier = true;
-					break;
+	/*	private boolean validateModifierKeywords(String query) {
+			boolean isModifier = false;
+			try {
+				String queryToLowerChars = query.toLowerCase();
+				String[] modifierKeywords = { " update ", " update(", ")update ", " delete ", " delete(", ")delete ",
+						" detach ", " detach(", ")detach ", " set ", " set(", ")set ", " create ", " create(", ")create " };
+				for (int i = 0; i < modifierKeywords.length; i++) {
+					if (queryToLowerChars.contains(modifierKeywords[i])) {
+						log.debug("Datasource modifier keyword found!");
+						isModifier = true;
+						break;
+					}
 				}
+			} catch (Exception e) {
+				log.error("Exception caught in validateModifierKeywords method. ", e);
 			}
-		} catch (Exception e) {
-			log.error("Exception caught in validateModifierKeywords method. ", e);
-		}
-		return isModifier;
-	}
+			return isModifier;
+		}*/
 
 }

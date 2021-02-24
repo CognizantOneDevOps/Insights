@@ -145,10 +145,7 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 			executionId = incomingTaskMessage.get(AssessmentReportAndWorkflowConstants.EXECUTIONID).getAsLong();
 			mailReportDTO.setTimeOfReportGeneration(InsightsUtils.insightsTimeXFormat(executionId));
 			workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
-			if(workflowConfig.getAssessmentConfig()!=null) {
-			mailReportDTO.setAsseementreportname(workflowConfig.getAssessmentConfig().getAsseementReportDisplayName());
-			}
-			mailReportDTO.setReportFilePath(emailHistory.getAttachmentPath());
+			mailReportDTO.setEmailAttachmentName(emailHistory.getMailAttachmentName());
 			if (emailHistory.getMailTo() != null) {
 				String[] recipientList = emailHistory.getMailTo().split(",");
 				recipientAddress = createRecipientAddress(recipientList);
@@ -167,6 +164,7 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 			mailReportDTO.setMailFrom(emailHistory.getMailFrom());
 			mailReportDTO.setSubject(emailHistory.getSubject());
 			mailReportDTO.setMailBody(emailHistory.getMailBody());
+			mailReportDTO.setMailAttachment(emailHistory.getAttachmentData());
 			return mailReportDTO;
 		} catch (Exception e) {
 			log.error("Workflow Detail ==== ReportEmailSubscriber Error while creating MailreportDTO ===== ", e);

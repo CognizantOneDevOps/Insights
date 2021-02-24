@@ -41,7 +41,7 @@ public class WorkflowTaskInitializer {
 	 * It will fetch all task from workflowjar folder which is located inside
 	 * INSIGHTS_HOME
 	 */
-	public void registerTaskSubscriber() {
+	public synchronized void registerTaskSubscriber() {
 		URLClassLoader urlClassLoader = null;
 			InsightsStatusProvider.getInstance().createInsightStatusNode("Workflow Task Initializer started.",
 					PlatformServiceConstants.SUCCESS);

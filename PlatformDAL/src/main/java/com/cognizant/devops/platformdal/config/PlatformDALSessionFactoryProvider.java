@@ -38,6 +38,7 @@ import com.cognizant.devops.platformdal.dashboards.CustomDashboard;
 import com.cognizant.devops.platformdal.dataArchivalConfig.InsightsDataArchivalConfig;
 import com.cognizant.devops.platformdal.entity.definition.EntityDefinition;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
+import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfig;
 import com.cognizant.devops.platformdal.grafana.user.User;
 import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetails;
 import com.cognizant.devops.platformdal.icon.Icon;
@@ -49,6 +50,7 @@ import com.cognizant.devops.platformdal.relationshipconfig.RelationshipConfigura
 import com.cognizant.devops.platformdal.settingsconfig.SettingsConfiguration;
 import com.cognizant.devops.platformdal.tools.layout.ToolsLayout;
 import com.cognizant.devops.platformdal.user.UserPortfolio;
+import com.cognizant.devops.platformdal.vsmReport.VsmReportConfig;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformdal.webhookConfig.WebhookDerivedConfig;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
@@ -104,6 +106,8 @@ public class PlatformDALSessionFactoryProvider {
 		    configuration.addAnnotatedClass(InsightsReportTemplateConfigFiles.class);
 		    configuration.addAnnotatedClass(InsightsConfigFiles.class);
 		    configuration.addAnnotatedClass(AutoMLConfig.class);
+		    configuration.addAnnotatedClass(GrafanaDashboardPdfConfig.class);
+		    configuration.addAnnotatedClass(VsmReportConfig.class);
 			PostgreData postgre = ApplicationConfigProvider.getInstance().getPostgre();
 			if(postgre != null){				
 				configuration.setProperty(AvailableSettings.USER, postgre.getUserName());

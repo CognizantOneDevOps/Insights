@@ -29,20 +29,15 @@ public class MailReport implements Serializable {
 	private List<InternetAddress> mailTo;
 	private List<InternetAddress> mailCC;
 	private List<InternetAddress> mailBCC;
-	private String asseementreportname;
+	private String emailAttachmentName;
 	private String reportFilePath;
 	private String timeOfReportGeneration;
 	private String mailFrom;
 	private String subject;
 	private String mailBody;
+	private byte[] mailAttachment;
 
-	public String getAsseementreportname() {
-		return asseementreportname;
-	}
 
-	public void setAsseementreportname(String asseementreportname) {
-		this.asseementreportname = asseementreportname;
-	}
 
 	public String getReportFilePath() {
 		return reportFilePath;
@@ -107,5 +102,20 @@ public class MailReport implements Serializable {
 	public void setMailBCC(List<InternetAddress> mailBCC) {
 		this.mailBCC = mailBCC;
 	}
+	
+	public byte[] getMailAttachment() {
+		return mailAttachment;
+	}
 
+	public void setMailAttachment(byte[] mailAttachment) {
+		this.mailAttachment = mailAttachment;
+	}
+
+	public String getEmailAttachmentName() {
+		return emailAttachmentName;
+	}
+
+	public void setEmailAttachmentName(String emailAttachmentName) {
+		this.emailAttachmentName = emailAttachmentName;
+	}
 }

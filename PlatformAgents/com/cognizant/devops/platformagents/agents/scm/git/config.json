@@ -19,12 +19,6 @@
 		"data": "SCM.GIT.DATA",
 		"health": "SCM.GIT.HEALTH"
 	},
-	"enrichData": {
-		"isEnrichmentRequired": false,
-		"sourceProperty": "message",
-		"keyPattern": "-",
-		"targetProperty": "key"
-	},
 	"communication": {
 		"type": "REST",
 		"sslVerify": false,
@@ -67,7 +61,7 @@
 				"ref": "baseBranch"
 			},
 			"isMerged": "isMerged",
-			"originBranchJiraKeys": "originBranchJiraKeys",
+			"originBranchAlmKeys": "originBranchAlmKeys",
 			"merge_commit_sha": "mergedSHA",
 			"commit": "commit",
 			"created_at": "createdAt",
@@ -149,6 +143,7 @@
 	"timeStampField": "commitTime",
 	"timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
 	"isEpochTimeFormat": false,
+	"almKeyRegEx": "([A-Z]{1}[A-Z0-9]+\\s?-\\s?\\d+)",
 	"agentSecretDetails": [
 		"accessToken"
 	],

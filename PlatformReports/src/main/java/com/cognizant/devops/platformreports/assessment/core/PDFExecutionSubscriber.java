@@ -198,8 +198,8 @@ public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 			String workflowId = incomingTaskMessageJson.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID)
 					.getAsString();
 			InsightsReportVisualizationContainer emailHistoryConfig = new InsightsReportVisualizationContainer();
-			emailHistoryConfig.setAttachmentPath(assessmentReportDTO.getPdfExportedFilePath());
 			emailHistoryConfig.setExecutionId(assessmentReportDTO.getExecutionId());
+			emailHistoryConfig.setMailAttachmentName(assessmentReportDTO.getAsseementreportname());
 			File attachedFile = new File(assessmentReportDTO.getPdfExportedFilePath());
 			if (attachedFile.exists()) {
 				emailHistoryConfig.setAttachmentData(FileUtils.readFileToByteArray(attachedFile));

@@ -15,12 +15,15 @@ O * Copyright 2020 Cognizant Technology Solutions
  ******************************************************************************/
 package com.cognizant.devops.platformworkflow.workflowtask.email;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
+import javax.activation.DataHandler;
 import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -31,6 +34,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -63,7 +67,7 @@ public class EmailProcesser implements Callable<JsonObject> {
 		} catch (Exception e) {
 			log.error(e);
 			returnMessage.addProperty("status", "error");
-			returnMessage.addProperty("reportName", mailReportDTO.getAsseementreportname());
+			returnMessage.addProperty("reportName", mailReportDTO.getEmailAttachmentName());
 			returnMessage.addProperty("message", e.getMessage());
 		}
 		return returnMessage;
@@ -116,12 +120,16 @@ public class EmailProcesser implements Callable<JsonObject> {
 			String htmlText = mail.getMailBody();
 			Multipart multipart = new MimeMultipart();
 			// Create the attachment part
-			if(!mail.getReportFilePath().isEmpty()) {
-			log.debug("Workflow Detail ==== Attaching file from {} ", mail.getReportFilePath());
 			BodyPart messageBodyPart = new MimeBodyPart();
-			((MimeBodyPart) messageBodyPart).attachFile(mail.getReportFilePath());
-			multipart.addBodyPart(messageBodyPart);//
+			if (mail.getMailAttachment().length > 0) {
+				InputStream inputStream = new ByteArrayInputStream(mail.getMailAttachment());
+				ByteArrayDataSource bds = new ByteArrayDataSource(inputStream, "application/pdf");
+				log.debug("Workflow Detail ==== Attaching file from {} ", mail.getReportFilePath());
+				messageBodyPart.setDataHandler(new DataHandler(bds));
+				messageBodyPart.setFileName(mail.getEmailAttachmentName() + ".pdf");
+				multipart.addBodyPart(messageBodyPart);
 			}
+
 			// Create the HTML Part
 			BodyPart htmlBodyPart = new MimeBodyPart();
 			htmlBodyPart.setContent(htmlText, "text/html");

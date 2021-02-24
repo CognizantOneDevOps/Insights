@@ -59,10 +59,10 @@ public abstract class WorkflowTaskSubscriberHandler {
 	 * @throws Exception
 	 */
 	public void registerSubscriber(String routingKey) throws IOException {
-		
-			 channel = WorkflowTaskSubscriberFactory.getInstance().getConnection().createChannel();
-			try {
-				String queueName = routingKey.replace(".", "_");
+
+		try {
+			channel = WorkflowTaskSubscriberFactory.getInstance().getConnection().createChannel();
+			String queueName = routingKey.replace(".", "_");
 			channel.queueDeclare(queueName, true, false, false, null);
 			channel.queueBind(queueName, MQMessageConstants.EXCHANGE_NAME, routingKey);
 			channel.basicQos(ApplicationConfigProvider.getInstance().getMessageQueue().getPrefetchCount());
@@ -103,7 +103,9 @@ public abstract class WorkflowTaskSubscriberHandler {
 			channel.basicConsume(queueName, false, routingKey, consumer);
 		} catch (IOException e) {
 			log.error("Unable to registerSubscriber for routingKey {} error ", routingKey, e);
-			InsightsStatusProvider.getInstance().createInsightStatusNode("In WorkflowTaskSubscriberHandler,Unable to registerSubscriber for routingKey "+routingKey+" error "+e.getMessage(),
+			InsightsStatusProvider.getInstance().createInsightStatusNode(
+					"In WorkflowTaskSubscriberHandler,Unable to registerSubscriber for routingKey " + routingKey
+							+ " error " + e.getMessage(),
 					PlatformServiceConstants.FAILURE);
 		}
 	}

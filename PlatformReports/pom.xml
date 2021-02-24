@@ -13,13 +13,13 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>7.5</version>
+		<version>7.6</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformReports</artifactId>
-	<version>7.5</version>
+	<version>7.6</version>
 	<name>PlatformReports</name>
 	<description>PlatformReports</description>
 
@@ -55,27 +55,27 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.10.3</version>
+			<version>2.10.5.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>7.5</version>
+			<version>7.6</version>
 		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>7.5</version>
+			<version>7.6</version>
 		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformWorkflow</artifactId>
-			<version>7.5</version>
+			<version>7.6</version>
 		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformAuditing</artifactId>
-			<version>7.5</version>
+			<version>7.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -96,6 +96,11 @@
 			<groupId>net.sourceforge.cssparser</groupId>
 			<artifactId>cssparser</artifactId>
 			<version>0.9.29</version>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.playwright</groupId>
+			<artifactId>playwright</artifactId>
+			<version>0.172.3</version>
 		</dependency>
 	</dependencies>
 	<build>

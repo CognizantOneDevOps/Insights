@@ -62,6 +62,8 @@ public class ReportEngineUtils {
 	public static final String ES_CONTENT_RESULT_SORT_COLUMN = "executionId";
 
 	public static final String REPORT_TYPE = "pdf";
+	
+	public static final String HTML_EXTENSION = "html";
 
 	public static final String REPORT_MEDIA_TYPE = "application/pdf";
 	

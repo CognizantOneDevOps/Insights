@@ -54,10 +54,10 @@ public class InsightsReportVisualizationContainer implements Serializable {
 
 	@Column(name = "mailbody", length = 10000)
 	private String mailBody;
-
-	@Column(name = "attachmentpath")
-	private String attachmentPath;
 	
+	@Column(name = "mailattachmentname")
+	private String mailAttachmentName;
+
 	@Column(name = "attachmentData")
 	private byte[] attachmentData;
 
@@ -139,12 +139,12 @@ public class InsightsReportVisualizationContainer implements Serializable {
 		this.mailBody = mailBody;
 	}
 
-	public String getAttachmentPath() {
-		return attachmentPath;
+	public String getMailAttachmentName() {
+		return mailAttachmentName;
 	}
 
-	public void setAttachmentPath(String attachmentPath) {
-		this.attachmentPath = attachmentPath;
+	public void setMailAttachmentName(String mailAttachmentName) {
+		this.mailAttachmentName = mailAttachmentName;
 	}
 
 	public String getStatus() {
