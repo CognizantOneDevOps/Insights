@@ -1,0 +1,58 @@
+[
+	{
+		"queryName": "Add workflow type",
+		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TYPE\"(id, workflowtype) SELECT nextval('hibernate_sequence'), 'Report' WHERE NOT EXISTS(SELECT id from public.\"INSIGHTS_WORKFLOW_TYPE\" WHERE workflowtype = 'Report');"
+	},
+	{
+		"queryName": "Add workflow type",
+		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TYPE\"(id, workflowtype) SELECT nextval('hibernate_sequence'), 'AUTOML' WHERE NOT EXISTS(SELECT id from public.\"INSIGHTS_WORKFLOW_TYPE\" WHERE workflowtype = 'AUTOML');"
+	},
+	{
+		"queryName": "Add workflow type",
+		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TYPE\"(id, workflowtype) SELECT nextval('hibernate_sequence'), 'SYSTEM' WHERE NOT EXISTS(SELECT id from public.\"INSIGHTS_WORKFLOW_TYPE\" WHERE workflowtype = 'SYSTEM');"
+	},
+	{
+		"queryName": "Add workflow type",
+		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TYPE\"(id, workflowtype) SELECT nextval('hibernate_sequence'), 'GRAFANADASHBOARDPDFREPORT' WHERE NOT EXISTS(SELECT id from public.\"INSIGHTS_WORKFLOW_TYPE\" WHERE workflowtype = 'GRAFANADASHBOARDPDFREPORT');"
+	},
+	{
+		"queryName": "Add workflow type",
+		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TYPE\"(id, workflowtype) SELECT nextval('hibernate_sequence'), 'UPSHIFTASSESSMENT' WHERE NOT EXISTS(SELECT id from public.\"INSIGHTS_WORKFLOW_TYPE\" WHERE workflowtype = 'UPSHIFTASSESSMENT');"
+	},
+	{
+		"queryName": "REPORT_KPI_Execute",
+		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TASK\"(taskid, componentname, dependency, description, mqchannel, workflowtype) SELECT nextval('hibernate_sequence'), 'com.cognizant.devops.platformreports.assessment.core.ReportKPISubscriber', 1, 'REPORT_KPI_Execute', 'WORKFLOW.TASK.KPI.EXCECUTION', 'Report' WHERE NOT EXISTS (SELECT taskid FROM public.\"INSIGHTS_WORKFLOW_TASK\" WHERE description = 'REPORT_KPI_Execute');"
+	},
+	{
+		"queryName": "REPORT_PDF_Execute",
+		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TASK\"(taskid, componentname, dependency, description, mqchannel, workflowtype) SELECT nextval('hibernate_sequence'), 'com.cognizant.devops.platformreports.assessment.core.PDFExecutionSubscriber', 2, 'REPORT_PDF_Execute', 'WORKFLOW.TASK.PDF.EXCECUTION', 'Report' WHERE NOT EXISTS (SELECT taskid FROM public.\"INSIGHTS_WORKFLOW_TASK\" WHERE description = 'REPORT_PDF_Execute');"
+	},
+	{
+		"queryName": "REPORT_EMAIL_Execute",
+		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TASK\"(taskid, componentname, dependency, description, mqchannel, workflowtype) SELECT nextval('hibernate_sequence'), 'com.cognizant.devops.platformreports.assessment.core.ReportEmailSubscriber', 3, 'REPORT_EMAIL_Execute', 'WORKFLOW.TASK.EMAIL.EXCECUTION', 'Report' WHERE NOT EXISTS (SELECT taskid FROM public.\"INSIGHTS_WORKFLOW_TASK\" WHERE description = 'REPORT_EMAIL_Execute');"
+	},
+	{
+		"queryName": "UPSHIFTNODE_Execute",
+		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TASK\"(taskid, componentname, dependency, description, mqchannel, workflowtype) SELECT nextval('hibernate_sequence'), 'com.cognizant.devops.platformreports.assessment.upshift.core.UpshiftAssessmentExecutionSubscriber', 0, 'UPSHIFTNODE_Execute', 'WORKFLOW.TASK.UPSHIFTREPORT.EXCECUTION', 'UPSHIFTASSESSMENT' WHERE NOT EXISTS (SELECT taskid FROM public.\"INSIGHTS_WORKFLOW_TASK\" WHERE description = 'UPSHIFTNODE_Execute');"
+	},
+	{
+		"queryName": "UPSHIFTRELATION_Execute",
+		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TASK\"(taskid, componentname, dependency, description, mqchannel, workflowtype) SELECT nextval('hibernate_sequence'), 'com.cognizant.devops.platformreports.assessment.upshift.core.UpshiftAssessmentRelationExecutionSubscriber', 1, 'UPSHIFTRELATION_Execute', 'WORKFLOW.TASK.UPSHIFTRELATION.EXCECUTION', 'UPSHIFTASSESSMENT' WHERE NOT EXISTS (SELECT taskid FROM public.\"INSIGHTS_WORKFLOW_TASK\" WHERE description = 'UPSHIFTRELATION_Execute');"
+	},
+	{
+		"queryName": "GRAFANA_PDF_Execute",
+		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TASK\"(taskid, componentname, dependency, description, mqchannel, workflowtype) SELECT nextval('hibernate_sequence'), 'com.cognizant.devops.platformreports.assessment.core.GrafanaPDFExecutionSubscriber', 0, 'GRAFANA_PDF_Execute', 'WORKFLOW.TASK.GRAFANAPDF.EXCECUTION', 'GRAFANADASHBOARDPDFREPORT' WHERE NOT EXISTS (SELECT taskid FROM public.\"INSIGHTS_WORKFLOW_TASK\" WHERE description = 'GRAFANA_PDF_Execute');"
+	},
+	{
+		"queryName": "Grafana_Email_Exeute",
+		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TASK\"(taskid, componentname, dependency, description, mqchannel, workflowtype) SELECT nextval('hibernate_sequence'), 'com.cognizant.devops.platformreports.assessment.core.ReportEmailSubscriber', 1, 'Grafana_Email_Exeute', 'WORKFLOW.TASK.EMAIL.EXCECUTION', 'GRAFANADASHBOARDPDFREPORT' WHERE NOT EXISTS (SELECT taskid FROM public.\"INSIGHTS_WORKFLOW_TASK\" WHERE description = 'Grafana_Email_Exeute');"
+	},
+	{
+		"queryName": "H2O_AutoML_Execute",
+		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TASK\"(taskid, componentname, dependency, description, mqchannel, workflowtype) SELECT nextval('hibernate_sequence'), 'com.cognizant.devops.automl.task.core.AutoMLSubscriber', -1, 'H2O_AutoML_Execute', 'WORKFLOW.TASK.AUTOML.EXCECUTION', 'AUTOML' WHERE NOT EXISTS (SELECT taskid FROM public.\"INSIGHTS_WORKFLOW_TASK\" WHERE description = 'H2O_AutoML_Execute');"
+	},
+	{
+		"queryName": "SystemNotification_Execute",
+		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TASK\"(taskid, componentname, dependency, description, mqchannel, workflowtype) SELECT nextval('hibernate_sequence'), 'com.cognizant.devops.platformreports.assessment.core.SystemNotificationDetailSubscriber', -1, 'SystemNotification_Execute', 'WORKFLOW.SYSTEM_TASK.SYSTEMNOTIFICATION.EXECUTION', 'SYSTEM' WHERE NOT EXISTS (SELECT taskid FROM public.\"INSIGHTS_WORKFLOW_TASK\" WHERE description = 'SystemNotification_Execute');"
+	}
+]

@@ -7,7 +7,7 @@
 	},
   "mqConfig": {
     "user": "username for RabbitMq",
-    "password": "Password for RabbitMq",
+    "password": "",
     "host": "127.0.0.1",
     "exchange": "iSight",
     "agentControlXchg":"iAgent"
@@ -43,11 +43,11 @@
   "useResponseTemplate" : true,
   "enableDataValidation": true,
   "toolCategory" : "CI",
-  "token" : "authenticatedtokenvalue",
+  "token" : "",
   "useAllBuildsApi" : false,
   "runSchedule": 30,
   "userid": "username",
-  "passwd": "password",
+  "passwd": "",
   "project": "organizationname/repositoryname",
   "baseUrl": "http://circleci.com/api/v1.1/project/github/",
   "toolsTimeZone" : "Asia/Kolkata",

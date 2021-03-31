@@ -7,7 +7,7 @@
 	},
 	"mqConfig": {
 		"user": "username for RabbitMq",
-		"password": "Password for RabbitMq",
+		"password": "",
 		"host": "127.0.0.1",
 		"exchange": "iSight",
 		"agentControlXchg": "iAgent"
@@ -365,7 +365,7 @@
 	"sprintRetrivalSchedule": 360,
 	"dataFetchCount": 30,
 	"userid": "username for Jira",
-	"passwd": "api token for Jira",
+	"passwd": "",
 	"baseUrl": "https://127.0.0.1/rest/api/2/search",
 	"startFrom": "2019-01-01 05:00",
 	"toolsTimeZone": "Asia/Kolkata",

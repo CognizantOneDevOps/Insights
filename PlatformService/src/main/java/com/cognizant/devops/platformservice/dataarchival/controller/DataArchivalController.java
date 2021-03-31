@@ -114,7 +114,7 @@ public class DataArchivalController {
 		try {
 			result = dataArchivalService.deleteArchivalRecord(archivalName);
 		} catch (InsightsCustomException e) {
-			return PlatformServiceUtil.buildFailureResponse(e.toString());
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(result);
 	}

@@ -7,7 +7,7 @@
   },
   "mqConfig": {
     "user": "username for RabbitMq",
-    "password": "Password for RabbitMq",
+    "password": "",
     "host": "127.0.0.1",
     "exchange": "iSight",
     "agentControlXchg":"iAgent"
@@ -73,7 +73,7 @@
 "useResponseTemplate" : true,
 "runSchedule": 2,
 "userid": "userid",
-"passwd": "passwd",
+"passwd": "",
 "baseUrl": "http://hostname",
 "timeStampField":"startDate",
 "timeStampFormat":"%Y%m%dT%H%M%S+0000",

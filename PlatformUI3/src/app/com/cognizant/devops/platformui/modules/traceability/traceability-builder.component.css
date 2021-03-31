@@ -27,6 +27,18 @@
     right: 0;
 }
 
+table {
+    width: 75%;  
+    border: 1px solid #00B140;
+    border-radius: 10px 10px 10px 10px;
+    font-size: 14px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.matTableBorder {
+    border-collapse: separate;
+}
 .labelInfo {
     font-size: 13px;
     padding-left: 10px;
@@ -67,6 +79,18 @@ tr.mat-footer-row, tr.mat-row-dynamic {
     text-align: left !important;
     vertical-align: middle;
     width: 50%;
+}
+
+.tableHeaderCssTrace {
+    background-color: grey;   
+    color: white;
+    font-size: 14px !important;
+    height: 40px !important;
+    margin: 0px;
+    padding:0px;
+    letter-spacing: .010em;
+    line-height: 1.2em;
+	text-align: center;
 }
 
 .dynamicTableHeaderCss {
@@ -244,6 +268,7 @@ tr.mat-footer-row, tr.mat-row-dynamic {
 
 .form {
     box-sizing: border-box;
+    height: 5vh;
 }
 
 .configureBut {
@@ -513,9 +538,9 @@ button.link {
     position: absolute;
     top: 10px;
     margin: auto;
-    border: 3px solid #0033a0;
+    border: 1px solid;
     width: auto;
-    box-shadow: 0px 0px 8px 0px black;
+    box-shadow: 0px 0px 8px 0px;
     border-radius: 5px;
     font-size: 12px;
     background: #ffffff;
@@ -559,4 +584,171 @@ dt.dt {
 
 .block {
     display: block;
+}
+.showTable {
+	background-color: #00B140;
+	color: white;
+	border-radius: 10px 10px 0 0;
+	text-align: center;
+	padding: 5px;
+	height: 40px;
+}
+.arrange-horizontally {
+	-webkit-box-orient: horizontal;
+	-webkit-box-direction: normal;
+	-webkit-flex-direction: row;
+	flex-direction: row;
+	box-sizing: border-box;
+	display: -webkit-box;
+	display: -webkit-flex;
+	margin-top: 10px;
+	height: 40px;
+}
+.column2 {
+	/* width: 190px; */
+	margin-bottom: 1%;
+	margin-right: 1px;
+	border-radius: 10px;
+    padding: 3px;
+    display: inline-block;
+    height: 58vh;
+    border:white;
+    border-radius: 10px;    
+    padding-left: 0px;
+    padding-top: 0px;
+    /* padding-right: 0px; */
+    padding-bottom: 0px;
+}
+.containercss{
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+}
+ /* Styles for tab labels */
+ ::ng-deep .healthcheck-tab-style .mat-tab-label {     
+    background-color: transparent;
+    color: #0033A0;
+    font-size: 18px;
+    font-family: inherit;
+    opacity: 1.0;
+}
+
+/* Styles for the active tab label */
+::ng-deep .healthcheck-tab-style .mat-tab-label-active {
+   color: #00B140;
+   font-weight:bold;
+   font-size: 18px;    
+   background-color: transparent;
+   font-family: inherit;
+}
+
+::ng-deep .healthcheck-tab-style .mat-tab-header {
+   border-bottom-style: none !important;  
+   
+}
+.sectionHeadingStyleWithoutButton {
+	background-color: #0033A0;
+	color: white;
+	font-size: 16px;
+	margin-top: 16px;
+	height: 30px;
+	border: 1px solid #0033A0;
+	border-radius: 10px 10px 10px 10px;
+	vertical-align: center;
+	padding-bottom: 3px;
+	margin-bottom: 20px;
+}
+
+/* Styles for the ink bar */
+::ng-deep .healthcheck-tab-style .mat-ink-bar {
+    background-color: #00B140 !important;
+}  
+
+.column3 {
+	float: left;
+	width: 21%;
+	margin-bottom: 1%;
+	margin-right: 1px;
+	border-radius: 10px;
+    height: 48vh;
+    padding: 3px;
+}
+.mat-card{
+     font-size: 12px;
+     cursor: pointer;
+}
+.formatcard{
+    text-overflow: ellipsis;
+    overflow:hidden;
+    display:block;
+    white-space:nowrap; 
+}
+/*.textOverflow
+{
+    white-space: nowrap; 
+    width: 14%; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+  
+} */
+.scroll{
+    overflow-x: hidden;
+    overflow-y: hidden;
+    height: 54vh;
+}
+
+.scroll:hover{
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 54vh;
+}
+.filterGroupCSS{
+    float: right;
+    width: 30%;
+    margin: 1%
+ }
+ ::-webkit-scrollbar-thumb {
+    background: #676666;
+  }
+ /* .mat-card:active {
+     background-color: greenyellow; 
+  }  */
+   .color {
+    background-color: rgb(9, 190, 9);
+   }
+   .highlight{
+    background-color: greenyellow;
+  }
+  
+  .not-highlight{
+    background: #fbeafc;
+  } 
+  a{
+      color: b;
+  }
+  .mat-tooltip {
+    /* your own custom styles here */ 
+    /* e.g. */
+    color: yellow;
+}
+.model-position {
+    /* overflow: hidden; */
+    overflow-wrap: break-word;
+    top: 70px;
+    left: 94px;
+    position: absolute;
+    width: 300px;
+    height: 200px;
+    text-align: left;
+    z-index: 999;
+    background-color: #ffffff;
+}
+.mat-icon{
+    height: 15px;
+    width: 15px;
+    color: #0033A0;
+    float: left;
+    top:0px;
+    position: absolute;
+    margin-left: -13px;
 }

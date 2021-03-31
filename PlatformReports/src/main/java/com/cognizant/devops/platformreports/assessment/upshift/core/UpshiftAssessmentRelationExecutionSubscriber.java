@@ -14,7 +14,7 @@
  * the License.
  ******************************************************************************/
 
-package com.cognizant.devops.platformreports.assessment.vsm.core;
+package com.cognizant.devops.platformreports.assessment.upshift.core;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -29,8 +29,8 @@ import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformdal.vsmReport.VsmReportConfig;
-import com.cognizant.devops.platformdal.vsmReport.VsmReportConfigDAL;
+import com.cognizant.devops.platformdal.upshiftassessment.UpshiftAssessmentConfig;
+import com.cognizant.devops.platformdal.upshiftassessment.UpshiftAssessmentConfigDAL;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
@@ -38,40 +38,40 @@ import com.cognizant.devops.platformworkflow.workflowtask.message.factory.Workfl
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class VsmReportRelationExecutionSubscriber extends WorkflowTaskSubscriberHandler {
+public class UpshiftAssessmentRelationExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 
-	private static Logger log = LogManager.getLogger(VsmReportRelationExecutionSubscriber.class);
+	private static Logger log = LogManager.getLogger(UpshiftAssessmentRelationExecutionSubscriber.class);
 	InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfiguration();
 	private WorkflowDAL workflowDAL = new WorkflowDAL();
 
 	private static GraphDBHandler dbHandler = new GraphDBHandler();
 	private static int numOfNodesRelated = 0;
-	private VsmReportConfigDAL vsmReportConfigDAL = new VsmReportConfigDAL();
+	private UpshiftAssessmentConfigDAL upshiftAssessmentConfigDAL = new UpshiftAssessmentConfigDAL();
 
-	public VsmReportRelationExecutionSubscriber(String routingKey) throws IOException {
+	public UpshiftAssessmentRelationExecutionSubscriber(String routingKey) throws IOException {
 		super(routingKey);
 	}
 
 	@Override
 	public void handleTaskExecution(byte[] body) throws IOException {
-		VsmReportConfig vsmReportConfig = null;
+		UpshiftAssessmentConfig upshiftAssessmentConfig = null;
 		try {
 			String incomingTaskMessage = new String(body, StandardCharsets.UTF_8);
-			log.debug("Worlflow Detail ==== VsmReportExecutionSubscriber started ... "
+			log.debug("Worlflow Detail ==== UpshiftAssessmentExecutionSubscriber started ... "
 					+ "routing key  message handleDelivery ===== {} ", incomingTaskMessage);
 
 			JsonObject incomingTaskMessageJson = new JsonParser().parse(incomingTaskMessage).getAsJsonObject();
 			String workflowId = incomingTaskMessageJson.get("workflowId").getAsString();
 			workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
 			log.debug("Worlflow Detail ==== scheduleType {} ", workflowConfig.getScheduleType());
-			vsmReportConfig = vsmReportConfigDAL.fetchGrafanaDashboardDetailsByWorkflowId(workflowId);
-			createRelationship(vsmReportConfig.getUuid());
+			upshiftAssessmentConfig = upshiftAssessmentConfigDAL.fetchUpshiftAssessmentDetailsByWorkflowId(workflowId);
+			createRelationship(upshiftAssessmentConfig.getUpshiftUuid());
 			
 			log.debug("Total nodes related: {}", numOfNodesRelated);
-			updateReportStatus(vsmReportConfig, WorkflowTaskEnum.VsmReportStatus.COMPLETED.name());
+			updateReportStatus(upshiftAssessmentConfig, WorkflowTaskEnum.UpshiftAssessmentStatus.COMPLETED.name());
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== GrafanaPDFExecutionSubscriber Completed with error ", e);
-			updateReportStatus(vsmReportConfig, WorkflowTaskEnum.VsmReportStatus.ERROR.name());
+			updateReportStatus(upshiftAssessmentConfig, WorkflowTaskEnum.UpshiftAssessmentStatus.ERROR.name());
 			throw new InsightsJobFailedException(e.getMessage());
 		}
 	}
@@ -83,33 +83,33 @@ public class VsmReportRelationExecutionSubscriber extends WorkflowTaskSubscriber
 	 */
 	private static void createRelationship(String uuid) throws InsightsCustomException {
 		
-		log.debug("Correlated Vsm report relationships for  : {}", uuid);
+		log.debug("Correlated upshift assessment relationships for  : {}", uuid);
 		StringBuilder cypherQuery = new StringBuilder();
-		cypherQuery.append("MATCH (n:INSIGHTSVSMREPORT) where NOT exists(n.correlated) and exists(n.insightsParentKey) and exists(n.insightsPrimaryKey)");
-		cypherQuery.append("  and n.vsm_uuid = \"").append(uuid).append("\"");
-		cypherQuery.append("  WITH DISTINCT n, n.insightsParentKey as Parent limit 1000 MATCH (a:INSIGHTSVSMREPORT) where a.insightsPrimaryKey=Parent MERGE (a)-[:VSMREPORT_CHILD]->(n) set n.correlated=true return n");
+		cypherQuery.append("MATCH (n:INSIGHTSUPSHIFT) where NOT exists(n.correlated) and exists(n.insightsParentKey) and exists(n.insightsTime)");
+		cypherQuery.append("  and n.upshiftUuid = \"").append(uuid).append("\"");
+		cypherQuery.append("  WITH DISTINCT n, n.insightsParentKey as Parent limit 1000 MATCH (a:INSIGHTSUPSHIFT) where a.insightsTime=Parent MERGE (a)-[:UPSHIFT_CHILD]->(n) set n.correlated=true return n");
 				
 		List<NodeData> nodes;
 		do {
 			GraphResponse graphResponse = dbHandler.executeCypherQuery(cypherQuery.toString());
 			nodes = graphResponse.getNodes();
 			if(!nodes.isEmpty())
-				log.debug("Correlated Vsm report nodes : {}", nodes.size());
+				log.debug("Correlated upshift assessment nodes : {}", nodes.size());
 			numOfNodesRelated+=nodes.size();
 		} while (!nodes.isEmpty());
 	}
 
 	/**
 	 * Update all required properties into database
-	 * @param vsmReportConfig
+	 * @param upshiftAssessmentConfig
 	 * @param status
 	 */
-	private void updateReportStatus(VsmReportConfig vsmReportConfig, String status) {
-		if(vsmReportConfig!= null) {
-			vsmReportConfig.setStatus(status);
-			vsmReportConfig.setWorkflowConfig(vsmReportConfig.getWorkflowConfig());
-			vsmReportConfig.setUpdatedDate(InsightsUtils.getCurrentTimeInEpochMilliSeconds());
-			vsmReportConfigDAL.updateVsmReportConfig(vsmReportConfig);
+	private void updateReportStatus(UpshiftAssessmentConfig upshiftAssessmentConfig, String status) {
+		if(upshiftAssessmentConfig != null) {
+			upshiftAssessmentConfig.setStatus(status);
+			upshiftAssessmentConfig.setWorkflowConfig(upshiftAssessmentConfig.getWorkflowConfig());
+			upshiftAssessmentConfig.setUpdatedDate(InsightsUtils.getCurrentTimeInEpochMilliSeconds());
+			upshiftAssessmentConfigDAL.updateUpshiftAssessmentConfig(upshiftAssessmentConfig);
 		}
 	}
 }

@@ -47,9 +47,5 @@
 	"runSchedule": 3000,
 	"useResponseTemplate": true,
 	"timeStampField": "lastUpdated",
-	"startFrom": "2016-10-10 00:01",
-	"dataCount": 1,
-	"start_date_days": 550,
-	"sleepTime": 10,
-	"createSprintData": true
+	"startFrom": "2016-10-10 00:01"
 }

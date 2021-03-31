@@ -7,7 +7,7 @@
   },
   "mqConfig": {
     "user": "username for RabbitMq",
-    "password": "Password for RabbitMq",
+    "password": "",
     "host": "127.0.0.1",
     "exchange": "iSight",
     "agentControlXchg": "iAgent"
@@ -129,7 +129,7 @@
   "startFrom": "2018-01-01T15:46:33",
   "baseUrl": "https://base_url.com",
   "userid": "user_name",
-  "passwd": "password",
+  "passwd": "",
   "isDebugAllowed": false,
   "loggingSetting": {
     "logLevel": "WARN",

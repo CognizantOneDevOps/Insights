@@ -7,7 +7,7 @@
 	},
   "mqConfig": {
     "user": "username for RabbitMq",
-    "password": "Password for RabbitMq",
+    "password": "",
     "host": "127.0.0.1",
     "exchange": "iSight",
     "agentControlXchg":"iAgent"
@@ -59,7 +59,7 @@
 "enableDataValidation": true,
 "runSchedule": 2,
 "userid": "tfs",
-"passwd": "tfs",
+"passwd": "",
 "baseUrl": "http://hostname/tfs",
 "timeStampField":"commitDate",
 "timeStampFormat":"%Y-%m-%dT%H:%M:%S",

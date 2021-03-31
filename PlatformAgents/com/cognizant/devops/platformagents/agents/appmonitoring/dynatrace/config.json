@@ -7,7 +7,7 @@
   },
   "mqConfig": {
     "user": "username for RabbitMq",
-    "password": "Password for RabbitMq",
+    "password": "",
     "host": "localhost",
     "exchange": "iSight",
     "agentControlXchg": "iAgent"
@@ -74,7 +74,7 @@
   "isEpochTimeFormat" : true,
   "agentSecretDetails": ["apiToken"],
   "pattern": "%Y-%m-%dT%H:%M:%S.%fZ",
-  "apiToken": "APIToken",
+  "apiToken": "",
   "startFrom" : "2018-10-02 15:46:33",
   "isDebugAllowed": false,
   "enableValueArray": false,

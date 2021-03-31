@@ -15,15 +15,19 @@
  ******************************************************************************/
 
 export class AgentConfigItem {
+   id :number;
     key: string;
     value: any;
     type: string;
+    inputType: string;
     children?: AgentConfigItem[];
 
-    public setData(key, value, type, children?: any): void {
+    public setData(id,key, value, type,inputType, children?: any): void {
+        this.id = id; 
         this.key = key;
         this.value = value;
         this.type = type;
+        this.inputType = inputType;
         if (children != undefined) {
             this.children = children;
         }

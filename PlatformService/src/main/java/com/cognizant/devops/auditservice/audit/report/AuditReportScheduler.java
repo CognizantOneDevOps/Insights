@@ -47,9 +47,10 @@ import com.google.gson.JsonParser;
  * Runs everyday Midnight to Fetch Query_builder table records .
  * 
  */
+@Deprecated
 @Component
 @Configuration
-@EnableScheduling
+//@EnableScheduling
 public class AuditReportScheduler {
 
 	private static Logger log = LogManager.getLogger(AuditReportScheduler.class.getName());
@@ -57,22 +58,22 @@ public class AuditReportScheduler {
 	/**
 	 * <second> <minute> <hour> <day-of-month> <month> <day-of-week> <year>
 	 */
-	@Scheduled(cron = "0 0 0 * * ?")//At 00:00:00am every day
+	//@Scheduled(cron = "0 0 0 * * ?")//At 00:00:00am every day
 	void dailyReport(){
 		fetchReports("Daily");
 	}
 	 
-	@Scheduled(cron = "0 0 0 */7 * ?")// At 00:00:00am, every 7 days starting on the 1st, every month
+	//@Scheduled(cron = "0 0 0 */7 * ?")// At 00:00:00am, every 7 days starting on the 1st, every month
 	void weeklyReport(){
 		fetchReports("Weekly");
 	}
 	
-	@Scheduled(cron = "0 0 0 15 * ?")// At 00:00:00am every 15th day of month 
+	//@Scheduled(cron = "0 0 0 15 * ?")// At 00:00:00am every 15th day of month 
 	void fornightlyReport(){
 		fetchReports("Fortnightly");
 	}
 	
-	@Scheduled(cron = "0 0 0 28-31 * ?")// At 00:00:00am, on the last day of the month, every month
+	//@Scheduled(cron = "0 0 0 28-31 * ?")// At 00:00:00am, on the last day of the month, every month
 	void monthlyReport(){
 		final Calendar c = Calendar.getInstance();
 	    if (c.get(Calendar.DATE) == c.getActualMaximum(Calendar.DATE)) {

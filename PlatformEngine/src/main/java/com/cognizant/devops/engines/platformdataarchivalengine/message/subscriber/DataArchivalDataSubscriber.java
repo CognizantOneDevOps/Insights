@@ -17,6 +17,7 @@
 package com.cognizant.devops.engines.platformdataarchivalengine.message.subscriber;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.NoResultException;
 
@@ -24,10 +25,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
+import com.cognizant.devops.platformcommons.constants.DataArchivalConstants;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
+import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.dataArchivalConfig.DataArchivalConfigDal;
+import com.cognizant.devops.platformdal.dataArchivalConfig.InsightsDataArchivalConfig;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -53,15 +58,25 @@ public class DataArchivalDataSubscriber extends EngineSubscriberResponseHandler 
 			JsonArray messageJson = parser.parse(message).getAsJsonObject().get("data").getAsJsonArray();
 			JsonObject updateURLJson = messageJson.get(0).getAsJsonObject();
 			if (PlatformServiceConstants.SUCCESS.equalsIgnoreCase(updateURLJson.get("status").getAsString())) {
-				String archivalName = updateURLJson.get("archivalName").getAsString();
-				String sourceUrl = updateURLJson.get("sourceUrl").getAsString();
-				log.debug("Inside Data archival data:- archivalName: {} , sourceUrl: {} ", archivalName, sourceUrl);
-				if (archivalName.isEmpty()) {
-					throw new InsightsCustomException("Archival name not present in message");
-				} else if (sourceUrl.isEmpty()) {
-					throw new InsightsCustomException("Container URL not present in message");
+				String containerID = updateURLJson.get(DataArchivalConstants.CONTAINERID).getAsString();
+				if (containerID.isEmpty()) {
+					throw new InsightsCustomException("ContainerID not present in message");
 				}
-				dataArchivalConfigDAL.updateArchivalSourceUrl(archivalName, sourceUrl);
+				if(updateURLJson.has(DataArchivalConstants.TASK) && "remove_container".equalsIgnoreCase(updateURLJson.get(DataArchivalConstants.TASK).getAsString())) {
+					InsightsDataArchivalConfig archivalConfigs = dataArchivalConfigDAL.getArchivalRecordByContainerId(containerID);
+					dataArchivalConfigDAL.updateArchivalStatus(archivalConfigs.getArchivalName(), DataArchivalStatus.TERMINATED.toString());
+				} else {
+					String archivalName = updateURLJson.get(DataArchivalConstants.ARCHIVALNAME).getAsString();
+					String sourceUrl = updateURLJson.get(DataArchivalConstants.SOURCEURL).getAsString();
+					Long expiryDate = getExpiryDate(archivalName);
+					log.debug("Inside Data archival data:- archivalName: {} , sourceUrl: {} ", archivalName, sourceUrl);
+					if (archivalName.isEmpty()) {
+						throw new InsightsCustomException("Archival name not present in message");
+					} else if (sourceUrl.isEmpty()) {
+						throw new InsightsCustomException("Container URL not present in message");
+					}
+					dataArchivalConfigDAL.updateContainerDetails(archivalName, sourceUrl, containerID, expiryDate);
+				}
 				getChannel().basicAck(envelope.getDeliveryTag(), false);
 			} else {
 				getChannel().basicAck(envelope.getDeliveryTag(), false);
@@ -75,6 +90,12 @@ public class DataArchivalDataSubscriber extends EngineSubscriberResponseHandler 
 			log.error("Exception occured ", e);
 		}
 
+	}
+
+	private Long getExpiryDate(String archivalName) {
+		InsightsDataArchivalConfig config = dataArchivalConfigDAL.getSpecificArchivalRecord(archivalName);
+		Long daysInMillis = TimeUnit.DAYS.toMillis(config.getDaysToRetain());
+		return ((InsightsUtils.getTodayTime() + daysInMillis)/1000);
 	}
 
 }

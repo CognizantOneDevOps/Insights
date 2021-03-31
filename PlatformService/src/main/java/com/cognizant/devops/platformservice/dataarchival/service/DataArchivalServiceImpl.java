@@ -99,9 +99,11 @@ public class DataArchivalServiceImpl implements DataArchivalService {
 					dataArchivalConfig.setEndDate(epochEndDate);
 					dataArchivalConfig.setAuthor(author);
 					dataArchivalConfig.setStatus(status);
-					dataArchivalConfig.setExpiryDate(expiryDate);
 					dataArchivalConfig.setDaysToRetain(daysToRetain);
 					dataArchivalConfig.setCreatedOn(createdOn);
+					dataArchivalConfig.setExpiryDate(expiryDate);
+					dataArchivalConfig.setSourceUrl("");
+					dataArchivalConfig.setContainerID("");
 					dataArchivalConfigdal.saveDataArchivalConfiguration(dataArchivalConfig);
 				} else {
 					throw new InsightsCustomException("Archival Name already exists.");
@@ -208,12 +210,12 @@ public class DataArchivalServiceImpl implements DataArchivalService {
 	public Boolean deleteArchivalRecord(String archivalName) throws InsightsCustomException {
 		try {
 			String status = dataArchivalConfigdal.getSpecificArchivalRecord(archivalName).getStatus();
-			if (status.equalsIgnoreCase(DataArchivalStatus.INACTIVE.name())
-					|| status.equalsIgnoreCase(DataArchivalStatus.INPROGRESS.name())) {
+			if (status.equalsIgnoreCase(DataArchivalStatus.ERROR.toString())
+					|| status.equalsIgnoreCase(DataArchivalStatus.TERMINATED.toString())) {
 				dataArchivalConfigdal.deleteArchivalRecord(archivalName);
 			} else {
 				throw new InsightsCustomException(
-						"Please change status of archival record, only inactive and inprogress records can be deleted.");
+						"Archival record cannot be deleted as container is created.");
 			}
 		} catch (Exception e) {
 			log.error("Error while deleting archived data {} ", e.getMessage());

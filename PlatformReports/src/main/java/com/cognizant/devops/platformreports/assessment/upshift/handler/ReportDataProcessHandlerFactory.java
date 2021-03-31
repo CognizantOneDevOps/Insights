@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2020 Cognizant Technology Solutions
+ * Copyright 2017 Cognizant Technology Solutions
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy
@@ -13,13 +13,21 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
+package com.cognizant.devops.platformreports.assessment.upshift.handler;
 
-package com.cognizant.devops.platformservice.vsmreport.service;
+import com.cognizant.devops.platformreports.assessment.dataprocess.BaseDataProcessor;
 
-import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import org.springframework.web.multipart.MultipartFile;
+public class ReportDataProcessHandlerFactory {
+	
+    private ReportDataProcessHandlerFactory() {
 
-public interface VsmReportService {
+    }
 
-    public void saveVsmReport(String uuid, String fileName, MultipartFile file, String email) throws InsightsCustomException;
+    public static BaseDataProcessor getDataHandler(String vendor) {
+        if (vendor.equalsIgnoreCase("UPSHIFTASSESSMENT")) {
+            return new UpshiftAssessmentHandler();
+        }
+        return null;
+    }
+
 }

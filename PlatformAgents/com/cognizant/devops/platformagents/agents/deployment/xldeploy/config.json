@@ -1,59 +1,59 @@
 {
-  "vault": {
-    "getFromVault": false,
-    "secretEngine": "insights-kv",
-    "readToken": "vault_secret_token",
-    "vaultUrl": "http://Vault_Host:port/v1/"
-  },
-  "mqConfig": {
-    "user": "username for RabbitMq",
-    "password": "Password for RabbitMq",
-    "host": "localhost",
-    "exchange": "iSight",
-    "agentControlXchg": "iAgent"
-  },
-  "subscribe": {
-    "config": "DEPLOYMENT.XLDEPLOY.config",
-    "agentCtrlQueue": "InsightsXlDeploy"
-  },
-  "publish": {
-    "data": "DEPLOYMENT.XLDEPLOY.DATA",
-    "health": "DEPLOYMENT.XLDEPLOY.HEALTH"
-  },
-  "communication": {
-    "type": "REST",
-    "sslVerify": false,
-    "responseType": "JSON"
-  },
-  "dynamicTemplate": {
-    "timeFieldMapping": {
-      "startDate": "%Y-%m-%dT%H:%M:%S"
-    }
-  },
-  "agentId": "",
-  "auth": "base64",
-  "toolCategory": "DEPLOYMENT",
-  "enableDataValidation": true,
-  "runSchedule": 30,
-  "toolsTimeZone": "Asia/Kolkata",
-  "isEpochTimeFormat": false,
-  "enableValueArray": false,
-  "agentSecretDetails": [
-    "userid",
-    "passwd"
-  ],
-  "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
-  "timeStampField": "startFrom",
-  "useResponseTemplate": true,
-  "userID": "userID",
-  "passwd": "passwd",
-  "baseEndPoint": "baseEndPoint",
-  "startFrom": "2020-04-01",
-  "isDebugAllowed": false,
-  "loggingSetting": {
-    "logLevel": "WARN",
-    "maxBytes": 5000000,
-    "backupCount": 1000
-  },
-  "auditing": false
+	"vault": {
+		"getFromVault": false,
+		"secretEngine": "insights-kv",
+		"readToken": "vault_secret_token",
+		"vaultUrl": "http://Vault_Host:port/v1/"
+	},
+	"mqConfig": {
+		"user": "username for RabbitMq",
+		"password": "",
+		"host": "localhost",
+		"exchange": "iSight",
+		"agentControlXchg": "iAgent"
+	},
+	"subscribe": {
+		"config": "DEPLOYMENT.XLDEPLOY.config",
+		"agentCtrlQueue": "InsightsXlDeploy"
+	},
+	"publish": {
+		"data": "DEPLOYMENT.XLDEPLOY.DATA",
+		"health": "DEPLOYMENT.XLDEPLOY.HEALTH"
+	},
+	"communication": {
+		"type": "REST",
+		"sslVerify": false,
+		"responseType": "JSON"
+	},
+	"dynamicTemplate": {
+		"timeFieldMapping": {
+			"startDate": "%Y-%m-%dT%H:%M:%S"
+		}
+	},
+	"agentId": "",
+	"auth": "base64",
+	"toolCategory": "DEPLOYMENT",
+	"enableDataValidation": true,
+	"runSchedule": 30,
+	"toolsTimeZone": "Asia/Kolkata",
+	"isEpochTimeFormat": false,
+	"enableValueArray": false,
+	"agentSecretDetails": [
+		"userid",
+		"passwd"
+	],
+	"timeStampFormat": "%Y-%m-%dT%H:%M:%S",
+	"timeStampField": "startFrom",
+	"useResponseTemplate": true,
+	"userID": "userID",
+	"passwd": "",
+	"baseEndPoint": "baseEndPoint",
+	"startFrom": "2020-04-01",
+	"isDebugAllowed": false,
+	"loggingSetting": {
+		"logLevel": "WARN",
+		"maxBytes": 5000000,
+		"backupCount": 1000
+	},
+	"auditing": false
 }

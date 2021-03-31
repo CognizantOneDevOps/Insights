@@ -59,9 +59,15 @@ export class ShowTraceabiltyDetailsDialog implements OnInit {
     showAgentFailureTab: boolean = false;
     timeZone: string = "";
     showToolDetailProp: boolean = true;
+    showCardDetail:boolean=false;
     timelagArray = [];
     columnsToDisplay: string[] = ['Tools', 'Handover Time'];
     timelagDataSource = new MatTableDataSource([]);
+    formatedData: string;
+    expandedElement: any;
+    cardData: any;
+    expandObjects: any[];
+
 
     constructor(public dialogRef: MatDialogRef<ShowTraceabiltyDetailsDialog>,
         @Inject(MAT_DIALOG_DATA) public data: any,
@@ -71,7 +77,10 @@ export class ShowTraceabiltyDetailsDialog implements OnInit {
 
     ngOnInit() {
         this.showToolDetailProp = this.data.showToolDetail;
-
+        this.showCardDetail=this.data.showCardDetail;
+        if(this.showCardDetail){
+            this.getCardDetails();
+        }
         if (this.showToolDetailProp) {
             this.gettooldetails();
             this.agentDetailedDatasource.paginator = this.paginator
@@ -85,45 +94,51 @@ export class ShowTraceabiltyDetailsDialog implements OnInit {
     getTimelagdetails() {
         this.timelagArray["average"] = this.data.dataArr
         this.timelagDataSource = this.data.dataArr
-
     }
-
+    getCardDetails(){
+            this.formatedData='';
+            this.cardData=this.data.cardData;
+            Object.entries(this.cardData).forEach(([key, value]) =>{ 
+            if (key !== 'uuid' && key !== 'count' &&  key !== 'order'&&  key !== 'moddate')
+            this.formatedData += `<b>${key.toUpperCase()}</b><span> :${value}</span><br/>`
+             }); 
+    }
     gettooldetails() {
-        this.traceabiltyService.getAsssetDetails(this.data.toolName, this.data.cachestring)
-            .then((response) => {
-                for (var x of response.data) {
-                    var obj = x;
-                    for (let key in x) {
+        for (var x of this.data.cachestring) {
+                   
+            var obj = x;
 
-                        if (key == 'uuid' || key == 'count' || key == 'toolName') {
-                            if (key == 'toolName')
-                                this.dispplaytoolname = obj[key];
-                            continue;
-                        }
-                        if (typeof obj["inSightsTimeX"] !== "undefined") {
+            for (let key in x) {
 
-                            obj["inSightsTimeX"] = this.datePipe.transform(obj["inSightsTimeX"], 'yyyy-MM-dd HH:mm:ss');
-                        }
-                        this.finalHeaderToShow.set(key, obj[key]);
-                    }
-                    this.key.push(x)
+                if (key == 'uuid' || key == 'count' || key == 'toolName') {
+                    if (key == 'toolName')
+                        this.dispplaytoolname = obj[key];
+                    continue;
                 }
-                for (var x of response.data) {
-                    for (let key in x) {
-                        if (key == 'uuid' || key == 'count' || key == 'toolName' || key == 'order') {
-                            continue
-                        }
-                        this.key1.push(key);
-                    }
-                    break;
+                if (typeof obj["inSightsTimeX"] !== "undefined") {
+
+                    obj["inSightsTimeX"] = this.datePipe.transform(obj["inSightsTimeX"], 'yyyy-MM-dd HH:mm:ss');
                 }
+                this.finalHeaderToShow.set(key, obj[key]);
+            }
+            this.key.push(x)
+        }
+        for (var x of this.data.cachestring) {
+            for (let key in x) {
+                if (key == 'uuid' || key == 'count' || key == 'toolName' || key == 'order') {
+                    continue
+                }
+                this.key1.push(key);
+            }
+            break;
+        }
                 this.headerArrayDisplay = this.key1;
                 this.agentDetailedDatasource.data = this.key;
                 this.agentDetailedDatasource.paginator = this.paginator;
-            });
     }
 
     ngAfterViewInit() {
+        this.agentDetailedDatasource.paginator = this.paginator;
 
     }
 

@@ -14,19 +14,19 @@
  * the License.
  ******************************************************************************/
 
+import { DatePipe } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { DataArchivingService } from '@insights/app/modules/settings/dataarchiving/dataarchiving-service';
-import { DataSharedService } from '@insights/common/data-shared-service';
+import { MatDatepickerInputEvent } from '@angular/material/datepicker';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatRadioChange } from '@angular/material/radio';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { MatTableDataSource } from '@angular/material/table';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
-import { DatePipe } from '@angular/common';
-import { MatDatepickerInputEvent } from '@angular/material/datepicker';
-import { MatDialog } from '@angular/material/dialog';
-import { DataArchiveDetailsDialog } from '@insights/app/modules/settings/dataarchiving/data-archive-details/data-archive-details-dialog';
 import { DataArchiveConfigureURLDialog } from '@insights/app/modules/settings/dataarchiving/data-archive-configureurl/data-archive-configureurl-dialog';
+import { DataArchiveDetailsDialog } from '@insights/app/modules/settings/dataarchiving/data-archive-details/data-archive-details-dialog';
+import { DataArchivingService } from '@insights/app/modules/settings/dataarchiving/dataarchiving-service';
+import { DataSharedService } from '@insights/common/data-shared-service';
 
 @Component({
   selector: 'app-dataarchiving',
@@ -73,6 +73,7 @@ export class DataArchivingComponent implements OnInit {
   clicked = new Array();
   pageRefreshed: boolean = false;
   archivedRecordDetailData = { data: [] };
+  hideEdit: boolean = true;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
   constructor(
@@ -110,7 +111,7 @@ export class DataArchivingComponent implements OnInit {
       this.showList = false;
     } else {
       this.messageDialog.showApplicationsMessage(
-        'Max count of reload is set to 5. Please delete unused containers to proceed.',
+        'Maximum 5 <b> ACTIVE </b> containers allowed.',
         'WARN'
       );
       this.showDetail = true;
@@ -126,24 +127,29 @@ export class DataArchivingComponent implements OnInit {
   }
 
   radioChange(event: MatRadioChange, index) {
-    this.enableDelete = true;
+    if (event.value.status == 'ERROR' || event.value.status == 'TERMINATED') {
+      this.enableDelete = true;
+    } else {
+      this.enableDelete = false;
+    }
     this.enableBrowse = true;
     this.enableEdit = true;
-    if (this.previousActiveIndex == -1 && event.value.status != 'INPROGRESS') {
+    if (this.previousActiveIndex == -1 && (event.value.status == 'ACTIVE' || event.value.status == 'INACTIVE')) {
       this.clicked[index] = false;
       this.previousActiveIndex = index;
     } else if (
       this.pageRefreshed &&
       index === this.previousActiveIndex &&
-      event.value.status != 'INPROGRESS'
+      (event.value.status == 'ACTIVE' || event.value.status == 'INACTIVE')
     ) {
       this.clicked[this.previousActiveIndex] = false;
       this.pageRefreshed = false;
-    } else if (event.value.status != 'INPROGRESS') {
+    } else if (event.value.status == 'ACTIVE' || event.value.status == 'INACTIVE') {
       this.clicked[index] = false;
       this.clicked[this.previousActiveIndex] = true;
       this.previousActiveIndex = index;
-    } else if (event.value.status == 'INPROGRESS') {
+    } else if (event.value.status == 'INPROGRESS' || event.value.status == 'ERROR' ||
+      event.value.status == 'TERMINATED' || event.value.status == 'ERROR_REMOVE_CONTAINER') {
       this.clicked[this.previousActiveIndex] = true;
       this.previousActiveIndex = index;
     }
@@ -165,13 +171,18 @@ export class DataArchivingComponent implements OnInit {
       self.showDetail = true;
       for (var element of this.archivalDatasource.data) {
         if (this.count < this.archivalDatasource.data.length) {
-          this.dateObj = new Date(
-            this.archivalDatasource.data[this.count].expiryDate * 1000
-          );
-          this.dateObjFormatted = this.dataShare.convertDateToSpecificDateFormat(this.dateObj, "yyyy-MM-dd HH:mm:ss");
-          this.archivalDatasource.data[
-            this.count
-          ].expiryDate = this.dateObjFormatted;
+          if (this.archivalDatasource.data[this.count].expiryDate == 0) {
+            this.archivalDatasource.data[this.count].expiryDate = "-";
+          } else {
+            this.dateObj = new Date(
+              this.archivalDatasource.data[this.count].expiryDate * 1000
+            );
+            this.dateObjFormatted = this.dataShare.convertDateToSpecificDateFormat(this.dateObj, "yyyy-MM-dd HH:mm:ss");
+            this.archivalDatasource.data[
+              this.count
+            ].expiryDate = this.dateObjFormatted;
+          }
+
           this.dateObj = new Date(
             this.archivalDatasource.data[this.count].createdOn * 1000
           );
@@ -313,8 +324,8 @@ export class DataArchivingComponent implements OnInit {
   delete() {
     var self = this;
     if (
-      self.selectedArchivedData.status == 'INACTIVE' ||
-      self.selectedArchivedData.status == 'INPROGRESS'
+      self.selectedArchivedData.status == 'ERROR' ||
+      self.selectedArchivedData.status == 'TERMINATED'
     ) {
       var title = 'Delete';
       var dialogmessage =
@@ -345,6 +356,11 @@ export class DataArchivingComponent implements OnInit {
                 );
                 self.getExistingArchivedData();
                 self.refresh();
+              } else if (data.status == 'failure' && data.message != null) {
+                self.messageDialog.showApplicationsMessage(data.message, 'ERROR');
+              } else {
+                self.messageDialog.showApplicationsMessage("Failed to delete <b>" +
+                  self.selectedArchivedData.archivalName + "</b>. Please check logs for details.", "ERROR");
               }
             })
             .catch(function (data) {
@@ -468,9 +484,11 @@ export class DataArchivingComponent implements OnInit {
     }
   }
 
-  onNavigate(sourceUrl: any): void {
+  onNavigate(sourceUrl: any,status:any): void {
+    if(status ==='ACTIVE'){
     window.open(sourceUrl, '_blank');
     this.refresh();
+    }
   }
 
   archiveRecordsDetails() {

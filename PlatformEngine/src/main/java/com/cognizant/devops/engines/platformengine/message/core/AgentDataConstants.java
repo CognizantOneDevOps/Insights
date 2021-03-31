@@ -29,5 +29,6 @@ public interface AgentDataConstants {
 	String COLON = ":";
 	String LABELS="labels";
 	String PROPERTIES ="properties";
+	String SELECTED_PROPERTIES = "selectedProperties";
 
 }

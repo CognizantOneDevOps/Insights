@@ -7,7 +7,7 @@
 	},
 	"mqConfig": {
 		"user": "username for RabbitMq",
-		"password": "Password for RabbitMq",
+		"password": "",
 		"host": "127.0.0.1",
 		"exchange": "iSight",
 		"agentControlXchg": "iAgent"
@@ -144,7 +144,7 @@
 	"timeStampFormat": "%Y-%m-%dT%H:%M:%S.",
 	"isEpochTimeFormat": false,
 	"startFrom": "2019-08-01 00:00:33",
-	"accessToken": "accessToken",
+	"accessToken": "",
 	"getRepos": "getRepos",
 	"commitsBaseEndPoint": "commitsBaseEndPoint",
 	"isDebugAllowed": false,

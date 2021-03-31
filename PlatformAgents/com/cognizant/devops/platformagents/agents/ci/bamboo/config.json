@@ -7,7 +7,7 @@
 	  },
 	  "mqConfig": {
 	    "user": "username for RabbitMq",
-	    "password": "Password for RabbitMq",
+	    "password": "",
 	    "host": "127.0.0.1",
 	    "exchange": "iSight",
 	    "agentControlXchg": "iAgent"
@@ -46,7 +46,7 @@
 	"toolCategory": "CI",
 	"auth": "base64",
 	"userid": "userid",
-	"passwd": "password",
+	"passwd": "",
 	"toolsTimeZone" : "Asia/Kolkata",
 	"insightsTimeZone" : "Asia/Kolkata",
 	"useResponseTemplate" : true,

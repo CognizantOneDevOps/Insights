@@ -15,14 +15,17 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.traceabilitydashboard.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonObject;
 
 public interface TraceabilityDashboardService {
-	 public JsonObject getPipeline(String toolName,String fieldName,String fieldValue,boolean isEpic) throws InsightsCustomException;
+	 public JsonObject getPipeline(String toolName,String fieldName,List<String> fieldValue,String isEpic) throws InsightsCustomException;
 	 public List<JsonObject> getToolSummary(String toolName, String cacheKey) throws InsightsCustomException;
 	 public List<String> getAvailableTools() throws InsightsCustomException;
-	 public List<String> getToolKeyset(String toolName) throws InsightsCustomException;   
+	 public List<String> getToolKeyset(String toolName) throws InsightsCustomException;
+	
+	
 }

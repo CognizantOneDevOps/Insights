@@ -5,6 +5,7 @@
     <classes>
       <class name="com.cognizant.devops.platformreports.test.testngInitializer.TestngInitializerTest"/>
       <class name="com.cognizant.devops.platformreports.test.AssessmentReportsTest"/>
+      <class name="com.cognizant.devops.platformreports.test.upshiftassessment.UpshiftAssessmentTest"/>
     </classes>
   </test>
 </suite>

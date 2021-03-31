@@ -7,7 +7,7 @@
   },
  "mqConfig": {
     "user": "username for RabbitMq",
-    "password": "password for RabbitMq",
+    "password": "",
     "host": "127.0.0.1",
     "exchange": "iSight",
     "agentControlXchg":"iAgent" 
@@ -36,7 +36,7 @@
   "enableDataValidation": true,
   "timeStampField": "metricdate",
   "userid":"username for Sonar",
-  "passwd":"password for Sonar",
+  "passwd":"",
   "timeMachineapi": "no",
   "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
   "startFrom": "2019-01-01T00:01:01",

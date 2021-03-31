@@ -20,7 +20,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
-import javax.annotation.PostConstruct;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -31,27 +30,21 @@ import javax.servlet.ServletException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.appender.RollingFileAppender;
-import org.apache.logging.log4j.core.appender.rolling.DefaultRolloverStrategy;
-import org.apache.logging.log4j.core.appender.rolling.SizeBasedTriggeringPolicy;
-import org.apache.logging.log4j.core.appender.rolling.TriggeringPolicy;
-import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.springframework.util.Assert;
 import org.springframework.web.WebApplicationInitializer;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformservice.masterdata.ProcessMasterData;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.cognizant.devops.platformservice.security.config.InsightsResponseHeaderWriterFilter;
+
 /**
  * 
- * @author 146414
- * This class will initialize the config.json.
+ * @author 146414 This class will initialize the config.json.
  */
 public class PlatformServiceInitializer implements WebApplicationInitializer {
 	static Logger log = LogManager.getLogger(PlatformServiceInitializer.class.getName());
@@ -63,6 +56,10 @@ public class PlatformServiceInitializer implements WebApplicationInitializer {
 			loadServerConfig();
 			ApplicationConfigCache.updateLogLevel(LogLevelConstants.PlatformService);
 			disableSslVerification();
+
+			ProcessMasterData processMasterData = new ProcessMasterData();
+			processMasterData.executeMasterDataProcessing();
+
 			validateAutheticationProtocol();
 			servletContext.addFilter("InsightsResponseHeaderWriter", InsightsResponseHeaderWriterFilter.class)
 					.addMappingForUrlPatterns(null, false, "/*");
@@ -71,11 +68,9 @@ public class PlatformServiceInitializer implements WebApplicationInitializer {
 		} catch (Exception e) {
 			PlatformServiceStatusProvider.getInstance().createPlatformServiceStatusNode(
 					"Error in starting PlatformService", PlatformServiceConstants.FAILURE);
-			Assert.isTrue(Boolean.FALSE,
-					"Error in starting PlatformService "
-						+ e.getMessage());
+			Assert.isTrue(Boolean.FALSE, "Error in starting PlatformService " + e.getMessage());
 		}
-		
+
 	}
 
 	private void loadServerConfig() {
@@ -91,57 +86,54 @@ public class PlatformServiceInitializer implements WebApplicationInitializer {
 		log.debug(" Authetication Protocol for applications {} ", autheticationProtocol);
 		Assert.isTrue(AuthenticationUtils.AUTHENTICATION_PROTOCOL_LIST.contains(autheticationProtocol),
 				"Please provide valid authetication Protocol from list "
-					+ AuthenticationUtils.AUTHENTICATION_PROTOCOL_LIST.toString());
+						+ AuthenticationUtils.AUTHENTICATION_PROTOCOL_LIST.toString());
 	}
 
 	private static void disableSslVerification() {
-	    try
-	    {
-	        // Create a trust manager that does not validate certificate chains
-	        TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
-	            @Override
+		try {
+			// Create a trust manager that does not validate certificate chains
+			TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+				@Override
 				public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-	                return new X509Certificate[0];
-	            }
-	            @Override
-				public void checkClientTrusted(X509Certificate[] certs, String authType) throws CertificateException{
-						try {
-							for (X509Certificate cert : certs) {
-								cert.checkValidity();
-							}
-						} catch (Exception e) {
-							throw new CertificateException("Certificate not valid or trusted.");
-						}
-	            }
-	            @Override
-				public void checkServerTrusted(X509Certificate[] certs, String authType) throws CertificateException{
-						try {
-							for (X509Certificate cert : certs) {
-								cert.checkValidity();
-							}
-						} catch (Exception e) {
-							throw new CertificateException("Certificate not valid or trusted.");
-						}
-	            }
-	        }
-	        };
+					return new X509Certificate[0];
+				}
 
-	        // Install the all-trusting trust manager
-	        SSLContext sc = SSLContext.getInstance("TLS");
-	        sc.init(null, trustAllCerts, new java.security.SecureRandom());
-	        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+				@Override
+				public void checkClientTrusted(X509Certificate[] certs, String authType) throws CertificateException {
+					try {
+						for (X509Certificate cert : certs) {
+							cert.checkValidity();
+						}
+					} catch (Exception e) {
+						throw new CertificateException("Certificate not valid or trusted.");
+					}
+				}
 
-	        // Create all-trusting host name verifier
-	        HostnameVerifier allHostsValid = (hostname,session) -> hostname.equalsIgnoreCase(session.getPeerHost());
-	        
-	        // Install the all-trusting host verifier
-	        HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
-	    } catch (NoSuchAlgorithmException | KeyManagementException e) {
-	        log.error(e);
-	    } 
+				@Override
+				public void checkServerTrusted(X509Certificate[] certs, String authType) throws CertificateException {
+					try {
+						for (X509Certificate cert : certs) {
+							cert.checkValidity();
+						}
+					} catch (Exception e) {
+						throw new CertificateException("Certificate not valid or trusted.");
+					}
+				}
+			} };
+
+			// Install the all-trusting trust manager
+			SSLContext sc = SSLContext.getInstance("TLS");
+			sc.init(null, trustAllCerts, new java.security.SecureRandom());
+			HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+			// Create all-trusting host name verifier
+			HostnameVerifier allHostsValid = (hostname, session) -> hostname.equalsIgnoreCase(session.getPeerHost());
+
+			// Install the all-trusting host verifier
+			HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+		} catch (NoSuchAlgorithmException | KeyManagementException e) {
+			log.error(e);
+		}
 	}
-	
-	
-	
 
 }

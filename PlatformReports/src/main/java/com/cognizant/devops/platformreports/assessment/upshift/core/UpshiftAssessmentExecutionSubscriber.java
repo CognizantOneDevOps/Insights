@@ -14,7 +14,7 @@
  * the License.
  ******************************************************************************/
 
-package com.cognizant.devops.platformreports.assessment.vsm.core;
+package com.cognizant.devops.platformreports.assessment.upshift.core;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -27,20 +27,20 @@ import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsAssessmentConfigurationDTO;
 import com.cognizant.devops.platformreports.assessment.dataprocess.BaseDataProcessor;
-import com.cognizant.devops.platformreports.assessment.vsm.handler.ReportDataProcessHandlerFactory;
+import com.cognizant.devops.platformreports.assessment.upshift.handler.ReportDataProcessHandlerFactory;
 import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformworkflow.workflowtask.message.factory.WorkflowTaskSubscriberHandler;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class VsmReportExecutionSubscriber extends WorkflowTaskSubscriberHandler {
+public class UpshiftAssessmentExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 
-    private static Logger log = LogManager.getLogger(VsmReportExecutionSubscriber.class);
+    private static Logger log = LogManager.getLogger(UpshiftAssessmentExecutionSubscriber.class);
     InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfiguration();
     InsightsAssessmentConfigurationDTO assessmentReportDTO = null;
     private WorkflowDAL workflowDAL = new WorkflowDAL();
 
-    public VsmReportExecutionSubscriber(String routingKey) throws IOException {
+    public UpshiftAssessmentExecutionSubscriber(String routingKey) throws IOException {
         super(routingKey);
     }
 
@@ -48,7 +48,7 @@ public class VsmReportExecutionSubscriber extends WorkflowTaskSubscriberHandler 
     public void handleTaskExecution(byte[] body) throws IOException {
         try {
             String incomingTaskMessage = new String(body, StandardCharsets.UTF_8);
-            log.debug("Worlflow Detail ==== VsmReportExecutionSubscriber started ... "
+            log.debug("Worlflow Detail ==== UpshiftAssessmentExecutionSubscriber started ... "
                     + "routing key  message handleDelivery ===== {} ", incomingTaskMessage);
 
             JsonObject incomingTaskMessageJson = new JsonParser().parse(incomingTaskMessage).getAsJsonObject();
@@ -59,11 +59,11 @@ public class VsmReportExecutionSubscriber extends WorkflowTaskSubscriberHandler 
 
             assessmentReportDTO = new InsightsAssessmentConfigurationDTO();
             assessmentReportDTO.setIncomingTaskMessageJson(incomingTaskMessage);
-            assessmentReportDTO.setAsseementreportname(WorkflowTaskEnum.WorkflowType.VSMREPORT.getValue());
+            assessmentReportDTO.setAsseementreportname(WorkflowTaskEnum.WorkflowType.UPSHIFTASSESSMENT.getValue());
             assessmentReportDTO.setExecutionId(executionId);
             assessmentReportDTO.setWorkflowId(workflowId);
             BaseDataProcessor chartHandler = ReportDataProcessHandlerFactory
-                    .getDataHandler("VSMREPORT");
+                    .getDataHandler("UPSHIFTASSESSMENT");
             chartHandler.processJson(assessmentReportDTO);
         } catch (Exception e) {
             log.error("Worlflow Detail ==== GrafanaPDFExecutionSubscriber Completed with error ", e);

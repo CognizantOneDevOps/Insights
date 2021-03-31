@@ -25,6 +25,7 @@ import os
 import re
 import sys
 import urllib
+import hashlib
 from datetime import datetime as dateTime
 from dateutil import parser
 from ....core.BaseAgent import BaseAgent
@@ -47,6 +48,7 @@ class GitAgent(BaseAgent):
         isOptimalDataCollect = self.config.get("enableOptimizedDataRetrieval", False)
         isPullReqCommitAPIDataRetrieval = self.config.get("enablePullReqCommitAPIDataRetrieval", False)
         enableBrancheDeletion = self.config.get("enableBrancheDeletion", False)
+        enableCommitFileUpdation = self.config.get("enableCommitFileUpdation", False)
         self.TrackingCachePathSetup('trackingCache')
         repos = self.getResponse(getReposUrl+'?per_page=100&sort=created&page=1', 'GET', None, None, None, reqHeaders=headers)
         responseTemplate = self.getResponseTemplate()
@@ -230,6 +232,7 @@ class GitAgent(BaseAgent):
                                                     orphanCommitInjectData['branchAlmKeys'] = branchAlmKeys
                                                 else :
                                                     orphanCommitInjectData.pop('branchAlmKeys','')
+                                            fetchNextCommitsPage = True
                                             while fetchNextCommitsPage:
                                                 try:
                                                     commits =self.getResponse(getCommitDetailsUrl + '&page=' +str(commitsPageNum),'GET', None, None,None, reqHeaders=headers)
@@ -281,6 +284,7 @@ class GitAgent(BaseAgent):
                         for branch in orderedBranches:
                             hasLatestPullReq =False
                             data= []
+                            commitFileData = []
                             orphanCommitIdList = list()
                             if branch == repoDefaultBranch:
                                 injectData['default'] =True
@@ -317,6 +321,8 @@ class GitAgent(BaseAgent):
                                                 injectData['almKeyProcessed'] =True
                                                 injectData['consumptionTime'] = timeStampNow()
                                                 data += self.parseResponse(responseTemplate, commit, injectData)
+                                                if enableCommitFileUpdation :
+                                                    commitFileData += self.fileDetailsUpdate(commitId, repoName, commitsBaseEndPoint, headers)
                                                 commitDict[commitId] = False
                                                 orphanCommitIdList.append(commitId)
                                             elif not commitDict.get(commitId, False):
@@ -333,9 +339,13 @@ class GitAgent(BaseAgent):
                                     logging.error(ex)
                                 commitsPageNum = commitsPageNum + 1
                             if data or orphanCommitIdList:
+                                self.publishToolsData(data, commitsMetaData)
+                                if enableCommitFileUpdation and commitFileData :
+                                    commitFileDetails = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('commitFileDetails', None)
+                                    relationMetadata = commitFileDetails.get('relationMetadata')
+                                    self.publishToolsData(commitFileData, relationMetadata)
                                 self.TrackingForBranchUpdate(trackingDetails, branch, latestCommit, repoDefaultBranch,
                                                              isOptimalDataCollect, len(data), hasLatestPullReq)
-                                self.publishToolsData(data, commitsMetaData)
                                 orphanBranch = {
                                     'repoName': repoName,
                                     'branch': branch,
@@ -639,6 +649,48 @@ class GitAgent(BaseAgent):
         data_branch_delete.append(branch_delete)
         branchMetadata = {"labels": ["METADATA"], "dataUpdateSupported": True, "uniqueKey": ["repoName", "branchName"]}
         self.publishToolsData(data_branch_delete, branchMetadata)
+        
+    def fileDetailsUpdate(self, commitId, repoName, commitsBaseEndPoint, headers):
+        commitFileDetailsUrl = commitsBaseEndPoint + repoName + '/commits/' + commitId
+        commitFileDetails =self.getResponse(commitFileDetailsUrl,'GET', None, None,None, reqHeaders=headers)
+        commitSHA = commitFileDetails.get('sha', None)
+        commitMessage = commitFileDetails.get('commit',dict()).get('message','')
+        author = commitFileDetails.get('commit',dict()).get('author',dict()).get('name','')
+        commitTime = commitFileDetails.get('commit',dict()).get('author',dict()).get('date','')
+        commitFiles = commitFileDetails.get('files',list())
+        parentsCount = len(commitFileDetails.get('parents',list()))
+        data = []
+        
+            
+        for file in commitFiles:
+            if (parentsCount > 1):
+                break 
+            
+            filename = file.get('filename', None)
+            status = file.get('status', None)
+            deletions = file.get('deletions', None)
+            additions = file.get('additions', None)
+            changes = file.get('changes', None)
+            filepathHash = hashlib.md5(filename.encode('utf-8')).hexdigest()
+            fileExtension = os.path.splitext(filename)[1][1:]
+
+            fileDetailsDict = {
+                "commitId":commitSHA,
+                "commitMessage":commitMessage,
+                "authorName":author,
+                "commitTime":commitTime,
+                "filename":filename,
+                "status":status,
+                "additions":additions,
+                "deletions":deletions,
+                "changes":changes,
+                "filepathHash":filepathHash,
+                "fileExtension":fileExtension
+            }
+            
+            data.append(fileDetailsDict)
+                
+        return data   
 
 
 if __name__ == "__main__":

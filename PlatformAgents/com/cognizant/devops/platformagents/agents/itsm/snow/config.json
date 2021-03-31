@@ -7,7 +7,7 @@
 	},
 	"mqConfig" : {
 		"user" : "username for RabbitMq", 
-		"password" : "Password for RabbitMq", 
+		"password" : "", 
 		"host" : "127.0.0.1", 
 		"exchange" : "iSight",
 		"agentControlXchg":"iAgent"
@@ -60,7 +60,7 @@
 	"IN_sysid_url":"/api/now/table/incident?sysparm_display_value=true&sysparm_exclude_reference_link=true&sysparm_fields=sys_id&sysparm_query=active%3Dtrue%5Esys_updated_onBETWEENjavascript%3Ags.dateGenerate(",
 	"baseUrl": "#service-now.com",
 	"userid": "username",
-	"passwd": "password",
+	"passwd": "",
 	"isDebugAllowed" : false,
 	"loggingSetting" : {
 		"logLevel" : "INFO",

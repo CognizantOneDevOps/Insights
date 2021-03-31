@@ -19,4 +19,7 @@ public interface DataArchivalConstants {
 	 String TOOLNAME = "elastictransfer";
 	 String TOOLCATEGORY = "SYSTEM";
 	 String ARCHIVALNAME= "archivalName";
+	 String SOURCEURL = "sourceUrl";
+	 String TASK = "task";
+	 String CONTAINERID = "containerID";
 }

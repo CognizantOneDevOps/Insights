@@ -17,7 +17,9 @@ package com.cognizant.devops.platformregressiontest.test.common;
 
 public interface ConfigOptionsTest {
 
-	String PROP_FILE = "regression_test.properties";
+	String PROP_FILE = "regression_test.properties";	
+	String AGENT_JSON_FILE = "agentTestData.json";
+	String REPORT_JSON_FILE = "reportTestData.json";
 	String TESTDATA_FILE = "Test_Data.xlsx";
 	String INSIGHTS_HOME = "INSIGHTS_HOME";
 	String CONFIG_DIR = ".InSights";

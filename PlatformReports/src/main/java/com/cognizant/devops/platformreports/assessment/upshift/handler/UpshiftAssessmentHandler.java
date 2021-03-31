@@ -14,7 +14,7 @@
  * the License.
  ******************************************************************************/
 
-package com.cognizant.devops.platformreports.assessment.vsm.handler;
+package com.cognizant.devops.platformreports.assessment.upshift.handler;
 
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
@@ -22,8 +22,8 @@ import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformdal.vsmReport.VsmReportConfig;
-import com.cognizant.devops.platformdal.vsmReport.VsmReportConfigDAL;
+import com.cognizant.devops.platformdal.upshiftassessment.UpshiftAssessmentConfig;
+import com.cognizant.devops.platformdal.upshiftassessment.UpshiftAssessmentConfigDAL;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsAssessmentConfigurationDTO;
 import com.cognizant.devops.platformreports.assessment.dataprocess.BaseDataProcessor;
 import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
@@ -38,13 +38,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class VsmReportHandler implements BaseDataProcessor {
+public class UpshiftAssessmentHandler implements BaseDataProcessor {
 
-    private static Logger log = LogManager.getLogger(VsmReportHandler.class);
+    private static Logger log = LogManager.getLogger(UpshiftAssessmentHandler.class);
     private static Gson gson = new Gson();
     private static JsonParser jsonParser = new JsonParser();
     private static GraphDBHandler dbHandler = new GraphDBHandler();
-    private VsmReportConfigDAL vsmReportConfigDAL = new VsmReportConfigDAL();
+    private UpshiftAssessmentConfigDAL upshiftAssessmentConfigDAL = new UpshiftAssessmentConfigDAL();
     private boolean flag = true;
     private static final String QUOTATION = "\"";
     private static int numOfNodes = 0;
@@ -57,19 +57,20 @@ public class VsmReportHandler implements BaseDataProcessor {
     @Override
     public void processJson(InsightsAssessmentConfigurationDTO assessmentReportDTO) {
         try {
-            VsmReportConfig vsmReportConfig = vsmReportConfigDAL.fetchGrafanaDashboardDetailsByWorkflowId(assessmentReportDTO.getWorkflowId());
-            byte[] vsmFileBytes = vsmReportConfig.getFile();
-            String uuid = vsmReportConfig.getUuid();
-            String fileString = new String(vsmFileBytes, StandardCharsets.ISO_8859_1);
+            UpshiftAssessmentConfig upshiftAssessmentConfig = upshiftAssessmentConfigDAL.fetchUpshiftAssessmentDetailsByWorkflowId(assessmentReportDTO.getWorkflowId());
+            byte[] upshiftFileBytes = upshiftAssessmentConfig.getFile();
+            String uuid = upshiftAssessmentConfig.getUpshiftUuid();
+            String fileString = new String(upshiftFileBytes, StandardCharsets.ISO_8859_1);
             Map<?, ?> map = gson.fromJson(fileString, Map.class);
             List<JsonObject> dataList = new ArrayList<>();
             JsonObject primaryKey = new JsonObject();
             String primKey = String.valueOf(System.currentTimeMillis());
-            primaryKey.addProperty("insightsPrimaryKey", primKey);
-            primaryKey.addProperty("insightsVSMReporttype", "main");
-            primaryKey.addProperty("vsm_uuid", uuid);
+            primaryKey.addProperty("insightsTime", primKey);
+            primaryKey.addProperty("toolName", "UPSHIFT");
+            primaryKey.addProperty("categoryName", "INSIGHTSUPSHIFT");
+            primaryKey.addProperty("jenkinsExecutionId", upshiftAssessmentConfig.getJenkinsExecId());
             dataList.add(primaryKey);
-            if(createNode("vsm", dataList)) {
+            if(createNode("DATA", dataList)) {
                 flag = Boolean.FALSE;
             }
 
@@ -84,9 +85,9 @@ public class VsmReportHandler implements BaseDataProcessor {
                     parseJsonArray(uuid, primKey, entry.getKey().toString(), element.getAsJsonArray());
                 }
             }
-            log.debug("Completed processing of vsm report: {}", vsmReportConfig.getFileName());
+            log.debug("Completed processing of upshift report: {}", upshiftAssessmentConfig.getFileName());
             log.debug("Total nodes created: {}", numOfNodes);
-            updateReportStatus(vsmReportConfig);
+            updateReportStatus(upshiftAssessmentConfig);
 
         } catch (Exception e) {
             log.error(e.getStackTrace());
@@ -96,14 +97,14 @@ public class VsmReportHandler implements BaseDataProcessor {
 
     /**
      * Update the report status in database
-     * @param vsmReportConfig
+     * @param upshiftAssessmentConfig
      */
-	private void updateReportStatus(VsmReportConfig vsmReportConfig) {
+	private void updateReportStatus(UpshiftAssessmentConfig upshiftAssessmentConfig) {
 		if(flag) {
-		    updateReportStatus(vsmReportConfig, WorkflowTaskEnum.VsmReportStatus.NODE_CREATED.name());
+		    updateReportStatus(upshiftAssessmentConfig, WorkflowTaskEnum.UpshiftAssessmentStatus.NODE_CREATED.name());
 		}
 		else {
-		    updateReportStatus(vsmReportConfig, WorkflowTaskEnum.VsmReportStatus.ERROR.name());
+		    updateReportStatus(upshiftAssessmentConfig, WorkflowTaskEnum.UpshiftAssessmentStatus.ERROR.name());
 		}
 	}
 
@@ -111,7 +112,7 @@ public class VsmReportHandler implements BaseDataProcessor {
      * If data type is jsonobject, create node and process the child elements
      * @param parentId
      * @param name
-     * @param string 
+     * @param uuid
      * @param input
      */
     private void createObjectNode(String uuid, String parentId, String name, JsonObject input) {
@@ -119,10 +120,12 @@ public class VsmReportHandler implements BaseDataProcessor {
     		String primKey = String.valueOf(System.currentTimeMillis());
     		List<JsonObject> dataList = new ArrayList<>();
     		JsonObject nodeProperties = new JsonObject();
-    		nodeProperties.addProperty("insightsPrimaryKey", primKey);
+    		nodeProperties.addProperty("insightsTime", primKey);
     		nodeProperties.addProperty("insightsParentKey", parentId);
     		nodeProperties.addProperty("insightsVSMReporttype", name);
-    		nodeProperties.addProperty("vsm_uuid", uuid);
+    		nodeProperties.addProperty("toolName", "UPSHIFT");
+    		nodeProperties.addProperty("upshiftUuid", uuid);
+    		nodeProperties.addProperty("categoryName", "INSIGHTSUPSHIFT");
     		dataList.add(nodeProperties);
     		if(createNode(name, dataList)) {
     			flag = Boolean.FALSE;
@@ -188,14 +191,14 @@ public class VsmReportHandler implements BaseDataProcessor {
      * @throws InsightsCustomException
      */
     private static boolean createNode(String label, List<JsonObject> dataList) throws InsightsCustomException {
-        StringBuilder cypherQuery = new StringBuilder("UNWIND {props} as properties CREATE (n:INSIGHTSVSMREPORT:");
+        StringBuilder cypherQuery = new StringBuilder("UNWIND {props} as properties CREATE (n:INSIGHTSUPSHIFT:UPSHIFT:");
         cypherQuery.append(label);
         cypherQuery.append(") SET n=properties RETURN n ");
 
         JsonObject graphResponse = dbHandler.executeQueryWithData(cypherQuery.toString(), dataList);
 
         if (graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0) {
-            log.error("Unable to insert vsm report nodes, error occured: {} ",graphResponse);
+            log.error("Unable to insert upshift report nodes, error occured: {} ",graphResponse);
             log.error(dataList);
             return Boolean.TRUE;
         }
@@ -225,7 +228,7 @@ public class VsmReportHandler implements BaseDataProcessor {
             tempList.forEach( s -> propValue1.add(QUOTATION + StringEscapeUtils.escapeJava(s) + QUOTATION));
             propValue= "";
         }
-        StringBuilder cypherQuery = new StringBuilder("MATCH (n:INSIGHTSVSMREPORT) where n.insightsPrimaryKey = \"");
+        StringBuilder cypherQuery = new StringBuilder("MATCH (n:INSIGHTSUPSHIFT) where n.insightsTime = \"");
         cypherQuery.append(primary);
         cypherQuery.append("\" SET n.").append(propName).append(" = ").append(quotes).append(propValue);
         if(!propValue1.isEmpty()) {
@@ -236,7 +239,7 @@ public class VsmReportHandler implements BaseDataProcessor {
         GraphResponse graphResponse = dbHandler.executeCypherQuery(cypherQuery.toString());
         List<NodeData> nodes = graphResponse.getNodes();
         if (nodes.isEmpty()) {
-            log.error("Unable to update vsm report nodes, error occured: {} ",graphResponse);
+            log.error("Unable to update upshift report nodes, error occured: {} ",graphResponse);
             log.error("primary key : {}",primary);
             return true;
         }
@@ -245,14 +248,14 @@ public class VsmReportHandler implements BaseDataProcessor {
 
     /**
      * Update all required properties into database
-     * @param vsmReportConfig
+     * @param upshiftAssessmentConfig
      * @param status
      */
-    private void updateReportStatus(VsmReportConfig vsmReportConfig, String status) {
-        vsmReportConfig.setStatus(status);
-        vsmReportConfig.setWorkflowConfig(vsmReportConfig.getWorkflowConfig());
-        vsmReportConfig.setUpdatedDate(InsightsUtils.getCurrentTimeInEpochMilliSeconds());
-        vsmReportConfigDAL.updateVsmReportConfig(vsmReportConfig);
+    private void updateReportStatus(UpshiftAssessmentConfig upshiftAssessmentConfig, String status) {
+        upshiftAssessmentConfig.setStatus(status);
+        upshiftAssessmentConfig.setWorkflowConfig(upshiftAssessmentConfig.getWorkflowConfig());
+        upshiftAssessmentConfig.setUpdatedDate(InsightsUtils.getCurrentTimeInEpochMilliSeconds());
+        upshiftAssessmentConfigDAL.updateUpshiftAssessmentConfig(upshiftAssessmentConfig);
     }
 
 

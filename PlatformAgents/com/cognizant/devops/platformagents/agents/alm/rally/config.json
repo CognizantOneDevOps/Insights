@@ -7,7 +7,7 @@
    },
    "mqConfig":{
       "user":"username for RabbitMq",
-      "password":"Password for RabbitMq",
+      "password":"",
       "host":"127.0.0.1",
       "exchange":"iSight",
       "agentControlXchg":"iAgent"
@@ -170,7 +170,7 @@
    "accesstoken":"",
    "runSchedule":30,
    "userid":"userid",
-   "passwd":"passwd",
+   "passwd":"",
    "dataSize":20,
    "enableDataValidation":true,
    "baseUrl":"https://rally1.rallydev.com/slm/webservice/v2.0/",

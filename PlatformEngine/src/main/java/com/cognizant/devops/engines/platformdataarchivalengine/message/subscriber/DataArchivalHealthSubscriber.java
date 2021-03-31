@@ -95,8 +95,13 @@ public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandle
 	private void updateErrorStateInArchivalRecord(JsonObject messageJson) {
 		if (messageJson.has(DataArchivalConstants.ARCHIVALNAME)) {
 			if (!messageJson.get(DataArchivalConstants.ARCHIVALNAME).getAsString().isEmpty()) {
-				dataArchivalConfigDal.updateArchivalStatus(messageJson.get(DataArchivalConstants.ARCHIVALNAME).getAsString(),
-						DataArchivalStatus.ERROR.toString());
+				if(messageJson.has(DataArchivalConstants.TASK) && "remove_container".equalsIgnoreCase(messageJson.get(DataArchivalConstants.TASK).getAsString())) {
+					dataArchivalConfigDal.updateArchivalStatus(messageJson.get(DataArchivalConstants.ARCHIVALNAME).getAsString(),
+							DataArchivalStatus.ERROR_REMOVE_CONTAINER.toString());
+				} else {
+					dataArchivalConfigDal.updateArchivalStatus(messageJson.get(DataArchivalConstants.ARCHIVALNAME).getAsString(),
+							DataArchivalStatus.ERROR.toString());
+				}
 			} else {
 				log.error("Archival name not provided");
 			}

@@ -7,7 +7,7 @@
 	},
 	"mqConfig": {
 		"user": "username for RabbitMq",
-		"password": "Password for RabbitMq",
+		"password": "",
 		"host": "127.0.0.1",
 		"exchange": "iSight",
 		"agentControlXchg": "iAgent"
@@ -49,7 +49,7 @@
 	"useResponseTemplate": true,
 	"runSchedule": 5,
 	"userid": "admin",
-	"passwd": "password",
+	"passwd": "",
 	"toolCategory": "ARTIFACTMANAGEMENT",
 	"BaseUrl": "http://localhost:8081/artifactory/api/",
 	"timeStampField": "nex_lastupdated",

@@ -16,6 +16,7 @@
 #
 # Originally written for OneDevops Insights by
 #   513585 && 543825
+# To be updated as per latest software versions
 
 FROM centos:centos7
 MAINTAINER Onedevops Insights

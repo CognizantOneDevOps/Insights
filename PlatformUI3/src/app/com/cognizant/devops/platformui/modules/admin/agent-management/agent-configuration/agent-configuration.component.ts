@@ -13,14 +13,12 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-import { Component, OnInit, PipeTransform, Pipe, ViewChild, ElementRef } from '@angular/core';
-import { InsightsInitService } from '@insights/common/insights-initservice';
-import { AgentService } from '@insights/app/modules/admin/agent-management/agent-management-service';
-import { Router, ActivatedRoute, ParamMap, NavigationExtras } from '@angular/router';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { AgentConfigItem } from '@insights/app/modules/admin/agent-management/agent-configuration/agentConfigItem';
-import { AdminComponent } from '@insights/app/modules/admin/admin.component';
+import { AgentService } from '@insights/app/modules/admin/agent-management/agent-management-service';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { InsightsInitService } from '@insights/common/insights-initservice';
 
 @Component({
   selector: 'app-agent-configuration',
@@ -79,7 +77,7 @@ export class AgentConfigurationComponent implements OnInit {
   color = 'accent';
   vault = false;
   validSecretDetails = true;
-
+  secretProperties = ["accessToken", "password","passwd","apiToken","secret_access_key","awsSecretkey","awsAccesskey","authtoken","access_key_id","neo4j_password","elasticsearch_passwd","docker_repo_passwd"];
   constructor(public config: InsightsInitService, public agentService: AgentService,
     private router: Router, private route: ActivatedRoute,
     public messageDialog: MessageDialogService) {
@@ -241,22 +239,27 @@ export class AgentConfigurationComponent implements OnInit {
         if (value == undefined || value == null) {
           value = "";
         }
+        var inputType = this.secretProperties.find(element => element === configDatakey) ? 'password' : 'text';
         if (typeof (data[configDatakey]) == 'object' && configDatakey != 'dynamicTemplate') {
           for (let configinnerDatakey of Object.keys(value)) {
             let agentConfigChild = new AgentConfigItem();
-            agentConfigChild.setData(configinnerDatakey, value[configinnerDatakey], typeof (value[configinnerDatakey]))
+            var childKeyInputType = this.secretProperties.find(element => element === configinnerDatakey) ? 'password' : 'text';
+            agentConfigChild.setData(this.getRandomNumber(),configinnerDatakey, value[configinnerDatakey], typeof (value[configinnerDatakey]),childKeyInputType)
             agentConfigChilds.push(agentConfigChild);
           }
-          agentConfig.setData(configDatakey, value, typeof (value), agentConfigChilds);
+          agentConfig.setData(this.getRandomNumber(),configDatakey, value, typeof (value),inputType, agentConfigChilds);
         } else if (configDatakey == 'dynamicTemplate') {
-          agentConfig.setData(configDatakey, JSON.stringify(value, undefined, 4), typeof (value));
+          agentConfig.setData(this.getRandomNumber(),configDatakey, JSON.stringify(value, undefined, 4), typeof (value),inputType);
         } else {
-          agentConfig.setData(configDatakey, value, typeof (value));
+          agentConfig.setData(this.getRandomNumber(),configDatakey, value, typeof (value),inputType);
         }
         this.agentConfigItems.push(agentConfig);
       }
-      //console.log(this.agentConfigItems.length);
     }
+  }
+
+  getRandomNumber(): number {
+    return Math.random();
   }
 
   getAgentConfigItems(filtername: any) {
@@ -308,13 +311,14 @@ export class AgentConfigurationComponent implements OnInit {
       } else if (configParamData.key != "dynamicTemplate" && configParamData.type == "object") {
         this.item = {};
         for (let configinnerData of configParamData.children) {
-          this.item[configinnerData.key] = this.checkDatatype(configinnerData.value);
+          this.item[configinnerData.key] = this.checkDatatype(configinnerData.value,configinnerData.type); 
         }
         this.updatedConfigParamdata[configParamData.key] = this.item;
       } else if (configParamData.key != "dynamicTemplate" && configParamData.type != "object") {
-        this.updatedConfigParamdata[configParamData.key] = this.checkDatatype(configParamData.value);
+        this.updatedConfigParamdata[configParamData.key] = this.checkDatatype(configParamData.value,configParamData.type);
       } else if (configParamData.key == "dynamicTemplate") {
         this.updatedConfigParamdata["dynamicTemplate"] = JSON.parse(configParamData.value);
+    
       }
     }
 
@@ -499,9 +503,18 @@ export class AgentConfigurationComponent implements OnInit {
     this.showMessage = Msg
   }
 
-  checkDatatype(dataVal) {
-
-    if (typeof (dataVal) == "boolean") {
+  checkDatatype(dataVal,type) {
+     if(dataVal==='')
+     {
+     if (type == "boolean" ) {
+       return false;
+     } else if (type == "string") {
+       return "";
+     } else if (type == "number") {
+       return 0;
+     }
+   }
+     if (typeof (dataVal) == "boolean") {
       return dataVal;
     } else if (isNaN(dataVal)) {
       if (dataVal == "true") {

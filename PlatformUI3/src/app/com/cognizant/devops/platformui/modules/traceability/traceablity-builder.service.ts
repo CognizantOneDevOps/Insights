@@ -15,14 +15,14 @@ export class TraceabiltyService implements ITraceablityService {
         private dataShare: DataSharedService) {
     }
 
-    getAssetHistory(toolName: string, toolField: string, toolValue: string): Promise<any> {
+    getAssetHistory(toolName: string, toolField: string, toolValue: string,type: string): Promise<any> {
         var restHandler = this.restCallHandlerService;
-        return restHandler.get("GET_DETAILS", {'toolName': toolName, 'fieldName': toolField, 'fieldValue': toolValue });
+        return restHandler.get("GET_DETAILS", {'toolName': toolName, 'fieldName': toolField, 'fieldValue': toolValue,'type':type });
     }
 
-    getEpicIssues(toolName: string, toolField: string, toolValue: string,isEpic:boolean): Promise<any> {
+    getEpicIssues(toolName: string, toolField: string, toolValue: string,type:string): Promise<any> {
         var restHandler = this.restCallHandlerService;
-        return restHandler.get("GET_EPIC_ISSUES", {'toolName': toolName, 'fieldName': toolField, 'fieldValue': toolValue,'isEpic':isEpic });
+        return restHandler.get("GET_EPIC_ISSUES", {'toolName': toolName, 'fieldName': toolField, 'fieldValue': toolValue,'type':type });
     }
 
     getIssuesPipeline(issue:string): Promise<any>{
@@ -31,7 +31,10 @@ export class TraceabiltyService implements ITraceablityService {
        return this.restCallHandlerService.postWithData("GET_ISSUES_PIPELINE", issue, { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
     }
 
-    
+    public getToolDisplayProperties()  {
+       return this.restCallHandlerService.get("GET_TOOL_PROPERTIES", {});
+    }
+
 
     getAsssetDetails(toolName: string, cachestring: string) {
         var restHandler = this.restCallHandlerService;

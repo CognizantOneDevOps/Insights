@@ -58,8 +58,6 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		super(routingKey);
 	}
 
-	private boolean dataUpdateSupported;
-	private String uniqueKey;
 	private String category;
 	private String toolName;
 	private String labelName;
@@ -69,13 +67,11 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 	private Boolean isEnrichmentRequired;
 	List<BusinessMappingData> businessMappingList = new ArrayList<BusinessMappingData>(0);
 
-	public AgentDataSubscriber(String routingKey, boolean dataUpdateSupported, String uniqueKey, String category,
+	public AgentDataSubscriber(String routingKey, String category,
 			String labelName, String toolName, List<BusinessMappingData> businessMappingList,
 			boolean isEnrichmentRequired, String targetProperty, String keyPattern, String sourceProperty)
 			throws Exception {
 		super(routingKey);
-		this.dataUpdateSupported = dataUpdateSupported;
-		this.uniqueKey = uniqueKey;
 		this.category = category;
 		this.toolName = toolName;
 		this.labelName = labelName;
@@ -111,8 +107,8 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 
 		List<JsonObject> dataList = new ArrayList<JsonObject>();
 		JsonElement json = new JsonParser().parse(message);
-		boolean dataUpdateSupported = this.dataUpdateSupported;
-		String uniqueKey = this.uniqueKey;
+		boolean dataUpdateSupported = false;
+		String uniqueKey = "";
 		JsonObject relationMetadata = null;
 		if (json.isJsonObject()) {
 			JsonObject messageObject = json.getAsJsonObject();
@@ -415,11 +411,14 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		return cypherQuery.toString();
 	}
 
-	private void buildNodePropertiesQueryPart(JsonObject node, String nodeName, StringBuffer cypherQuery) {
-		if (node.has(AgentDataConstants.PROPERTIES)) {
-			cypherQuery.append(" set ").append(nodeName).append("+=properties ");
-		}
-	}
+	private void buildNodePropertiesQueryPart(JsonObject metaDataNode, String nodeName, StringBuffer cypherQuery) {
+        if (metaDataNode.has(AgentDataConstants.PROPERTIES)) {
+            cypherQuery.append(" set ").append(nodeName).append("+=properties ");
+        } else if (metaDataNode.has(AgentDataConstants.SELECTED_PROPERTIES)) {
+            cypherQuery.append(appendSelectedAdditionalPropertyQueryPart(metaDataNode, nodeName,
+                    AgentDataConstants.SELECTED_PROPERTIES));
+        }
+    }
 
 	private String buildPropertyConstraintQueryPart(JsonObject json, String memberName) {
 		StringBuffer cypherQuery = new StringBuffer();
@@ -435,4 +434,22 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		}
 		return cypherQuery.toString();
 	}
+	
+	private String appendSelectedAdditionalPropertyQueryPart(JsonObject metaDataNodejson, String nodeName, String memberName) {
+        StringBuilder cypherQuery = new StringBuilder();
+        if (metaDataNodejson.has(memberName)) {
+            JsonArray properties = metaDataNodejson.getAsJsonArray(memberName);
+            if (properties.size() > 0) {
+                cypherQuery.append(" set ");
+                for (JsonElement additionalProperty : properties) {
+                    String fieldName = additionalProperty.getAsString();
+                    cypherQuery.append(nodeName).append(".").append(fieldName).append(" = properties.")
+                            .append(fieldName).append(",");
+                }
+                cypherQuery.delete(cypherQuery.length() - 1, cypherQuery.length());
+            }
+        }
+        return cypherQuery.toString();
+    }
+
 }

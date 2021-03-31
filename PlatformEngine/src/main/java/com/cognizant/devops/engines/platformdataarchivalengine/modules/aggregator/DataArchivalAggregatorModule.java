@@ -28,14 +28,16 @@ import com.cognizant.devops.engines.platformdataarchivalengine.message.subscribe
 import com.cognizant.devops.engines.platformdataarchivalengine.message.subscriber.DataArchivalHealthSubscriber;
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
+import com.cognizant.devops.engines.util.EngineUtils;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.DataArchivalConstants;
-import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
+import com.cognizant.devops.platformdal.dataArchivalConfig.DataArchivalConfigDal;
+import com.cognizant.devops.platformdal.dataArchivalConfig.InsightsDataArchivalConfig;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -43,6 +45,7 @@ public class DataArchivalAggregatorModule extends TimerTask implements Applicati
 	private static Logger log = LogManager.getLogger(DataArchivalAggregatorModule.class);
 	private static Map<String, EngineSubscriberResponseHandler> registry = new HashMap<>();
 	AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
+	DataArchivalConfigDal dataArchivalConfigDal = new DataArchivalConfigDal();
 
 	@Override
 	public void run() {
@@ -50,17 +53,17 @@ public class DataArchivalAggregatorModule extends TimerTask implements Applicati
 		try {
 			ApplicationConfigInterface.loadConfiguration();
 			ApplicationConfigProvider.performSystemCheck();
-			List<AgentConfig> agentConfig = agentConfigDAL.getAgentConfigurations(DataArchivalConstants.TOOLNAME,
+			List<AgentConfig> agentConfigs = agentConfigDAL.getAgentConfigurations(DataArchivalConstants.TOOLNAME,
 					DataArchivalConstants.TOOLCATEGORY);
-			if (!agentConfig.isEmpty()) {
-				JsonObject config = (JsonObject) new JsonParser().parse(agentConfig.get(0).getAgentJson());
+			for(AgentConfig agentConfig: agentConfigs) {
+				JsonObject config = (JsonObject) new JsonParser().parse(agentConfig.getAgentJson());
 				JsonObject publishJson = config.get("publish").getAsJsonObject();
 				String dataRoutingKey = publishJson.get("data").getAsString();
 				registerDataAggregator(dataRoutingKey);
 				String healthRoutingKey = publishJson.get("health").getAsString();
 				registerHealthAggregator(healthRoutingKey);
-			} else {
-				throw new InsightsCustomException("Data archival agent not present.");
+				String routingKey = config.get("subscribe").getAsJsonObject().get("dataArchivalQueue").getAsString();
+				performExpiredRecordCheck(routingKey);
 			}
 		} catch (Exception e) {
 			log.error("Unable to add subscriber ", e);
@@ -68,6 +71,31 @@ public class DataArchivalAggregatorModule extends TimerTask implements Applicati
 					" Error occured while executing data archival aggregator  " + e.getMessage(), PlatformServiceConstants.FAILURE);
 		}
 
+	}
+
+	private void performExpiredRecordCheck(String routingKey) {
+		List<InsightsDataArchivalConfig> expiredArchivalrecords = dataArchivalConfigDal.getExpiredArchivalrecords();
+		if (!expiredArchivalrecords.isEmpty()) {
+			try {
+				for(InsightsDataArchivalConfig archivalConfig: expiredArchivalrecords) {
+					JsonObject mqRequestJson = new JsonObject();
+					mqRequestJson.addProperty(DataArchivalConstants.TASK, "remove_container");
+					if(archivalConfig.getContainerID() != null && !archivalConfig.getContainerID().isEmpty()) {
+						mqRequestJson.addProperty(DataArchivalConstants.CONTAINERID, archivalConfig.getContainerID());
+					} else {
+						throw new InsightsCustomException("ContainerID is null or empty for " + archivalConfig.getArchivalName());
+					}
+					EngineUtils.publishMessageInMQ(routingKey, mqRequestJson.toString());
+				}
+				
+			} catch (Exception e) {
+				log.error(e);
+			}
+		} else {
+			log.debug("No archival records are currently on due to expire");
+		}
+
+		
 	}
 
 	private void registerDataAggregator(String dataRoutingKey) {

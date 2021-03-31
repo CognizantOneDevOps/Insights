@@ -7,7 +7,7 @@
 	},
   "mqConfig": {
     "user": "username for RabbitMq",
-    "password": "Password for RabbitMq",
+    "password": "",
     "host": "127.0.0.1",
     "exchange": "iSight",
     "agentControlXchg":"iAgent"
@@ -49,7 +49,7 @@
 "isDebugAllowed" : false,
 "enableValueArray": false,
 "userid": "userid",
-"passwd": "password",
+"passwd": "",
 "BaseUrl": "#BaseUrl",
 "TeamName": "people-sched",
 "timeStampField":"startDate",

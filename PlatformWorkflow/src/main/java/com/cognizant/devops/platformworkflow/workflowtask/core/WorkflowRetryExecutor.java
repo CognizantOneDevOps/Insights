@@ -161,11 +161,12 @@ public class WorkflowRetryExecutor implements Job, ApplicationConfigInterface {
 						firstworkflowTask.getWorkflowTaskEntity().getTaskId(), firstworkflowTask.getNextTask(),
 						firstworkflowTask.getSequence(), mqRequestJson);
 				try {
+					Thread.sleep(1);
 					log.debug(" Worlflow Detail ==== before publish message retryWorkflowWithoutHistory {} ",
 							mqRequestJson);
 					workflowProcessing.publishMessageInMQ(firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),
 							mqRequestJson);
-				} catch (WorkflowTaskInitializationException e) {
+				} catch (WorkflowTaskInitializationException | InterruptedException e) {
 					log.debug(
 							" Worlflow Detail ==== retryWorkflowWithoutHistory workflow failed to execute due to MQ exception {}  ",
 							workflowConfig.getWorkflowId());

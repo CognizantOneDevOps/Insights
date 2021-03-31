@@ -109,7 +109,7 @@ public class EngineAggregatorModule extends TimerTask implements ApplicationConf
 
 			if (dataRoutingKey != null && !registry.containsKey(dataRoutingKey)) {
 				try {
-					registry.put(dataRoutingKey, new AgentDataSubscriber(dataRoutingKey,agentConfig.isDataUpdateSupported(), agentConfig.getUniqueKey(),
+					registry.put(dataRoutingKey, new AgentDataSubscriber(dataRoutingKey,
 							agentConfig.getToolCategory(), agentConfig.getLabelName(), toolName, businessMappingList,isEnrichmentRequired, targetProperty,
 							keyPattern,sourceProperty));
 				} catch (Exception e) {

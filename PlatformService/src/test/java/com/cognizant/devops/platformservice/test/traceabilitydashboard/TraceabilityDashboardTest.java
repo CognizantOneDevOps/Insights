@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.compress.utils.IOUtils;
@@ -108,7 +109,7 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 		JsonObject resp = new JsonObject();
 		try {
 			  resp = service.getPipeline(TreceabilityTestData.toolName, TreceabilityTestData.fieldName,
-					TreceabilityTestData.fieldVal,false);
+					Arrays.asList(TreceabilityTestData.fieldVal),"Issue");
 			  if(resp.get("pipeline").getAsJsonArray().size()==0)
 			  {
 				  throw new InsightsCustomException("data not found");
@@ -126,7 +127,7 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 		JsonObject resp = new JsonObject();
 		try {
 			  resp = service.getPipeline(TreceabilityTestData.toolName, TreceabilityTestData.fieldName,
-					TreceabilityTestData.fieldVal,false);
+					  Arrays.asList(TreceabilityTestData.fieldVal),"Issue");
 			  if(resp.get("summary").getAsJsonArray().size()==0)
 			  {
 				  throw new InsightsCustomException("summary data not found");
@@ -141,7 +142,7 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 	@Test(priority = 6)
 	public void testPipelineResponseWithIncorrectData() throws InsightsCustomException {
 		JsonObject resp = service.getPipeline(TreceabilityTestData.toolName, TreceabilityTestData.fieldName,
-				TreceabilityTestData.incorrectFieldVal,false);
+				Arrays.asList(TreceabilityTestData.incorrectFieldVal),"Issue");
 		Assert.assertEquals(0, resp.get("pipeline").getAsJsonArray().size());
 	}
 	

@@ -1,13 +1,13 @@
 {
-  "vault": {
+	"vault": {
 		"getFromVault": false,
-		"secretEngine":"insights-kv",
-		"readToken":"vault_secret_token",
-		"vaultUrl":"http://Vault_Host:port/v1/"
+		"secretEngine": "insights-kv",
+		"readToken": "vault_secret_token",
+		"vaultUrl": "http://Vault_Host:port/v1/"
 	},
   "mqConfig": {
     "user": "username for RabbitMq",
-    "password": "Password for RabbitMq",
+    "password": "",
     "host": "127.0.0.1",
     "exchange": "iSight",
     "agentControlXchg": "iAgent"
@@ -42,8 +42,8 @@
   "runSchedule": 30,
   "timeStampField": "buildTime",
   "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
-  "awsAccesskey": "accesskey",
-  "awsSecretkey": "seccretkey",
+  "awsAccesskey": "",
+  "awsSecretkey": "",
   "awsRegion": "region",
   "isEpochTimeFormat": false,
   "agentSecretDetails": ["awsAccesskey","awsSecretkey","awsRegion"],

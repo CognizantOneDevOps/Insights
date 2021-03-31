@@ -31,6 +31,8 @@ import thread
 import pika
 import Queue
 import os
+import shutil
+import stat
 
 from ....core.MessageQueueProvider import MessageFactory
 from ....core.BaseAgent import BaseAgent
@@ -104,7 +106,6 @@ def getCSVHeaderFromSchemaIndex(esHelperObj,indexName):
 
 #################################################################
 def getCSVHeaderFromESIndex(esHelperObj,indexName1,indexType1):
-
     datatypeMapping = {'boolean': ':BOOLEAN', 'integer':':INT','float': ':FLOAT', 'date':':DATETIME','long':':LONG','double':':DOUBLE'}
     excludeList = {'uuid:ID':0 ,':LABEL':0 ,':START_ID':0 ,':END_ID':0,':TYPE':0, 'inSightsTime:DOUBLE':0 }
     headerCreatedList = {}
@@ -166,7 +167,6 @@ def getCSVHeaderFromESIndex(esHelperObj,indexName1,indexType1):
 #*********************************************************
 
 def modifyDictKeys(dict,indexType1,csvHeaders):
-
     headerCreatedList = {}
 
     #Take  copy of the dict, and modify original dict keys
@@ -197,16 +197,15 @@ def modifyDictKeys(dict,indexType1,csvHeaders):
 
     return dict
 
-def getAllIndices (elasticsearch_hostname_uri,csv_download_path):
-
+def getAllIndices (self,elasticsearch_hostname_uri,csv_download_path):
+    logging.debug("INFO: Get all ES indices")
     allIndices={}
     global neo4jImportCmd
     #neo4jImportCmd = "./bin/neo4j-admin import  --delimiter=\",\" --array-delimiter=\"^\"  --multiline-fields=true "
     neo4jImportCmd = "./bin/neo4j-import  --delimiter=\",\" --array-delimiter=\"^\"  --multiline-fields=true --ignore-empty-strings=true  --into data/databases/graph.db/"
 
-
-    esHelperObj = elasticsearch.Elasticsearch(hosts=elasticsearch_hostname_uri)
-
+    esHelperObj = elasticsearch.Elasticsearch(hosts=elasticsearch_hostname_uri,http_auth=(self.getCredential('elasticsearch_username'), self.getCredential('elasticsearch_passwd')))
+    
     indices = esHelperObj.indices.get_alias("*")
 
     for k,v in indices.items():
@@ -214,7 +213,10 @@ def getAllIndices (elasticsearch_hostname_uri,csv_download_path):
         #Get only the node and relation indices, ignore scheme indices
         if "_neo4j_schema" not in k:
             index_map = esHelperObj.indices.get_mapping(k)
-            temp=index_map[k]['mappings']['_doc']['properties']
+            if int(esHelperObj.info().get('version').get('number').split('.')[0]) > 6:
+                temp=index_map[k]['mappings']['properties']
+            if int(esHelperObj.info().get('version').get('number').split('.')[0]) == 6:
+                temp=index_map[k]['mappings']['_doc']['properties']
 
             if temp.get("uuid")!=None and temp.get("_label")!=None and temp.get("inSightsTime")!=None:
                 allIndices[k] = "node"
@@ -239,7 +241,8 @@ def es_write_csv(MainClass,ESIndex, ESIndexType, elasticsearch_hostname_uri,fetc
 
     try:
 
-        _es = elasticsearch.Elasticsearch(hosts=elasticsearch_hostname_uri)
+        #_es = elasticsearch.Elasticsearch(hosts=elasticsearch_hostname_uri)
+        _es = elasticsearch.Elasticsearch(hosts=elasticsearch_hostname_uri,http_auth=(MainClass.getCredential('elasticsearch_username'), MainClass.getCredential('elasticsearch_passwd')))
         if not _es.ping():
             print('ERROR - ES CONNECT FAIL....',elasticsearch_hostname_uri)
             raise Exception("ERROR:: FAILED CONNECT TO ES....",elasticsearch_hostname_uri)
@@ -321,9 +324,9 @@ def es_write_csv(MainClass,ESIndex, ESIndexType, elasticsearch_hostname_uri,fetc
             raise Exception("Invalid CSV Download Path....",csv_download_path)
 
         with open(csv_download_path + "/"+ESIndex + '.csv', 'w') as f:
-            header_present = False
+            w = csv.DictWriter(f,fieldnames=csvHeader.values(),escapechar="\\",quoting=csv.QUOTE_ALL)
+            w.writeheader()
             for doc in ESResponse:
-
                 my_dict = doc['_source']
                 #print("\n***************************")
                 #print("Writing Index...",str(my_dict))
@@ -332,17 +335,6 @@ def es_write_csv(MainClass,ESIndex, ESIndexType, elasticsearch_hostname_uri,fetc
                 # eg. 'uuid' --> ':ID', '_labels' --> ':LABEL'
                 # Append Datatype , eg:  'insightsTime' --> 'insightsTime:DATE'
                 my_dict = modifyDictKeys(my_dict, ESIndexType, csvHeader)
-
-                # 2. First time Only - Write CSV Header
-                if not header_present:
-                    #w = csv.DictWriter(f, csvHeader.values())  #,  extrasaction='ignore')
-                    #w = csv.DictWriter(f,fieldnames=csvHeader.values(),delimiter=",",escapechar="\\",quoting=csv.QUOTE_NONE)
-
-                    #use QUOTE_ALL for to  cover quotes within fields, change escape char
-                    w = csv.DictWriter(f,fieldnames=csvHeader.values(),escapechar="\\",quoting=csv.QUOTE_ALL)
-                    w.writeheader()
-                    header_present = True
-
                 # 3. Write Row
                 w.writerow(my_dict)
                 i=i+1
@@ -385,6 +377,7 @@ def entryproccess(self):
             global myqueue
 
 
+            logging.debug("INFO: Wait for RabbitMQ Message...")
             print("INFO: Wait for RabbitMQ Message...")
             ##BLOCKING CALL
             queueData=myqueue.get()
@@ -399,19 +392,32 @@ def entryproccess(self):
             #start_time = self.get_epoch(self.config.get('start_time', ''), time_format)
             #finish_time = self.get_epoch(self.config.get('finish_time', ''), time_format)
 
-            start_time = queueData["start_time"]
-            finish_time = queueData["finish_time"]
-            archivalName = queueData["archival_name"]
+            task = queueData.get('task',None)
+            if task:
+              if task=='remove_container':
+                container_id = queueData["containerID"]
+                try:
 
-            es_indexes = self.config.get('es_indexes', {})
-            no_of_processes = self.config.get('no_of_processes', 8)
-            #csv_download_path = self.config.get('csv_download_path', '')
-            fetch_all_data = self.config.get('fetch_all_data', 1)
+                  self.remove_docker_container(container_id)
 
-            try:
+                except Exception as ex:
+                  logging.error(ex)
+                  self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
+            else:
+              start_time = queueData["start_time"]
+              finish_time = queueData["finish_time"]
+              archivalName = queueData["archival_name"]
+
+              es_indexes = self.config.get('es_indexes', {})
+              no_of_processes = self.config.get('no_of_processes', 8)
+              #csv_download_path = self.config.get('csv_download_path', '')
+              fetch_all_data = self.config.get('fetch_all_data', 1)
+
+              try:
 
                 ports,volumes,csv_download_path = self.checkPortAvailability()
                 if  len(ports) == 0:
+                    logging.debug("ERROR::Docker --> No Free Ports Available")
                     print("ERROR::Docker --> No Free Ports Available")
 
                     ex = archivalName+" \n Docker ERROR::--> No Free Ports Available "
@@ -419,10 +425,9 @@ def entryproccess(self):
                     self.publishHealthDataForExceptions(ex, additionalProperties=additionalProperties)
 
                     continue
-                
                 #if "*":"*" get all the indices
                 if es_indexes.get("*")!=None:
-                    es_indexes = getAllIndices(elasticsearch_hostname_uri,csv_download_path)
+                    es_indexes = getAllIndices(self,elasticsearch_hostname_uri,csv_download_path)
 
                 pool = multiprocessing.Pool(no_of_processes)
 
@@ -458,18 +463,19 @@ def entryproccess(self):
           
                 neo4jImportCmd=''
 
-            except Exception as ex:
+              except Exception as ex:
                 logging.error(ex)
                 self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
 
-            print('Exit  Main Process...Time Elapased:',time.time()-start, "...TotalNodes:",ns["totalNode"],"..REls:",ns["totalRel"],"....Errors:", str(nodeErrors.keys()))
-            logging.debug('Exit  Main Process...Time Elapased:'+str(time.time()-start)+"...TotalNodes:"+str(ns["totalNode"])+"..REls:"+str(ns["totalRel"])+"....Errors"+str(nodeErrors.keys()))
+              print('Exit  Main Process...Time Elapased:',time.time()-start, "...TotalNodes:",ns["totalNode"],"..REls:",ns["totalRel"],"....Errors:", str(nodeErrors.keys()))
+              logging.debug('Exit  Main Process...Time Elapased:'+str(time.time()-start)+"...TotalNodes:"+str(ns["totalNode"])+"..REls:"+str(ns["totalRel"])+"....Errors"+str(nodeErrors.keys()))
 
-            #Shutdown
-            manager.shutdown()
-            #queue_channel.basic_ack(delivery_tag = queue_method.delivery_tag)
+              #Shutdown
+              manager.shutdown()
+              #queue_channel.basic_ack(delivery_tag = queue_method.delivery_tag)
 
     except (KeyboardInterrupt, SystemExit,EOFError):
+        logging.debug("exception")
         print("exception")
         self.publishHealthData(self.generateHealthData(systemFailure=True))
 
@@ -491,12 +497,13 @@ class ElasticTransferAgent(BaseAgent):
             credentials = pika.PlainCredentials(self.config.get('mqConfig').get('user'), self.config.get('mqConfig').get('password'))
             connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=self.config.get('mqConfig').get('host')))
             channel = connection.channel()
-            queue=self.config.get('subscribe').get('dataArchivalQueue')
+            queue=self.config.get('subscribe').get('dataArchivalQueue').replace('.','_')
             channel.queue_declare(queue=queue,durable=True,)
 
             # Consume "dataArchivalQueue"
-            routingKey = self.config.get('subscribe').get('dataArchivalQueue')
+            routingKey = self.config.get('subscribe').get('dataArchivalQueue').replace('.','_')
             self.messageFactory.subscribe(routingKey, self.callback)
+            logging.debug("INFO: Connected to RabitMQ..")
             print("INFO: Connected to RabitMQ..")
 
         except Exception as ex:
@@ -508,6 +515,7 @@ class ElasticTransferAgent(BaseAgent):
         routingKey = self.config.get('subscribe').get('agentCtrlQueue')
         def callback(ch, method, properties, data):
 
+            logging.debug("RabbitMQ -> Agent ctrl Queue")
             print("RabbitMQ -> Agent ctrl Queue")
             #Update the config file and cache.
             action = data
@@ -541,31 +549,47 @@ class ElasticTransferAgent(BaseAgent):
     #Queue callback from RabbitMQ
     def callback(self,ch, method, properties, data):
 
+        logging.debug("INFO:: RabbitMQ data Callback")
         print("INFO:: RabbitMQ data Callback")
         data=json.loads(data)
-
-        start_time=data['startDate']
-        finish_time=data['endDate']
-        archival_name=data['archivalName']
-        print(start_time+" "+finish_time)
-        days_to_retain=data['daysToRetain']
-
-        time_format = self.config.get('time_format', '')
-        start_time = self.get_epoch(start_time, time_format)
-        finish_time = self.get_epoch(finish_time, time_format)
-
-        #insert data into Global Queue for Es2CSV
+    
         global myqueue
-        queueData={}
-        queueData['start_time']=start_time
-        queueData['finish_time']=finish_time
-        queueData['archival_name']=archival_name
+        if data.get('task',None):
+          task = data.get('task',None)
+          container_id = data.get('containerID',None)
+          queueData={}
+          queueData['task']=task
+          queueData['containerID']=container_id
+          myqueue.put(queueData)
+          logging.debug("*************queue inserted************")
+          print("*************queue inserted************")
+          #Acknowledge data received
+          ch.basic_ack(delivery_tag = method.delivery_tag)
+        else:
+          start_time=data['startDate']
+          finish_time=data['endDate']
+          archival_name=data['archivalName']
+          logging.debug(start_time+" "+finish_time)
+          print(start_time+" "+finish_time)
+          days_to_retain=data['daysToRetain']
+          #days_to_retain=data.get('daysToRetain',None)
 
-        myqueue.put(queueData)
-        print("**************queue inserted**********")
+          time_format = self.config.get('time_format', '')
+          start_time = self.get_epoch(start_time, time_format)
+          finish_time = self.get_epoch(finish_time, time_format)
 
-        #Acknowledge data received
-        ch.basic_ack(delivery_tag = method.delivery_tag)
+          #insert data into Global Queue for Es2CSV
+          queueData={}
+          queueData['start_time']=start_time
+          queueData['finish_time']=finish_time
+          queueData['archival_name']=archival_name
+
+          myqueue.put(queueData)
+          logging.debug("**************queue inserted**********")
+          print("**************queue inserted**********")
+
+          #Acknowledge data received
+          ch.basic_ack(delivery_tag = method.delivery_tag)
 
 
     def get_epoch(self, time_string, time_format):
@@ -578,12 +602,13 @@ class ElasticTransferAgent(BaseAgent):
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
 
     def checkPortAvailability(self):
-
+        logging.debug("INFO::Checking port availability")
         bindPort=self.config.get('dynamicTemplate', {}).get('bindPort','')
         hostPort=self.config.get('dynamicTemplate', {}).get('hostPort','')
         hostVolume=self.config.get('dynamicTemplate', {}).get('hostVolume','')
         mountVolume=self.config.get('dynamicTemplate', {}).get('mountVolume','')
         hostAddress=self.config.get('hostAddress','')
+        dockerCSVPath = self.config.get('docker_csv_path','')
         portlen=len(hostPort)
         volumelen=len(mountVolume)
 
@@ -594,7 +619,7 @@ class ElasticTransferAgent(BaseAgent):
         #volumeindex=1
         cli= docker.APIClient(base_url='tcp://'+self.config.get('dockerHost','')+':'+ str(self.config.get('dockerPort','')))
         containers = cli.containers()
-
+        
         allocatedPorts =[]
         for container in containers:
             for each_port in container['Ports']:
@@ -610,28 +635,68 @@ class ElasticTransferAgent(BaseAgent):
                 #Volumes - Port1 - "Data1", "import1", "log1", "conf1"
                 # Port 2 -   "Data2", "conf2", etc
 
-                print("INFO::Docker Port Allocated Success... HOST--->"+hostAddress+"-->Neo4j:"+str(hostPort[0]) +"...BOLT:"+str(hostPort[1]))
+                logging.debug("INFO::Docker Port Allocated Success... HOST--->"+hostAddress+"-->Neo4j:"+str(hostPort[x]) +"...BOLT:"+str(hostPort[x+1]))
+                print("INFO::Docker Port Allocated Success... HOST--->"+hostAddress+"-->Neo4j:"+str(hostPort[x]) +"...BOLT:"+str(hostPort[x+1]))
 
                 for i in range(0,4):
-                    volume.append(hostVolume[i]+str(volumeindex)+":"+mountVolume[i])
-
-                    volumepath = "/var/lib/docker/volumes/"+hostVolume[i]+str(volumeindex)
-                    if "import" in volumepath:
-                        csv_download_path =  volumepath +'/_data'
-                    # recreate volume
-                    cli = docker.APIClient(base_url='tcp://'+self.config.get('dockerHost','')+':'+ str(self.config.get('dockerPort','')))
-                    #To handle volume not found exception
-                    cli.create_volume(hostVolume[i]+str(volumeindex))
-                    cli.remove_volume(hostVolume[i]+str(volumeindex))
-                    cli.create_volume(hostVolume[i]+str(volumeindex))
-                    print("INFO::Docker New volume :: "+hostVolume[i]+str(volumeindex))
+                    if "import" in hostVolume[i]:
+                        csv_download_path = os.path.join(os.environ['INSIGHTS_HOME'],"es_importcsv",hostVolume[i]+str(volumeindex))
+                        if os.path.exists(csv_download_path):
+                            os.chmod(csv_download_path, stat.S_IWRITE)
+                            shutil.rmtree(csv_download_path)
+                            os.makedirs(csv_download_path, mode=777)
+                        else:
+                            os.makedirs(csv_download_path, mode=777)
+                        if dockerCSVPath != "":
+                            volume.append(dockerCSVPath+"/"+hostVolume[i]+str(volumeindex)+":"+mountVolume[i])
+                        else:
+                            raise Exception("Docker CSV path not provided")
+                    else:
+                        volume.append(hostVolume[i]+str(volumeindex)+":"+mountVolume[i])
+                        # recreate volume
+                        cli = docker.APIClient(base_url='tcp://'+self.config.get('dockerHost','')+':'+ str(self.config.get('dockerPort','')))
+                        #To handle volume not found exception
+                        cli.create_volume(hostVolume[i]+str(volumeindex))
+                        cli.remove_volume(hostVolume[i]+str(volumeindex))
+                        cli.create_volume(hostVolume[i]+str(volumeindex))
+                        logging.debug("INFO::Docker New volume :: "+hostVolume[i]+str(volumeindex))
+                        print("INFO::Docker New volume :: "+hostVolume[i]+str(volumeindex)) 
 
                 break
             #else:
                 #print("INFO::Docker",str(hostPort[x]),"port already allocated")
         return port,volume,csv_download_path
 
+    def remove_docker_container(self,container_id):
+        logging.debug("INFO::Removing Docker Instance")
+        print("INFO::Removing Docker Instance")
+        responseTemplate = self.getResponseTemplate()
+        dataTransferMetadata = self.config.get('dynamicTemplate', {}).get('dataTransferMetadata', None)
+
+        mq_response={}
+
+        try:
+
+            cli = docker.APIClient(base_url='tcp://'+self.config.get('dockerHost','')+':'+ str(self.config.get('dockerPort','')))
+            cli.remove_container(container_id,force=True)
+
+            mq_response["task"]="remove_container"
+            mq_response["containerID"]=container_id
+            mq_response["status"]="Success"
+            logging.debug("containerID "+container_id+" Removed Succesfully")
+            print("containerID "+container_id+" Removed Succesfully")
+            data=list()
+            data += self.parseResponse(responseTemplate, mq_response)
+            metadata = {
+                          "dataUpdateSupported" : False
+                       }
+            self.publishToolsData(data,metadata)
+
+        except Exception as ex:
+            logging.error(ex)
+
     def docker_container_with_neo4j(self,neo4jImportCmd,port,volume,ns,nodeErrors,archivalName):
+        logging.debug("INFO::Creating Docker Instance")
         print("INFO::Creating Docker Instance")
         responseTemplate = self.getResponseTemplate()
         dataTransferMetadata = self.config.get('dynamicTemplate', {}).get('dataTransferMetadata', None)
@@ -642,20 +707,40 @@ class ElasticTransferAgent(BaseAgent):
         try:
 
             cli= docker.APIClient(base_url='tcp://'+self.config.get('dockerHost','')+':'+ str(self.config.get('dockerPort','')))
-            #for line in cli.pull(self.config.get('dockerImageName','')+':'+self.config.get('dockerImageTag',''),auth_config=docker_auth, stream=True):
-            #    print(json.dumps(json.loads(line), indent=4 ))
+
+            docker_image_not_found_flag = True
+            dockerImage = self.config.get('dockerImageName','')+':'+self.config.get('dockerImageTag','')
+            client_images =  cli.images()
+            for images in client_images:
+                if images['RepoTags'][0] == dockerImage:
+                    docker_image_not_found_flag = False
+                    logging.debug("Docker Image Found.")
+                    print("Docker Image Found.")
+
+            if docker_image_not_found_flag == True:
+              logging.error("Docker Image Not Found.")
+              print("Docker Image Not Found.")
+              docker_auth={'username':'','password':''}
+              docker_auth['username']=self.getCredential('docker_repo_username')
+              docker_auth['password']=self.getCredential('docker_repo_passwd')
+              for line in cli.pull(dockerImage, auth_config=docker_auth, stream=True):
+                  print(json.dumps(json.loads(line), indent=4 ))
 
             #####creating conatiner and importing csv ######
-            container_id = cli.create_container(self.config.get('dockerImageName','')+':'+self.config.get('dockerImageTag',''), 'ls', ports=self.config.get('dynamicTemplate', {}).get('bindPort',''), volumes=self.config.get('dynamicTemplate', {}).get('mountVolume',''),environment=['COMMAND_HERE='+neo4jImportCmd],host_config=cli.create_host_config(port_bindings=port,binds=volume))
+            container_id = cli.create_container(self.config.get('dockerImageName','')+':'+self.config.get('dockerImageTag',''), 'ls', ports=self.config.get('dynamicTemplate', {}).get('bindPort',''), volumes=self.config.get('dynamicTemplate', {}).get('mountVolume',''),environment=['COMMAND_HERE='+neo4jImportCmd],host_config=cli.create_host_config(port_bindings=port,binds=volume,privileged=True))
             response = cli.start(container=container_id.get('Id'))
 
             #print(response)
+            logging.debug("For archival record "+archivalName)
+            logging.debug(container_id)
+            print("For archival record "+archivalName)
             print(container_id)
                         #####getting status of spawned container#####
             container_details=cli.inspect_container(container_id["Id"])
 
             mq_response["sourceUrl"]="http://"+container_details["NetworkSettings"]["Ports"][str(self.config.get('dynamicTemplate', {}).get('bindPort','')[0])+"/tcp"][0]["HostIp"]+":"+container_details["NetworkSettings"]["Ports"][str(self.config.get('dynamicTemplate', {}).get('bindPort','')[0])+"/tcp"][0]["HostPort"]
             mq_response["archivalName"]=archivalName
+            mq_response["containerID"]=container_id.get('Id',None)
             if container_details["State"]["Status"]=="running":
                 mq_response["status"]="Success"
 
@@ -671,14 +756,67 @@ class ElasticTransferAgent(BaseAgent):
                 print("***************")
                         #####executing command inside a conatiner#####
             '''
-            time.sleep(70)
-
-            print("INFO::DockerContainer Creation Success..."+mq_response["sourceUrl"])
-
-            #print(container_id["Id"])
-            exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c','cd neo4j-Insights && bin/cypher-shell -a bolt://localhost:7687 -u neo4j -p C0gnizant@1 "match(n) return count (n)"'])
+            neo4j_user_id = self.getCredential('neo4j_user_id')
+            neo4j_password = self.getCredential('neo4j_password')
+            exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c','cd neo4j-Insights && bin/cypher-shell -a bolt://localhost:7687 -u '+neo4j_user_id+' -p '+neo4j_password+' "match(n) return count (n)"'])
             #print(exec_id)
             result=cli.exec_start(exec_id["Id"])
+            logging.debug("INFO::Cypher Test Exec Result::"+result)
+            print("INFO::Cypher Test Exec Result::"+result)
+
+            while "Connection refused" in str(result):
+                logging.debug("Waiting another 10 seconds for neo4j to start")
+                print("Waiting another 10 seconds for neo4j to start")
+                time.sleep(10)
+                exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c','cd neo4j-Insights && bin/cypher-shell -a bolt://localhost:7687 -u '+neo4j_user_id+' -p '+neo4j_password+' "match(n) return count (n)"'])
+                #print(exec_id)
+                result=cli.exec_start(exec_id["Id"])
+
+            logging.debug("INFO::DockerContainer Creation Success..."+mq_response["sourceUrl"])
+            print("INFO::DockerContainer Creation Success..."+mq_response["sourceUrl"])
+            _es = elasticsearch.Elasticsearch(hosts=self.config.get('elasticsearch_hostname_uri',''),http_auth=(self.getCredential('elasticsearch_username'), self.getCredential('elasticsearch_passwd')))
+
+            #print(container_id["Id"])
+            nodeBody = {
+                "size": 1,
+                "query": {
+                        "match_all": {}
+                    }
+
+            }
+            neo4jIndex = "neo4j_index"
+
+            ESResponse = elasticsearch.helpers.scan(_es, index=neo4jIndex, doc_type="_doc",
+                                query={"query": nodeBody["query"]},
+                                scroll='10s', raise_on_error=True, preserve_order=False,
+                                size=1,
+                                request_timeout=None,ignore=[404])
+
+
+            #indexCreationCommand='cd neo4j-Insights && '
+            indexCreationCommand='echo "'
+
+            for doc in ESResponse:
+                indexDict = doc['_source']
+                for index in indexDict:
+                  if indexDict[index] == 'ONLINE':
+                    #indexCreationCommand += 'bin/cypher-shell -a bolt://localhost:7687 -u '+neo4j_user_id+' -p '+neo4j_password+' "'+'CREATE '+ index+'";'
+                    indexCreationCommand += 'CREATE '+ index+';'
+                break
+
+            indexCreationCommand+='" | neo4j-Insights/bin/cypher-shell -a bolt://localhost:7687 -u '+neo4j_user_id+' -p '+neo4j_password
+            exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c',indexCreationCommand])
+            result=cli.exec_start(exec_id["Id"])
+            
+            logging.debug("Waiting for index creation")
+            print("Waiting for index creation")
+            exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c','cd neo4j-Insights && bin/cypher-shell -a bolt://localhost:7687 -u '+neo4j_user_id+' -p '+neo4j_password+' "CALL db.awaitIndexes(36000)"'])
+            result=cli.exec_start(exec_id["Id"])
+
+            exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c','cd neo4j-Insights && bin/cypher-shell -a bolt://localhost:7687 -u '+neo4j_user_id+' -p '+neo4j_password+' "match(n) return count (n)"'])
+            #print(exec_id)
+            result=cli.exec_start(exec_id["Id"])
+            logging.debug("INFO::Cypher Test Exec Result::"+result)
             print("INFO::Cypher Test Exec Result::"+result)
 
             if "Connection refused" in str(result):
@@ -692,11 +830,13 @@ class ElasticTransferAgent(BaseAgent):
                 parsedData = self.parseResponse(responseTemplate, mq_response, {})
 
                 print("ERROR::Cont Mismatch. Neo4j  Import Error(s)")
+                logging.debug("ERROR::Cont Mismatch. Neo4j  Import Error(s)")
                 self.publishToolsData(parsedData)
             else:
                 mq_response["message"]="Node Count = "+str(nodecount)
                 #print('****************MQ RESPONSE****************')
                 #print(mq_response)
+                logging.debug("Docker Container Succesfully started")
                 print("Docker Container Succesfully started")
                 data=list()
                 data += self.parseResponse(responseTemplate, mq_response)
@@ -705,7 +845,6 @@ class ElasticTransferAgent(BaseAgent):
                               "dataUpdateSupported" : False
                            }
                 self.publishToolsData(data,metadata)
-
 
             ##comment these
         except Exception as ex:

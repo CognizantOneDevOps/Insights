@@ -25,6 +25,7 @@ import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
+import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
@@ -201,6 +202,81 @@ public class DataArchivalConfigDal extends BaseDAL {
 			log.error(e.getMessage());
 			throw e;
 		}
+	}
+	
+	/**
+	 * Method to update source URL, containerID and expiry date.
+	 * 
+	 * @param archivalName
+	 * @param sourceUrl
+	 * @param containerID
+	 * @param expiryDate
+	 * @return Boolean
+	 */
+	public Boolean updateContainerDetails(String archivalName, String sourceUrl, String containerID, Long expiryDate) {
+		try (Session session = getSessionObj()) {
+			Query<InsightsDataArchivalConfig> createQuery = session.createQuery(
+					INSIGHTSDATAARCHIVALCONFIG_QUERY + DA_ARCHIVALNAME,
+					InsightsDataArchivalConfig.class);
+			createQuery.setParameter(ARCHIVALNAME, archivalName);
+			InsightsDataArchivalConfig updateSourceUrl = createQuery.uniqueResult();
+			if (updateSourceUrl != null) {
+				updateSourceUrl.setSourceUrl(sourceUrl);
+				updateSourceUrl.setContainerID(containerID);
+				updateSourceUrl.setExpiryDate(expiryDate);
+				updateSourceUrl.setStatus(DataArchivalStatus.ACTIVE.name());
+				session.beginTransaction();
+				session.update(updateSourceUrl);
+				session.getTransaction().commit();
+
+			} else {
+				throw new NoResultException("No entity result found for query");
+			}
+			return Boolean.TRUE;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
+	}
+	
+	/**
+	 * Method to get specific archival record using containerID.
+	 * 
+	 * @param containerID
+	 * @return InsightsDataArchivalConfig object
+	 */
+	public InsightsDataArchivalConfig getArchivalRecordByContainerId(String containerID) {
+		
+		try (Session session = getSessionObj()) {
+			Query<InsightsDataArchivalConfig> createQuery = session.createQuery(
+					INSIGHTSDATAARCHIVALCONFIG_QUERY + "DA.containerID = :containerID",
+					InsightsDataArchivalConfig.class);
+			createQuery.setParameter("containerID", containerID);
+			return createQuery.uniqueResult();
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
+		
+	}
+	
+	/**
+	 * Method to get expired records which have status other than TERMINATED.
+	 * 
+	 * @return List<InsightsDataArchivalConfig>
+	 */
+	public List<InsightsDataArchivalConfig> getExpiredArchivalrecords() {
+		try (Session session = getSessionObj()) {
+			long now = InsightsUtils.getCurrentTimeInSeconds();
+			Query<InsightsDataArchivalConfig> createQuery = session.createQuery(
+					INSIGHTSDATAARCHIVALCONFIG_QUERY + "DA.expiryDate <= :now AND DA.status != 'TERMINATED'", InsightsDataArchivalConfig.class);
+			createQuery.setParameter("now", now);
+			return createQuery.getResultList();
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
+		
 	}
 
 }

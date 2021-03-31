@@ -25,14 +25,12 @@ import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
 import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowTaskInitializationException;
-import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadPool;
 import com.google.gson.JsonObject;
 
 public class WorkflowExecutor implements Job , ApplicationConfigInterface{
@@ -80,11 +78,13 @@ public class WorkflowExecutor implements Job , ApplicationConfigInterface{
 				workflowProcessing.createTaskRequestJson(executionId, workflowConfig.getWorkflowId(),
 						firstworkflowTask.getWorkflowTaskEntity().getTaskId(), firstworkflowTask.getNextTask(),
 						firstworkflowTask.getSequence(), mqRequestJson);
+				
 				try {
+					Thread.sleep(1);
 					log.debug(" Worlflow Detail ==== before publish message executeWorkflow {} ", mqRequestJson);
 					workflowProcessing.publishMessageInMQ(firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),
 							mqRequestJson);
-				} catch (WorkflowTaskInitializationException e) {
+				} catch (WorkflowTaskInitializationException | InterruptedException e) {
 					log.debug(" Worlflow Detail ====  workflow failed to execute due to MQ exception {}  ",
 							workflowConfig.getWorkflowId());
 					InsightsStatusProvider.getInstance().createInsightStatusNode("WorkflowExecutor failed due to exception: "+workflowConfig.getWorkflowId(),

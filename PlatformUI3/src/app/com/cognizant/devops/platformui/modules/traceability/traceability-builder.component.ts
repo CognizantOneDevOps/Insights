@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, Renderer2 } from '@angular/core';
 import { TraceabiltyService } from './traceablity-builder.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -14,7 +14,7 @@ import { DataSharedService } from '@insights/common/data-shared-service';
     styleUrls: ['./traceability-builder.component.css', './../home.module.css']
 })
 
-export class TraceabilityDashboardCompenent implements OnInit {
+export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
     isDatainProgress = false;
     selectedTool: string;
     selectedField: string;
@@ -23,6 +23,7 @@ export class TraceabilityDashboardCompenent implements OnInit {
     isToolSelected: boolean;
     isFieldSelected: boolean;
     list = [];
+    epiccachestring: string;
     cachestring: string;
     pipeheight = 0;
     traceabilityData: any;
@@ -35,14 +36,54 @@ export class TraceabilityDashboardCompenent implements OnInit {
     resultSummary: any;
     toolSummaryArray = [];
     timeZone: string = "";
-    toolTimelagArray = [];
+    toolTimelagArray: any;
     isEnable = false;
     timelagData: {}
-    isEpic:boolean =false;
+    isEpic: boolean = false;
     issueTypeSelected: string;
-    issueTypes:string[]=['Epic','Issue'];
+    git = [];
+    epicArr = [];
+    jiraArr = [];
+    jenkins = [];
+    sonar = [];
+    runDeck = [];
+    showGit: boolean = false;
+    epic: boolean;
+    showAll: boolean;
+    issueTypes: string[] = ['Other', 'Epic', 'Issue'];
+    globalData: any;
+    filteredData = [];
+    toolNameArr = [];
+    isSelected: string;
+    selected = [false, false, false, false];
+    selectedJira: number;
+    selectedGit: number;
+    selectedJenkin: number;
+    selectedSonar: number;
+    selectedRunDeck: number;
+    traceabilityObj = {};
+    map = new Map<String, Object[]>();
+    globalMap = new Map<String, Object[]>();
+    displayProperty = [];
+    mapValues: any;
+    formatedData: string;
+    modalleft: any;
+    modaltop: any;
+    cacheMap = new Map<any, any>();
+    sublData: any;
+    showDiv: boolean;
+    inputVal: any;
+    displayButton: String = 'Show Summary'
+    displaySummary: boolean;
+    showSummary: boolean;
+    columnsToDisplay: string[] = ['Tools', 'Handover Time'];
+    timelagDataSource = new MatTableDataSource([]);
+    toolData: any[];
+    gChart: boolean;
+    total: number;
+
     constructor(private dialog: MatDialog, public messageDialog: MessageDialogService,
-        private traceablityService: TraceabiltyService, public dataShare: DataSharedService) {
+        private traceablityService: TraceabiltyService, private renderer: Renderer2, public dataShare: DataSharedService) {
     }
 
     ngOnInit() {
@@ -56,105 +97,369 @@ export class TraceabilityDashboardCompenent implements OnInit {
                 }
             });
     }
+    ngAfterViewInit() {
+        this.tabClick();
+
+    }
+    tabClick() {
+        let google = (window as any).google;
+        let FusionCharts  = (window as any).FusionCharts;
+        if(FusionCharts === undefined){
+            this.gChart=true;
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(this.drawChart(google));
+        }else{
+            this.gChart=false;
+            this.drawFusionChart();
+        }
+    }
+    drawFusionChart(){
+        let toolArr = [];
+        this.total=0;
+        this.toolTimelagArray.forEach(ele => {
+            let dataTool = {};
+            dataTool['label'] = ele.Tools;
+            dataTool['value'] = ele.HandoverTime;
+            this.total=this.total+Number(ele.HandoverTime.split('')[0]);
+            toolArr.push(dataTool);
+        });
+        let FusionCharts  = (window as any).FusionCharts;
+        FusionCharts.ready(function () {
+
+            let myChart = new FusionCharts({
+                type: "waterfall2d",
+                renderAt: "chart-container",
+                width: "100%",
+                height: "75%",
+                dataFormat: "json",
+                dataSource: {
+                    chart: {
+                        caption: "Fusion Chart",
+                        subcaption: "Timelag details",
+                        xaxisname: "ToolName",
+                        yaxisname: "Days",
+                        numbersuffix: "D",
+                        theme: "fusion"
+                    },
+                    data: toolArr
+                }
+
+            }).render();
+            console.log("My charts", myChart)
+
+        });
+    }
+    drawChart(google) {
+        let g = (window as any).google;
+        var data = g.visualization.arrayToDataTable(this.toolData, true);
+        var options = {
+            legend: 'none',
+            bar: { groupWidth: '75%' }, // Remove space between bars.
+            candlestick: {
+                fallingColor: { strokeWidth: 0, fill: '#0f9d58' }, // red
+                risingColor: { strokeWidth: 0, fill: '#0f9d58' }   // green
+            },
+        }
+        var chart = new g.visualization.CandlestickChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+    }
+    constructChartData(data){
+        let toolArr = [];
+        data.forEach(ele => {
+            let dataTool = {};
+            dataTool['label'] = ele.Tools;
+            dataTool['value'] = Number(ele.HandoverTime.split('')[0]);
+            toolArr.push(dataTool);
+        });
+
+        this.toolData = [];
+        let initial = 0;
+        for (let i = 0; i < toolArr.length; i++) {
+            this.toolData.push([toolArr[i].label, initial, initial, initial+toolArr[i].value, initial+toolArr[i].value]);
+            initial = initial+toolArr[i].value;
+        }
+        console.log("toolArr" + this.toolData);
+    }
+    createDivelement() {
+        const createDiv = this.renderer.createElement('div');
+        // Set the id of the div
+        this.renderer.setProperty(createDiv, 'id', 'chart-container');
+        // Append the created div to the body element
+        this.renderer.appendChild(document.body, createDiv);
+        return createDiv;
+    }
     getDetails() {
         this.list = [];
         this.toolSummaryArray = [];
+        this.map = new Map<String, Object[]>();
+        this.cacheMap = new Map<String, Object[]>();
         this.isEnable = false;
-        if(this.issueTypeSelected=='Epic')
-        { 
-           this.getEpicIssuesDetails(this.selectedTool, this.selectedField, this.fieldValue,false);
+        this.showDiv = false
+        this.getToolDisplayProperties();
+        if (this.issueTypeSelected == 'Epic') {
+            this.getEpicIssuesDetails(this.selectedTool, this.selectedField, this.fieldValue, "Epic");
         }
-        else
-        {
-            this.getAssetHistoryDetails(this.selectedTool, this.selectedField, this.fieldValue);
-        }
-       
-
-    }
-
-    getEpicIssuesDetails(toolName: string, toolField: string, toolValue: string,isEpic:boolean)
-    {
-       let response= this.traceablityService.getEpicIssues(toolName, toolField, toolValue,true);
-       this.cachestring = toolName + "." + toolField + "." + toolValue;
-       response.then((data) => {          
-        if (data.status == "success") {
-            if (data.data.pipeline.length != 0) {
-                for (var element of data.data.pipeline) {
-                    this.order[(element.order) - 1] = element.toolName;
-                }
-                let result = data.data.pipeline;
-                let historyData = [];
-                result.map((resultmap) => {
-                    Object.keys(resultmap).forEach(element => {
-                        const matchKey = element.match('AssetID');
-                        if (matchKey) {
-                            resultmap['assetID'] = resultmap[element];
-                        }
-                    })
-                    historyData.push(resultmap);
-                });
-                if (data.data.summary.length > 0) {
-
-                    this.toolSummaryArray = [];
-                    var tempArr = []
-                    for (let orderredTool in this.order) {
-                        var toolName = this.order[orderredTool]
-                        var toolData = data.data.summary[0][toolName]
-                        if (toolData != undefined) {
-                            tempArr.push(toolData)
-                        }
-                    }
-                    var summaryLen = tempArr.length;
-                    for (let index = 0; index < summaryLen; index++) {
-                        var object = tempArr[index]
-                        var obejctString = JSON.stringify(object);
-                        var objectLen = obejctString.split(",").length
-                        for (var i = 0; i < objectLen; i++) {
-                            this.toolSummaryArray.push(tempArr[index][i])
-                        }
-                    }
-                }
-                if (data.data.timelag.length > 0) {
-                    var tempArr = []
-                    for (var element of data.data.timelag) {
-                        for (var key in element) {
-                            this.timelagData = { 'Tools': key, 'HandoverTime': element[key] }
-                            tempArr.push(this.timelagData)
-                        }
-                    }
-
-                    this.toolTimelagArray = tempArr
-
-                    if (this.toolTimelagArray.length > 0) {
-                        this.isEnable = true;
-                    }                 
-                }
-                this.traceabilityData = data;
-                this.workflow();
-                this.isDatainProgress = false;
-            }
-            else {
-                this.messageDialog.showApplicationsMessage("No data found for the given selection.", "ERROR");
-                this.isDatainProgress = false;
-            }
-
+        else if (this.issueTypeSelected == 'Issue') {
+            this.getAssetHistoryDetails(this.selectedTool, this.selectedField, this.fieldValue, "Issue");
         }
         else {
-            this.messageDialog.showApplicationsMessage(data.message, "ERROR");
-            this.isDatainProgress = false;
+            this.getAssetHistoryDetails(this.selectedTool, this.selectedField, this.fieldValue, "Other");
         }
-    });
-
-
+    }
+    filterValues(data, key) {
+        let searchKey = data;
+        if (this.map.has(key)) {
+            let val = JSON.parse(JSON.stringify(this.map.get(key)));
+            console.log("val.includes(data)" + val.includes(data));
+            if (val.includes(data)) {
+                this.map.delete(key);
+                this.map.set(key, val);
+            }
+        }
 
     }
+    showButton() {
+        if (this.displayButton === 'Show Summary') {
+            this.displaySummary = true;
+            this.displayButton = 'Show Graph';
+        } else {
+            this.displaySummary = false;
+            this.displayButton = 'Show Summary'
+        }
+    }
+    getToolDisplayProperties() {
+        let response = this.traceablityService.getToolDisplayProperties();
+        response.then((data) => {
+            let res = data.data;
+            this.displayProperty = res;
+          //  if (this.issueTypeSelected === 'Epic') {
+                this.displayProperty['Epic'] = ["issueKey"];
+          //  }
+        });
+    }
+    getEpicIssuesDetails(toolName: string, toolField: string, toolValue: string, type: string) {
+        this.isDatainProgress = true;
+        let response = this.traceablityService.getEpicIssues(toolName, toolField, toolValue, "Epic");
+        this.cachestring = toolName + "." + toolField + "." + toolValue;
+        response.then((data) => {
+            if (data.status == "success") {
+                if (data.data.pipeline.length != 0) {
+                    for (var element of data.data.pipeline) {
+                        this.order[(element.order) - 1] = element.toolName;
+                    }
+                    let result = data.data.pipeline;
+                    let historyData = [];
+                    result.map((resultmap) => {
+                        Object.keys(resultmap).forEach(element => {
+                            const matchKey = element.match('AssetID');
+                            if (matchKey) {
+                                resultmap['assetID'] = resultmap[element];
+                            }
+                        })
+                        historyData.push(resultmap);
+                    });
+                    if (data.data.summary.length > 0) {
 
-    getAssetHistoryDetails(toolName: string, toolField: string, toolValue: string) {
+                        this.toolSummaryArray = [];
+                        this.showSummary = true;
+                        var tempArr = []
+                        for (let orderredTool in this.order) {
+                            var toolName = this.order[orderredTool]
+                            var toolData = data.data.summary[0][toolName]
+                            if (toolData != undefined) {
+                                tempArr.push(toolData)
+                            }
+                        }
+                        var summaryLen = tempArr.length;
+                        for (let index = 0; index < summaryLen; index++) {
+                            var object = tempArr[index]
+                            var obejctString = JSON.stringify(object);
+                            var objectLen = obejctString.split(",").length
+                            for (var i = 0; i < objectLen; i++) {
+                                if(tempArr[index][i] !== undefined)
+                                this.toolSummaryArray.push(tempArr[index][i])
+                            }
+                        }
+                    }
+                    if (data.data.timelag.length > 0) {
+                        var tempArr = []
+                        for (var element of data.data.timelag) {
+                            for (var key in element) {
+                                this.timelagData = { 'Tools': key, 'HandoverTime': element[key] }
+                                tempArr.push(this.timelagData)
+                            }
+                        }
+
+                        this.toolTimelagArray = tempArr
+                        this.constructChartData(this.toolTimelagArray);
+
+                        if (this.toolTimelagArray.length > 0) {
+                            this.isEnable = true;
+                        }
+                        this.timelagDataSource = this.toolTimelagArray;
+                    }
+                    this.traceabilityData = data;
+                    this.globalData = this.traceabilityData.data.pipeline;
+                    this.constructObject(this.traceabilityData);
+                    this.epic = true;
+                    this.showAll = false;
+                    this.epicArr = this.traceabilityData.data.pipeline.filter(x => x.toolName === 'Epic');
+                    this.jiraArr = this.traceabilityData.data.pipeline.filter(x => x.toolName === 'JIRA');
+                    this.workflow();
+                    this.isDatainProgress = false;
+                }
+                else {
+                    this.messageDialog.showApplicationsMessage("No data found for the given selection.", "ERROR");
+                    this.isDatainProgress = false;
+                }
+
+            }
+            else {
+                this.messageDialog.showApplicationsMessage(data.message, "ERROR");
+                this.isDatainProgress = false;
+            }
+        });
+    }
+    constructObject(data) {
+        data.data.pipeline.forEach(element => {
+            this.showDiv = true;
+            let key = element.order + "_" + element.toolName;
+            if (this.map.has(key)) {
+                this.map.get(key).push(element);
+            }
+            else {
+                this.map.set(key, [element]);
+            }
+        });
+        this.globalMap = this.map;
+    }
+    onCardClickJira(index, event, key) {
+        this.isDatainProgress=true;
+        this.showModel = null;
+        this.selectedJira = index
+        let clickedElement = key;
+        clickedElement['searchKey'] = this.selectedField;
+        this.cachestring = clickedElement['toolName'] + "." + clickedElement['searchKey'] + "." + clickedElement['issueKey'];
+        console.log(clickedElement);
+        if (this.map.size == 1) {
+            this.messageDialog.showApplicationsMessage("No further pipeline found for given selection.", "ERROR");
+            this.isDatainProgress = false;
+        } else if (this.cacheMap.has(clickedElement.uuid)) {
+            this.map = new Map<String, Object[]>();
+            let data = this.cacheMap.get(clickedElement.uuid);
+            data.forEach(element => {
+                let key = element.order + "_" + element.toolName;
+                if (this.map.has(key)) {
+                    this.map.get(key).push(element);
+                }
+                else {
+                    this.map.set(key, [element]);
+                }
+            });
+            this.globalMap = this.map;
+            this.isDatainProgress = false;
+        }
+        else {
+            this.traceablityService.getIssuesPipeline(clickedElement)
+                .then((data) => {
+                   // setTimeout(()=>{this.isDatainProgress=true},8000); 
+                   this.map = new Map<String, Object[]>(); 
+                    let res = data.data.pipeline;
+                    this.cacheMap.set(clickedElement.uuid, res);
+                    console.log(data)
+                    this.globalData = res;
+                    res.forEach(element => {
+                        let key = element.order + "_" + element.toolName;
+                        if (this.map.has(key)) {
+                            this.map.get(key).push(element);
+                        }
+                        else {
+                            this.map.set(key, [element]);
+                        }
+                    });
+                    this.globalMap = this.map;
+                    this.isDatainProgress=false;  
+                  //  setTimeout(()=>{this.isDatainProgress=false},8000);  
+                    if (data.data.summary.length > 0) {
+
+                        this.toolSummaryArray = [];
+                    var tempArr = []
+                        for (let orderredTool in this.order) {
+                            var toolName = this.order[orderredTool]
+                            var toolData = data.data.summary[0][toolName]
+                            if (toolData != undefined) {
+                                tempArr.push(toolData)
+                            }
+                        }
+                        var summaryLen = tempArr.length;
+                        for (let index = 0; index < summaryLen; index++) {
+                            var object = tempArr[index]
+                            var obejctString = JSON.stringify(object);
+                            var objectLen = obejctString.split(",").length
+                            for (var i = 0; i < objectLen; i++) {
+                                this.toolSummaryArray.push(tempArr[index][i])
+                            }
+                        }
+                    }
+                    if (data.data.timelag.length > 0) {
+                        var tempArr = []
+                        for (var element of data.data.timelag) {
+                            for (var key in element) {
+                                this.timelagData = { 'Tools': key, 'HandoverTime': element[key] }
+                                tempArr.push(this.timelagData)
+                            }
+                        }
+
+                        this.toolTimelagArray = tempArr
+                        this.constructChartData(this.toolTimelagArray);
+                        if (this.toolTimelagArray.length > 0) {
+                            this.isEnable = true;
+                        }
+                        this.timelagDataSource = this.toolTimelagArray;
+                    }
+
+                });
+        }
+
+    }
+    onCardClick(inbex: number, event, key) {
+        let cache;
+        this.showModel = null;
+        this.map = new Map<String, Object[]>();;
+        let clickedElement = key;
+        clickedElement['searchKey'] = this.selectedField;
+        this.cachestring = clickedElement['toolName'] + "." + clickedElement['searchKey'] + "." + clickedElement['issueKey'];
+        console.log(clickedElement);
+
+        this.traceablityService.getIssuesPipeline(clickedElement)
+            .then((data) => {
+                let res = data.data.pipeline;
+                console.log(data)
+                this.globalData = res;
+                res.forEach(element => {
+                    let key = element.order + "_" + element.toolName;
+                    if (this.map.has(key)) {
+                        this.map.get(key).push(element);
+                    }
+                    else {
+                        this.map.set(key, [element]);
+                    }
+                });
+            });
+    }
+
+    applyFilter(filterValue: string) {
+
+        this.git = this.git.filter(x => x.commitId === filterValue);
+    }
+
+    getAssetHistoryDetails(toolName: string, toolField: string, toolValue: string, type: string) {
+        debugger;
         this.isDatainProgress = true;
         this.cachestring = toolName + "." + toolField + "." + toolValue;
         var self = this;
-        this.traceablityService.getAssetHistory(toolName, toolField, toolValue)
-            .then((data) => {              
+        this.traceablityService.getAssetHistory(toolName, toolField, toolValue, type)
+            .then((data) => {
                 if (data.status == "success") {
                     if (data.data.pipeline.length != 0) {
                         for (var element of data.data.pipeline) {
@@ -206,9 +511,17 @@ export class TraceabilityDashboardCompenent implements OnInit {
                             if (this.toolTimelagArray.length > 0) {
                                 this.isEnable = true;
                             }
-                          
+                            this.timelagDataSource = this.toolTimelagArray;
                         }
                         this.traceabilityData = data;
+                        this.constructObject(this.traceabilityData);
+                        this.epic = false;
+                        this.jiraArr = this.traceabilityData.data.pipeline.filter(x => x.toolName === 'JIRA');
+                        this.git = this.traceabilityData.data.pipeline.filter(x => x.toolName === 'GIT');
+                        this.jenkins = this.traceabilityData.data.pipeline.filter(x => x.toolName === 'JENKINS');
+                        this.sonar = this.traceabilityData.data.pipeline.filter(x => x.toolName === 'SONAR');
+                        this.runDeck = this.traceabilityData.data.pipeline.filter(x => x.toolName === 'RUNDECK');
+                        this.showAll = true;
                         this.workflow();
                         this.isDatainProgress = false;
                     }
@@ -302,7 +615,7 @@ export class TraceabilityDashboardCompenent implements OnInit {
 
         this.list.map((l) => {
             this.pipeheight = this.pipeheight < l.child.length ? l.child.length : this.pipeheight;
-        })     
+        })
 
     }
 
@@ -311,93 +624,96 @@ export class TraceabilityDashboardCompenent implements OnInit {
             return x.moddate - y.moddate;
         })
     }
-    eventGet(index) {
+    eventGet(e, index, data) {
+        this.formatedData = '';
         this.showModel = index;
+        Object.entries(data).forEach(([key, value]) =>
+            this.formatedData += `<b>${key}</b><span> :${value}</span><br/>`
+        );
     }
-    onmouseleave(index){
-       
+    onmouseleave(index) {
+
     }
 
-    onclick(index)
-    {
-        // console.log("IndexOnclick-------------------------->",index)
-        //  let topElementIndex= index.split('-')[0];
-        //  let childElementIndex=index.split('-')[1];
-        //  let topElement=this.list[topElementIndex];       
-        //  let clickedElement= topElement.child[childElementIndex].point;
-        //  clickedElement['searchKey']=this.selectedField;
-        //  this.traceablityService.getIssuesPipeline(clickedElement)
-        //  .then((data) => {
-        //      console.log("data=========================>",data)
-        //      if (data.status == "success") {
-        //          if (data.data.pipeline.length != 0) {
-        //              for (var element of data.data.pipeline) {
-        //                  this.order[(element.order) - 1] = element.toolName;
-        //              }
-        //              let result = data.data.pipeline;
-        //              let historyData = [];
-        //              result.map((resultmap) => {
-        //                  Object.keys(resultmap).forEach(element => {
-        //                      const matchKey = element.match('AssetID');
-        //                      if (matchKey) {
-        //                          resultmap['assetID'] = resultmap[element];
-        //                      }
-        //                  })
-        //                  historyData.push(resultmap);
-        //             });
-        //              if (data.data.summary.length > 0) {
+    onclick(index) {
 
-        //                  this.toolSummaryArray = [];
-        //                  var tempArr = []
-        //                  for (let orderredTool in this.order) {
-        //                      var toolName = this.order[orderredTool]
-        //                      var toolData = data.data.summary[0][toolName]
-        //                     if (toolData != undefined) {
-        //                          tempArr.push(toolData)
-        //                      }
-        //                  }
-        //                  var summaryLen = tempArr.length;
-        //                  for (let index = 0; index < summaryLen; index++) {
-        //                      var object = tempArr[index]
-        //                      var obejctString = JSON.stringify(object);
-        //                      var objectLen = obejctString.split(",").length
-        //                      for (var i = 0; i < objectLen; i++) {
-        //                          this.toolSummaryArray.push(tempArr[index][i])
-        //                      }
-        //                  }
-        //              }
-        //              if (data.data.timelag.length > 0) {
-        //                  var tempArr = []
-        //                  for (var element of data.data.timelag) {
-        //                      for (var key in element) {
-        //                          this.timelagData = { 'Tools': key, 'HandoverTime': element[key] }
-        //                          tempArr.push(this.timelagData)
-        //                      }
-        //                  }
+        let topElementIndex = index.split('-')[0];
+        let childElementIndex = index.split('-')[1];
+        let topElement = this.list[topElementIndex];
+        let clickedElement = topElement.child[childElementIndex].point;
+        clickedElement['searchKey'] = this.selectedField;
+        this.cachestring = clickedElement['toolName'] + "." + clickedElement['searchKey'] + "." + clickedElement['issueKey'];
+        this.traceablityService.getIssuesPipeline(clickedElement)
+            .then((data) => {
+                if (data.status == "success") {
+                    if (data.data.pipeline.length != 0) {
+                        for (var element of data.data.pipeline) {
+                            this.order[(element.order) - 1] = element.toolName;
+                        }
+                        let result = data.data.pipeline;
+                        let historyData = [];
+                        result.map((resultmap) => {
+                            Object.keys(resultmap).forEach(element => {
+                                const matchKey = element.match('AssetID');
+                                if (matchKey) {
+                                    resultmap['assetID'] = resultmap[element];
+                                }
+                            })
+                            historyData.push(resultmap);
+                        });
+                        if (data.data.summary.length > 0) {
 
-        //                  this.toolTimelagArray = tempArr
+                            this.toolSummaryArray = [];
+                            var tempArr = []
+                            for (let orderredTool in this.order) {
+                                var toolName = this.order[orderredTool]
+                                var toolData = data.data.summary[0][toolName]
+                                if (toolData != undefined) {
+                                    tempArr.push(toolData)
+                                }
+                            }
+                            var summaryLen = tempArr.length;
+                            for (let index = 0; index < summaryLen; index++) {
+                                var object = tempArr[index]
+                                var obejctString = JSON.stringify(object);
+                                var objectLen = obejctString.split(",").length
+                                for (var i = 0; i < objectLen; i++) {
+                                    this.toolSummaryArray.push(tempArr[index][i])
+                                }
+                            }
+                        }
+                        if (data.data.timelag.length > 0) {
+                            var tempArr = []
+                            for (var element of data.data.timelag) {
+                                for (var key in element) {
+                                    this.timelagData = { 'Tools': key, 'HandoverTime': element[key] }
+                                    tempArr.push(this.timelagData)
+                                }
+                            }
 
-        //                  if (this.toolTimelagArray.length > 0) {
-        //                      this.isEnable = true;
-        //                  }
-        //                  console.log(this.toolTimelagArray)
-        //              }
-        //              this.traceabilityData = data;
-        //              this.workflow();
-        //              this.isDatainProgress = false;
-        //         }
-        //          else {
-        //              this.messageDialog.showApplicationsMessage("No data found for the given selection.", "ERROR");
-        //              this.isDatainProgress = false;
-        //          }
+                            this.toolTimelagArray = tempArr
 
-        //      }
-        //     else {
-        //          this.messageDialog.showApplicationsMessage(data.message, "ERROR");
-        //          this.isDatainProgress = false;
-        //  }
-        //  });
-        
+                            if (this.toolTimelagArray.length > 0) {
+                                this.isEnable = true;
+                            }
+                            this.timelagDataSource = this.toolTimelagArray;
+                        }
+                        this.traceabilityData = data;
+                        this.workflow();
+                        this.isDatainProgress = false;
+                    }
+                    else {
+                        this.messageDialog.showApplicationsMessage("No data found for the given selection.", "ERROR");
+                        this.isDatainProgress = false;
+                    }
+
+                }
+                else {
+                    this.messageDialog.showApplicationsMessage(data.message, "ERROR");
+                    this.isDatainProgress = false;
+                }
+            });
+
 
 
     }
@@ -406,8 +722,8 @@ export class TraceabilityDashboardCompenent implements OnInit {
         this.showModel = null;
     }
 
-    issueTypeOnChange(value):void{
-     this.issueTypeSelected=value;    
+    issueTypeOnChange(value): void {
+        this.issueTypeSelected = value;
     }
 
     toolOnChange(): void {
@@ -440,12 +756,29 @@ export class TraceabilityDashboardCompenent implements OnInit {
     }
 
     showDetailsDialog(toolName: string) {
+        let dialogData;
+        for (let [key, value] of this.map.entries()) {
+            if (key.split('_')[1] === toolName) {
+                dialogData = value;
+            }
+        }
         let showDetailsDialog = this.dialog.open(ShowTraceabiltyDetailsDialog, {
             panelClass: 'traceablity-show-details-dialog-container',
-            width: '65%',
+            width: '68%',
             height: '70%',
             disableClose: true,
-            data: { toolName: toolName, cachestring: this.cachestring, showToolDetail: true }
+            data: { toolName: toolName, cachestring: dialogData, showToolDetail: true }
+        });
+    }
+
+    showOnHoverDialog(index, data) {
+        let dialogData = data;
+        let showDetailsDialog = this.dialog.open(ShowTraceabiltyDetailsDialog, {
+            panelClass: 'traceablity-show-details-dialog-container',
+            width: '22%',
+            height: '50%',
+            disableClose: true,
+            data: { cardData: dialogData, index: index, showCardDetail: true }
         });
     }
 
@@ -457,5 +790,18 @@ export class TraceabilityDashboardCompenent implements OnInit {
             data: { toolName: "toolName", dataArr: this.toolTimelagArray, showToolDetail: false }
         });
     }
-
+    clear() {
+        this.selectedTool = '';
+        this.selectedField = '';
+        this.issueTypeSelected = '';
+        this.fieldValue = '';
+        this.showDiv = false
+        this.cacheMap.clear();
+        this.map.clear();
+        console.log("clear" + this.map);
+    }
+    reset() {
+        this.map = new Map<String, Object[]>();;
+        this.getDetails();
+    }
 }

@@ -7,7 +7,7 @@
   },
   "mqConfig": {
     "user": "username for RabbitMq",
-    "password": "password for RabbitMq",
+    "password": "",
     "host": "127.0.0.1",
     "exchange": "iSight",
     "agentControlXchg":"iAgent" 
@@ -38,7 +38,7 @@
   "auth": "base64",
   "runSchedule": 5,
   "userid": "username for Nexus",
-  "passwd": "password for Nexus",
+  "passwd": "",
   "baseUrl": "http://localhost:8082/",
   "timeStampField":"timestamp",
   "timeStampFormat":"%Y%m%d%H%M%S",

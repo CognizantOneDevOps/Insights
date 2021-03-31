@@ -38,7 +38,9 @@
 			<class
 				name="com.cognizant.devops.platformservice.test.serverConfig.ServerConfigServiceTest" />
 			<class
-				name="com.cognizant.devops.platformservice.test.fileManagement.FileManagementTest" />	
+				name="com.cognizant.devops.platformservice.test.fileManagement.FileManagementTest" />
+            <class
+                    name="com.cognizant.devops.platformservice.test.upshiftassessment.UpshiftAssessmentServiceTest" />
 		</classes>
 	</test>
 </suite>

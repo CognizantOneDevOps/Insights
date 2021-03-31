@@ -37,15 +37,14 @@ public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInter
 	 * 
 	 */
 	private static final Logger log = LogManager.getLogger(WorkflowImmediateJobExecutor.class);
-	
+
 	private static final long serialVersionUID = -282836461086782615L;
 	final int maxWorkflowsRetries = ApplicationConfigProvider.getInstance().getAssessmentReport()
 			.getMaxWorkflowRetries();
 	private WorkflowDataHandler workflowProcessing = new WorkflowDataHandler();
 
 	@Override
-	public void execute(JobExecutionContext context)
-			throws JobExecutionException {
+	public void execute(JobExecutionContext context) throws JobExecutionException {
 		log.debug(" Worlflow Detail ====  Schedular Inside WorkflowImmediateJobExecutor ");
 		try {
 			ApplicationConfigInterface.loadConfiguration();
@@ -54,13 +53,13 @@ public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInter
 		} catch (Exception e) {
 			log.error(e);
 		}
- 
+
 	}
 
 	/**
-	 * This class method use to fetch all immediate workflow configuration
-	 * Get all ready to run workflow, fetch first workflow task,
-	 * prepare request message and publish that in RabbitMq
+	 * This class method use to fetch all immediate workflow configuration Get all
+	 * ready to run workflow, fetch first workflow task, prepare request message and
+	 * publish that in RabbitMq
 	 */
 	public void executeImmediateWorkflow() {
 		log.debug(" Worlflow Detail ====  Schedular Inside executeImmediateWorkflow  ");
@@ -83,7 +82,8 @@ public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInter
 							firstworkflowTask.getSequence(), mqRequestJson);
 					workflowProcessing.publishMessageInMQ(firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),
 							mqRequestJson);
-				} catch (WorkflowTaskInitializationException e) {
+					Thread.sleep(1);
+				} catch (WorkflowTaskInitializationException | InterruptedException e) {
 					log.debug(" Worlflow Detail ====  workflow failed to execute due to MQ exception {}  ",
 							workflowConfig.getWorkflowId());
 					InsightsStatusProvider.getInstance()
@@ -97,10 +97,10 @@ public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInter
 					PlatformServiceConstants.SUCCESS);
 		} else {
 			log.debug("Worlflow Detail ==== WorkflowImmediateJobExecutor No reports are currently on due to run ");
-			
+
 		}
 	}
-	
+
 	private void initilizeWorkflowTasks() {
 		WorkflowTaskInitializer taskSubscriber = new WorkflowTaskInitializer();
 		try {

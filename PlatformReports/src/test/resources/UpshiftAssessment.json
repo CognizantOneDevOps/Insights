@@ -1,0 +1,103 @@
+{
+  "sourceFilePath": "/vsm/vsm_output/_fego/assess_2020-09-12-08-55-37/srcZip/springboot-k8s-demo.zip",
+  "appName": "springboot-k8s-demo",
+  "upshiftUuid": "Test01",
+  "appDesc": "",
+  "appLanguage": "Java",
+  "appLanguageai": "Java",
+  "testEmptyArray": [],
+  "tstStringArray":["a","b","c"],
+  "antipatternSection": {
+    "antipatternItems": [
+      {
+        "appName": "springboot-k8s-demo",
+        "language": "Java",
+        "group": "ConfigFiles",
+        "subGroup": "ConfigFiles",
+        "type": "Property files",
+        "description": "Config Files - Properties",
+        "masterItemDescription": "Config Files Config Files",
+        "fileName": "src/src/main/resources/application.properties",
+        "recommendationInfo": {
+          "language": "Java",
+          "group": "ConfigFiles",
+          "subGroup": "ConfigFiles",
+          "platform": "generic",
+          "isMultiCloud": false,
+          "recommendationShort": "Configuration info must be externalized in version control systems for centralized management. Named profiles must be used for managing variable definitions across environments (like dev, prod, etc.) Config info can be secured by encrypting them and persisting them in vaults.",
+          "recommendationDetail": "There are several options for externalizing configuration information. \\n One option is to store this info in an external repository. Apps will then have to look up for info via configuration services. These configuration services provide access to external repositories and also help manage these settings across different environments. In platforms such as PCF, these services are available as backing services. Additionally, separate Config servers can also be used for this purpose. Popular config servers include Spring Cloud config, Consul, Apache Zookeeper, etc. \\n Another option is to have config information injected as environment variables. In this option, apps do not need to rely on external configuration services. However. this option is dependent on the underlying platform\u0027s ability to support it. \\n Kubernetes config maps can be leveraged for this purpose. For sensitive configuration data, config info can be encrypted and injected as kube secrets. \\n PCF provides built in config server (p-config-servers). \\n Azure will require custom config server to be provisioned. Key Vaults can be leveraged for managing info securely. \\n GCP manages configuration centrally through Runtime Configurator and spring cloud abstracts the run time configuration with minimal code changes.",
+          "reference": [
+            {
+              "displayText": "Spring Cloud - Config Server",
+              "title": "Spring Cloud",
+              "url": "https://docs.pivotal.io/spring-cloud-services/1-5/common/config-server/index.html"
+            },
+            {
+              "displayText": "Spring Cloud - Config Server - Git",
+              "title": "Spring Cloud",
+              "url": "https://docs.run.pivotal.io/spring-cloud-services/config-server/configuring-with-git.html"
+            },
+            {
+              "displayText": "Azure - Key Vault",
+              "title": "Azure",
+              "url": "https://docs.microsoft.com/en-us/azure/key-vault/key-vault-whatis"
+            },
+            {
+              "displayText": "Azure - Spring Boot - Key Vault",
+              "title": "Azure",
+              "url": "https://docs.microsoft.com/en-us/java/azure/spring-framework/configure-spring-boot-starter-java-app-with-azure-key-vault?view\u003dazure-java-stable"
+            },
+            {
+              "displayText": "Spring Cloud - GCP - Config",
+              "title": "Spring Cloud",
+              "url": "https://spring.io/blog/2018/09/03/bootiful-gcp-runtime-configuration-with-spring-cloud-gcp-runtime-config-5-8"
+            },
+            {
+              "displayText": "Kubernetes - Configuration",
+              "title": "Kubernetes",
+              "url": "https://kubernetes.io/docs/concepts/configuration/secret/"
+            },
+            {
+              "displayText": "Kubernetes - Configuration - Containers",
+              "title": "Kubernetes",
+              "url": "https://kubernetes.io/blog/2016/04/configuration-management-with-containers/"
+            }
+          ]
+        },
+        "migrationRecommendation4R": "Rehost",
+        "severity": 4,
+        "severityString": "Warning",
+        "line": "",
+        "foundInAI": false,
+        "problemLines": [
+          ""
+        ],
+        "actionType": "ConfigChange",
+        "twelveFactor": "ConfigurationCredentialsCode",
+        "platform": "",
+        "multiCloud": false
+      }
+    ],
+    "totalAntiPatternCount": 5,
+    "totalAntiPatternCountCodeChangeComplex": 1,
+    "totalAntiPatternCountCodeChangeExternalCall": 1,
+    "totalAntiPatternCountConfigChange": 3,
+    "totalAntiPatternCountVerification": 0,
+    "totalAntiPatternCount15Factor03DependencyManagement": 1,
+    "totalAntiPatternCount15Factor05ConfigurationCredentialsCode": 3,
+    "totalAntiPatternCount15Factor08BackingServices": 1,
+    "totalAntiPatternCount15Factor12StatelessProcesses": 0,
+    "totalAntiPatternCount15Factor11PortBinding": 0,
+    "totalAntiPatternCount15Factor07Disposability": 0,
+    "totalAntiPatternCount15Factor06Logs": 0,
+    "totalAntiPatternCount15Factor15AuthenticationAndAuthorization": 0,
+    "totalAntiPatternCount99Others": 0,
+    "knownIssues": {
+      "count": 0,
+      "message": "No issue found",
+      "issue": [
+
+      ]
+    }
+  }
+}

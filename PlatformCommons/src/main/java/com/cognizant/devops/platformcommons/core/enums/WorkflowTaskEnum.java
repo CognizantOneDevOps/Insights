@@ -29,7 +29,7 @@ public class WorkflowTaskEnum {
 		AUTOML("AUTOML"),
 		SYSTEM("SYSTEM"),
 		GRAFANADASHBOARDPDFREPORT("GRAFANADASHBOARDPDFREPORT"),
-		VSMREPORT("VSMREPORT");
+		UPSHIFTASSESSMENT("UPSHIFTASSESSMENT");
 
 		private String value;
 
@@ -88,7 +88,7 @@ public class WorkflowTaskEnum {
 		NOT_STARTED, IN_PROGRESS, COMPLETED, ERROR
 	}
 
-	public enum VsmReportStatus {
+	public enum UpshiftAssessmentStatus {
 		NOT_STARTED, COMPLETED, NODE_CREATED, ERROR
 	}
 }

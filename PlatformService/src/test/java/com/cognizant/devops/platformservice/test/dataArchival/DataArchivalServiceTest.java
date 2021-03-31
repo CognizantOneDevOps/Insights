@@ -230,15 +230,10 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 		Assert.assertTrue(activeRecords.size() > 0);
 	}
 
-	@Test(priority = 20)
+	@Test(priority = 20, expectedExceptions = InsightsCustomException.class)
 	public void testDeleteArchivalRecords() throws InsightsCustomException {
-		try {
 			Boolean status = dataArchivalServiceImpl
 					.deleteArchivalRecord(saveArchivalRecordsForDeleteCaseJson.get("archivalName").getAsString());
-			Assert.assertTrue(status);
-		} catch (AssertionError e) {
-			Assert.fail(e.getMessage());
-		}
 	}
 
 	@Test(priority = 21, expectedExceptions = InsightsCustomException.class)

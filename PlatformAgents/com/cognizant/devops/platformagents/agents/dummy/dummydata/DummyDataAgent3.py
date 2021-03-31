@@ -43,13 +43,11 @@ class DummyDataAgent(BaseAgent):
         self.boardIdForProjects = [101, 201, 301, 401]   
         self.startFrom = self.config.get("startFrom")
         self.startDate = parser.parse(self.startFrom, ignoretz=True)
-        self.start_date_days = self.config.get("start_date_days")
                 
         # JIRA Variables        
         self.numberofRelease = self.config.get("numberofReleasesRequired") 
         self.numberOfSprintsInRelease = self.config.get("numberOfSprintsInRelease")
         self.numberofDaysInSprint = self.config.get("numberofDaysInSprint")
-        self.createSprintData = self.config.get('createSprintData')              
         self.Priority = ['High', 'Low', 'Medium']
         self.jiraUsers = ["Vicky" , "Sam", "John", "Tom", "Adam"] 
         self.issueTypes = ['Story', 'Task'] 
@@ -108,7 +106,7 @@ class DummyDataAgent(BaseAgent):
         except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)#                
+            print((exc_type, fname, exc_tb.tb_lineno))#                
                 
     def createProjectData (self): 
         try :       
@@ -116,9 +114,9 @@ class DummyDataAgent(BaseAgent):
             self.projectId = self.projectIds[self.project_names.index(self.projectName)]
             self.groupId = self.group_ids[self.project_names.index(self.projectName)]
             self.noOfSprintsClosedSoFar = 0  # To Track Total Number of Sprints closed for each project
-            self.jenkinsBuildNumber = 1  # Total Number of Builds trigerred in each project
+            self.jenkinsBuildNumber = 0o1  # Total Number of Builds trigerred in each project
             self.pullRequestNo = 1  # Total Number of pull requests raised in each project
-            time_offset_hours = (random.randint(1, 4))
+            time_offset_hours = (random.randint(0o1, 0o4))
             time_offset_seconds = (random.randint(101, 800))
             self.releaseStartDate = self.startDate #datetime.datetime.now() - datetime.timedelta(days=self.start_date_days)
             self.sprintEndDate = self.startDate #datetime.datetime.now() - datetime.timedelta(days=self.start_date_days)
@@ -137,7 +135,7 @@ class DummyDataAgent(BaseAgent):
         except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            print((exc_type, fname, exc_tb.tb_lineno))
             
     def startReleaseWork(self, release):
         try :                       
@@ -150,7 +148,7 @@ class DummyDataAgent(BaseAgent):
             self.listofEpicsKeyInCurrentRelease = []          
             self.totalIssuesInRelease = [] 
             self.releaseData =[] 
-            numberOfEpicsRequiredForRelease = (random.randint(2, 5)) #Range for epic releases         
+            numberOfEpicsRequiredForRelease = (random.randint(0o2, 0o5)) #Range for epic releases         
             # Creating epics in the beginning of the Release.
             epic_counts = 1    
             releaseSample = {}
@@ -158,6 +156,8 @@ class DummyDataAgent(BaseAgent):
             releaseSample["startDate"] = (self.releaseStartDate).strftime("%Y-%m-%dT%H:%M:%S")
             releaseSample ["endDate"]   =    (self.releaseEndDate).strftime("%Y-%m-%dT%H:%M:%S")
             releaseSample["numberOfEpics"] =  numberOfEpicsRequiredForRelease  
+            releaseSample['toolName'] = "JIRA"
+            releaseSample['categoryName'] = "ALM"
             self.releaseData.append(releaseSample) 
             releaseMetadata = {"labels" : ["ALM", "JIRA", "DATA","RELEASE"]}                
             self.publishToolsData(self.releaseData, releaseMetadata)  
@@ -219,7 +219,7 @@ class DummyDataAgent(BaseAgent):
         except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno,ex)    
+            print((exc_type, fname, exc_tb.tb_lineno,ex))    
             
     def createEpicsForRelease(self, epic_count):
         try :
@@ -227,7 +227,7 @@ class DummyDataAgent(BaseAgent):
             jiraSample = {}                       
             jiraSample['key'] = epicKey                    
             jiraSample['priority'] = random.choice(self.Priority)
-            time_offset_hours_epic = (random.randint(1, 24))
+            time_offset_hours_epic = (random.randint(0o1, 24))
             time_offset_seconds_epic = (random.randint(101, 800))         
             createdDate = self.releaseStartDate + datetime.timedelta(hours=time_offset_hours_epic, seconds=time_offset_seconds_epic)
             self.updatedAt = createdDate        
@@ -238,13 +238,15 @@ class DummyDataAgent(BaseAgent):
             jiraSample['issueType'] = 'Epic'
             jiraSample['projectName'] = self.projectName       
             jiraSample['reporter'] = random.choice(self.jiraUsers)
+            jiraSample['toolName'] = "JIRA"
+            jiraSample['categoryName'] = "ALM"
             self.detailsOfEpicsInRelease.append(jiraSample)       
             self.listofEpicsKeyInCurrentRelease.append(epicKey)        
             self.noOfEpicsCreatedSoFar = self.noOfEpicsCreatedSoFar + 1 
         except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            print((exc_type, fname, exc_tb.tb_lineno))
             
     def startSprintWork(self, rangeNumber):
         try:
@@ -254,7 +256,7 @@ class DummyDataAgent(BaseAgent):
             self.detailsOfIssues = []  
             self.listofIssueInCurrentSprint = []  
             issue_counts = 1
-            time_offset_hours = (random.randint(1, 24))
+            time_offset_hours = (random.randint(0o1, 24))
             time_offset_seconds = (random.randint(101, 800))   
             numberOfIssuesToBeCreatedForSprint = (random.randint(10, 30))   #  Number of issues in a sprint            
             #sprintEndDate = (self.sprintStartDate + datetime.timedelta(days=self.numberofDaysInSprint))
@@ -277,6 +279,8 @@ class DummyDataAgent(BaseAgent):
             sprintSample['sprintEndDateEpoch'] = epoch_End 
             sprintSample['insightsTimeX'] = self.sprintEndDate.strftime("%Y-%m-%dT%H:%M:%SZ")
             sprintSample['insightsTime'] = epoch_End 
+            sprintSample['toolName'] = "JIRA"
+            sprintSample['categoryName'] = "ALM"
             gmt = time.gmtime()
             currentTime = calendar.timegm(gmt)
             # Creating issues for each sprint
@@ -313,7 +317,7 @@ class DummyDataAgent(BaseAgent):
                     sprintsAdded.append(spillStory['sprints'])
                     sprintsAdded.append(self.sprintId)            
                     time_offset_seconds = (random.randint(101, 800))                    
-                    time_offset_hours = (random.randint(1, 5))
+                    time_offset_hours = (random.randint(0o1, 0o5))
                     self.updatedAt = self.sprintStartDate + datetime.timedelta(hours=time_offset_hours, seconds=time_offset_seconds)
                     spillStory['lastUpdated'] = self.sprintStartDate.strftime("%Y-%m-%dT%H:%M:%S")
                     spillStory['lastUpdatedEpoch'] = int(time.mktime(time.strptime(self.sprintStartDate.strftime("%Y-%m-%dT%H:%M:%S"), "%Y-%m-%dT%H:%M:%S")))   
@@ -349,7 +353,7 @@ class DummyDataAgent(BaseAgent):
         except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno,ex)    
+            print((exc_type, fname, exc_tb.tb_lineno,ex))    
     
     def workingOnIssues(self, detail, rangeNumber, git_repo=None, git_branch=None, git_toBranch=None, git_author=None, originalStory=None, forceCloseInCurrentSprint=False):   
         try :
@@ -408,7 +412,9 @@ class DummyDataAgent(BaseAgent):
                     bugDetail ['issueType'] = "Bug"
                     bugDetail ['storyPoints'] = ""
                     bugDetail ['summary'] = "Bug Raised for " + workingKey
-                    bugDetail["createdAt"] = self.updatedAt.strftime("%Y-%m-%dT%H:%M:%S");                  
+                    bugDetail["createdAt"] = self.updatedAt.strftime("%Y-%m-%dT%H:%M:%S"); 
+                    bugDetail['toolName'] = "JIRA"
+                    bugDetail['categoryName'] = "ALM"                 
                     self.change_Log(bugKey, "status", "In Progress", "To Do", self.updatedAt)                 
                     self.change_Log(workingKey, "status", "Reopened", "QA In Progress", self.updatedAt)
                     originalStory = detail.copy()
@@ -428,7 +434,7 @@ class DummyDataAgent(BaseAgent):
         except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            print((exc_type, fname, exc_tb.tb_lineno))
 
     def creatingIssue(self): 
         jiraSample = {}                             
@@ -449,6 +455,8 @@ class DummyDataAgent(BaseAgent):
         jiraSample['epicKey'] = random.choice(self.listofEpicsKeyInCurrentRelease)
         jiraSample['boardId'] = self.boardIdForProjects[self.project_names.index(self.projectName)]
         jiraSample['fixVersion'] = "V." + str(self.releaseVersion)
+        jiraSample['toolName'] = "JIRA"
+        jiraSample['categoryName'] = "ALM"
         if issueType == 'Story':
             jiraSample['storyPoints'] = random.choice(self.storyPoints)
         self.issueCreationStarted = self.issueCreationStarted + 1
@@ -861,9 +869,9 @@ class DummyDataAgent(BaseAgent):
         changeLog["fromString"] = fromString
         changeLog['issueKey'] = changeKey
         changeLog['toString'] = toString
-        time_offset_hours_change = (random.randint(1, 24))
+        time_offset_hours_change = (random.randint(0o1, 24))
         time_offset_seconds_change = (random.randint(101, 800))
-        time_offset_days_change = (random.randint(1, 5))
+        time_offset_days_change = (random.randint(0o1, 0o5))
         self.updatedAt = (updatedAt + datetime.timedelta(days=time_offset_days_change, hours=time_offset_hours_change, seconds=time_offset_seconds_change))
         changeLog['changeDate'] = self.updatedAt.strftime("%Y-%m-%dT%H:%M:%S")                              
         changeLogData.append(changeLog)
@@ -880,9 +888,9 @@ class DummyDataAgent(BaseAgent):
         pullRequest['author'] = git_author
         pullRequest['state'] = state
         pullRequest ['jiraKey'] = changeKey
-        time_offset_hours_change = (random.randint(1, 24))
+        time_offset_hours_change = (random.randint(0o1, 24))
         time_offset_seconds_change = (random.randint(101, 800))
-        time_offset_days_change = (random.randint(1, 5))
+        time_offset_days_change = (random.randint(0o1, 0o5))
         self.updatedAt = (updatedAt + datetime.timedelta(days=time_offset_days_change, hours=time_offset_hours_change, seconds=time_offset_seconds_change))
         
         if state == "Open" : 

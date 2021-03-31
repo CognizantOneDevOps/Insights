@@ -7,7 +7,7 @@
   },
   "mqConfig": {
     "user": "username for RabbitMq",
-    "password": "Password for RabbitMq",
+    "password": "",
     "host": "127.0.0.1",
     "exchange": "iSight",
     "agentControlXchg": "iAgent"
@@ -48,8 +48,8 @@
       "vpc-id2"
     ]
   },
-  "access_key_id": "#Access_Key_ID#",
-  "secret_access_key": "#secret_key#",
+  "access_key_id": "",
+  "secret_access_key": "",
   "isDebugAllowed": false,
   "enableValueArray": false,
   "agentSecretDetails": ["access_key_id","secret_access_key"],

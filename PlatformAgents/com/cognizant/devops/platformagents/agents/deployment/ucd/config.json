@@ -1,65 +1,68 @@
 {
-  "vault": {
+	"vault": {
 		"getFromVault": false,
-		"secretEngine":"insights-kv",
-		"readToken":"vault_secret_token",
-		"vaultUrl":"http://Vault_Host:port/v1/"
+		"secretEngine": "insights-kv",
+		"readToken": "vault_secret_token",
+		"vaultUrl": "http://Vault_Host:port/v1/"
 	},
-  "mqConfig": {
-    "user": "username for RabbitMq",
-    "password": "Password for RabbitMq",
-    "host": "127.0.0.1",
-    "exchange": "iSight",
-    "agentControlXchg":"iAgent"
-  },
-  "subscribe": {
-    "config": "DEPLOYMENT.UCD.config"
-  },
-  "publish": {
-    "data": "DEPLOYMENT.UCD.DATA",
-    "health": "DEPLOYMENT.UCD.HEALTH"
-  },
-  "communication": {
-    "type": "REST",
-    "sslVerify": true,
-    "responseType": "JSON"
-  },
-   "dynamicTemplate": {
-   	    "timeFieldMapping" : {
-			"startDate" : "%Y-%m-%d"
-  		},
-	  "responseTemplate": {
-	    "status": "status",
-		"date": "date",
-		"duration": "duration",
-		"environment": "environment",
-		"application": "application",
-		"applicationRequestId": "applicationRequestId",
-		"user": "user"
-	  }
-  },
-  "agentId" : "",
-  "toolCategory" : "DEPLOYMENT",
-  "runSchedule": 30,
-  "enableDataValidation": true,
-  "userid": "userId",
-  "passwd": "Passwd",
-  "reportType": "com.urbancode.ds.subsys.report.domain.deployment_report.DeploymentReport",
-  "baseUrl": "http://hostname:8080",
-  "startFrom": "2017-01-01",
-  "toolsTimeZone" : "GMT",
-  "insightsTimeZone" : "GMT",
-  "useResponseTemplate" : true,
-  "timeStampField": "date",
-  "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
-  "isEpochTimeFormat": true,
-  "agentSecretDetails": ["userid","passwd"],
-  "isDebugAllowed" : false,
-  "enableValueArray": false,
-  "loggingSetting" : {
-		"logLevel" : "WARN",
-		"maxBytes" : 5000000,
-		"backupCount" : 1000
+	"mqConfig": {
+		"user": "username for RabbitMq",
+		"password": "",
+		"host": "127.0.0.1",
+		"exchange": "iSight",
+		"agentControlXchg": "iAgent"
+	},
+	"subscribe": {
+		"config": "DEPLOYMENT.UCD.config"
+	},
+	"publish": {
+		"data": "DEPLOYMENT.UCD.DATA",
+		"health": "DEPLOYMENT.UCD.HEALTH"
+	},
+	"communication": {
+		"type": "REST",
+		"sslVerify": true,
+		"responseType": "JSON"
+	},
+	"dynamicTemplate": {
+		"timeFieldMapping": {
+			"startDate": "%Y-%m-%d"
+		},
+		"responseTemplate": {
+			"status": "status",
+			"date": "date",
+			"duration": "duration",
+			"environment": "environment",
+			"application": "application",
+			"applicationRequestId": "applicationRequestId",
+			"user": "user"
+		}
+	},
+	"agentId": "",
+	"toolCategory": "DEPLOYMENT",
+	"runSchedule": 30,
+	"enableDataValidation": true,
+	"userid": "userId",
+	"passwd": "",
+	"reportType": "com.urbancode.ds.subsys.report.domain.deployment_report.DeploymentReport",
+	"baseUrl": "http://hostname:8080",
+	"startFrom": "2017-01-01",
+	"toolsTimeZone": "GMT",
+	"insightsTimeZone": "GMT",
+	"useResponseTemplate": true,
+	"timeStampField": "date",
+	"timeStampFormat": "%Y-%m-%dT%H:%M:%S",
+	"isEpochTimeFormat": true,
+	"agentSecretDetails": [
+		"userid",
+		"passwd"
+	],
+	"isDebugAllowed": false,
+	"enableValueArray": false,
+	"loggingSetting": {
+		"logLevel": "WARN",
+		"maxBytes": 5000000,
+		"backupCount": 1000
 	},
 	"auditing": false
 }

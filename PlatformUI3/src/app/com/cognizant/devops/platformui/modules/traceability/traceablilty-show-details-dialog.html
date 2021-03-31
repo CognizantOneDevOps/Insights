@@ -15,13 +15,17 @@
  * the License.
  *******************************************************************************-->
 
- <div [style.height.%]="12" class="arrange-horizontally-Dialog">
+<div [style.height.%]="12" class="arrange-horizontally-Dialog">
 
-    <div style="margin-top: 7px; margin-bottom: 7px;" class="gridheadercenter" *ngIf="!showToolDetailProp">
+    <div style="margin-top: 7px; margin-bottom: 7px;" class="gridheadercenter"
+        *ngIf="!showToolDetailProp&&!showCardDetail">
         Timelag Details
     </div>
     <div class="gridheadercenter" *ngIf="showToolDetailProp">
         Additional Details - {{dispplaytoolname}}
+    </div>
+    <div class="gridheadercenterover" *ngIf="showCardDetail">
+        Additional Details
     </div>
     <div class="closeIconCss">
         <a (click)="closeShowDetailsDialog()">
@@ -30,7 +34,7 @@
     </div>
 </div>
 <mat-dialog-content [style.height.%]="78">
-    <div class="timelag mat-elevation-z4" style="text-align: center;" *ngIf="!showToolDetailProp">
+    <div class="timelag mat-elevation-z4" style="text-align: center;" *ngIf="!showToolDetailProp&&!showCardDetail">
         <table mat-table [dataSource]="timelagDataSource" mat-elevation-z4>
             <ng-container matColumnDef="Tools">
                 <mat-header-cell *matHeaderCellDef style="width:40% !important" class="tableHeaderCss">Tools
@@ -49,13 +53,17 @@
     <div *ngIf="showToolDetailProp">
         <table mat-table [dataSource]="agentDetailedDatasource">
             <ng-container *ngFor="let header of finalHeaderToShow | keyvalue" matColumnDef="{{header.key}}">
-                <th mat-header-cell *matHeaderCellDef>{{header.key}}</th>
+                <th mat-header-cell *matHeaderCellDef>{{header.key | uppercase}}</th>
                 <td mat-cell style="padding-top:2px;padding-bottom:2px; line-height: 1.7em;" *matCellDef="let element">
                     {{element[header.key]}}</td>
             </ng-container>
             <tr mat-header-row *matHeaderRowDef="headerArrayDisplay" class="tableHeaderCss"></tr>
-            <tr mat-row *matRowDef="let row; columns: headerArrayDisplay;"></tr>
+            <tr mat-row *matRowDef="let row; columns: headerArrayDisplay;" (click)="clickRow(row);"
+                class="asset-details-element-row" [class.asset-details-expanded-row]="expandedElement === element"></tr>
         </table>
+    </div>
+    <div *ngIf="showCardDetail">
+        <pre class="cardDetail" [innerHTML]="formatedData"></pre>
     </div>
 </mat-dialog-content>
 <div *ngIf="showToolDetailProp" class="timezoneText" [style.height.%]="2"> Current Timezone : {{timeZone}} </div>

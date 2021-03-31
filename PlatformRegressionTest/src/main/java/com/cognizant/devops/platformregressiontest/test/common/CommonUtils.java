@@ -36,7 +36,6 @@ import io.restassured.specification.RequestSpecification;
 public class CommonUtils {
 
 	private static final Logger log = LogManager.getLogger(CommonUtils.class);
-	
 
 	private CommonUtils() {
 		super();
@@ -48,28 +47,25 @@ public class CommonUtils {
 	static String xsrfToken;
 
 	static {
-		loadProperties();
-
+		loadProperties();		
 	}
 
 	public static void loadProperties() {
 
-		try {
-			FileReader reader = null;
+		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator + ConfigOptionsTest.AUTO_DIR
+				+ File.separator + ConfigOptionsTest.PROP_FILE;
 
-			String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-					+ ConfigOptionsTest.AUTO_DIR + File.separator + ConfigOptionsTest.PROP_FILE;
+		try (FileReader reader = new FileReader(path)) {
 
-			reader = new FileReader(path);
 			props = new Properties();
 
 			props.load(reader);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
+		} catch (FileNotFoundException e) {
+			log.error("Property File is not found {}", e);
+		} catch (IOException e) {
+			log.error(e);
+		}
 	}
 
 	public static String getProperty(String key) {

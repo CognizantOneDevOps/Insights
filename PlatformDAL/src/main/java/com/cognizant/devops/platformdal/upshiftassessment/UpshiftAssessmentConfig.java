@@ -14,26 +14,27 @@
  * the License.
  ******************************************************************************/
 
-package com.cognizant.devops.platformdal.vsmReport;
+package com.cognizant.devops.platformdal.upshiftassessment;
 
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name = "\"INSIGHTS_VSMREPORT_CONFIGURATION\"")
-public class VsmReportConfig {
+@Table(name = "\"INSIGHTS_UPSHIFTASSESSMENT_CONFIGURATION\"")
+public class UpshiftAssessmentConfig {
     @Id
     @Column(name = "ID", unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @Column(name = "UUID")
-    private String uuid;
+    @Column(name = "UPSHIFT_UUID")
+    private String upshiftUuid;
 
     @Column(name = "FILENAME")
     private String fileName;
 
+    @Lob
     @Column(name = "FILE")
     private byte[] file;
 
@@ -49,6 +50,9 @@ public class VsmReportConfig {
     @Column(name = "UPDATED_DATE")
     private Long updatedDate = 0L;
 
+    @Column(name = "JENKIND_EXECUTIONID")
+    private String jenkinsExecId;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "workflowId", referencedColumnName = "workflowId")
     private InsightsWorkflowConfiguration workflowConfig;
@@ -61,12 +65,12 @@ public class VsmReportConfig {
         this.id = id;
     }
 
-    public String getUuid() {
-        return uuid;
+    public String getUpshiftUuid() {
+        return upshiftUuid;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public void setUpshiftUuid(String upshiftUuid) {
+        this.upshiftUuid = upshiftUuid;
     }
 
     public String getFileName() {
@@ -115,6 +119,14 @@ public class VsmReportConfig {
 
     public void setUpdatedDate(Long updatedDate) {
         this.updatedDate = updatedDate;
+    }
+
+    public String getJenkinsExecId() {
+        return jenkinsExecId;
+    }
+
+    public void setJenkinsExecId(String jenkinsExecId) {
+        this.jenkinsExecId = jenkinsExecId;
     }
 
     public InsightsWorkflowConfiguration getWorkflowConfig() {

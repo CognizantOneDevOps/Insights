@@ -56,6 +56,9 @@ public class InsightsDataArchivalConfig {
 
 	@Column(name = "CREATED_ON")
 	private Long createdOn;
+	
+	@Column(name = "CONTAINER_ID")
+	private String containerID;
 
 	public int getId() {
 		return id;
@@ -136,5 +139,14 @@ public class InsightsDataArchivalConfig {
 	public void setCreatedOn(Long createdOn) {
 		this.createdOn = createdOn;
 	}
+
+	public String getContainerID() {
+		return containerID;
+	}
+
+	public void setContainerID(String containerID) {
+		this.containerID = containerID;
+	}
+	
 
 }

@@ -7,7 +7,7 @@
 	},
 	"mqConfig": {
 		"user": "username for RabbitMq",
-		"password": "Password for RabbitMq",
+		"password": "",
 		"host": "127.0.0.1",
 		"exchange": "iSight",
 		"agentControlXchg": "iAgent"
@@ -125,14 +125,61 @@
 					"gitType"
 				]
 			}
+		},
+		"extensions": {
+			"commitFileDetails": {
+				"insightsTimeXFieldMapping": {
+					"timefield": "commitTime",
+					"isEpoch": false,
+					"timeformat": "%Y-%m-%dT%H:%M:%SZ"
+				},
+				"runSchedule": 60,
+				"relationMetadata": {
+					"relation": {
+						"properties": [
+							"commitTime",
+							"authorName",
+							"additions",
+							"deletions",
+							"changes",
+							"status"
+						],
+						"name": "FILE_HAS_COMMITS",
+						"source": {
+							"labels": [
+								"LATEST"
+							],
+							"constraints": [
+								"commitId"
+							]
+						},
+						"destination": {
+							"labels": [
+								"FILE_CHANGE"
+							],
+							"constraints": [
+								"filepathHash",
+								"filename"
+							],
+							"selectedProperties": [
+								"inSightsTimeX",
+								"inSightsTime",
+								"toolName",
+								"categoryName",
+								"fileExtension" ]
+						}
+					}
+				}
+			}
 		}
 	},
 	"agentId": "",
 	"enableBranches": true,
 	"enableOptimizedDataRetrieval": true,
-	"enablePullReqCommitAPIDataRetrieval": true,
+	"enablePullReqCommitAPIDataRetrieval": false,
 	"enableBrancheDeletion": false,
 	"enableDataValidation": true,
+	"enableCommitFileUpdation": true,
 	"toolCategory": "SCM",
 	"toolsTimeZone": "GMT",
 	"insightsTimeZone": "Asia/Kolkata",
@@ -148,7 +195,7 @@
 		"accessToken"
 	],
 	"startFrom": "2020-01-01 15:46:33",
-	"accessToken": "accessToken for git",
+	"accessToken": "",
 	"getRepos": "https://api.github.com/users/<USER_NAME>/repos",
 	"commitsBaseEndPoint": "https://api.github.com/repos/<REPO_NAME>/",
 	"isDebugAllowed": false,

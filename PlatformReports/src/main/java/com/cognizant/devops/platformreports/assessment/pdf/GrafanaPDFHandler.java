@@ -80,6 +80,8 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 	private static final String VIEW = ".view";
 	private static final String PROXY_URL_PATTERN = "**/proxy/**";
 	private static final String DASHBOARD = "Dashboard";
+	
+	private static final int DASHBOARD_LOAD_TIME = 30000;
 
 	private WorkflowDAL workflowDAL = new WorkflowDAL();
 	private GrafanaDashboardPdfConfigDAL grafanaDashboardConfigDAL = new GrafanaDashboardPdfConfigDAL();
@@ -191,6 +193,9 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			page.waitForResponse(grafanaUrl);
 			page.waitForNavigation();
 			page.navigate(grafanaUrl,navigateOptions);
+			log.debug("Starting Waiting for dashboard to load == in ms {} ",DASHBOARD_LOAD_TIME);
+			Thread.sleep(DASHBOARD_LOAD_TIME);
+			log.debug("Waiting exit post configured time to load Dashboard ");
 			Page.WaitForSelectorOptions waitForSelectorOptions = new Page.WaitForSelectorOptions();
 			waitForSelectorOptions.withState(State.ATTACHED);
 			Deferred<ElementHandle> event = page.waitForSelector(VIEW, new Page.WaitForSelectorOptions()
@@ -285,7 +290,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 	 * @param incomingTaskMessageJson
 	 * @param exportedFilePath 
 	 */
-	private void printableDashboardAsPdf(InsightsAssessmentConfigurationDTO assessmentReportDTO, GrafanaDashboardPdfConfig grafanaDashboardPdfConfig, String exportedFilePath) {
+	private synchronized void printableDashboardAsPdf(InsightsAssessmentConfigurationDTO assessmentReportDTO, GrafanaDashboardPdfConfig grafanaDashboardPdfConfig, String exportedFilePath) {
 		Playwright playwright = Playwright.create();
 		try {
 			JsonParser jsonParser = new JsonParser();
@@ -479,8 +484,8 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 	}
 
 	private String getGrafanaAuth() {
-		return ApplicationConfigProvider.getInstance().getUserId()+":"+
-				ApplicationConfigProvider.getInstance().getPassword();
+		return ApplicationConfigProvider.getInstance().getGrafana().getAdminUserName()+":"+
+				ApplicationConfigProvider.getInstance().getGrafana().getAdminUserPassword();
 	}
 
 	private String getGrafanaEndPoint() {

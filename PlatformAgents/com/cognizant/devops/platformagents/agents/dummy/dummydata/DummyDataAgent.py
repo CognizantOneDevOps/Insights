@@ -43,13 +43,11 @@ class DummyDataAgent(BaseAgent):
         self.boardIdForProjects = [101, 201, 301, 401]   
         self.startFrom = self.config.get("startFrom")
         self.startDate = parser.parse(self.startFrom, ignoretz=True)
-        self.start_date_days = self.config.get("start_date_days")
                 
         # JIRA Variables        
         self.numberofRelease = self.config.get("numberofReleasesRequired") 
         self.numberOfSprintsInRelease = self.config.get("numberOfSprintsInRelease")
         self.numberofDaysInSprint = self.config.get("numberofDaysInSprint")
-        self.createSprintData = self.config.get('createSprintData')              
         self.Priority = ['High', 'Low', 'Medium']
         self.jiraUsers = ["Vicky" , "Sam", "John", "Tom", "Adam"] 
         self.issueTypes = ['Story', 'Task'] 
@@ -158,6 +156,8 @@ class DummyDataAgent(BaseAgent):
             releaseSample["startDate"] = (self.releaseStartDate).strftime("%Y-%m-%dT%H:%M:%S")
             releaseSample ["endDate"]   =    (self.releaseEndDate).strftime("%Y-%m-%dT%H:%M:%S")
             releaseSample["numberOfEpics"] =  numberOfEpicsRequiredForRelease  
+            releaseSample['toolName'] = "JIRA"
+            releaseSample['categoryName'] = "ALM"
             self.releaseData.append(releaseSample) 
             releaseMetadata = {"labels" : ["ALM", "JIRA", "DATA","RELEASE"]}                
             self.publishToolsData(self.releaseData, releaseMetadata)  
@@ -238,6 +238,8 @@ class DummyDataAgent(BaseAgent):
             jiraSample['issueType'] = 'Epic'
             jiraSample['projectName'] = self.projectName       
             jiraSample['reporter'] = random.choice(self.jiraUsers)
+            jiraSample['toolName'] = "JIRA"
+            jiraSample['categoryName'] = "ALM"
             self.detailsOfEpicsInRelease.append(jiraSample)       
             self.listofEpicsKeyInCurrentRelease.append(epicKey)        
             self.noOfEpicsCreatedSoFar = self.noOfEpicsCreatedSoFar + 1 
@@ -277,6 +279,8 @@ class DummyDataAgent(BaseAgent):
             sprintSample['sprintEndDateEpoch'] = epoch_End 
             sprintSample['insightsTimeX'] = self.sprintEndDate.strftime("%Y-%m-%dT%H:%M:%SZ")
             sprintSample['insightsTime'] = epoch_End 
+            sprintSample['toolName'] = "JIRA"
+            sprintSample['categoryName'] = "ALM"
             gmt = time.gmtime()
             currentTime = calendar.timegm(gmt)
             # Creating issues for each sprint
@@ -408,7 +412,9 @@ class DummyDataAgent(BaseAgent):
                     bugDetail ['issueType'] = "Bug"
                     bugDetail ['storyPoints'] = ""
                     bugDetail ['summary'] = "Bug Raised for " + workingKey
-                    bugDetail["createdAt"] = self.updatedAt.strftime("%Y-%m-%dT%H:%M:%S");                  
+                    bugDetail["createdAt"] = self.updatedAt.strftime("%Y-%m-%dT%H:%M:%S"); 
+                    bugDetail['toolName'] = "JIRA"
+                    bugDetail['categoryName'] = "ALM"                 
                     self.change_Log(bugKey, "status", "In Progress", "To Do", self.updatedAt)                 
                     self.change_Log(workingKey, "status", "Reopened", "QA In Progress", self.updatedAt)
                     originalStory = detail.copy()
@@ -449,6 +455,8 @@ class DummyDataAgent(BaseAgent):
         jiraSample['epicKey'] = random.choice(self.listofEpicsKeyInCurrentRelease)
         jiraSample['boardId'] = self.boardIdForProjects[self.project_names.index(self.projectName)]
         jiraSample['fixVersion'] = "V." + str(self.releaseVersion)
+        jiraSample['toolName'] = "JIRA"
+        jiraSample['categoryName'] = "ALM"
         if issueType == 'Story':
             jiraSample['storyPoints'] = random.choice(self.storyPoints)
         self.issueCreationStarted = self.issueCreationStarted + 1

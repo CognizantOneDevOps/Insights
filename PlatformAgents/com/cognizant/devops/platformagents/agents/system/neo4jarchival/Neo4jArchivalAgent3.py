@@ -38,37 +38,39 @@ from datetime import datetime
 class Neo4jArchivalAgent(BaseAgent):
     def process(self):
         neo4j_host_uri = self.config.get("neo4j_host_uri", '')
-        neo4j_user_id = self.config.get("neo4j_user_id", '')
         neo4j_query_limit = self.config.get("querylimit", '')
-        neo4j_password = self.config.get("neo4j_password", '')
+        neo4j_user_id = self.getCredential("neo4j_user_id")
+        neo4j_password = self.getCredential("neo4j_password")
         elasticsearch_hostname_uri = self.config.get("elasticsearch_hostname_uri", '')
+        elasticsearch_username = self.getCredential('elasticsearch_username')
+        elasticsearch_passwd = self.getCredential('elasticsearch_passwd')
         neo4j_label_csv = self.config.get("neo4j_label", '')
         neo4j_label = neo4j_label_csv.split(",")
         neo4j_data_delete = self.config.get("neo4j_data_delete", "")
         self._driver = GraphDatabase.driver(neo4j_host_uri, auth=(neo4j_user_id, neo4j_password), max_connection_lifetime=200)
-        _es = elasticsearch.Elasticsearch(hosts=elasticsearch_hostname_uri)
+        _es = elasticsearch.Elasticsearch(hosts=elasticsearch_hostname_uri,http_auth=(elasticsearch_username, elasticsearch_passwd))
         if _es.ping():
-            print('connected')
+            logging.debug('connected')
         else:
-            print('could not connect!')
+            logging.debug('could not connect!')
         try:
             if neo4j_label_csv == "*":
                 with self._driver.session() as session:
                     list_of_labels = session.write_transaction(self.find_labels)
-                    print(list_of_labels)
+                    logging.debug(list_of_labels)
                     dctNode = list_of_labels[0]
                     tem = dict(dctNode)
-                    values_view = tem.values()
+                    values_view = list(tem.values())
                     value_iterator = iter(values_view)
                     first_value = next(value_iterator)
-                    print(first_value)
+                    logging.debug(first_value)
                     list_lables = list(first_value)
-                    print(list_lables)
+                    logging.debug(list_lables)
             else:
                 list_lables = neo4j_label
             for i in range(len(list_lables)):
                 if list_lables[i]:
-                    print(list_lables[i])
+                    #logging.debug((list_lables[i]))
                     self.process_node_datatype(_es, list_lables[i])
                     self.process_rel_datatype(_es, list_lables[i])
                     self.resume_migrate_nodes(_es, list_lables[i], neo4j_query_limit)
@@ -80,10 +82,11 @@ class Neo4jArchivalAgent(BaseAgent):
                     self.process_node_datatype(_es, list_lables[i])
                     self.process_rel_datatype(_es, list_lables[i])
                     if (neo4j_data_delete):
-                        print("deletion starts")
+                        #logging.debug("deletion starts")
                         self.delete_batchof_relationships(_es, list_lables[i], neo4j_query_limit)
                         self.delete_batchof_nodes(_es, list_lables[i], neo4j_query_limit)
-            print("process complete")
+            self.process_indexes(_es)
+            logging.debug("process complete")
 
 
         except Exception as ex:
@@ -93,18 +96,19 @@ class Neo4jArchivalAgent(BaseAgent):
 
     def process_node_datatype(self, _es, label):
         try:
+            logging.debug("INFO:: Inside Process Node Datatype")
             with self._driver.session() as session:
                 schemadict ={}
                 result = session.write_transaction(self.get_node_datatype)
-                print(result)
+                logging.debug(result)
                 for i in range(len(result)):
-                    print(result[i])
-                    print(result[i]["nodeLabels"])
+                    #logging.debug((result[i]))
+                    #logging.debug((result[i]["nodeLabels"]))
                     labellist = result[i]["nodeLabels"]
                     if labellist.count(label) >0 :
                         schemadict[result[i]["propertyName"]] = result[i]["propertyTypes"]
                         schemadict["_label"] = ["String"]
-                print(schemadict)
+                logging.debug(schemadict)
                 label= label+"_neo4j_schema"
                 copy_schema_data_to_es_result =self.copy_schema_data_to_es(_es, schemadict, label)
 
@@ -115,18 +119,19 @@ class Neo4jArchivalAgent(BaseAgent):
 
     def process_rel_datatype(self, _es, label):
         try:
+            logging.debug("INFO:: Inside Process Rel Datatype")
             with self._driver.session() as session:
                 schemadict ={}
                 relationship_types = session.write_transaction(self.get_distinct_relationship_details,label)
-                print(relationship_types)
+                logging.debug(relationship_types)
                 result = session.write_transaction(self.get_rel_datatype)
-                print(result)
+                logging.debug(result)
                 for j in range(len(relationship_types)):
                     for i in range(len(result)):
-                        print(result[i]["relType"])
+                        #logging.debug((result[i]["relType"]))
                         relatioshipname = relationship_types[j]["relationshipName"]
                         relatioshipname_altered = ":`"+relatioshipname+"`"
-                        print(relatioshipname)
+                        #logging.debug(relatioshipname)
                         relType_val = result[i]["relType"]
                         if relatioshipname_altered == relType_val:
                             schemadict[result[i]["propertyName"]] = result[i]["propertyTypes"]
@@ -139,7 +144,7 @@ class Neo4jArchivalAgent(BaseAgent):
                             schemadict["time_node_end"] = ["Double"]
                             schemadict["_end"] = ["String"]
                             schemadict["copy_to_ES"] = ["Boolean"]
-                    print(schemadict)
+                    #logging.debug(schemadict)
                     relatioshipname= relatioshipname+"_neo4j_schema"
                     copy_schema_data_to_es_result =self.copy_schema_data_to_es(_es, schemadict, relatioshipname)
 
@@ -148,8 +153,26 @@ class Neo4jArchivalAgent(BaseAgent):
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
             exit(1)
 
+    def process_indexes(self, _es):
+        try:
+            logging.debug("INFO:: Inside Process Indexes")
+            with self._driver.session() as session:
+                indexdict ={}
+                result = session.write_transaction(self.get_indexes)
+                if len(result)>0:
+                  for i in range(len(result)):
+                    indexdict[result[i]["description"]]=result[i]["state"]
+                  label= "neo4j_index"
+                  copy_index_data_to_es_result =self.copy_index_data_to_es(_es, indexdict, label)
+
+        except Exception as ex:
+            logging.error(ex)
+            self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
+            exit(1)
+
     def delete_batchof_nodes(self, _es, label,neo4j_query_limit):
         try:
+            logging.debug("INFO:: Inside delete batch of nodes")
             with self._driver.session() as session:
                 timeperiod_epoch = self.obtain_epoch_date()
                 list_of_NodeID = []
@@ -167,6 +190,7 @@ class Neo4jArchivalAgent(BaseAgent):
 
     def delete_batchof_relationships(self, _es, label,neo4j_query_limit):
         try:
+            logging.debug("INFO:: Inside delete batch of relationships")
             with self._driver.session() as session:
                 timeperiod_epoch = self.obtain_epoch_date()
                 list_of_NodeID = []
@@ -186,11 +210,12 @@ class Neo4jArchivalAgent(BaseAgent):
     Function: resume_migrate_nodes
     Description: get node details add labels as seperated values seperated by  ^ which are incomplete in previous transaction
     Parameter: _es = holds elasticsearch obejct (object), label = neo4j labels (string),
-                neo4j_query_limit = limit passed to query while pulling data (integer)                
-        
+                neo4j_query_limit = limit passed to query while pulling data (integer)
+
     """
     def resume_migrate_nodes(self, _es, label,neo4j_query_limit):
         try:
+            logging.debug("INFO:: Inside resume migrate nodes")
             with self._driver.session() as session:
                 timeperiod_epoch = self.obtain_epoch_date()
                 list_of_NodeID = []
@@ -202,7 +227,7 @@ class Neo4jArchivalAgent(BaseAgent):
                 for k in range(no_of_loop):
                     nodeData = session.write_transaction(self.get_node_details_unack, timeperiod_epoch, label,neo4j_query_limit)
                     for i in range(len(nodeData)):
-                        print(nodeData[i]['n'])
+                        #logging.debug((nodeData[i]['n']))
                         dictNode = dict(nodeData[i]['n'])
                         lstlabel = nodeData[i]["_label"]
                         insightstime = int(nodeData[i]["inSightsTime"])
@@ -211,7 +236,7 @@ class Neo4jArchivalAgent(BaseAgent):
                         convlabelstring = ""
                         for j in range(len(lstlabel)):
                             convlabelstring = convlabelstring + "^" + lstlabel[j]
-                        #print(dictNode)
+                        #logging.debug(dictNode)
 
                         dictNode.update({'_label': convlabelstring})
                         copy_node_data_to_es_result = self.copy_node_data_to_es(_es, elasticsearchID, dictNode, label)
@@ -221,7 +246,7 @@ class Neo4jArchivalAgent(BaseAgent):
                     verified_ids = []
                     for i in range(len(list_of_NodeID)):
                         node_details_from_ES = _es.get(index=label.lower(), id=list_of_elasticsearchId[i])
-                        print(node_details_from_ES)
+                        #logging.debug(node_details_from_ES)
                         if node_details_from_ES['found']:
                             verified_ids.append(list_of_NodeID[i])
                     session.write_transaction(self.set_flag_true_node, label, verified_ids)
@@ -229,19 +254,19 @@ class Neo4jArchivalAgent(BaseAgent):
         except Exception as ex:
             logging.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
-            print(label)
             exit(1)
 
     """
         Function: resume_migrate_forward_relationship
         Description: get relationship detials, add rel name and push to es which are incomplete in previous transaction
         Parameter: _es = holds elasticsearch obejct (object), label = neo4j labels (string),
-                    neo4j_query_limit = limit passed to query while pulling data (integer)                
+                    neo4j_query_limit = limit passed to query while pulling data (integer)
 
         """
 
     def resume_migrate_forward_relationship(self, _es, label,neo4j_query_limit):
         try:
+            logging.debug("INFO:: Inside resume migrate forward relationship")
             timeperiod_epoch = self.obtain_epoch_date()
             with self._driver.session() as session:
                 querycount = session.write_transaction(self.total_unmigrated_forward_realtionship_count_unack, timeperiod_epoch,
@@ -262,7 +287,7 @@ class Neo4jArchivalAgent(BaseAgent):
                         dictNode.update({'_start' : relData[i]["_start"]})
                         dictNode.update({'time_node_end' : relData[i]["time_node_end"]})
                         dictNode.update({'_end': relData[i]["_end"]})
-                        #print(dictNode)
+                        #logging.debug(dictNode)
                         copy_relationship_data_to_es_result = self.copy_relationship_data_to_es(_es, dictNode)
                         if copy_relationship_data_to_es_result:
                             relId = relData[i]["relationshipID"]
@@ -270,7 +295,7 @@ class Neo4jArchivalAgent(BaseAgent):
                             elasticsearchId = str(relId)+str(time_node_start)
                             realtioshipName_detail = relData[i]["relationshipName"]
                             rel_response = _es.get(index=realtioshipName_detail.lower(), id=elasticsearchId)
-                            print(rel_response)
+                            #logging.debug(rel_response)
                             if rel_response['found'] == True:
                                 verified_ids.append(relId)
                     session.write_transaction(self.set_flag_true_rel, label, verified_ids )
@@ -284,12 +309,13 @@ class Neo4jArchivalAgent(BaseAgent):
             Function: resume_migrate_backward_relationship
             Description: get relationship detials, add rel name and push to es whichare incomplete in previous transaction
             Parameter: _es = holds elasticsearch obejct (object), label = neo4j labels (string),
-                        neo4j_query_limit = limit passed to query while pulling data (integer)                
+                        neo4j_query_limit = limit passed to query while pulling data (integer)
 
     """
 
     def resume_migrate_backward_relationship(self, _es, label,neo4j_query_limit):
         try:
+            logging.debug("INFO:: Inside resume migrate backward relationship")
             timeperiod_epoch = self.obtain_epoch_date()
             with self._driver.session() as session:
                 querycount = session.write_transaction(self.total_unmigrated_backward_realtionship_count_unack, timeperiod_epoch,
@@ -310,7 +336,7 @@ class Neo4jArchivalAgent(BaseAgent):
                         dictNode.update({'_start' : relData[i]["_start"]})
                         dictNode.update({'time_node_end' : relData[i]["time_node_end"]})
                         dictNode.update({'_end': relData[i]["_end"]})
-                        #print(dictNode)
+                        #logging.debug(dictNode)
                         copy_relationship_data_to_es_result = self.copy_relationship_data_to_es(_es, dictNode)
                         if copy_relationship_data_to_es_result:
                             relId = relData[i]["relationshipID"]
@@ -318,7 +344,7 @@ class Neo4jArchivalAgent(BaseAgent):
                             elasticsearchId = str(relId) + str(time_node_start)
                             realtioshipName_detail = relData[i]["relationshipName"]
                             rel_response = _es.get(index=realtioshipName_detail.lower(), id=elasticsearchId)
-                            print(rel_response)
+                            #logging.debug(rel_response)
                             if rel_response['found'] == True:
                                 verified_ids.append(relId)
                     session.write_transaction(self.set_flag_true_rel, label, verified_ids )
@@ -333,13 +359,14 @@ class Neo4jArchivalAgent(BaseAgent):
 
     """
                 Function: migrate_nodes
-                Description: get node details add labels as seperated values seperated by  ^  
+                Description: get node details add labels as seperated values seperated by  ^
                 Parameter: _es = holds elasticsearch obejct (object), label = neo4j labels (string),
-                            neo4j_query_limit = limit passed to query while pulling data (integer)                
+                            neo4j_query_limit = limit passed to query while pulling data (integer)
 
     """
     def migrate_nodes(self, _es, label, neo4j_query_limit):
         try:
+            logging.debug("INFO:: Inside migrate nodes")
             with self._driver.session() as session:
                 timeperiod_epoch = self.obtain_epoch_date()
                 list_of_NodeID = []
@@ -351,7 +378,7 @@ class Neo4jArchivalAgent(BaseAgent):
                 for k in range(no_of_loop):
                     nodeData = session.write_transaction(self.get_node_details, timeperiod_epoch, label,neo4j_query_limit)
                     for i in range(len(nodeData)):
-                        #print(nodeData[i]['n'])
+                        #logging.debug(nodeData[i]['n'])
                         dictNode = dict(nodeData[i]['n'])
                         lstlabel = nodeData[i]["_label"]
                         nodeId = nodeData[i]["ID"]
@@ -360,7 +387,7 @@ class Neo4jArchivalAgent(BaseAgent):
                         convlabelstring=""
                         for j in range(len(lstlabel)):
                             convlabelstring = convlabelstring+"^"+lstlabel[j]
-                        #print(dictNode)
+                        #logging.debug(dictNode)
                         dictNode.update({'_label': convlabelstring})
                         copy_node_data_to_es_result = self.copy_node_data_to_es(_es, elasticsearchID, dictNode, label)
                         if copy_node_data_to_es_result:
@@ -369,7 +396,7 @@ class Neo4jArchivalAgent(BaseAgent):
                     verified_ids = []
                     for i in range(len(list_of_NodeID)):
                         node_details_from_ES = _es.get(index=label.lower(), id=list_of_elasticsearchId[i])
-                        print(node_details_from_ES)
+                        #logging.debug(node_details_from_ES)
                         if node_details_from_ES['found']:
                             verified_ids.append(list_of_NodeID[i])
                     session.write_transaction(self.set_flag_true_node,label,verified_ids )
@@ -384,11 +411,12 @@ class Neo4jArchivalAgent(BaseAgent):
          Function: migrate_forward_relationship
          Description: get relationship detials, add rel name and push to es
          Parameter: _es = holds elasticsearch obejct (object), label = neo4j labels (string),
-                     neo4j_query_limit = limit passed to query while pulling data (integer)                
+                     neo4j_query_limit = limit passed to query while pulling data (integer)
 
      """
     def migrate_forward_relationship(self,_es, label,neo4j_query_limit):
         try:
+            logging.debug("INFO:: Inside migrate forward relationship")
             timeperiod_epoch = self.obtain_epoch_date()
             with self._driver.session() as session:
                 querycount = session.write_transaction(self.total_forward_unmigrated_realtionship_count, timeperiod_epoch,label)
@@ -408,7 +436,7 @@ class Neo4jArchivalAgent(BaseAgent):
                         dictNode.update({'_start' : relData[i]["_start"]})
                         dictNode.update({'time_node_end' : relData[i]["time_node_end"]})
                         dictNode.update({'_end': relData[i]["_end"]})
-                        #print(dictNode)
+                        #logging.debug(dictNode)
                         copy_relationship_data_to_es_result = self.copy_relationship_data_to_es(_es, dictNode)
                         if copy_relationship_data_to_es_result:
                             relId = relData[i]["relationshipID"]
@@ -416,7 +444,7 @@ class Neo4jArchivalAgent(BaseAgent):
                             elasticsearchId = str(relId) + str(time_node_start)
                             realtioshipName_detail = relData[i]["relationshipName"]
                             rel_response = _es.get(index=realtioshipName_detail.lower(), id=elasticsearchId)
-                            print(rel_response)
+                            #logging.debug(rel_response)
                             if rel_response['found'] == True:
                                 verified_ids.append(relId)
                     session.write_transaction(self.set_flag_true_rel, label, verified_ids )
@@ -430,12 +458,13 @@ class Neo4jArchivalAgent(BaseAgent):
             Function: migrate_backward_relationship
             Description: get relationship detials, add rel name and push to es
             Parameter: _es = holds elasticsearch obejct (object), label = neo4j labels (string),
-                       neo4j_query_limit = limit passed to query while pulling data (integer)                
+                       neo4j_query_limit = limit passed to query while pulling data (integer)
 
     """
 
     def migrate_backward_relationship(self,_es, label,neo4j_query_limit):
         try:
+            logging.debug("INFO:: Inside migrate backward relationship")
             timeperiod_epoch = self.obtain_epoch_date()
             with self._driver.session() as session:
                 querycount = session.write_transaction(self.total_backward_unmigrated_realtionship_count, timeperiod_epoch,label)
@@ -455,7 +484,7 @@ class Neo4jArchivalAgent(BaseAgent):
                         dictNode.update({'_start' : relData[i]["_start"]})
                         dictNode.update({'time_node_end' : relData[i]["time_node_end"]})
                         dictNode.update({'_end': relData[i]["_end"]})
-                        #print(dictNode)
+                        #logging.debug(dictNode)
                         copy_relationship_data_to_es_result = self.copy_relationship_data_to_es(_es, dictNode)
                         if copy_relationship_data_to_es_result:
                             relId = relData[i]["relationshipID"]
@@ -463,7 +492,7 @@ class Neo4jArchivalAgent(BaseAgent):
                             elasticsearchId = str(relId) + str(time_node_start)
                             realtioshipName_detail = relData[i]["relationshipName"]
                             rel_response = _es.get(index=realtioshipName_detail.lower(), id=elasticsearchId)
-                            print(rel_response)
+                            #logging.debug(rel_response)
                             if rel_response['found'] == True:
                                 verified_ids.append(relId)
 
@@ -478,25 +507,27 @@ class Neo4jArchivalAgent(BaseAgent):
             Function: copy_schema_data_to_es
             Description: all the schema of nodes and relationship are stored as seperate index.
             Parameter: _es = holds elasticsearch obejct (object), indexName = index name named after neo4j label  (string),
-                                nodeId = nodeid of neo4j created as id for es(integer)   , dctNode : dictionary of schema data             
+                                nodeId = nodeid of neo4j created as id for es(integer)   , dctNode : dictionary of schema data
 
         """
 
     def copy_schema_data_to_es(self, _es, dctNode, indexName):
         try:
+            logging.debug("INFO:: Inside copy schema data to es")
             if len(dctNode) > 0:
                 jsonNode = json.dumps(dctNode)
                 if (json.loads(jsonNode)):
                     jsonNode = json.loads(jsonNode)
-                    indexName = string.lower(indexName)
+                    #indexName = string.lower(indexName)
+                    indexName = indexName.lower()
                     doc_type = "_doc"
                     response = _es.index(index=indexName, doc_type=doc_type, id=indexName, body=jsonNode)
-                    print("Nodes schema dumped to Elastic search successfully")
+                    logging.debug("Nodes schema dumped to Elastic search successfully")
                     if response['result'] == "created":
-                        print("Nodes schema dumped to Elastic search successfully")
+                        logging.debug("Nodes schema dumped to Elastic search successfully")
                         return True
                     elif response['result'] == "updated":
-                        print("Nodes schema updated to Elastic search successfully")
+                        logging.debug("Nodes schema updated to Elastic search successfully")
                         return True
                     else:
                         return False
@@ -506,68 +537,104 @@ class Neo4jArchivalAgent(BaseAgent):
             exit(1)
 
 
+    """
+            Function: copy_index_data_to_es
+            Description: all the indexes of noeo4j are stored as seperate index.
+            Parameter: _es = holds elasticsearch obejct (object), indexName = index name
+                             , dctNode : dictionary of index data
+
+        """
+
+    def copy_index_data_to_es(self, _es, dctNode, indexName):
+        try:
+            logging.debug("INFO:: Inside copy index data to es")
+            if len(dctNode) > 0:
+                jsonNode = json.dumps(dctNode)
+                if (json.loads(jsonNode)):
+                    jsonNode = json.loads(jsonNode)
+                    #indexName = string.lower(indexName)
+                    indexName = indexName.lower()
+                    doc_type = "_doc"
+                    response = _es.index(index=indexName, doc_type=doc_type, id=indexName, body=jsonNode)
+                    logging.debug("Nodes schema dumped to Elastic search successfully")
+                    if response['result'] == "created":
+                        logging.debug("Nodes schema dumped to Elastic search successfully")
+                        return True
+                    elif response['result'] == "updated":
+                        logging.debug("Nodes schema updated to Elastic search successfully")
+                        return True
+                    else:
+                        return False
+        except Exception as ex:
+            logging.error(ex)
+            self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
+            exit(1)
+
 
     """
         Function: copy_node_data_to_es
         Description: esID = nodeID+insightstime , all labels stored in seperate index
         Parameter: _es = holds elasticsearch obejct (object), indexName = index name named after neo4j label  (string),
-                            nodeId = nodeid of neo4j created as id for es(integer)   , dctNode : dictionary of node data             
+                            nodeId = nodeid of neo4j created as id for es(integer)   , dctNode : dictionary of node data
 
     """
     def copy_node_data_to_es(self, _es, nodeId, dctNode, indexName):
         try:
+            logging.debug("INFO:: Inside copy node data to es")
             jsonNode = json.dumps(dctNode)
             if (json.loads(jsonNode)):
                 jsonNode = json.loads(jsonNode)
-                indexName = string.lower(indexName)
+                #indexName = string.lower(indexName)
+                indexName = indexName.lower()
                 doc_type = "_doc"
                 response = _es.index(index=indexName, doc_type=doc_type, id=nodeId, body=jsonNode)
-                print("Nodes dumped to Elastic search successfully")
+                logging.debug("Nodes dumped to Elastic search successfully")
         except Exception as ex:
             logging.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
             exit(1)
 
         if response['result'] == "created":
-            print("Nodes dumped to Elastic search successfully")
+            logging.debug("Nodes dumped to Elastic search successfully")
             return True
         elif response['result'] == "updated":
-            print("Nodes updated to Elastic search successfully")
+            logging.debug("Nodes updated to Elastic search successfully")
             return True
         else:
             return False
     """
         Function: copy_relationship_data_to_es
-        Description: all the forward and backward indexes are stored as seperate indexes in es elasticsearchID= neo4jrelationshipID+startNodeInsightsTIme 
+        Description: all the forward and backward indexes are stored as seperate indexes in es elasticsearchID= neo4jrelationshipID+startNodeInsightsTIme
         Parameter: _es = holds elasticsearch obejct (object),
-                            result : dictionary of relationship data             
+                            result : dictionary of relationship data
 
     """
 
     def copy_relationship_data_to_es(self, _es, result):
         try:
+            logging.debug("INFO:: Inside copy relationship data to es")
             jsonNode = json.dumps(result)
             if (json.loads(jsonNode)):
                 jsonNode = json.loads(jsonNode)
                 relationshipName = result['relationshipName']
-                relationshipName = string.lower(relationshipName)
+                #relationshipName = string.lower(relationshipName)
+                relationshipName = relationshipName.lower()
                 relationshipID = result['relationshipID']
                 time_node_start = int(result['time_node_start'])
                 elasticsearchID = str(relationshipID) + str(time_node_start)
                 response = _es.index(index=relationshipName, doc_type="_doc", id=elasticsearchID,
                                      body=jsonNode)
-                print(response['result'])
+                logging.debug((response['result']))
         except Exception as ex:
             logging.error(ex)
-            print(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
             exit(1)
 
         if response['result'] == "created":
-            print("Relationship dumped to Elastic search successfully")
+            logging.debug("Relationship dumped to Elastic search successfully")
             return True
         elif response['result'] == "updated":
-            print("Relationship updated to Elastic search successfully")
+            logging.debug("Relationship updated to Elastic search successfully")
             return True
         else:
             return False
@@ -575,7 +642,7 @@ class Neo4jArchivalAgent(BaseAgent):
     """
            Function: obtain_epoch_date
            Description: converts the timeperiod in days to epoch date from the current date
-           Parameter:              
+           Parameter:
 
     """
     def obtain_epoch_date(self):
@@ -587,13 +654,13 @@ class Neo4jArchivalAgent(BaseAgent):
                 days_in_epoch = days * 24 * 60 * 60
                 now = datetime.now()
                 current_time = now.strftime("%d.%m.%Y %H:%M:%S")
-                print("Current Time =", current_time)
+                logging.debug(("Current Time =", current_time))
                 epoch = int(time.mktime(time.strptime(current_time, pattern)))
                 date_result = epoch - days_in_epoch
-                print(date_result)
+                logging.debug(date_result)
             else:
                 date_result = int(time.mktime(time.strptime(archival_enddate, pattern)))
-                print(date_result)
+                logging.debug(date_result)
 
             return date_result
         except Exception as ex:
@@ -607,8 +674,8 @@ class Neo4jArchivalAgent(BaseAgent):
             result = tx.run("MATCH (n:{label}:DATA) "
                             "WHERE toInt(n.inSightsTime) < $timeperiod and not exists(n.copy_to_ES)"
                             "RETURN count(n) as Count ".format(label=label1), timeperiod=timeperiod).data()
-            print("count of Nodes to left************")
-            print(result)
+            logging.debug("count of Nodes to left************")
+            logging.debug(result)
 
         except Exception as ex:
             logging.error(ex)
@@ -620,8 +687,8 @@ class Neo4jArchivalAgent(BaseAgent):
             result = tx.run("MATCH (n:{label}:DATA) "
                             "WHERE toInt(n.inSightsTime) < $timeperiod and n.copy_to_ES = false "
                             "RETURN count(n) as Count ".format(label=label1), timeperiod=timeperiod).data()
-            print("count of Nodes to left************")
-            print(result)
+            logging.debug("count of Nodes to left************")
+            logging.debug(result)
 
         except Exception as ex:
             logging.error(ex)
@@ -633,8 +700,8 @@ class Neo4jArchivalAgent(BaseAgent):
             result = tx.run("MATCH (n:{label}:DATA) "
                             "WHERE toInt(n.inSightsTime) < $timeperiod and n.copy_to_ES = true "
                             "RETURN count(n) as Count ".format(label=label1), timeperiod=timeperiod).data()
-            print("count of Nodes to left************")
-            print(result)
+            logging.debug("count of Nodes to left************")
+            logging.debug(result)
 
         except Exception as ex:
             logging.error(ex)
@@ -646,8 +713,8 @@ class Neo4jArchivalAgent(BaseAgent):
             result = tx.run("MATCH (n:{label}:DATA)-[r]-(b) "
                             "WHERE toInt(n.inSightsTime) < $timeperiod and r.copy_to_ES = true and exists(b.inSightsTime) "
                             "RETURN count(r) as Count ".format(label=label1), timeperiod=timeperiod).data()
-            print("count of Relationships to left************")
-            print(result)
+            logging.debug("count of Relationships to left************")
+            logging.debug(result)
 
         except Exception as ex:
             logging.error(ex)
@@ -659,8 +726,8 @@ class Neo4jArchivalAgent(BaseAgent):
             result = tx.run("MATCH (n:{label}:DATA)-[r]->(b)"
                             "WHERE toInt(n.inSightsTime) < $timeperiod and not exists(r.copy_to_ES) and exists(b.inSightsTime) "
                             "RETURN count(r) as Count ".format(label=label1), timeperiod=timeperiod).data()
-            print("count of Relationships to left************")
-            print(result)
+            logging.debug("count of Relationships to left************")
+            logging.debug(result)
 
         except Exception as ex:
             logging.error(ex)
@@ -672,8 +739,8 @@ class Neo4jArchivalAgent(BaseAgent):
             result = tx.run("MATCH (n:{label}:DATA)<-[r]-(b)"
                             "WHERE toInt(n.inSightsTime) < $timeperiod and not exists(r.copy_to_ES) and exists(b.inSightsTime) "
                             "RETURN count(r) as Count ".format(label=label1), timeperiod=timeperiod).data()
-            print("count of Relationships to left************")
-            print(result)
+            logging.debug("count of Relationships to left************")
+            logging.debug(result)
 
         except Exception as ex:
             logging.error(ex)
@@ -685,10 +752,10 @@ class Neo4jArchivalAgent(BaseAgent):
     def total_unmigrated_forward_realtionship_count_unack(self, tx, timeperiod, label1):
         try:
             result = tx.run("MATCH (n:{label}:DATA)-[r]->(b)"
-                            "WHERE toInt(n.inSightsTime) < $timeperiod and r.copy_to_ES = false and exists(b.inSightsTime) "   
+                            "WHERE toInt(n.inSightsTime) < $timeperiod and r.copy_to_ES = false and exists(b.inSightsTime) "
                             "RETURN count(r) as Count ".format(label=label1), timeperiod=timeperiod).data()
-            print("count of Relationships to left************")
-            print(result)
+            logging.debug("count of Relationships to left************")
+            logging.debug(result)
 
         except Exception as ex:
             logging.error(ex)
@@ -700,8 +767,8 @@ class Neo4jArchivalAgent(BaseAgent):
             result = tx.run("MATCH (n:{label}:DATA)<-[r]-(b)"
                             "WHERE toInt(n.inSightsTime) < $timeperiod and r.copy_to_ES = false and exists(b.inSightsTime) "
                             "RETURN count(r) as Count ".format(label=label1), timeperiod=timeperiod).data()
-            print("count of Relationships to left************")
-            print(result)
+            logging.debug("count of Relationships to left************")
+            logging.debug(result)
 
         except Exception as ex:
             logging.error(ex)
@@ -825,7 +892,7 @@ class Neo4jArchivalAgent(BaseAgent):
 
 
     def set_flag_true_rel(self, tx, label1, relId):
-        print(relId)
+        logging.debug(relId)
         try:
             result = tx.run("MATCH (a:{label}:DATA )-[r]-(b) "
                             "WHERE id(r) in $relId and r.copy_to_ES = false "
@@ -855,7 +922,7 @@ class Neo4jArchivalAgent(BaseAgent):
                             "WHERE r.copy_to_ES = true  "
                             "with r limit  $neo4j_query_limit "
                             "Delete r ".format(label=label1),neo4j_query_limit=neo4j_query_limit).data()
-            print("Relationships deleted")
+            logging.debug("Relationships deleted")
         except Exception as ex:
             logging.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
@@ -868,7 +935,7 @@ class Neo4jArchivalAgent(BaseAgent):
                             "WHERE n.copy_to_ES = true "
                             "with n limit $neo4j_query_limit "
                             "Detach Delete n ".format(label=label1), timeperiod=timeperiod,neo4j_query_limit=neo4j_query_limit).data()
-            print("Nodes deleted")
+            logging.debug("Nodes deleted")
 
         except Exception as ex:
             logging.error(ex)
@@ -881,8 +948,8 @@ class Neo4jArchivalAgent(BaseAgent):
             result = tx.run("MATCH (n:{label}:DATA) "
                             "WHERE toInt(n.inSightsTime) < $timeperiod and n.copy_to_ES = true "
                             "RETURN count(n) as Count ".format(label=label1), timeperiod=timeperiod).data()
-            print("count of Nodes to left ack")
-            print(result)
+            logging.debug("count of Nodes to left ack")
+            logging.debug(result)
 
         except Exception as ex:
             logging.error(ex)
@@ -904,20 +971,18 @@ class Neo4jArchivalAgent(BaseAgent):
     def get_node_datatype(self,tx):
         try:
             result = tx.run("call db.schema.nodeTypeProperties ").data()
-            print(result)
+            logging.debug(result)
         except Exception as ex:
             logging.error(ex)
-            print(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
         return result
 
     def get_rel_datatype(self, tx):
         try:
             result = tx.run("call db.schema.relTypeProperties ").data()
-            print(result)
+            logging.debug(result)
         except Exception as ex:
             logging.error(ex)
-            print(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
         return result
 
@@ -931,7 +996,16 @@ class Neo4jArchivalAgent(BaseAgent):
 
         return result
 
+    def get_indexes(self,tx):
+        try:
+            result = tx.run("call db.indexes ").data()
+        except Exception as ex:
+            logging.error(ex)
+            self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
+        return result
+
 
 
 if __name__ == "__main__":
     Neo4jArchivalAgent()
+

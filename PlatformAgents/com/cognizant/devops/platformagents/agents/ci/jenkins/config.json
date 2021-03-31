@@ -7,7 +7,7 @@
   }, 
   "mqConfig": {
     "user": "username for RabbitMq",
-    "password": "password for RabbitMq",
+    "password": "",
     "host": "127.0.0.1",
     "exchange": "iSight",
     "agentControlXchg":"iAgent"    
@@ -86,7 +86,7 @@
 "isDebugAllowed" : false,
 "enableValueArray": true,
 "userid": "username for Jenkins",
-"passwd": "password for Jenkins",
+"passwd": "",
 "runSchedule": 30,
 "baseUrl": "http://127.0.0.1:8080/",
 "jenkinsMasters" : {

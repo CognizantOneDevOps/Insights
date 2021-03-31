@@ -84,85 +84,75 @@
                     <!-- Radio Button Column -->
                     <ng-container matColumnDef="select">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"
-                            style="width:7% !important;padding-left: 14px !important"></th>
+                            style="width:7% !important;padding-left: 0.15% !important"></th>
                         <td mat-cell *matCellDef="let element;let i = dataIndex"
                             style="margin-left:5%;width:7% !important">
-                            <mat-radio-button style="margin-left: 5px" [value]="element" color="primary"
+                            <mat-radio-button style="padding-left: 0.05%" [value]="element" color="primary"
                                 (change)="radioChange($event,i);"></mat-radio-button>
                         </td>
                     </ng-container>
                     <ng-container matColumnDef="reportName">
-                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="width:20% !important;">
+                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="width:17% !important;">
                             Report
                             Name</th>
 
-                        <td mat-cell *matCellDef="let element" style="width:20% !important"> {{element.reportName}}
+                        <td mat-cell *matCellDef="let element" style="width:17% !important"> {{element.reportName}}
                         </td>
                     </ng-container>
 
-
                     <ng-container matColumnDef="schedule">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"
-                            style="width:13% !important;padding-left:15px">Schedule</th>
+                            style="width:15% !important;padding-left:0.15%">Schedule</th>
 
-                        <td mat-cell *matCellDef="let element" style="width:13% !important;padding-left:15px">
+                        <td mat-cell *matCellDef="let element" style="width:15% !important;padding-left:0.15%">
                             {{element.schedule}} </td>
                     </ng-container>
 
-
-
-
                     <ng-container matColumnDef="lastRun">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"
-                            style="padding-left: 24px !important;width:20% !important;">Last
+                            style="padding-left: 0.15% !important;width:20% !important;">Last
                             Run
                             ({{timeZone}})</th>
 
-                        <td mat-cell *matCellDef="let element"
-                            style="width:20% !important;margin-left: 50%;text-align: center">
+                        <td mat-cell *matCellDef="let element" style="width:20% !important;padding-left:0.15%">
                             {{element.lastRun}} </td>
                     </ng-container>
 
                     <ng-container matColumnDef="nextRun">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"
-                            style="padding-left: 24px !important;width:20% !important;">Next
+                            style="padding-left: 0.15% !important;width:20% !important;">Next
                             Run
                             ({{timeZone}})</th>
 
-                        <td mat-cell *matCellDef="let element"
-                            style="width:20% !important;margin-left: 50%;text-align: center">
+                        <td mat-cell *matCellDef="let element" style="width:20% !important;padding-left:0.15%">
                             {{element.isReoccuring ? element.nextRun : '-'}}
-                             </td>
+                        </td>
                     </ng-container>
-
 
                     <ng-container matColumnDef="status">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"
-                            style="padding-left: 8px !important;width:13% !important">Status</th>
+                            style="padding-left: 0.30% !important;width:25% !important">Status</th>
 
                         <td mat-cell *matCellDef="let element"
-                            style="padding-left: 8px !important;width:13% !important">
+                            style="padding-left: 0.30% !important;width:25% !important">
                             {{element.status}} </td>
                     </ng-container>
 
                     <ng-container matColumnDef="reoccurence">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"
-                            style="width:13% !important;padding-left:15px">Reoccurence</th>
+                            style="width:13% !important;padding-left:0.20%">Reoccurence</th>
 
-                        <td mat-cell *matCellDef="let element" style="width:13% !important;padding-left:15px">
+                        <td mat-cell *matCellDef="let element" style="width:13% !important;padding-left:0.20%">
                             {{element.isReoccuring ? 'Yes' : 'No'}}
-                             </td>
+                        </td>
                     </ng-container>
-                    
-                    
-
 
                     <ng-container matColumnDef="active">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"
-                            style="padding-left: 12px !important;">Active</th>
+                            style="padding-left: 0.8% !important;">Active</th>
 
                         <td mat-cell *matCellDef="let element;let i=dataIndex"
-                            style="width:12% !important;padding-left: 12px !important;">
+                            style="width:12% !important;padding-left: 0.8% !important;">
                             <mat-slide-toggle (change)="updateStatus($event,element.configId,element)"
                                 [(ngModel)]="element.isActive" [checked]="isActive" [disabled]="clicked[i]"
                                 [matTooltip]="element.isActive?'Active':'Inactive'">

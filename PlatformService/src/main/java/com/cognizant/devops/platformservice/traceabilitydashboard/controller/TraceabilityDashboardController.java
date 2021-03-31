@@ -16,6 +16,8 @@
 
 package com.cognizant.devops.platformservice.traceabilitydashboard.controller;
 
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +31,7 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.traceabilitydashboard.service.TraceabilityDashboardServiceImpl;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/traceabilitydashboard")
@@ -76,7 +79,7 @@ public class TraceabilityDashboardController {
 	public JsonObject getPipeline(@RequestParam String toolName, @RequestParam String fieldName,
 			@RequestParam String fieldValue) {
 		try {
-			JsonObject response = traceabilityDashboardServiceImpl.getPipeline(toolName, fieldName, fieldValue,false);
+			JsonObject response = traceabilityDashboardServiceImpl.getPipeline(toolName, fieldName, Arrays.asList(fieldValue),"Other");
 			return PlatformServiceUtil.buildSuccessResponseWithData(response);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage()); 
@@ -87,10 +90,10 @@ public class TraceabilityDashboardController {
 	@GetMapping(value = "/getEpicIssues", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public JsonObject getEpicIssues(@RequestParam String toolName, @RequestParam String fieldName,
-			@RequestParam String fieldValue,@RequestParam Boolean isEpic) {
-		try {
-			JsonObject response = traceabilityDashboardServiceImpl.getPipeline(toolName, fieldName, fieldValue,isEpic);
-			return PlatformServiceUtil.buildSuccessResponseWithData(response);
+			@RequestParam String fieldValue,@RequestParam String type) {
+		try {			
+			JsonObject response = traceabilityDashboardServiceImpl.getPipeline(toolName, fieldName, Arrays.asList(fieldValue),type);
+		    return PlatformServiceUtil.buildSuccessResponseWithData(response);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage()); 
 		}
@@ -104,11 +107,30 @@ public class TraceabilityDashboardController {
 		JsonObject response = new JsonObject();
 		try {
 
-			response = traceabilityDashboardServiceImpl.getIssuePipeline(issue);
+			JsonParser parser = new JsonParser();			
+			JsonObject nodeObject = (JsonObject) parser.parse(issue);			
+			response = traceabilityDashboardServiceImpl.getPipelineForSelectedNode(nodeObject);
 			return PlatformServiceUtil.buildSuccessResponseWithData(response);
 		} catch (Exception e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
 
 	}
+	
+	@GetMapping(value="/getToolDisplayProperties", produces=MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public JsonObject getToolDisplayProperties()
+	{
+		JsonObject response = new JsonObject();
+		try {
+           
+			response = traceabilityDashboardServiceImpl.getToolDisplayProperties();
+			return PlatformServiceUtil.buildSuccessResponseWithData(response);
+		} catch (Exception e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+
+	}
+	
+	
 }

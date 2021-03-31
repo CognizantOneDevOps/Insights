@@ -1,58 +1,63 @@
 {
-  "vault": {
-    "getFromVault": false,
-    "secretEngine": "insights-kv",
-    "readToken": "vault_secret_token",
-    "vaultUrl": "http://Vault_Host:port/v1/"
-  },
-  "mqConfig": {
-    "user": "username for RabbitMq",
-    "password": "Password for RabbitMq",
-    "host": "127.0.0.1",
-    "exchange": "iSight",
-    "agentControlXchg": "iAgent"
-  },
-  "subscribe": {
-    "config": "SYSTEM.NEO4JARCHIVAL.config"
-  },
-  "publish": {
-    "data": "SYSTEM.NEO4JARCHIVAL.DATA",
-    "health": "SYSTEM.NEO4JARCHIVAL.HEALTH"
-  },
-  "communication": {
-    "type": "REST",
-    "sslVerify": false
-  },
-  "dynamicTemplate": {
-    "responseTemplate": {
-      "id": "id"
-    }
-  },
-  "agentId": "",
-  "toolCategory": "SYSTEM",
-  "auth": "base64",
-  "toolsTimeZone": "Asia/Kolkata",
-  "insightsTimeZone": "Asia/Kolkata",
-  "runSchedule": 30,
-  "isEpochTimeFormat": false,
-  "agentSecretDetails": [
-    "neo4j_user_id",
-    "neo4j_password"
-  ],
-  "neo4j_data_delete": false,
-  "querylimit": 10000,
-  "neo4j_host_uri": "bolt://localhost:7687",
-  "neo4j_user_id": "",
-  "neo4j_password": "",
-  "elasticsearch_hostname_uri": "http://localhost:9200/",
-  "neo4j_label": "*",
-  "timeperiod": 0,
-  "timeStampFormat": "%d.%m.%Y %H:%M:%S",
-  "archival_enddate": "01.01.2000 01:01:01",
-  "isDebugAllowed": false,
-  "loggingSetting": {
-    "logLevel": "WARN",
-    "maxBytes": 5000000,
-    "backupCount": 1000
-  }
+    "agentId": "",
+    "agentSecretDetails": [
+        "neo4j_user_id",
+        "neo4j_password",
+        "elasticsearch_username",
+        "elasticsearch_passwd"
+    ],
+    "archival_enddate": "01.01.2000 01:01:01",
+    "auth": "base64",
+    "communication": {
+        "sslVerify": false,
+        "type": "REST"
+    },
+    "dynamicTemplate": {
+        "responseTemplate": {
+            "id": "id"
+        }
+    },
+    "elasticsearch_hostname_uri": "",
+    "elasticsearch_username":"",
+    "elasticsearch_passwd":"",
+    "insightsTimeZone": "Asia/Kolkata",
+    "isDebugAllowed": false,
+    "isEpochTimeFormat": false,
+    "loggingSetting": {
+        "backupCount": 1000,
+        "logLevel": "WARN",
+        "maxBytes": 5000000
+    },
+    "mqConfig": {
+        "agentControlXchg": "iAgent",
+        "exchange": "iSight",
+        "host": "127.0.0.1",
+        "password": "",
+        "user": "username for RabbitMq"
+    },
+    "neo4j_data_delete": false,
+    "neo4j_host_uri": "bolt://localhost:7687",
+    "neo4j_label": "*",
+    "neo4j_password": "",
+    "neo4j_user_id": "",
+    "publish": {
+        "data": "SYSTEM.NEO4JARCHIVAL.DATA",
+        "health": "SYSTEM.NEO4JARCHIVAL.HEALTH"
+    },
+    "querylimit": 10000,
+    "runSchedule": 30,
+    "subscribe": {
+        "config": "SYSTEM.NEO4JARCHIVAL.config"
+    },
+    "timeStampFormat": "%d.%m.%Y %H:%M:%S",
+    "timeperiod": 1,
+    "toolCategory": "SYSTEM",
+    "toolsTimeZone": "Asia/Kolkata",
+    "vault": {
+        "getFromVault": false,
+        "readToken": "vault_secret_token",
+        "secretEngine": "insights-kv",
+        "vaultUrl": "http://Vault_Host:port/v1/"
+	}
 }
+

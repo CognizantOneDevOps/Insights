@@ -14,7 +14,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ****************************************************************************** -->
-<div class="pageCss">
+<div class="pageCss" style="cursor: pointer;">
 	<div layout layout-align="left" class="titleStyle">
 		<div>
 			<a class="greenTitleTxt">Traceability Dashboard </a>
@@ -37,24 +37,30 @@
 					<mat-option *ngFor="let key of fieldList" value="{{key}}">{{key}}</mat-option>
 				</mat-select>
 			</div>
-			<!-- <div>
+			<div>
 				<mat-select required [(ngModel)]="issueTypeSelected" name="issueTypeSelected" class="form-control"
-					placeholder="Isuse Type" (selectionChange)="issueTypeOnChange($event.value)"style="width:150px;">
-					<mat-option *ngFor="let issue of issueTypes | keyvalue" value="{{issue.value}}">{{issue.value}}</mat-option>
+					placeholder="Isuse Type" (selectionChange)="issueTypeOnChange($event.value)" style="width:150px;">
+					<mat-option *ngFor="let issue of issueTypes | keyvalue" value="{{issue.value}}">{{issue.value}}
+					</mat-option>
 				</mat-select>
-			</div> -->
+			</div>
 			<div>
 				<input type="text" placeholder="{{fieldPlaceVal}}" class="form-control" [(ngModel)]="fieldValue"
 					name="toolFieldValue">
-			</div>			
+			</div>
 			<div style="margin-left: 30px">
 				<button mat-raised-button (click)="getDetails()"
 					[disabled]="frmagentconfig.invalid || fieldValue == null" class="configureBut"
 					style="width: 150px; padding-left: 10px; padding-right: 10px;">
-					Submit</button>
+					Search</button>
 				<br>
 			</div>
-
+			<div>
+				<button mat-raised-button (click)="clear()" class="configureBut"
+					style="width: 150px; padding-left: 10px; padding-right: 10px;">
+					Clear</button>
+				<br>
+			</div>
 		</div>
 		<div style="display: flex; justify-content: center; align-items: center">
 			<div class="loading-indicator">
@@ -64,125 +70,84 @@
 		</div>
 		<br>
 	</form>
-	<div>
-		<div class="PWGx-PipelineGraph" style="position: relative; overflow: auto; margin-left: -40px;">
-			<svg [attr.width]="(253.75 + ((list.length) * 120))" [attr.height]="320">
+	<mat-tab-group color="primary" class="healthcheck-tab-style" (selectedTabChange)="tabClick($event)"
+		*ngIf="showDiv&& !displaySummary" style="margin-top: 3%;">
+		<mat-tab label="Pipeline">
+			<div layout layout-align="left" class="sectionHeadingStyleWithoutButton">
+				<div layout>&nbsp; Pipeline</div>
+			</div>	
+			<div layout-align="center center">
 
-				<g transform="translate(40,55)" class="PWGx-pipeline-node" *ngIf="list[0]?.child?.length >= 2">
-					<circle r="7" class="PWGx-pipeline-node-terminal"></circle>
-				</g>
-				<g transform="translate(60,55)" class="PWGx-pipeline-node"
-					*ngIf="list?.length > 1 && list[0]?.child?.length == 1">
-					<circle r="7" class="PWGx-pipeline-node-terminal"></circle>
-					<circle r="19" class="PWGx-pipeline-node-hittarget" fill-opacity="0" stroke="none"></circle>
-				</g>
-				<!-- end -->
-				<g [attr.transform]="'translate(' + (253.75 + ((list.length-1) * 120)) + ',55)'"
-					class="PWGx-pipeline-node" *ngIf="list?.length > 1 && list[0]?.child?.length == 1">
-					<circle r="7" class="PWGx-pipeline-node-terminal"></circle>
-					<circle r="19" class="PWGx-pipeline-node-hittarget" fill-opacity="0" stroke="none"></circle>
-				</g>
-				<!-- first lines -->
-				<line class="PWGx-pipeline-connector" *ngFor="let item of list; let i = index" stroke-width="3.5"
-					x1="65.25" y1="55" x2="133.75" y2="55"></line>
-				<!-- lines -->
-				<g *ngFor="let item of list; let i = index">
-					<line class="PWGx-pipeline-connector" stroke-width="3.5" [attr.x1]="154.25 + ((i)*120)" y1="55"
-						[attr.x2]="253.75 + ((i)*120)" y2="55"></line>
-					<!-- left paths -->
-					<path class="PWGx-pipeline-connector"
-						*ngFor="let item of item?.child | slice:1:item?.child?.length; let j = index;"
-						stroke-width="3.5"
-						[attr.d]="'M ' + (154.25 + ((i-1)*120)) + ' 55 l 49.75 0 c 12 0 12 12 12 12 l 0  ' + (46 + (j*70)) +' c 0 12 12 12 12 12 l 25.75 0'"
-						fill="none"></path>
-					<!-- right paths -->
-					<path class="PWGx-pipeline-connector"
-						*ngFor="let item of item?.child | slice:1:item?.child?.length; let j = index;"
-						stroke-width="3.5"
-						[attr.d]="'M ' + (154.75 + ((i)*120)) + ' '+ (125 + (j*70))  +' l 25.75 0 c 12 0 12 -12 12 -12 l 0  ' + (-46 - (j*70)) +' c 0 -12 12 -12 12 -12 l 49.75 0'"
-						fill="none"></path>
-				</g>
-				<!-- points -->
-				<g *ngFor="let item of list; let i = index">
-					<!-- top points -->
-					<g [attr.transform]="'translate(' + (144 + (i*120)) + ', 55)'" class="PWGx-pipeline-node"
-						(click)="onclick(i+'-'+0)" (mouseleave)="onmouseleave(item)">
-						<!--(mouseout)="eventLeave()"-->
-						<a class="second_popup" data-toggle="modal" data-target="#myModal2">
-							<g class="PWGx-svgResultStatusSolid">
-								<circle cx="0" cy="0" r="12" class="halo" stroke-width="3.5"></circle>
-								<circle cx="0" cy="0" r="12" class="statusColor circle-bg success"></circle>
-								<g class="PWGx-result-status-glyph">
-									<polygon
-										points="-2.00 2.80 -4.80 0.00 -5.73 0.933 -2.00 4.67 6.00 -3.33 5.07 -4.27">
-									</polygon>
-								</g>
-							</g>
-							<g class="PWGx-svgResultStatusSolid"
-								*ngIf="item?.child[0]?.point?.toolstatus.indexOf('F')>-1">
-								<circle cx="0" cy="0" r="12" class="halo" stroke-width="3.5"></circle>
-								<circle cx="0" cy="0" r="12" class="statusColor circle-bg failure"></circle>
-								<g class="PWGx-result-status-glyph">
-									<polygon
-										points="4.67 -3.73 3.73 -4.67 0 -0.94 -3.73 -4.67 -4.67 -3.73 -0.94 0 -4.67 3.73 -3.73 4.67 0 0.94 3.73 4.67 4.67 3.73 0.94 0">
-									</polygon>
-								</g>
-							</g>
-							<circle r="19" class="PWGx-pipeline-node-hittarget" fill-opacity="0" stroke="none"
-								cursor="pointer"></circle>
-						</a> </g>
-					<!-- child points -->
-					<g [attr.transform]="'translate(' + (144 + (i*120)) + ',' + (125 + (j * 70)) + ')'"
-						*ngFor="let item of item?.child | slice:1:item?.child?.length; let j = index;"
-						class="PWGx-pipeline-node"  (click)="onclick(i+'-'+(j+1))" > 
-						<!-- (mouseout)="eventLeave()"> -->
-						<g class="PWGx-svgResultStatusSolid" (mouseleave)="eventLeave()">
-							<circle cx="0" cy="0" r="12" class="halo" stroke-width="3.5"></circle>
-							<circle cx="0" cy="0" r="12" class="statusColor circle-bg success"></circle>
-							<g class="PWGx-result-status-glyph">
-								<polygon points="-2.00 2.80 -4.80 0.00 -5.73 0.933 -2.00 4.67 6.00 -3.33 5.07 -4.27">
-								</polygon>
-							</g>
-						</g>
-						<g class="PWGx-svgResultStatusSolid" *ngIf="item?.point?.toolstatus.indexOf('F') > -1"
-							(mouseleave)="eventLeave()">
-							<circle cx="0" cy="0" r="12" class="halo" stroke-width="3.5"></circle>
-							<circle cx="0" cy="0" r="12" class="statusColor circle-bg failure"></circle>
-							<g class="PWGx-result-status-glyph">
-								<polygon
-									points="4.67 -3.73 3.73 -4.67 0 -0.94 -3.73 -4.67 -4.67 -3.73 -0.94 0 -4.67 3.73 -3.73 4.67 0 0.94 3.73 4.67 4.67 3.73 0.94 0">
-								</polygon>
-							</g>
-						</g>
-						<circle r="19" class="PWGx-pipeline-node-hittarget" fill-opacity="0" stroke="none"
-							cursor="pointer"></circle>
-					</g>
-				</g>
+				<div class="containercss">
+						<div class="column2" *ngFor="let data of map | keyvalue">
+							<div class="showTable" style="text-align: center; padding: 5px;"
+								(click)="showDetailsDialog(data.key.split('_')[1])">
+								<b><u>
+										{{data.key.split('_')[1]}} </u>({{data.value.length}}) </b> <br>
+							</div>
 
-			</svg>
-			<div class="timelag" style="margin-left: 33%;" *ngIf="isEnable">
-				<b *ngIf="toolTimelagArray" class="hyperlink" (click)="showTimeDetailsDialog()"><u class="timelinetext">Advance View</u></b>
-			</div>
-
-			<div class="summarylist" style="margin-left: 35px;">
-				<ul>
-					<li style="color: #0033A0" *ngFor="let element of toolSummaryArray">{{element}}</li>
-				</ul>
-			</div>
-			<div *ngFor="let item of list; let i = index">
-				<div class="TruncatingLabel PWGx-pipeline-big-label" title="Click here to see more details"
-					class="letter-fix" [ngStyle]="{'left': (144 + (i*120)) + 'px'}">
-					<a class="link" (click)="showDetailsDialog(item.point)"><u class="timelinetext">{{item.point}}(
-							{{item.count}} ) </u>
-					</a>
-				</div>
-				<div *ngFor="let ite of item?.child; let j = index" class="TruncatingLabel PWGx-pipeline-small-label"
-					[title]="ite.point"
-					style="overflow-wrap: break-word; top: 70px; left: 219px; position: absolute; width: 89px; max-height: 39px; text-align: center;"
-					[style.top]="(70 * (j+1)) + 'px'" [style.left]="(94 + (i*120)) + 'px'">{{ite.point.toolstatus}}
+							<div class="scroll">
+								<div style="margin-top:10px;border-radius: 10px;"
+									*ngFor="let epic of data.value;let i=index">
+									<mat-card style="border-radius:10px">
+										<div (click)="showOnHoverDialog(i,epic)" style="height: 1px;">
+											<mat-icon svgIcon="info" title="View Details"
+												class="mat-icon material-icons">
+											</mat-icon><br>
+										</div>
+										<span (click)="onCardClickJira(i,$event,epic)" class="formatcard"
+											*ngFor="let disProp of displayProperty[data.key.split('_')[1]] | keyvalue">
+											<b>{{disProp.value | uppercase}}</b> : {{epic[disProp.value]}}
+											<br>
+										</span>
+									</mat-card>
+								</div>
+							</div>
+						</div>
 				</div>
 			</div>
-		</div>
-
-	</div>
+		</mat-tab>
+		<mat-tab label="Summary">
+			<div layout layout-align="left" class="sectionHeadingStyleWithoutButton">
+				<div layout>&nbsp; Summary</div>
+			</div>
+			<div>
+				<div class="summarylist">
+					<ul>
+						<li style="color: #0033A0" *ngFor="let element of toolSummaryArray">{{element}}</li>
+					</ul>
+				</div>
+			</div>
+		</mat-tab>
+		<mat-tab label="Timeline">
+			<div layout layout-align="left" class="sectionHeadingStyleWithoutButton">
+				<div layout>&nbsp; Timeline</div>
+			</div>
+			<div id="agentsTable" layout-align="center center">
+				<!-- Insights Agents Table -->
+				<table mat-table [dataSource]="timelagDataSource" class="matTableBorder">
+					<ng-container matColumnDef="Tools">
+						<th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> Tools </th>
+						<td mat-cell *matCellDef="let element"> {{element.Tools}} </td>
+					</ng-container>
+					<ng-container matColumnDef="Handover Time">
+						<th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> Handover Time</th>
+						<td mat-cell *matCellDef="let element"> {{element.HandoverTime}} </td>
+					</ng-container>
+					<tr mat-header-row *matHeaderRowDef="columnsToDisplay" class="tableHeaderCss" style="height:40px">
+					</tr>
+					<tr mat-row *matRowDef="let row; columns: columnsToDisplay;"></tr>
+				</table>
+				<br>
+			</div>
+		</mat-tab>
+		<mat-tab label="Visual Representation">
+			<div layout layout-align="left" class="sectionHeadingStyleWithoutButton">
+				<div layout>&nbsp; Visual Representation</div>
+			</div>
+			<div style="color: #0033A0;margin: 1px;">Total Number of Days: {{total}}</div>
+				<div *ngIf="gChart" id="chart_div" style="height: 50vh;overflow:hidden"></div>
+				<div id="chart-container" style="height: 80vh"></div>
+		</mat-tab>
+	</mat-tab-group>
 </div>

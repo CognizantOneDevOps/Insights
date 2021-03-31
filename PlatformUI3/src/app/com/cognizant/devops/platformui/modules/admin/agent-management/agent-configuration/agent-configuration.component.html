@@ -74,11 +74,12 @@
           <tbody class="dynamic-table-body" layout layout-wrap layout-margin layout-padding>
             <tr flex="30" layout layout-align="start start" class="mat-row-dynamic" *ngFor="let configDataChild of configData.children"
               style="display: inline-table;">
-              <td class="mat-cell-header">
-                <span>{{configDataChild.key}}</span>
+              <td class="mat-cell-header" title="{{configDataChild.key}}">
+                <span>{{configDataChild.key.length > 21 ? configDataChild.key.slice(0, 21).concat('..') : configDataChild.key}}</span>
               </td>
-              <td class="mat-cell-value">
-                <input class="inputBoxCont" [(ngModel)]="configDataChild.value" name="{{configDataChild.key}}">
+              <td class="mat-cell-value" title="{{configDataChild.inputType == 'text' ? configDataChild.value : '-'}}">
+                <input type={{configDataChild.inputType}} class="inputBoxCont" [(ngModel)]="configDataChild.value"
+                  name="{{configDataChild.key}}" id="{{configDataChild.id}}">
               </td>
               </tr>
           </tbody>
@@ -98,11 +99,13 @@
         </thead>
         <tbody class="dynamic-table-body" layout layout-wrap layout-margin layout-padding>
           <tr layout layout-align="start start" class="mat-row-dynamic" *ngFor="let configData of getAgentConfigItems('all')" style="display: inline-table;">
-            <td class="mat-cell-header">
-              <span>{{configData.key}}</span>
+            <td class="mat-cell-header" title="{{configData.key}}">
+              <span>{{configData.key.length > 21 ? configData.key.slice(0, 21).concat('..') : configData.key}}</span>
+
             </td>
-            <td class="mat-cell-value">
-              <input class="inputBoxCont" [(ngModel)]="configData.value" name="{{configData.key}}">
+            <td class="mat-cell-value" title="{{configData.inputType == 'text' ? configData.value : '-'}}">
+              <input type={{configData.inputType}} class="inputBoxCont" [(ngModel)]="configData.value"
+                name="{{configData.key}}" id="{{configData.id}}">
             </td>
           </tr>
         </tbody>

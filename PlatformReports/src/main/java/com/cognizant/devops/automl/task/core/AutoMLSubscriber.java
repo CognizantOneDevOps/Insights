@@ -44,6 +44,8 @@ public class AutoMLSubscriber extends WorkflowTaskSubscriberHandler {
 	private InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfiguration();
 	private WorkflowDAL workflowDAL = new WorkflowDAL();
 	private AutoMLConfigDAL autoMlDAL = new AutoMLConfigDAL();
+	private AutoMLConfig autoMlConfig=null;
+
 	private long executionId;
 
 	public AutoMLSubscriber(String routingKey) throws Exception {
@@ -52,14 +54,15 @@ public class AutoMLSubscriber extends WorkflowTaskSubscriberHandler {
 
 	@Override
 	public void handleTaskExecution(byte[] body) throws IOException {
+		List<JsonObject> failedJobs = new ArrayList<>();
 		try {
 			String message = new String(body, StandardCharsets.UTF_8);
 			JsonObject incomingTaskMessage = new JsonParser().parse(message).getAsJsonObject();
 			String workflowId = incomingTaskMessage.get("workflowId").getAsString();
 			executionId = incomingTaskMessage.get("executionId").getAsLong();
 			workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
-			AutoMLConfig autoMlConfig = autoMlDAL.fetchUseCasesByWorkflowId(workflowId);
-			List<JsonObject> failedJobs = new ArrayList<>();
+			autoMlConfig = autoMlDAL.fetchUseCasesByWorkflowId(workflowId);
+			
 			if (autoMlConfig != null) {				
 				autoMlConfig.setStatus(AutoMLEnum.Status.IN_PROGRESS.name());
 				autoMlDAL.updateMLConfig(autoMlConfig);				
@@ -71,8 +74,7 @@ public class AutoMLSubscriber extends WorkflowTaskSubscriberHandler {
 				/* submit each chunk to threadpool in a loop */
 				executeAutoMLChunks(kpiChunkList, failedJobs);
 				if (!failedJobs.isEmpty()) {
-					autoMlConfig.setStatus(AutoMLEnum.Status.ERROR.name());
-					autoMlDAL.updateMLConfig(autoMlConfig);
+					
 					updateFailedTaskStatusLog(failedJobs);
 				}
 			}
@@ -80,7 +82,11 @@ public class AutoMLSubscriber extends WorkflowTaskSubscriberHandler {
 			log.error("Worlflow Detail ==== InsightsJobFailedException ====  ", e);
 			throw new InsightsJobFailedException("Auto ML task failed to execute " + e.getMessage());
 		} catch (Exception e) {
-			throw new InsightsJobFailedException("AutoML task failed to execute Exception " + e.getMessage());
+			JsonObject response = new JsonObject();
+			response.addProperty("Status", "Failure");
+			response.addProperty("errorLog", e.getMessage());
+			failedJobs.add(response);
+			updateFailedTaskStatusLog(failedJobs);
 		}
 
 		log.debug("Worlflow Detail ==== AutoML task completed successfully.");
@@ -111,9 +117,12 @@ public class AutoMLSubscriber extends WorkflowTaskSubscriberHandler {
 		statusObject.addProperty("executionId", executionId);
 		statusObject.addProperty("workflowId", workflowConfig.getWorkflowId());
 		statusObject.add("errorLog", errorLog);
+		autoMlConfig.setStatus(AutoMLEnum.Status.ERROR.name());
+		autoMlDAL.updateMLConfig(autoMlConfig);
 		// statusLog set here which is class variable of WorkflowTaskSubscriberHandler
 		statusLog = new Gson().toJson(statusObject);
-		throw new InsightsJobFailedException("AutoML task failed to execute");
+		throw new InsightsJobFailedException("AutoML task failed to execute  " + statusLog);
+		
 	}
 
 }

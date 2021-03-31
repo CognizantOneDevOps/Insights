@@ -14,7 +14,7 @@
  * the License.
  ******************************************************************************/
 
-package com.cognizant.devops.platformdal.vsmReport;
+package com.cognizant.devops.platformdal.upshiftassessment;
 
 import com.cognizant.devops.platformdal.core.BaseDAL;
 import org.apache.logging.log4j.LogManager;
@@ -22,14 +22,14 @@ import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
-public class VsmReportConfigDAL extends BaseDAL {
-    private static Logger log = LogManager.getLogger(VsmReportConfigDAL.class);
+public class UpshiftAssessmentConfigDAL extends BaseDAL {
+    private static Logger log = LogManager.getLogger(UpshiftAssessmentConfigDAL.class);
 
-    public int saveVsmReport(VsmReportConfig vsmReportConfig) {
+    public int saveUpshiftAssessment(UpshiftAssessmentConfig upshiftAssessmentConfig) {
         int id = -1;
         try (Session session = getSessionObj()) {
             session.beginTransaction();
-            id = (int) session.save(vsmReportConfig);
+            id = (int) session.save(upshiftAssessmentConfig);
             session.getTransaction().commit();
             log.debug("Transaction ID == {}" , id);
             return id;
@@ -38,10 +38,10 @@ public class VsmReportConfigDAL extends BaseDAL {
         }
     }
 
-    public VsmReportConfig fetchGrafanaDashboardDetailsByWorkflowId(String workflowId) {
+    public UpshiftAssessmentConfig fetchUpshiftAssessmentDetailsByWorkflowId(String workflowId) {
         try (Session session = getSessionObj()) {
-            Query<VsmReportConfig> createQuery = session.createQuery(
-                    "FROM VsmReportConfig gd where gd.workflowConfig.workflowId = :workflowId", VsmReportConfig.class);
+            Query<UpshiftAssessmentConfig> createQuery = session.createQuery(
+                    "FROM UpshiftAssessmentConfig gd where gd.workflowConfig.workflowId = :workflowId", UpshiftAssessmentConfig.class);
             createQuery.setParameter("workflowId", workflowId);
             return createQuery.uniqueResult();
         } catch (Exception e) {
@@ -50,7 +50,19 @@ public class VsmReportConfigDAL extends BaseDAL {
         }
     }
 
-    public void updateVsmReportConfig(VsmReportConfig config) {
+    public UpshiftAssessmentConfig fetchUpshiftAssessmentByUuid(String uuid) {
+        try (Session session = getSessionObj()) {
+            Query<UpshiftAssessmentConfig> createQuery = session.createQuery(
+                    "FROM UpshiftAssessmentConfig gd where gd.upshiftUuid = :uuid", UpshiftAssessmentConfig.class);
+            createQuery.setParameter("uuid", uuid);
+            return createQuery.uniqueResult();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    public void updateUpshiftAssessmentConfig(UpshiftAssessmentConfig config) {
         try (Session session = getSessionObj()) {
             session.beginTransaction();
             session.update(config);
