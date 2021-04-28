@@ -15,29 +15,33 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.grafana.user;
 
-import org.hibernate.Session;
-import org.hibernate.query.Query;
+import java.util.HashMap;
+import java.util.Map;
 
-import com.cognizant.devops.platformdal.config.PlatformDALSessionFactoryProvider;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-public class UserDAL{
+import com.cognizant.devops.platformdal.core.BaseDAL;
+
+@Deprecated
+public class UserDAL extends BaseDAL{
+	private static Logger log = LogManager.getLogger(UserDAL.class);
 	
+	@Deprecated
 	public boolean saveUser(int userId) {
-		Session session = PlatformDALSessionFactoryProvider.getGrafanaSessionFactory().openSession();
 		try{
-			Query<User> createQuery = session.createQuery("FROM User a WHERE a.id = :id", User.class);
-			createQuery.setParameter("id", userId);
-			User user = createQuery.getSingleResult();;
-			session.beginTransaction();
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("id", userId);
+			User user = getSingleResult(
+					"FROM User a WHERE a.id = :id",User.class,parameters);
 			if (user != null) {
 				user.setPassword("");
 				user.setRands("");
 				user.setSalt("");
-				session.update(user);
+				update(user);
 			} 
-			session.getTransaction().commit();
-		}finally{
-			session.close();
+		}catch(Exception e) {
+			log.error(e);
 		}
 		return true;
 	}

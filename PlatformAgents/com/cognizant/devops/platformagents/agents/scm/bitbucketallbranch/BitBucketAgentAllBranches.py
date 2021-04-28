@@ -23,6 +23,8 @@ from dateutil import parser
 from ....core.BaseAgent import BaseAgent
 
 class BitBucketAgentAllBranches(BaseAgent):
+    
+    @BaseAgent.timed
     def process(self):
         BaseEndPoint = self.config.get("baseEndPoint", '')
         UserId = self.getCredential("userid")

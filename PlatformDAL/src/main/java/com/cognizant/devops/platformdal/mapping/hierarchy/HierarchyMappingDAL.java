@@ -15,77 +15,59 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.mapping.hierarchy;
 
+import java.util.HashMap;
 import java.util.List;
-
-import org.hibernate.query.Query;
-
+import java.util.Map;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class HierarchyMappingDAL extends BaseDAL {
-	private static final String HIERARCHYNAME="hierarchyName";
+	private static final String HIERARCHYNAME = "hierarchyName";
+
 	public List<HierarchyMapping> fetchAllHierarchyMapping() {
-		Query<HierarchyMapping> createQuery = getSession().createQuery("FROM HierarchyMapping HM",
-				HierarchyMapping.class);
-		List<HierarchyMapping> resultList = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return resultList;
+		Map<String, Object> parameters = new HashMap<>();
+		return getResultList("FROM HierarchyMapping HM", HierarchyMapping.class, parameters);
 	}
 
 	public boolean saveHierarchyMapping(int rowId, String hierarchyName, String orgName, int orgId) {
-		Query<HierarchyMapping> createQuery = getSession().createQuery(
+		Map<String, Object> parameters = new HashMap<>();
+		parameters.put(HIERARCHYNAME, hierarchyName);
+		parameters.put("orgName", orgName);
+		parameters.put("rowId", rowId);
+		parameters.put("orgId", orgId);
+		List<HierarchyMapping> resultList = getResultList(
 				"FROM HierarchyMapping a WHERE a.hierarchyName = :hierarchyName AND a.orgName = :orgName AND a.rowId = :rowId AND a.orgId = :orgId",
-				HierarchyMapping.class);
-		createQuery.setParameter(HIERARCHYNAME, hierarchyName);
-		createQuery.setParameter("orgName", orgName);
-		createQuery.setParameter("rowId", rowId);
-		createQuery.setParameter("orgId", orgId);
-		List<HierarchyMapping> resultList = createQuery.getResultList();
+				HierarchyMapping.class, parameters);
+
 		HierarchyMapping hierarchyMapping = null;
-		if (resultList.size() > 0) {
+		if (!resultList.isEmpty()) {
 			hierarchyMapping = resultList.get(0);
 		}
-		getSession().beginTransaction();
 		if (hierarchyMapping == null) {
 			hierarchyMapping = new HierarchyMapping();
 			hierarchyMapping.setHierarchyName(hierarchyName);
 			hierarchyMapping.setOrgName(orgName);
 			hierarchyMapping.setRowId(rowId);
 			hierarchyMapping.setOrgId(orgId);
-			getSession().save(hierarchyMapping);
+			save(hierarchyMapping);
 		}
-		// in else need to write update logic
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
 		return true;
 	}
 
-	public List<String> getHierarchyMapping(String hierarchyName) {
-		/*Query<HierarchyMapping> createQuery = getSession().createQuery(
-				"FROM HierarchyMapping a WHERE a.hierarchyName = :hierarchyName",
-				HierarchyMapping.class);*/
-		Query<String> createQuery = getSession().createQuery(
-				"SELECT HM.orgName FROM HierarchyMapping HM WHERE HM.hierarchyName = :hierarchyName",String.class);
-		createQuery.setParameter(HIERARCHYNAME, hierarchyName);
-		List<String> resultList = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return resultList;
+	public List<String> getHierarchyMapping(String hierarchyName) {		
+		Map<String, Object> parameters = new HashMap<>();
+		parameters.put(HIERARCHYNAME, hierarchyName);
+		return getResultList("SELECT HM.orgName FROM HierarchyMapping HM WHERE HM.hierarchyName = :hierarchyName", String.class, parameters);
 	}
 
 	public boolean deleteHierarchyMapping(String hierarchyName, String orgName) {
-		Query<HierarchyMapping> createQuery = getSession().createQuery(
+		Map<String,Object> parameters = new HashMap<>();
+		parameters.put(HIERARCHYNAME, hierarchyName);
+		parameters.put("orgName", orgName);
+		HierarchyMapping hierarchyMapping = getSingleResult(
 				"FROM HierarchyMapping a WHERE a.hierarchyName = :hierarchyName AND a.orgName = :orgName",
-				HierarchyMapping.class);
-		createQuery.setParameter(HIERARCHYNAME, hierarchyName);
-		createQuery.setParameter("orgName", orgName);
-		HierarchyMapping hierarchyMapping = createQuery.getSingleResult();
-		getSession().beginTransaction();
-		getSession().delete(hierarchyMapping);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
+				HierarchyMapping.class,
+				parameters);
+		delete(hierarchyMapping);
 		return true;
 	}
 }

@@ -25,6 +25,8 @@ import base64
 from ....core.BaseAgent3 import BaseAgent
 
 class NexusAgent(BaseAgent):
+    
+    @BaseAgent.timed
     def process(self):
         self.userid = self.getCredential("userid")
         self.passwd = self.getCredential("passwd")

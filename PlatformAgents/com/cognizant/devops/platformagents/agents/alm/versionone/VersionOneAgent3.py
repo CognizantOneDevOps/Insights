@@ -28,6 +28,8 @@ import time
 import json,ast
 
 class VersionOneAgent(BaseAgent):
+    
+    @BaseAgent.timed
     def process(self):
         userid = self.getCredential("userid")
         passwd = self.getCredential("passwd")

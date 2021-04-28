@@ -200,12 +200,10 @@
 	"commitsBaseEndPoint": "https://api.github.com/repos/<REPO_NAME>/",
 	"isDebugAllowed": false,
 	"loggingSetting": {
-		"logLevel": "WARN",
+		"logLevel": "INFO",
 		"maxBytes": 5000000,
-		"backupCount": 1000
+		"backupCount": 10
 	},
-	"osversion": "windows",
-	"agentVersion": "v7.2",
 	"labelName": "GIT",
 	"toolName": "GIT",
 	"auditing": false

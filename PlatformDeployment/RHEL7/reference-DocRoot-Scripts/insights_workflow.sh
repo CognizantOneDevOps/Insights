@@ -15,8 +15,11 @@
 #-------------------------------------------------------------------------------
 # get insights workflow jar
 echo "#################### Getting Insights workflow Jar ####################"
-sudo mkdir /opt/insightsworkflow
-cd /opt/insightsworkflow
+source /etc/environment
+source /etc/profile
+cd $INSIGHTS_APP_ROOT_DIRECTORY
+sudo mkdir insightsworkflow
+cd $INSIGHTS_APP_ROOT_DIRECTORY/insightsworkflow
 export INSIGHTS_WORKFLOW=`pwd`
 sudo echo INSIGHTS_WORKFLOW=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" INSIGHTS_WORKFLOW=`pwd` | sudo tee -a /etc/profile
@@ -24,12 +27,14 @@ source /etc/environment
 source /etc/profile
 sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformWorkflow.jar -O PlatformWorkflow.jar
 sleep 5
-sudo chmod -R 777 /opt/insightsworkflow
+sudo chmod -R 777 $INSIGHTS_APP_ROOT_DIRECTORY/insightsworkflow
 cd /etc/init.d/
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/InSightsWebHook.sh
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/InSightsWorkflow.sh
 sudo mv InSightsWorkflow.sh InSightsWorkflow
 sudo chmod +x InSightsWorkflow
 sudo chkconfig InSightsWorkflow on
+sudo yum install dos2unix
+sudo dos2unix /etc/init.d/InSightsWorkflow
 sleep 10
 sudo service InSightsWorkflow stop
 sudo service InSightsWorkflow start

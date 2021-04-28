@@ -15,6 +15,7 @@ export interface MyQuery extends DataQuery {
   fixTime: any;
   cacheType: any;
   cacheValue: any;
+  serviceUrl:any;
 }
 
 
@@ -29,7 +30,8 @@ export const defaultQuery: Partial<MyQuery> = {
   varTime: false,
   fixTime: false,
   cacheType: undefined,
-  cacheValue: undefined
+  cacheValue: undefined,
+  serviceUrl: undefined
 };
  
 
@@ -37,7 +39,9 @@ export const defaultQuery: Partial<MyQuery> = {
  * These are options configured for each DataSource instance
  */
 export interface MyDataSourceOptions extends DataSourceJsonData {
+  logging: any ;
   path?: string;
+  serviceUrl?: any;
 }
 
 /**
@@ -45,4 +49,10 @@ export interface MyDataSourceOptions extends DataSourceJsonData {
  */
 export interface MySecureJsonData {
   apiKey?: string;
+}
+
+export const defaults: MyDataSourceOptions = {
+  logging :true,
+  path: '',
+  serviceUrl : 'http://localhost:8080/PlatformService/datasource/logDashboardInfo',
 }

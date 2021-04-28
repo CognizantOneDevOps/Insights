@@ -20,10 +20,11 @@ Created on Jun 22, 2016
 '''
 from ....core.BaseAgent3 import BaseAgent
 import xml.etree.ElementTree as ET
-import logging
 import json
 
 class HpAlmAgent(BaseAgent):
+    
+    @BaseAgent.timed
     def getHpAlmSSOHeader(self, baseEndPoint):
         self.userid = self.getCredential("userid")
         self.passwd = self.getCredential("passwd")
@@ -58,6 +59,7 @@ class HpAlmAgent(BaseAgent):
         projectResponse = self.getResponse(projectsEndPoint, 'GET', None, None, None, reqHeaders=cookieHeader)
         return projectResponse
            
+    @BaseAgent.timed
     def getProjectDetails(self, baseEndPoint, reqHeaders, domain, project, entityName, fields, startFrom):
         domainTracking = self.tracking.get(domain, None)
         if domainTracking == None:
@@ -141,7 +143,7 @@ class HpAlmAgent(BaseAgent):
                     latestRecord = dataList[len(dataList) - 1]
                     projectTracking[entityName] = latestRecord[entityMetaDetails[trackingFieldName]]
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
         return dataList
     
     def extractValueWithType(self, value):
@@ -155,7 +157,8 @@ class HpAlmAgent(BaseAgent):
             return int(value)
         except ValueError:
             return value
-       
+    
+    @BaseAgent.timed
     def process(self):
         baseEndPoint = self.config.get('baseEndPoint')
         self.dataFetchCount = self.config.get('dataFetchCount', 200)
@@ -186,7 +189,7 @@ class HpAlmAgent(BaseAgent):
                                     self.extendSession(baseEndPoint, cookieHeader)
                                     dataList = self.getProjectDetails(baseEndPoint, cookieHeader, domainName, projectName, almEntity, fields, startFrom)
                                 except Exception as ex:
-                                    logging.error(ex)
+                                    self.baseLogger.error(ex)
                                 if len(dataList) > 0 :
                                     self.publishToolsData(dataList)
                                     self.updateTrackingJson(self.tracking)
@@ -201,7 +204,7 @@ class HpAlmAgent(BaseAgent):
                                 try:
                                     dataList = self.getProjectDetails(baseEndPoint, cookieHeader, domainName, projectName, almEntity, fields, startFrom)
                                 except Exception as ex:
-                                    logging.error(ex)
+                                    self.baseLogger.error(ex)
                                 if len(dataList) > 0 :
                                     self.publishToolsData(dataList)
                                     self.updateTrackingJson(self.tracking)

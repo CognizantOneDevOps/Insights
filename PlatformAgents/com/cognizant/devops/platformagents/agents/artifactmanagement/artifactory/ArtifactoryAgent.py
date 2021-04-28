@@ -26,6 +26,8 @@ from ....core.BaseAgent import BaseAgent
 from datetime import datetime, timedelta
 import time
 class ArtifactoryAgent(BaseAgent):
+    
+    @BaseAgent.timed
     def process(self):
         user = self.getCredential("userid")
         passwd = self.getCredential("passwd")

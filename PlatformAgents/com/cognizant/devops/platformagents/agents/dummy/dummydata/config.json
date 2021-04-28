@@ -47,5 +47,5 @@
 	"runSchedule": 3000,
 	"useResponseTemplate": true,
 	"timeStampField": "lastUpdated",
-	"startFrom": "2016-10-10 00:01"
+	"startFrom": "2021-01-01 00:01"
 }

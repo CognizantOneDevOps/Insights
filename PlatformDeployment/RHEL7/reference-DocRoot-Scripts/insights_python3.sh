@@ -14,11 +14,10 @@
 # the License.
 #-------------------------------------------------------------------------------
 # Pythonecho "#################### Installing Python with Virtual Env ####################"
-#sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/python/python_dependencies.zip
-#sudo unzip python_dependencies.zip && cd python_dependencies
-#sudo rpm -Uvh *.rpm
-cd /opt
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/python/Python.tar.gz
+source /etc/environment
+source /etc/profile
+cd $INSIGHTS_APP_ROOT_DIRECTORY
+sudo mkdir python3 && cd python3 && sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/python/Python.tar.gz
 sudo tar -zxf Python.tar.gz
 cd Python
 sudo yum install gcc -y
@@ -27,9 +26,13 @@ sudo yum install bzip2-devel -y
 sudo yum install libffi-devel -y
 sudo ./configure --enable-optimizations
 sudo make altinstall
-sudo rm -f /usr/bin/python
-sudo ln -s /opt/Python/python /usr/bin/python
-sudo python -m pip install pika==1.1.0
-sudo python -m pip install requests apscheduler python-dateutil xmltodict pytz requests_ntlm boto3 urllib3 neotime neo4j neobolt elasticsearch
-python --version
+sudo rm -f /usr/bin/python3
+sudo ln -s $INSIGHTS_APP_ROOT_DIRECTORY/python3/Python/python /usr/bin/python3
+cd $INSIGHTS_APP_ROOT_DIRECTORY/python3 && sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/python/get-pip.py
+python3 --version
+sudo python3 get-pip.py
+sudo python3 -m pip install setuptools -U
+sudo python3 -m pip install pika==1.1.0
+sudo python3 -m pip install requests apscheduler python-dateutil xmltodict pytz requests_ntlm boto3 urllib3 neotime neo4j neobolt elasticsearch
+python3 --version
 sleep 5

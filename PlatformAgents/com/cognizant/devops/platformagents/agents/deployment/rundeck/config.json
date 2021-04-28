@@ -69,9 +69,9 @@
 	"executionsBaseEndPoint": "http://127.0.0.1:4440/api/15/project",
 	"isDebugAllowed": false,
 	"loggingSetting": {
-		"logLevel": "WARN",
+		"logLevel": "INFO",
 		"maxBytes": 5000000,
-		"backupCount": 1000
+		"backupCount": 10
 	},
 	"auditing": false
 }

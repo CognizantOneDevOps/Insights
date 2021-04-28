@@ -35,6 +35,8 @@ from ....core.BaseAgent3 import BaseAgent
 import json
 
 class BitBucketAgent(BaseAgent):
+    
+    @BaseAgent.timed
     def process(self):
         self.baseEndPoint = self.config.get("baseEndPoint", '')
         self.userId = self.getCredential("userid")
@@ -138,7 +140,7 @@ class BitBucketAgent(BaseAgent):
                 break;
             start = bitBucketProjects.get("nextPageStart", None)
 
-
+    @BaseAgent.timed
     def processAllCommitsForBranch(self,projKey,repoName, branchName, repoTracking):
         data = []
         injectData = {}
@@ -179,7 +181,7 @@ class BitBucketAgent(BaseAgent):
             self.publishToolsData(data)
             self.updateTrackingJson(self.tracking)
 
-
+    @BaseAgent.timed
     def processPullRequestsForRepo(self,projKey,repoName, repoTracking):
         pullRequestTemplate = self.responseTemplate.get("pullRequests",None)
 

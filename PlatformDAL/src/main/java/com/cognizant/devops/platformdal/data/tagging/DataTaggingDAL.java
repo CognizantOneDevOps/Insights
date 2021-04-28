@@ -15,12 +15,12 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.data.tagging;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
@@ -30,10 +30,8 @@ public class DataTaggingDAL extends BaseDAL {
 	
 	
 	public boolean addEntityData(DataTagging dataTagging) {
-		try (Session session = getSessionObj()) {
-			session.beginTransaction();
-			session.save(dataTagging);
-			session.getTransaction().commit();
+		try  {
+			save(dataTagging);
 			return true;
 		} catch (Exception e) {
 			log.error(e.getMessage());
@@ -42,45 +40,26 @@ public class DataTaggingDAL extends BaseDAL {
 	}
 
 	public List<DataTagging> fetchEntityData(String hierarchyName) {
-		try (Session session = getSessionObj()) {
-			Query<DataTagging> createQuery = session
-					.createQuery("FROM DataTagging DT WHERE DT.hierarchyName = :hierarchyName", DataTagging.class);
-			createQuery.setParameter("hierarchyName", hierarchyName);
-			return createQuery.getResultList();
-		} catch (Exception e) {
-			log.error(e.getMessage());
-			throw e;
-		}
-		
-	}
-	
-	public List<DataTagging> fetchEntityDataByLevelName(String levelName) {
-
-		try (Session session = getSessionObj()) {
-		Query<DataTagging> createQuery = session.createQuery("SELECT DT.levelName = :levelName from DataTagging DT",DataTagging.class);
-		return createQuery.getResultList();	
-		}catch (Exception e) {
-			log.error(e.getMessage());
-			throw e;
-		}
-	}
-	
-	public List<String> fetchEntityHierarchyName() {
-		try (Session session = getSessionObj()) {
-			Query<String> createQuery = session.createQuery("SELECT DISTINCT DT.hierarchyName FROM DataTagging DT",
-					String.class);
-			List<String> resultList = createQuery.getResultList();
-			return resultList;
+		try {
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("hierarchyName", hierarchyName);
+			return getResultList(
+					"FROM DataTagging DT WHERE DT.hierarchyName = :hierarchyName",
+					DataTagging.class,
+					parameters);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
 		}
 	}
-
+	
 	public List<DataTagging> fetchAllEntityData() {
-		try (Session session = getSessionObj()) {
-		Query<DataTagging> createQuery = session.createQuery("FROM DataTagging DT", DataTagging.class);
-		return createQuery.getResultList();	
+		try {
+			Map<String,Object> parameters = new HashMap<>();
+			return getResultList(
+					"FROM DataTagging DT",
+					DataTagging.class,
+					parameters);
 		}catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
@@ -88,16 +67,15 @@ public class DataTaggingDAL extends BaseDAL {
 	}
 
 	public boolean deleteEntityData(String hierarchyName) {
-		try (Session session = getSessionObj()) {
-		Query<DataTagging> createQuery = session.createQuery(
-				"FROM DataTagging DT WHERE DT.hierarchyName = :hierarchyName",
-				DataTagging.class);
-		createQuery.setParameter("hierarchyName", hierarchyName);
-		DataTagging dataTagging = createQuery.getSingleResult();
-		session.beginTransaction();
-		session.delete(dataTagging);
-		session.getTransaction().commit();
-		return true;
+		try {
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("hierarchyName", hierarchyName);
+			DataTagging dataTagging =  getSingleResult(
+					"FROM DataTagging DT WHERE DT.hierarchyName = :hierarchyName",
+					DataTagging.class,
+					parameters);
+			delete(dataTagging);
+			return true;
 		}catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;

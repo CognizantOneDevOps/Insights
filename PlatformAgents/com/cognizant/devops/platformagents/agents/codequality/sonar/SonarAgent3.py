@@ -26,6 +26,8 @@ from ....core.BaseAgent3 import BaseAgent
 import json
 
 class SonarAgent(BaseAgent):
+    
+    @BaseAgent.timed
     def process(self):
         baseUrl = self.config.get("baseUrl", '')
         projectsUrl = baseUrl+"api/components/search?qualifiers=TRK&format=json"

@@ -27,7 +27,10 @@ import json, ast
 
 
 class AwsCodePipelineAgent(BaseAgent):
-    def process(self):       
+
+    @BaseAgent.timed
+    def process(self):
+        self.baseLogger.info('Inside process')
         startFrom = self.config.get("startFrom", '')
         startFrom = parser.parse(startFrom)
         startFrom = startFrom.strftime('%Y-%m-%dT%H:%M:%S')

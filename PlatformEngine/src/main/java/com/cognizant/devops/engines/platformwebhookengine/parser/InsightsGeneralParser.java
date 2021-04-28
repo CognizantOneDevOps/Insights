@@ -152,7 +152,7 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 								responseTemplateJson.addProperty(DerivedOperations.INSIGHTSTIMEX_DB.getValue(),
 										timeFieldValue);
 							} else {
-								dateTimeFromEpoch = InsightsUtils.insightsTimeXFormat(epochTime);
+								dateTimeFromEpoch = InsightsUtils.insightsTimeXFormatFromSeconds(epochTime);
 								responseTemplateJson.addProperty(DerivedOperations.INSIGHTSTIMEX_DB.getValue(),
 										dateTimeFromEpoch);
 							}
@@ -170,7 +170,7 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 					if (timeFieldValue != null) {
 						dateFormat = operationFieldsList.get("mappingTimeFormat").getAsString();
 						epochTime = InsightsUtils.getEpochTime(timeFieldValue, dateFormat);
-						responseTemplateJson.addProperty(timeFieldKey + "_epoch", epochTime);
+						responseTemplateJson.addProperty(timeFieldKey + "Epoch", epochTime);
 					}
 				} else if (operationName.equalsIgnoreCase(DerivedOperations.DATAENRICHMENT.getValue())) {
 					processDataEnrichment(operationFieldsList, responseTemplateJson);

@@ -29,6 +29,7 @@ from ....core.BaseAgent import BaseAgent
 
 class AzureBoardAgent(BaseAgent):
 
+    @BaseAgent.timed
     def process(self):
         self.userid = self.getCredential("userid")
         self.passwd = self.getCredential("passwd")

@@ -22,13 +22,13 @@ from datetime import datetime as dateTime2
 import datetime 
 import copy
 import re 
-import logging.handlers
 from dateutil import parser
 from ....core.BaseAgent3 import BaseAgent
 
 class JiraAgent(BaseAgent):
     changedFields = set()
 
+    @BaseAgent.timed
     def process(self):
          self.userid=self.getCredential("userid")
          self.passwd=self.getCredential("passwd")
@@ -185,7 +185,7 @@ class JiraAgent(BaseAgent):
                         try:
                             self.loadRemoteLinks(issue['key'], remoteIssueLinkDataMap)
                         except Exception as ex:
-                            logging.error(ex)
+                            self.baseLogger.error(ex)
         return workLogData
 
     def loadRemoteLinks(self, issueKey, remoteIssueLinkChangeDataMap):
@@ -273,7 +273,7 @@ class JiraAgent(BaseAgent):
         elif keyType in [str, str]:
             data.append(temObject)
         else:
-            logging.error ("Response Template not well formed")
+            self.baseLogger.error ("Response Template not well formed")
 
 
     def processSprintInformation(self, parsedIssue, issue,  isIssueStatusFilter,sprintField, tracking):
@@ -332,6 +332,7 @@ class JiraAgent(BaseAgent):
                 #            if sprintTracking.get(sprint, None) is None:
                 #                sprintTracking[sprint] = {} 
  
+    @BaseAgent.timed
     def retrieveSprintDetails (self):
         sprintDetails = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('sprints', None)
 		
@@ -388,6 +389,7 @@ class JiraAgent(BaseAgent):
                 if len(data) > 0 : 
                     self.publishToolsData(data, sprintMetadata,timeStampField,timeStampFormat,isEpoch,True)
     
+    @BaseAgent.timed
     def retrieveBacklogDetails(self):
         backlogDetails = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('backlog', None)
         boardApiUrl = backlogDetails.get('boardApiUrl')
@@ -424,6 +426,7 @@ class JiraAgent(BaseAgent):
                     board['error'] = str(ex)
                     #Get the individual sprint details.
     
+    @BaseAgent.timed
     def retrieveSprintReports(self):
         sprintDetails = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('sprintReport', None)
         boardApiUrl = sprintDetails.get('boardApiUrl')
@@ -474,6 +477,7 @@ class JiraAgent(BaseAgent):
                                 self.publishToolsData(data, relationMetadata)
                                 self.updateTrackingJson(self.tracking)
 
+    @BaseAgent.timed
     def getSprintInformation(self, content, boardId, sprintId, boardName, boardType):
         data = []
         sprint = content.get('sprint')
@@ -512,7 +516,8 @@ class JiraAgent(BaseAgent):
                 issue['sprintIssueRegion'] = sprintIssueRegion
                 issue['projectKey'] = issueKey.split('-')[0]
         return parsedIssues
-     
+    
+    @BaseAgent.timed 
     def retrieveReleaseDetails(self):
         releaseDetails = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('releaseDetails', None)
         insighstTimeXFieldMapping = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('releaseDetails', {}).get('insightsTimeXFieldMapping',None)

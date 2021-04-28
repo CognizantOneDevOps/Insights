@@ -23,6 +23,8 @@ from dateutil import parser
 from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
 
 class BitBucketAgentBranchesUserDefined(BaseAgent):
+    
+    @BaseAgent.timed
     def process(self):
         BaseEndPoint = self.config.get("baseEndPoint", '')
         UserId = self.config.get("userID", '')

@@ -11,14 +11,14 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>7.7</version>
+		<version>7.8</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>PlatformService</artifactId>
 	<groupId>com.cognizant.devops</groupId>
 	<packaging>war</packaging>
-	<version>7.7</version>
+	<version>7.8</version>
 	<name>PlatformService</name>
 	
 	<properties>
@@ -239,19 +239,19 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>7.7</version>
+			<version>7.8</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformAuditing</artifactId>
-			<version>7.7</version>
+			<version>7.8</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>7.7</version>
+			<version>7.8</version>
 		</dependency>
 
 		<dependency>
@@ -389,6 +389,12 @@
             <artifactId>httpmime</artifactId>
             <version>4.5.12</version>
         </dependency>
+		
+		 <dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+			<version>1.8</version>
+		</dependency>
 
 	</dependencies>
 

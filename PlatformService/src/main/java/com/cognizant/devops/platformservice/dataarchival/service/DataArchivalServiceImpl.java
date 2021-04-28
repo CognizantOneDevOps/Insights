@@ -104,6 +104,7 @@ public class DataArchivalServiceImpl implements DataArchivalService {
 					dataArchivalConfig.setExpiryDate(expiryDate);
 					dataArchivalConfig.setSourceUrl("");
 					dataArchivalConfig.setContainerID("");
+					dataArchivalConfig.setBoltPort(0);
 					dataArchivalConfigdal.saveDataArchivalConfiguration(dataArchivalConfig);
 				} else {
 					throw new InsightsCustomException("Archival Name already exists.");

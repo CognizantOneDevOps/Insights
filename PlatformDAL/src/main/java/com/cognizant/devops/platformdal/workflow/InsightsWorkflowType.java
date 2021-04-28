@@ -67,4 +67,10 @@ public class InsightsWorkflowType implements Serializable {
 	public void setWorkflowTaskEntity(Set<InsightsWorkflowTask> workflowTaskEntity) {
 		this.workflowTaskEntity = workflowTaskEntity;
 	}
+
+	@Override
+	public String toString() {
+		return "InsightsWorkflowType [id=" + id + ", workflowType=" + workflowType + ", workflowTaskEntity="
+				+ workflowTaskEntity + "]";
+	}
 }

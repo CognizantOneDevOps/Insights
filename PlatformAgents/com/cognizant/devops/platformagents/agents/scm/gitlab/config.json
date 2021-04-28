@@ -150,9 +150,9 @@
 	"isDebugAllowed": false,
 	"toolName": "GITLAB",
 	"loggingSetting": {
-		"logLevel": "ERROR",
+		"logLevel": "INFO",
 		"maxBytes": 5000000,
-		"backupCount": 1000
+		"backupCount": 10
 	},
 	"auditing": false
 }

@@ -22,7 +22,9 @@ from ....core.BaseAgent3 import BaseAgent
 import json
 
 class ConcourseAgent(BaseAgent):
+    @BaseAgent.timed
     def process(self):
+        self.baseLogger.info('Inside process')
         BaseUrl = self.config.get("BaseUrl", '')
         UserID = self.getCredential("userid")
         Passwd = self.getCredential("passwd")

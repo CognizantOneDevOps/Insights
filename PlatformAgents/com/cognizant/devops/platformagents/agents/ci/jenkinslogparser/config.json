@@ -85,9 +85,9 @@
 "isEpochTimeFormat" : true,
 "startFrom" : "2019-03-01 15:46:33",
 "loggingSetting" : {
-	"logLevel" : "WARN",
+	"logLevel" : "INFO",
 	"maxBytes" : 5000000,
-	"backupCount" : 1000
+	"backupCount" : 10
 },
 "auditing": false
 }

@@ -26,10 +26,10 @@
 # Short-Description: Simple script to run InSightsWorkflow program at boot
 # Description: Runs a InSightsWorkflow program at boot
 ### END INIT INFO
-[[ -z "${INSIGHTS_WORKFLOW}" ]] && INSIGHTS_WORKFLOW=env | grep INSIGHTS_WORKFLOW | cut -d'=' -f2 || INSIGHTS_WORKFLOW="${INSIGHTS_WORKFLOW}"
+source /etc/environment
+source /etc/profile
 echo $INSIGHTS_WORKFLOW
-INSIGHTS_WORKFLOW=/opt/insightsworkflow
-INSIGHTS_HOME=/usr/INSIGHTS_HOME
+echo $INSIGHTS_HOME
 case "$1" in
   start)
     if [[ $(ps aux | grep ' [P]latformWorkflow.jar' | awk '{print $2}') ]]; then
@@ -37,7 +37,7 @@ case "$1" in
     else
      echo "Starting InSightsWorkflow"
      cd $INSIGHTS_WORKFLOW
-	 sudo nohup java -cp PlatformWorkflow.jar:$INSIGHTS_HOME/workflowjar/* com.cognizant.devops.platformworkflow.workflowtask.app.PlatformWorkflowApplication &
+	 sudo nohup java -cp PlatformWorkflow.jar:$INSIGHTS_HOME/workflowjar/* com.cognizant.devops.platformworkflow.workflowtask.app.PlatformWorkflowApplication > /dev/null 2>&1 &
      echo $! > InSightsWorkflow-pid.txt
      sleep 10
     fi
@@ -70,7 +70,7 @@ case "$1" in
      echo "InSightsWorkflow stopped"
      echo "InSightsWorkflow starting"
      cd $INSIGHTS_WORKFLOW
-	 sudo nohup java -cp PlatformWorkflow.jar:$INSIGHTS_HOME/workflowjar/* com.cognizant.devops.platformworkflow.workflowtask.app.PlatformWorkflowApplication &
+	 sudo nohup java -cp PlatformWorkflow.jar:$INSIGHTS_HOME/workflowjar/* com.cognizant.devops.platformworkflow.workflowtask.app.PlatformWorkflowApplication > /dev/null 2>&1 &
      echo $! > InSightsWorkflow-pid.txt
 	 sleep 10
      echo "InSightsWorkflow started"
@@ -78,7 +78,7 @@ case "$1" in
      echo "InSightsWorkflow already in stopped state"
      echo "InSightsWorkflow starting"
      cd $INSIGHTS_WORKFLOW
-	 sudo nohup java -cp PlatformWorkflow.jar:$INSIGHTS_HOME/workflowjar/* com.cognizant.devops.platformworkflow.workflowtask.app.PlatformWorkflowApplication &
+	 sudo nohup java -cp PlatformWorkflow.jar:$INSIGHTS_HOME/workflowjar/* com.cognizant.devops.platformworkflow.workflowtask.app.PlatformWorkflowApplication > /dev/null 2>&1 &
      echo $! > InSightsWorkflow-pid.txt
 	 sleep 10
      echo "InSightsWorkflow started"

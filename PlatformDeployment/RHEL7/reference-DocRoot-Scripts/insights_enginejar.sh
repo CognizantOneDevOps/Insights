@@ -16,8 +16,11 @@
 # get insights engine jar
 # get insights engine jar
 echo "#################### Getting Insights Engine Jar ####################"
-sudo mkdir /opt/insightsengine
-cd /opt/insightsengine
+source /etc/environment
+source /etc/profile
+cd $INSIGHTS_APP_ROOT_DIRECTORY
+sudo mkdir insightsengine
+cd $INSIGHTS_APP_ROOT_DIRECTORY/insightsengine
 export INSIGHTS_ENGINE=`pwd`
 sudo echo INSIGHTS_ENGINE=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" INSIGHTS_ENGINE=`pwd` | sudo tee -a /etc/profile
@@ -25,13 +28,15 @@ source /etc/environment
 source /etc/profile
 sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformEngine.jar -O PlatformEngine.jar
 sleep 2
-sudo nohup java -jar PlatformEngine.jar &
-sudo chmod -R 777 /opt/insightsengine
+sudo nohup java -jar PlatformEngine.jar > /dev/null 2>&1 &
+sudo chmod -R 777 $INSIGHTS_APP_ROOT_DIRECTORY/insightsengine
 cd /etc/init.d/
 sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/InSightsEngine.sh
-sudo mv InSightsEngine.sh InsightsEngine
-sudo chmod +x InsightsEngine
-sudo chkconfig InsightsEngine on
+sudo mv InSightsEngine.sh InSightsEngine
+sudo chmod +x InSightsEngine
+sudo chkconfig InSightsEngine on
+sudo yum install dos2unix
+sudo dos2unix /etc/init.d/InSightsEngine
 sleep 10
-sudo service InsightsEngine stop
-sudo service InsightsEngine start
+sudo service InSightsEngine stop
+sudo service InSightsEngine start

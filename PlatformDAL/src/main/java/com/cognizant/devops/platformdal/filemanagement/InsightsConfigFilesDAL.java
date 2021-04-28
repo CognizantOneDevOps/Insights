@@ -15,12 +15,12 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.filemanagement;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformdal.core.BaseDAL;
@@ -35,10 +35,11 @@ public class InsightsConfigFilesDAL extends BaseDAL {
 	 * @return List<InsightsConfigFiles>
 	 */
 	public List<InsightsConfigFiles> getAllConfigurationFiles() {
-		try (Session session = getSessionObj()) {
-			Query<InsightsConfigFiles> createQuery = session.createQuery("FROM InsightsConfigFiles ICF",
-					InsightsConfigFiles.class);
-			return createQuery.getResultList();
+		try  {
+			Map<String,Object> parameters = new HashMap<>();
+			return getResultList( "FROM InsightsConfigFiles ICF",
+					InsightsConfigFiles.class,
+					parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -52,11 +53,12 @@ public class InsightsConfigFilesDAL extends BaseDAL {
 	 * @return List<InsightsConfigFiles>
 	 */
 	public List<InsightsConfigFiles> getAllConfigurationFilesForModule(String fileModule) {
-		try (Session session = getSessionObj()) {
-			Query<InsightsConfigFiles> createQuery = session.createQuery(
-					"FROM InsightsConfigFiles ICF where ICF.fileModule = :fileModule", InsightsConfigFiles.class);
-			createQuery.setParameter("fileModule", fileModule);
-			return createQuery.getResultList();
+		try  {
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("fileModule", fileModule);
+			return getResultList( "FROM InsightsConfigFiles ICF where ICF.fileModule = :fileModule",
+					InsightsConfigFiles.class,
+					parameters);
 		} catch (Exception e) {
 			log.error(e);
 			return null;
@@ -70,11 +72,12 @@ public class InsightsConfigFilesDAL extends BaseDAL {
 	 * @return InsightsConfigFiles
 	 */
 	public InsightsConfigFiles getConfigurationFile(String fileName) {
-		try (Session session = getSessionObj()) {
-			Query<InsightsConfigFiles> createQuery = session.createQuery(
-					"FROM InsightsConfigFiles ICF where ICF.fileName = :fileName", InsightsConfigFiles.class);
-			createQuery.setParameter("fileName", fileName);
-			return createQuery.uniqueResult();
+		try  {
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("fileName", fileName);
+			return getUniqueResult( "FROM InsightsConfigFiles ICF where ICF.fileName = :fileName",
+					InsightsConfigFiles.class,
+					parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -88,11 +91,8 @@ public class InsightsConfigFilesDAL extends BaseDAL {
 	 * @return int
 	 */
 	public int saveConfigurationFile(InsightsConfigFiles config) {
-		try (Session session = getSessionObj()) {
-			session.beginTransaction();
-			int recordId = (int) session.save(config);
-			session.getTransaction().commit();
-			return recordId;
+		try  {
+			return (int) save(config);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -106,14 +106,14 @@ public class InsightsConfigFilesDAL extends BaseDAL {
 	 * @return String
 	 */
 	public String deleteConfigurationFile(String fileName) {
-		try (Session session = getSessionObj()) {
-			session.beginTransaction();
-			Query<InsightsConfigFiles> createQuery = session.createQuery(
-					"FROM InsightsConfigFiles ICF where ICF.fileName = :fileName", InsightsConfigFiles.class);
-			createQuery.setParameter("fileName", fileName);
-			InsightsConfigFiles record = createQuery.getSingleResult();
-			session.delete(record);
-			session.getTransaction().commit();
+		try {
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("fileName", fileName);
+			InsightsConfigFiles record = getSingleResult(
+					"FROM InsightsConfigFiles ICF where ICF.fileName = :fileName",
+							InsightsConfigFiles.class,
+					parameters);
+			delete(record);
 			return PlatformServiceConstants.SUCCESS;
 		} catch (Exception e) {
 			log.error(e);
@@ -128,10 +128,8 @@ public class InsightsConfigFilesDAL extends BaseDAL {
 	 * @return int
 	 */
 	public int updateConfigurationFile(InsightsConfigFiles config) {
-		try (Session session = getSessionObj()) {
-			session.beginTransaction();
-			session.update(config);
-			session.getTransaction().commit();
+		try {
+			update(config);
 			return 0;
 		} catch (Exception e) {
 			log.error(e);

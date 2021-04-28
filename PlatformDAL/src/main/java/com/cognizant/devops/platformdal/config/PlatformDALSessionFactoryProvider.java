@@ -15,6 +15,11 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.config;
 
+import javax.persistence.PersistenceException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.AvailableSettings;
@@ -39,7 +44,6 @@ import com.cognizant.devops.platformdal.dataArchivalConfig.InsightsDataArchivalC
 import com.cognizant.devops.platformdal.entity.definition.EntityDefinition;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfig;
-import com.cognizant.devops.platformdal.grafana.user.User;
 import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetails;
 import com.cognizant.devops.platformdal.icon.Icon;
 import com.cognizant.devops.platformdal.mapping.hierarchy.HierarchyMapping;
@@ -49,8 +53,8 @@ import com.cognizant.devops.platformdal.queryBuilder.QueryBuilderConfig;
 import com.cognizant.devops.platformdal.relationshipconfig.RelationshipConfiguration;
 import com.cognizant.devops.platformdal.settingsconfig.SettingsConfiguration;
 import com.cognizant.devops.platformdal.tools.layout.ToolsLayout;
-import com.cognizant.devops.platformdal.user.UserPortfolio;
 import com.cognizant.devops.platformdal.upshiftassessment.UpshiftAssessmentConfig;
+import com.cognizant.devops.platformdal.user.UserPortfolio;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformdal.webhookConfig.WebhookDerivedConfig;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
@@ -63,13 +67,14 @@ import com.cognizant.devops.platformdal.workflow.InsightsWorkflowType;
 public class PlatformDALSessionFactoryProvider {
 	private static SessionFactory sessionFactory;
 	private static SessionFactory grafanaSessionFactory;
+	private static Logger log = LogManager.getLogger(PlatformDALSessionFactoryProvider.class);
 	
 	private PlatformDALSessionFactoryProvider(){
 	
 	}
 	static{
 		initInSightsDAL();
-//		initGrafanaDAL();
+		initGrafanaDAL();
 	}
 	private synchronized static void initInSightsDAL(){
 		if(sessionFactory == null){
@@ -115,10 +120,10 @@ public class PlatformDALSessionFactoryProvider {
 				configuration.setProperty(AvailableSettings.URL, postgre.getInsightsDBUrl());
 				configuration.setProperty(AvailableSettings.DRIVER, postgre.getDriver());
 				configuration.setProperty(AvailableSettings.DIALECT,postgre.getDialect());
-				configuration.setProperty(AvailableSettings.SHOW_SQL, "false");
-				configuration.setProperty(AvailableSettings.USE_SQL_COMMENTS, "false");
-				configuration.setProperty(AvailableSettings.FORMAT_SQL, "false");
-				configuration.setProperty(AvailableSettings.GENERATE_STATISTICS, "false");
+				configuration.setProperty(AvailableSettings.SHOW_SQL, Boolean.FALSE.toString());
+				configuration.setProperty(AvailableSettings.USE_SQL_COMMENTS, Boolean.FALSE.toString());
+				configuration.setProperty(AvailableSettings.FORMAT_SQL, Boolean.FALSE.toString());
+				configuration.setProperty(AvailableSettings.GENERATE_STATISTICS, Boolean.FALSE.toString());
 				configuration.setProperty(AvailableSettings.HBM2DDL_AUTO, "update");
 				/* c3p configuration setting */
 				if (postgre.getDriver().equals("org.postgresql.Driver")) {
@@ -128,27 +133,42 @@ public class PlatformDALSessionFactoryProvider {
 					configuration.setProperty(AvailableSettings.C3P0_TIMEOUT, postgre.getC3pTimout());
 					configuration.setProperty(AvailableSettings.C3P0_ACQUIRE_INCREMENT, "1");
 				}
-				
-				
 			}		
-			StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
-			sessionFactory = configuration.buildSessionFactory(builder.build());
+			try {
+				StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
+				sessionFactory = configuration.buildSessionFactory(builder.build());
+			} catch (HibernateException e) {
+				printHibernateDALException(e,"HibernateException occur during staring session Factory");
+				log.error(e);
+				throw e;
+			}
 		}
 	}
 	
 	private static void initGrafanaDAL() {
 		if(grafanaSessionFactory == null){
 			Configuration configuration = new Configuration();
-			configuration.addAnnotatedClass(User.class);
 			PostgreData postgre = ApplicationConfigProvider.getInstance().getPostgre();
-			if(postgre != null){
+			if(postgre != null && postgre.getDriver().equals("org.postgresql.Driver")){
 				configuration.setProperty(AvailableSettings.USER, postgre.getUserName());
 				configuration.setProperty(AvailableSettings.PASS, postgre.getPassword());
 				configuration.setProperty(AvailableSettings.URL, postgre.getGrafanaDBUrl());
+				configuration.setProperty(AvailableSettings.DRIVER, postgre.getDriver());
+				configuration.setProperty(AvailableSettings.DIALECT,postgre.getDialect());
+				configuration.setProperty(AvailableSettings.SHOW_SQL, Boolean.FALSE.toString());
+				configuration.setProperty(AvailableSettings.USE_SQL_COMMENTS, Boolean.FALSE.toString());
+				configuration.setProperty(AvailableSettings.FORMAT_SQL, Boolean.FALSE.toString());
+				configuration.setProperty(AvailableSettings.GENERATE_STATISTICS, Boolean.FALSE.toString());
 				configuration.setProperty(AvailableSettings.HBM2DDL_AUTO, "validate");
+				try {
+					StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
+					grafanaSessionFactory = configuration.buildSessionFactory(builder.build());
+				} catch (HibernateException e) {
+					printHibernateDALException(e,"HibernateException occur during staring grafana session Factory");
+					log.error(e);
+					throw e;
+				}
 			}
-			StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
-			grafanaSessionFactory = configuration.buildSessionFactory(builder.build());
 		}
 	}
 
@@ -158,5 +178,18 @@ public class PlatformDALSessionFactoryProvider {
 	
 	public static SessionFactory getGrafanaSessionFactory(){
 		return grafanaSessionFactory;
+	}
+	
+	static void  printHibernateDALException(PersistenceException e, Object sourceProperty) {
+		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+		StackTraceElement stackTrace = stacktrace[3];
+		StackTraceElement stacktraceService = stacktrace[4];
+		
+		log.error(e);
+		log.error(
+				"Type=HibernateException className={} methodName={} lineNo={} serviceFileName={} serviceMethodName={} serviceFileLineNo={} "
+						+ "exceptionClass={} sourceProperty={} message={} ",
+				stackTrace.getFileName(), stackTrace.getMethodName(), stackTrace.getLineNumber(),stacktraceService.getFileName(),stacktraceService.getMethodName(),stacktraceService.getLineNumber(), e.getClass(),
+				sourceProperty, e.getMessage());
 	}
 }

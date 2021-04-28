@@ -25,10 +25,11 @@ import sys
 import os
 from datetime import datetime, timedelta
 from ....core.BaseAgent import BaseAgent
-import logging.handlers
 import json
 
 class DynatraceAgent(BaseAgent):
+    
+    @BaseAgent.timed
     def process(self):
         print("Inside process")
         try:
@@ -49,7 +50,7 @@ class DynatraceAgent(BaseAgent):
             self.publishToolsData(self.data)
             self.updateTrackingJson(trackingDetails)
         except Exception as e:
-            logging.error(e)
+            self.baseLogger.error(e)
             
     def getHostsDetails(self):
         hostInfo = self.responseTemplate.get('Host')

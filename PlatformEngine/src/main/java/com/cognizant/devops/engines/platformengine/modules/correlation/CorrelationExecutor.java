@@ -225,7 +225,7 @@ public class CorrelationExecutor {
 			correlationCypher.append("set ").append(propertyVal).append(" ");
 		}
 		correlationCypher.append("RETURN count(distinct destination) as count");
-		log.debug("CorrelationExecution Started  {} ", correlationCypher);
+		log.debug("CorrelationExecution Started executeCorrelations {} ", correlationCypher);
 		GraphDBHandler dbHandler = new GraphDBHandler();
 		JsonObject correlationExecutionResponse;
 		int processedRecords = 0;

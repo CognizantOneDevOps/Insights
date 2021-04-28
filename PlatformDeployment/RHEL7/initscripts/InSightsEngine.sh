@@ -26,8 +26,8 @@
 # Short-Description: Simple script to run InSightsEngine program at boot
 # Description: Runs a InSightsEngine program at boot
 ### END INIT INFO
-[[ -z "${INSIGHTS_ENGINE}" ]] && INSIGHTS_ENGINE=sudo env | grep INSIGHTS_ENGINE | cut -d'=' -f2 || INSIGHTS_ENGINE="${INSIGHTS_ENGINE}"
-echo $INSIGHTS_ENGINE
+source /etc/environment
+source /etc/profile
 case "$1" in
   start)
     if [[ $(ps aux | grep ' [P]latformEngine.jar' | awk '{print $2}') ]]; then
@@ -35,7 +35,7 @@ case "$1" in
     else
      echo "Starting InSightsEngine"
      cd $INSIGHTS_ENGINE
-     sudo nohup java -jar PlatformEngine.jar &
+     sudo nohup java -jar PlatformEngine.jar > /dev/null 2>&1 &
      echo $! > InSightsEngine-pid.txt
      sleep 10
     fi
@@ -68,7 +68,7 @@ case "$1" in
      echo "InSightsEngine stopped"
      echo "InSightsEngine starting"
      cd $INSIGHTS_ENGINE
-     sudo nohup java -jar PlatformEngine.jar &
+     sudo nohup java -jar PlatformEngine.jar > /dev/null 2>&1 &
      echo $! > InSightsEngine-pid.txt
 	 sleep 10
      echo "InSightsEngine started"
@@ -76,7 +76,7 @@ case "$1" in
      echo "InSightsEngine already in stopped state"
      echo "InSightsEngine starting"
      cd $INSIGHTS_ENGINE
-     sudo nohup java -jar PlatformEngine.jar &
+     sudo nohup java -jar PlatformEngine.jar > /dev/null 2>&1 &
      echo $! > InSightsEngine-pid.txt
 	 sleep 10
      echo "InSightsEngine started"

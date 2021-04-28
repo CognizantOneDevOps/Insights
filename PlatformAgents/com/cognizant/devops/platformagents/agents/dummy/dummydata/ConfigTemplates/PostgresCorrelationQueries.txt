@@ -1,0 +1,29 @@
+INSERT INTO "INSIGHTS_CORRELATION_CONFIGURATIONS"(id, destination_fields, destination_labelname, destination_toolcategory, destination_toolname, enable_correlation, is_self_tool_relation, relation_name,  source_fields, source_labelname, source_toolcategory, source_toolname)
+VALUES (100, 'scmcommitId', 'JENKINS', 'CI', 'JENKINS', TRUE, FALSE, 'TEST_FROM_GIT_TO_JENKINS', 'commitId', 'GIT', 'SCM', 'GIT');
+
+INSERT INTO "INSIGHTS_CORRELATION_CONFIGURATIONS"(id, destination_fields, destination_labelname, destination_toolcategory, destination_toolname, enable_correlation, is_self_tool_relation, relation_name,  source_fields, source_labelname, source_toolcategory, source_toolname) 
+VALUES (101, 'jiraKey', 'GIT', 'SCM', 'GIT', TRUE, FALSE, 'TEST_FROM_JIRA_TO_GIT', 'key', 'JIRA', 'ALM', 'JIRA');
+
+INSERT INTO "INSIGHTS_CORRELATION_CONFIGURATIONS"(id, destination_fields, destination_labelname, destination_toolcategory, destination_toolname, enable_correlation, is_self_tool_relation, relation_name,  source_fields, source_labelname, source_toolcategory, source_toolname) 
+VALUES (102, 'jenkinsBuildNumber', 'SONAR', 'CODEQUALITY', 'SONAR', TRUE, FALSE, 'TEST_FROM_JENKINS_TO_SONAR', 'buildNumber', 'JENKINS', 'CI', 'JENKINS');
+
+INSERT INTO "INSIGHTS_CORRELATION_CONFIGURATIONS"(id, destination_fields, destination_labelname, destination_toolcategory, destination_toolname, enable_correlation, is_self_tool_relation, relation_name,  source_fields, source_labelname, source_toolcategory, source_toolname) 
+VALUES (103, 'jenkinsBuildNumber', 'NEXUS', 'ARTIFACTMANAGEMENT', 'NEXUS', TRUE, FALSE, 'TEST_FROM_JENKINS_TO_NEXUS', 'buildNumber', 'JENKINS', 'CI', 'JENKINS');
+
+INSERT INTO "INSIGHTS_CORRELATION_CONFIGURATIONS"(id, destination_fields, destination_labelname, destination_toolcategory, destination_toolname, enable_correlation, is_self_tool_relation, relation_name,  source_fields, source_labelname, source_toolcategory, source_toolname) 
+VALUES (104, 'jenkinsBuildNumber', 'RUNDECK', 'DEPLOYMENT', 'RUNDECK', TRUE, FALSE, 'TEST_FROM_JENKINS_TO_RUNDECK', 'buildNumber', 'JENKINS', 'CI', 'JENKINS');
+
+INSERT INTO public."INSIGHTS_RELATIONSHIP_CONFIGURATIONS"(rid, relationship_field_value, operation, operation_json, relation_name,relationship_id)
+    VALUES (201, 'handovertime', 'DIFF', '{"OperandOne":"inSightsTime","OperandTwo":"inSightsTime"}', 'TEST_FROM_GIT_TO_JENKINS',100);
+
+INSERT INTO public."INSIGHTS_RELATIONSHIP_CONFIGURATIONS"(rid, relationship_field_value, operation, operation_json, relation_name, relationship_id)
+    VALUES (202, 'handovertime', 'DIFF', '{"OperandOne":"inSightsTime","OperandTwo":"inSightsTime"}', 'TEST_FROM_JIRA_TO_GIT', 101);
+
+INSERT INTO public."INSIGHTS_RELATIONSHIP_CONFIGURATIONS"(rid, relationship_field_value, operation, operation_json, relation_name, relationship_id)
+    VALUES (203,  'handovertime', 'DIFF', '{"OperandOne":"inSightsTime","OperandTwo":"inSightsTime"}', 'TEST_FROM_JENKINS_TO_SONAR', 102);
+
+INSERT INTO public."INSIGHTS_RELATIONSHIP_CONFIGURATIONS"(rid, relationship_field_value, operation, operation_json, relation_name, relationship_id)
+    VALUES (204,  'handovertime', 'DIFF', '{"OperandOne":"inSightsTime","OperandTwo":"inSightsTime"}', 'TEST_FROM_JENKINS_TO_NEXUS', 103);
+
+INSERT INTO public."INSIGHTS_RELATIONSHIP_CONFIGURATIONS"(rid, relationship_field_value, operation, operation_json, relation_name, relationship_id)
+    VALUES (205,  'handovertime', 'DIFF', '{"OperandOne":"inSightsTime","OperandTwo":"inSightsTime"}', 'TEST_FROM_JENKINS_TO_RUNDECK', 104);

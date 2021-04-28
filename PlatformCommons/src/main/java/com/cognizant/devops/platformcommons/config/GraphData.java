@@ -22,16 +22,19 @@ import javax.validation.constraints.Pattern;
 
 public class GraphData implements Serializable{
 
-	 @NotBlank
+	private static final long serialVersionUID = 1784847834315454L;
+
+	@NotBlank
 	private String endpoint;
 
-	 @Pattern(regexp = "^(?!\\s*$).+", message = "Neo4j  authToken must not be blank")
+	 @Pattern(regexp = "^(?!\\s*$).+", message = "Neo4j authToken must not be blank")
 	private String authToken;
 	 
 	 @NotBlank
 	private String boltEndPoint;
 	private Integer connectionExpiryTimeOut;
 	private Integer maxIdleConnections;
+	private Integer logQueryIfProcessingTimeGreaterThanInMS=5;
 	
 	public String getEndpoint() {
 		return endpoint;
@@ -62,5 +65,11 @@ public class GraphData implements Serializable{
 	}
 	public void setConnectionExpiryTimeOut(Integer connectionExpiryTimeOut) {
 		this.connectionExpiryTimeOut = connectionExpiryTimeOut;
+	}
+	public Integer getLogQueryIfProcessingTimeGreaterThanInMS() {
+		return logQueryIfProcessingTimeGreaterThanInMS;
+	}
+	public void setLogQueryIfProcessingTimeGreaterThanInMS(Integer logQueryIfProcessingTimeGreaterThanInMS) {
+		this.logQueryIfProcessingTimeGreaterThanInMS = logQueryIfProcessingTimeGreaterThanInMS;
 	}
 }

@@ -21,7 +21,10 @@ Created on 12 April 2017
 from ....core.BaseAgent import BaseAgent
 from datetime import datetime
 class BambooAgent(BaseAgent):
-    def process(self):        
+    
+    @BaseAgent.timed
+    def process(self):
+        self.baseLogger.info('Inside process')
         BaseUrl = self.config.get("baseUrl", None)
         UserID = self.getCredential("userid")
         Passwd = self.getCredential("passwd")

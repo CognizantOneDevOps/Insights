@@ -1,0 +1,47 @@
+{
+   "reportName":"REPORT_AUTOML_PREDICT",
+   "description":"Template for Automl usecases",
+   "isActive":true,
+   "visualizationutil":"FUSION",
+   "kpiConfigs":[
+      {
+         "kpiId":21,
+         "visualizationConfigs":[
+            {
+               "vType":"table_21",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN DISTINCT n.jiraKey as `Issue key`,toInt(round(toFloat(n.predictedValue))) as `Predicted Number Of Days To Complete`"
+            }
+         ]
+      },
+	  {
+	  "kpiId":22,
+         "visualizationConfigs":[
+            {
+               "vType":"table_22",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN DISTINCT n.jiraKey as `Issue key`,n.predictedValue as `Completed Within Current Sprint`"
+            },
+			{
+               "vType":"pie2d_22",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.kpiId={kpiId} RETURN DISTINCT n.predictedValue as `Completed Within Current Sprint`, count(n) as count"
+            }
+         ]
+      },
+	  {
+         "kpiId":23,
+         "visualizationConfigs":[
+			{
+               "vType":"angulargauge_23",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN DISTINCT n.resultField as predictedField, toInt(sum(round(toFloat(n.predictedValue)))) as `Total estimated story points`"
+            },
+			{
+               "vType":"msbar2d_23",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN DISTINCT n.Issuekey as `Issue key`,toInt(round(toFloat(n.predictedValue))) as `Predicted Story Point` limit 5"
+            },
+			{
+               "vType":"mscolumn2d_23",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.Issuekey as `Issue key`,toInt(round(toFloat(n.predictedValue))) as `Predicted Story Point`"
+            }
+         ]
+      }
+	 ]
+}

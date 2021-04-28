@@ -21,8 +21,6 @@ echo "Installing Java"
 wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_java.sh -O insights_java.sh && sh insights_java.sh
 echo "Insitalling Elastic Search"
 wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_es.sh -O insights_es.sh  && sh insights_es.sh
-echo "Installing Neo4j"
-wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_neo4j.sh -O insights_neo4j.sh && sh insights_neo4j.sh
 echo "Install Postgres"
 wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_postgres.sh -O insights_postgres.sh && sh insights_postgres.sh
 echo "Install Grafana"
@@ -32,7 +30,7 @@ wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/instal
 echo "Install Erlang and RabbitMQ"
 wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_rabbitmq.sh -O insights_rabbitmq.sh && sh insights_rabbitmq.sh
 echo "Install Tomcat "
-wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_tomcat.sh -O insights_tomcat8.sh && sh insights_tomcat8.sh
+wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_tomcat.sh -O insights_tomcat.sh && sh insights_tomcat.sh
 echo "Get Insights Agents"
 wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_agents.sh -O insights_agents.sh && sh insights_agents.sh
 echo "Get Insights Engine"

@@ -3,6 +3,7 @@
   "name": "Neo4j Data Source",
   "id": "neo4j-datasource",
   "metrics": true,
+  "logs": true,
   "annotations": true,
   "executable": "neo4j-plugin",
   "info": {
@@ -25,7 +26,19 @@
   },
 
   "dependencies": {
-    "grafanaVersion": "7.0.0",
+    "grafanaVersion": "7.1.0",
     "plugins": []
-  }
+  },
+  "routes": [
+    {
+      "path": "platform",
+      "url": "https://api.example.com",
+      "headers": [
+        {
+          "name": "Authorization",
+          "content": "Bearer {{ .SecureJsonData.apiToken }}"
+        }
+      ]
+    }
+  ]
 }

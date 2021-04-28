@@ -512,6 +512,11 @@ public class InsightsUtils {
 		LocalDateTime utcTime=ZonedDateTime.ofInstant(Instant.ofEpochMilli(inputTime), zoneIdUTC).toLocalDateTime();
 		return utcTime.format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));			
 	}
+	
+	public static String insightsTimeXFormatFromSeconds(long inputTime) {
+		LocalDateTime utcTime=ZonedDateTime.ofInstant(Instant.ofEpochSecond(inputTime), zoneIdUTC).toLocalDateTime();
+		return utcTime.format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));			
+	}
 
 	/**
 	 * 
@@ -552,7 +557,7 @@ public class InsightsUtils {
 
 	public static long getEpochTime(String datetime, String dateFormat) throws InsightsCustomException {
 
-		return convertToEpoch(datetime, dateFormat);
+		return convertToEpochSeconds(datetime, dateFormat);
 	}
 
 	private static long calculateEpochTime(String datetime) {
@@ -567,11 +572,11 @@ public class InsightsUtils {
 
 	}
 	
-	private static long convertToEpoch(String datetime, String dateFormat) throws InsightsCustomException{
+	private static long convertToEpochSeconds(String datetime, String dateFormat) throws InsightsCustomException{
 		try
 		{
 		return LocalDateTime.parse(datetime,DateTimeFormatter.ofPattern(dateFormat))
-		        .atZone(zoneIdUTC).toInstant().toEpochMilli();
+		        .atZone(zoneIdUTC).toInstant().getEpochSecond();
 		}
 		catch(Exception e) {
 			log.error(e.getMessage());

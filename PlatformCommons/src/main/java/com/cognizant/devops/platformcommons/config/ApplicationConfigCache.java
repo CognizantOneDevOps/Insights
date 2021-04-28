@@ -39,9 +39,7 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.apache.logging.log4j.core.appender.RollingFileAppender;
 import org.apache.logging.log4j.core.config.AppenderRef;
-import org.apache.logging.log4j.core.config.Configurator;
 import org.apache.logging.log4j.core.config.LoggerConfig;
-import org.apache.logging.log4j.util.Strings;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
@@ -351,9 +349,11 @@ public class ApplicationConfigCache {
 
 			Map<String, LoggerConfig> allloggerList = context.getConfiguration().getLoggers();
 			for (Map.Entry<String, LoggerConfig> entry : allloggerList.entrySet()) {
+				if(!entry.getValue().getName().equalsIgnoreCase("com.cognizant.devops.platformservice.neo4jpluginlogs")) {
 					context.getConfiguration().removeLogger(entry.getValue().getName());
 					removeLoggerString.put(entry.getValue().getName(), entry.getValue().getLevel());
 					context.updateLoggers();
+				}
 			}
 
 

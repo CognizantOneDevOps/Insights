@@ -182,6 +182,9 @@ export class DataArchivingComponent implements OnInit {
               this.count
             ].expiryDate = this.dateObjFormatted;
           }
+          if (this.archivalDatasource.data[this.count].boltPort == 0) {
+            this.archivalDatasource.data[this.count].boltPort = "-";
+          }
 
           this.dateObj = new Date(
             this.archivalDatasource.data[this.count].createdOn * 1000
@@ -216,6 +219,7 @@ export class DataArchivingComponent implements OnInit {
         'radio',
         'ArchivalName',
         'DataSourceUrl',
+        'BoltPort',
         'ExpiryDate',
         'Status',
         'Action'

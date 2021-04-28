@@ -15,14 +15,14 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.dataArchivalConfig;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.NoResultException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 
 import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
@@ -45,19 +45,17 @@ public class DataArchivalConfigDal extends BaseDAL {
 	 * @throws InsightsCustomException
 	 */
 	public Boolean saveDataArchivalConfiguration(InsightsDataArchivalConfig dataArchivalConfig) throws InsightsCustomException {
-		
-		try (Session session = getSessionObj()) {
-			Query<InsightsDataArchivalConfig> createQuery = session.createQuery(
+		try  {
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put(ARCHIVALNAME, dataArchivalConfig.getArchivalName());
+			List<InsightsDataArchivalConfig> resultList = getResultList(
 					INSIGHTSDATAARCHIVALCONFIG_QUERY + DA_ARCHIVALNAME,
-					InsightsDataArchivalConfig.class);
-			createQuery.setParameter(ARCHIVALNAME, dataArchivalConfig.getArchivalName());
-			List<InsightsDataArchivalConfig> resultList = createQuery.getResultList();
+					InsightsDataArchivalConfig.class,
+					parameters);
 			if (!resultList.isEmpty()) {
 				throw new InsightsCustomException("Archival Name already exists.");
 			} else {
-				session.beginTransaction();
-				session.save(dataArchivalConfig);
-				session.getTransaction().commit();
+				save(dataArchivalConfig);
 				return Boolean.TRUE;
 			}
 		} catch (Exception e) {
@@ -73,19 +71,17 @@ public class DataArchivalConfigDal extends BaseDAL {
 	 * @return InsightsDataArchivalConfig object
 	 */
 	public InsightsDataArchivalConfig getSpecificArchivalRecord(String archivalName) {
-		
-		try (Session session = getSessionObj()) {
-			Query<InsightsDataArchivalConfig> createQuery = session.createQuery(
+		try  {
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put(ARCHIVALNAME, archivalName);
+			return getUniqueResult(
 					INSIGHTSDATAARCHIVALCONFIG_QUERY + DA_ARCHIVALNAME,
-					InsightsDataArchivalConfig.class);
-			createQuery.setParameter(ARCHIVALNAME, archivalName);
-			InsightsDataArchivalConfig result = createQuery.uniqueResult();
-			return result;
+					InsightsDataArchivalConfig.class,
+					parameters);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
 		}
-		
 	}
 	
 	/**
@@ -94,10 +90,12 @@ public class DataArchivalConfigDal extends BaseDAL {
 	 * @return List<InsightsDataArchivalConfig>
 	 */
 	public List<InsightsDataArchivalConfig> getAllArchivalRecord() {
-		try (Session session = getSessionObj()) {
-			Query<InsightsDataArchivalConfig> createQuery = session.createQuery(
-					"FROM InsightsDataArchivalConfig DA ORDER BY DA.createdOn DESC", InsightsDataArchivalConfig.class);
-			return createQuery.getResultList();
+		try  {
+			Map<String,Object> parameters = new HashMap<>();
+			return getResultList(
+					"FROM InsightsDataArchivalConfig DA ORDER BY DA.createdOn DESC",
+					InsightsDataArchivalConfig.class,
+					parameters);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
@@ -111,13 +109,12 @@ public class DataArchivalConfigDal extends BaseDAL {
 	 * @return List<InsightsDataArchivalConfig>
 	 */
 	public List<InsightsDataArchivalConfig> getActiveList() {
-		
-		try (Session session = getSessionObj()) {
-			Query<InsightsDataArchivalConfig> createQuery = session.createQuery(
-					"FROM InsightsDataArchivalConfig DA WHERE DA.status = 'ACTIVE' ORDER BY DA.createdOn DESC",
-					InsightsDataArchivalConfig.class);
-			List<InsightsDataArchivalConfig> resultList = createQuery.getResultList();
-			return resultList;
+		try {
+			Map<String,Object> parameters = new HashMap<>();
+			return getResultList(
+					INSIGHTSDATAARCHIVALCONFIG_QUERY +" DA.status = 'ACTIVE' ORDER BY DA.createdOn DESC",
+					InsightsDataArchivalConfig.class,
+					parameters);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
@@ -132,15 +129,14 @@ public class DataArchivalConfigDal extends BaseDAL {
 	 * @return Boolean
 	 */
 	public Boolean deleteArchivalRecord(String archivalName) {
-		try (Session session = getSessionObj()) {
-			Query<InsightsDataArchivalConfig> createQuery = session.createQuery(
+		try  {
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put(ARCHIVALNAME, archivalName);
+			InsightsDataArchivalConfig dataArchivalConfig = (InsightsDataArchivalConfig) getSingleResult(
 					INSIGHTSDATAARCHIVALCONFIG_QUERY + DA_ARCHIVALNAME,
-					InsightsDataArchivalConfig.class);
-			createQuery.setParameter(ARCHIVALNAME, archivalName);
-			InsightsDataArchivalConfig dataArchivalConfig = createQuery.getSingleResult();
-			session.beginTransaction();
-			session.delete(dataArchivalConfig);
-			session.getTransaction().commit();
+					InsightsDataArchivalConfig.class,
+					parameters);
+			delete(dataArchivalConfig);
 			return Boolean.TRUE;
 		} catch (Exception e) {
 			log.error(e.getMessage());
@@ -156,16 +152,15 @@ public class DataArchivalConfigDal extends BaseDAL {
 	 * @return Boolean
 	 */
 	public Boolean updateArchivalStatus(String archivalName, String status) {
-		try (Session session = getSessionObj()) {
-			Query<InsightsDataArchivalConfig> createQuery = session.createQuery(
+		try  {
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put(ARCHIVALNAME, archivalName);
+			InsightsDataArchivalConfig updateStatus = getSingleResult(
 					INSIGHTSDATAARCHIVALCONFIG_QUERY + DA_ARCHIVALNAME,
-					InsightsDataArchivalConfig.class);
-			createQuery.setParameter(ARCHIVALNAME, archivalName);
-			InsightsDataArchivalConfig updateStatus = createQuery.getSingleResult();
+					InsightsDataArchivalConfig.class,
+					parameters);
 			updateStatus.setStatus(status);
-			session.beginTransaction();
-			session.update(updateStatus);
-			session.getTransaction().commit();
+			update(updateStatus);
 			return Boolean.TRUE;
 		} catch (Exception e) {
 			log.error(e.getMessage());
@@ -181,19 +176,18 @@ public class DataArchivalConfigDal extends BaseDAL {
 	 * @return Boolean 
 	 */
 	public Boolean updateArchivalSourceUrl(String archivalName, String sourceUrl) {
-		try (Session session = getSessionObj()) {
-			Query<InsightsDataArchivalConfig> createQuery = session.createQuery(
+		try {
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put(ARCHIVALNAME, archivalName);
+			InsightsDataArchivalConfig updateSourceUrl =  getUniqueResult(
 					INSIGHTSDATAARCHIVALCONFIG_QUERY + DA_ARCHIVALNAME,
-					InsightsDataArchivalConfig.class);
-			createQuery.setParameter(ARCHIVALNAME, archivalName);
-			InsightsDataArchivalConfig updateSourceUrl = createQuery.uniqueResult();
+					InsightsDataArchivalConfig.class,
+					parameters);
+			
 			if (updateSourceUrl != null) {
 				updateSourceUrl.setSourceUrl(sourceUrl);
 				updateSourceUrl.setStatus(DataArchivalStatus.ACTIVE.name());
-				session.beginTransaction();
-				session.update(updateSourceUrl);
-				session.getTransaction().commit();
-
+				update(updateSourceUrl);
 			} else {
 				throw new NoResultException("No entity result found for query");
 			}
@@ -213,22 +207,22 @@ public class DataArchivalConfigDal extends BaseDAL {
 	 * @param expiryDate
 	 * @return Boolean
 	 */
-	public Boolean updateContainerDetails(String archivalName, String sourceUrl, String containerID, Long expiryDate) {
-		try (Session session = getSessionObj()) {
-			Query<InsightsDataArchivalConfig> createQuery = session.createQuery(
+	public Boolean updateContainerDetails(String archivalName, String sourceUrl, String containerID, Long expiryDate,int boltPort) {
+		try  {
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put(ARCHIVALNAME, archivalName);
+			InsightsDataArchivalConfig updateSourceUrl = getUniqueResult(
 					INSIGHTSDATAARCHIVALCONFIG_QUERY + DA_ARCHIVALNAME,
-					InsightsDataArchivalConfig.class);
-			createQuery.setParameter(ARCHIVALNAME, archivalName);
-			InsightsDataArchivalConfig updateSourceUrl = createQuery.uniqueResult();
+					InsightsDataArchivalConfig.class,
+					parameters);
+			
 			if (updateSourceUrl != null) {
 				updateSourceUrl.setSourceUrl(sourceUrl);
 				updateSourceUrl.setContainerID(containerID);
 				updateSourceUrl.setExpiryDate(expiryDate);
 				updateSourceUrl.setStatus(DataArchivalStatus.ACTIVE.name());
-				session.beginTransaction();
-				session.update(updateSourceUrl);
-				session.getTransaction().commit();
-
+				updateSourceUrl.setBoltPort(boltPort);
+				update(updateSourceUrl);
 			} else {
 				throw new NoResultException("No entity result found for query");
 			}
@@ -247,12 +241,13 @@ public class DataArchivalConfigDal extends BaseDAL {
 	 */
 	public InsightsDataArchivalConfig getArchivalRecordByContainerId(String containerID) {
 		
-		try (Session session = getSessionObj()) {
-			Query<InsightsDataArchivalConfig> createQuery = session.createQuery(
+		try {
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("containerID", containerID);
+			return getUniqueResult(
 					INSIGHTSDATAARCHIVALCONFIG_QUERY + "DA.containerID = :containerID",
-					InsightsDataArchivalConfig.class);
-			createQuery.setParameter("containerID", containerID);
-			return createQuery.uniqueResult();
+					InsightsDataArchivalConfig.class,
+					parameters);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
@@ -266,12 +261,14 @@ public class DataArchivalConfigDal extends BaseDAL {
 	 * @return List<InsightsDataArchivalConfig>
 	 */
 	public List<InsightsDataArchivalConfig> getExpiredArchivalrecords() {
-		try (Session session = getSessionObj()) {
+		try  {
 			long now = InsightsUtils.getCurrentTimeInSeconds();
-			Query<InsightsDataArchivalConfig> createQuery = session.createQuery(
-					INSIGHTSDATAARCHIVALCONFIG_QUERY + "DA.expiryDate <= :now AND DA.status != 'TERMINATED'", InsightsDataArchivalConfig.class);
-			createQuery.setParameter("now", now);
-			return createQuery.getResultList();
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("now", now);
+			return getResultList(
+					INSIGHTSDATAARCHIVALCONFIG_QUERY + "DA.expiryDate <= :now AND DA.status != 'TERMINATED'",
+					InsightsDataArchivalConfig.class,
+					parameters);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;

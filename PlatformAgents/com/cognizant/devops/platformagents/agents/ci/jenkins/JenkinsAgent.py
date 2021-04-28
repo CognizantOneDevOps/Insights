@@ -26,7 +26,10 @@ from requests.auth import HTTPBasicAuth
 from ....core.BaseAgent import BaseAgent
 
 class JenkinsAgent(BaseAgent):
+
+    @BaseAgent.timed
     def process(self):
+        self.baseLogger.info('Inside process')
         self.userid = self.getCredential("userid")
         self.passwd = self.getCredential("passwd")
         self.BaseUrl = self.config.get("baseUrl", '')

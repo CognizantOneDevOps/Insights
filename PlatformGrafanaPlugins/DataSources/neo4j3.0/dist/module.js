@@ -2204,10 +2204,39 @@ function (_super) {
       }));
     };
 
+    _this.onServiceUrlChange = function (event) {
+      var _a = _this.props,
+          onOptionsChange = _a.onOptionsChange,
+          options = _a.options;
+
+      var jsonData = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])(Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])({}, options.jsonData), {
+        serviceUrl: event.target.value
+      });
+
+      onOptionsChange(Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])(Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])({}, options), {
+        jsonData: jsonData
+      }));
+    };
+
+    _this.onSwitched = function (event) {
+      var _a = _this.props,
+          onOptionsChange = _a.onOptionsChange,
+          options = _a.options;
+
+      var jsonData = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])(Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])({}, options.jsonData), {
+        logging: event.target.checked
+      });
+
+      onOptionsChange(Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])(Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])({}, options), {
+        jsonData: jsonData
+      }));
+    };
+
     return _this;
   }
 
   ConfigEditor.prototype.render = function () {
+    console.log(this.props.options.jsonData);
     var _a = this.props,
         options = _a.options,
         onOptionsChange = _a.onOptionsChange;
@@ -2216,7 +2245,19 @@ function (_super) {
       dataSourceConfig: options,
       showAccessOptions: true,
       onChange: onOptionsChange
-    }));
+    }), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(_grafana_ui__WEBPACK_IMPORTED_MODULE_2__["LegacyForms"].Switch, {
+      label: "Enable Logging",
+      labelClass: "width-8",
+      checked: options.jsonData.logging,
+      onChange: this.onSwitched
+    }), options.jsonData.logging && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(_grafana_ui__WEBPACK_IMPORTED_MODULE_2__["Field"], {
+      label: "Service URL",
+      description: "This is required only when insights usage is collected."
+    }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(_grafana_ui__WEBPACK_IMPORTED_MODULE_2__["Input"], {
+      name: "serviceUrl",
+      onChange: this.onServiceUrlChange,
+      value: options.jsonData.serviceUrl
+    })));
   };
 
   return ConfigEditor;
@@ -2262,6 +2303,12 @@ function (_super) {
     _this.type = instanceSettings.type;
     _this.url = instanceSettings.url;
     _this.name = instanceSettings.name;
+    _this.serviceUrl = instanceSettings.jsonData.serviceUrl;
+    _this.datasourceId = instanceSettings.id;
+    _this.logging = instanceSettings.jsonData.logging;
+
+    _this.getUserDetailsPerDashboardHit();
+
     return _this;
   }
   /**provides ability to test connection from connection settings page . */
@@ -2325,6 +2372,8 @@ function (_super) {
   DataSource.prototype.query = function (options) {
     var e_1, _a;
 
+    var _this = this;
+
     var queries = [];
     var streams = [];
     var range = options.range;
@@ -2333,8 +2382,19 @@ function (_super) {
     var cypherQuery = {};
     var statements = [];
     var metadata = [];
+    var logInfo = {};
     cypherQuery['statements'] = statements;
     cypherQuery['metadata'] = metadata;
+    logInfo['panelId'] = options.panelId;
+    logInfo['dashboardId'] = options.dashboardId;
+    logInfo['datasourceId'] = this.datasourceId;
+    logInfo['datasourceType'] = this.type;
+    logInfo['datasourceName'] = this.name;
+    logInfo['userId'] = this.userId;
+    logInfo['userName'] = this.userName;
+    logInfo['email'] = this.email;
+    logInfo['orgId'] = this.orgId;
+    logInfo['timestamp'] = new Date().toISOString();
 
     try {
       // Start streams and prepare queries
@@ -2381,12 +2441,35 @@ function (_super) {
       }
     }
 
+    logInfo['query'] = cypherQuery;
+    var startTime = Date.now();
+    console.log('start-', startTime);
+
     if (queries.length) {
       var req = Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getBackendSrv"])().datasourceRequest({
         method: 'POST',
         url: this.url,
         data: cypherQuery
       }).then(function (res) {
+        var endTime = Date.now();
+        console.log('end-', endTime);
+        logInfo['time_ms'] = endTime - startTime;
+        logInfo['panelQuery'] = true;
+
+        if (_this.logging) {
+          try {
+            Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getBackendSrv"])().datasourceRequest({
+              method: 'POST',
+              url: _this.serviceUrl,
+              data: logInfo
+            }).then(function (res) {
+              console.log(res);
+            });
+          } catch (e) {
+            console.log(e);
+          }
+        }
+
         if (queries[0].table) {
           return Object(Utils__WEBPACK_IMPORTED_MODULE_4__["convertResponseToDataFramesTable"])(queries, res);
         } else if (queries[0].graph) {
@@ -2406,7 +2489,22 @@ function (_super) {
       streams.push(Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["from"])(req));
     }
 
+    console.log(logInfo);
     return rxjs__WEBPACK_IMPORTED_MODULE_3__["merge"].apply(void 0, Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])(streams));
+  };
+
+  DataSource.prototype.getUserDetailsPerDashboardHit = function () {
+    var _this = this;
+
+    Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getBackendSrv"])().datasourceRequest({
+      method: 'GET',
+      url: '/api/user'
+    }).then(function (res) {
+      _this.userId = res.data.id;
+      _this.userName = res.data.name;
+      _this.email = res.data.email;
+      _this.orgId = res.data.orgId;
+    });
   };
 
   DataSource.prototype.metricFindQuery = function (query, options) {
@@ -3204,12 +3302,13 @@ var plugin = new _grafana_data__WEBPACK_IMPORTED_MODULE_0__["DataSourcePlugin"](
 /*!******************!*\
   !*** ./types.ts ***!
   \******************/
-/*! exports provided: defaultQuery */
+/*! exports provided: defaultQuery, defaults */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "defaultQuery", function() { return defaultQuery; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "defaults", function() { return defaults; });
 var defaultQuery = {
   constant: 6.5,
   graph: false,
@@ -3221,7 +3320,13 @@ var defaultQuery = {
   varTime: false,
   fixTime: false,
   cacheType: undefined,
-  cacheValue: undefined
+  cacheValue: undefined,
+  serviceUrl: undefined
+};
+var defaults = {
+  logging: true,
+  path: '',
+  serviceUrl: 'http://localhost:8080/PlatformService/datasource/logDashboardInfo'
 };
 
 /***/ }),

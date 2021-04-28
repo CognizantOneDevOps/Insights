@@ -18,7 +18,8 @@
 		"endpoint": "http://localhost:7474",
 		"authToken": "",
 		"boltEndPoint": "bolt://localhost:7687",
-		"maxIdleConnections": 25
+		"maxIdleConnections": 25,
+		"logQueryIfProcessingTimeGreaterThanInMS":5
 	},
 	"postgre": {
 		"userName": "",

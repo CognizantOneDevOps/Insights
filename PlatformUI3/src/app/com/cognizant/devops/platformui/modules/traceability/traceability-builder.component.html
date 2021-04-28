@@ -39,7 +39,7 @@
 			</div>
 			<div>
 				<mat-select required [(ngModel)]="issueTypeSelected" name="issueTypeSelected" class="form-control"
-					placeholder="Isuse Type" (selectionChange)="issueTypeOnChange($event.value)" style="width:150px;">
+					placeholder="Issue Type" (selectionChange)="issueTypeOnChange($event.value)" style="width:150px;">
 					<mat-option *ngFor="let issue of issueTypes | keyvalue" value="{{issue.value}}">{{issue.value}}
 					</mat-option>
 				</mat-select>
@@ -70,17 +70,20 @@
 		</div>
 		<br>
 	</form>
-	<mat-tab-group color="primary" class="healthcheck-tab-style" (selectedTabChange)="tabClick($event)"
-		*ngIf="showDiv&& !displaySummary" style="margin-top: 3%;">
-		<mat-tab label="Pipeline">
-			<div layout layout-align="left" class="sectionHeadingStyleWithoutButton">
-				<div layout>&nbsp; Pipeline</div>
-			</div>	
-			<div layout-align="center center">
+	<div class="others" layout="row" layout-align="start center" *ngIf="showDiv&& !displaySummary">
+		<mat-tab-group color="primary" class="healthcheck-tab-style" (selectedTabChange)="tabClick($event)"
+			 style="margin-top: 0.5%; width: 99% !important;">
+			<mat-tab label="Pipeline">
+				<div layout layout-align="left" class="sectionHeadingStyleTraceability">
+					<div layout>&nbsp; Pipeline View</div>
+					<span class="sectionSubHeading"> &nbsp; (Shows overall pipeline view. Click on any card for drill down. Scroll individual tool section for more detail.)</span>
+				</div>
+				
+				<div layout="row" layout-align="start center">
 
-				<div class="containercss">
+					<div class="containercss">
 						<div class="column2" *ngFor="let data of map | keyvalue">
-							<div class="showTable" style="text-align: center; padding: 5px;"
+							<div class="showTable"
 								(click)="showDetailsDialog(data.key.split('_')[1])">
 								<b><u>
 										{{data.key.split('_')[1]}} </u>({{data.value.length}}) </b> <br>
@@ -89,65 +92,73 @@
 							<div class="scroll">
 								<div style="margin-top:10px;border-radius: 10px;"
 									*ngFor="let epic of data.value;let i=index">
-									<mat-card style="border-radius:10px">
-										<div (click)="showOnHoverDialog(i,epic)" style="height: 1px;">
-											<mat-icon svgIcon="info" title="View Details"
-												class="mat-icon material-icons">
-											</mat-icon><br>
-										</div>
+									<mat-card style="border-radius:10px; width: 200px; height:85px;">
+
 										<span (click)="onCardClickJira(i,$event,epic)" class="formatcard"
+											title="{{disProp.value }} : {{epic[disProp.value]}}"
 											*ngFor="let disProp of displayProperty[data.key.split('_')[1]] | keyvalue">
-											<b>{{disProp.value | uppercase}}</b> : {{epic[disProp.value]}}
+											<b>{{disProp.value }}</b> : {{epic[disProp.value]}}
 											<br>
+										</span>
+										<span (click)="showOnHoverDialog(i,epic)" style="height: 1px; color: blue;">
+											more info
+											<!-- <mat-icon svgIcon="info" title="View Details"
+												class="mat-icon material-icons">
+											</mat-icon><br> -->
 										</span>
 									</mat-card>
 								</div>
 							</div>
 						</div>
+					</div>
 				</div>
-			</div>
-		</mat-tab>
-		<mat-tab label="Summary">
-			<div layout layout-align="left" class="sectionHeadingStyleWithoutButton">
-				<div layout>&nbsp; Summary</div>
-			</div>
-			<div>
-				<div class="summarylist">
-					<ul>
-						<li style="color: #0033A0" *ngFor="let element of toolSummaryArray">{{element}}</li>
-					</ul>
+			</mat-tab>
+			<mat-tab label="Summary">
+				<div layout layout-align="left" class="sectionHeadingStyleTraceability">
+					<div layout>&nbsp; Summary</div>
+					<span class="sectionSubHeading">  &nbsp; (Shows pipeline inferences)</span>
 				</div>
-			</div>
-		</mat-tab>
-		<mat-tab label="Timeline">
-			<div layout layout-align="left" class="sectionHeadingStyleWithoutButton">
-				<div layout>&nbsp; Timeline</div>
-			</div>
-			<div id="agentsTable" layout-align="center center">
-				<!-- Insights Agents Table -->
-				<table mat-table [dataSource]="timelagDataSource" class="matTableBorder">
-					<ng-container matColumnDef="Tools">
-						<th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> Tools </th>
-						<td mat-cell *matCellDef="let element"> {{element.Tools}} </td>
-					</ng-container>
-					<ng-container matColumnDef="Handover Time">
-						<th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> Handover Time</th>
-						<td mat-cell *matCellDef="let element"> {{element.HandoverTime}} </td>
-					</ng-container>
-					<tr mat-header-row *matHeaderRowDef="columnsToDisplay" class="tableHeaderCss" style="height:40px">
-					</tr>
-					<tr mat-row *matRowDef="let row; columns: columnsToDisplay;"></tr>
-				</table>
-				<br>
-			</div>
-		</mat-tab>
-		<mat-tab label="Visual Representation">
-			<div layout layout-align="left" class="sectionHeadingStyleWithoutButton">
-				<div layout>&nbsp; Visual Representation</div>
-			</div>
-			<div style="color: #0033A0;margin: 1px;">Total Number of Days: {{total}}</div>
+				<div>
+					<div class="summarylist">
+						<ul>
+							<li style="color: #0033A0" *ngFor="let element of toolSummaryArray">{{element}}</li>
+						</ul>
+					</div>
+				</div>
+			</mat-tab>
+			<mat-tab label="Timeline">
+				<div layout layout-align="left" class="sectionHeadingStyleTraceability">
+					<div layout>&nbsp; Timeline</div>
+					<span class="sectionSubHeading">  &nbsp; (Average handover time between each stages) </span>
+				</div>
+				<div id="agentsTable" layout-align="center center">
+					<!-- Insights Agents Table -->
+					<table mat-table [dataSource]="timelagDataSource" class="matTableBorder">
+						<ng-container matColumnDef="Tools">
+							<th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> Tools </th>
+							<td mat-cell *matCellDef="let element"> {{element.Tools}} </td>
+						</ng-container>
+						<ng-container matColumnDef="Handover Time">
+							<th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> Handover Time</th>
+							<td mat-cell *matCellDef="let element"> {{element.HandoverTime}} </td>
+						</ng-container>
+						<tr mat-header-row *matHeaderRowDef="columnsToDisplay" class="tableHeaderCss"
+							style="height:40px">
+						</tr>
+						<tr mat-row *matRowDef="let row; columns: columnsToDisplay;"></tr>
+					</table>
+					<br>
+				</div>
+			</mat-tab>
+			<mat-tab label="Visual Representation">
+				<div layout layout-align="left" class="sectionHeadingStyleTraceability">
+					<div layout>&nbsp; Visual Representation</div>
+					<span class="sectionSubHeading">  &nbsp; (Visual representation of handover time) </span>
+				</div>
+				<div style="color: #0033A0;margin: 0.5%;">Total Number of Days: {{total}}</div>
 				<div *ngIf="gChart" id="chart_div" style="height: 50vh;overflow:hidden"></div>
 				<div id="chart-container" style="height: 80vh"></div>
-		</mat-tab>
-	</mat-tab-group>
+			</mat-tab>
+		</mat-tab-group>
+	</div>
 </div>

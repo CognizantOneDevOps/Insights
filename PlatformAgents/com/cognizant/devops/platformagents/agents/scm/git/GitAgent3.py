@@ -20,7 +20,6 @@ Created on Jun 16, 2016
 '''
 import datetime
 import json
-import logging
 import os
 import re
 import sys
@@ -30,12 +29,12 @@ from datetime import datetime as dateTime
 from dateutil import parser
 from ....core.BaseAgent3 import BaseAgent
 
-
 class GitAgent(BaseAgent):
     trackingCachePath = None
    
-
+    @BaseAgent.timed
     def process(self):
+        self.baseLogger.info('Inside process')
         timeStampNow = lambda: dateTime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
         self.almRegEx = str(self.config.get("almKeyRegEx", ''))
         getReposUrl = self.config.get("getRepos", '')
@@ -149,7 +148,7 @@ class GitAgent(BaseAgent):
                                 topicsResp = self.getResponse(getTopicsUrl, 'GET',None, None, None, reqHeaders=topicsAPIHeaders)
                                 topicsList = topicsResp.get('names', list())
                             except Exception as err:
-                                logging.error(err)
+                                self.baseLogger.error(err)
                             if topicsList:
                                 repoMeta['topics'] = topicsList
                                 appIdIter = re.finditer(r"(?i)app[0-9]+" , str(topicsList))
@@ -257,7 +256,7 @@ class GitAgent(BaseAgent):
                                                             break
                                                 except Exception as ex:
                                                     fetchNextCommitsPage = False
-                                                    logging.error(ex)
+                                                    self.baseLogger.error(ex)
                                                 commitsPageNum = commitsPageNum
                                             if commitIdList:
                                                 self.publishToolsData(data,commitsMetaData)
@@ -294,7 +293,7 @@ class GitAgent(BaseAgent):
                                 parseBranch = urllib.parse.quote_plus(branch.encode('utf-8'))
                                 injectData['branchName'] = parseBranch
                             except Exception as er:
-                                logging.error(er)
+                                self.baseLogger.error(er)
                             fetchNextCommitsPage = True
                             getCommitDetailsUrl = commitsBaseEndPoint + repoName +'/commits?sha=' + parseBranch +'&per_page=100'
                             branchTrackingDetails = branchesTrackingDetails.get(branch,{})
@@ -337,7 +336,7 @@ class GitAgent(BaseAgent):
                                         break
                                 except Exception as ex:
                                     fetchNextCommitsPage = False
-                                    logging.error(ex)
+                                    self.baseLogger.error(ex)
                                 commitsPageNum = commitsPageNum + 1
                             if data or orphanCommitIdList:
                                 self.publishToolsData(data, commitsMetaData)
@@ -367,9 +366,11 @@ class GitAgent(BaseAgent):
                 repoPageNum = repoPageNum + 1
                 repos = self.getResponse(getReposUrl + '?per_page=100&sort=created&page=' + str(repoPageNum), 'GET', None, None, None, reqHeaders=headers)
 
+    @BaseAgent.timed
     def PullRequest(self, repoEndPoint, repoName, defaultBranch, trackingDetails, trackingCache,
                             startFrom, metaData, responseTemplate, commitMetaData, commitsResponseTemplate,
                             orphanCommitMetaData, orphanCommitResTemplate, headers):
+        self.baseLogger.info('Inside PullRequest')
         timeStampNow = lambda: dateTime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
         injectData = dict()
         pullReqData = list()
@@ -412,7 +413,7 @@ class GitAgent(BaseAgent):
                     pullReqLatestModifiedTime = pullReqDetails[0].get('updated_at', None)
                     isLatestPullReqDateSet = True
             except Exception as err:
-                logging.error(err)
+                self.baseLogger.error(err)
             for pullReq in pullReqDetails:
                 commitList = list()
                 commitIdSet = set()
@@ -457,7 +458,7 @@ class GitAgent(BaseAgent):
                         if commitDetails:
                             latestCommit = commitDetails[-1]
                     except Exception as err:
-                        logging.error(err)
+                        self.baseLogger.error(err)
                     for commit in commitDetails:
                         commitId = commit.get('sha', '')
                         commitMessage = commit.get('commit', dict()).get('message', '')
@@ -528,8 +529,8 @@ class GitAgent(BaseAgent):
                         originTrackingDetails['baseBranches'] = list(baseBranches)
                         originTrackingDetails['totalPullReqCommits'] = originTrackingDetails.get('totalPullReqCommits', 0) + len(commitList)
                     except Exception as err:
-                        logging.error(err)
-                        logging.warn(baseOriginPullReqDict[str(pullReqNumber)])
+                        self.baseLogger.error(err)
+                        self.baseLogger.warn(baseOriginPullReqDict[str(pullReqNumber)])
                 if commitList:
                     pullReqData += self.parseResponse(responseTemplate, pullReq,  {'repoName': repoName, 'gitType': 'pullRequest', 'consumptionTime': timeStampNow()})
                     commitData += commitList
@@ -582,7 +583,7 @@ class GitAgent(BaseAgent):
         #                             totalPage = int(math.ceil(float(total) / 100))
         #                             pageSetFlag = True
         #                     except Exception as err:
-        #                         logging.error(err)
+        #                         self.baseLogger.error(err)
         #                     responseData = response.get('items', None)
         #                     if responseData:
         #                         for pullReqInfo in responseData:
@@ -604,20 +605,24 @@ class GitAgent(BaseAgent):
         #             self.publishToolsData(associatedPullReq, metaData)
 
     def TrackingCachePathSetup(self, folderName):
+        self.baseLogger.info('Inside TrackingCachePathSetup')
         self.trackingCachePath = os.path.dirname(sys.modules[self.__module__].__file__) + os.path.sep + folderName + os.path.sep
         if not os.path.exists(self.trackingCachePath):
             os.mkdir(self.trackingCachePath)
 
     def TrackingCacheFileLoad(self, fileName):
+        self.baseLogger.info('Inside TrackingCacheFileLoad')
         with open(self.trackingCachePath + fileName + '.json', 'r') as filePointer:
             data = json.load(filePointer)
         return data
 
     def UpdateTrackingCache(self, fileName, trackingDict):
+        self.baseLogger.info('Inside UpdateTrackingCache')
         with open(self.trackingCachePath + fileName + '.json', 'w') as filePointer:
             json.dump(trackingDict, filePointer)
 
     def TrackingForBranchUpdate(self, trackingDetails, branchName, latestCommit, repoDefaultBranch,isOptimalDataCollect=False, totalCommit=0, hasLatestPullReq=False):
+        self.baseLogger.info('Inside TrackingForBranchUpdate')
         updatetimestamp = latestCommit["commit"]["author"]["date"]
         dt = parser.parse(updatetimestamp)
         fromDateTime = dt + datetime.timedelta(seconds=0o1)
@@ -640,6 +645,7 @@ class GitAgent(BaseAgent):
                 branchTrackingDetails['commitCount'] = totalCommit
 
     def CreateDeleteTrackingForBranchUpdate(self, trackingDetails, repoName, branchName, lastCommitDate, lastCommitId):
+        self.baseLogger.info('Inside CreateDeleteTrackingForBranchUpdate')
         data_branch_delete = []
         branch_delete = {}
         branch_delete['branchName'] = branchName
@@ -652,6 +658,7 @@ class GitAgent(BaseAgent):
         self.publishToolsData(data_branch_delete, branchMetadata)
         
     def fileDetailsUpdate(self, commitId, repoName, commitsBaseEndPoint, headers):
+        self.baseLogger.info('Inside fileDetailsUpdate')
         commitFileDetailsUrl = commitsBaseEndPoint + repoName + '/commits/' + commitId
         commitFileDetails =self.getResponse(commitFileDetailsUrl,'GET', None, None,None, reqHeaders=headers)
         commitSHA = commitFileDetails.get('sha', None)

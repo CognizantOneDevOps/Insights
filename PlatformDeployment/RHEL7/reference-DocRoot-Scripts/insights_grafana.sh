@@ -13,27 +13,32 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 #-------------------------------------------------------------------------------
-# Install customized Grafana V4.6.2
+# Install customized Grafana V7.1.0
 echo "#################### Installing Grafana (running as BG process) ####################"
-cd /opt
+source /etc/environment
+source /etc/profile
+cd $INSIGHTS_APP_ROOT_DIRECTORY
 sudo mkdir grafana
 cd grafana
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/Grafana-6.1.6/grafana.tar.gz
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/latest/grafana.tar.gz
 sudo tar -zxvf grafana.tar.gz
 export GRAFANA_HOME=`pwd`
 sudo echo GRAFANA_HOME=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" GRAFANA_HOME=`pwd` | sudo tee -a /etc/profile
 source /etc/environment
 source /etc/profile
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/Grafana-6.1.6/ldap.toml
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/latest/ldap.toml
 sudo cp ldap.toml $GRAFANA_HOME/conf/ldap.toml
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/Grafana-6.1.6/defaults.ini
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/latest/defaults.ini
 sudo cp defaults.ini $GRAFANA_HOME/conf/defaults.ini
 sudo nohup ./bin/grafana-server &
 sudo echo $! > grafana-pid.txt
-sudo chmod -R 777 /opt/grafana
+sleep 10
+sudo chmod -R 777 $INSIGHTS_APP_ROOT_DIRECTORY/grafana
 cd /etc/init.d/
 sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/Grafana.sh
+sudo yum install dos2unix -y
+sudo dos2unix Grafana.sh
 sudo mv Grafana.sh Grafana
 sudo chmod +x Grafana
 sudo chkconfig Grafana on

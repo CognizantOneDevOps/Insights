@@ -26,7 +26,10 @@ from datetime import timedelta
 from ....core.BaseAgent3 import BaseAgent
 
 class XLDeployAgent(BaseAgent):
+
+    @BaseAgent.timed
     def process(self):
+        self.baseLogger.info('Inside process')
         baseEndPoint = self.config.get("baseEndPoint", '')
         userID = self.config.get("userID", '')
         passwd = self.config.get("passwd", '')

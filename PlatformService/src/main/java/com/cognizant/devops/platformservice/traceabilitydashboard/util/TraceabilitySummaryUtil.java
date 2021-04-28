@@ -28,8 +28,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import org.apache.commons.text.StringSubstitutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.owasp.esapi.util.CollectionsUtil;
+
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -67,22 +73,113 @@ public class TraceabilitySummaryUtil {
 
 	public static String calSUM(String operandName, JsonArray operandValue, List<JsonObject> toolRespPayload,
 			String message) {
-		int totalCount = toolRespPayload.size();
-		List<String> statusList = new ArrayList<>();
-		for (JsonElement values : operandValue) {
-			statusList.add(values.getAsString());
-		}		
-		if (totalCount >= 0 && toolRespPayload.stream().allMatch(predicate->predicate.has(operandName))) {			
-				int count = (int) toolRespPayload.stream()
-						.filter(payload ->statusList.contains(payload.get(operandName).getAsString())).count();
-				int rem = totalCount - count;
-				MessageFormat mf = new MessageFormat(message);
-				return mf.format(new Object[] { count, rem });
-			
+		try {
+			int totalCount = toolRespPayload.size();
+			List<String> statusList = new ArrayList<>();
+			for (JsonElement values : operandValue) {
+				statusList.add(values.getAsString());
+			}		
+			if (totalCount >= 0 && toolRespPayload.stream().anyMatch(predicate->predicate.has(operandName))) {			
+					int count = (int) toolRespPayload.stream()
+							.filter(payload -> payload.has(operandName) && statusList.contains(payload.get(operandName).getAsString())).count();
+					int rem = totalCount - count;
+					MessageFormat mf = new MessageFormat(message);
+					return mf.format(new Object[] { count, rem });
+				
+			}
+		} catch (Exception e) {
+			log.error(e);
 		}
 		return "";
 
 	}
+	
+	public static String calCount(String operandName, JsonArray operandValue, List<JsonObject> toolRespPayload,
+			String message) {
+		String returnMessage = "";
+		try {
+			int totalCount = toolRespPayload.size();
+			Map<String,Integer> valueMap = new HashMap<>();
+			List<String> operanValueList = StreamSupport.stream(operandValue.spliterator(), false)
+	                .map(e ->  e.getAsString())
+	                .collect(Collectors.toList());
+			if (totalCount >= 0 ) {
+				for (int i=0; i<operanValueList.size(); i++) {
+					String operandSingleValue =operanValueList.get(i);
+					int count = (int) toolRespPayload.stream()
+							.filter(payload -> payload.has(operandName) && operandSingleValue.contains(payload.get(operandName).getAsString())).count();
+				 valueMap.put(String.valueOf(i), count);
+				}
+				StringSubstitutor sub = new StringSubstitutor(valueMap, "{", "}");
+				returnMessage = sub.replace(message);
+			}
+		}catch (Exception e) {
+			log.error(e);
+		}
+		return returnMessage;
+	}
+	
+	
+	public static String calPropertyCount(String operandName, JsonArray operandValue, List<JsonObject> toolRespPayload,
+			String message) {
+		String returnMessage = "";
+		try {
+			int totalCount = toolRespPayload.size();
+			Map<String,Integer> valueMap = new HashMap<>();
+			List<String> operanValueList = 
+					 StreamSupport.stream(toolRespPayload.spliterator(), false)
+					.filter(payload -> payload.has(operandName) )
+                    .filter( distinctByKey(payload ->payload.get(operandName).getAsString()) )
+                    .map(payload -> payload.get(operandName).getAsString())
+                    .collect( Collectors.toList() );
+			if (totalCount >= 0 ) {
+				for (int i=0; i<operanValueList.size(); i++) {
+					String operandSingleValue =operanValueList.get(i);
+					int count = (int) toolRespPayload.stream()
+							.filter(payload -> payload.has(operandName) && operandSingleValue.contains(payload.get(operandName).getAsString())).count();
+				 valueMap.put(operandSingleValue, count);
+				}
+				String mapAsString = valueMap.entrySet().stream()
+					      .map(entry  ->  entry.getValue()  + " " + entry.getKey())
+					      .collect(Collectors.joining(", "));
+				
+				MessageFormat mf = new MessageFormat(message); 
+				  return mf.format(new Object[] { mapAsString });
+			}
+		}catch (Exception e) {
+			log.error(e);
+		}
+		return returnMessage;
+	}
+	
+	public static String calDistinctCount(String operandName, JsonArray operandValue, List<JsonObject> toolRespPayload,
+			String message) {
+		try {
+			int totalCount = toolRespPayload.size();
+			List<String> statusList = new ArrayList<>();
+			for (JsonElement values : operandValue) {
+				statusList.add(values.getAsString());
+			}		
+			if (totalCount >= 0 && toolRespPayload.stream().anyMatch(predicate->predicate.has(operandName))) {
+				
+				List<JsonObject> Names = 
+						toolRespPayload.stream()
+						.filter(payload -> payload.has(operandName) )
+	                    .filter( distinctByKey(payload ->payload.get(operandName)) )
+	                    .collect( Collectors.toList() );
+				
+				  MessageFormat mf = new MessageFormat(message); 
+				  return mf.format(new Object[] { Names.size() });
+				 
+			}
+		} catch (Exception e) {
+			log.error(e);
+		}
+		return "";
+
+	}
+	
+
 
 	public static String calPercentage(String operandName, JsonArray operandValue, List<JsonObject> toolRespPayload,
 			String message) {

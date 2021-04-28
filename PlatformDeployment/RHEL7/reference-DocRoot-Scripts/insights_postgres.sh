@@ -14,9 +14,14 @@
 # the License.
 #-------------------------------------------------------------------------------
 # install postgresql
+# Input parameters prompt postgres Grafana DB apssword
+# 1. NATIVE_SYSTEM_USER_GRAFANA_PASSWORD
+################################################################################
 echo "#################### Installing Postgres with configs , Databases and Roles ####################"
-cd /opt
-sudo rpm -ivh https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/postgres/pgdg.noarch.rpm -y
+source /etc/environment
+source /etc/profile
+cd $INSIGHTS_APP_ROOT_DIRECTORY
+sudo rpm -ivh https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/postgres/pgdg.noarch.rpm
 sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/postgres/postgres_dependencies.zip
 sudo unzip postgres_dependencies.zip && cd postgres_dependencies
 sudo rpm -ivh *.rpm
@@ -27,8 +32,19 @@ sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/i
 sudo cp pg_hba.conf /var/lib/pgsql/9.5/data/pg_hba.conf
 sudo systemctl start  postgresql-9.5.service
 sudo useradd grafana
-sudo usermod --password C0gnizant@1 grafana
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/postgres/dbscript.sql
+echo "Native system user 'grafana' is created. Need to set password for 'grafana' user."
+echo -n "Password: "
+read -s NATIVE_SYSTEM_USER_GRAFANA_PASSWORD
+sudo usermod --password $NATIVE_SYSTEM_USER_GRAFANA_PASSWORD grafana
+echo  :> dbscript.sql
+chmod +x dbscript.sql
+printf '\n'
+printf 'Writing to dbscript.sql file'
+echo "CREATE USER grafana WITH PASSWORD '$NATIVE_SYSTEM_USER_GRAFANA_PASSWORD' SUPERUSER;">dbscript.sql
+echo "CREATE DATABASE grafana WITH OWNER grafana TEMPLATE template0 ENCODING 'SQL_ASCII' TABLESPACE  pg_default LC_COLLATE  'C' LC_CTYPE  'C' CONNECTION LIMIT  -1;">>dbscript.sql
+echo "CREATE DATABASE insight WITH OWNER grafana TEMPLATE template0 ENCODING 'SQL_ASCII' TABLESPACE  pg_default LC_COLLATE  'C' LC_CTYPE  'C' CONNECTION LIMIT  -1;">>dbscript.sql
+printf '\n'
+printf 'dbscript.sql is ready'
 sudo chmod +x dbscript.sql
 psql -U postgres -f dbscript.sql
 cd ../

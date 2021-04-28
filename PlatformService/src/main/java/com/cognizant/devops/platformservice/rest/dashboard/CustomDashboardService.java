@@ -28,6 +28,7 @@ import com.cognizant.devops.platformdal.user.UserPortfolioEnum;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonObject;
 
+@Deprecated
 @RestController
 @RequestMapping("/dashboard")
 public class CustomDashboardService {

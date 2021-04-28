@@ -16,8 +16,13 @@
 package com.cognizant.devops.platformcommons.dal.neo4j;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
@@ -34,6 +39,7 @@ import com.google.gson.JsonParser;
  *         This class will handle all the interactions with graph database.
  */
 public class GraphDBHandler{
+	private static Logger log = LogManager.getLogger(GraphDBHandler.class);
 	String COMMIT_URL = "/db/data/transaction/commit";
 	String SCHEMAURL = "/db/data/schema/index/";
 	String SCHEMA_INDEX_URL = ApplicationConfigProvider.getInstance().getGraph().getEndpoint()
@@ -240,12 +246,89 @@ public class GraphDBHandler{
 	 * @throws InsightsCustomException
 	 */
 	private String neo4jCommunication(JsonObject requestJson) throws InsightsCustomException {
+		long time = System.currentTimeMillis();
+		int rowCount = 0;
 		String returnResponse = null;
 		Map<String, String> headers = new HashMap<>();
 		headers.put(ConfigOptions.AUTHORIZATION, ApplicationConfigProvider.getInstance().getGraph().getAuthToken());
+		headers.put("X-Stream", "true");
 		returnResponse = RestApiHandler.doPost(TRANSACTION_COMMIT_URL, requestJson, headers);
+		
+		JsonObject graphJsonObj=new JsonParser().parse(returnResponse).getAsJsonObject();
+
+		parseGraphResponseForError(graphJsonObj, requestJson.toString());
+		rowCount = getRecordCount(graphJsonObj); 
+		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+		StackTraceElement stackTrace = stacktrace[3];
+
+		long processingTime = (System.currentTimeMillis() - time);
+
+		if (processingTime > ApplicationConfigProvider.getInstance().getGraph()
+				.getLogQueryIfProcessingTimeGreaterThanInMS()) {
+			Set<String> queryList = getQueryListFromRequestJson(requestJson);
+			log.debug(
+					"Type=GraphDB className={} methodName={} lineNo={} "
+							+ "Datasource={} ProcessingTime={} rowCount={} queryList={}",
+					stackTrace.getFileName(), stackTrace.getMethodName(), stackTrace.getLineNumber(),
+					ApplicationConfigProvider.getInstance().getGraph().getEndpoint(), processingTime, rowCount,
+					queryList);
+		} else {
+			log.debug(
+					"Type=GraphDB className={} methodName={} lineNo={} "
+							+ "Datasource={} ProcessingTime={} rowCount={} ",
+					stackTrace.getFileName(), stackTrace.getMethodName(), stackTrace.getLineNumber(),
+					ApplicationConfigProvider.getInstance().getGraph().getEndpoint(), processingTime, rowCount);
+		}
 		return returnResponse;
 	}
+	
+
+
+	void parseGraphResponseForError(JsonObject graphResponse,String requestJson) throws InsightsCustomException {
+		JsonArray errorMessage = graphResponse.getAsJsonArray("errors");
+		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+		StackTraceElement stackTrace = stacktrace[4];//maybe this number needs to be corrected
+		if (errorMessage != null && errorMessage.size() >= 1) {
+			for (JsonElement jsonElement : errorMessage) {
+				String errorMessageText = jsonElement.getAsJsonObject().get("message").getAsString();
+				log.error("Type=GraphDB className {} methodName {} lineNo {} "
+						+ "requestJson {} message {} ", 
+						stackTrace.getClassName(),stackTrace.getMethodName(),stackTrace.getLineNumber(),
+						requestJson,errorMessageText);
+			}
+			throw new InsightsCustomException("Error while running Neo4j Query ");
+		}
+	}
+	
+	private Set<String> getQueryListFromRequestJson(JsonObject requestJson) {
+		Set<String> queryList = new HashSet<>();
+		try {
+			if(requestJson.has("statements")){
+				JsonArray data = requestJson.getAsJsonArray("statements");
+				for (JsonElement jsonElement : data) {
+					queryList.add(jsonElement.getAsJsonObject().get("statement").toString());
+				}
+			}
+		} catch (Exception e) {
+			log.error(e);
+		}
+		return queryList;
+	}
+
+	private int getRecordCount(JsonObject graphResp) {
+		try {
+			JsonObject graphResultJsonResult = graphResp.getAsJsonArray(ConfigOptions.RESULTS).get(0).getAsJsonObject();
+			if (graphResultJsonResult.has("data")) {
+				JsonArray data = graphResultJsonResult.getAsJsonArray("data");
+				return data.size();
+			}
+		} catch (Exception e) {
+			log.error(e);
+		}
+		return 0;
+	}
+	
+
 
 	/**
 	 * Load the available field indices in Neo4J

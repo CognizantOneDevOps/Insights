@@ -24,8 +24,8 @@
     "isDebugAllowed": false,
     "isEpochTimeFormat": false,
     "loggingSetting": {
-        "backupCount": 1000,
-        "logLevel": "WARN",
+        "backupCount": 10,
+        "logLevel": "INFO",
         "maxBytes": 5000000
     },
     "mqConfig": {

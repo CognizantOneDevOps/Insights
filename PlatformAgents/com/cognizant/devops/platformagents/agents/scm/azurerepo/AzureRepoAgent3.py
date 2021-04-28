@@ -21,10 +21,11 @@ Created on Jun 1, 2019
 from dateutil import parser
 import datetime
 from ....core.BaseAgent3 import BaseAgent
-import logging
 import json
 
 class AzureRepoAgent(BaseAgent):
+    
+    @BaseAgent.timed
     def process(self):
         UserID = self.getCredential("userid")
         Passwd = self.getCredential("passwd")
@@ -141,7 +142,7 @@ class AzureRepoAgent(BaseAgent):
                             except Exception as ex:
                                 print(ex)
                                 fetchNextCommitsPage = False
-                                logging.error(ex)
+                                self.baseLogger.error(ex)
                             if len(data) > 0:
                                 self.updateTrackingForBranch(trackingDetails, branch, latestCommit)
                                 self.publishToolsData(data)

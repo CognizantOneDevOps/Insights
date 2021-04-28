@@ -15,10 +15,11 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.grafana.pdf;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
@@ -30,10 +31,8 @@ public class GrafanaDashboardPdfConfigDAL extends BaseDAL {
 	public int saveGrafanaDashboardConfig(GrafanaDashboardPdfConfig config)
     { 
 		int id = -1;
-		try (Session session = getSessionObj()) {
-			session.beginTransaction();
-			id = (int) session.save(config);
-			session.getTransaction().commit();
+		try  {
+			id = (int) save(config);
 			return id;
 		} catch (Exception e) {
 			return id;
@@ -41,23 +40,21 @@ public class GrafanaDashboardPdfConfigDAL extends BaseDAL {
     }
 	
 	public GrafanaDashboardPdfConfig fetchGrafanaDashboardDetailsByWorkflowId(String workflowId) {
-		try (Session session = getSessionObj()) {
-			Query<GrafanaDashboardPdfConfig> createQuery = session.createQuery(
-					"FROM GrafanaDashboardPdfConfig gd where gd.workflowConfig.workflowId = :workflowId", GrafanaDashboardPdfConfig.class);
-			createQuery.setParameter("workflowId", workflowId);
-			return createQuery.uniqueResult();
+		try {
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("workflowId", workflowId);
+			return getUniqueResult( "FROM GrafanaDashboardPdfConfig gd where gd.workflowConfig.workflowId = :workflowId",
+					GrafanaDashboardPdfConfig.class,
+					parameters);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
 		}
 	}
 	
-	public void updateGrafanaDashboardConfig(GrafanaDashboardPdfConfig config)
-    { 
-		try (Session session = getSessionObj()) {
-			session.beginTransaction();
-			session.update(config);
-			session.getTransaction().commit();
+	public void updateGrafanaDashboardConfig(GrafanaDashboardPdfConfig config){ 
+		try  {
+			update(config);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;

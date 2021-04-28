@@ -30,14 +30,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cognizant.devops.platformcommons.constants.ErrorMessage;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetailsDAL;
 import com.cognizant.devops.platformservice.rest.datatagging.constants.DatataggingConstants;
 import com.cognizant.devops.platformservice.rest.datatagging.model.Node;
 import com.cognizant.devops.platformservice.rest.datatagging.util.DataProcessorUtil;
-import com.cognizant.devops.platformservice.rest.neo4j.GraphDBService;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -47,8 +46,7 @@ import com.google.gson.JsonObject;
 @RestController
 @RequestMapping("/admin/hierarchyDetails")
 public class HierarchyDetailsService {
-	static Logger log = LogManager.getLogger(GraphDBService.class.getName());
-	private JsonObject asJsonObject;
+	static Logger log = LogManager.getLogger(HierarchyDetailsService .class);
 
 
 	@RequestMapping(value = "/fetchDistinctHierarchyName", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)

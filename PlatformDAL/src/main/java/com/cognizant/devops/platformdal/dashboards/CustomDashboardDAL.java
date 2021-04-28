@@ -15,27 +15,27 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.dashboards;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 
 import com.cognizant.devops.platformdal.core.BaseDAL;
 import com.cognizant.devops.platformdal.user.UserPortfolioEnum;
 
+@Deprecated
 public class CustomDashboardDAL extends BaseDAL{
 	
 	private static Logger log = LogManager.getLogger(CustomDashboardDAL.class);
 	
 	public List<CustomDashboard> getCustomDashboard(UserPortfolioEnum portfolio){
-		try (Session session = getSessionObj()) {
-			Query<CustomDashboard> createQuery = session
-					.createQuery("FROM CustomDashboard C WHERE C.portfolio = :portfolio", CustomDashboard.class);
-			createQuery.setParameter("portfolio", portfolio);
-			return createQuery.getResultList();
-
+		try {
+			Map<String, Object> parameters = new HashMap<>();
+			parameters.put("portfolio", portfolio);
+			return getResultList("FROM CustomDashboard C WHERE C.portfolio = :portfolio",
+					CustomDashboard.class, parameters);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
@@ -43,14 +43,12 @@ public class CustomDashboardDAL extends BaseDAL{
 	}
 	
 	public boolean addCustomDashboard(String dashboardName, String dashboardJson, UserPortfolioEnum portfolio){
-		try (Session session = getSessionObj()) {
+		try {
 		CustomDashboard customDashboard = new CustomDashboard();
 		customDashboard.setDashboardName(dashboardName);
 		customDashboard.setDashboardJson(dashboardJson);
 		customDashboard.setPortfolio(portfolio);
-		session.beginTransaction();
-		session.save(customDashboard);
-		session.getTransaction().commit();		
+		save(customDashboard);	
 		return true;
 		}catch (Exception e) {
 			log.error(e.getMessage());

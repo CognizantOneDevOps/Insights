@@ -27,7 +27,8 @@ from datetime import datetime, timedelta
 import json
 import time
 class ArtifactoryAgent(BaseAgent):
-
+    
+    @BaseAgent.timed
     def process(self):
         user = self.getCredential("userid")
         passwd = self.getCredential("passwd")

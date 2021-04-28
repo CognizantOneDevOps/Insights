@@ -166,7 +166,9 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 				try {
 					List<String> childNodes = getDownTool(keyvaluePair.getKey(), dataModel);
 					for (String eachNode : childNodes) {
-						String construct = keyvaluePair.getKey() + " To " + eachNode;
+						//int childNodeCount = map.containsKey(eachNode)?map.get(eachNode).size():0; //+" ("+childNodeCount + ")"
+						String construct = keyvaluePair.getKey() + " To " + eachNode ;
+						LOG.debug("Construct timeline map for {} and {} ",keyvaluePair.getKey(),eachNode);
 						sortedHandoverTimeMap.put(construct, handOverTimeMap.get(construct));
 					}
 
@@ -240,6 +242,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 					"with case when exists(r.handovertime) then collect(r.handovertime) else [] end as val, a, b");
 			queryBuilder.append(" unwind(case val when [] then [null] else val end) as list ");
 			queryBuilder.append("return  b.toolName as toolName, collect(distinct b.uuid) as uuids ,b as nodes, abs(avg(list))");
+			//LOG.debug(" Cypher query for hop 2 {} ",queryBuilder);
 			return queryBuilder.toString();
 		} else if (hopCount == 3) {
 			return "MATCH (a:DATA) WHERE a.uuid IN " + stringify(toolVal)
@@ -259,9 +262,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 			return queryBuilder.append("match(n:").append(toolCategory).append(":" + toolname).append(":DATA)")
 					.append("where n.").append(toolField).append(" IN ").append(stringify(toolVal))
 					.append(" return n.toolName as toolname ,n.uuid as uuid ,n as nodes").toString();
-		}
-
-		else {
+		}else {
 			return "MATCH (a:" + toolname + ":DATA) WHERE a.uuid IN " + stringify(toolVal)
 					+ " WITH distinct a.toolName as toolName, collect(distinct a) as nodes Return toolName, nodes";
 		}
@@ -362,7 +363,8 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 			try {
 				long d1 = InsightsUtils.getEpochTime(o1.get(KEY_NAME).getAsString());
 				long d2 = InsightsUtils.getEpochTime(o2.get(KEY_NAME).getAsString());
-				if (d1 > d2) {
+				// use to sort descending order 
+				if (d1 < d2) {
 					return 1;
 				} else if (d1 == d2) {
 					return 0;
@@ -474,12 +476,19 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 		final String OPERAND_VALUE = "OperandValue";
 		HashMap<String, List<JsonObject>> map = masterMap;
 		JsonObject summaryObject = new JsonObject();
+		StringBuilder summaryMessage = new StringBuilder();
+		JsonArray messagesArray = new JsonArray();
+		summaryMessage.append("This search has fetched ");
 		for (Map.Entry<String, List<JsonObject>> entry : map.entrySet()) {
 			try {
 				String tool = entry.getKey();
 				List<JsonObject> payload = entry.getValue();
+				
 				JsonObject summary = new JsonObject();
 				JsonObject toolObjectFromDataModel = dataModel.get(tool).getAsJsonObject();
+				String displayText = toolObjectFromDataModel.has("displayText")?toolObjectFromDataModel.get("displayText").getAsString():tool;
+				summaryMessage.append(payload.size()+" "+displayText);
+				summaryMessage.append(", ");
 				if (toolObjectFromDataModel.has(TraceabilityConstants.MESSAGES)) // check the toolname has message
 				{
 					int messageSize = toolObjectFromDataModel.get(TraceabilityConstants.MESSAGES).getAsJsonArray()
@@ -487,47 +496,42 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 					for (int i = 0; i < messageSize; i++) {
 						JsonObject messageClause = toolObjectFromDataModel.get(TraceabilityConstants.MESSAGES)
 								.getAsJsonArray().get(i).getAsJsonObject();
+						
 						String operationName = messageClause.get("Operation").getAsString();
+						String operandName = messageClause.get(OPERAND_NAME).getAsString();
+						JsonArray operandValue = messageClause.get(OPERAND_VALUE).getAsJsonArray();
+						String message = messageClause.get(TraceabilityConstants.MESSAGE).getAsString();
+						String resp="";
 						if (operationName.equals("SUM")) {
-							String operandName = messageClause.get(OPERAND_NAME).getAsString();
-							JsonArray operandValue = messageClause.get(OPERAND_VALUE).getAsJsonArray();
-							String message = messageClause.get(TraceabilityConstants.MESSAGE).getAsString();
-							String resp = TraceabilitySummaryUtil.calSUM(operandName, operandValue, payload, message);
-							if (!resp.equals("")) {
-								summary.addProperty(String.valueOf(i), resp);
-								summaryObject.add(tool, summary);
-							}
-						}
-						if (operationName.equals("PERCENTAGE")) {
-							String operandName = messageClause.get(OPERAND_NAME).getAsString();
-
-							JsonArray operandValue = messageClause.get(OPERAND_VALUE).getAsJsonArray();
-							String message = messageClause.get(TraceabilityConstants.MESSAGE).getAsString();
-							String resp = TraceabilitySummaryUtil.calPercentage(operandName, operandValue, payload,
+							resp = TraceabilitySummaryUtil.calSUM(operandName, operandValue, payload, message);
+						}else if (operationName.equals("COUNT")) {
+							resp = TraceabilitySummaryUtil.calCount(operandName, operandValue, payload, message);
+						}else if (operationName.equals("PROPERTY_COUNT")) {
+							resp = TraceabilitySummaryUtil.calPropertyCount(operandName, operandValue, payload, message);
+						}else if (operationName.equals("PERCENTAGE")) {
+							resp = TraceabilitySummaryUtil.calPercentage(operandName, operandValue, payload,
 									message);
-							if (!resp.equals("")) {
-								summary.addProperty(String.valueOf(i), resp);
-								summaryObject.add(tool, summary);
-							}
-						}
-						if (operationName.equals("TIMEDIFF")) {
-							String operandName = messageClause.get(OPERAND_NAME).getAsString();
-							String message = messageClause.get(TraceabilityConstants.MESSAGE).getAsString();
-							String resp;
+						}else if (operationName.equals("TIMEDIFF")) {
 							resp = TraceabilitySummaryUtil.calTimeDiffrence(operandName, payload, message);
-							if (!resp.equals("")) {
-								summary.addProperty(String.valueOf(i), resp);
-								summaryObject.add(tool, summary);
-							}
-
+						}else if (operationName.equals("DISTINCT_COUNT")) {
+							resp = TraceabilitySummaryUtil.calDistinctCount(operandName, operandValue, payload, message);
+						}else {
+							LOG.error("No claculation method found to calculate summary information ");
+						}
+						if (!resp.equals("")) {
+							summary.addProperty(String.valueOf(i), resp);
+							messagesArray.add(resp);
 						}
 					}
 				}
 			} catch (Exception e) {
-				LOG.error(e.getMessage());
-				throw new InsightsCustomException("Traceability matrix not configured properly...");
+				LOG.error(e);
+				throw new InsightsCustomException("Traceability dashboard not configured properly...");
 			}
 		}
+		summaryMessage.setLength(summaryMessage.length() - 2);
+		summaryObject.add("messages", messagesArray);
+		summaryObject.addProperty("Total", summaryMessage.toString());
 		return summaryObject;
 
 	}
@@ -578,6 +582,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 			List<String> labelsTemp = new ArrayList<>();
 			HashMap<String, List<String>> tempMap = new HashMap<>();
 			for (Map.Entry<String, List<String>> entry : drilldownListMap.entrySet()) {
+				LOG.debug(" resolveUpAndDownLinks {}",entry.getKey());
 				String tool = entry.getKey();
 				List<String> uuids = entry.getValue();
 				mainToolList.put(tool, uuids);
@@ -643,10 +648,10 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 					/*
 					 * Execute the first query to get the linked tools for the tool selected in UI
 					 */
-					HashMap<String, List<String>> temp = (HashMap<String, List<String>>) format(
-							executeCypherQuery(buildCypherQuery(toolName, fieldName, toolCategory,
-									new ArrayList<String>(fieldValue), Collections.emptyList(), 2)),
-							Arrays.asList(toolName));
+					String cypherQuery = buildCypherQuery(toolName, fieldName, toolCategory,
+							new ArrayList<String>(fieldValue), Collections.emptyList(), 2);
+					JsonObject hopQueryOutput = executeCypherQuery(cypherQuery);
+					HashMap<String, List<String>> temp = (HashMap<String, List<String>>) format(hopQueryOutput,Arrays.asList(toolName));
 
 					if (temp.size() > 0) {
 						uplinkMap = (HashMap<String, List<String>>) temp.entrySet().stream()
@@ -788,7 +793,8 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 		responseObject.add("pipeline", pipelineArray);
 		responseObject.add("summary", summaryArray);
 		responseObject.add("timelag", timelagArray);
-		pipelineCache.put(toolName + "." + fieldName + "." + fieldValue, responseObject.toString());	
+		cacheKey = toolName + "." + fieldName + "." + "Epic" + "." + arrayList;
+		pipelineCache.put(cacheKey, responseObject.toString());	
 		return responseObject;
 	}
 
@@ -832,8 +838,8 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 			responsePipeline = getPipeline(toolName, "uuid", uuids, "Other");
 			return responsePipeline;
 		} catch (Exception e) {
-			LOG.error("Traceability========mandatory fields are missing in traceability json {}", e.getMessage());
-			throw new InsightsCustomException("mandatory fields are missing in traceability json {}");
+			LOG.error("Traceability========Issue while fetching epic pipeline ", e);
+			throw new InsightsCustomException("Traceability========Issue while fetching epic pipeline "+e.getMessage());
 		}
 	}
 

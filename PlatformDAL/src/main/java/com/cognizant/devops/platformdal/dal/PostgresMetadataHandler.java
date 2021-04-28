@@ -15,18 +15,31 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.dal;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.hibernate.type.Type;
+
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class PostgresMetadataHandler extends BaseDAL {
+	private static Logger logger = LogManager.getLogger(PostgresMetadataHandler.class);
 	
 	public String getPostgresDBVersion() {
 		Object result =null;
 		try {
+			Map<String,Type> scalarList = new LinkedHashMap<>();
+			Map<String,Object> parameters = new HashMap<>();
 			String query="Select version()";
-			result = getSession().createNativeQuery(query).getSingleResult();
-			terminateSession();
+			List<Object> results =executeSQLQueryAndRetunList(query,scalarList,parameters);
+			result=results.get(0);
+			logger.debug(" PostgresMetadataHandler result  {} ",result);
 		} catch (Exception e) {
-			terminateSession();
+			logger.error(e);
 		}
 		return (String) result;
 	}

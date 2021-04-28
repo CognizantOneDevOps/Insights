@@ -14,18 +14,14 @@
 # the License.
 #-------------------------------------------------------------------------------
 # install ES  - Some Issues here test on new server
-echo "#################### Installing Eleastic Search with configs ####################"
-sudo mkdir elasticsearch
-cd elasticsearch
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/es/elasticsearch.rpm
+echo "#################### Installing EleasticSearch 7.6.1 with configs ####################"
+source /etc/environment
+source /etc/profile
+mkdir -p $INSIGHTS_APP_ROOT_DIRECTORY/elasticsearch
+cd $INSIGHTS_APP_ROOT_DIRECTORY/elasticsearch
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/es/latest/elasticsearch.rpm
 sudo rpm -Uvh elasticsearch.rpm
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/es/ElasticSearch.zip
-sudo unzip ElasticSearch.zip
-sudo cp ElasticSearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
-sudo cp ElasticSearch/log4j2.properties /etc/elasticsearch/log4j2.properties
+export ES_JAVA_HOME=/usr/share/elasticsearch/jdk
 sudo systemctl daemon-reload
 sudo systemctl enable elasticsearch.service
 sudo systemctl start elasticsearch.service
-sleep 20
-curl -XPUT 'localhost:9200/_template/neo4j-*' -d '{"order" : 0, "template": "neo4j-*","settings": {"index.number_of_shards": "5"},"mappings": {"_default_": {"dynamic_templates": [{"string_fields" : {"mapping" : {"index" : "analyzed","omit_norms" : true,"type" : "string","fields" : {"raw" : {"ignore_above" : 256,"index" : "not_analyzed","type" : "string"}}},"match_mapping_type" : "string","match" : "*"}}]}},"aliases": {}}}'
-

@@ -1,6 +1,6 @@
 import React, { PureComponent, ChangeEvent } from 'react';
 //import { LegacyForms } from '@grafana/ui';
-import { DataSourceHttpSettings } from '@grafana/ui';
+import { DataSourceHttpSettings, Field, Input, LegacyForms, Switch } from '@grafana/ui';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 import { MyDataSourceOptions } from './types';
 
@@ -45,7 +45,27 @@ export class ConfigEditor extends PureComponent<Props, State> {
     });
   };
 
+
+  onServiceUrlChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { onOptionsChange, options } = this.props;
+    const jsonData = {
+      ...options.jsonData,
+      serviceUrl: event.target.value,
+    };
+    onOptionsChange({ ...options, jsonData });
+  };
+
+  onSwitched = (event: any) => {
+    const { onOptionsChange, options } = this.props;
+    const jsonData = {
+      ...options.jsonData,
+      logging: event.target.checked,
+    };
+    onOptionsChange({ ...options, jsonData });
+}
+
   render() {
+    console.log(this.props.options.jsonData);
     const { options, onOptionsChange } = this.props;
 
     return (
@@ -56,7 +76,12 @@ export class ConfigEditor extends PureComponent<Props, State> {
           showAccessOptions={true}
           onChange={onOptionsChange}
         />
+         <LegacyForms.Switch label="Enable Logging"  labelClass="width-8" checked={options.jsonData.logging} onChange={this.onSwitched} />
+        {(options.jsonData.logging) &&<Field label="Service URL" description="This is required only when insights usage is collected.">
+          <Input name="serviceUrl" onChange={this.onServiceUrlChange} value={options.jsonData.serviceUrl}/>
+        </Field>}
       </>
     );
   }
+  
 }

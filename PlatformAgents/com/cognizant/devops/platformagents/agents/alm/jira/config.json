@@ -379,12 +379,10 @@
 		"passwd"
 	],
 	"loggingSetting": {
-		"logLevel": "WARN",
+		"logLevel": "INFO",
 		"maxBytes": 5000000,
-		"backupCount": 1000
+		"backupCount": 10
 	},
-	"osversion": "windows",
-	"agentVersion": "v7.2",
 	"labelName": "JIRA",
 	"toolName": "JIRA",
 	"auditing": false

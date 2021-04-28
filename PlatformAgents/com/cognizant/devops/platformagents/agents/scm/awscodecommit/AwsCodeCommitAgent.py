@@ -26,6 +26,8 @@ from datetime import datetime, timedelta
 
 
 class AwsCodeCommitAgent(BaseAgent):
+    
+    @BaseAgent.timed
     def process(self):
         data = []
         accesskey = self.getCredential("awsAccesskey")

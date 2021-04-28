@@ -15,13 +15,13 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.webhookConfig;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -33,14 +33,13 @@ public class WebHookConfigDAL extends BaseDAL {
 	public static final String WEBHOOKNAME = "webhookName";
 
 	public Boolean updateWebHookConfiguration(WebHookConfig webhookConfiguration) {
-		
-		WebHookConfig parentConfigList = null;
-		try (Session session = getSessionObj()) {
 
-			Query<WebHookConfig> createQuery = session
-					.createQuery(WEBHOOKCONFIG_QUERY, WebHookConfig.class);
-			createQuery.setParameter(WEBHOOKNAME, webhookConfiguration.getWebHookName());
-			parentConfigList = createQuery.getSingleResult();
+		WebHookConfig parentConfigList = null;
+		try {
+
+			Map<String, Object> parameters = new HashMap<>();
+			parameters.put(WEBHOOKNAME, webhookConfiguration.getWebHookName());
+			parentConfigList = getSingleResult(WEBHOOKCONFIG_QUERY, WebHookConfig.class, parameters);
 
 			if (parentConfigList != null) {
 				Set<WebhookDerivedConfig> dataFromUI = webhookConfiguration.getWebhookDerivedConfig();
@@ -63,52 +62,36 @@ public class WebHookConfigDAL extends BaseDAL {
 			} else {
 				return Boolean.FALSE;
 			}
-		} catch (Exception e) {
-			log.error(e.getMessage());
-			return Boolean.FALSE;
-		}
-		try (Session session = getSessionObj()) {
-			session.beginTransaction();
-			session.saveOrUpdate(parentConfigList);
-			session.getTransaction().commit();
+			saveOrUpdate(parentConfigList);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			return Boolean.FALSE;
 		}
 		return Boolean.TRUE;
-		 
-
 	}
 
 	public Boolean saveWebHookConfiguration(WebHookConfig webhookConfiguration) throws InsightsCustomException {
-	
-		try(Session session =getSessionObj())
-		{
-		Query<WebHookConfig> createQuery = session
-					.createQuery(WEBHOOKCONFIG_QUERY, WebHookConfig.class);
-		createQuery.setParameter(WEBHOOKNAME, webhookConfiguration.getWebHookName());
-		List<WebHookConfig> resultList = createQuery.getResultList();
-		if (resultList != null && !resultList.isEmpty()) {
-			throw new InsightsCustomException(PlatformServiceConstants.WEBHOOK_NAME);
-		}
-		session.beginTransaction();
-		session.save(webhookConfiguration);
-		session.getTransaction().commit();
-		}catch(Exception e) {
+		try {
+			Map<String, Object> parameters = new HashMap<>();
+			parameters.put(WEBHOOKNAME, webhookConfiguration.getWebHookName());
+			List<WebHookConfig> resultList = getResultList(WEBHOOKCONFIG_QUERY, WebHookConfig.class, parameters);
+			if (resultList != null && !resultList.isEmpty()) {
+				throw new InsightsCustomException(PlatformServiceConstants.WEBHOOK_NAME);
+			}
+			save(webhookConfiguration);
+		} catch (Exception e) {
 			log.error(e.getMessage());
-			//return Boolean.FALSE;
 			throw new InsightsCustomException(e.getMessage());
 		}
-		
+
 		return Boolean.TRUE;
 	}
 
 	public List<WebHookConfig> getAllWebHookConfigurations() {
-		
-		try (Session session = getSessionObj()) {
-			session.beginTransaction();
-			Query<WebHookConfig> createQuery =session.createQuery("FROM WebHookConfig WH", WebHookConfig.class);
-			return createQuery.getResultList();			
+
+		try {
+			Map<String, Object> parameters = new HashMap<>();
+			return getResultList("FROM WebHookConfig WH", WebHookConfig.class, parameters);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
@@ -116,10 +99,10 @@ public class WebHookConfigDAL extends BaseDAL {
 	}
 
 	public List<WebHookConfig> getAllActiveWebHookConfigurations() {
-		try (Session session = getSessionObj()) {
-			Query<WebHookConfig> createQuery =session
-					.createQuery("FROM WebHookConfig WH WHERE WH.subscribeStatus = true", WebHookConfig.class);
-			return createQuery.getResultList();			
+		try {
+			Map<String, Object> parameters = new HashMap<>();
+			return getResultList("FROM WebHookConfig WH WHERE WH.subscribeStatus = true", WebHookConfig.class,
+					parameters);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
@@ -127,14 +110,13 @@ public class WebHookConfigDAL extends BaseDAL {
 	}
 
 	public String deleteWebhookConfigurations(String webhookName) {
-		try (Session session = getSessionObj()) {
-			Query<WebHookConfig> createQuery = session
-					.createQuery("FROM WebHookConfig a WHERE a.webhookName = :webhookName", WebHookConfig.class);
-			createQuery.setParameter(WEBHOOKNAME, webhookName);
-			WebHookConfig webhookConfig = createQuery.getSingleResult();
-			session.beginTransaction();
-			session.delete(webhookConfig);
-			session.getTransaction().commit();
+		try {
+			Map<String, Object> parameters = new HashMap<>();
+			parameters.put(WEBHOOKNAME, webhookName);
+			WebHookConfig webhookConfig = getSingleResult("FROM WebHookConfig a WHERE a.webhookName = :webhookName",
+					WebHookConfig.class, parameters);
+
+			delete(webhookConfig);
 			return PlatformServiceConstants.SUCCESS;
 		} catch (Exception e) {
 			log.error(e.getMessage());
@@ -143,32 +125,28 @@ public class WebHookConfigDAL extends BaseDAL {
 	}
 
 	public void updateWebhookStatus(String webhookName, boolean status) {
-		try (Session session = getSessionObj()) {
-		Query<WebHookConfig> createQuery = session
-					.createQuery(WEBHOOKCONFIG_QUERY, WebHookConfig.class);
-		createQuery.setParameter(WEBHOOKNAME, webhookName);
-		WebHookConfig updateWebhook = createQuery.getSingleResult();
-		updateWebhook.setSubscribeStatus(status);
-		session.beginTransaction();
-		session.update(updateWebhook);
-		session.getTransaction().commit();
-		}catch(Exception e) {
+		try {
+			Map<String, Object> parameters = new HashMap<>();
+			parameters.put(WEBHOOKNAME, webhookName);
+			WebHookConfig updateWebhook = getSingleResult(WEBHOOKCONFIG_QUERY, WebHookConfig.class, parameters);
+
+			updateWebhook.setSubscribeStatus(status);
+			update(updateWebhook);
+		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
 		}
 	}
-	
-	public List<WebHookConfig> getAllEventWebHookConfigurations()
-	{	
-		try (Session session = getSessionObj()) {
-			session.beginTransaction();
-		Query<WebHookConfig> createQuery = session
-				.createQuery("FROM WebHookConfig WH WHERE WH.isEventProcessing = true", WebHookConfig.class);
-		return createQuery.getResultList();
-		}catch(Exception e) {
+
+	public List<WebHookConfig> getAllEventWebHookConfigurations() {
+		try {
+			Map<String, Object> parameters = new HashMap<>();
+			return getResultList("FROM WebHookConfig WH WHERE WH.isEventProcessing = true", WebHookConfig.class,
+					parameters);
+		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
 		}
-		
+
 	}
 }

@@ -54,9 +54,9 @@
   "enableValueArray": false,
   "agentSecretDetails": ["access_key_id","secret_access_key"],
   "loggingSetting": {
-    "logLevel": "WARN",
+    "logLevel": "INFO",
 	"maxBytes" : 5000000,
-	"backupCount" : 1000
+	"backupCount" : 10
   },
   "auditing": false
 }

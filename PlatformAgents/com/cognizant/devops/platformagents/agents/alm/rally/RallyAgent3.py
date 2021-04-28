@@ -24,9 +24,10 @@ from ....core.BaseAgent3 import BaseAgent
 import json
 import datetime
 import time
-import logging.handlers
 
 class RallyAgent(BaseAgent):
+    
+    @BaseAgent.timed
     def process(self):
         userid = self.getCredential("userid")
         passwd = self.getCredential("passwd")
@@ -55,18 +56,18 @@ class RallyAgent(BaseAgent):
         if len(specificWorkspaceConfigList) == 0:
              specificWorkspaceList = []
              subscriptionListUrl = baseUrl + "subscription"
-             logging.debug(" subscriptionListUrl ==== " + subscriptionListUrl)
+             self.baseLogger.info(" subscriptionListUrl ==== " + subscriptionListUrl)
              subscriptionListRes = self.getResponse(subscriptionListUrl, 'GET', accesstoken, '', None)
              subscriptionUrl = subscriptionListRes['Subscription']['_ref']
              subspaceworkspace = subscriptionUrl + "/Workspaces"
-             logging.debug("  subspaceworkspace ==== " + subspaceworkspace)
+             self.baseLogger.info("  subspaceworkspace ==== " + subspaceworkspace)
              subWorkspaceRes = self.getResponse(subspaceworkspace, 'GET', accesstoken, '', None)
-             # logging.debug(subWorkspaceRes)
+             # self.baseLogger.info(subWorkspaceRes)
              for i in range (0, len(subWorkspaceRes['QueryResult']['Results'])):
                  specificWorkspaceList.append(subWorkspaceRes['QueryResult']['Results'][i]['_ref'])
         else:
             for workspaceConfigUrl in specificWorkspaceConfigList:
-                logging.debug("workspaceConfigUrl from config ==== "+workspaceConfigUrl)
+                self.baseLogger.info("workspaceConfigUrl from config ==== "+workspaceConfigUrl)
                 specificWorkspaceList.append(workspaceConfigUrl)
         trackingDetails = self.tracking.get('LastUpdatedDate', None)        
         if trackingDetails is None:
@@ -75,23 +76,23 @@ class RallyAgent(BaseAgent):
             lastUpdated = trackingDetails
         artifactTypeList = self.config.get('dynamicTemplate', {}).get('artifactType', None)
         arr = self.config.get('dynamicTemplate', {}).get('storyResponseTemplate', None)
-        logging.debug(" specificWorkspaceList ==== " + str(len(specificWorkspaceList)))
+        self.baseLogger.info(" specificWorkspaceList ==== " + str(len(specificWorkspaceList)))
         try:
             for i in range(0, len(specificWorkspaceList)):
                 workspaceUrl = str(specificWorkspaceList[i])
-                logging.debug("workspaceUrl ==== " + workspaceUrl)
+                self.baseLogger.info("workspaceUrl ==== " + workspaceUrl)
                 artifactListUrl = baseUrl + "artifact?workspace=" + workspaceUrl + "&query=(LastUpdateDate > " + lastUpdated + ")&fetch=true"
-                logging.debug(" artifactListUrl   ==== " + artifactListUrl)
+                self.baseLogger.info(" artifactListUrl   ==== " + artifactListUrl)
                 responseTemplate = self.getResponseTemplate()
                 pageNum = 1
                 fetchNextPage = True
                 while fetchNextPage:
-                     logging.debug(" artifactListUrl  ==== " + artifactListUrl)
+                     self.baseLogger.info(" artifactListUrl  ==== " + artifactListUrl)
                      artifactListUrlPage = artifactListUrl + '&pagesize=' + str(pageSize) + '&start=' + str(pageNum)
-                     logging.debug(" artifactListUrlPage  ==== " + artifactListUrlPage)
+                     self.baseLogger.info(" artifactListUrlPage  ==== " + artifactListUrlPage)
                      try:
                          artifactListRes = self.getResponse(artifactListUrlPage, 'GET', accesstoken, '', None)
-                         logging.debug(" artifactListRes record count  ==== " + str(artifactListRes['QueryResult']['TotalResultCount']))
+                         self.baseLogger.info(" artifactListRes record count  ==== " + str(artifactListRes['QueryResult']['TotalResultCount']))
                          if len(artifactListRes['QueryResult']['Results']) == 0:
                             fetchNextPage = False
                             break
@@ -99,7 +100,7 @@ class RallyAgent(BaseAgent):
                              artifactListResCount = len(artifactListRes['QueryResult']['Results'])
                          else:
                              artifactListResCount = artifactListRes['QueryResult']['PageSize']
-                         logging.debug("artifactListResCount 8 ==== " + str(artifactListResCount))
+                         self.baseLogger.info("artifactListResCount 8 ==== " + str(artifactListResCount))
                      except Exception as ex:
                          artifactListResCount=0  
                          self.publishHealthDataForExceptions(ex)
@@ -112,7 +113,7 @@ class RallyAgent(BaseAgent):
                            projectRef = projectUrl.split("/")
                            projectReflen = len(projectRef)
                            projectId = int(projectRef[projectReflen - 1])
-                           logging.debug("artifact ====" + str(artifact) + " projectId ==== " + str(projectId) + " artifactType ==== " + artifactType + " artifactUrl  ==== " + artifactUrl + "  FormattedID  "+artifactListData['FormattedID'])
+                           self.baseLogger.info("artifact ====" + str(artifact) + " projectId ==== " + str(projectId) + " artifactType ==== " + artifactType + " artifactUrl  ==== " + artifactUrl + "  FormattedID  "+artifactListData['FormattedID'])
                            # artifactRes = self.getResponse(artifactUrl, 'GET', accesstoken, '', None)               
                            if (artifactType in artifactTypeList):
                                injectArtifactData = {}
@@ -130,17 +131,17 @@ class RallyAgent(BaseAgent):
                                injectArtifactData['projectName'] = artifactListData['Project']['_refObjectName']
                                injectArtifactData['projectID'] = projectId
                                injectArtifactData['lastUpdateDate'] = artifactListData['LastUpdateDate']
-                               logging.debug("Tag Count ==== " + str(artifactListData['Tags']['Count']))
+                               self.baseLogger.info("Tag Count ==== " + str(artifactListData['Tags']['Count']))
                                if artifactListData['Tags']:
                                    if artifactListData['Tags']['Count'] != 0:
                                         tagVal = artifactListData['Tags']['_tagsNameArray'][0]
-                                        logging.debug("Tag Value tagVal ==== " + str(tagVal))
+                                        self.baseLogger.info("Tag Value tagVal ==== " + str(tagVal))
                                         val = tagVal.get('Name')
                                         injectArtifactData['tagName'] = val
-                                        logging.debug("Tag Value ==== " + val)
+                                        self.baseLogger.info("Tag Value ==== " + val)
                                if artifactListData.get('Iteration') and artifactListData['Iteration'] != None :
                                 injectArtifactData['iterationName'] = artifactListData['Iteration']['_refObjectName']
-                                logging.debug("iterationRef  ==== " + artifactListData['Iteration']['_ref'])
+                                self.baseLogger.info("iterationRef  ==== " + artifactListData['Iteration']['_ref'])
                                 iterationRef = artifactListData['Iteration']['_ref'].split("/")
                                 iterationReflen = len(iterationRef)
                                 iterationId = iterationRef[iterationReflen - 1]
@@ -150,9 +151,9 @@ class RallyAgent(BaseAgent):
                                 injectArtifactData['iterationName'] = 0
                                if artifactListData.get('Release') and artifactListData['Release'] != None:
                                 injectArtifactData['releaseName'] = artifactListData['Release']['_refObjectName']
-                                logging.debug(" releaseName artifact ==== " + str(artifactListData['Release']['_refObjectName']))
+                                self.baseLogger.info(" releaseName artifact ==== " + str(artifactListData['Release']['_refObjectName']))
                                 ReleaseUrl = artifactListData['Release']['_ref']
-                                logging.debug(" ReleaseUrl artifact ==== " + ReleaseUrl)
+                                self.baseLogger.info(" ReleaseUrl artifact ==== " + ReleaseUrl)
                                 ReleasetRes = self.getResponse(ReleaseUrl, 'GET', accesstoken, '', None)
                                 for Release in ReleasetRes:
                                   injectArtifactData['releasePlanEstimate'] = ReleasetRes['Release']['PlanEstimate']
@@ -189,17 +190,17 @@ class RallyAgent(BaseAgent):
             for Workspace in range(0, len(specificWorkspaceList)):
                workspaceUrl = specificWorkspaceList[Workspace]
                iterationListUrl = baseUrl + "iteration?workspace=" + workspaceUrl + "&fetch=true"
-               logging.debug(" iterationListUrl ==== " + iterationListUrl)
+               self.baseLogger.info(" iterationListUrl ==== " + iterationListUrl)
                pageNum = 1
                fetchNextPage = True
                while fetchNextPage:
                 iterationListUrlPage = iterationListUrl + '?pagesize=' + str(pageSize) + '&start=' + str(pageNum)
-                logging.debug(" iterationListUrlPage ==== " + iterationListUrlPage)
+                self.baseLogger.info(" iterationListUrlPage ==== " + iterationListUrlPage)
                 try:
                     iterationListRes = self.getResponse(iterationListUrlPage, 'GET', accesstoken, '', None)
-                    logging.debug(" iterationListRes length  ==== "+str(len(iterationListRes['QueryResult']['Results'])))
+                    self.baseLogger.info(" iterationListRes length  ==== "+str(len(iterationListRes['QueryResult']['Results'])))
                     if len(iterationListRes['QueryResult']['Results']) == 0:
-                        logging.debug(" iterationListUrlPage is empty  ==== ")
+                        self.baseLogger.info(" iterationListUrlPage is empty  ==== ")
                         fetchNextPage = False
                         break
                     if len(iterationListRes['QueryResult']['Results']) < 20:
@@ -214,7 +215,7 @@ class RallyAgent(BaseAgent):
                         iterationListData = iterationListRes['QueryResult']['Results'][iterationRes]
                         iterationUrl = iterationListData['_ref']
                         iterationType = iterationListData['_type']
-                        logging.debug(" iterationUrl ==== " + iterationUrl)
+                        self.baseLogger.info(" iterationUrl ==== " + iterationUrl)
                         iterationRes = self.getResponse(iterationUrl, 'GET', accesstoken, '', None)
                         injectIterationData = {}
                         workspaceUrl = iterationRes['Iteration']['Workspace']['_ref']
@@ -237,21 +238,21 @@ class RallyAgent(BaseAgent):
                 pageNum = 20 + pageNum
             
             ''' Section used to get all release inforamtion  '''
-            logging.debug(" Before release code ==== " +str(len(specificWorkspaceList)))
+            self.baseLogger.info(" Before release code ==== " +str(len(specificWorkspaceList)))
             for workspaceRelease in range(0, len(specificWorkspaceList)):
                workspaceUrl = specificWorkspaceList[workspaceRelease]
                releaseListUrl = baseUrl + "release?workspace=" + workspaceUrl + "&fetch=true"
-               logging.debug(" releaseListUrl ==== " + releaseListUrl)
+               self.baseLogger.info(" releaseListUrl ==== " + releaseListUrl)
                pageNum = 1
                fetchNextPage = True
                while fetchNextPage:
                 releaseListUrlPage = releaseListUrl + '?pagesize=' + str(pageSize) + '&start=' + str(pageNum)
-                logging.debug(" releaseListUrlPage ==== " + releaseListUrlPage)
+                self.baseLogger.info(" releaseListUrlPage ==== " + releaseListUrlPage)
                 try:
                     releaseListRes = self.getResponse(releaseListUrlPage, 'GET', accesstoken, '', None)
-                    logging.debug(" releaseListRes length  ==== "+str(len(releaseListRes['QueryResult']['Results'])))
+                    self.baseLogger.info(" releaseListRes length  ==== "+str(len(releaseListRes['QueryResult']['Results'])))
                     if len(releaseListRes['QueryResult']['Results']) == 0:
-                        logging.debug(" releaseListUrlPage is empty  ==== ")
+                        self.baseLogger.info(" releaseListUrlPage is empty  ==== ")
                         fetchNextPage = False
                         break
                     if len(releaseListRes['QueryResult']['Results']) < 20:
@@ -266,7 +267,7 @@ class RallyAgent(BaseAgent):
                         releaseListData = releaseListRes['QueryResult']['Results'][releaseRes]
                         releaseUrl = releaseListData['_ref']
                         releaseType = releaseListData['_type']
-                        logging.debug(" releaseUrl ==== " + releaseUrl)
+                        self.baseLogger.info(" releaseUrl ==== " + releaseUrl)
                         releaseRes = self.getResponse(releaseUrl, 'GET', accesstoken, '', None)
                         injectReleaseData = {}
                         workspaceUrl = releaseRes['Release']['Workspace']['_ref']
@@ -289,7 +290,7 @@ class RallyAgent(BaseAgent):
                 pageNum = 20 + pageNum
         except Exception as ex:
             self.publishHealthDataForExceptions(ex)
-        logging.debug(" publish data  ==== " )
+        self.baseLogger.info(" publish data  ==== " )
         storyTimestamp = storyinsightsTimeX.get('timefield',None)
         storyTimestampFormat = storyinsightsTimeX.get('timeformat',None)
         storyIsEpoch = storyinsightsTimeX.get('isEpoch',False)
@@ -303,7 +304,7 @@ class RallyAgent(BaseAgent):
         releaseIsEpoch = releaseinsightsTimeX.get('isEpoch',False)
         self.publishToolsData(data_release, releaseMetadata,releaseTimestamp,releaseTimestampFormat,releaseIsEpoch,True)
         self.tracking['LastUpdatedDate'] = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%dT%H:%M:%SZ')
-        logging.debug(" publish data complete ==== " )
+        self.baseLogger.info(" publish data complete ==== " )
         self.updateTrackingJson(self.tracking)
 
 if __name__ == "__main__":

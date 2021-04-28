@@ -1,0 +1,121 @@
+/*******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+package com.cognizant.devops.platformservice.neo4jpluginlogs.controller;
+
+import java.time.Duration;
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.config.builders.ExpiryPolicyBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
+import org.ehcache.config.units.EntryUnit;
+import org.ehcache.config.units.MemoryUnit;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.cognizant.devops.platformservice.neo4jpluginlogs.service.Neo4jPluginLogsService;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+@RestController
+@RequestMapping("/datasource")
+public class Neo4jPluginLogsController {
+
+	Cache<Integer, String> dashboardCache;
+	Cache<Integer, String> orgCache;
+	public static final Long GRAFANA_DASHBOARD_CACHE_HEAP_SIZE_BYTES=1000000l;
+	static Logger log = LogManager.getLogger(Neo4jPluginLogsController.class);
+	
+	@Autowired
+	Neo4jPluginLogsService neo4jPluginLogsService;
+	
+	{
+
+		CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
+				.withCache("grafana",
+						CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
+								ResourcePoolsBuilder.newResourcePoolsBuilder().heap(30, EntryUnit.ENTRIES).offheap(10,
+										MemoryUnit.MB)))
+				.build();
+		cacheManager.init();
+		dashboardCache = cacheManager.createCache("dashboard",
+				CacheConfigurationBuilder
+						.newCacheConfigurationBuilder(Integer.class, String.class,
+								ResourcePoolsBuilder.heap(GRAFANA_DASHBOARD_CACHE_HEAP_SIZE_BYTES))
+									.withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofHours(1L))));
+		
+		orgCache = cacheManager.createCache("org",
+				CacheConfigurationBuilder
+						.newCacheConfigurationBuilder(Integer.class, String.class,
+								ResourcePoolsBuilder.heap(GRAFANA_DASHBOARD_CACHE_HEAP_SIZE_BYTES))
+									.withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofHours(1L))));
+
+
+	}
+	
+	@PostMapping(value = "/logDashboardInfo", produces = MediaType.APPLICATION_JSON_VALUE)
+	public void logDashboardInfo(@RequestBody JsonObject dashboardDetails) {
+		
+		String panelId = dashboardDetails.get("panelId").getAsString();
+		int dashboardId = dashboardDetails.get("dashboardId").getAsInt();
+		int orgId = dashboardDetails.get("orgId").getAsInt();
+		if(dashboardCache.get(dashboardId) == null ) {
+			JsonObject dashboardJson = neo4jPluginLogsService.getDashboardDetails();
+			JsonArray recordArray = dashboardJson.get("records").getAsJsonArray();
+			recordArray.forEach(record -> dashboardCache.put(record.getAsJsonObject().get("id").getAsInt(),record.getAsJsonObject().get("dashboard").getAsString()));
+				if(orgCache.get(orgId) == null ) {
+					JsonObject orgJson = neo4jPluginLogsService.fetchOrgDetails();
+					JsonArray orgArray = orgJson.get("records").getAsJsonArray();
+					orgArray.forEach(record -> orgCache.put(record.getAsJsonObject().get("id").getAsInt(),record.getAsJsonObject().get("orgName").getAsString()));
+					dashboardDetails.addProperty("orgName", orgCache.get(orgId));
+				}else {
+					dashboardDetails.addProperty("orgName", orgCache.get(orgId));
+				}
+				processDashboardJsonForLog(dashboardDetails, panelId, dashboardCache.get(dashboardId));
+		}else {
+			String orgName = orgCache.get(orgId);
+			dashboardDetails.addProperty("orgName", orgName);
+			String dashboardJson = dashboardCache.get(dashboardId);
+			processDashboardJsonForLog(dashboardDetails, panelId, dashboardJson);
+		}
+	}
+
+	private void processDashboardJsonForLog(JsonObject dashboardDetails, String panelId, String dashboardJson) {
+		JsonObject dashboardJsonObject = new JsonParser().parse(dashboardJson).getAsJsonObject();
+		if(dashboardJsonObject.get("panels").getAsJsonArray().size() > 0) {
+			dashboardDetails.addProperty("uid", dashboardJsonObject.get("uid").getAsString());
+			dashboardDetails.addProperty("dashboardName", dashboardJsonObject.get("title").getAsString());
+			dashboardDetails.addProperty("panelCount", dashboardJsonObject.get("panels").getAsJsonArray().size());
+			dashboardJsonObject.get("panels").getAsJsonArray().forEach(panel -> {
+				if(panel.getAsJsonObject().get("id").getAsInt() == Integer.parseInt(panelId)){
+					dashboardDetails.addProperty("panelName", panel.getAsJsonObject().get("title").getAsString());
+					dashboardDetails.addProperty("chartType", panel.getAsJsonObject().get("type").getAsString());
+				}
+			});
+			log.info(dashboardDetails);
+		}
+	}
+}

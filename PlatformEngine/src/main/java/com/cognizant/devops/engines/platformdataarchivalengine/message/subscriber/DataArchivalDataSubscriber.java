@@ -68,6 +68,7 @@ public class DataArchivalDataSubscriber extends EngineSubscriberResponseHandler 
 				} else {
 					String archivalName = updateURLJson.get(DataArchivalConstants.ARCHIVALNAME).getAsString();
 					String sourceUrl = updateURLJson.get(DataArchivalConstants.SOURCEURL).getAsString();
+					int boltPort = updateURLJson.get(DataArchivalConstants.BOLTPORT).getAsInt();
 					Long expiryDate = getExpiryDate(archivalName);
 					log.debug("Inside Data archival data:- archivalName: {} , sourceUrl: {} ", archivalName, sourceUrl);
 					if (archivalName.isEmpty()) {
@@ -75,7 +76,7 @@ public class DataArchivalDataSubscriber extends EngineSubscriberResponseHandler 
 					} else if (sourceUrl.isEmpty()) {
 						throw new InsightsCustomException("Container URL not present in message");
 					}
-					dataArchivalConfigDAL.updateContainerDetails(archivalName, sourceUrl, containerID, expiryDate);
+					dataArchivalConfigDAL.updateContainerDetails(archivalName, sourceUrl, containerID, expiryDate,boltPort);
 				}
 				getChannel().basicAck(envelope.getDeliveryTag(), false);
 			} else {

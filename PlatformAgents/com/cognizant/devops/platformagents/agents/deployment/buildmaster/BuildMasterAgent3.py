@@ -20,7 +20,10 @@ from dateutil import parser
 import json
 
 class BuildMasterAgent(BaseAgent):
+
+    @BaseAgent.timed
     def process(self):
+        self.baseLogger.info('Inside process')
         startFrom = self.config.get("StartFrom", '')
         apiKey = str(self.config.get("apiKey", ''))
         baseurl = self.config.get("endpoint", '')

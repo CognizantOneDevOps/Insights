@@ -26,12 +26,14 @@ import requests
 from dateutil import parser
 import datetime, time
 from ....core.BaseAgent3 import BaseAgent
-import logging.handlers
 import json
 
 class snowAgent(BaseAgent):
-    warnings.filterwarnings('ignore') 
+    warnings.filterwarnings('ignore')
+
+    @BaseAgent.timed
     def process(self):
+        self.baseLogger.info('Inside process')
         try:
             self.BaseUrl = self.config.get("baseUrl", '')
             self.CR_sysid_url = self.config.get("CR_sysid_url", '')
@@ -53,7 +55,7 @@ class snowAgent(BaseAgent):
             self.tracking_time["start_time"]=self.end_time
             self.printdata()
         except Exception as e:
-            logging.error(e)
+            self.baseLogger.error(e)
             
     def printdata(self):
         try:
@@ -109,7 +111,7 @@ class snowAgent(BaseAgent):
             
             
         except Exception as e:
-            logging.error(e)
+            self.baseLogger.error(e)
 
          
 if __name__ == "__main__":

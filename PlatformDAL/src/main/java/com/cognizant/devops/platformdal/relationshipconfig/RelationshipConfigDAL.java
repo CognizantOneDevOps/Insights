@@ -15,65 +15,53 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.relationshipconfig;
 
+import java.util.HashMap;
 import java.util.List;
-
-import javax.persistence.criteria.CriteriaQuery;
-
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
-
 import com.cognizant.devops.platformdal.core.BaseDAL;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
 
+@Deprecated
 public class RelationshipConfigDAL extends BaseDAL {
-	
+
 	private static Logger log = LogManager.getLogger(RelationshipConfigDAL.class);
 	
-	public List<RelationshipConfiguration> getRelationshipConfig(String releationshipName)
-	{
-		try (Session session = getSessionObj()) {
-			session.beginTransaction();
-			Query<RelationshipConfiguration> createQuery = session.createQuery(
-					"FROM RelationshipConfiguration RC where RC.relationname=:relationname ",
-					RelationshipConfiguration.class);
-			createQuery.setParameter("relationname", releationshipName);
-			return createQuery.getResultList();
+	@Deprecated
+	public List<RelationshipConfiguration> getRelationshipConfig(String releationshipName) {
+		try {
+			Map<String, Object> parameters = new HashMap<>();
+			parameters.put("relationname", releationshipName);
+			return getResultList("FROM RelationshipConfiguration RC where RC.relationname=:relationname ",
+					RelationshipConfiguration.class, parameters);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
 		}
-	
 	}
-	
-	public List<RelationshipConfiguration> loadRelationshipsFromDatabase()
-	{
-		try (Session session = getSessionObj()) {
-			session.beginTransaction();
-			CriteriaQuery<RelationshipConfiguration> cq = session.getCriteriaBuilder()
-					.createQuery(RelationshipConfiguration.class);
-			cq.from(RelationshipConfiguration.class);
-			return session.createQuery(cq).getResultList();
+
+	@Deprecated
+	public List<RelationshipConfiguration> loadRelationshipsFromDatabase() {
+		try  {
+			Map<String, Object> parameters = new HashMap<>();
+			return getResultList("FROM RelationshipConfiguration RC ",
+					RelationshipConfiguration.class, parameters);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
 		}
-       
-		
 	}
-	
-    public void saveRelationshipConfig(CorrelationConfiguration config)
-    {
-		try (Session session = getSessionObj()) {
-			session.beginTransaction();
-			session.save(config);
-			session.getTransaction().commit();
+
+	@Deprecated
+	public void saveRelationshipConfig(CorrelationConfiguration config) {
+		try {
+			save(config);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
 		}
-    
-    }
-    
+
+	}
+
 }

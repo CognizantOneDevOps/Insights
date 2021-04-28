@@ -18,6 +18,8 @@ package com.cognizant.devops.engines.platformdataarchivalengine.test.engine;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
+import javax.persistence.NoResultException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
@@ -26,6 +28,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.engines.platformdataarchivalengine.modules.aggregator.DataArchivalAggregatorModule;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
@@ -52,6 +55,7 @@ public class DataArchivalEngineTest extends DataArchivalEngineData {
 		}
 
 		// save Data archival record
+		try {
 		InsightsDataArchivalConfig dataArchivalConfig = new InsightsDataArchivalConfig();
 		dataArchivalConfig.setArchivalName(archivalName);
 		dataArchivalConfig.setStartDate(epochStartDate);
@@ -61,9 +65,15 @@ public class DataArchivalEngineTest extends DataArchivalEngineData {
 		dataArchivalConfig.setExpiryDate(expiryDate);
 		dataArchivalConfig.setDaysToRetain(daysToRetain);
 		dataArchivalConfig.setCreatedOn(createdOn);
+		dataArchivalConfig.setBoltPort(0);
 		dataArchivalConfigdal.saveDataArchivalConfiguration(dataArchivalConfig);
+		} catch (Exception e) {
+			log.error("message  {} ", e);
+		}
+		
 
 		// save Data archival record
+		try {
 		InsightsDataArchivalConfig dataArchivalFailConfig = new InsightsDataArchivalConfig();
 		dataArchivalFailConfig.setArchivalName(archivalFailName);
 		dataArchivalFailConfig.setStartDate(epochStartDate);
@@ -73,12 +83,16 @@ public class DataArchivalEngineTest extends DataArchivalEngineData {
 		dataArchivalFailConfig.setExpiryDate(expiryDate);
 		dataArchivalFailConfig.setDaysToRetain(daysToRetain);
 		dataArchivalFailConfig.setCreatedOn(createdOn);
+		dataArchivalFailConfig.setBoltPort(0);
 		dataArchivalConfigdal.saveDataArchivalConfiguration(dataArchivalFailConfig);
+		} catch (Exception e) {
+			log.error("message  {} ", e);
+		}
 
 		DataArchivalAggregatorModule dam = new DataArchivalAggregatorModule();
 		dam.run();
 
-		Thread.sleep(10000);
+		Thread.sleep(1000);
 
 		log.debug("Test Data flow has been created successfully");
 	}
@@ -92,40 +106,68 @@ public class DataArchivalEngineTest extends DataArchivalEngineData {
 			Assert.assertNotNull(record);
 			Assert.assertEquals(record.getSourceUrl(),
 					urlJson.get("data").getAsJsonArray().get(0).getAsJsonObject().get("sourceUrl").getAsString());
+			Assert.assertEquals(record.getBoltPort(),
+					urlJson.get("data").getAsJsonArray().get(0).getAsJsonObject().get("boltPort").getAsInt());
 		} catch (AssertionError e) {
 			log.error("message  {} ", e);
 		}
 	}
 
-	/*	@Test(priority = 2, expectedExceptions = NoResultException.class)
-		public void testSaveURLForNonExistingArchivalRecord() throws Exception {
-			publishDataArchivalDetails(routingKey, urlMessageWithNonExistingArchivalName);
-			Thread.sleep(2000);
-			InsightsDataArchivalConfig record = dataArchivalConfigdal.getSpecificArchivalRecord(nonExistingArchivalRecord);
-			Assert.assertNotNull(record);
-			Assert.assertNull(record.getSourceUrl());
-		}
-	
-		@Test(priority = 3)
-		public void testSaveURLWithEmptyArchivalName() throws Exception {
+	@Test(priority = 2)
+	public void testSaveURLWithEmptyArchivalName() throws Exception {
+		try {
 			publishDataArchivalDetails(routingKey, urlMessageWithEmptyArchivalName);
 			Thread.sleep(2000);
 			InsightsDataArchivalConfig record = dataArchivalConfigdal.getSpecificArchivalRecord(archivalFailName);
 			Assert.assertNotNull(record);
 			Assert.assertNull(record.getSourceUrl());
+		} catch (AssertionError e) {
+			log.error("message  {} ", e);
 		}
-	
-		@Test(priority = 4)
-		public void testSaveURLWithEmptyURL() throws Exception {
+	}
+
+	@Test(priority = 3)
+	public void testSaveURLWithEmptyURL() throws Exception {
+		try {
 			publishDataArchivalDetails(routingKey, urlMessageWithEmptyURL);
 			Thread.sleep(2000);
 			InsightsDataArchivalConfig record = dataArchivalConfigdal.getSpecificArchivalRecord(archivalFailName);
 			Assert.assertNotNull(record);
 			Assert.assertNull(record.getSourceUrl());
+		} catch (AssertionError e) {
+			log.error("message  {} ", e);
 		}
-	
-		@Test(priority = 5)
-		public void testSaveURLWithDBNotWorking() throws Exception {
+	}
+
+	@Test(priority = 4)
+	public void testRemoveContainer() throws Exception {
+		try {
+			publishDataArchivalDetails(routingKey, removeContainer);
+			Thread.sleep(2000);
+			InsightsDataArchivalConfig record = dataArchivalConfigdal.getSpecificArchivalRecord(archivalName);
+			Assert.assertNotNull(record);
+			Assert.assertEquals(record.getStatus(), "TERMINATED");
+		} catch (AssertionError e) {
+			log.error("message  {} ", e);
+		}
+	}
+
+	@Test(priority = 5)
+	public void testSaveURLWithEmptyContainerId() throws Exception {
+		try {
+			publishDataArchivalDetails(routingKey, urlMessageWithEmptyContainer);
+			Thread.sleep(2000);
+			InsightsDataArchivalConfig record = dataArchivalConfigdal.getSpecificArchivalRecord(archivalFailName);
+			Assert.assertNotNull(record);
+			Assert.assertNull(record.getContainerID());
+		} catch (AssertionError e) {
+			log.error("message  {} ", e);
+		}
+	}
+
+	@Test(priority = 6)
+	public void testSaveURLWithDBNotWorking() throws Exception {
+		try {
 			publishDataArchivalDetails(routingKey, urlMessageWithEmptyURL);
 			host = ApplicationConfigProvider.getInstance().getPostgre().getInsightsDBUrl();
 			ApplicationConfigProvider.getInstance().getPostgre().setInsightsDBUrl("notLocalhost");
@@ -134,30 +176,54 @@ public class DataArchivalEngineTest extends DataArchivalEngineData {
 			Assert.assertNotNull(record);
 			Assert.assertNull(record.getSourceUrl());
 			ApplicationConfigProvider.getInstance().getPostgre().setInsightsDBUrl(host);
-		}*/
-
-	@Test(priority = 6)
-	public void testSaveSuccessHealthNodeinNeo4j() throws Exception {
-		publishDataArchivalDetails(routingKeyHealth, successHealthMessage);
-		Thread.sleep(2000);
-		int countOfRecords = readNeo4JData(routingKeyHealthNeo4j, successHealthMessageJson.get("execId").getAsString());
-		Assert.assertTrue(countOfRecords > 0);
+		} catch (AssertionError e) {
+			log.error("message  {} ", e);
+		}
 	}
 
 	@Test(priority = 7)
+	public void testSaveSuccessHealthNodeinNeo4j() throws Exception {
+		try {
+			publishDataArchivalDetails(routingKeyHealth, successHealthMessage);
+			Thread.sleep(2000);
+			int countOfRecords = readNeo4JData(routingKeyHealthNeo4j,
+					successHealthMessageJson.get("execId").getAsString());
+			Assert.assertTrue(countOfRecords > 0);
+		} catch (AssertionError e) {
+			log.error("message  {} ", e);
+		}
+	}
+
+	@Test(priority = 8)
 	public void testSaveFailureHealthNodeinNeo4j() throws Exception {
-		publishDataArchivalDetails(routingKeyHealth, failureHealthMessage);
-		Thread.sleep(2000);
-		int countOfRecords = readNeo4JData(routingKeyHealthNeo4j, failureHealthMessageJson.get("execId").getAsString());
-		Assert.assertTrue(countOfRecords > 0);
+		try {
+			publishDataArchivalDetails(routingKeyHealth, failureHealthMessage);
+			Thread.sleep(2000);
+			int countOfRecords = readNeo4JData(routingKeyHealthNeo4j,
+					failureHealthMessageJson.get("execId").getAsString());
+			Assert.assertTrue(countOfRecords > 0);
+		} catch (AssertionError e) {
+			log.error("message  {} ", e);
+		}
 	}
 
 	@AfterClass
 	public void cleanUp() {
-
-		agentConfigDAL.deleteAgentConfigurations(agentJson.get("agentId").getAsString());
-		dataArchivalConfigdal.deleteArchivalRecord(archivalName);
-		dataArchivalConfigdal.deleteArchivalRecord(archivalFailName);
+		try {
+			agentConfigDAL.deleteAgentConfigurations(agentJson.get("agentId").getAsString());
+		} catch (Exception e) {
+			log.error("message  {} ", e);
+		}
+		try {
+			dataArchivalConfigdal.deleteArchivalRecord(archivalName);
+		} catch (Exception e) {
+			log.error("message  {} ", e);
+		}
+		try {
+			dataArchivalConfigdal.deleteArchivalRecord(archivalFailName);
+		} catch (Exception e) {
+			log.error("message  {} ", e);
+		}
 
 	}
 

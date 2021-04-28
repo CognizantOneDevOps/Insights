@@ -26,7 +26,8 @@
 # Short-Description: Simple script to run InSightsWebHook program at boot
 # Description: Runs a InSightsWebHook program at boot
 ### END INIT INFO
-[[ -z "${INSIGHTS_WEBHOOK}" ]] && INSIGHTS_WEBHOOK=env | grep INSIGHTS_WEBHOOK | cut -d'=' -f2 || INSIGHTS_WEBHOOK="${INSIGHTS_WEBHOOK}"
+source /etc/environment
+source /etc/profile
 echo $INSIGHTS_WEBHOOK
 case "$1" in
   start)
@@ -35,7 +36,7 @@ case "$1" in
     else
      echo "Starting InSightsWebHook"
      cd $INSIGHTS_WEBHOOK
-	 sudo nohup java -jar PlatformInsightsWebHook.jar -config.file.location=$INSIGHTS_WEBHOOK &
+	 sudo nohup java -jar PlatformInsightsWebHook.jar -config.file.location=$INSIGHTS_WEBHOOK > /dev/null 2>&1 &
      echo $! > InSightsWebHook-pid.txt
      sleep 10
     fi
@@ -68,7 +69,7 @@ case "$1" in
      echo "InSightsWebHook stopped"
      echo "InSightsWebHook starting"
      cd $INSIGHTS_WEBHOOK
-	 sudo nohup java -jar PlatformInsightsWebHook.jar -config.file.location=$INSIGHTS_WEBHOOK &
+	 sudo nohup java -jar PlatformInsightsWebHook.jar -config.file.location=$INSIGHTS_WEBHOOK > /dev/null 2>&1 &
      echo $! > InSightsWebHook-pid.txt
 	 sleep 10
      echo "InSightsWebHook started"
@@ -76,7 +77,7 @@ case "$1" in
      echo "InSightsWebHook already in stopped state"
      echo "InSightsWebHook starting"
      cd $INSIGHTS_WEBHOOK
-	 sudo nohup java -jar PlatformInsightsWebHook.jar -config.file.location=$INSIGHTS_WEBHOOK &
+	 sudo nohup java -jar PlatformInsightsWebHook.jar -config.file.location=$INSIGHTS_WEBHOOK > /dev/null 2>&1 &
      echo $! > InSightsWebHook-pid.txt
 	 sleep 10
      echo "InSightsWebHook started"

@@ -17,8 +17,6 @@ package com.cognizant.devops.platformdal.masterdata;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.query.NativeQuery;
 
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
@@ -27,12 +25,9 @@ public class MasterDataDAL extends BaseDAL {
 	private static final Logger log = LogManager.getLogger(MasterDataDAL.class);
 
 	public void processMasterDataQuery(String query) {
-		log.debug("query  {} ", query);
-		try (Session session = getSessionObj()) {
-			session.beginTransaction();
-			NativeQuery createSQLQuery = session.createSQLQuery(query);
-			createSQLQuery.executeUpdate();
-			session.getTransaction().commit();
+		try {
+			int executedRecord = executeUpdateWithSQLQuery(query);
+			log.debug("processMasterDataQuery data updated {} for query  {} ",executedRecord, query);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;

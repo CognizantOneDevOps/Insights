@@ -18,10 +18,11 @@ from datetime import datetime as dateTime2
 from dateutil import parser
 import datetime
 import json
-import logging.handlers
 import base64
 
 class QtestAgent(BaseAgent):
+    
+    @BaseAgent.timed
     def process(self):
         baseUrl = self.config.get("baseUrl", None)
         username = self.config.get("username", None)
@@ -108,7 +109,7 @@ class QtestAgent(BaseAgent):
                                         except Exception as ex:
                                             nextPageResponse = False
                                             entity_type_available = False
-                                            logging.error("ProjectID: " + str(projectId) + " Type: " +str(entityType) + str(ex))
+                                            self.baseLogger.error("ProjectID: " + str(projectId) + " Type: " +str(entityType) + str(ex))
                                             break
                                     else:
                                         nextPageResponse = False
@@ -232,7 +233,7 @@ class QtestAgent(BaseAgent):
                             dataTraceMatrix.append(injectData)
                 except Exception as ex:
                     nextPageResponse = False
-                    logging.error(ex)
+                    self.baseLogger.error(ex)
                     break
             else:
                 nextPageResponse = False

@@ -109,7 +109,6 @@ public class InsightsWorkflowTask implements Serializable {
 	@Override
 	public String toString() {
 		return "InsightsWorkflowTask [taskId=" + taskId + ", description=" + description + ", mqChannel=" + mqChannel
-				+ ", compnentName=" + compnentName + ", dependency=" + dependency + ", workflowType=" + workflowType
-				+ "]";
+				+ ", compnentName=" + compnentName + ", dependency=" + dependency + "]";
 	}
 }

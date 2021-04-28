@@ -21,8 +21,6 @@ Created on Jun 16, 2016
 
 import json
 import requests
-from .MessageQueueProvider3 import MessageFactory
-from .CommunicationFacade3 import CommunicationFacade
 from apscheduler.schedulers.blocking import BlockingScheduler
 import sys
 import os.path
@@ -37,17 +35,36 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from base64 import b64encode, b64decode
+from functools import wraps
+
+from .LoggingFilter import LoggingFilter
+from .MessageQueueProvider3 import MessageFactory
+from .CommunicationFacade3 import CommunicationFacade
 
 class BaseAgent(object):
+    
+    @staticmethod
+    def timed(func):
+        """This decorator prints the execution time for the decorated function."""
+        @wraps(func)
+        def wrapper(self,*args, **kwargs):
+            start = time.time()
+            result = func(self,*args, **kwargs)
+            end = time.time()
+            self.functionName = func.__name__
+            self.timeLogger.info("ProcessingTime={}s".format(round(end - start, 2)))
+            return result
+        return wrapper
        
     def __init__(self):
         try:
             self.shouldAgentRun = True;
             self.setupAgent()
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.publishHealthData(self.generateHealthData(ex=ex))
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
+            raise ValueError(ex)
 
     def setupAgent(self):
         self.resolveConfigPath()
@@ -66,6 +83,7 @@ class BaseAgent(object):
         self.scheduleAgent()
 
     def fetchAgentCredentials(self):
+        #self.baseLogger.info('Inside fetchAgentCredentials')
         self.vaultFlag = self.config.get("vault").get("getFromVault", False)
         if self.vaultFlag:
             VaultCredentials = self.loadVaultCredentials()
@@ -96,47 +114,71 @@ class BaseAgent(object):
         
     
     def resolveConfigPath(self):
-        filePresent = os.path.isfile('config.json')
-        agentDir = os.path.dirname(sys.modules[self.__class__.__module__].__file__) + os.path.sep
-        if "INSIGHTS_HOME" in os.environ:
-            logDirPath = os.environ['INSIGHTS_HOME']+'/logs/PlatformAgent'
-            if not os.path.exists(logDirPath):
-                os.makedirs(logDirPath)
-        else:
-            logDirPath = agentDir
-        if filePresent:
-            self.configFilePath = 'config.json'
-            self.trackingFilePath = 'tracking.json'
-            #self.logFilePath = logDirPath +'/'+ 'log_'+type(self).__name__+'.log'            
-        else:
-            self.configFilePath = agentDir+'config.json'
-            self.trackingFilePath = agentDir+'tracking.json' 
-	    #self.logFilePath = logDirPath + '/'+'log_'+type(self).__name__+'.log'	    
-        trackingFilePresent = os.path.isfile(self.trackingFilePath)
-        if not trackingFilePresent:
-            self.updateTrackingJson({})
-    
-    def setupLogging(self):
-        agentDir = os.path.dirname(sys.modules[self.__class__.__module__].__file__) + os.path.sep
-        self.logFilePath = agentDir +'/'+ 'log_'+type(self).__name__+'.log'
-        if self.config.get('agentId') != None and self.config.get('agentId') != '':
+        try:
+            filePresent = os.path.isfile('config.json')
+            agentDir = os.path.dirname(sys.modules[self.__class__.__module__].__file__) + os.path.sep
             if "INSIGHTS_HOME" in os.environ:
-                logDirPath = os.environ['INSIGHTS_HOME']+'/logs/PlatformAgent'
+                logDirPath = os.environ['INSIGHTS_HOME'] + '/logs/PlatformAgent'
                 if not os.path.exists(logDirPath):
                     os.makedirs(logDirPath)
-                self.logFilePath = logDirPath +'/'+ 'log_'+self.config.get('agentId')+'.log'
+            else:
+                logDirPath = agentDir
+            if filePresent:
+                self.configFilePath = 'config.json'
+                self.trackingFilePath = 'tracking.json'
+                # self.logFilePath = logDirPath +'/'+ 'log_'+type(self).__name__+'.log'
+            else:
+                self.configFilePath = agentDir + 'config.json'
+                self.trackingFilePath = agentDir + 'tracking.json'
+                # self.logFilePath = logDirPath + '/'+'log_'+type(self).__name__+'.log'
+            trackingFilePresent = os.path.isfile(self.trackingFilePath)
+            if not trackingFilePresent:
+                self.updateTrackingJson({})
+        except Exception as ex:
+            raise ValueError(ex)
+    
+    def setupLogging(self):
+        try:
+            agentDir = os.path.dirname(sys.modules[self.__class__.__module__].__file__) + os.path.sep
+            self.logFilePath = agentDir + '/' + 'log_' + type(self).__name__ + '.log'
+            if self.config.get('agentId') != None and self.config.get('agentId') != '':
+                if "INSIGHTS_HOME" in os.environ:
+                    logDirPath = os.environ['INSIGHTS_HOME'] + '/logs/PlatformAgent'
+                    if not os.path.exists(logDirPath):
+                        os.makedirs(logDirPath)
+                    self.logFilePath = logDirPath + '/' + 'log_' + self.config.get('agentId') + '.log'
+            self.agentId = self.config.get('agentId')
+            self.toolName = self.config.get('toolName')
+            self.executionId = '--';
+            self.functionName = '--'
+            loggingSetting = self.config.get('loggingSetting', {})
+            maxBytes = loggingSetting.get('maxBytes', 1000 * 1000 * 5)
+            backupCount = loggingSetting.get('backupCount', 1000)
         
-        loggingSetting = self.config.get('loggingSetting',{})
-        maxBytes = loggingSetting.get('maxBytes', 1000 * 1000 * 5)
-        backupCount = loggingSetting.get('backupCount', 1000)
-        handler = logging.handlers.RotatingFileHandler(self.logFilePath, maxBytes=maxBytes, backupCount=backupCount)
-        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(filename)s - %(lineno)s - %(funcName)s - %(message)s')
-        handler.setFormatter(formatter)
-        logging.getLogger().setLevel(loggingSetting.get('logLevel',logging.WARN))
-        logging.getLogger("pika").setLevel(logging.WARNING)
-        logging.getLogger().addHandler(handler)
+            handler = logging.handlers.RotatingFileHandler(self.logFilePath, maxBytes=maxBytes, backupCount=backupCount)
+            
+            formatters = {
+                'baseLogger': logging.Formatter('t=%(asctime)s - lvl=%(levelname)s - filename=%(filename)s  - funcName=%(funcName)s - lineno=%(lineno)s - toolName='+self.toolName+' - agentId='+self.agentId+' - execId=%(execId)s   - message=%(message)s'),
+                'timeLogger': logging.Formatter('t=%(asctime)s - lvl=%(levelname)s - functionName=%(functionName)s - toolName='+self.toolName+' - agentId='+self.agentId+' - execId=%(execId)s   - message=%(message)s'),
+            }
+            default_formatter =logging.Formatter('t=%(asctime)s - lvl=%(levelname)s - filename=%(filename)s  - funcName=%(funcName)s - lineno=%(lineno)s - toolName='+self.toolName+' - agentId='+self.agentId+' - execId=%(execId)s   - message=%(message)s')
+            
+            handler.setFormatter(LoggingFilter(self,formatters,default_formatter))
+            handler.setLevel(loggingSetting.get('logLevel', logging.INFO))
+            handler.addFilter(LoggingFilter(self,formatters,default_formatter))
+            logging.getLogger().setLevel(loggingSetting.get('logLevel', logging.INFO))
+            logging.getLogger().addHandler(handler)
+            logging.getLogger().addFilter(LoggingFilter(self,formatters,default_formatter))
+            logging.getLogger().propagate = True
+            
+            self.baseLogger = logging.getLogger('baseLogger')
+            self.timeLogger = logging.getLogger('timeLogger')
+        except Exception as ex:
+            raise ValueError(ex)
+        
     
     def setupLocalCache(self):
+        self.baseLogger.info('Inside setupLocalCache')
         self.dataRoutingKey = str(self.config.get('publish').get('data'))
         self.healthRoutingKey = str(self.config.get('publish').get('health'))
         self.runSchedule = self.config.get('runSchedule', 30)
@@ -149,6 +191,7 @@ class BaseAgent(object):
         self.buildTimeFormatLengthMapping()      
     
     def buildTimeFormatLengthMapping(self):
+        self.baseLogger.info('Inside buildTimeFormatLengthMapping')
         self.timeFormatLengthMapping = {}
         timeFieldMapping = self.config.get('dynamicTemplate', {}).get('timeFieldMapping', None)
         if timeFieldMapping:
@@ -157,6 +200,7 @@ class BaseAgent(object):
         
     
     def extractToolName(self):
+        self.baseLogger.info('Inside extractToolName')
         tokens = self.dataRoutingKey.split('.')
         self.categoryName = tokens[0]
         self.toolName = tokens[1]
@@ -165,18 +209,23 @@ class BaseAgent(object):
          
     
     def loadConfig(self):
-        with open(self.configFilePath, 'r') as config_file:    
-            self.config = json.load(config_file)
-        if self.config == None:
-            raise ValueError('BaseAgent: unable to load config JSON')
+        try:
+            with open(self.configFilePath, 'r') as config_file:
+                self.config = json.load(config_file)
+            if self.config == None:
+                raise ValueError('BaseAgent: unable to load config JSON')
+        except Exception as ex:
+            raise ValueError(ex)
         
     def loadTrackingConfig(self):
+        self.baseLogger.info('Inside loadTrackingConfig')
         with open(self.trackingFilePath, 'r') as config_file:    
             self.tracking = json.load(config_file)
         if self.tracking == None:
             raise ValueError('BaseAgent: unable to load tracking JSON')
         
     def loadCommunicationFacade(self):
+        self.baseLogger.info('Inside loadCommunicationFacade')
         communicationFacade = CommunicationFacade();
         config = self.config.get('communication',{})
         facadeType = config.get('type', None)
@@ -186,6 +235,7 @@ class BaseAgent(object):
         self.communicationFacade = communicationFacade.getCommunicationFacade(facadeType, sslVerify, self.responseType, enableValueArray)
         
     def initializeMQ(self):
+        self.baseLogger.info('Inside initializeMQ')
         mqConfig = self.config.get('mqConfig', None)
         if mqConfig == None:
             raise ValueError('BaseAgent: unable to initialize MQ. mqConfig is not found')
@@ -206,22 +256,25 @@ class BaseAgent(object):
     Subscribe for Agent START/STOP exchange and queue
     '''
     def subscriberForAgentControl(self):
+        self.baseLogger.info('Inside subscriberForAgentControl')
         routingKey = self.config.get('subscribe').get('agentCtrlQueue')
         def callback(ch, method, properties, data):
-            logging.debug("Data received in subscriberForAgentControl .... ")
-            logging.debug(data)
+            self.baseLogger.info("Data received in subscriberForAgentControl .... ")
+            self.baseLogger.info(data)
             #Update the config file and cache.
             action = data
             if "STOP" == action.decode():
                 self.shouldAgentRun = False
             ch.basic_ack(delivery_tag = method.delivery_tag)
-            logging.debug(self.shouldAgentRun)
+            #self.baseLogger.info(self.shouldAgentRun)
+            self.baseLogger.info(self.shouldAgentRun)
         self.agentCtrlMessageFactory.subscribe(routingKey, callback)
            
     '''
     Subscribe for Engine Config Changes. Any changes to respective agent will be consumed and processed here.
     '''
     def configUpdateSubscriber(self):
+        self.baseLogger.info('Inside executeAgentExtensions')
         routingKey = self.config.get('subscribe').get('config')
         def callback(ch, method, properties, data):
             #Update the config file and cache.
@@ -240,19 +293,35 @@ class BaseAgent(object):
             uniqeKey: String --> comma separated node properties
         }
     '''
-    def publishToolsData(self, data, metadata=None,  timeStampField=None, timeStampFormat=None, isEpochTime=False,isExtension=False):
+    
+    def getMQDataPktSize(self, data):
+        self.baseLogger.info('Inside getMQDataPktSize')
+        pckSize = 0
+        self.pckLen = 0
+        for i in data:
+            pckSize = pckSize + sys.getsizeof(str(i))
+            self.pckLen = self.pckLen + 1
+        return str(pckSize)
+    
+    @timed.__func__
+    def publishToolsData(self, data, metadata=None, timeStampField=None, timeStampFormat=None, isEpochTime=False,
+                         isExtension=False):
         if metadata:
+            self.baseLogger.info(
+                    ' - DataSize=' + self.getMQDataPktSize(data) + " Bytes " + ' - DataType=Metadata' + ' - DataCount=' + str(self.pckLen))
             metadataType = type(metadata)
             if metadataType is not dict:
                 raise ValueError('BaseAgent: Dict metadata object is expected')
+        else:
+            self.baseLogger.info(
+                    ' - DataSize=' + self.getMQDataPktSize(data) + " Bytes " + ' - DataType=Regular' + ' - DataCount=' + str(self.pckLen))
         if data:
-            enableDataValidation = self.config.get('enableDataValidation',False)
+            enableDataValidation = self.config.get('enableDataValidation', False)
             if enableDataValidation:
                 data = self.validateData(data)
             self.addExecutionId(data, self.executionId)
-            self.addTimeStampField(data, timeStampField, timeStampFormat, isEpochTime,isExtension)
-            #logging.info(data)
-            auditing=self.config.get('auditing',False)
+            self.addTimeStampField(data, timeStampField, timeStampFormat, isEpochTime, isExtension)
+            auditing = self.config.get('auditing', False)
             if auditing:
                 self.addDigitalSign(data)
             self.messageFactory.publish(self.dataRoutingKey, data, self.config.get('dataBatchSize', 100), metadata)
@@ -272,7 +341,7 @@ class BaseAgent(object):
                 if isinstance(each_json[element],dict):
                     errorFlag = True
                     showErrorMessage = True
-                    logging.error('Value is not in expected format, nested JSON encountered.Rejecting: '+ str(each_json))                    
+                    self.baseLogger.error('Value is not in expected format, nested JSON encountered.Rejecting: '+ str(each_json))                    
                     break;
             if not errorFlag:
                 corrected_json_array.append(each_json)
@@ -283,6 +352,7 @@ class BaseAgent(object):
         return data
         
     def publishHealthData(self, data):
+        self.baseLogger.info('Inside publishHealthData')
         self.addExecutionId(data, self.executionId)
         self.messageFactory.publish(self.healthRoutingKey, data)
     
@@ -318,8 +388,8 @@ class BaseAgent(object):
                             value = value[:self.timeFormatLengthMapping[field]]
                             d[outputField] = self.getRemoteDateTime(datetime.strptime(value, timeFormat)).get('epochTime')
                         except Exception as ex:
-                            logging.warn('Unable to parse timestamp field '+ field)
-                            logging.error(ex)
+                            self.baseLogger.error('Unable to parse timestamp field '+ field)
+                            self.baseLogger.error(ex)
             
             d['toolName'] = self.toolName;
             d['categoryName'] = self.categoryName; 
@@ -334,10 +404,12 @@ class BaseAgent(object):
         return response;
     
     def addExecutionId(self, data, executionId):
+        self.baseLogger.info('Inside addExecutionId')
         for d in data:
             d['execId'] = executionId
-			
+            
     def addDigitalSign(self, data):
+        self.baseLogger.info('Inside addDigitalSign')
         dataString = ''
         for d in data:
             for key in sorted(d.keys()):
@@ -352,12 +424,10 @@ class BaseAgent(object):
                         dataString += str(d[key]).lower()
                     else:
                         dataString += str(d[key])
-            #print("dataString")
-            #print(dataString)
             hex = hashlib.sha256(dataString.encode('utf-8')).hexdigest()
             #print(hex)
             hex_signature = self.rsaEncrypt(hex)
-			
+            
             d['digitalSignature'] = hex_signature.decode('utf-8')
             #print(d['digitalSignature'])
             dataString = ''
@@ -396,6 +466,7 @@ class BaseAgent(object):
         return self.communicationFacade.processResponse(template, response, injectData, self.config.get('useResponseTemplate',False))
     
     def getResponseTemplate(self):
+        self.baseLogger.info('Inside getResponseTemplate')
         return self.config.get('dynamicTemplate', {}).get('responseTemplate',None)
     
     def generateHealthData(self, ex=None, systemFailure=False,note=None, additionalProperties=None):
@@ -417,16 +488,17 @@ class BaseAgent(object):
         elif ex != None:
             health['status'] = 'failure'
             health['message'] = 'Error occurred: '+str(ex)
-            logging.error(ex)
+            self.baseLogger.error(ex)
         else:
             health['status'] = 'success'
             if note != None:
                 health['message'] = note
         data.append(health)
-        logging.debug(data)
+        self.baseLogger.info(data)
         return data
     
     def scheduleAgent(self):
+        self.baseLogger.info('Inside scheduleAgent')
         if not hasattr(self, 'scheduler'):
             scheduler = BlockingScheduler()
             self.scheduler = scheduler
@@ -453,6 +525,7 @@ class BaseAgent(object):
                 pass
     
     def scheduleExtensions(self):
+        self.baseLogger.info('Inside scheduleExtensions')
         '''
         Schedule the extensions from here
         '''
@@ -460,12 +533,14 @@ class BaseAgent(object):
     Register the agent extensions. All the extensions will be called after the time interval specified using duration (in minutes)
     '''
     def registerExtension(self, name, func, duration):
+        self.baseLogger.info('Inside registerExtension')
         if not hasattr(self, 'extensions'):
             self.extensions = {}
         self.extensions[name] = {'func': func, 'duration': duration}
     
+    @timed.__func__
     def execute(self):
-        logging.debug('Agent is in START mode')
+        self.baseLogger.info('In execute method, Agent is in START mode')
         try:
             self.executionStartTime = datetime.now()
             self.logIndicator(self.EXECUTION_START, self.config.get('isDebugAllowed', False))
@@ -478,23 +553,24 @@ class BaseAgent(object):
         finally:
             '''If agent receive the STOP command, Python program should exit gracefully after current data collection is complete.  '''
             if self.shouldAgentRun == False:
-                logging.debug('executing agent stop and publish health message health message  ....   ')
+                self.baseLogger.info('executing agent stop and publish health message health message  ....   ')
                 try:
                     self.publishHealthData(self.generateHealthData(note="Agent is in STOP mode"))
                     os._exit(0)
                 except Exception as ex:
-                    logging.error(ex)
+                    self.baseLogger.error(ex)
 
     '''
         This method publishes health node for an exception and 
         Writes exception inside log file of corresponding Agent 
     '''
     def publishHealthDataForExceptions(self, ex):
-        logging.error(ex)
+        self.baseLogger.error(ex)
         self.publishHealthData(self.generateHealthData(ex=ex))
         self.logIndicator(self.EXECUTION_ERROR, self.config.get('isDebugAllowed', False))
     
     def executeAgentExtensions(self):
+        self.baseLogger.info('Inside executeAgentExtensions')
         if hasattr(self, 'extensions'):
             extensions = self.extensions
             agentExtensionsTracking = self.tracking.get('agentExtensions', None)
@@ -523,6 +599,7 @@ class BaseAgent(object):
                     
         
     def process(self):
+        self.baseLogger.info('Inside process')
         '''
         Override process in Agent class
         '''

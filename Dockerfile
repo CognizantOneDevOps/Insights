@@ -28,7 +28,23 @@ RUN yum update -y && \
     mkdir /usr/INSIGHTS_HOME /opt/grafana /opt/insightsengine/ /opt/python /opt/agent20 /opt/agent20/download && \
     mkdir /opt/insightsagents /opt/insightsagents/AgentDaemon /opt/insightsagents/PlatformAgents /opt/insightsWebhook/
 
+#Install jq - json processor
+RUN wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && \
+    chmod +x ./jq && \
+    cp jq /usr/bin
+
 VOLUME [/usr/INSIGHTS_HOME]
+
+# Initial Setup
+RUN cd /usr/INSIGHTS_HOME && \
+    wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/InSightsConfig.zip && \
+    unzip InSightsConfig.zip && rm -rf InSightsConfig.zip && \
+    cp -R InSightsConfig/.InSights/ . && rm -rf InSightsConfig && \
+    export INSIGHTS_HOME=/usr/INSIGHTS_HOME && \
+    echo INSIGHTS_HOME=/usr/INSIGHTS_HOME | tee -a /etc/environment && \
+    echo "export INSIGHTS_HOME=/usr/INSIGHTS_HOME" | tee -a /etc/profile && \
+    source /etc/environment && \
+    source /etc/profile
 
 # Installing Java with Env Variable
 
@@ -68,28 +84,14 @@ RUN yum install -y gcc openssl-devel bzip2-devel make && wget https://www.python
 RUN yum install -y postgresql
 EXPOSE 25672/tcp 4369/tcp 5672/tcp 15672/tcp
 
-# Installing Agents config
-
-WORKDIR /opt/insightsagents
-RUN export INSIGHTS_AGENT_HOME=`pwd` && echo INSIGHTS_AGENT_HOME=`pwd` | tee -a /etc/environment && \
-    echo "export" INSIGHTS_AGENT_HOME=`pwd` | tee -a /etc/profile && source /etc/environment && source /etc/profile && \
-    chmod -R 755 AgentDaemon && chmod -R 755 PlatformAgents
-WORKDIR /opt/insightsagents/AgentDaemon
-RUN wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/agentdaemon.zip -O agentdaemon.zip && \
-    unzip agentdaemon.zip && rm -rf agentdaemon.zip && chmod +x installdaemonagent.sh && yum install sudo -y && \
-    sed -i -e "s|extractionpath|/opt/insightsagents/PlatformAgents|g" /opt/insightsagents/AgentDaemon/com/cognizant/devops/platformagents/agents/agentdaemon/config.json && \
-    sudo sed -i -e "s|\$INSIGHTS_AGENT_HOME|/opt/insightsagents|g" /opt/insightsagents/AgentDaemon/InSightsDaemonAgent.sh && \
-    sudo chmod +x installdaemonagent.sh
-VOLUME [/opt/insightsagents/PlatformAgents]
-
 # installing Grafana
 
 WORKDIR /opt/grafana
-RUN chmod -R 766 /opt/grafana && wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/Grafana-6.1.6/grafana.tar.gz && \
-    tar -zxvf grafana.tar.gz && export GRAFANA_HOME=`pwd` && echo GRAFANA_HOME=`pwd` | sudo tee -a /etc/environment && echo "export" GRAFANA_HOME=`pwd` | sudo tee -a /etc/profile && \
-    wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/Grafana-6.1.6/ldap.toml && cp ldap.toml ./conf/ldap.toml && \
-    wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/Grafana-6.1.6/defaults.ini && cp defaults.ini ./conf/defaults.ini && \
-    wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/Grafana-6.1.6/custom.ini && cp custom.ini ./conf/custom.ini && \
+RUN chmod -R 766 /opt/grafana && wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/latest/grafana.tar.gz && \
+    tar -zxvf grafana.tar.gz && export GRAFANA_HOME=`pwd` && echo GRAFANA_HOME=`pwd` | tee -a /etc/environment && echo "export" GRAFANA_HOME=`pwd` | tee -a /etc/profile && \
+    wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/latest/ldap.toml && cp ldap.toml ./conf/ldap.toml && \
+    wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/latest/defaults.ini && cp defaults.ini ./conf/defaults.ini && \
+    wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/latest/custom.ini && cp custom.ini ./conf/custom.ini && \
     wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/Grafana.sh && cp Grafana.sh /etc/init.d/Grafana && \
     chmod 755 /etc/init.d/Grafana && chkconfig Grafana on
 VOLUME [/opt/grafana]
@@ -97,8 +99,9 @@ EXPOSE 3000/tcp 5432/tcp 7474/tcp
 
 # installing Apache Tomcat
 
-COPY PlatformService/target/*.war /opt/PlatformService.war
-COPY PlatformUI3/target/*.zip /opt/PlatformUI3.zip
+RUN wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformService.war -O /opt/PlatformService.war
+RUN wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformUI3.zip -O /opt/PlatformUI3.zip
+
 WORKDIR /opt/
 RUN unzip PlatformUI3.zip && rm -rf PlatformUI3.zip && \
     wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/tomcat/apache-tomcat.tar.gz && \
@@ -110,14 +113,24 @@ RUN cp -r /opt/app /opt/apache-tomcat/webapps/ && cp /opt/PlatformService.war /o
 # installing Insights Engine
 
 WORKDIR /opt/insightsengine/
-COPY PlatformEngine/target/PlatformEn*.jar /opt/insightsengine/PlatformEngine.jar
-RUN chmod -R 755 /opt/insightsengine/
+RUN wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformEngine.jar -O /opt/insightsengine/PlatformEngine.jar
+RUN chmod -R 755 /opt/insightsengine/PlatformEngine.jar
 
 # installing Insights Webhook
 
 WORKDIR /opt/insightsWebhook/
-COPY PlatformInsightsWebHook/target/PlatformInsightsWeb*.jar /opt/insightsWebhook/PlatformInsightsWebHook.jar
+RUN wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformInsightsWebHook.jar -O /opt/insightsWebhook/PlatformInsightsWebHook.jar
 RUN chmod -R 755 /opt/insightsWebhook/
+
+# installing Insights Reports - Reports jar must be inside INSIGHTS_HOME path. Used as classpath for Workflow jar
+WORKDIR /usr/INSIGHTS_HOME
+RUN wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformReports.jar -O /usr/INSIGHTS_HOME/PlatformReports.jar
+RUN chmod -R 755 /usr/INSIGHTS_HOME/PlatformReports.jar
+
+# installing Insights Workflow
+WORKDIR /opt/insightsWorkflow/
+RUN wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformWorkflow.jar -O /opt/insightsWorkflow/PlatformWorkflow.jar
+RUN chmod -R 755 /opt/insightsWorkflow/
 
 #installing Apache httpd
 RUN yum install httpd -y
@@ -125,7 +138,22 @@ WORKDIR /etc/httpd/conf
 RUN rm -f httpd.conf && wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/httpd/RHEL/http/httpd.conf
 WORKDIR /etc/httpd/conf.d
 RUN rm -f httpd-vhosts.conf && wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/httpd/RHEL/http/httpd-vhosts.conf
-EXPOSE 80/tcp
+EXPOSE 8080/tcp
+
+# Installing Agents config
+
+WORKDIR /opt/insightsagents
+RUN export INSIGHTS_AGENT_HOME=`pwd` && echo INSIGHTS_AGENT_HOME=`pwd` | tee -a /etc/environment && \
+    echo "export" INSIGHTS_AGENT_HOME=`pwd` | tee -a /etc/profile && source /etc/environment && source /etc/profile && \
+    chmod -R 755 AgentDaemon && chmod -R 755 PlatformAgents
+WORKDIR /opt/insightsagents/AgentDaemon
+RUN wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/agentdaemon.zip -O agentdaemon.zip && \
+    unzip agentdaemon.zip && rm -rf agentdaemon.zip && chmod +x installdaemonagent.sh && \
+    sed -i -e "s|extractionpath|/opt/insightsagents/PlatformAgents|g" /opt/insightsagents/AgentDaemon/com/cognizant/devops/platformagents/agents/agentdaemon/config.json && \
+    sed -i -e "s|\$INSIGHTS_AGENT_HOME|/opt/insightsagents|g" /opt/insightsagents/AgentDaemon/InSightsDaemonAgent.sh && \
+    cp /opt/insightsagents/AgentDaemon/InSightsDaemonAgent.sh /etc/init.d/InSightsDaemonAgent && chmod +x /etc/init.d/InSightsDaemonAgent
+
+VOLUME [/opt/insightsagents/PlatformAgents]
 
 # Running entry script
 WORKDIR /

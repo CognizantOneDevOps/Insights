@@ -210,15 +210,15 @@ public class DataExtractor {
 					projectList.add(projectData);
 					projectIssueSize += projectData.get("count").getAsInt();
 				}
-				if (!projectProcessingBatches.contains(projectList) && projectList.size() > 0) {
+				if (!projectProcessingBatches.contains(projectList) && !projectList.isEmpty()) {
 					projectProcessingBatches.add(projectList);
 				}
 				if (projectIssueSize >= dataBatchSize) {
-					projectList = new ArrayList<JsonObject>();
+					projectList = new ArrayList<>();
 					projectIssueSize = 0;
 				}
 			}
-			if (projectProcessingBatches.size() > 0) {
+			if (!projectProcessingBatches.isEmpty()) {
 				for (List<JsonObject> batch : projectProcessingBatches) {
 					long st = System.currentTimeMillis();
 					int processedRecords = 0;
@@ -226,8 +226,7 @@ public class DataExtractor {
 						processedRecords += obj.get("count").getAsInt();
 					}
 					JsonObject almEnrichmentResponse = dbHandler.bulkCreateNodes(batch, null, almDataEnrichmentCypher);
-					log.debug("Processed/Enriched " + processedRecords + " " + sourceTool + " records, time taken: "
-							+ (System.currentTimeMillis() - st) + " ms");
+					log.debug("Processed/Enriched {} {} records, time taken: {}" , processedRecords, sourceTool ,(System.currentTimeMillis() - st) + " ms");
 					log.debug(almEnrichmentResponse);
 				}
 			}

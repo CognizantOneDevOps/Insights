@@ -135,7 +135,7 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 		InsightsWorkflowExecutionHistory historyConfig = workflowDAL
 				.getWorkflowExecutionHistoryByHistoryId(incomingTaskMessage.get("exectionHistoryId").getAsInt());
 		JsonObject statusLog = new Gson().fromJson(historyConfig.getStatusLog(), JsonObject.class);
-		log.debug(" Worlflow Detail ====  extractKPIAndContentRetryList statusLog ", statusLog);
+		log.debug(" Worlflow Detail ====  extractKPIAndContentRetryList statusLog {}", statusLog);
 		if (statusLog != null) {
 			Type type = new TypeToken<List<Integer>>() {
 			}.getType();

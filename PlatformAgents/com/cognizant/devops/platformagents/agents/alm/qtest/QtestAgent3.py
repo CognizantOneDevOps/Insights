@@ -15,7 +15,6 @@
 #-------------------------------------------------------------------------------
 from ....core.BaseAgent3 import BaseAgent
 import json
-import logging.handlers
 import math
 import datetime
 from dateutil import parser
@@ -23,6 +22,7 @@ from dateutil import parser
 
 class QtestAgent (BaseAgent):
 
+    @BaseAgent.timed
     def process(self):
         baseUrl = self.config.get('baseUrl', '')
         userName = self.getCredential('userid')
@@ -109,7 +109,7 @@ class QtestAgent (BaseAgent):
                                 totalPage = int(math.ceil(float(total) / 100))
                                 pageSetFlag = True
                         except Exception as err:
-                            logging.error(err)
+                            self.baseLogger.error(err)
                         responseData = response.get('items', None)
                         if responseData:
                             for response in responseData:
@@ -140,7 +140,7 @@ class QtestAgent (BaseAgent):
                         projectTrackingDetails[entity] = {'idList': idList, 'lastModificationDate': lastTracked}
                         self.updateTrackingJson(self.tracking)
         except Exception as err:
-            logging.error(err)
+            self.baseLogger.error(err)
         finally:
             self.logout(token, baseUrl)
 
@@ -156,9 +156,10 @@ class QtestAgent (BaseAgent):
         payload = 'grant_type=password&username=' + userName + '&password=' + password
         response = self.getResponse(baseUrl + '/oauth/token', 'POST', None, None, payload, None, headers)
         if "error" in response:
-            logging.error(response)
+            self.baseLogger.error(response)
         return response.get("access_token", None)
 
+    @BaseAgent.timed
     def automationTypeHistory(self, historyUrl, projectId, entityType, automationType, headers, idList, idChunkSize, pageSize):
         try:
             automationData = list()
@@ -180,7 +181,7 @@ class QtestAgent (BaseAgent):
                             totalPage = int(math.ceil(float(total) / 100))
                             pageSetFlag = True
                     except Exception as err:
-                        logging.error(err)
+                        self.baseLogger.error(err)
                     finally:
                         if 'items' in historyResponse and historyResponse['items']:
                             changeHistoryList = historyResponse.get('items')
@@ -210,7 +211,7 @@ class QtestAgent (BaseAgent):
             return automationData
 
         except Exception as err:
-            logging.error(err)
+            self.baseLogger.error(err)
 
     @staticmethod
     def _ConstructHistoryObjectQuery(entityIdList):
@@ -235,6 +236,7 @@ class QtestAgent (BaseAgent):
         else:
             return [self._ConstructHistoryObjectQuery(idList), ]
 
+    @BaseAgent.timed
     def retrieveLinkedArtifacts(self):
         baseUrl = self.config.get('baseUrl', '')
         userName = self.config.get('username', '')
@@ -300,7 +302,7 @@ class QtestAgent (BaseAgent):
                                 if len(idList[start:end]) == 0:
                                     dictIsNotEmpty = False
                         except Exception as err:
-                            logging.error(err)
+                            self.baseLogger.error(err)
                         finally:
                             entityTrackingDetails.pop('idList')
                     if data:
@@ -317,7 +319,7 @@ class QtestAgent (BaseAgent):
                                 projectTrackingDetails['test-cases']['idList'] = idData
                         self.updateTrackingJson(self.tracking)
         except Exception as ex1:
-            logging.error(ex1)
+            self.baseLogger.error(ex1)
         finally:
             self.logout(token, baseUrl)
 

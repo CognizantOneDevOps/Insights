@@ -16,21 +16,20 @@
 
 package com.cognizant.devops.platformdal.upshiftassessment;
 
-import com.cognizant.devops.platformdal.core.BaseDAL;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
+
+import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class UpshiftAssessmentConfigDAL extends BaseDAL {
     private static Logger log = LogManager.getLogger(UpshiftAssessmentConfigDAL.class);
 
     public int saveUpshiftAssessment(UpshiftAssessmentConfig upshiftAssessmentConfig) {
         int id = -1;
-        try (Session session = getSessionObj()) {
-            session.beginTransaction();
-            id = (int) session.save(upshiftAssessmentConfig);
-            session.getTransaction().commit();
+        try {
+            id = (int)save(upshiftAssessmentConfig);
             log.debug("Transaction ID == {}" , id);
             return id;
         } catch (Exception e) {
@@ -39,11 +38,14 @@ public class UpshiftAssessmentConfigDAL extends BaseDAL {
     }
 
     public UpshiftAssessmentConfig fetchUpshiftAssessmentDetailsByWorkflowId(String workflowId) {
-        try (Session session = getSessionObj()) {
-            Query<UpshiftAssessmentConfig> createQuery = session.createQuery(
-                    "FROM UpshiftAssessmentConfig gd where gd.workflowConfig.workflowId = :workflowId", UpshiftAssessmentConfig.class);
-            createQuery.setParameter("workflowId", workflowId);
-            return createQuery.uniqueResult();
+        try {
+        	Map<String,Object> parameters = new HashMap<>();
+			parameters.put("workflowId", workflowId);
+			return getUniqueResult(
+					"FROM UpshiftAssessmentConfig gd where gd.workflowConfig.workflowId = :workflowId",
+					UpshiftAssessmentConfig.class,
+					parameters);
+        	
         } catch (Exception e) {
             log.error(e.getMessage());
             throw e;
@@ -51,11 +53,13 @@ public class UpshiftAssessmentConfigDAL extends BaseDAL {
     }
 
     public UpshiftAssessmentConfig fetchUpshiftAssessmentByUuid(String uuid) {
-        try (Session session = getSessionObj()) {
-            Query<UpshiftAssessmentConfig> createQuery = session.createQuery(
-                    "FROM UpshiftAssessmentConfig gd where gd.upshiftUuid = :uuid", UpshiftAssessmentConfig.class);
-            createQuery.setParameter("uuid", uuid);
-            return createQuery.uniqueResult();
+        try {
+        	Map<String,Object> parameters = new HashMap<>();
+			parameters.put("uuid", uuid);
+			return getUniqueResult(
+					"FROM UpshiftAssessmentConfig gd where gd.upshiftUuid = :uuid",
+					UpshiftAssessmentConfig.class,
+					parameters);
         } catch (Exception e) {
             log.error(e.getMessage());
             throw e;
@@ -63,10 +67,8 @@ public class UpshiftAssessmentConfigDAL extends BaseDAL {
     }
 
     public void updateUpshiftAssessmentConfig(UpshiftAssessmentConfig config) {
-        try (Session session = getSessionObj()) {
-            session.beginTransaction();
-            session.update(config);
-            session.getTransaction().commit();
+        try {
+        	update(config);
         } catch (Exception e) {
             log.error(e.getMessage());
             throw e;

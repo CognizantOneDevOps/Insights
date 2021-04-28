@@ -121,7 +121,7 @@ public class EmailProcesser implements Callable<JsonObject> {
 			Multipart multipart = new MimeMultipart();
 			// Create the attachment part
 			BodyPart messageBodyPart = new MimeBodyPart();
-			if (mail.getMailAttachment().length > 0) {
+			if (mail.getMailAttachment()!=null && mail.getMailAttachment().length > 0) {
 				InputStream inputStream = new ByteArrayInputStream(mail.getMailAttachment());
 				ByteArrayDataSource bds = new ByteArrayDataSource(inputStream, "application/pdf");
 				log.debug("Workflow Detail ==== Attaching file from {} ", mail.getReportFilePath());

@@ -28,7 +28,10 @@ import json, ast
 
 
 class AwsCodeDeployAgent(BaseAgent):
+
+    @BaseAgent.timed
     def process(self):
+        self.baseLogger.info('Inside process')
         startFrom = self.config.get("startFrom", '')
         startFrom = parser.parse(startFrom)
         startFrom = startFrom.strftime('%Y-%m-%dT%H:%M:%S')

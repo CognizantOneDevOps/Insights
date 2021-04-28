@@ -1,0 +1,12 @@
+{
+  "agentManagement" : "Agent Management",
+  "osName"	: "Windows",
+  "version" : "v7.6",
+  "toolName" : "git",
+  "mqUser"	: "iSight",
+  "agentId" : "GIT_TEST",
+  "dataLabelName" : "SCM.GIT_RELEASE.DATA",
+  "healthLabelName" : "SCM.GIT_RELEASE.HEALTH",
+  "getRepos" : "https://api.github.com/users/<USER_NAME>/repos",
+  "commitsBaseEndPoint" : "https://api.github.com/repos/<REPO_NAME>/"
+}

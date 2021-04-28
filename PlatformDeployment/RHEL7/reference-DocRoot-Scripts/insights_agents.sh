@@ -14,26 +14,28 @@
 # the License.
 #-------------------------------------------------------------------------------
 echo "Set up Agent_Daemon"
-cd /opt/ && sudo mkdir insightsagents
-chmod -R 755 insightsagents/
+source /etc/environment
+source /etc/profile
+cd $INSIGHTS_APP_ROOT_DIRECTORY
+sudo mkdir insightsagents
+sudo chmod -R 755 insightsagents/
 cd insightsagents
 export INSIGHTS_AGENT_HOME=`pwd`
 echo INSIGHTS_AGENT_HOME=`pwd` |sudo tee -a /etc/environment
 echo "export" INSIGHTS_AGENT_HOME=`pwd` |sudo tee -a /etc/profile
 sudo mkdir AgentDaemon
 sudo mkdir PlatformAgents
-chmod -R 755 AgentDaemon
-chmod -R 755 PlatformAgents
+sudo chmod -R 755 AgentDaemon
+sudo chmod -R 755 PlatformAgents
 echo $INSIGHTS_AGENT_HOME
 cd AgentDaemon
 sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/agentdaemon.zip -O agentdaemon.zip
 sudo unzip agentdaemon.zip && sudo rm -rf agentdaemon.zip
 source /etc/environment
 source /etc/profile
-sudo sed -i -e "s|extractionpath|/opt/insightsagents/PlatformAgents|g" /opt/insightsagents/AgentDaemon/com/cognizant/devops/platformagents/agents/agentdaemon/config.json
+sudo sed -i -e "s|extractionpath|/"$INSIGHTS_APP_ROOT_DIRECTORY"/insightsagents/PlatformAgents|g" $INSIGHTS_APP_ROOT_DIRECTORY/insightsagents/AgentDaemon/com/cognizant/devops/platformagents/agents/agentdaemon/config.json
 sudo chmod +x installdaemonagent.sh
-sudo mkdir /opt/agent20
-sudo mkdir /opt/agent20/download
-sudo chmod -R 777 /opt/agent20
+sudo mkdir $INSIGHTS_APP_ROOT_DIRECTORY/agent20
+sudo mkdir $INSIGHTS_APP_ROOT_DIRECTORY/agent20/download
+sudo chmod -R 777 $INSIGHTS_APP_ROOT_DIRECTORY/agent20
 sudo sh installdaemonagent.sh Linux
-

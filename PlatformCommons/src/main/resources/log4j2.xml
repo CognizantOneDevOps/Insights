@@ -2,18 +2,28 @@
 <Configuration status="DEBUG">
 
 	<Appenders>
-		<Console name="Console" target="SYSTEM_OUT">
+		<Console name="Console" >
 			<PatternLayout
-				pattern="%d{yyyy-MM-dd HH:mm:ss} %p [%t]:%c{1}.%M()%L :: %m%n" />
+				pattern="t=%d{yyyy-MM-dd HH:mm:ss} lvl=%p [%t]:%c{1}.%M()%L :: message=%m%n" />
 		</Console>
-
-
 
 		<RollingFile name="PlatformService"
 			filename="${env:INSIGHTS_HOME}/logs/PlatformService/platformService.log"
 			filepattern="${env:INSIGHTS_HOME}/logs/PlatformService/platformService-%i.log">
 			<PatternLayout
-				pattern="%d{dd-MM-yyyy HH:mm:ss,SSS} %p %c{1}.%M()%L :: %m%n" />
+				pattern="t=%d{yyyy-MM-dd HH:mm:ss} lvl=%p [%t]:%c{1}.%M()%L :: message=%m%n" />
+			<Policies>
+				<SizeBasedTriggeringPolicy size="10 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="20" />
+		</RollingFile>
+		
+		<RollingFile name="PlatformServiceGrafana"
+			filename="${env:INSIGHTS_HOME}/logs/PlatformServiceGrafana/PlatformServiceGrafana.log"
+			filepattern="${env:INSIGHTS_HOME}/logs/PlatformServiceGrafana/PlatformServiceGrafana-%i.log">
+			<PatternLayout
+				pattern="%msg%n" />
+				
 			<Policies>
 				<SizeBasedTriggeringPolicy size="10 MB" />
 			</Policies>
@@ -24,7 +34,7 @@
 			filename="${env:INSIGHTS_HOME}/logs/PlatformEngine/platformEngine.log"
 			filepattern="${env:INSIGHTS_HOME}/logs/PlatformEngine/platformEngine-%i.log">
 			<PatternLayout
-				pattern="%d{yyyy-MM-dd HH:mm:ss} %p [%t]:%c{3}.%M()%L %-5p:: %m%n" />
+				pattern="t=%d{yyyy-MM-dd HH:mm:ss} lvl=%p [%t]:%c{1}.%M()%L :: message=%m%n" />
 			<Policies>
 				<SizeBasedTriggeringPolicy size="10 MB" />
 			</Policies>
@@ -35,7 +45,7 @@
 			filename="${env:INSIGHTS_HOME}/logs/PlatformWorkflow/platformWorkflow.log"
 			filepattern="${env:INSIGHTS_HOME}/logs/PlatformWorkflow/platformWorkflow-%i.log">
 			<PatternLayout
-				pattern="%d{yyyy-MM-dd HH:mm:ss} %p [%thread]:%c{1}.%M()%L :: %m%n" />
+				pattern="t=%d{yyyy-MM-dd HH:mm:ss} lvl=%p [%t]:%c{1}.%M()%L :: message=%m%n" />
 			<Policies>
 				<SizeBasedTriggeringPolicy size="10 MB" />
 			</Policies>
@@ -46,7 +56,7 @@
 			filename="${env:INSIGHTS_HOME}/logs/PlatformRegressionTest/platformRegressionTest.log"
 			filepattern="${env:INSIGHTS_HOME}/logs/PlatformRegressionTest/platformRegressionTest-%i.log">
 			<PatternLayout
-				pattern="%d{yyyy-MM-dd HH:mm:ss} %p [%t]:%c{3}.%M()%L %-5p:: %m%n" />
+				pattern="t=%d{yyyy-MM-dd HH:mm:ss} lvl=%p [%t]:%c{1}.%M()%L :: message=%m%n" />
 			<Policies>
 				<SizeBasedTriggeringPolicy size="10 MB" />
 			</Policies>
@@ -57,7 +67,7 @@
 			filename="${env:INSIGHTS_HOME}/logs/ApplicationModuleStartupLog.log"
 			filepattern="${env:INSIGHTS_HOME}/logs/ApplicationModuleStartupLog-%i.log">
 			<PatternLayout
-				pattern="%d{yyyy-MM-dd HH:mm:ss} %p [%t]:%c{3}.%M()%L %-5p:: %m%n" />
+				pattern="t=%d{yyyy-MM-dd HH:mm:ss} lvl=%p [%t]:%c{1}.%M()%L :: message=%m%n" />
 			<Policies>
 				<SizeBasedTriggeringPolicy size="10 MB" />
 			</Policies>
@@ -67,10 +77,19 @@
 	</Appenders>
 
 	<Loggers>
+		<Logger name="com.cognizant.devops.platformservice.neo4jpluginlogs" level="debug" additivity="false">
+			<AppenderRef ref="Console" />
+			<AppenderRef ref="PlatformServiceGrafana"/>
+		</Logger>
+		
 		<Logger name="org.hibernate" level="error" additivity="false">
 			<AppenderRef ref="Console" />
 		</Logger>
-
+		
+		<Logger name="org.hibernate.stat" level="error" additivity="false">
+			<AppenderRef ref="Console" />
+		</Logger>
+		
 		<Logger name="org" level="error" additivity="false">
 			<AppenderRef ref="Console" />
 		</Logger>
@@ -81,17 +100,17 @@
 		</Logger>
 
 		<!-- NettyClientHandler -->
-		<Logger name="io.grpc.netty" level="error">
+		<Logger name="io.grpc.netty" level="error" additivity="false">
 			<AppenderRef ref="Console" />
 		</Logger>
 
 		<!-- SslHandler -->
-		<Logger name="io.netty" level="error">
+		<Logger name="io.netty" level="error" additivity="false">
 			<AppenderRef ref="Console" />
 		</Logger>
 
 		<!-- Hyperledger network events polling -->
-		<Logger name="org.hyperledger" level="error">
+		<Logger name="org.hyperledger" level="error" additivity="false">
 			<AppenderRef ref="Console" />
 		</Logger>
 

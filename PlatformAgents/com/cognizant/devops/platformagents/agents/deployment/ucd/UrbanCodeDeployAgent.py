@@ -27,7 +27,10 @@ from dateutil import parser
 from ....core.BaseAgent import BaseAgent
 
 class UrbanCodeDeployAgent(BaseAgent):
+
+    @BaseAgent.timed
     def process(self):
+        self.baseLogger.info('Inside process')
         userid = self.getCredential("userid")
         passwd = self.getCredential("passwd")
         baseUrl = self.config.get("baseUrl", '')

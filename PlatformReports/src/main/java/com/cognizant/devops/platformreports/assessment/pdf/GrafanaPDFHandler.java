@@ -388,7 +388,6 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 	 * @param grafanaDashboardConfig
 	 */
 	private void updateReportStatus(GrafanaDashboardPdfConfig grafanaDashboardConfig) {
-		GrafanaDashboardPdfConfigDAL grafanaDashboardConfigDAL = new GrafanaDashboardPdfConfigDAL();
 		grafanaDashboardConfig.setStatus(WorkflowTaskEnum.WorkflowStatus.COMPLETED.name());
 		grafanaDashboardConfig.setWorkflowConfig(grafanaDashboardConfig.getWorkflowConfig());
 		grafanaDashboardConfig.setUpdatedDate(InsightsUtils.getCurrentTimeInEpochMilliSeconds());

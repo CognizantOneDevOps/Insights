@@ -36,6 +36,7 @@ from datetime import datetime
 
 
 class Neo4jArchivalAgent(BaseAgent):
+    @BaseAgent.timed
     def process(self):
         neo4j_host_uri = self.config.get("neo4j_host_uri", '')
         neo4j_query_limit = self.config.get("querylimit", '')
@@ -50,27 +51,27 @@ class Neo4jArchivalAgent(BaseAgent):
         self._driver = GraphDatabase.driver(neo4j_host_uri, auth=(neo4j_user_id, neo4j_password), max_connection_lifetime=200)
         _es = elasticsearch.Elasticsearch(hosts=elasticsearch_hostname_uri,http_auth=(elasticsearch_username, elasticsearch_passwd))
         if _es.ping():
-            logging.debug('connected')
+            self.baseLogger.info('connected')
         else:
-            logging.debug('could not connect!')
+            self.baseLogger.info('could not connect!')
         try:
             if neo4j_label_csv == "*":
                 with self._driver.session() as session:
                     list_of_labels = session.write_transaction(self.find_labels)
-                    logging.debug(list_of_labels)
+                    self.baseLogger.info(list_of_labels)
                     dctNode = list_of_labels[0]
                     tem = dict(dctNode)
                     values_view = tem.values()
                     value_iterator = iter(values_view)
                     first_value = next(value_iterator)
-                    logging.debug(first_value)
+                    self.baseLogger.info(first_value)
                     list_lables = list(first_value)
-                    logging.debug(list_lables)
+                    self.baseLogger.info(list_lables)
             else:
                 list_lables = neo4j_label
             for i in range(len(list_lables)):
                 if list_lables[i]:
-                    #logging.debug(list_lables[i])
+                    #self.baseLogger.info(list_lables[i])
                     self.process_node_datatype(_es, list_lables[i])
                     self.process_rel_datatype(_es, list_lables[i])
                     self.resume_migrate_nodes(_es, list_lables[i], neo4j_query_limit)
@@ -82,56 +83,56 @@ class Neo4jArchivalAgent(BaseAgent):
                     self.process_node_datatype(_es, list_lables[i])
                     self.process_rel_datatype(_es, list_lables[i])
                     if (neo4j_data_delete):
-                        logging.debug("deletion starts")
+                        self.baseLogger.info("deletion starts")
                         self.delete_batchof_relationships(_es, list_lables[i], neo4j_query_limit)
                         self.delete_batchof_nodes(_es, list_lables[i], neo4j_query_limit)
             self.process_indexes(_es)
-            logging.debug("process complete")
+            self.baseLogger.info("process complete")
 
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
             exit(1)
 
     def process_node_datatype(self, _es, label):
         try:
-            logging.debug("INFO:: Inside Process Node Datatype")
+            self.baseLogger.info("INFO:: Inside Process Node Datatype")
             with self._driver.session() as session:
                 schemadict ={}
                 result = session.write_transaction(self.get_node_datatype)
-                logging.debug(result)
+                self.baseLogger.info(result)
                 for i in range(len(result)):
-                    #logging.debug(result[i])
-                    #logging.debug(result[i]["nodeLabels"])
+                    #self.baseLogger.info(result[i])
+                    #self.baseLogger.info(result[i]["nodeLabels"])
                     labellist = result[i]["nodeLabels"]
                     if labellist.count(label) >0 :
                         schemadict[result[i]["propertyName"]] = result[i]["propertyTypes"]
                         schemadict["_label"] = ["String"]
-                logging.debug(schemadict)
+                self.baseLogger.info(schemadict)
                 label= label+"_neo4j_schema"
                 copy_schema_data_to_es_result =self.copy_schema_data_to_es(_es, schemadict, label)
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
             exit(1)
 
     def process_rel_datatype(self, _es, label):
         try:
-            logging.debug("INFO:: Inside Process Rel Datatype")
+            self.baseLogger.info("INFO:: Inside Process Rel Datatype")
             with self._driver.session() as session:
                 schemadict ={}
                 relationship_types = session.write_transaction(self.get_distinct_relationship_details,label)
-                logging.debug(relationship_types)
+                self.baseLogger.info(relationship_types)
                 result = session.write_transaction(self.get_rel_datatype)
-                logging.debug(result)
+                self.baseLogger.info(result)
                 for j in range(len(relationship_types)):
                     for i in range(len(result)):
-                        #logging.debug(result[i]["relType"])
+                        #self.baseLogger.info(result[i]["relType"])
                         relatioshipname = relationship_types[j]["relationshipName"]
                         relatioshipname_altered = ":`"+relatioshipname+"`"
-                        #logging.debug(relatioshipname)
+                        #self.baseLogger.info(relatioshipname)
                         relType_val = result[i]["relType"]
                         if relatioshipname_altered == relType_val:
                             schemadict[result[i]["propertyName"]] = result[i]["propertyTypes"]
@@ -144,18 +145,18 @@ class Neo4jArchivalAgent(BaseAgent):
                             schemadict["time_node_end"] = ["Double"]
                             schemadict["_end"] = ["String"]
                             schemadict["copy_to_ES"] = ["Boolean"]
-                    #logging.debug(schemadict)
+                    #self.baseLogger.info(schemadict)
                     relatioshipname= relatioshipname+"_neo4j_schema"
                     copy_schema_data_to_es_result =self.copy_schema_data_to_es(_es, schemadict, relatioshipname)
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
             exit(1)
 
     def process_indexes(self, _es):
         try:
-            logging.debug("INFO:: Inside Process Indexes")
+            self.baseLogger.info("INFO:: Inside Process Indexes")
             with self._driver.session() as session:
                 indexdict ={}
                 result = session.write_transaction(self.get_indexes)
@@ -166,13 +167,13 @@ class Neo4jArchivalAgent(BaseAgent):
                   copy_index_data_to_es_result =self.copy_index_data_to_es(_es, indexdict, label)
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
             exit(1)
 
     def delete_batchof_nodes(self, _es, label,neo4j_query_limit):
         try:
-            logging.debug("INFO:: Inside delete batch of nodes")
+            self.baseLogger.info("INFO:: Inside delete batch of nodes")
             with self._driver.session() as session:
                 timeperiod_epoch = self.obtain_epoch_date()
                 list_of_NodeID = []
@@ -184,13 +185,13 @@ class Neo4jArchivalAgent(BaseAgent):
                     session.write_transaction(self.delete_node, timeperiod_epoch, label,neo4j_query_limit)
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
             exit(1)
 
     def delete_batchof_relationships(self, _es, label,neo4j_query_limit):
         try:
-            logging.debug("INFO:: Inside delete batch of relationships")
+            self.baseLogger.info("INFO:: Inside delete batch of relationships")
             with self._driver.session() as session:
                 timeperiod_epoch = self.obtain_epoch_date()
                 list_of_NodeID = []
@@ -202,7 +203,7 @@ class Neo4jArchivalAgent(BaseAgent):
                     session.write_transaction(self.delete_relationship, label,neo4j_query_limit)
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
             exit(1)
 
@@ -215,7 +216,7 @@ class Neo4jArchivalAgent(BaseAgent):
     """
     def resume_migrate_nodes(self, _es, label,neo4j_query_limit):
         try:
-            logging.debug("INFO:: Inside resume migrate nodes")
+            self.baseLogger.info("INFO:: Inside resume migrate nodes")
             with self._driver.session() as session:
                 timeperiod_epoch = self.obtain_epoch_date()
                 list_of_NodeID = []
@@ -227,7 +228,7 @@ class Neo4jArchivalAgent(BaseAgent):
                 for k in range(no_of_loop):
                     nodeData = session.write_transaction(self.get_node_details_unack, timeperiod_epoch, label,neo4j_query_limit)
                     for i in range(len(nodeData)):
-                        #logging.debug(nodeData[i]['n'])
+                        #self.baseLogger.info(nodeData[i]['n'])
                         dictNode = dict(nodeData[i]['n'])
                         lstlabel = nodeData[i]["_label"]
                         insightstime = int(nodeData[i]["inSightsTime"])
@@ -236,7 +237,7 @@ class Neo4jArchivalAgent(BaseAgent):
                         convlabelstring = ""
                         for j in range(len(lstlabel)):
                             convlabelstring = convlabelstring + "^" + lstlabel[j]
-                        #logging.debug(dictNode)
+                        #self.baseLogger.info(dictNode)
 
                         dictNode.update({'_label': convlabelstring})
                         copy_node_data_to_es_result = self.copy_node_data_to_es(_es, elasticsearchID, dictNode, label)
@@ -246,15 +247,15 @@ class Neo4jArchivalAgent(BaseAgent):
                     verified_ids = []
                     for i in range(len(list_of_NodeID)):
                         node_details_from_ES = _es.get(index=label.lower(), id=list_of_elasticsearchId[i])
-                        #logging.debug(node_details_from_ES)
+                        #self.baseLogger.info(node_details_from_ES)
                         if node_details_from_ES['found']:
                             verified_ids.append(list_of_NodeID[i])
                     session.write_transaction(self.set_flag_true_node, label, verified_ids)
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
-            logging.debug(label)
+            self.baseLogger.info(label)
             exit(1)
 
     """
@@ -267,7 +268,7 @@ class Neo4jArchivalAgent(BaseAgent):
 
     def resume_migrate_forward_relationship(self, _es, label,neo4j_query_limit):
         try:
-            logging.debug("INFO:: Inside resume migrate forward relationship")
+            self.baseLogger.info("INFO:: Inside resume migrate forward relationship")
             timeperiod_epoch = self.obtain_epoch_date()
             with self._driver.session() as session:
                 querycount = session.write_transaction(self.total_unmigrated_forward_realtionship_count_unack, timeperiod_epoch,
@@ -288,7 +289,7 @@ class Neo4jArchivalAgent(BaseAgent):
                         dictNode.update({'_start' : relData[i]["_start"]})
                         dictNode.update({'time_node_end' : relData[i]["time_node_end"]})
                         dictNode.update({'_end': relData[i]["_end"]})
-                        #logging.debug(dictNode)
+                        #self.baseLogger.info(dictNode)
                         copy_relationship_data_to_es_result = self.copy_relationship_data_to_es(_es, dictNode)
                         if copy_relationship_data_to_es_result:
                             relId = relData[i]["relationshipID"]
@@ -296,12 +297,12 @@ class Neo4jArchivalAgent(BaseAgent):
                             elasticsearchId = str(relId)+str(time_node_start)
                             realtioshipName_detail = relData[i]["relationshipName"]
                             rel_response = _es.get(index=realtioshipName_detail.lower(), id=elasticsearchId)
-                            #logging.debug(rel_response)
+                            #self.baseLogger.info(rel_response)
                             if rel_response['found'] == True:
                                 verified_ids.append(relId)
                     session.write_transaction(self.set_flag_true_rel, label, verified_ids )
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
             exit(1)
 
@@ -316,7 +317,7 @@ class Neo4jArchivalAgent(BaseAgent):
 
     def resume_migrate_backward_relationship(self, _es, label,neo4j_query_limit):
         try:
-            logging.debug("INFO:: Inside resume migrate backward relationship")
+            self.baseLogger.info("INFO:: Inside resume migrate backward relationship")
             timeperiod_epoch = self.obtain_epoch_date()
             with self._driver.session() as session:
                 querycount = session.write_transaction(self.total_unmigrated_backward_realtionship_count_unack, timeperiod_epoch,
@@ -337,7 +338,7 @@ class Neo4jArchivalAgent(BaseAgent):
                         dictNode.update({'_start' : relData[i]["_start"]})
                         dictNode.update({'time_node_end' : relData[i]["time_node_end"]})
                         dictNode.update({'_end': relData[i]["_end"]})
-                        #logging.debug(dictNode)
+                        #self.baseLogger.info(dictNode)
                         copy_relationship_data_to_es_result = self.copy_relationship_data_to_es(_es, dictNode)
                         if copy_relationship_data_to_es_result:
                             relId = relData[i]["relationshipID"]
@@ -345,12 +346,12 @@ class Neo4jArchivalAgent(BaseAgent):
                             elasticsearchId = str(relId) + str(time_node_start)
                             realtioshipName_detail = relData[i]["relationshipName"]
                             rel_response = _es.get(index=realtioshipName_detail.lower(), id=elasticsearchId)
-                            #logging.debug(rel_response)
+                            #self.baseLogger.info(rel_response)
                             if rel_response['found'] == True:
                                 verified_ids.append(relId)
                     session.write_transaction(self.set_flag_true_rel, label, verified_ids )
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
             exit(1)
 
@@ -367,7 +368,7 @@ class Neo4jArchivalAgent(BaseAgent):
     """
     def migrate_nodes(self, _es, label, neo4j_query_limit):
         try:
-            logging.debug("INFO:: Inside migrate nodes")
+            self.baseLogger.info("INFO:: Inside migrate nodes")
             with self._driver.session() as session:
                 timeperiod_epoch = self.obtain_epoch_date()
                 list_of_NodeID = []
@@ -379,7 +380,7 @@ class Neo4jArchivalAgent(BaseAgent):
                 for k in range(no_of_loop):
                     nodeData = session.write_transaction(self.get_node_details, timeperiod_epoch, label,neo4j_query_limit)
                     for i in range(len(nodeData)):
-                        #logging.debug(nodeData[i]['n'])
+                        #self.baseLogger.info(nodeData[i]['n'])
                         dictNode = dict(nodeData[i]['n'])
                         lstlabel = nodeData[i]["_label"]
                         nodeId = nodeData[i]["ID"]
@@ -388,7 +389,7 @@ class Neo4jArchivalAgent(BaseAgent):
                         convlabelstring=""
                         for j in range(len(lstlabel)):
                             convlabelstring = convlabelstring+"^"+lstlabel[j]
-                        #logging.debug(dictNode)
+                        #self.baseLogger.info(dictNode)
                         dictNode.update({'_label': convlabelstring})
                         copy_node_data_to_es_result = self.copy_node_data_to_es(_es, elasticsearchID, dictNode, label)
                         if copy_node_data_to_es_result:
@@ -397,13 +398,13 @@ class Neo4jArchivalAgent(BaseAgent):
                     verified_ids = []
                     for i in range(len(list_of_NodeID)):
                         node_details_from_ES = _es.get(index=label.lower(), id=list_of_elasticsearchId[i])
-                        #logging.debug(node_details_from_ES)
+                        #self.baseLogger.info(node_details_from_ES)
                         if node_details_from_ES['found']:
                             verified_ids.append(list_of_NodeID[i])
                     session.write_transaction(self.set_flag_true_node,label,verified_ids )
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
             exit(1)
 
@@ -417,7 +418,7 @@ class Neo4jArchivalAgent(BaseAgent):
      """
     def migrate_forward_relationship(self,_es, label,neo4j_query_limit):
         try:
-            logging.debug("INFO:: Inside migrate forward relationship")
+            self.baseLogger.info("INFO:: Inside migrate forward relationship")
             timeperiod_epoch = self.obtain_epoch_date()
             with self._driver.session() as session:
                 querycount = session.write_transaction(self.total_forward_unmigrated_realtionship_count, timeperiod_epoch,label)
@@ -437,7 +438,7 @@ class Neo4jArchivalAgent(BaseAgent):
                         dictNode.update({'_start' : relData[i]["_start"]})
                         dictNode.update({'time_node_end' : relData[i]["time_node_end"]})
                         dictNode.update({'_end': relData[i]["_end"]})
-                        #logging.debug(dictNode)
+                        #self.baseLogger.info(dictNode)
                         copy_relationship_data_to_es_result = self.copy_relationship_data_to_es(_es, dictNode)
                         if copy_relationship_data_to_es_result:
                             relId = relData[i]["relationshipID"]
@@ -445,12 +446,12 @@ class Neo4jArchivalAgent(BaseAgent):
                             elasticsearchId = str(relId) + str(time_node_start)
                             realtioshipName_detail = relData[i]["relationshipName"]
                             rel_response = _es.get(index=realtioshipName_detail.lower(), id=elasticsearchId)
-                            #logging.debug(rel_response)
+                            #self.baseLogger.info(rel_response)
                             if rel_response['found'] == True:
                                 verified_ids.append(relId)
                     session.write_transaction(self.set_flag_true_rel, label, verified_ids )
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
             exit(1)
 
@@ -465,7 +466,7 @@ class Neo4jArchivalAgent(BaseAgent):
 
     def migrate_backward_relationship(self,_es, label,neo4j_query_limit):
         try:
-            logging.debug("INFO:: Inside migrate backward relationship")
+            self.baseLogger.info("INFO:: Inside migrate backward relationship")
             timeperiod_epoch = self.obtain_epoch_date()
             with self._driver.session() as session:
                 querycount = session.write_transaction(self.total_backward_unmigrated_realtionship_count, timeperiod_epoch,label)
@@ -485,7 +486,7 @@ class Neo4jArchivalAgent(BaseAgent):
                         dictNode.update({'_start' : relData[i]["_start"]})
                         dictNode.update({'time_node_end' : relData[i]["time_node_end"]})
                         dictNode.update({'_end': relData[i]["_end"]})
-                        #logging.debug(dictNode)
+                        #self.baseLogger.info(dictNode)
                         copy_relationship_data_to_es_result = self.copy_relationship_data_to_es(_es, dictNode)
                         if copy_relationship_data_to_es_result:
                             relId = relData[i]["relationshipID"]
@@ -493,14 +494,14 @@ class Neo4jArchivalAgent(BaseAgent):
                             elasticsearchId = str(relId) + str(time_node_start)
                             realtioshipName_detail = relData[i]["relationshipName"]
                             rel_response = _es.get(index=realtioshipName_detail.lower(), id=elasticsearchId)
-                            #logging.debug(rel_response)
+                            #self.baseLogger.info(rel_response)
                             if rel_response['found'] == True:
                                 verified_ids.append(relId)
 
                     session.write_transaction(self.set_flag_true_rel, label, verified_ids )
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
             exit(1)
 
@@ -514,7 +515,7 @@ class Neo4jArchivalAgent(BaseAgent):
 
     def copy_schema_data_to_es(self, _es, dctNode, indexName):
         try:
-            logging.debug("INFO:: Inside copy schema data to es")
+            self.baseLogger.info("INFO:: Inside copy schema data to es")
             if len(dctNode) > 0:
                 jsonNode = json.dumps(dctNode)
                 if (json.loads(jsonNode)):
@@ -523,17 +524,17 @@ class Neo4jArchivalAgent(BaseAgent):
                     indexName = indexName.lower()
                     doc_type = "_doc"
                     response = _es.index(index=indexName, doc_type=doc_type, id=indexName, body=jsonNode)
-                    logging.debug("Nodes schema dumped to Elastic search successfully")
+                    self.baseLogger.info("Nodes schema dumped to Elastic search successfully")
                     if response['result'] == "created":
-                        logging.debug("Nodes schema dumped to Elastic search successfully")
+                        self.baseLogger.info("Nodes schema dumped to Elastic search successfully")
                         return True
                     elif response['result'] == "updated":
-                        logging.debug("Nodes schema updated to Elastic search successfully")
+                        self.baseLogger.info("Nodes schema updated to Elastic search successfully")
                         return True
                     else:
                         return False
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
             exit(1)
 
@@ -548,7 +549,7 @@ class Neo4jArchivalAgent(BaseAgent):
 
     def copy_index_data_to_es(self, _es, dctNode, indexName):
         try:
-            logging.debug("INFO:: Inside copy index data to es")
+            self.baseLogger.info("INFO:: Inside copy index data to es")
             if len(dctNode) > 0:
                 jsonNode = json.dumps(dctNode)
                 if (json.loads(jsonNode)):
@@ -557,17 +558,17 @@ class Neo4jArchivalAgent(BaseAgent):
                     indexName = indexName.lower()
                     doc_type = "_doc"
                     response = _es.index(index=indexName, doc_type=doc_type, id=indexName, body=jsonNode)
-                    logging.debug("Nodes schema dumped to Elastic search successfully")
+                    self.baseLogger.info("Nodes schema dumped to Elastic search successfully")
                     if response['result'] == "created":
-                        logging.debug("Nodes schema dumped to Elastic search successfully")
+                        self.baseLogger.info("Nodes schema dumped to Elastic search successfully")
                         return True
                     elif response['result'] == "updated":
-                        logging.debug("Nodes schema updated to Elastic search successfully")
+                        self.baseLogger.info("Nodes schema updated to Elastic search successfully")
                         return True
                     else:
                         return False
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
             exit(1)
 
@@ -581,7 +582,7 @@ class Neo4jArchivalAgent(BaseAgent):
     """
     def copy_node_data_to_es(self, _es, nodeId, dctNode, indexName):
         try:
-            logging.debug("INFO:: Inside copy node data to es")
+            self.baseLogger.info("INFO:: Inside copy node data to es")
             jsonNode = json.dumps(dctNode)
             if (json.loads(jsonNode)):
                 jsonNode = json.loads(jsonNode)
@@ -589,17 +590,17 @@ class Neo4jArchivalAgent(BaseAgent):
                 indexName = indexName.lower()
                 doc_type = "_doc"
                 response = _es.index(index=indexName, doc_type=doc_type, id=nodeId, body=jsonNode)
-                logging.debug("Nodes dumped to Elastic search successfully")
+                self.baseLogger.info("Nodes dumped to Elastic search successfully")
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
             exit(1)
 
         if response['result'] == "created":
-            logging.debug("Nodes dumped to Elastic search successfully")
+            self.baseLogger.info("Nodes dumped to Elastic search successfully")
             return True
         elif response['result'] == "updated":
-            logging.debug("Nodes updated to Elastic search successfully")
+            self.baseLogger.info("Nodes updated to Elastic search successfully")
             return True
         else:
             return False
@@ -613,7 +614,7 @@ class Neo4jArchivalAgent(BaseAgent):
 
     def copy_relationship_data_to_es(self, _es, result):
         try:
-            logging.debug("INFO:: Inside copy relationship data to es")
+            self.baseLogger.info("INFO:: Inside copy relationship data to es")
             jsonNode = json.dumps(result)
             if (json.loads(jsonNode)):
                 jsonNode = json.loads(jsonNode)
@@ -625,17 +626,17 @@ class Neo4jArchivalAgent(BaseAgent):
                 elasticsearchID = str(relationshipID) + str(time_node_start)
                 response = _es.index(index=relationshipName, doc_type="_doc", id=elasticsearchID,
                                      body=jsonNode)
-                logging.debug(response['result'])
+                self.baseLogger.info(response['result'])
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
             exit(1)
 
         if response['result'] == "created":
-            logging.debug("Relationship dumped to Elastic search successfully")
+            self.baseLogger.info("Relationship dumped to Elastic search successfully")
             return True
         elif response['result'] == "updated":
-            logging.debug("Relationship updated to Elastic search successfully")
+            self.baseLogger.info("Relationship updated to Elastic search successfully")
             return True
         else:
             return False
@@ -655,17 +656,17 @@ class Neo4jArchivalAgent(BaseAgent):
                 days_in_epoch = days * 24 * 60 * 60
                 now = datetime.now()
                 current_time = now.strftime("%d.%m.%Y %H:%M:%S")
-                logging.debug("Current Time =", current_time)
+                #self.baseLogger.info("Current Time =", str(current_time))
                 epoch = int(time.mktime(time.strptime(current_time, pattern)))
                 date_result = epoch - days_in_epoch
-                logging.debug(date_result)
+                self.baseLogger.info(date_result)
             else:
                 date_result = int(time.mktime(time.strptime(archival_enddate, pattern)))
-                logging.debug(date_result)
+                self.baseLogger.info(date_result)
 
             return date_result
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
             exit(1)
 
@@ -675,11 +676,11 @@ class Neo4jArchivalAgent(BaseAgent):
             result = tx.run("MATCH (n:{label}:DATA) "
                             "WHERE toInt(n.inSightsTime) < $timeperiod and not exists(n.copy_to_ES)"
                             "RETURN count(n) as Count ".format(label=label1), timeperiod=timeperiod).data()
-            logging.debug("count of Nodes to left************")
-            logging.debug(result)
+            self.baseLogger.info("count of Nodes to left************")
+            self.baseLogger.info(result)
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
         return result
 
@@ -688,11 +689,11 @@ class Neo4jArchivalAgent(BaseAgent):
             result = tx.run("MATCH (n:{label}:DATA) "
                             "WHERE toInt(n.inSightsTime) < $timeperiod and n.copy_to_ES = false "
                             "RETURN count(n) as Count ".format(label=label1), timeperiod=timeperiod).data()
-            logging.debug("count of Nodes to left************")
-            logging.debug(result)
+            self.baseLogger.info("count of Nodes to left************")
+            self.baseLogger.info(result)
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
         return result
 
@@ -701,11 +702,11 @@ class Neo4jArchivalAgent(BaseAgent):
             result = tx.run("MATCH (n:{label}:DATA) "
                             "WHERE toInt(n.inSightsTime) < $timeperiod and n.copy_to_ES = true "
                             "RETURN count(n) as Count ".format(label=label1), timeperiod=timeperiod).data()
-            logging.debug("count of Nodes to left************")
-            logging.debug(result)
+            self.baseLogger.info("count of Nodes to left************")
+            self.baseLogger.info(result)
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
         return result
 
@@ -714,11 +715,11 @@ class Neo4jArchivalAgent(BaseAgent):
             result = tx.run("MATCH (n:{label}:DATA)-[r]-(b) "
                             "WHERE toInt(n.inSightsTime) < $timeperiod and r.copy_to_ES = true and exists(b.inSightsTime) "
                             "RETURN count(r) as Count ".format(label=label1), timeperiod=timeperiod).data()
-            logging.debug("count of Relationships to left************")
-            logging.debug(result)
+            self.baseLogger.info("count of Relationships to left************")
+            self.baseLogger.info(result)
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
         return result
 
@@ -727,11 +728,11 @@ class Neo4jArchivalAgent(BaseAgent):
             result = tx.run("MATCH (n:{label}:DATA)-[r]->(b)"
                             "WHERE toInt(n.inSightsTime) < $timeperiod and not exists(r.copy_to_ES) and exists(b.inSightsTime) "
                             "RETURN count(r) as Count ".format(label=label1), timeperiod=timeperiod).data()
-            logging.debug("count of Relationships to left************")
-            logging.debug(result)
+            self.baseLogger.info("count of Relationships to left************")
+            self.baseLogger.info(result)
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
         return result
 
@@ -740,11 +741,11 @@ class Neo4jArchivalAgent(BaseAgent):
             result = tx.run("MATCH (n:{label}:DATA)<-[r]-(b)"
                             "WHERE toInt(n.inSightsTime) < $timeperiod and not exists(r.copy_to_ES) and exists(b.inSightsTime) "
                             "RETURN count(r) as Count ".format(label=label1), timeperiod=timeperiod).data()
-            logging.debug("count of Relationships to left************")
-            logging.debug(result)
+            self.baseLogger.info("count of Relationships to left************")
+            self.baseLogger.info(result)
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
         return result
 
@@ -755,11 +756,11 @@ class Neo4jArchivalAgent(BaseAgent):
             result = tx.run("MATCH (n:{label}:DATA)-[r]->(b)"
                             "WHERE toInt(n.inSightsTime) < $timeperiod and r.copy_to_ES = false and exists(b.inSightsTime) "
                             "RETURN count(r) as Count ".format(label=label1), timeperiod=timeperiod).data()
-            logging.debug("count of Relationships to left************")
-            logging.debug(result)
+            self.baseLogger.info("count of Relationships to left************")
+            self.baseLogger.info(result)
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
         return result
 
@@ -768,11 +769,11 @@ class Neo4jArchivalAgent(BaseAgent):
             result = tx.run("MATCH (n:{label}:DATA)<-[r]-(b)"
                             "WHERE toInt(n.inSightsTime) < $timeperiod and r.copy_to_ES = false and exists(b.inSightsTime) "
                             "RETURN count(r) as Count ".format(label=label1), timeperiod=timeperiod).data()
-            logging.debug("count of Relationships to left************")
-            logging.debug(result)
+            self.baseLogger.info("count of Relationships to left************")
+            self.baseLogger.info(result)
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
         return result
 
@@ -783,7 +784,7 @@ class Neo4jArchivalAgent(BaseAgent):
                             "RETURN id(n) as ID ".format(label=label1), timeperiod=timeperiod).data()
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
         return result
 
@@ -796,7 +797,7 @@ class Neo4jArchivalAgent(BaseAgent):
                             "RETURN n , id(n) as ID ,labels(n) as _label, n.inSightsTime as inSightsTime ".format(label=label1), timeperiod=timeperiod,neo4j_query_limit=neo4j_query_limit).data()
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
 
         return result
@@ -810,7 +811,7 @@ class Neo4jArchivalAgent(BaseAgent):
                             timeperiod=timeperiod,neo4j_query_limit=neo4j_query_limit).data()
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
 
         return result
@@ -824,7 +825,7 @@ class Neo4jArchivalAgent(BaseAgent):
                             timeperiod=timeperiod,neo4j_query_limit=neo4j_query_limit).data()
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
 
         return result
@@ -836,7 +837,7 @@ class Neo4jArchivalAgent(BaseAgent):
                             "RETURN id(r) as relationshipID ".format(
                 label=label1), nodeId=nodeId).data()
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
 
         return result
@@ -849,7 +850,7 @@ class Neo4jArchivalAgent(BaseAgent):
                             "RETURN distinct type(r) as relationshipName, id(r) as relationshipID, id(a) as startNodeID, id(b) as endNodeID ,a.inSightsTime as time_node_start , a.uuid as _start , b.inSightsTime as time_node_end, b.uuid as _end ,r "
                             "limit $neo4j_query_limit ".format(label=label1), timeperiod=timeperiod,neo4j_query_limit=neo4j_query_limit).data()
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
 
         return result
@@ -862,7 +863,7 @@ class Neo4jArchivalAgent(BaseAgent):
                             "RETURN distinct type(r) as relationshipName, id(r) as relationshipID, id(a) as endNodeID, id(b) as startNodeID ,a.inSightsTime as time_node_end , a.uuid as _end , b.inSightsTime as time_node_start, b.uuid as _start , r   "
                             "limit $neo4j_query_limit ".format(label=label1), timeperiod=timeperiod,neo4j_query_limit=neo4j_query_limit).data()
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
 
         return result
@@ -874,7 +875,7 @@ class Neo4jArchivalAgent(BaseAgent):
                             "RETURN distinct type(r) as relationshipName, id(r) as relationshipID, id(a) as startNodeID, id(b) as endNodeID ,a.inSightsTime as time_node_start , a.uuid as _start , b.inSightsTime as time_node_end, b.uuid as _end  ,r "
                             "limit $neo4j_query_limit ".format(label=label1), timeperiod=timeperiod,neo4j_query_limit=neo4j_query_limit).data()
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
 
         return result
@@ -886,21 +887,21 @@ class Neo4jArchivalAgent(BaseAgent):
                             "RETURN distinct type(r) as relationshipName, id(r) as relationshipID, id(a) as startNodeID, id(b) as endNodeID ,a.inSightsTime as time_node_start , a.uuid as _start , b.inSightsTime as time_node_end, b.uuid as _end , r  "
                             "limit $neo4j_query_limit ".format(label=label1), timeperiod=timeperiod,neo4j_query_limit=neo4j_query_limit).data()
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
 
         return result
 
 
     def set_flag_true_rel(self, tx, label1, relId):
-        logging.debug(relId)
+        self.baseLogger.info(relId)
         try:
             result = tx.run("MATCH (a:{label}:DATA )-[r]-(b) "
                             "WHERE id(r) in $relId and r.copy_to_ES = false "
                             "SET r.copy_to_ES = true "
                             "RETURN id(r) as count ".format(label=label1), relId=relId).data()
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
 
         return result
@@ -912,7 +913,7 @@ class Neo4jArchivalAgent(BaseAgent):
                             "SET n.copy_to_ES = true "
                             "RETURN  count(n) as count ".format(label=label1), nodeId=nodeId).data()
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
 
         return result
@@ -923,9 +924,9 @@ class Neo4jArchivalAgent(BaseAgent):
                             "WHERE r.copy_to_ES = true  "
                             "with r limit  $neo4j_query_limit "
                             "Delete r ".format(label=label1),neo4j_query_limit=neo4j_query_limit).data()
-            logging.debug("Relationships deleted")
+            self.baseLogger.info("Relationships deleted")
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
 
         return result
@@ -936,10 +937,10 @@ class Neo4jArchivalAgent(BaseAgent):
                             "WHERE n.copy_to_ES = true "
                             "with n limit $neo4j_query_limit "
                             "Detach Delete n ".format(label=label1), timeperiod=timeperiod,neo4j_query_limit=neo4j_query_limit).data()
-            logging.debug("Nodes deleted")
+            self.baseLogger.info("Nodes deleted")
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
 
         return result
@@ -949,11 +950,11 @@ class Neo4jArchivalAgent(BaseAgent):
             result = tx.run("MATCH (n:{label}:DATA) "
                             "WHERE toInt(n.inSightsTime) < $timeperiod and n.copy_to_ES = true "
                             "RETURN count(n) as Count ".format(label=label1), timeperiod=timeperiod).data()
-            logging.debug("count of Nodes to left ack")
-            logging.debug(result)
+            self.baseLogger.info("count of Nodes to left ack")
+            self.baseLogger.info(result)
 
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
         return result
 
@@ -965,25 +966,25 @@ class Neo4jArchivalAgent(BaseAgent):
                             "with distinct label "
                             "return [_Iter IN COLLECT(label) WHERE NOT _Iter IN ['RAW','ALM', 'DATA','DUMMY','DUMMYDATA','LATEST','SCM','CI','APPMONITORING','CODEQUALITY','DEPLOYMENT','ENVIRONMENT']] ").data()
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
         return result
 
     def get_node_datatype(self,tx):
         try:
             result = tx.run("call db.schema.nodeTypeProperties ").data()
-            logging.debug(result)
+            self.baseLogger.info(result)
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
         return result
 
     def get_rel_datatype(self, tx):
         try:
             result = tx.run("call db.schema.relTypeProperties ").data()
-            logging.debug(result)
+            self.baseLogger.info(result)
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
         return result
 
@@ -992,7 +993,7 @@ class Neo4jArchivalAgent(BaseAgent):
             result = tx.run("MATCH (a:{label}:DATA)-[r]-(b) "
                             "RETURN distinct type(r) as relationshipName ".format(label=label)).data()
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
 
         return result
@@ -1001,7 +1002,7 @@ class Neo4jArchivalAgent(BaseAgent):
         try:
             result = tx.run("call db.indexes ").data()
         except Exception as ex:
-            logging.error(ex)
+            self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
         return result
 

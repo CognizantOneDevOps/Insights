@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.PersistenceException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -167,8 +169,12 @@ public class WorkflowDataHandler {
 	 * @return
 	 */
 	public InsightsWorkflowTaskSequence getWorkflowTaskSequenceByWorkflowId(String workflowId) {
-
-		return workflowDAL.getWorkflowTaskSequenceByWorkflowId(workflowId);
+		try {
+			return workflowDAL.getWorkflowTaskSequenceByWorkflowId(workflowId);
+		} catch (PersistenceException e) {
+			log.error("Error while executing workflow retry ", e);
+			throw e;
+		}
 	}
 
 	/**
@@ -179,7 +185,7 @@ public class WorkflowDataHandler {
 	 */
 	public InsightsWorkflowTask getWorkflowTaskByTaskId(int taskId) {
 
-		return workflowDAL.getTaskByTaskIdList(taskId);
+		return workflowDAL.getTaskByTaskId(taskId);
 	}
 
 	/**

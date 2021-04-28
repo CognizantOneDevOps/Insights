@@ -24,7 +24,9 @@ from urllib import quote
 import time
 
 class CircleAgent(BaseAgent):
+    @BaseAgent.timed
     def process(self):
+        self.baseLogger.info('Inside process')
         userid = self.getCredential("userid")
         passwd = self.getCredential("passwd")
         BaseUrl = self.config.get("baseUrl", '')

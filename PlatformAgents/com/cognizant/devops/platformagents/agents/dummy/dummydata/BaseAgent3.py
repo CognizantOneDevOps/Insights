@@ -76,10 +76,10 @@ class BaseAgent(object):
         else:
             self.configFilePath = agentDir+'config.json'
             self.trackingFilePath = agentDir+'tracking.json' 
-            #self.logFilePath = logDirPath + '/'+'log_'+type(self).__name__+'.log'        
-            trackingFilePresent = os.path.isfile(self.trackingFilePath)
-            if not trackingFilePresent:
-                self.updateTrackingJson({})
+        #self.logFilePath = logDirPath + '/'+'log_'+type(self).__name__+'.log'        
+        trackingFilePresent = os.path.isfile(self.trackingFilePath)
+        if not trackingFilePresent:
+            self.updateTrackingJson({})
     
     def setupLogging(self):
         agentDir = os.path.dirname(sys.modules[self.__class__.__module__].__file__) + os.path.sep
@@ -104,7 +104,7 @@ class BaseAgent(object):
         try:
             logging.debug('==== '+str(message))
             if printOnConsole:
-                print(str(message))
+                print((str(message)))
         except Exception as ex:
             logging.error(ex)
     
@@ -267,7 +267,7 @@ class BaseAgent(object):
                 timeResponse = None
                 if isEpochTime:
                     eventTime = str(eventTime)
-                    eventTime = long(eventTime[:10])
+                    eventTime = int(eventTime[:10])
                     timeResponse = self.getRemoteDateTime(datetime.fromtimestamp(eventTime))
                 else:
                     eventTime = eventTime[:self.dateTimeLength]
@@ -295,7 +295,7 @@ class BaseAgent(object):
         localDateTime = self.toolsTimeZone.localize(time)
         remoteDateTime = localDateTime.astimezone(self.insightsTimeZone)
         response = {
-                    'epochTime' : (remoteDateTime - self.epochStartDateTime).total_seconds(),
+                    'epochTime' : int((remoteDateTime - self.epochStartDateTime).total_seconds()),
                     'time' : remoteDateTime.strftime('%Y-%m-%dT%H:%M:%SZ')
                     }
         return response;

@@ -21,6 +21,8 @@ Created on 10 April 2017
 from ....core.BaseAgent import BaseAgent
 
 class TFSAgent(BaseAgent):
+    
+    @BaseAgent.timed
     def process(self):
         BaseUrl = self.config.get("baseUrl", '')
         UserID = self.getCredential("userid")

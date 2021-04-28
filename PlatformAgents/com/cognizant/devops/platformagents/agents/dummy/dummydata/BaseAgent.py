@@ -76,7 +76,7 @@ class BaseAgent(object):
         else:
             self.configFilePath = agentDir+'config.json'
             self.trackingFilePath = agentDir+'tracking.json' 
-        #self.logFilePath = logDirPath + '/'+'log_'+type(self).__name__+'.log'	    
+        #self.logFilePath = logDirPath + '/'+'log_'+type(self).__name__+'.log'        
         trackingFilePresent = os.path.isfile(self.trackingFilePath)
         if not trackingFilePresent:
             self.updateTrackingJson({})
@@ -295,7 +295,7 @@ class BaseAgent(object):
         localDateTime = self.toolsTimeZone.localize(time)
         remoteDateTime = localDateTime.astimezone(self.insightsTimeZone)
         response = {
-                    'epochTime' : (remoteDateTime - self.epochStartDateTime).total_seconds(),
+                    'epochTime' : int((remoteDateTime - self.epochStartDateTime).total_seconds()),
                     'time' : remoteDateTime.strftime('%Y-%m-%dT%H:%M:%SZ')
                     }
         return response;

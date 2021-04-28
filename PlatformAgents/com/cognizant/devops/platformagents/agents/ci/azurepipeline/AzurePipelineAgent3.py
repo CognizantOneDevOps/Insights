@@ -22,7 +22,9 @@ from ....core.BaseAgent3 import BaseAgent
 
 
 class AzurePipelineAgent(BaseAgent):
+    @BaseAgent.timed
     def process(self):
+        self.baseLogger.info('Inside process')
         BaseUrl = self.config.get("baseUrl", '')
         UserID = self.getCredential("userid")
         Passwd = self.getCredential("passwd")

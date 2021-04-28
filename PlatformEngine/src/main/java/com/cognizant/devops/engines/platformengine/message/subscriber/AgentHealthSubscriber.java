@@ -16,6 +16,7 @@
 package com.cognizant.devops.engines.platformengine.message.subscriber;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -49,12 +50,12 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body)
 			throws IOException {
 		try {
-			String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
+			String message = new String(body, StandardCharsets.UTF_8);
 			String routingKey = envelope.getRoutingKey();
-			log.debug(consumerTag + " [x] Received '" + routingKey + "':'" + message + "'");
+			log.debug( " {} [x] Received '{} ':' {} '",consumerTag,routingKey,message);
 			List<String> labels = Arrays.asList(routingKey.split(MQMessageConstants.ROUTING_KEY_SEPERATOR));
-			List<JsonObject> dataList = new ArrayList<JsonObject>();
-			List<JsonObject> failedDataList = new ArrayList<JsonObject>();
+			List<JsonObject> dataList = new ArrayList<>();
+			List<JsonObject> failedDataList = new ArrayList<>();
 			JsonElement json = new JsonParser().parse(message);
 			String agentId = "";
 			String toolName = "";
@@ -154,14 +155,21 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 		JsonObject graphResponse = dbHandler.executeQueryWithData(healthQuery, dataList);
 		if (graphResponse.get("response").getAsJsonObject().get("results").getAsJsonArray().get(0).getAsJsonObject()
 				.get("data").getAsJsonArray().size() == 0) {
+			log.debug("Another Health query {} ",healthQuery);
 			healthQuery = "";
 			healthQuery = healthQuery + CREATE + nodeLabels + " {props})";
 			JsonObject graphResponse1 = dbHandler.executeQueryWithData(healthQuery, dataList);
+			parseGraphResponseForError(graphResponse1,routingKey);
 		}
-		if (graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0) {
-			log.error("Unable to insert health nodes for routing key: " + routingKey + ", error occured:  "
-					+ graphResponse);
-			log.error(dataList);
+		parseGraphResponseForError(graphResponse,routingKey);
+	}
+	
+	void parseGraphResponseForError(JsonObject graphResponse,String routingKey ) {
+		JsonArray errorMessage = graphResponse.getAsJsonArray("errors");
+		if (errorMessage != null && errorMessage.size() >= 0) {
+			String errorMessageText = errorMessage.get(0).getAsJsonObject().get("message").getAsString();
+			log.error("Unable to insert health nodes for routing key: {} , error occured: {}  {}  " , routingKey
+					,errorMessageText, graphResponse);
 			EngineStatusLogger.getInstance().createEngineStatusNode(
 					"Unable to insert health nodes for routing key: " + routingKey, PlatformServiceConstants.FAILURE);
 		}

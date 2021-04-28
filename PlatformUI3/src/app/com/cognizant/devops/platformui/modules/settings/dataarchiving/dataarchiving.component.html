@@ -102,14 +102,19 @@
                   </td>
               </ng-container>
               <ng-container matColumnDef="DataSourceUrl">
-                  <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="padding-left:13px">Data Source Url</th>
-                  <td mat-cell *matCellDef="let element" style="width:40% !important; word-break: break-word; padding-left:15px" [ngStyle]="element.sourceUrl && element.status=='ACTIVE'?{'color': 'blue','cursor': 'pointer','text-decoration': 'underline'}: {'cursor':'auto'}" (click)="onNavigate(element.sourceUrl,element.status)">
+                  <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="padding-left:1%">Data Source Url</th>
+                  <td mat-cell *matCellDef="let element" style="width:36% !important; word-break: break-word; padding-left:1%" [ngStyle]="element.sourceUrl && element.status=='ACTIVE'?{'color': 'blue','cursor': 'pointer','text-decoration': 'underline'}: {'cursor':'auto'}" (click)="onNavigate(element.sourceUrl,element.status)">
                       {{element.sourceUrl}}
               </ng-container>
+              <ng-container matColumnDef="BoltPort">
+                <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="padding-left:3%;text-align: left">Bolt Port</th>
+                <td mat-cell *matCellDef="let element" style="width:10% !important; padding-left:3%;text-align: left" >
+                    {{element.boltPort}}
+            </ng-container>
               <ng-container matColumnDef="ExpiryDate">
-                  <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="padding-left:15px;text-align: center">Expiry Date
+                  <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="text-align: center">Expiry Date
                       ({{timeZone}})</th>
-                  <td mat-cell *matCellDef="let element" style="width:18%;padding-left:15px;text-align: center">
+                  <td mat-cell *matCellDef="let element" style="width:17%;text-align: center">
                       {{element.expiryDate}} </td>
               </ng-container>
               <ng-container matColumnDef="Status">
@@ -118,7 +123,7 @@
                       {{element.status}} </td>
               </ng-container>
               <ng-container matColumnDef="Action">
-                  <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="padding-left: 15px !important">Action</th>
+                  <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="padding-left: 2% !important">Action</th>
                   <td mat-cell *matCellDef="let element;let i = index" style="width:10% !important">
                       <mat-slide-toggle (change)="updateStatus($event, element)" 
                       [disabled]="clicked[i]" [(ngModel)]="element.action"

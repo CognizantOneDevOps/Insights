@@ -29,7 +29,10 @@ from ....core.BaseAgent import BaseAgent
 import logging.handlers
 
 class AwsAgent(BaseAgent):
+
+    @BaseAgent.timed
     def process(self):
+        self.baseLogger.info('Inside process')
         try:
             self.id = self.getCredential("access_key_id")
             self.key = self.getCredential("secret_access_key")

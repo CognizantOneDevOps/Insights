@@ -25,6 +25,8 @@ from ....core.BaseAgent3 import BaseAgent
 import json
 
 class BitBucketAgentAllBranches(BaseAgent):
+    
+    @BaseAgent.timed
     def process(self):
         BaseEndPoint = self.config.get("baseEndPoint", '')
         UserId = self.getCredential("userid")

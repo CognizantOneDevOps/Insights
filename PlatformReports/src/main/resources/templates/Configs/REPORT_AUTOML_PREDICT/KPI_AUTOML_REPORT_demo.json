@@ -1,0 +1,41 @@
+[
+  {
+    "kpiId": 21,
+    "name": "Estimated No Of Days To Complete Story",
+    "group": "ALM",
+    "category": "PREDICTION",
+    "toolName": "JIRA",
+    "DBQuery": "MATCH(n:JIRA) where n.issueType='Story' and n.status='Development' or n.status='Planned' return  size(n.sprints) as noOfSprint , size(n.subtasks) as noOfSubtask , n.key as jiraKey , n.priority as Priority , n.issueType as issueType , n.status as Status, n.assigneeDisplayName as AssigneeName",
+    "datasource": "NEO4J",
+    "isActive": true,
+    "resultField": "numberOfDays",
+    "usecase": "NoOfDaysToCompleteStoryPredict",
+    "outputDatasource": ""
+  },
+  {
+    "kpiId": 22,
+    "name": "Probability Of Story Completion ",
+    "group": "ALM",
+    "category": "PREDICTION",
+    "toolName": "JIRA",
+    "DBQuery": "MATCH(n:JIRA) where n.issueType='Story' and n.status='Development' or n.status='Planned' return  size(n.sprints) as noOfSprint , size(n.subtasks) as noOfSubtask , n.key as jiraKey , n.priority as Priority , n.issueType as issueType , n.status as Status, n.assigneeDisplayName as AssigneeName",
+    "datasource": "NEO4J",
+    "isActive": true,
+    "resultField": "isCompletedWithinCurrentSprint",
+    "usecase": "StoryCompletedWithinSprint",
+    "outputDatasource": ""
+  },
+  {
+    "kpiId": 23,
+    "name": "Story Point Prediction",
+    "group": "ALM",
+    "category": "PREDICTION",
+    "toolName": "JIRA",
+    "DBQuery": "MATCH (n:JIRA) where n.status='To Do' or n.status='Planned' RETURN n.status as Status,n.priority as Priority, n.assigneeDisplayName as Assignee, n.reporterDisplayName as Reporter, n.creatorDisplayName as Creator, n.creationDate as Created, n.summary as Summary, n.key as Issuekey",
+    "datasource": "NEO4J",
+    "isActive": true,
+    "resultField": "StoryPoints",
+    "usecase": "StoryPointPredict",
+    "outputDatasource": ""
+  }
+]

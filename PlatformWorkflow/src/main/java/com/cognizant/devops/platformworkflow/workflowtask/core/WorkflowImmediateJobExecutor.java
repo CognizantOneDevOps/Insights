@@ -17,6 +17,8 @@ package com.cognizant.devops.platformworkflow.workflowtask.core;
 
 import java.util.List;
 
+import javax.persistence.PersistenceException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.quartz.Job;
@@ -71,7 +73,6 @@ public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInter
 			for (InsightsWorkflowConfiguration workflowConfig : readyToRunWorkflow) {
 				try {
 					long executionId = System.currentTimeMillis();
-					System.out.println(workflowConfig.getWorkflowId());
 					log.debug(" Worlflow Detail ==== WorkflowImmediateJobExecutor workflowId {} executionId {}  ",
 							workflowConfig.getWorkflowId(), executionId);
 					InsightsWorkflowTaskSequence firstworkflowTask = workflowProcessing
@@ -83,7 +84,7 @@ public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInter
 					workflowProcessing.publishMessageInMQ(firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),
 							mqRequestJson);
 					Thread.sleep(1);
-				} catch (WorkflowTaskInitializationException | InterruptedException e) {
+				} catch (WorkflowTaskInitializationException  | PersistenceException e) {
 					log.debug(" Worlflow Detail ====  workflow failed to execute due to MQ exception {}  ",
 							workflowConfig.getWorkflowId());
 					InsightsStatusProvider.getInstance()
@@ -91,6 +92,15 @@ public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInter
 									+ workflowConfig.getWorkflowId(), PlatformServiceConstants.FAILURE);
 					workflowProcessing.updateWorkflowDetails(workflowConfig.getWorkflowId(),
 							WorkflowTaskEnum.WorkflowStatus.TASK_INITIALIZE_ERROR.toString(), false);
+				}catch(InterruptedException e) {
+					log.debug(" Worlflow Detail ====  workflow failed to execute due to InterruptedException {}  ",
+							workflowConfig.getWorkflowId());
+					InsightsStatusProvider.getInstance()
+							.createInsightStatusNode("WorkflowEmmediateJobExecutorfailed to execute due to exception "
+									+ workflowConfig.getWorkflowId(), PlatformServiceConstants.FAILURE);
+					workflowProcessing.updateWorkflowDetails(workflowConfig.getWorkflowId(),
+							WorkflowTaskEnum.WorkflowStatus.TASK_INITIALIZE_ERROR.toString(), false);
+					Thread.currentThread().interrupt();
 				}
 			}
 			InsightsStatusProvider.getInstance().createInsightStatusNode("WorkflowImmediateJobExecutor completed. ",

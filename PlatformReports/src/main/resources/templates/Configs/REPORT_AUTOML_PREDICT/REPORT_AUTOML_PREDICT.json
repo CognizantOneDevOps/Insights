@@ -1,0 +1,111 @@
+[
+	{
+		"type": "table",
+		"renderAt": "table_21",
+		"dataFormat": "json",
+		"caption": "Estimated Number Of Days To Complete Story",
+		"dataEmptyMessage": "No Data Found.",
+		"dataSource": {
+			"chart": {
+				"caption": "Estimated Number Of Days To Complete Story",
+				"subCaption": "",
+				"theme": "fusion"
+			}
+		}
+	},
+	{
+		"type": "table",
+		"renderAt": "table_22",
+		"dataFormat": "json",
+		"caption": "Probability Of Story Completion Within Current Sprint",
+		"dataEmptyMessage": "No Data Found.",
+		"dataSource": {
+			"chart": {
+				"caption": "Probability Of Story Completion Within Current Sprint",
+				"subCaption": "",
+				"theme": "fusion"
+			}
+		}
+	},
+	{
+		"type": "pie2d",
+		"renderAt": "pie2d_22",
+		"dataFormat": "json",
+		"dataEmptyMessage": "No Data Found.",
+		"dataSource": {
+			"chart": {
+				"caption": "Story Completion Probability",
+				"subCaption": "",
+				"theme": "fusion"
+			}
+		}
+	},
+	{
+		"type": "angulargauge",
+		"renderAt": "angulargauge_23",
+		"dataFormat": "json",
+		"dataEmptyMessage": "No Data Found.",
+		"dataSource": {
+			"chart": {
+				"caption": "Total Estimated Backlog Size",
+				"subcaption": "",
+				"lowerlimit": "0",
+				"upperlimit": "1000",
+				"manageresize": "1",
+				"theme": "fusion",
+				"showValue": "1",
+				"editMode": "1",
+				"gaugeFillMix": "{dark-30},{light-60},{dark-10}",
+				"gaugeFillRatio": "15"
+			},
+			"colorrange": {
+				"color": [
+					{
+						"minvalue": "0",
+						"maxvalue": "250",
+						"code": "#62B58F"
+					},
+					{
+						"minvalue": "250",
+						"maxvalue": "500",
+						"code": "#FFC533"
+					},
+					{
+						"minvalue": "500",
+						"maxvalue": "1000",
+						"code": "#F2726F"
+					}
+				]
+			}
+		}
+	},
+	{
+		"type": "msbar2d",
+		"renderAt": "msbar2d_23",
+		"dataFormat": "json",
+		"dataEmptyMessage": "No Data Found.",
+		"dataSource": {
+			"chart": {
+				"caption": "Story Point Prediction For Backlog Items",
+				"subCaption": "",
+				"theme": "fusion",
+				"yAxisMaxValue": "8",
+				"yAxisMinValue": "0"
+			}
+		}
+	},
+	{
+		"type": "table",
+		"renderAt": "table_23",
+		"dataFormat": "json",
+		"caption": "Predicted Story Point",
+		"dataEmptyMessage": "No Data Found.",
+		"dataSource": {
+			"chart": {
+				"caption": "Predicted Story Point",
+				"subCaption": "",
+				"theme": "fusion"
+			}
+		}
+	}
+]

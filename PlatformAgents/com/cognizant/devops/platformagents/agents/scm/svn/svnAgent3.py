@@ -26,7 +26,6 @@ import os
 from dateutil import parser
 import datetime, time
 from ....core.BaseAgent3 import BaseAgent
-import logging.handlers
 
 class SvnAgent(BaseAgent):
     def get_login(self, realm, username, may_save ):
@@ -34,6 +33,7 @@ class SvnAgent(BaseAgent):
         password = self.getCredential("passwd")
         return True, username, password, False
 
+    @BaseAgent.timed
     def process(self):
         self.repoList = []
         self.newrepo=[]
@@ -45,7 +45,7 @@ class SvnAgent(BaseAgent):
             self.repoList = self.config.get('dynamicTemplate', {}).get("baseUrl", '')
             self.date_time = self.config.get("startFrom", '')
             self.pattern = self.config.get("timeStampFormat", '')
-            logging.info('List of Repositories : %s ' % self.repoList)
+            self.baseLogger.info('List of Repositories : %s ' % self.repoList)
             self.trackingData()
             self.publishData()
             if self.data != []:
@@ -53,7 +53,7 @@ class SvnAgent(BaseAgent):
                 self.publishToolsData(self.data)
             self.updateTrackingJson(self.trackingdata) 
         except Exception as e:
-            logging.error(e)
+            self.baseLogger.error(e)
         
     def trackingData(self):
         with open(self.trackingFilePath, 'r') as config_file:    
@@ -75,7 +75,7 @@ class SvnAgent(BaseAgent):
             try:
                 epoch = int(time.mktime(time.strptime(self.date_time, self.pattern)))
             except Exception as e:
-                logging.error(e)
+                self.baseLogger.error(e)
             self.end_rev=pysvn.Revision(pysvn.opt_revision_kind.date, epoch)
             self.retrieveData(repo)
             self.printdata(repo)

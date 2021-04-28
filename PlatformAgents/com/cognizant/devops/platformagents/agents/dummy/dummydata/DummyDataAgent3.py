@@ -432,6 +432,7 @@ class DummyDataAgent(BaseAgent):
                 detail['git_author'] = git_author                                      
                 self.spillOverStories.append(detail)                           
         except Exception as ex:
+            logging.error(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print((exc_type, fname, exc_tb.tb_lineno))
@@ -519,9 +520,9 @@ class DummyDataAgent(BaseAgent):
         git_datetime_epoch = int(time.mktime(git_date.timetuple()))
         self.updatedAt = git_date            
         gitSample = {}            
-        gitSample['gitCommitTime'] = git_date.strftime("%Y-%m-%dT%H:%M:%SZ")            
+        gitSample['gitCommitTime'] = git_date.strftime("%Y-%m-%dT%H:%M:%S")            
         timeStampField = "gitCommitTime",
-        timeStampFormat = "%Y-%m-%dT%H:%M:%SZ",
+        timeStampFormat = "%Y-%m-%dT%H:%M:%S",
         isEpoch = False
         if isForceSuccessRequired == False : 
             if isOrphanCommit :
@@ -546,7 +547,7 @@ class DummyDataAgent(BaseAgent):
         
         gitMetadata = {"labels" : ["SCM", "GIT", "DATA"]}   
         # self.updatedAt =    git_date    
-        self.publishToolsData(git_data, gitMetadata, timeStampField, timeStampFormat, isEpoch)        
+        self.publishToolsData(git_data, gitMetadata, "gitCommitTime","%Y-%m-%dT%H:%M:%S", isEpoch)        
         isJenkinsBuildSuccess = self.jenkinsProcessing(self.updatedAt, commitId, isForceSuccessRequired) 
         return isJenkinsBuildSuccess
     
@@ -554,7 +555,7 @@ class DummyDataAgent(BaseAgent):
         jenkins_data = [] 
         time_offset = (random.randint(101, 800))
         # self.jenkinsBuildNumber = self.jenkinsBuildNumber +1                                
-# print('a jenkine key '+randomJenkineBuildNumber +'  '+gitSampleData['inSightsTimeX']) #+'  '+gitSample['git_date']
+        # print('a jenkine key '+randomJenkineBuildNumber +'  '+gitSampleData['inSightsTimeX']) #+'  '+gitSample['git_date']
         isOrphanBuild = bool(random.getrandbits(1)) 
         jenkins_date = (updatedAt + datetime.timedelta(seconds=120))
         self.updatedAt = jenkins_date
@@ -567,8 +568,8 @@ class DummyDataAgent(BaseAgent):
         jenkinsSample = {}
         # jenkinsSample['inSightsTimeX'] = (jenkins_date).strftime("%Y-%m-%dT%H:%M:%SZ")
         # jenkinsSample['inSightsTime'] = jenkine_epochtime
-        jenkinsSample['startTime'] = jenkins_startTime.strftime("%Y-%m-%dT%H:%M:%SZ")
-        jenkinsSample['endTime'] = jenkins_endTime.strftime("%Y-%m-%dT%H:%M:%SZ")
+        jenkinsSample['startTime'] = jenkins_startTime.strftime("%Y-%m-%dT%H:%M:%S")
+        jenkinsSample['endTime'] = jenkins_endTime.strftime("%Y-%m-%dT%H:%M:%S")
         jenkinsSample['duration'] = (jenkins_endTime - jenkins_startTime).seconds
         
         # jenkinsSample['sprintID'] = random.choice(sprint)
@@ -586,7 +587,7 @@ class DummyDataAgent(BaseAgent):
         jenkinsSample['categoryName'] = "CI"
         # print(jenkinsSample)
         timeStampField = "startTime",
-        timeStampFormat = "%Y-%m-%dT%H:%M:%SZ",
+        timeStampFormat = "%Y-%m-%dT%H:%M:%S",
         isEpoch = False  
         # jenkinsSample['jenkins_date']=str(jenkins_date)
         # if rangeNumber < 2001 :
@@ -620,7 +621,7 @@ class DummyDataAgent(BaseAgent):
         jenkinsSample = {}
         self.jenkinsBuildNumber = self.jenkinsBuildNumber + 1        
         jenkinsMetadata = {"labels" : ["CI", "JENKINS", "DATA"]}     
-        self.publishToolsData(jenkins_data, jenkinsMetadata, timeStampField, timeStampFormat, isEpoch)                        
+        self.publishToolsData(jenkins_data, jenkinsMetadata, "startTime", "%Y-%m-%dT%H:%M:%S", isEpoch)                        
         return isJenkinsBuildSuccess
     
     def sonarProcessing(self, buildNumberString, updatedAt, isForceSuccessRequired=False):
@@ -630,8 +631,8 @@ class DummyDataAgent(BaseAgent):
         sonar_date = (updatedAt + datetime.timedelta(seconds=120))       
         time_offset = (random.randint(101, 800))
         # self.printLog('Jenkine build number '+jenkinsSampleData['buildNumber']+' Jenkine Date '+jenkinsSampleData['inSightsTimeX']+' Sonar Date '+str(sonar_date), False)
-        sonar_startTime = sonar_date.strftime("%Y-%m-%dT%H:%M:%SZ")
-        sonar_endTime = (sonar_date + datetime.timedelta(seconds=time_offset)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        sonar_startTime = sonar_date.strftime("%Y-%m-%dT%H:%M:%S")
+        sonar_endTime = (sonar_date + datetime.timedelta(seconds=time_offset)).strftime("%Y-%m-%dT%H:%M:%S")
         self.updatedAt = sonar_date + datetime.timedelta(seconds=time_offset) 
         sonarSample = {}
         # sonarSample['inSightsTimeX'] = sonar_date.strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -678,10 +679,10 @@ class DummyDataAgent(BaseAgent):
         
         sonar_data.append(sonarSample)
         timeStampField = "startTime",
-        timeStampFormat = "%Y-%m-%dT%H:%M:%SZ",
+        timeStampFormat = "%Y-%m-%dT%H:%M:%S",
         isEpoch = False
         sonarMetadata = {"labels" : ["CODEQUALITY", "SONAR", "DATA"]}
-        self.publishToolsData(sonar_data, sonarMetadata, timeStampField, timeStampFormat, isEpoch)
+        self.publishToolsData(sonar_data, sonarMetadata, "startTime", "%Y-%m-%dT%H:%M:%S", isEpoch)
         return isJenkinsBuildSuccess     
     
     def nexusProcessing(self, buildNumberString, updatedAt, isSnapshot=True, isForceSuccessRequired=False):
@@ -731,7 +732,7 @@ class DummyDataAgent(BaseAgent):
         timeStampField = "uploadedDate",
         timeStampFormat = "%Y-%m-%dT%H:%M:%S",
         isEpoch = False            
-        self.publishToolsData(nexus_data, nexusMetadata, timeStampField, timeStampFormat, isEpoch)
+        self.publishToolsData(nexus_data, nexusMetadata, "uploadedDate", "%Y-%m-%dT%H:%M:%S", isEpoch)
         if nexusStatus == "succeeded":            
             isJenkinsBuildSuccess = self.rundeckProcessing(buildNumberString, self.updatedAt, isForceSuccessRequired);                       
         else :
@@ -749,8 +750,8 @@ class DummyDataAgent(BaseAgent):
         rundeckSample = {}
          # rundeckSample['inSightsTimeX'] = rundeck_date.strftime("%Y-%m-%dT%H:%M:%SZ")
          # rundeckSample['inSightsTime'] = int(time.mktime(rundeck_startTime.timetuple()))
-        rundeckSample['startTime'] = rundeck_startTime.strftime("%Y-%m-%dT%H:%M:%SZ")
-        rundeckSample['endTime'] = rundeck_endTime.strftime("%Y-%m-%dT%H:%M:%SZ")        
+        rundeckSample['startTime'] = rundeck_startTime.strftime("%Y-%m-%dT%H:%M:%S")
+        rundeckSample['endTime'] = rundeck_endTime.strftime("%Y-%m-%dT%H:%M:%S")        
         rundeckStaus = random.choice(self.rundeck_status)
         
         rundeckSample['environment'] = random.choice(self.rundeck_env)
@@ -782,10 +783,10 @@ class DummyDataAgent(BaseAgent):
         RundeckMetadata = {"labels" : ["DEPLOYMENT", "RUNDECK", "DATA"]}
          # print(len(rundeck_data))
         timeStampField = "startTime",
-        timeStampFormat = "%Y-%m-%dT%H:%M:%SZ",
+        timeStampFormat = "%Y-%m-%dT%H:%M:%S",
         isEpoch = False
          # total_record_count =total_record_count + len(rundeck_data)
-        self.publishToolsData(rundeck_data, RundeckMetadata, timeStampField, timeStampFormat, isEpoch)
+        self.publishToolsData(rundeck_data, RundeckMetadata, "startTime", "%Y-%m-%dT%H:%M:%S", isEpoch)
         return isJenkinsBuildSuccess   
     
     def qaTestProcessing(self, key, updatedAt, isForceSuccessRequired=False):   

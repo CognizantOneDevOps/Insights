@@ -15,66 +15,55 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.mapping.projects;
 
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
-
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
-public class ProjectMappingDAL extends BaseDAL{
-	
+public class ProjectMappingDAL extends BaseDAL {
+
 	private static Logger log = LogManager.getLogger(ProjectMappingDAL.class);
-	
-	
-	public List<ProjectMapping> fetchProjectMapping(String projectName, String projectId){
-		try (Session session = getSessionObj()) {
-		Query<ProjectMapping> createQuery = session.createQuery(
-				"FROM ProjectMapping PM WHERE PM.projectName = :projectName AND PM.projectId = :projectId", ProjectMapping.class);
-		createQuery.setParameter("projectName", projectName);
-		createQuery.setParameter("projectId", projectId);
-		List<ProjectMapping> resultList = createQuery.getResultList();
-		return resultList;
-		}catch (Exception e) {
-			log.error(e.getMessage());
-			throw e;
-		}
-	}
-	
-	public List<ProjectMapping> fetchProjectMappingByOrgId(int orgId){
-		
-		try (Session session = getSessionObj()) {
-			Query<ProjectMapping> createQuery = session.createQuery("FROM ProjectMapping PM WHERE PM.orgId = :orgId",
-					ProjectMapping.class);
-			createQuery.setParameter("orgId", orgId);
-			List<ProjectMapping> resultList = createQuery.getResultList();
-			return resultList;
+
+	public List<ProjectMapping> fetchProjectMapping(String projectName, String projectId) {
+		try {
+			Map<String, Object> parameters = new HashMap<>();
+			parameters.put("projectName", projectName);
+			parameters.put("projectId", projectId);
+			return getResultList(
+					"FROM ProjectMapping PM WHERE PM.projectName = :projectName AND PM.projectId = :projectId",
+					ProjectMapping.class, parameters);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
 		}
 	}
-	
-	
-	public List<ProjectMapping> fetchAllProjectMapping(){
-		
-		try (Session session = getSessionObj()) {
-			Query<ProjectMapping> createQuery = session.createQuery("FROM ProjectMapping PM", ProjectMapping.class);
-			List<ProjectMapping> resultList = createQuery.getResultList();
-			return resultList;
+
+	public List<ProjectMapping> fetchProjectMappingByOrgId(int orgId) {
+		try {
+			Map<String, Object> parameters = new HashMap<>();
+			parameters.put("orgId", orgId);
+			return getResultList("FROM ProjectMapping PM WHERE PM.orgId = :orgId", ProjectMapping.class, parameters);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
 		}
 	}
-	
-	public boolean addProjectMapping(ProjectMapping projectMapping){
-		try (Session session = getSessionObj()) {
-			session.beginTransaction();
-			session.save(projectMapping);
-			session.getTransaction().commit();
+
+	public List<ProjectMapping> fetchAllProjectMapping() {
+		try {
+			Map<String, Object> parameters = new HashMap<>();
+			return getResultList("FROM ProjectMapping PM", ProjectMapping.class, parameters);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
+	}
+
+	public boolean addProjectMapping(ProjectMapping projectMapping) {
+		try {
+			save(projectMapping);
 			return true;
 		} catch (Exception e) {
 			log.error(e.getMessage());

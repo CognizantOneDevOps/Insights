@@ -23,7 +23,10 @@ from dateutil import parser
 from ....core.BaseAgent import BaseAgent
 
 class RundeckAgent(BaseAgent):
+
+    @BaseAgent.timed
     def process(self):
+        self.baseLogger.info('Inside process')
         getProjects = self.config.get("baseEndPoint", '')
         authtoken = self.getCredential("authtoken")
         ExecutionsBaseEndPoint = self.config.get("executionsBaseEndPoint", '')

@@ -22,4 +22,5 @@ public interface DataArchivalConstants {
 	 String SOURCEURL = "sourceUrl";
 	 String TASK = "task";
 	 String CONTAINERID = "containerID";
+	 String BOLTPORT = "boltPort";
 }

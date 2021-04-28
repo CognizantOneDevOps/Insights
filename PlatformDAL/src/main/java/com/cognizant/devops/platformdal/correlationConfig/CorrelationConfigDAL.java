@@ -15,12 +15,13 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.correlationConfig;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
+
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
@@ -31,18 +32,18 @@ public class CorrelationConfigDAL extends BaseDAL {
 	
 	public Boolean saveCorrelationConfig(CorrelationConfiguration saveCorrelationJson) throws InsightsCustomException {
 		
-		try (Session session = getSessionObj()) {
-			Query<CorrelationConfiguration> createQuery = session.createQuery(
+		try {
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put(RELATIONNAME, saveCorrelationJson.getRelationName());
+			List<CorrelationConfiguration> resultList = getResultList(
 					CORRELATION_CONFIGURATION_QUERY,
-					CorrelationConfiguration.class);
-			createQuery.setParameter(RELATIONNAME, saveCorrelationJson.getRelationName());
-			List<CorrelationConfiguration> resultList = createQuery.getResultList();
+					CorrelationConfiguration.class,
+					parameters);
+			
 			if (!resultList.isEmpty()) {
 				throw new InsightsCustomException("Relation Name already exists.");
 			} else {
-				session.beginTransaction();
-				session.save(saveCorrelationJson);
-				session.getTransaction().commit();
+				save(saveCorrelationJson);
 				return Boolean.TRUE;
 			}
 		} catch (Exception e) {
@@ -53,20 +54,20 @@ public class CorrelationConfigDAL extends BaseDAL {
 
 	public Boolean updateCorrelationConfig(String relationName, Boolean flag) throws InsightsCustomException {
 		
-		try (Session session = getSessionObj()) {
-			Query<CorrelationConfiguration> createQuery = session.createQuery(
+		try {
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put(RELATIONNAME, relationName);
+			List<CorrelationConfiguration> resultList = getResultList(
 					CORRELATION_CONFIGURATION_QUERY,
-					CorrelationConfiguration.class);
-			createQuery.setParameter(RELATIONNAME, relationName);
-			List<CorrelationConfiguration> resultList = createQuery.getResultList();
+					CorrelationConfiguration.class,
+					parameters);
+
 			if (resultList.isEmpty()) {
 				throw new InsightsCustomException("Unable to update correlation.");
 			} else {
 				CorrelationConfiguration correlationConfig = resultList.get(0);
-				session.beginTransaction();
 				correlationConfig.setEnableCorrelation(flag);
-				session.update(correlationConfig);
-				session.getTransaction().commit();				
+				update(correlationConfig);				
 				return Boolean.TRUE;
 			}
 		} catch (Exception e) {
@@ -76,20 +77,19 @@ public class CorrelationConfigDAL extends BaseDAL {
 	}
 
 	public Boolean deleteCorrelationConfig(String relationName) throws InsightsCustomException{
-
-		try (Session session = getSessionObj()) {
-			Query<CorrelationConfiguration> createQuery = session.createQuery(
+		try {
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put(RELATIONNAME, relationName);
+			List<CorrelationConfiguration> resultList = getResultList(
 					CORRELATION_CONFIGURATION_QUERY,
-					CorrelationConfiguration.class);
-			createQuery.setParameter(RELATIONNAME, relationName);
-			List<CorrelationConfiguration> resultList = createQuery.getResultList();
+					CorrelationConfiguration.class,
+					parameters);
+			
 			if (resultList.isEmpty()) {
 				throw new InsightsCustomException("Unable to update correlation.");
 			} else {
 				CorrelationConfiguration correlationConfig = resultList.get(0);
-				session.beginTransaction();
-				session.delete(correlationConfig);
-				session.getTransaction().commit();
+				delete(correlationConfig);
 				return Boolean.TRUE;
 			}
 		} catch (Exception e) {
@@ -99,12 +99,12 @@ public class CorrelationConfigDAL extends BaseDAL {
 	}
 
 	public List<CorrelationConfiguration> getActiveCorrelations() {
-		try (Session session = getSessionObj()) {
-			Query<CorrelationConfiguration> createQuery = session.createQuery(
+		try {
+			Map<String,Object> parameters = new HashMap<>();
+			return getResultList(
 					"FROM CorrelationConfiguration CC WHERE CC.enableCorrelation = true ",
-					CorrelationConfiguration.class);
-			List<CorrelationConfiguration> result = createQuery.getResultList();
-			return result;
+					CorrelationConfiguration.class,
+					parameters);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
@@ -112,11 +112,12 @@ public class CorrelationConfigDAL extends BaseDAL {
 	}
 
 	public List<CorrelationConfiguration> getAllCorrelations() {
-		try (Session session = getSessionObj()) {
-			Query<CorrelationConfiguration> createQuery = session.createQuery("FROM CorrelationConfiguration CC ",
-					CorrelationConfiguration.class);
-			List<CorrelationConfiguration> result = createQuery.getResultList();
-			return result;
+		try {
+			Map<String,Object> parameters = new HashMap<>();
+			return getResultList(
+					"FROM CorrelationConfiguration CC ",
+					CorrelationConfiguration.class,
+					parameters);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;

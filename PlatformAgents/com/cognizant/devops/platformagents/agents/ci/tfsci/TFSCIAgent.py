@@ -21,7 +21,10 @@ Created on 06 February 2020
 from ....core.BaseAgent import BaseAgent
 
 class TFSCIAgent(BaseAgent):
+
+    @BaseAgent.timed
     def process(self):
+        self.baseLogger.info('Inside process')
         BaseUrl = self.config.get("baseUrl", '')
         UserID = self.getCredential("userid")
         Passwd = self.getCredential("passwd")

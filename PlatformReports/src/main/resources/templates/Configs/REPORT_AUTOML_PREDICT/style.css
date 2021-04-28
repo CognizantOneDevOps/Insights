@@ -1,0 +1,79 @@
+.content-mesaage {
+    max-width: 370px !important;
+    word-wrap: break-word !important;
+    font-size: 14px;
+    text-align: left;
+}
+.singleStatRowCss{
+	 background-color:#5d62b5;
+}
+
+.pagebreak
+{
+	margin-top: 500px;
+}
+
+.singlestatCSS {
+    width: 250px;
+    height: 150px;	
+    text-align: center;
+	margin-bottom:70%;
+    font-size: 70px;
+    color: white;
+}
+
+.content {
+    margin-left: 1.5%;
+    margin-top: 4%;
+    text-align: center;
+}
+
+.h3 {
+    text-align: center;
+    font-weight: bold;
+    font-family: 'Source Sans Pro', sans-serif;
+    color: black;
+    font-size: 16px;
+}
+
+.row {
+    margin-top: 1%;
+}
+
+h4 {
+    margin-top: 1.5%;
+    text-decoration: underline;
+    font-weight: bold;
+    font-family: 'Source Sans Pro', sans-serif;
+    color: blue;
+    font-size: 16px;
+}
+
+ul {
+    margin: 0px
+}
+
+.table th{
+	color: #0000ff;
+	background-color: #00FF00;
+	font-size: 14;
+}
+
+.table td{
+	font-size: 10;
+}
+
+
+.table .observations .li{
+	font-size: 10;
+}
+
+.table .observations {
+	font-size: 15;
+}
+
+.table .caption
+{
+    font-size: 20;
+       
+}

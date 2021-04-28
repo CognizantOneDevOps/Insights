@@ -22,7 +22,9 @@ from ....core.BaseAgent3 import BaseAgent
 from datetime import datetime
 import json
 class BambooAgent(BaseAgent):
-    def process(self):        
+    @BaseAgent.timed
+    def process(self):
+        self.baseLogger.info('Inside process')
         BaseUrl = self.config.get("baseUrl", None)
         UserID = self.getCredential("userid")
         Passwd = self.getCredential("passwd")

@@ -14,23 +14,24 @@
 # the License.
 #-------------------------------------------------------------------------------
 echo "#################### Installing Tomcat9.0.36 ####################"
-cd /opt
+source /etc/environment
+source /etc/profile
+cd $INSIGHTS_APP_ROOT_DIRECTORY
 sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformUI3.zip -O PlatformUI3.zip
 sudo unzip PlatformUI3.zip && sudo rm -rf PlatformUI3.zip
 sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformService.war -O PlatformService.war
 sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/tomcat/apache-tomcat.tar.gz
 sudo tar -zxvf apache-tomcat.tar.gz
-sudo cp -R ./app /opt/apache-tomcat/webapps
+sudo cp -R ./app $INSIGHTS_APP_ROOT_DIRECTORY/apache-tomcat/webapps
 sudo rm -rf PlatformUI3
-sudo cp PlatformService.war /opt/apache-tomcat/webapps
+sudo cp PlatformService.war $INSIGHTS_APP_ROOT_DIRECTORY/apache-tomcat/webapps
 sudo rm -rf PlatformService.war
 cd apache-tomcat
-sudo chmod -R 777 /opt/apache-tomcat
+sudo chmod -R 777 $INSIGHTS_APP_ROOT_DIRECTORY/apache-tomcat
 cd /etc/init.d/
 sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/Tomcat.sh
 sudo mv Tomcat.sh Tomcat
 sudo chmod +x Tomcat
 sudo chkconfig Tomcat on
 sleep 10
-sudo service Tomcat stop
-sudo service Tomcat start
+sudo service Tomcat restart

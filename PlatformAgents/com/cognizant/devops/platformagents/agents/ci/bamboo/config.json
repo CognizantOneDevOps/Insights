@@ -58,7 +58,7 @@
 	"agentSecretDetails": ["userid","passwd"],
 	"startFrom" : "2016-12-07 15:46:33",
 	"loggingSetting" : {
-		"logLevel" : "WARN"
+		"logLevel" : "INFO"
 	},
 	"isDebugAllowed" : true,
 	"auditing": false

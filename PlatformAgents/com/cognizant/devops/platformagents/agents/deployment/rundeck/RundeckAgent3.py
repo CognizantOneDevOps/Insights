@@ -25,7 +25,10 @@ from ....core.BaseAgent3 import BaseAgent
 import json
 
 class RundeckAgent(BaseAgent):
+
+    @BaseAgent.timed
     def process(self):
+        self.baseLogger.info('Inside process')
         getProjects = self.config.get("baseEndPoint", '')
         authtoken = self.getCredential("authtoken")
         ExecutionsBaseEndPoint = self.config.get("executionsBaseEndPoint", '')

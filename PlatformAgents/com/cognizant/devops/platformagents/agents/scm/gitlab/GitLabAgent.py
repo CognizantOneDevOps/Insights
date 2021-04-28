@@ -20,7 +20,6 @@ Re-Created on March 06, 2020
 
 import datetime
 import json
-import logging
 import os
 import sys
 import urllib
@@ -32,6 +31,7 @@ from ....core.BaseAgent import BaseAgent
 class GitLabAgent(BaseAgent):
     trackingCachePath = None
 
+    @BaseAgent.timed
     def process(self):        
         timeStampNow = lambda: dateTime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
         getProjects = self.config.get("getRepos", '')
@@ -217,7 +217,7 @@ class GitLabAgent(BaseAgent):
                                         break
                                 except Exception as ex:
                                     fetchNextCommitsPage = False
-                                    logging.error(ex)
+                                    self.baseLogger.error(ex)
                                 commitsPageNum = commitsPageNum + 1
                             if data or orphanCommitIdList:
                                 self.updateTrackingForBranch(trackingDetails, branch, latestCommit, projectDefaultBranch,
@@ -295,7 +295,7 @@ class GitLabAgent(BaseAgent):
                                 fetchNextCommitsPage = False
                         except Exception as ex:
                             fetchNextCommitsPage = False
-                            logging.error(ex)
+                            self.baseLogger.error(ex)
                         commitsPageNum = commitsPageNum + 1
                     if len(commitList) > 0:
                         tagNode = {
@@ -321,6 +321,7 @@ class GitLabAgent(BaseAgent):
             self.publishToolsData(data, tagMetadata)
             self.updateTrackingJson(self.tracking)
 
+    @BaseAgent.timed
     def retrieveMergeRequest(self, projectEndPoint, projectId, projectPath, encodedProjectName, defaultBranch, accessToken, trackingDetails,
                             trackingCache,
                             startFrom, metaData, responseTemplate, commitMetaData, commitsResponseTemplate):
@@ -445,7 +446,7 @@ class GitLabAgent(BaseAgent):
                         originTrackingDetails['totalMergeReqCommits'] = originTrackingDetails.get('totalMergeReqCommits',
                                                                                                  0) + len(commitList)
                     except Exception as err:
-                        logging.error(err)
+                        self.baseLogger.error(err)
                 if commitList:
                     mergeReqData += self.parseResponse(responseTemplate, mergeReq,
                                                       {'projectPath': projectPath,'projectId': projectId, 'gitType': 'mergeRequest',
@@ -486,7 +487,7 @@ class GitLabAgent(BaseAgent):
             try:
                 os.makedirs(os.path.dirname(filePath))
             except Exception as err:
-                logging.error(err)
+                self.baseLogger.error(err)
         with open(self.trackingCachePath + fileName + '.json', 'w') as filePointer:
             json.dump(trackingDict, filePointer)
 

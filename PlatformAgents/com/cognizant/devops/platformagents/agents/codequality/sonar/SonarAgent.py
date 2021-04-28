@@ -24,6 +24,8 @@ from datetime import timedelta
 from ....core.BaseAgent import BaseAgent
 import json
 class SonarAgent(BaseAgent):
+    
+    @BaseAgent.timed
     def process(self):
         baseUrl = self.config.get("baseUrl", '')
         projectsUrl = baseUrl+"api/components/search?qualifiers=TRK&format=json"

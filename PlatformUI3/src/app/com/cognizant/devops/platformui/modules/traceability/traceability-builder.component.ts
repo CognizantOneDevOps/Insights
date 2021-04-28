@@ -1,12 +1,10 @@
 import { AfterViewInit, Component, OnInit, Renderer2 } from '@angular/core';
-import { TraceabiltyService } from './traceablity-builder.service';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
-import { ShowTraceabiltyDetailsDialog } from './traceabilty-show-details-dialog';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { DataSharedService } from '@insights/common/data-shared-service';
+import { ShowTraceabiltyDetailsDialog } from './traceabilty-show-details-dialog';
+import { TraceabiltyService } from './traceablity-builder.service';
 
 @Component({
     selector: 'app-traceabilitydashboard',
@@ -233,7 +231,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
             let res = data.data;
             this.displayProperty = res;
           //  if (this.issueTypeSelected === 'Epic') {
-                this.displayProperty['Epic'] = ["issueKey"];
+                this.displayProperty['Epic'] = ["issueKey","toolstatus"];
           //  }
         });
     }
@@ -258,29 +256,8 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
                         })
                         historyData.push(resultmap);
                     });
-                    if (data.data.summary.length > 0) {
-
-                        this.toolSummaryArray = [];
-                        this.showSummary = true;
-                        var tempArr = []
-                        for (let orderredTool in this.order) {
-                            var toolName = this.order[orderredTool]
-                            var toolData = data.data.summary[0][toolName]
-                            if (toolData != undefined) {
-                                tempArr.push(toolData)
-                            }
-                        }
-                        var summaryLen = tempArr.length;
-                        for (let index = 0; index < summaryLen; index++) {
-                            var object = tempArr[index]
-                            var obejctString = JSON.stringify(object);
-                            var objectLen = obejctString.split(",").length
-                            for (var i = 0; i < objectLen; i++) {
-                                if(tempArr[index][i] !== undefined)
-                                this.toolSummaryArray.push(tempArr[index][i])
-                            }
-                        }
-                    }
+                    this.prepareSummaryDetail(data.data.summary);
+                    
                     if (data.data.timelag.length > 0) {
                         var tempArr = []
                         for (var element of data.data.timelag) {
@@ -333,6 +310,19 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
         });
         this.globalMap = this.map;
     }
+    prepareSummaryDetail(data){
+
+        if (data.length > 0) {
+            this.toolSummaryArray = [];
+            var totalMessage = data[0]['Total']
+            this.toolSummaryArray.push(totalMessage)
+            var messagesArr = data[0]['messages'];
+            for (let index = 0; index < messagesArr.length; index++) {
+                var object = messagesArr[index]
+                this.toolSummaryArray.push(object)
+            }
+        }
+    }
     onCardClickJira(index, event, key) {
         this.isDatainProgress=true;
         this.showModel = null;
@@ -378,29 +368,9 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
                         }
                     });
                     this.globalMap = this.map;
-                    this.isDatainProgress=false;  
-                  //  setTimeout(()=>{this.isDatainProgress=false},8000);  
-                    if (data.data.summary.length > 0) {
-
-                        this.toolSummaryArray = [];
-                    var tempArr = []
-                        for (let orderredTool in this.order) {
-                            var toolName = this.order[orderredTool]
-                            var toolData = data.data.summary[0][toolName]
-                            if (toolData != undefined) {
-                                tempArr.push(toolData)
-                            }
-                        }
-                        var summaryLen = tempArr.length;
-                        for (let index = 0; index < summaryLen; index++) {
-                            var object = tempArr[index]
-                            var obejctString = JSON.stringify(object);
-                            var objectLen = obejctString.split(",").length
-                            for (var i = 0; i < objectLen; i++) {
-                                this.toolSummaryArray.push(tempArr[index][i])
-                            }
-                        }
-                    }
+                    this.isDatainProgress=false;   
+                  this.prepareSummaryDetail(data.data.summary);
+                  
                     if (data.data.timelag.length > 0) {
                         var tempArr = []
                         for (var element of data.data.timelag) {
@@ -476,27 +446,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
                             })
                             historyData.push(resultmap);
                         });
-                        if (data.data.summary.length > 0) {
-
-                            this.toolSummaryArray = [];
-                            var tempArr = []
-                            for (let orderredTool in this.order) {
-                                var toolName = this.order[orderredTool]
-                                var toolData = data.data.summary[0][toolName]
-                                if (toolData != undefined) {
-                                    tempArr.push(toolData)
-                                }
-                            }
-                            var summaryLen = tempArr.length;
-                            for (let index = 0; index < summaryLen; index++) {
-                                var object = tempArr[index]
-                                var obejctString = JSON.stringify(object);
-                                var objectLen = obejctString.split(",").length
-                                for (var i = 0; i < objectLen; i++) {
-                                    this.toolSummaryArray.push(tempArr[index][i])
-                                }
-                            }
-                        }
+                        this.prepareSummaryDetail(data.data.summary);
                         if (data.data.timelag.length > 0) {
                             var tempArr = []
                             for (var element of data.data.timelag) {
@@ -661,27 +611,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
                             })
                             historyData.push(resultmap);
                         });
-                        if (data.data.summary.length > 0) {
-
-                            this.toolSummaryArray = [];
-                            var tempArr = []
-                            for (let orderredTool in this.order) {
-                                var toolName = this.order[orderredTool]
-                                var toolData = data.data.summary[0][toolName]
-                                if (toolData != undefined) {
-                                    tempArr.push(toolData)
-                                }
-                            }
-                            var summaryLen = tempArr.length;
-                            for (let index = 0; index < summaryLen; index++) {
-                                var object = tempArr[index]
-                                var obejctString = JSON.stringify(object);
-                                var objectLen = obejctString.split(",").length
-                                for (var i = 0; i < objectLen; i++) {
-                                    this.toolSummaryArray.push(tempArr[index][i])
-                                }
-                            }
-                        }
+                        this.prepareSummaryDetail(data.data.summary);
                         if (data.data.timelag.length > 0) {
                             var tempArr = []
                             for (var element of data.data.timelag) {
@@ -764,7 +694,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
         }
         let showDetailsDialog = this.dialog.open(ShowTraceabiltyDetailsDialog, {
             panelClass: 'traceablity-show-details-dialog-container',
-            width: '68%',
+            width: '85%',
             height: '70%',
             disableClose: true,
             data: { toolName: toolName, cachestring: dialogData, showToolDetail: true }
@@ -775,7 +705,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
         let dialogData = data;
         let showDetailsDialog = this.dialog.open(ShowTraceabiltyDetailsDialog, {
             panelClass: 'traceablity-show-details-dialog-container',
-            width: '22%',
+            width: '35%',
             height: '50%',
             disableClose: true,
             data: { cardData: dialogData, index: index, showCardDetail: true }

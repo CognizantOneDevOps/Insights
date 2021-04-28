@@ -59,6 +59,9 @@ public class InsightsDataArchivalConfig {
 	
 	@Column(name = "CONTAINER_ID")
 	private String containerID;
+	
+	@Column(name = "BOLTPORT")
+	private int boltPort;
 
 	public int getId() {
 		return id;
@@ -147,6 +150,16 @@ public class InsightsDataArchivalConfig {
 	public void setContainerID(String containerID) {
 		this.containerID = containerID;
 	}
+
+	public int getBoltPort() {
+		return boltPort;
+	}
+
+	public void setBoltPort(int boltPort) {
+		this.boltPort = boltPort;
+	}
+	
+	
 	
 
 }

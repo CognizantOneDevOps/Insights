@@ -27,6 +27,8 @@ from dateutil import parser
 
 
 class PivotalTrackerAgent(BaseAgent):
+    
+    @BaseAgent.timed
     def process(self):
         self.setUpVariables()
         self.login()
