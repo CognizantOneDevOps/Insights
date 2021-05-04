@@ -97,7 +97,6 @@ source /etc/profile
 echo "#################### Setting up Insights Home ####################"
 sudo yum install wget -y
 sudo yum install unzip -y
-sudo yum install jq -y
 sudo yum install dos2unix -y
 cd $INSIGHTS_HOME_ROOT_DIRECTORY
 sudo mkdir INSIGHTS_HOME
@@ -113,13 +112,13 @@ source /etc/environment
 source /etc/profile
 dos2unix $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json
 grafanadbpass=$1
-myextip=$(wget -qO- icanhazip.com)
+export myextip=$(wget -qO- icanhazip.com)
 echo $myextip
 sed -i -e "s|localhost:3000|${myextip}:3000|g" $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json
 sed -i -e "s|hostip|${myextip}|g" $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json
 #Postgres grafana user credentials using jq
-jq --arg user "grafana" '.postgre.userName = $user' server-config.json > server-config.json.tmp && mv server-config.json.tmp server-config.json
-jq --arg pass "${grafanadbpass}" '.postgre.password = $pass' server-config.json > server-config.json.tmp && mv server-config.json.tmp server-config.json
+jq --arg user "grafana" '.postgre.userName=$user' $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json > $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json.tmp && mv $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json.tmp $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json -f
+jq --arg pass ${grafanadbpass} '.postgre.password=$pass' $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json > $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json.tmp && mv $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json.tmp $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json -f
 #Add IP in trusted host
 sed -i -e '/"trustedHosts":/ a "hostip",'  $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json
 sed -i -e "s|hostip|${myextip}|g"  $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json
