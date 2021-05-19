@@ -28,6 +28,7 @@ source /etc/profile
 
 #Framing Endpoint Url
 neo4jEndpoint="http://$neo4jIP:7474"
+neo4jBoltEndpoint="http://$neo4jIP:7687"
 grafanaDBEndpoint="jdbc:postgresql://$postgresIP:5432/grafana"
 insightsDBUrl="jdbc:postgresql://$postgresIP:5432/insight"
 grafanaDBUrl="jdbc:postgresql://$postgresIP:5432/grafana"
@@ -50,11 +51,14 @@ echo $(jq --arg grafanaEndpoint $grafanaEndpoint '(.grafana.grafanaEndpoint) |= 
 echo $(jq --arg grafanaDBEndpoint $grafanaDBEndpoint '(.grafana.grafanaDBEndpoint) |= $grafanaDBEndpoint' $configPath) > $configPath
 echo $(jq --arg postgresIP $postgresIP --arg hostIP $hostIP '(.trustedHosts) |= .+ [$postgresIP,$hostIP]' $configPath) > $configPath
 echo $(jq --arg neo4jEndpoint $neo4jEndpoint '(.graph.endpoint) |= $neo4jEndpoint' $configPath) > $configPath
+echo $(jq --arg neo4jBoltEndpoint $neo4jBoltEndpoint '(.graph.boltEndPoint) |= $neo4jBoltEndpoint' $configPath) > $configPath
 echo $(jq --arg grafanaDBUser $grafanaDBUser '(.postgre.userName) |= $grafanaDBUser' $configPath) > $configPath
 echo $(jq --arg grafanaDBPass $grafanaDBPass '(.postgre.password) |= $grafanaDBPass' $configPath) > $configPath
 echo $(jq --arg insightsDBUrl $insightsDBUrl '(.postgre.insightsDBUrl) |= $insightsDBUrl' $configPath) > $configPath
 echo $(jq --arg grafanaDBUrl $grafanaDBUrl '(.postgre.grafanaDBUrl) |= $grafanaDBUrl' $configPath) > $configPath
 echo $(jq --arg rabbitmqIP $rabbitmqIP '(.messageQueue.host) |= $rabbitmqIP' $configPath) > $configPath
+echo $(jq --arg rabbitMqUser $rabbitMqUser '(.messageQueue.user) |= $rabbitMqUser' $configPath) > $configPath
+echo $(jq --arg rabbitMqPassword $rabbitMqPassword '(.messageQueue.password) |= $rabbitMqPassword' $configPath) > $configPath
 echo $(jq --arg insightsServiceURL $ServiceEndpoint '(.insightsServiceURL) |= $insightsServiceURL' $configPath) > $configPath
 
 sed -i "s/\r$//g" $configPath
@@ -65,6 +69,11 @@ sed -i -e "s/host = localhost:5432/host = $postgresIP:5432/g"  /opt/grafana/conf
 #update uiconfig
 echo $(jq --arg serviceHost $ServiceEndpoint '(.serviceHost) |= $serviceHost' /opt/apache-tomcat/webapps/app/config/uiConfig.json) > /opt/apache-tomcat/webapps/app/config/uiConfig.json
 echo $(jq --arg grafanaHost $grafanaEndpoint '(.grafanaHost) |= $grafanaHost' /opt/apache-tomcat/webapps/app/config/uiConfig.json) > /opt/apache-tomcat/webapps/app/config/uiConfig.json
+
+sed -i -e "s/app.mqHost=/app.mqHost=$rabbitmqIP/g" /opt/insightsWebhook/webhook_subscriber.properties
+sed -i -e "s/app.mqUser=/app.mqUser=$rabbitMqUser/g" /opt/insightsWebhook/webhook_subscriber.properties
+sed -i -e "s/app.mqPassword=/app.mqPassword=$rabbitMqPassword/g" /opt/insightsWebhook/webhook_subscriber.properties
+sed -i -e "s/app.mqExchangeName=/app.mqExchangeName=iSight/g" /opt/insightsWebhook/webhook_subscriber.properties
 
 
 #updating environmental variables
@@ -80,11 +89,11 @@ sed -i -e "s/.*host.*/\"host\": \"$rabbitmqIP\",/g" /opt/insightsagents/AgentDae
 
 #starting services
 nohup /usr/sbin/httpd &
-cd /opt/grafana && nohup ./bin/grafana-server &
-cd /opt/apache-tomcat && nohup ./bin/startup.sh &
-cd /opt/insightsengine/ && nohup java  -Xmx1024M -Xms500M  -jar /opt/insightsengine/PlatformEngine.jar &
-cd /opt/insightsWebhook/ && nohup java  -Xmx1024M -Xms500M  -jar /opt/insightsWebhook/PlatformInsightsWebHook.jar &
-cd /opt/insightsWorkflow/ && nohup java -Xmx1024M -Xms500M -jar /opt/insightsWorkflow/PlatformWorkflow.jar &
+cd /opt/grafana/bin && nohup ./grafana-server > grafana-server.log 2>&1 &
+cd /opt/apache-tomcat/bin && ./startup.sh
+cd /opt/insightsengine/ && nohup java  -Xmx1024M -Xms512M  -jar /opt/insightsengine/PlatformEngine.jar  > /dev/null 2>&1 &
+cd /opt/insightsWebhook/ && nohup java  -Xmx1024M -Xms512M  -jar /opt/insightsWebhook/PlatformInsightsWebHook.jar  > /dev/null 2>&1 &
+cd /opt/insightsWorkflow/ && nohup java -Xmx1024M -Xms512M -jar /opt/insightsWorkflow/PlatformWorkflow.jar  > /dev/null 2>&1 &
 #sh /opt/insightsagents/AgentDaemon/installdaemonagent.sh Linux
 /etc/init.d/InSightsDaemonAgent start
 

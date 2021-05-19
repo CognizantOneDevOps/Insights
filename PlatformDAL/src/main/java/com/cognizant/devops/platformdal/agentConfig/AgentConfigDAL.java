@@ -46,7 +46,7 @@ public class AgentConfigDAL extends BaseDAL {
 	 * @return
 	 */
 	public boolean updateAgentConfigFromUI(String agentId, String toolCategory, String labelName, String toolName,
-			JsonObject agentJson, String agentVersion, String osversion, Date updateDate, boolean vault) {
+			JsonObject agentJson, String agentVersion, String osversion, Date updateDate, boolean vault,boolean isWebhook) {
 		try {
 			Map<String,Object> parameters = new HashMap<>();
 			parameters.put(AgentCommonConstant.AGENTID, agentId);
@@ -57,7 +57,7 @@ public class AgentConfigDAL extends BaseDAL {
 
 			if (agentConfig != null) {
 				setAgentConfigValues(agentConfig, toolCategory, labelName, agentId, toolName, agentJson, agentVersion,
-						osversion, updateDate, vault);
+						osversion, updateDate, vault,isWebhook);
 				update(agentConfig);
 				return Boolean.TRUE;
 			} else {
@@ -109,11 +109,11 @@ public class AgentConfigDAL extends BaseDAL {
 	 * @return
 	 */
 	public boolean saveAgentConfigFromUI(String agentId, String toolCategory, String labelName, String toolName,
-		JsonObject agentJson, String agentVersion, String osversion, Date updateDate, boolean vault) {
+		JsonObject agentJson, String agentVersion, String osversion, Date updateDate, boolean vault,boolean isWebhook) {
 		AgentConfig agentConfig = new AgentConfig();
 		try {
 		setAgentConfigValues(agentConfig, toolCategory, labelName, agentId, toolName, agentJson, agentVersion,
-				osversion, updateDate, vault);
+				osversion, updateDate, vault,isWebhook);
 		save(agentConfig);
 		}catch(Exception e) {
 			log.error(e.getMessage());
@@ -124,7 +124,7 @@ public class AgentConfigDAL extends BaseDAL {
 
 	private void setAgentConfigValues(AgentConfig agentConfig, String toolCategory, String labelName, String agentId,
 			String toolName, JsonObject agentJson, String agentVersion, String osversion, Date updateDate,
-			boolean vault) {
+			boolean vault,boolean isWebhook) {
 
 		agentConfig.setToolCategory(toolCategory.toUpperCase());
 		agentConfig.setToolName(toolName);
@@ -136,6 +136,7 @@ public class AgentConfigDAL extends BaseDAL {
 		agentConfig.setAgentKey(agentId);
 		agentConfig.setAgentStatus(AGENTACTION.START.name());
 		agentConfig.setVault(vault);
+		agentConfig.setIswebhook(isWebhook);
 	}
 
 	/**
@@ -240,7 +241,7 @@ public class AgentConfigDAL extends BaseDAL {
 		try {
 			Map<String,Object> parameters = new HashMap<>();
 			return getResultList(
-					"FROM AgentConfig AC WHERE AC.toolCategory != 'DAEMONAGENT' AND AC.toolName != 'AGENTDAEMON'",
+					"FROM AgentConfig AC WHERE AC.toolCategory != 'DAEMONAGENT' AND AC.toolName != 'AGENTDAEMON' ORDER By AC.toolName, AC.agentKey",
 					AgentConfig.class,
 					parameters);
 		} catch (Exception e) {

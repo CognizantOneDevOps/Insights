@@ -118,6 +118,12 @@ import { ServerConfigurationService } from '@insights/app/modules/server-configu
 import { FileSystemComponent } from './filesystem/file-system.component';
 import { FileSystemService } from './filesystem/file-system.service';
 import { FileSystemConfigComponent } from './filesystem/file-system-configuration/filesystem-config.component';
+import { DashboardPdfDownloadComponent } from './dashboard-pdf-download/dashboard-pdf-download.component';
+import { DashboardPreviewConfigDialog } from './dashboard-pdf-download/dashboard-preview-configuration-dialog';
+import { DashboardListComponent } from './dashboard-pdf-download/dashboard-list/dash-list.component';
+import { DashboardDetailsDialog } from './dashboard-pdf-download/dashboard-details-dialog/dashboard-details-dialog';
+import { NgxJsonViewerModule } from 'ngx-json-viewer';
+import { EditDashboardComponent } from './dashboard-pdf-download/edit-dashboard/edit-dashboardcomponent';
 
 @NgModule({
   declarations: [
@@ -167,8 +173,8 @@ import { FileSystemConfigComponent } from './filesystem/file-system-configuratio
     ModelManagementComponent,
     WorkflowHistoryDetailsDialog,
     EmailConfigurationDialog,
+    DashboardPreviewConfigDialog,
     PredictionShowDetailsDialog,
-    EmailConfigurationDialog,
     KpiCreationComponent,
     KpiAdditionComponent,
     FileUploadDialog,
@@ -180,7 +186,11 @@ import { FileSystemConfigComponent } from './filesystem/file-system-configuratio
     ReportTemplateConfig,
     ServerConfigurationComponent,
     FileSystemComponent,
-    FileSystemConfigComponent
+    FileSystemConfigComponent,
+    DashboardPdfDownloadComponent,
+    EditDashboardComponent,
+    DashboardListComponent,
+    DashboardDetailsDialog
   ],
   imports: [
     HomeRouting,
@@ -195,7 +205,8 @@ import { FileSystemConfigComponent } from './filesystem/file-system-configuratio
     StorageServiceModule,
     DragulaModule,
     MatSliderModule,
-    NgxPaginationModule
+    NgxPaginationModule,
+    NgxJsonViewerModule
   ],
   exports: [MatSortModule],
   entryComponents: [
@@ -217,7 +228,10 @@ import { FileSystemConfigComponent } from './filesystem/file-system-configuratio
     PredictionShowDetailsDialog,
     FileUploadDialog,
     KpiListDialog,
-    KpiReportListDialog
+    KpiReportListDialog,
+    DashboardPreviewConfigDialog,
+    DashboardDetailsDialog
+
   ],
 
   providers: [

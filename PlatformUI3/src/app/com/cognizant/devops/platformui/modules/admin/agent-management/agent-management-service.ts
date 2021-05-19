@@ -21,7 +21,7 @@ export interface IAgentService {
     loadHealthConfigurations(toolName: string, toolCategory: string): Promise<any>;
     loadServerHealthConfiguration(ServerName: string): Promise<any>;
     getDocRootAgentVersionTools(): Promise<any>;
-    getDocrootAgentConfig(Version: string, toolName: string): Promise<any>;
+    getDocrootAgentConfig(Version: string, toolName: string, isWebhook:boolean): Promise<any>;
     getDbAgentConfig(agentId: string): Promise<any>;
     loadAgentServices(ServerName: string): Promise<any>;
     registerAgent(toolName: string, toolVersion: string, osName: string, configData: string, trackingDetails: string): Promise<any>;
@@ -53,8 +53,8 @@ export class AgentService implements IAgentService {
         return this.restCallHandlerService.get("DOCROOT_AGENT_VERSION_TOOLS");
     }
 
-    getDocrootAgentConfig(Version: string, toolName: string): Promise<any> {
-        return this.restCallHandlerService.get("DOCROOT_AGENT_TOOL_CONFIG_DETAILS", { 'version': Version, 'tool': toolName });
+    getDocrootAgentConfig(Version: string, toolName: string, isWebhook:boolean): Promise<any> {
+        return this.restCallHandlerService.get("DOCROOT_AGENT_TOOL_CONFIG_DETAILS", { 'version': Version, 'tool': toolName, 'isWebhook':isWebhook });
     }
 
     getDbAgentConfig(agentId: string): Promise<any> {

@@ -74,13 +74,13 @@ public class EngineAggregatorCorelationModuleTest {
 		try {
 			agentConfigDAL.saveAgentConfigFromUI(p.getProperty("gitAgentId"), EngineTestData.gitToolCategory,
 					EngineTestData.gitLabelName, "git", EngineTestData.getJsonObject(EngineTestData.gitConfig),
-					EngineTestData.agentVersion, EngineTestData.osversion, EngineTestData.updateDate, false);
+					EngineTestData.agentVersion, EngineTestData.osversion, EngineTestData.updateDate, false,false);
 			/******************************************************************************************/
 
 			agentConfigDAL.saveAgentConfigFromUI(p.getProperty("jenkinsAgentId"), EngineTestData.jenkinToolCategory,
 					EngineTestData.jenkinLabelName, "jenkins",
 					EngineTestData.getJsonObject(EngineTestData.jenkinsConfig), EngineTestData.agentVersion,
-					EngineTestData.osversion, EngineTestData.updateDate, false);
+					EngineTestData.osversion, EngineTestData.updateDate, false,false);
 
 			CorrelationConfiguration saveCorrelationJson = EngineTestData
 					.loadCorrelation(EngineTestData.saveDataConfig);

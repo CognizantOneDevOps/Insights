@@ -61,7 +61,7 @@ public class InsightsDataArchivalConfig {
 	private String containerID;
 	
 	@Column(name = "BOLTPORT")
-	private int boltPort;
+	private int boltPort=0;
 
 	public int getId() {
 		return id;

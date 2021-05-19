@@ -131,7 +131,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		try {
 			ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
 			AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
-			String configJson = agentServiceImpl.getToolRawConfigFile(version, tool);
+			String configJson = agentServiceImpl.getToolRawConfigFile(version, tool,false);
 			
 			Gson gson = new Gson();
 			JsonElement jsonElement = gson.fromJson(configJson.trim(), JsonElement.class);
@@ -152,7 +152,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 //		String tool = "pivotalTracker";
 		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
 		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
-		String configJson = agentServiceImpl.getToolRawConfigFile(version, toolName);
+		String configJson = agentServiceImpl.getToolRawConfigFile(version, toolName,false);
 
 		Gson gson = new Gson();
 		JsonElement jsonElement = gson.fromJson(configJson.trim(), JsonElement.class);
@@ -169,7 +169,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		
 		String response = agentServiceImpl.registerAgent(agentManagementTestData.toolName, 
 							agentManagementTestData.agentVersion, agentManagementTestData.osversion, 
-							agentManagementTestData.configDetails, agentManagementTestData.trackingDetails, false);
+							agentManagementTestData.configDetails, agentManagementTestData.trackingDetails, false,false);
 		
 		Assert.assertEquals(expectedOutcome, response);
 			
@@ -183,7 +183,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		
 		String response = agentServiceImpl.registerAgent(agentManagementTestData.toolName, 
 							agentManagementTestData.agentVersion, agentManagementTestData.osversion, 
-							agentManagementTestData.configDetails, agentManagementTestData.trackingDetails, false);
+							agentManagementTestData.configDetails, agentManagementTestData.trackingDetails, false,false);
 		
 		Assert.assertEquals(expectedOutcome, response);
 			
@@ -197,7 +197,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		
 		String response = agentServiceImpl.registerAgent(agentManagementTestData.toolName, 
 							agentManagementTestData.agentVersion, agentManagementTestData.osversion, 
-							agentManagementTestData.configDetailsWithSameIDs, agentManagementTestData.trackingDetails, false);
+							agentManagementTestData.configDetailsWithSameIDs, agentManagementTestData.trackingDetails, false,false);
 		
 		Assert.assertEquals(expectedOutcome, response);
 			
@@ -211,7 +211,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		
 		String response = agentServiceImpl.registerAgent(agentManagementTestData.toolName, 
 							agentManagementTestData.agentVersion, agentManagementTestData.osversion, 
-							agentManagementTestData.configDetailsWithInvalidDataLabel, agentManagementTestData.trackingDetails, false);
+							agentManagementTestData.configDetailsWithInvalidDataLabel, agentManagementTestData.trackingDetails, false,false);
 		
 		Assert.assertEquals(expectedOutcome, response);
 			
@@ -225,7 +225,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		
 		String response = agentServiceImpl.registerAgent(agentManagementTestData.toolName, 
 							agentManagementTestData.agentVersion, agentManagementTestData.osversion, 
-							agentManagementTestData.configDetailsWithInvalidHealthLabel, agentManagementTestData.trackingDetails, false);
+							agentManagementTestData.configDetailsWithInvalidHealthLabel, agentManagementTestData.trackingDetails, false, false);
 		
 		Assert.assertEquals(expectedOutcome, response);
 			
@@ -335,7 +335,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
 		AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
 		agentManagementServiceImpl.updateAgent(agentManagementTestData.agentId, configDetails, agentManagementTestData.toolName, 
-																agentManagementTestData.agentVersion, agentManagementTestData.osversion, false);
+																agentManagementTestData.agentVersion, agentManagementTestData.osversion, false,false);
 	}
 	
 	@Test(priority = 20)

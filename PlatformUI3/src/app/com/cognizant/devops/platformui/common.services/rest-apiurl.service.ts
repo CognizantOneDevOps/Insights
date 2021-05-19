@@ -14,6 +14,7 @@
  * the License.
  ******************************************************************************/
 
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { Injectable } from '@angular/core';
 import { InsightsInitService } from '@insights/common/insights-initservice';
 
@@ -82,6 +83,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("USER_ORG_SEARCH", '/PlatformService/accessGrpMgmt/searchUser');
         this.addEndPoint("CURRENT_USER_DETAIL", '/PlatformService/accessGrpMgmt/currentUserDetail');
         this.addEndPoint("SEARCH_DASHBOARD_FOLDERDETAIL", '/PlatformService/accessGrpMgmt/getDashboardsFoldersDetail');
+        this.addEndPoint("GET_DASHBOARD_LIST_BY_ORG", '/PlatformService/accessGrpMgmt/getDashboardByOrg');
         //Business Mapping module under Admin section
         this.addEndPoint("GET_ALL_HIERARCHY_DETAILS", '/PlatformService/admin/businessmapping/getAllHierarchyDetails');
         this.addEndPoint("GET_HIERARCHY_PROPERTIES", '/PlatformService/admin/businessmapping/getHierarchyProperties');
@@ -93,10 +95,15 @@ export class RestAPIurlService implements IRestAPIUrlService {
 
         this.addEndPoint("UPLOAD_IMAGE", '/PlatformService/admin/settings/uploadCustomLogo');
         this.addEndPoint("GET_LOGO_IMAGE", '/PlatformService/settings/getLogoImage');
-
         //this.addEndPoint("SAVE_DATAPURGING_SETTING", '/PlatformService/admin/settings/saveSettingsConfiguration');
-        //this.addEndPoint("LIST_DATAPURGING_SETTING", '/PlatformService/admin/settings/loadSettingsConfiguration');
-
+        this.addEndPoint("GET_DASHBOARD_BY_UID", '/PlatformService/accessGrpMgmt/getDashboardByUid');
+        this.addEndPoint("GET_TEMPLATE_BY_QUERY", '/PlatformService/accessGrpMgmt/getTemplateQueryResults');
+        this.addEndPoint("SAVE_GRAFANA_DASHBOARD_CONFIG",'/PlatformService/datasource/exportPDF/getDashboardAsPDF')
+        this.addEndPoint("FETCH_DASHBOARD_CONFIGS",'/PlatformService/dashboardReport/exportPDF/fetchGrafanaDashboardConfigs')
+        this.addEndPoint("UPDATE_DASHBOARD_CONFIGS",'/PlatformService/dashboardReport/exportPDF/updateDashboardConfig')
+        this.addEndPoint("DELETE_DASHBOARD_CONFIGS",'/PlatformService/dashboardReport/exportPDF/deleteDashboardConfig')
+        this.addEndPoint("DOWNLOAD_DASHBOARD_REPORT_PDF",'/PlatformService/datasource/exportPDF/downloadReportPDF'),
+       this.addEndPoint("GET_EXECUTIONID",'/PlatformService/insights/workflow/getLatestExecutionId')
         //Agent Configuration
         this.addEndPoint("AGENT_REGISTER", '/PlatformService/admin/agentConfiguration/registerAgent');
         this.addEndPoint("AGENT_UPDATE", '/PlatformService/admin/agentConfiguration/updateAgent');

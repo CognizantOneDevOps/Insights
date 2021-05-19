@@ -87,6 +87,7 @@ EXPOSE 25672/tcp 4369/tcp 5672/tcp 15672/tcp
 # installing Grafana
 
 WORKDIR /opt/grafana
+
 RUN chmod -R 766 /opt/grafana && wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/latest/grafana.tar.gz && \
     tar -zxvf grafana.tar.gz && export GRAFANA_HOME=`pwd` && echo GRAFANA_HOME=`pwd` | tee -a /etc/environment && echo "export" GRAFANA_HOME=`pwd` | tee -a /etc/profile && \
     wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/latest/ldap.toml && cp ldap.toml ./conf/ldap.toml && \
@@ -96,6 +97,9 @@ RUN chmod -R 766 /opt/grafana && wget https://infra.cogdevops.com:8443/repositor
     chmod 755 /etc/init.d/Grafana && chkconfig Grafana on
 VOLUME [/opt/grafana]
 EXPOSE 3000/tcp 5432/tcp 7474/tcp
+
+RUN wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/GrafanaLogRotate.sh && \
+    mv GrafanaLogRotate.sh /etc/logrotate.d/GrafanaLogRotate
 
 # installing Apache Tomcat
 
@@ -119,7 +123,8 @@ RUN chmod -R 755 /opt/insightsengine/PlatformEngine.jar
 # installing Insights Webhook
 
 WORKDIR /opt/insightsWebhook/
-RUN wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformInsightsWebHook.jar -O /opt/insightsWebhook/PlatformInsightsWebHook.jar
+RUN wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformInsightsWebHook.jar -O /opt/insightsWebhook/PlatformInsightsWebHook.jar 
+RUN wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/webhook_subscriber.properties -O /opt/insightsWebhook/webhook_subscriber.properties
 RUN chmod -R 755 /opt/insightsWebhook/
 
 # installing Insights Reports - Reports jar must be inside INSIGHTS_HOME path. Used as classpath for Workflow jar

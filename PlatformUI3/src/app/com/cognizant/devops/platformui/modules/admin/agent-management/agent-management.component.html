@@ -59,6 +59,11 @@
           fiber_manual_record
         </mat-icon>
       </button>
+      <button mat-icon-button [disabled]="isCopyLinkDisabled" (click)="copyInputMessage(selectedAgent)">
+        <mat-icon  style="margin-top: 10%;" 
+           title="Copy the Webhook Url to Clipboard" svgIcon="webhookCopyClipboard">
+        </mat-icon>
+    </button>
       <button mat-icon-button [disabled]="buttonDisableStatus" (click)="editAgent()">
         <mat-icon title="Edit " class="mat-icon material-icons">
           edit
@@ -79,9 +84,14 @@
 
         <ng-container matColumnDef="radio">
           <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="width:10% !important"></th>
-          <td mat-cell *matCellDef="let element " style="width:10% !important">
+          <td mat-cell *matCellDef="let element " style="width:5% !important">
             <mat-radio-button [value]="element" color="primary" (click)="statusEdit(element)"></mat-radio-button>
           </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Type">
+          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Type</th>
+          <td mat-cell *matCellDef="let element" style="width:10% !important"> {{element.iswebhook?'Webhook':'Agent'}} </td>
         </ng-container>
 
         <ng-container matColumnDef="ToolName">
@@ -89,31 +99,29 @@
           <td mat-cell *matCellDef="let element" style="width:15% !important"> {{element.toolName}} </td>
         </ng-container>
 
-
+        <ng-container matColumnDef="ToolCategory">
+          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Tool Category</th>
+          <td mat-cell *matCellDef="let element" style="width:15% !important"> {{element.toolCategory}} </td>
+        </ng-container>
 
         <ng-container matColumnDef="AgentKey">
           <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Instance ID</th>
-          <td mat-cell *matCellDef="let element" style="width:25% !important"> {{element.agentKey}} </td>
+          <td mat-cell *matCellDef="let element" style="width:20% !important"> {{element.agentKey}} </td>
         </ng-container>
 
         <ng-container matColumnDef="OS">
           <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Operating System</th>
-          <td mat-cell *matCellDef="let element" style="width:20% !important"> {{element.osVersion}} </td>
+          <td mat-cell *matCellDef="let element" style="width:15% !important"> {{element.osVersion}} </td>
         </ng-container>
 
-        <ng-container matColumnDef="ToolCategory">
-          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Tool Category</th>
-          <td mat-cell *matCellDef="let element" style="width:20% !important"> {{element.toolCategory}} </td>
-        </ng-container>
-
-        <ng-container matColumnDef="Version">
+         <ng-container matColumnDef="Version">
           <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Version</th>
           <td mat-cell *matCellDef="let element" style="width:10% !important"> {{element.agentVersion}} </td>
         </ng-container>
 
         <ng-container matColumnDef="Status">
           <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Status</th>
-          <td mat-cell *matCellDef="let element" style="width:15% !important"> {{element.agentStatus}} </td>
+          <td mat-cell *matCellDef="let element" style="width:10% !important"> {{element.agentStatus}} </td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

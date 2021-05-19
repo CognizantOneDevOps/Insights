@@ -1,0 +1,158 @@
+{
+  "vault": {
+    "getFromVault": false,
+    "secretEngine": "insights-kv",
+    "readToken": "vault_secret_token",
+    "vaultUrl": "http://Vault_Host:port/v1/"
+  },
+  "mqConfig": {
+    "user": "username for RabbitMq",
+    "password": "",
+    "host": "127.0.0.1",
+    "exchange": "iSight",
+    "agentControlXchg": "iAgent"
+  },
+  "subscribe": {
+    "config": "ALM.GITLAB.config"
+  },
+  "publish": {
+    "data": "ALM.GITLAB_ISSUE.DATA",
+    "health": "ALM.GITLAB_ISSUE.HEALTH"
+  },
+  "communication": {
+    "type": "REST",
+    "sslVerify": false,
+    "responseType": "JSON"
+  },
+  "dynamicTemplate": {
+    "issue": {
+      "insightsTimeXFieldMapping": {
+        "timefield": "updatedAt",
+        "isEpoch": false,
+        "timeformat": "%Y-%m-%dT%H:%M:%SZ"
+      },
+      "issueResponseTemplate": {
+        "object_kind": "gitlab_webhookType",
+        "user": {
+          "name": "issueCreatedBy"
+        },
+        "project": {
+          "id": "projectId",
+          "name": "projectName"
+        },
+        "object_attributes": {
+          "closed_at": "issueClosedDate",
+          "created_at": "issueCreatedDate",
+          "description": "issueDescription",
+          "due_date": "issueDueDate",
+          "id": "issueId",
+          "iid": "issueDisplayId",
+          "last_edited_at": "issueLastEditedDate",
+          "last_edited_by_id": "issueLastEditedBy",
+          "milestone_id": "milestoneId",
+          "state_id": "stateId",
+          "time_estimate": "timeEstimate",
+          "title": "title",
+          "updated_at": "updatedAt",
+          "updated_by_id": "updatedById",
+          "weight": "weight",
+          "total_time_spent": "totalTimeSpent",
+          "assignee_id": "assigneeId",
+          "state": "issueState",
+          "action": "action"
+        },
+        "labels": [
+          {
+            "id": "labelId",
+            "title": "labelTitle",
+            "project_id": "labelProjectId",
+            "created_at": "labelCreatedAt",
+            "updated_at": "labelUpdatedAt"
+          }
+        ],
+        "assignees": [
+          {
+            "name": "assigneeDisplayName",
+            "username": "assigneeUserName",
+            "email": "assigneeEmail"
+          }
+        ]
+      },
+      "issueMetadata": {
+        "dataUpdateSupported": true,
+        "uniqueKey": [
+          "issueId",
+          "issueDisplayId",
+          "gitlab_webhookType"
+        ]
+      }
+    },
+    "Changes": {
+      "metadata": {
+        "labels": [
+          "CHANGE_LOG_GITLAB_ISSUE"
+        ],
+        "dataUpdateSupported": true,
+        "uniqueKey": [
+          "issueId",
+          "issueDisplayId",
+          "changedfield",
+          "changeId"
+        ]
+      },
+      "relationMetadata": {
+        "relation": {
+          "properties": [
+            "changedfield",
+            "updatedAt",
+            "updatedById"
+          ],
+          "name": "GITLAB_ISSUE_HAS_CHANGES",
+          "source": {
+            "labels": [
+              "LATEST"
+            ],
+            "constraints": [
+              "issueId",
+          	  "issueDisplayId",
+          	  "gitlab_webhookType"
+            ]
+          },
+          "destination": {
+            "labels": [
+              "CHANGE_LOG_GITLAB_ISSUE"
+            ],
+            "constraints": [
+              "issueId",
+          	  "issueDisplayId",
+         	  "changedfield",
+          	  "changeId"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "agentId": "",
+  "webhookEnabled": true,
+  "enableDataValidation": true,
+  "toolCategory": "ALM",
+  "toolsTimeZone": "UTC",
+  "insightsTimeZone": "Asia/Kolkata",
+  "enableValueArray": true,
+  "useResponseTemplate": true,
+  "auth": "base64",
+  "runSchedule": 30,
+  "timeStampField": "updatedAt",
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
+  "isEpochTimeFormat": false,
+  "startFrom": "2019-08-01 00:00:33",
+  "isDebugAllowed": false,
+  "toolName": "GITLABISSUE",
+  "loggingSetting": {
+    "logLevel": "INFO",
+    "maxBytes": 5000000,
+    "backupCount": 10
+  },
+  "auditing": false
+}

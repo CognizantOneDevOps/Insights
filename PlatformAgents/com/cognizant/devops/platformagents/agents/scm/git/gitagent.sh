@@ -29,14 +29,28 @@
 #export INSIGHTS_AGENT_HOME=/home/ec2-user/insightsagents
 source /etc/profile
 python_version="$(python -V 2>&1)"
+#agent_type will be set after UI registration
+agent_type=__AGENT_TYPE__
 detectPythonVersion()
 {
      if echo "$1" | grep -q "Python 2"; then
       echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.git.GitAgent import GitAgent; GitAgent()" &
-     elif echo "$1" | grep -q "Python 3"; then
+		  if [ $agent_type = "Agent" ]; then
+			echo "Running Agent Python 2 ------------------------------------------------"
+			python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.git.GitAgent import GitAgent; GitAgent()" &
+		  else
+			echo "Running Webhook Python 2 ----------------------------------------------"
+			python -c "from  __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.git.GitWebhookAgent import GitWebhookAgent; GitWebhookAgent()" &
+		  fi
+  	 elif echo "$1" | grep -q "Python 3"; then
       echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.git.GitAgent3 import GitAgent; GitAgent()" &
+		  if [ $agent_type = "Agent" ]; then
+			echo "Running Agent Python 3 ------------------------------------------------"
+			python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.git.GitAgent3 import GitAgent; GitAgent()" &
+		  else
+			echo "Running Webhook Python 3 ----------------------------------------------"
+			python -c "from  __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.git.GitWebhookAgent3 import GitWebhookAgent; GitWebhookAgent()" &
+		  fi
      else
       echo "python version not supported"
 	  exit 1;

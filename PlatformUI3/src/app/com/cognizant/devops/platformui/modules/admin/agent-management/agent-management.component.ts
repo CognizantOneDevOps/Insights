@@ -22,6 +22,8 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { DataSharedService } from '@insights/common/data-shared-service';
+import { ClipboardService } from "ngx-clipboard";
+import { InsightsInitService } from '@insights/common/insights-initservice';
 
 @Component({
   selector: 'app-agent-management',
@@ -52,11 +54,14 @@ export class AgentManagementComponent implements OnInit {
   receivedParam: any;
   toolVersionData: any;
   versionList = [];
-  MAX_ROWS_PER_TABLE = 5;
+  MAX_ROWS_PER_TABLE =8;
+  isCopyLinkDisabled =true;
+
   constructor(public agentService: AgentService, public router: Router,
     private route: ActivatedRoute, public dialog: MatDialog,
     public messageDialog: MessageDialogService, private changeDetectorRefs: ChangeDetectorRef,
-    private dataShare: DataSharedService) {
+    private dataShare: DataSharedService,private _clipboardService: ClipboardService,
+    public initConfig: InsightsInitService) {
     this.getRegisteredAgents();
   }
 
@@ -84,6 +89,7 @@ export class AgentManagementComponent implements OnInit {
   public async getRegisteredAgents() {
 
     var self = this;
+    self.isCopyLinkDisabled = true;
     self.showList = false;
     self.showThrobber = true;
     self.buttonDisableStatus = true;
@@ -103,7 +109,7 @@ export class AgentManagementComponent implements OnInit {
       //console.log(this.agentListDatasource);
       self.showDetail = true;
       //console.log(this.agentNameList);
-      this.displayedColumns = ['radio', 'ToolName', 'AgentKey', 'ToolCategory', 'OS', 'Version', 'Status'];
+      this.displayedColumns = ['radio','Type', 'ToolName','ToolCategory', 'AgentKey', 'OS', 'Version', 'Status'];
       setTimeout(() => {
         this.showConfirmMessage = "";
       }, 3000);
@@ -143,6 +149,12 @@ export class AgentManagementComponent implements OnInit {
   statusEdit(element) {
     this.runDisableStatus = element.agentStatus;
     this.buttonDisableStatus = false;
+    if(element.iswebhook){
+      this.isCopyLinkDisabled=false
+    }else{
+      this.isCopyLinkDisabled=true
+    }
+    
   }
 
   agentStartStopAction(actType): void {
@@ -225,5 +237,15 @@ export class AgentManagementComponent implements OnInit {
     } else {
       self.messageDialog.showApplicationsMessage("Please stop the Agent before uninstalling!", "WARN");
     }
+  }
+
+  copyInputMessage(inputElement) {
+    var hostname = this.initConfig.getWebhookHost();
+    var value_to_copy =
+      hostname +
+      "/PlatformInsightsWebHook/insightsDevOpsWebHook?webHookName=" +
+      inputElement.agentKey;
+    console.log(value_to_copy);
+    this._clipboardService.copyFromContent(value_to_copy);
   }
 }

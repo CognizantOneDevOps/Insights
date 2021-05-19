@@ -40,7 +40,6 @@ export class EmailConfigurationDialog {
     }
 
     initializeVariables() {
-        console.log("type: ", this.data.type);
         if (this.data.type == 'edit' && this.data.emailDetails) {
             console.log("Details: ", this.data.emailDetails);
             this.senderEmailAddress = this.data.emailDetails.senderEmailAddress;
@@ -56,7 +55,11 @@ export class EmailConfigurationDialog {
             this.receiverEmailAddress = '';
             this.receiverCCEmailAddress='';
             this.receiverBCCEmailAddress='';
-            this.mailSubject = '';
+            if(this.data.screen === 'dashboard'){
+                this.mailSubject =this.data.subject;
+            }else{
+                this.mailSubject = '';
+            }
             this.mailBodyTemplate = '';
             this.buttonName = 'ADD';
         }

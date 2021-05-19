@@ -16,7 +16,9 @@
 sudo yum install wget -y
 sudo yum install unzip -y
 sudo yum install dos2unix -y
-sudo yum install jq -y
+wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+chmod +x ./jq
+sudo cp jq /usr/bin
 #Download scripts
 wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL7/reference-DocRoot-Scripts/insights_first_arm.sh -O insights_first.sh
 wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL7/reference-DocRoot-Scripts/insights_java.sh -O insights_java.sh
@@ -27,6 +29,8 @@ wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/Platfo
 wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL7/reference-DocRoot-Scripts/insights_rabbitmq_arm.sh -O insights_rabbitmq.sh
 wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL7/reference-DocRoot-Scripts/insights_tomcat.sh -O insights_tomcat.sh
 wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL7/reference-DocRoot-Scripts/insights_enginejar.sh -O insights_enginejar.sh
+wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL7/reference-DocRoot-Scripts/insights_workflow.sh -O insights_workflow.sh
+wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL7/reference-DocRoot-Scripts/insights_webhook_arm.sh -O insights_webhook.sh
 wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL7/reference-DocRoot-Scripts/insights_agents.sh -O insights_agents.sh
 wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL7/reference-DocRoot-Scripts/insights_ext_arm.sh -O insights_ext.sh
 
@@ -43,7 +47,7 @@ dos2unix *.sh
 chmod +x *.sh
 #Insights Installation
 echo "Get required env varidables for Insights"
-sudo sh insights_first.sh
+sudo sh insights_first.sh $1
 echo "Installing Java"
 sudo sh insights_java.sh
 echo "Insitalling Elastic Search"
@@ -63,6 +67,10 @@ echo "Install Tomcat "
 sudo sh insights_tomcat.sh
 echo "Get Insights Engine"
 sudo sh insights_enginejar.sh
+echo "Get Insights Workflow"
+sudo sh insights_workflow.sh
+echo "Get Insights Webhook"
+sudo sh insights_webhook.sh $rabbitadminpwd
 echo "Get Insights Agents"
 sudo sh insights_agents.sh
 #echo "Get Insights Initd scripts"

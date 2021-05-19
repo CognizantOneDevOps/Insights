@@ -18,12 +18,25 @@ import { RestCallHandlerService } from '@insights/common/rest-call-handler.servi
 
 @Injectable()
 export class LandingPageService {
+    dashList: any;
     constructor(private restCallHandlerService: RestCallHandlerService) {
     }
 
     searchDashboard(): Promise<any> {
         var restHandler = this.restCallHandlerService;
         return restHandler.get("SEARCH_DASHBOARD_FOLDERDETAIL");
+    }
+
+    getDashboardList(orgId): Promise<any> {
+        var restHandler = this.restCallHandlerService;
+        return this.restCallHandlerService.postWithParameter("GET_DASHBOARD_LIST_BY_ORG", { 'orgId': orgId }, { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
+    }
+    
+    setDashboard(data) {
+        this.dashList = data;
+    }
+    getDashboard() {
+        return this.dashList;
     }
 
 }

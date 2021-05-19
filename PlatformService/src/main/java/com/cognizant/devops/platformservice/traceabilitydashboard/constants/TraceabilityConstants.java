@@ -28,6 +28,12 @@ public final class TraceabilityConstants {
 	public static final String ORDER = "order";
 	public static final String MESSAGES = "messages";
 	public static final String MESSAGE= "Message";
-	
-
+	public static final String DISPLAYPROPSTEXT = "displayText";
+	public static final String EXCLUDE_LABEL_PROPERTY = "excludeLabels";
+	public static final String CATEGORY = "category";
+	public static final String TIME_LAG = "timelag";
+	public static final String SUMMARY = "summary";
+	public static final String PIPELINE="pipeline";
+	public static final String METADATA = "metaData";
+	public static final String DISPLAY_PROPS_TEXT = "displayTextProperty";
 }

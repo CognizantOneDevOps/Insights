@@ -37,8 +37,6 @@ export class GrafanaDashboardService implements IGrafanaDashboardService {
         return restHandler.get("ORGS_GET");
     }
 
-
-
     getCurrentUserOrgs(): Promise<any> {
         var restHandler = this.restCallHandlerService;
         return restHandler.get("ACCESS_GROUP_MANAGEMENT_GET_CURRENT_USER_ORGS");

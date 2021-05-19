@@ -15,8 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.rest.AccessGroupManagement;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +40,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.es.models.DashboardResponse;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
@@ -448,6 +448,7 @@ public class AccessGroupManagement {
 			for (JsonElement data : dashboardsJsonArray) {
 				JsonObject dashboardData = data.getAsJsonObject();
 				JsonObject datamodel = new JsonObject();
+				datamodel.addProperty("uid", dashboardData.get("uid").getAsString());
 				datamodel.addProperty(PlatformServiceConstants.TITLE,
 						dashboardData.get(PlatformServiceConstants.TITLE).getAsString());
 				datamodel.addProperty("id", dashboardData.get("id").getAsInt());
@@ -496,4 +497,40 @@ public class AccessGroupManagement {
 		DashboardResponse dashboardResponse = accessGrpMgmtServiceImpl.loadGrafanaDashboardData();
 		return new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create().toJson(dashboardResponse);
 	}
+	
+	@GetMapping(value = "/getTemplateQueryResults", produces = MediaType.APPLICATION_JSON_VALUE)
+	public JsonObject getTemplateQueryResults(@RequestParam String query) throws InsightsCustomException {
+		log.debug("%n%nInside getTemplateQueryResults method call {} == ",query);
+		GraphDBHandler dbHandler = new GraphDBHandler();
+		JsonObject neo4jResponse = dbHandler.executeCypherQueryForJsonResponse(query);
+		log.debug("getTemplateQueryResults ===== response received from neo4j {}", neo4jResponse);
+		return neo4jResponse;
+	}
+		
+	@GetMapping(value = "/getDashboardByUid", produces = MediaType.APPLICATION_JSON_VALUE)
+    public JsonObject getDashboardByUid(@RequestParam String uuid,@RequestParam int orgId) throws InsightsCustomException {
+        log.debug("%n%nInside getDashboardByUid method call");//getGrafanaDashboardByAPIUid
+        String auth = ApplicationConfigProvider.getInstance().getGrafana().getAdminUserName()+":"+
+				ApplicationConfigProvider.getInstance().getGrafana().getAdminUserPassword();
+		byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.ISO_8859_1));
+		String authHeader = "Basic " + new String(encodedAuth);
+		Map<String, String> headers = new HashMap<>();
+		headers.put("Authorization", authHeader);
+		headers.put("x-grafana-org-id", String.valueOf(orgId));
+        String response = grafanaHandler.grafanaGet("/api/dashboards/uid/"+uuid, headers);
+        return PlatformServiceUtil.buildSuccessResponseWithData(new JsonParser().parse(response));
+    }
+	@GetMapping(value = "/getDashboardByDBUid", produces = MediaType.APPLICATION_JSON_VALUE)
+    public JsonObject getDashboardByDBUid(@RequestParam String uuid,@RequestParam int orgId)  {
+        log.debug("%n%nInside getDashboardByDBUid method call");//getDashboardByUid
+        JsonObject responseDashbaoard = accessGrpMgmtServiceImpl.getDashboardByUid(uuid,orgId);
+        return PlatformServiceUtil.buildSuccessResponseWithData(responseDashbaoard);
+    }
+	
+	@PostMapping(value = "/getDashboardByOrg", produces = MediaType.APPLICATION_JSON_VALUE)
+    public JsonObject getDashboardByOrg(@RequestParam int orgId)  {
+        log.debug("%n%nInside getDashboardByOrg method call");
+        List<JsonObject> responseDashbaoardList = accessGrpMgmtServiceImpl.getDashboardByOrg(orgId);
+        return PlatformServiceUtil.buildSuccessResponseWithData(responseDashbaoardList);
+    }
 }

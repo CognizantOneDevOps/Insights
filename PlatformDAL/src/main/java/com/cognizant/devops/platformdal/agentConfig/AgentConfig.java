@@ -61,6 +61,9 @@ public class AgentConfig {
 
 	@Column(name = "IS_VAULT_ENABLE")
 	private Boolean vault;
+	
+	@Column(name = "iswebhook")
+	private Boolean iswebhook = Boolean.FALSE;
 
 	public int getId() {
 		return id;
@@ -153,4 +156,18 @@ public class AgentConfig {
 		this.vault = vault;
 	}
 
+	public Boolean getIswebhook() {
+		if(this.iswebhook == null) {
+			return false;
+		}
+		return iswebhook;
+	}
+
+	public void setIswebhook(Boolean iswebhook) {
+		if(iswebhook != null) {
+			this.iswebhook = iswebhook;
+		}else {
+			this.iswebhook = Boolean.FALSE;
+		}
+	}
 }

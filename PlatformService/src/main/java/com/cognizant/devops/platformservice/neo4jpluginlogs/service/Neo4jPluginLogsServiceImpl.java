@@ -20,14 +20,14 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.cognizant.devops.platformdal.pluginlogs.Neo4jPluginLogsDAL;
+import com.cognizant.devops.platformdal.grafanadatabase.GrafanaDatabaseDAL;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 @Service("neo4jPluginLogsService")
 public class Neo4jPluginLogsServiceImpl implements Neo4jPluginLogsService{
 	
-	Neo4jPluginLogsDAL neo4jPluginLogsDAL = new Neo4jPluginLogsDAL();
+	GrafanaDatabaseDAL neo4jPluginLogsDAL = new GrafanaDatabaseDAL();
 	
 	@Override
 	public JsonObject getDashboardDetails() {

@@ -15,7 +15,7 @@
 ******************************************************************************/
 package com.cognizant.devops.platformcommons.core.util;
 
-import java.text.ParseException;
+
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.Duration;

@@ -28,4 +28,7 @@ public interface AgentCommonConstant {
 	String TOOLCATEGORY = "toolCategory";
 	String TOOLNAME = "toolName";
 	String CATEGORY= "category";
+	String WEBHOOK_QUEUE_CONSTANT="IPW_";
+	String WEBHOOK_FILE_NAME_KEY="webhookPythonFileName";
+	String WEBHOOK_CONFIG_TEMPLATE ="webhookConfigTemplate.json";
 }

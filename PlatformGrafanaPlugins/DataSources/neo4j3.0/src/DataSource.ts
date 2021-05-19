@@ -32,7 +32,6 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   email: any;
   orgId: any;
   logging: any;
-
   
   constructor(instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>, private templateSrv) {
     super(instanceSettings);
@@ -87,22 +86,18 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     const { range } = options;
     const from1 = range!.from.valueOf() / 1000;
     const to = range!.to.valueOf() / 1000;
-    
     let cypherQuery = {};
     let statements = [] as any;
     let metadata = [] as any;
     let logInfo = {};
     cypherQuery['statements'] = statements;
     cypherQuery['metadata'] = metadata;
+    logInfo['eventName'] = 'data-request';
     logInfo['panelId'] = options.panelId;
     logInfo['dashboardId'] = options.dashboardId;
     logInfo['datasourceId'] = this.datasourceId;
     logInfo['datasourceType'] = this.type;
     logInfo['datasourceName'] = this.name;
-    logInfo['userId'] = this.userId;
-    logInfo['userName'] = this.userName;
-    logInfo['email'] = this.email;
-    logInfo['orgId'] = this.orgId;
     logInfo['timestamp'] = new Date().toISOString();
     
     // Start streams and prepare queries
@@ -130,9 +125,8 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     }
     logInfo['query'] = cypherQuery;
     let startTime = Date.now();
-    console.log('start-',startTime);
-
     if (queries.length) {
+      
       const req: Promise<any> = getBackendSrv()
         .datasourceRequest({
           method: 'POST',
@@ -141,19 +135,16 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
         })
         .then((res: any) => {
           let endTime = Date.now();
-          console.log('end-',endTime);
           logInfo['time_ms'] = endTime-startTime;
           logInfo['panelQuery'] = true;
+          logInfo['requestId'] = options.requestId;
           if (this.logging) {
             try {
-              getBackendSrv().datasourceRequest({
-                method: 'POST',
-                url: this.serviceUrl,
-                data: logInfo
-              })
-                .then((res: any) => {
-                  console.log(res);
-                });
+              logInfo['userId'] = this.userId;
+              logInfo['userName'] = this.userName;
+              logInfo['email'] = this.email;
+              logInfo['orgId'] = this.orgId;
+              this.logDashboardInfo(logInfo);
             } catch (e) {
               console.log(e);
             }
@@ -174,25 +165,32 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
         });
       streams.push(from(req));
     }
-
-    console.log(logInfo);
-
-    
-
+    //console.log(logInfo);
     return merge(...streams);
   }
 
-  private getUserDetailsPerDashboardHit() {
+  private logDashboardInfo(logInfo: {}) {
     getBackendSrv().datasourceRequest({
-      method: 'GET',
-      url: '/api/user',
+      method: 'POST',
+      url: this.serviceUrl,
+      data: logInfo
     })
       .then((res: any) => {
+        console.log(res);
+      });
+  }
+
+  private async getUserDetailsPerDashboardHit() {
+  await getBackendSrv().datasourceRequest({
+      method: 'GET',
+      url: '/api/user',
+    }).then((res: any) => {
         this.userId = res.data.id;
         this.userName = res.data.name;
         this.email = res.data.email;
         this.orgId = res.data.orgId;
       });
+
   }
 
   metricFindQuery(query: string, options: any) {

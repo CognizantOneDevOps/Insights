@@ -25,19 +25,28 @@
 
   <div layout layout-align="left" class="sectionHeadingStyleWithoutButton">
     <div layout>&nbsp; {{subTitleName}}
-      <span class="sectionSubHeading"> {{subTitleInfoText}} </span>
+      <span class="sectionSubHeading"> &nbsp; {{subTitleInfoText}} </span>
     </div>
   </div>
 
   <form #frmagentconfig="ngForm" class="form">
     <div class="arrange-horizontally button-row">
-      <div> <label class="mainText"> Select the Operating System </label> </div>
+      <div> <label class="mainText"> Operating System </label> </div>
       <div>
-        <mat-select required [(ngModel)]="selectedOS" name="selectedOS" class="form-control" placeholder="Select OS" (ngModelChange)="versionOnChange(selectedVersion, 'validate')"
+        <mat-select required [(ngModel)]="selectedOS" name="selectedOS" [disabled]="btnValue == 'Update'" class="form-control" placeholder="Select OS" (ngModelChange)="versionOnChange(selectedVersion, 'validate')"
           style="width:150px;">
           <mat-option *ngFor="let os of osLists | keyvalue" value="{{os.value}}">{{os.key}}</mat-option>
           </mat-select>
       </div>
+
+      <div> <label class="mainText"> Type </label> </div>
+      <div>
+        <mat-select required [(ngModel)]="selectedType" name="selectedType" [disabled]="btnValue == 'Update'" class="form-control" placeholder="Select Type"  (ngModelChange)="checkType()"
+          style="width:150px;">
+          <mat-option *ngFor="let type of agentType " value="{{type}}">{{type}}</mat-option>
+          </mat-select>
+      </div>
+
       <div> <label class="mainText"> Version of the Agent </label> </div>
       <div>
         <mat-select required [(ngModel)]="selectedVersion" name="selectedVersion" class="form-control" placeholder="Select Version"

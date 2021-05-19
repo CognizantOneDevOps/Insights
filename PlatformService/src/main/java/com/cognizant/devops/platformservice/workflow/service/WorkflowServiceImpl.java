@@ -572,4 +572,41 @@ public class WorkflowServiceImpl {
 		return emailDetailsJson;
 	}
 
+	public JsonObject getLatestExecutionId(String workflowId) throws InsightsCustomException{
+		try {
+			long workflowExecutionId = -1;
+			long reportVisualizerExecutionId = -1;
+			boolean status = false;
+			long executionId = -1;
+			boolean alreadySet = false;
+			List<Object[]> result = workflowConfigDAL
+					.getMaxExecutionIDsFromWorkflowExecutionAndReportVisualization(workflowId);
+			for (Object[] record : result) {
+				if (record[0] == null && record[1] == null) {
+					executionId = -1;
+					alreadySet = true;
+				} else {
+					reportVisualizerExecutionId = (long) record[0];
+					workflowExecutionId = (long) record[1];
+				}
+			}
+			if (!alreadySet) {
+				if (workflowExecutionId == reportVisualizerExecutionId) {
+					status = true;
+					executionId = reportVisualizerExecutionId;
+				} else {
+					executionId = reportVisualizerExecutionId;
+				}
+			}
+			JsonObject responseJson = new JsonObject();
+			responseJson.addProperty("status", status);
+			responseJson.addProperty("executionId", executionId);
+			responseJson.addProperty(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
+			return responseJson;
+		} catch (Exception e) {
+			log.error("Error while fetching execution ids", e);
+			throw new InsightsCustomException("Error while fetching execution ids");
+		}
+	}
+
 }

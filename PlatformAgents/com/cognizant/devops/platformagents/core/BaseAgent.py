@@ -79,7 +79,10 @@ class BaseAgent(object):
         self.loadCommunicationFacade()
         self.initializeMQ()
         # self.configUpdateSubscriber()
-        self.subscriberForAgentControl()
+        if self.webhookEnabled:
+            self.subscriberForWebhookAgent()
+        else:
+            self.subscriberForAgentControl()
         self.setupLocalCache()
         self.extractToolName()
         self.scheduleExtensions()
@@ -116,7 +119,7 @@ class BaseAgent(object):
 
     def resolveConfigPath(self):
         try:
-            filePresent = os.path.isfile('config.jso')
+            filePresent = os.path.isfile('config.json')
             agentDir = os.path.dirname(sys.modules[self.__class__.__module__].__file__) + os.path.sep
             if "INSIGHTS_HOME" in os.environ:
                 logDirPath = os.environ['INSIGHTS_HOME'] + '/logs/PlatformAgent'
@@ -150,6 +153,7 @@ class BaseAgent(object):
                     self.logFilePath = logDirPath + '/' + 'log_' + self.config.get('agentId') + '.log'
             self.agentId = self.config.get('agentId')
             self.toolName = self.config.get('toolName')
+            self.webhookEnabled = self.config.get('webhookEnabled', False)
             self.executionId = '--';
             self.functionName = '--'
             loggingSetting = self.config.get('loggingSetting', {})
@@ -267,6 +271,29 @@ class BaseAgent(object):
                 self.publishHealthData(self.generateHealthData(note="Agent is in STOP mode"))
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
+        self.agentCtrlMessageFactory.subscribe(routingKey, callback)
+        
+    def subscriberForWebhookAgent(self):
+        self.baseLogger.info('Inside subscriberForWebhookAgent')
+        routingKey = self.config.get('subscribe').get("webhookPayloadDataQueue")
+
+        # logging.debug("AgentId: " + str(self.agentId) + "exceId:" + str(self.executionId) + " " + str(data))
+        def callback(ch, method, properties, data):
+            # Update the config file and cache.
+            self.baseLogger.info('Inside subscriberForWebhookAgent callback')
+            try:
+                self.processWebhook(data)
+                ch.basic_ack(delivery_tag=method.delivery_tag)
+            except Exception as ex:
+                self.baseLogger.info(" subscriberForWebhookAgent ")
+                self.baseLogger.info(ex)
+                self.publishHealthDataForExceptions(ex)
+            finally:
+                '''If agent receive the STOP command, Python program should exit gracefully after current data collection is complete.  '''
+                if self.shouldAgentRun == False:
+                    os._exit(0)
+        
+        self.messageFactory.publish(routingKey, {})
         self.agentCtrlMessageFactory.subscribe(routingKey, callback)
 
     '''
@@ -614,6 +641,12 @@ class BaseAgent(object):
 
     def process(self):
         self.baseLogger.info('Inside process')
+        '''
+        Override process in Agent class
+        '''
+        
+    def processWebhook(self,data):
+        self.baseLogger.info('Inside processWebhook')
         '''
         Override process in Agent class
         '''

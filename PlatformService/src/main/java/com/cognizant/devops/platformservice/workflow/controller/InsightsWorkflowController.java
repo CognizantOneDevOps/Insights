@@ -121,6 +121,17 @@ public class InsightsWorkflowController {
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(records);
 	}
+	
+	@PostMapping(value = "/getLatestExecutionId", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject getLatestExecutionId(@RequestBody String workflowId) {
+		JsonObject records = null;
+		try {
+			records = workflowService.getLatestExecutionId(workflowId);
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+		return PlatformServiceUtil.buildSuccessResponseWithData(records);
+	}
 
 	@PostMapping(value = "/downloadReportPDF")
 	@ResponseBody

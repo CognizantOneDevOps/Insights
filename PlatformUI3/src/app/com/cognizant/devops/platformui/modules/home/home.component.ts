@@ -364,7 +364,15 @@ export class HomeComponent implements OnInit {
           title: "Health Check",
           isAdminMenu: true
         },
-  
+        {
+          displayName: 'Dashboard Report Download',
+          iconName: 'feature',
+          route: 'InSights/Home/dash-pdf-download',
+          isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+          showMenu: true,
+          title: "Dashboard Report Download",
+          isAdminMenu: true
+        },
         {
           displayName: 'Configuration',
           iconName: 'admin',

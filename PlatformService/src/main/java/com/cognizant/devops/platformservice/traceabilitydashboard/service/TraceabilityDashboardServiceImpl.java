@@ -78,7 +78,6 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 	Map<String,List<JsonObject>> mapOfPayload=new HashMap<>();
 
 	static final String PATTERN = "[\\[\\](){}\"\\\"\"]";
-	static final String CATEGORY = "category";
 	static final String DATE_PATTERN = "MM/dd/yyyy HH:mm:ss";
 	JsonObject dataModel = null;
 	static final String DATA_MODEL_FILE_RESOLVED_PATH = System.getenv().get(TraceabilityConstants.ENV_VAR_NAME)
@@ -188,9 +187,11 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 		JsonArray handOverArray = new JsonArray();
 		handOverArray.add(handOverTime);
 		/* Pipeline Response */
-		pipeLineObject.add("pipeline", pipeLineArray);
-		pipeLineObject.add("summary", summaryArray);
-		pipeLineObject.add("timelag", handOverArray);
+		JsonObject displayProperty = prepareMetaData();
+		pipeLineObject.add(TraceabilityConstants.PIPELINE, pipeLineArray);
+		pipeLineObject.add(TraceabilityConstants.SUMMARY, summaryArray);
+		pipeLineObject.add(TraceabilityConstants.TIME_LAG, handOverArray);
+		pipeLineObject.add(TraceabilityConstants.METADATA, displayProperty);
 		return pipeLineObject;
 	}
      
@@ -242,7 +243,6 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 					"with case when exists(r.handovertime) then collect(r.handovertime) else [] end as val, a, b");
 			queryBuilder.append(" unwind(case val when [] then [null] else val end) as list ");
 			queryBuilder.append("return  b.toolName as toolName, collect(distinct b.uuid) as uuids ,b as nodes, abs(avg(list))");
-			//LOG.debug(" Cypher query for hop 2 {} ",queryBuilder);
 			return queryBuilder.toString();
 		} else if (hopCount == 3) {
 			return "MATCH (a:DATA) WHERE a.uuid IN " + stringify(toolVal)
@@ -586,10 +586,11 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 				String tool = entry.getKey();
 				List<String> uuids = entry.getValue();
 				mainToolList.put(tool, uuids);
-				if (!(dataModel.has(tool) && dataModel.get(tool).getAsJsonObject().has(CATEGORY))) {
+				if (!(dataModel.has(tool) && dataModel.get(tool).getAsJsonObject().has(TraceabilityConstants.CATEGORY))) {
 					throw new InsightsCustomException("No category defined for tool :" + tool);
 				}
-				String category = dataModel.get(tool).getAsJsonObject().get(CATEGORY).getAsString();				
+				excludeLabels.addAll(getExcludeLabelList(tool));
+				String category = dataModel.get(tool).getAsJsonObject().get(TraceabilityConstants.CATEGORY).getAsString();				
 				String cypher = buildCypherQuery(tool, "uuid", category, uuids, excludeLabels, 2);
 			
 				/* collect all parent or child uuids for current basenode. */
@@ -630,10 +631,10 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 				HashMap<String, List<String>> downlinkMap = new HashMap<>();
 				HashMap<String, List<String>> toolsListMap = new HashMap<>();
 				/* Get the uuid of the tool selected in UI and store it in Main Map */
-				if (!dataModel.get(toolName).getAsJsonObject().has(CATEGORY)) {
+				if (!dataModel.get(toolName).getAsJsonObject().has(TraceabilityConstants.CATEGORY)) {
 					throw new InsightsCustomException("No category defined for tool :" + this.toolName);
 				}
-				String toolCategory = dataModel.get(toolName).getAsJsonObject().get(CATEGORY).getAsString();
+				String toolCategory = dataModel.get(toolName).getAsJsonObject().get(TraceabilityConstants.CATEGORY).getAsString();
 				if (type.equals("Epic")) {
 					return processEpic(toolName, fieldName, toolCategory, new ArrayList<String>(fieldValue));
 
@@ -648,8 +649,9 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 					/*
 					 * Execute the first query to get the linked tools for the tool selected in UI
 					 */
+					List<String> excludeLabels =getExcludeLabelList(toolName);
 					String cypherQuery = buildCypherQuery(toolName, fieldName, toolCategory,
-							new ArrayList<String>(fieldValue), Collections.emptyList(), 2);
+							new ArrayList<String>(fieldValue), excludeLabels, 2);
 					JsonObject hopQueryOutput = executeCypherQuery(cypherQuery);
 					HashMap<String, List<String>> temp = (HashMap<String, List<String>>) format(hopQueryOutput,Arrays.asList(toolName));
 
@@ -766,21 +768,21 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 		issues.forEach(obj -> uuids.add(obj.get("uuid").getAsString()));		
 
 		JsonObject resp = getEpicPipeline(toolName, uuids);
-		JsonArray pipelineArray = resp.get("pipeline").getAsJsonArray();
+		JsonArray pipelineArray = resp.get(TraceabilityConstants.PIPELINE).getAsJsonArray();
 		for (JsonElement element : pipelineArray) {
 			JsonObject eachObj = element.getAsJsonObject();
 			if (!payloadArray.contains(eachObj)) {
 				payloadArray.add(eachObj);
 			}
 		}
-		JsonArray summary = resp.get("summary").getAsJsonArray();
+		JsonArray summary = resp.get(TraceabilityConstants.SUMMARY).getAsJsonArray();
 		for (JsonElement element : summary) {
 			JsonObject eachObj = element.getAsJsonObject();
 			if (!summaryArray.contains(eachObj)) {
 				summaryArray.add(eachObj);
 			}
 		}
-		JsonArray timelag = resp.get("timelag").getAsJsonArray();
+		JsonArray timelag = resp.get(TraceabilityConstants.TIME_LAG).getAsJsonArray();
 		for (JsonElement element : timelag) {
 			JsonObject eachObj = element.getAsJsonObject();
 			if (!timelagArray.contains(eachObj)) {
@@ -790,9 +792,11 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 
 		List<JsonObject> epicIssues = Stream.concat(epic.stream(), issues.stream()).collect(Collectors.toList());		
 		epicIssues.forEach(issuesArray::add);
-		responseObject.add("pipeline", pipelineArray);
-		responseObject.add("summary", summaryArray);
-		responseObject.add("timelag", timelagArray);
+		JsonObject displayProperty = prepareMetaData();
+		responseObject.add(TraceabilityConstants.PIPELINE, pipelineArray);
+		responseObject.add(TraceabilityConstants.SUMMARY, summaryArray);
+		responseObject.add(TraceabilityConstants.TIME_LAG, timelagArray);
+		responseObject.add(TraceabilityConstants.METADATA, displayProperty);
 		cacheKey = toolName + "." + fieldName + "." + "Epic" + "." + arrayList;
 		pipelineCache.put(cacheKey, responseObject.toString());	
 		return responseObject;
@@ -951,9 +955,48 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 				responseObj.add(tName, toolArray);
 			}
 		} catch (Exception e) {
-			LOG.error("Treceability ==== responseObj");
+			LOG.error("Treceability ==== responseObj",e);
 		}
 		return responseObj;
+	}
+	
+	/** Used to return Display properties
+	 * @return
+	 */
+	private JsonObject prepareMetaData() {
+		JsonArray responseObj = new JsonArray();
+		JsonObject displayToolProperty = new JsonObject();
+		JsonObject displayProperty = new JsonObject();
+		try {
+			Set<Entry<String, JsonElement>> entrySet = dataModel.entrySet();
+			for (Entry<String, JsonElement> eachElement : entrySet) {
+				String tName = eachElement.getKey();
+				JsonObject toolObject = dataModel.getAsJsonObject(tName);
+				String toolDisplayText = toolObject.has(TraceabilityConstants.DISPLAYPROPSTEXT)?toolObject.get(TraceabilityConstants.DISPLAYPROPSTEXT).getAsString():tName;
+				displayToolProperty.addProperty(tName, toolDisplayText);
+			}
+			displayProperty.add(TraceabilityConstants.DISPLAY_PROPS_TEXT, displayToolProperty);
+			responseObj.add(displayProperty);
+		} catch (Exception e) {
+			LOG.error("Treceability ==== responseObj");
+		}
+		return displayProperty;
+	}
+	
+	/** This will return exclude label list 
+	 * @param toolName
+	 * @return
+	 */
+	private List<String> getExcludeLabelList(String toolName) {
+		List<String> excludeLabels = new ArrayList<>() ;
+		if (dataModel.has(toolName) && dataModel.get(toolName).getAsJsonObject().has(TraceabilityConstants.EXCLUDE_LABEL_PROPERTY)) {
+			LOG.debug("Tool {} has excludeLabels list ",toolName,excludeLabels);
+			JsonArray configuredExcludeLable = dataModel.get(toolName).getAsJsonObject().get(TraceabilityConstants.EXCLUDE_LABEL_PROPERTY).getAsJsonArray();
+			for (JsonElement stringExcludeLabel : configuredExcludeLable) {
+				excludeLabels.add(stringExcludeLabel.getAsString());
+			}
+		}
+		return excludeLabels;
 	}
 
 }

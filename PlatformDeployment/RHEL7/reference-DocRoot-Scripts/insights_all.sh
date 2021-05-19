@@ -16,6 +16,11 @@
 echo "Get required env varidables for Insights"
 sudo yum install wget -y
 sudo yum install unzip -y
+sudo yum install dos2unix -y
+wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+chmod +x ./jq
+sudo cp jq /usr/bin
+
 wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_first.sh -O insights_first.sh  && sh insights_first.sh
 echo "Installing Java"
 wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_java.sh -O insights_java.sh && sh insights_java.sh
@@ -35,8 +40,5 @@ echo "Get Insights Agents"
 wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_agents.sh -O insights_agents.sh && sh insights_agents.sh
 echo "Get Insights Engine"
 wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_enginejar.sh -O insights_enginejar.sh && sh insights_enginejar.sh
-#echo "Get Insights Initd scripts"
-#wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_initscripts.sh -O insights_initscripts.sh && sh insights_initscripts.sh
-
-
-
+echo "Get Insights Initd scripts"
+wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_initscripts.sh -O insights_initscripts.sh && sh insights_initscripts.sh

@@ -16,12 +16,14 @@
 package com.cognizant.devops.platformdal.grafana.pdf;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformdal.core.BaseDAL;
+import com.cognizant.devops.platformdal.workflow.InsightsWorkflowExecutionHistory;
 
 
 public class GrafanaDashboardPdfConfigDAL extends BaseDAL {
@@ -35,6 +37,7 @@ public class GrafanaDashboardPdfConfigDAL extends BaseDAL {
 			id = (int) save(config);
 			return id;
 		} catch (Exception e) {
+			log.error(e);
 			return id;
 		}
     }
@@ -47,19 +50,68 @@ public class GrafanaDashboardPdfConfigDAL extends BaseDAL {
 					GrafanaDashboardPdfConfig.class,
 					parameters);
 		} catch (Exception e) {
-			log.error(e.getMessage());
+			log.error(e);
 			throw e;
 		}
 	}
 	
-	public void updateGrafanaDashboardConfig(GrafanaDashboardPdfConfig config){ 
-		try  {
-			update(config);
+	public GrafanaDashboardPdfConfig getWorkflowById(int id)
+    { 
+		try {
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("id", id);
+			return getUniqueResult( "FROM GrafanaDashboardPdfConfig a WHERE a.id = :id",
+					GrafanaDashboardPdfConfig.class,
+					parameters);
 		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
+		
+    }
+	
+	public List<GrafanaDashboardPdfConfig> getAllGrafanaDashboardConfigs() {
+		try {
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("source", "PLATFORM");
+			return getResultList( "FROM GrafanaDashboardPdfConfig gd WHERE gd.source = :source",
+					GrafanaDashboardPdfConfig.class,
+					parameters);
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
+	}
+
+	public void updateGrafanaDashboardConfig(GrafanaDashboardPdfConfig config)
+    { 
+		try {
+			update(config);
+		}
+        catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
 		}
     }
+
+	public void deleteGrafanaDashboardConfig(GrafanaDashboardPdfConfig grafanaDashboardPdfConfig) {
+		try {
+			
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("workflowId", grafanaDashboardPdfConfig.getWorkflowConfig().getWorkflowId());
+			List<InsightsWorkflowExecutionHistory> executionRecord = getResultList( "FROM InsightsWorkflowExecutionHistory a WHERE a.workflowConfig.workflowId= :workflowId",
+					InsightsWorkflowExecutionHistory.class,
+					parameters);
+			for(InsightsWorkflowExecutionHistory history:executionRecord){
+				delete(history);
+			}
+
+			delete(grafanaDashboardPdfConfig);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
+	}
 	
 	
 }

@@ -26,7 +26,6 @@ import javax.persistence.NoResultException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.query.Query;
 import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.Type;
 
@@ -60,7 +59,7 @@ public class WorkflowDAL extends BaseDAL {
 				asssessment.setWorkflowConfig(null);
 				asssessment.setWorkflowTaskEntity(null);
 				listofPrimaryKey.add(asssessment.getId());
-				save(asssessment);
+				update(asssessment);
 			}
 			for (InsightsWorkflowTaskSequence asssessment : asssessmentList) {
 				delete(asssessment);
@@ -1048,6 +1047,30 @@ public class WorkflowDAL extends BaseDAL {
 			executionRecord.setAssessmentConfig(null);
 			delete(executionRecord);
 			return PlatformServiceConstants.SUCCESS;
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
+	}
+	
+	/**
+	 * Method to fetch Email Execution History using WorkflowId
+	 * 
+	 * @param workflowId
+	 * @return InsightsReportVisualizationContainer
+	 */
+	public InsightsReportVisualizationContainer getReportVisualizationContainerByWorkflowId(
+			String workflowId) {
+		try {
+			Map<String, Object> parameters = new HashMap<>();
+			Map<String, Object> extraParameters = new HashMap<>();
+			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
+			extraParameters.put("MaxResults", 1);
+
+			return (InsightsReportVisualizationContainer) executeUniqueResultQueryWithExtraParameter(
+					"FROM InsightsReportVisualizationContainer EH WHERE EH.workflowId = :workflowId",
+					InsightsReportVisualizationContainer.class, parameters, extraParameters);
+
 		} catch (Exception e) {
 			log.error(e);
 			throw e;

@@ -355,7 +355,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
                    // setTimeout(()=>{this.isDatainProgress=true},8000); 
                    this.map = new Map<String, Object[]>(); 
                     let res = data.data.pipeline;
-                    this.cacheMap.set(clickedElement.uuid, res);
+                    //this.cacheMap.set(clickedElement.uuid, res);
                     console.log(data)
                     this.globalData = res;
                     res.forEach(element => {

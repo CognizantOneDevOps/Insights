@@ -32,13 +32,38 @@ export interface IAuthenticationService {
 @Injectable()
 export class GrafanaAuthenticationService implements IAuthenticationService {
     public serverConfigSubject = new BehaviorSubject<any>('');
+    public onOkSubject=new BehaviorSubject<any>('');
+    public iconClkSubject=new BehaviorSubject<any>('');
+
     response: any;
     location: Location;
     constructor(location: Location, private router: Router,
         private dataShare: DataSharedService, private restCallHandlerService: RestCallHandlerService,
         private restAPIUrlService: RestAPIurlService) {
     }
+    public getDashboardByUid(uuid:any,orgId:any): Promise<any>{
+        var restHandler = this.restCallHandlerService;
+        return restHandler.get("GET_DASHBOARD_BY_UID",{'uuid': uuid, 'orgId': orgId});
 
+    }
+    public saveDashboardAsPDF(dashData:any): Promise<any> {
+        return this.restCallHandlerService.postWithData("SAVE_GRAFANA_DASHBOARD_CONFIG", dashData, "", { 'Cntent-Type': 'application/x-www-form-urlencoded' }).toPromise();
+    }
+    public updateDashboardAsPDF(dashData:any): Promise<any> {
+        return this.restCallHandlerService.postWithData("UPDATE_DASHBOARD_CONFIGS", dashData, "", { 'Cntent-Type': 'application/x-www-form-urlencoded' }).toPromise();
+    }
+    deleteDashboard(id: any): Promise<any> {
+        return this.restCallHandlerService.postWithParameter("DELETE_DASHBOARD_CONFIGS", {'id': id} , { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
+    }
+    public getTemplateByQuery(query:any): Promise<any>{
+        var restHandler = this.restCallHandlerService;
+        return restHandler.get("GET_TEMPLATE_BY_QUERY",{ 'query': query });
+
+    }
+    public fetchDashboardConfigs(): Promise<any> {
+        var restHandler = this.restCallHandlerService;
+        return restHandler.get("FETCH_DASHBOARD_CONFIGS");
+    }    
     public getCurrentUserOrgs(): Promise<any> {
         var restHandler = this.restCallHandlerService;
         return restHandler.get("ACCESS_GROUP_MANAGEMENT_GET_CURRENT_USER_ORGS");
@@ -69,4 +94,11 @@ export class GrafanaAuthenticationService implements IAuthenticationService {
         var restHandler = this.restCallHandlerService;
         return restHandler.postWithData("CURRENT_USER_DETAIL", login, "", { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
     }
+    downloadPDF(PDFRequestJson: string) {
+        return this.restCallHandlerService.postWithPDFData("DOWNLOAD_REPORT_PDF", PDFRequestJson,"",{ 'Content-Type': 'application/json' },{'responseType':'blob'}).toPromise();
+    }
+    getExecutionId(workflowId:string){
+        return this.restCallHandlerService.postWithData("GET_EXECUTIONID", workflowId, "", { 'Content-Type': 'application/json' }).toPromise();
+    }
+
 }

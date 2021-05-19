@@ -1,0 +1,291 @@
+<!--
+*******************************************************************************
+ * Copyright 2020 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div class="pageCss">
+  <div layout layout-align="left" class="titleStyle">
+    <div>Configuration |
+      <a class="greenTitleTxt">Dashboard Report Configuration </a>
+    </div>
+  </div>
+  <div class="orangeStripCss"></div>
+  <div layout layout-align="left" class="sectionHeadingStyle">
+    <div layout>&nbsp; Dashboard Report Configuration
+      <span class="sectionSubHeading"> (Configure a Dashboard Report)
+      </span>
+    </div>
+  </div>
+  <div class="btnAlign">
+
+    <button mat-icon-button (click)="onPreviewClick()">
+      <mat-icon svgIcon="view" title="View " style="margin-bottom: 25%;" class="mat-icon material-icons">
+        view </mat-icon>
+    </button>
+    <button mat-icon-button [disabled]="disableSave" (click)="save()">
+      <mat-icon title="Save" style="margin-top: 0%;" class="mat-icon material-icons">
+        save
+      </mat-icon>
+    </button>
+    <button mat-icon-button (click)="list()">
+      <mat-icon svgIcon="redirect_icon" title="Redirect To Landing Page" style="margin-bottom: 20%;"
+        class="mat-icon material-icons">
+      </mat-icon>
+    </button>
+  </div>
+  <div style="display: flex; justify-content: center; align-items: center">
+    <div class="loading-indicator">
+      <mat-progress-spinner *ngIf="isDatainProgress" [diameter]="100" color="primary" mode="indeterminate">
+      </mat-progress-spinner>
+    </div>
+  </div>  
+  <table class="mat-elevation-z8 mat-table">
+    <thead>
+      <tr class="mat-header-row" layout-align="start start">
+        <th colspan="4" class="tableHeaderCss mat-header-cell" style=" border-radius: 10px 10px 0 0;">
+          <span class="mainHeaderText">Edit Configuration Details </span>
+          <span class="infoHeaderText">(Please provide accurate details.
+            Fields marked "<span style="color:#ff0000;">*</span>" are mandatory)
+          </span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="mat-row-webhook">
+        <td class="mat-cell" class="columnName">
+          <span class="mainText">Organisation</span>
+          <span style="color:#ff0000;">*</span>
+        </td>
+        <td class="columnComponent">
+          <mat-select [(ngModel)]="organisation" style="margin:1%" class="form-control" required placeholder="Select Organisation"
+            color="primary" (selectionChange)="getDashboardsByOrg($event)" [disabled]="type === 'edit'">
+            <mat-option *ngFor="let org of orgArr" value="{{org.orgId}}" style="color:#0033A0">
+              {{org.name}} </mat-option>
+          </mat-select>
+        </td>
+        <td>
+          <span class="infoText">Select a Organisation</span>
+        </td>
+      </tr>
+      <tr class="mat-row-webhook">
+        <td class="mat-cell" class="columnName">
+          <span class="mainText">Dashboard List</span>
+          <span style="color:#ff0000;">*</span>
+        </td>
+        <td class="columnComponent">
+          <mat-select [(ngModel)]="dashboard" class="form-control" required placeholder="Select Dashboard"
+            color="primary" (selectionChange)="getDashboardJson($event.value)" style="margin:1%" [disabled]="type === 'edit'">
+            <mat-option *ngFor="let dash of dashOptions" value="{{dash.uid}}" style="color:#0033A0">
+              {{dash.title}} </mat-option>
+          </mat-select>
+        </td>
+        <td>
+          <span class="infoText">Select a Dashboard</span>
+        </td>
+      </tr>
+      <tr class="mat-row-webhook">
+        <td class="mat-cell" class="columnName">
+          <span class="mainText">Pdf Type</span>
+          <span style="color:#ff0000;">*</span>
+        </td>
+        <td class="columnComponent">
+          <mat-select [(ngModel)]="pdfType" class="form-control" required placeholder="Select PdfType" style="margin:1%" color="primary">
+            <mat-option style="color:#0033A0" value="Dashboard">Dashboard View</mat-option>
+            <mat-option style="color:#0033A0" value="Printable">Printable View</mat-option>
+          </mat-select>
+        </td>
+        <td>
+          <span class="infoText">Select a PdfType</span>
+        </td>
+      </tr>
+
+      <tr class="mat-row-webhook" *ngIf="templateVariableArr.length>0">
+        <td class="mat-cell" class="columnName">
+          <span class="mainText">Filters</span>
+          <span class="asteriskText">*</span>
+        </td>
+        <td class="columnComponent">
+          <form [formGroup]="variableForm">
+            <div *ngFor="let list of templateVariableArr">
+              <div *ngIf="list.hide !==2">
+                <div class="align-element" *ngIf="list.type ==='query' && list.multi">
+                  <label class="block">{{list.label?list.label:list.name}}</label>
+                  <mat-select id={{list.name}} class="form-control" style="margin: 1%;"
+                    (selectionChange)="onChangeVariables($event,list)" formControlName={{list.name}} required
+                    color="primary" multiple>
+                    <div *ngIf="list.includeAll">
+                      <mat-option value="All"> All </mat-option>
+                    </div>
+                    <mat-option *ngFor="let option of list.options" value="{{option}}" style="color:#0033A0">
+                      {{option}}</mat-option>
+                  </mat-select>
+                </div>
+                <div  class="align-element" *ngIf="list.type ==='query' && !list.multi">
+                  <label class="block">{{list.label?list.label:list.name}}</label>
+                  <mat-select id={{list.name}} class="form-control" style="margin: 1%;" formControlName={{list.name}}
+                    (selectionChange)="onChangeVariables($event,list)" required color="primary"
+                    [(ngModel)]="list.selectedValue[0]">
+                    <div *ngIf="list.includeAll">
+                      <mat-option value="All" #allSelected style="color:#0033A0"> All </mat-option>
+                    </div>
+                    <mat-option *ngFor="let option of list.options" value="{{option}}" style="color:#0033A0">
+                      {{option}}</mat-option>
+                  </mat-select>
+                </div>
+                <div class="align-element" *ngIf="list.type ==='custom' && list.multi">
+                  <label class="block">{{list.label?list.label:list.name}}</label>
+                  <mat-select id={{list.name}} class="form-control" style="margin: 1%;" formControlName={{list.name}}
+                    required color="primary" multiple>
+                    <div *ngIf="list.includeAll">
+                      <mat-option value="All" #allSelected style="color:#0033A0"> All </mat-option>
+                    </div>
+                    <mat-option *ngFor="let option of list.options" value="{{option.value}}" style="color:#0033A0">
+                      {{option.text}}</mat-option>
+                  </mat-select>
+                </div>
+                <div class="align-element" *ngIf="list.type ==='custom' && !list.multi">
+                  <label class="block">{{list.label?list.label:list.name}}</label>
+                  <mat-select id={{list.name}} class="form-control" style="margin: 1%;" formControlName={{list.name}}
+                    required color="primary" [(ngModel)]="list.selectedValue[0]">
+                    <div *ngIf="list.includeAll">
+                      <mat-option value="All" #allSelected style="color:#0033A0"> All </mat-option>
+                    </div>
+                    <mat-option *ngFor="let option of list.options" value="{{option.value}}" style="color:#0033A0">
+                      {{option.text}}</mat-option>
+                  </mat-select>
+                </div>
+                <div class="align-element" *ngIf="list.type ==='textbox' || list.type ==='constant'">
+                  <label class="block">{{list.label?list.label:list.name}}</label>
+                  <input id={{list.name}} class="form-control" style="margin: 1%;" formControlName={{list.name}}
+                    type="text" [(ngModel)]="list.selectedValue" value="{{list.options[0].value}}" />
+                </div>
+                <div class="align-element" *ngIf="list.type ==='interval'">
+                  <label class="block">{{list.label?list.label:list.name}}</label>
+                  <mat-select id={{list.name}} class="form-control" style="margin: 1%;" formControlName={{list.name}}
+                    required color="primary" [(ngModel)]="list.selectedValue[0]">
+                    <mat-option *ngFor="let option of list.options" value="{{option.value}}" style="color:#0033A0"
+                      selected={{option.selected}}>
+                      {{option.text}}</mat-option>
+                  </mat-select>
+                </div>
+                <div class="align-element" *ngIf="list.type ==='datasource' && list.multi">
+                  <label class="block">{{list.label?list.label:list.name}}</label>
+                  <mat-select id={{list.name}} class="form-control" style="margin: 1%;" formControlName={{list.name}}
+                    required color="primary" (selectionChange)="toggleAllSelection($event,list)" multiple>
+                    <div *ngIf="list.includeAll">
+                      <mat-option value="All"> All </mat-option>
+                    </div>
+                    <mat-option *ngFor="let option of list.current.value" value="{{option}}" style="color:#0033A0">
+                      {{option}}</mat-option>
+                  </mat-select>
+                </div>
+                <div class="align-element" *ngIf="list.type ==='datasource' && !list.multi">
+                  <label class="block">{{list.label?list.label:list.name}}</label>
+                  <mat-select id={{list.name}} class="form-control" style="margin: 1%;" formControlName={{list.name}}
+                    required color="primary" (selectionChange)="toggleAllSelection($event,list)">
+                    <div *ngIf="list.includeAll">
+                      <mat-option value="All"> All </mat-option>
+                    </div>
+                    <mat-option *ngFor="let option of list.current.value" value="{{option}}" style="color:#0033A0">
+                      {{option}}</mat-option>
+                  </mat-select>
+                </div>
+              </div>
+            </div>
+          </form>
+        </td>
+        <td>
+          <span class="infoText">Select the filters</span>
+        </td>
+
+      </tr>
+      <tr class="mat-row-webhook">
+        <td class="mat-cell" class="columnName">
+          <span class="mainText">Frequency</span>
+          <span class="asteriskText">*</span>
+        </td>
+        <td class="columnComponent">
+          <mat-select required [(ngModel)]="frequency" style="margin: 1%;" name="schedule" class="form-control"
+            placeholder="Select frequency" color="primary">
+            <mat-option *ngFor="let schedule of scheduleList" [value]="schedule">
+              {{schedule}}
+            </mat-option>
+          </mat-select>
+        </td>
+        <td>
+          <span class="infoText">Select a frequency for the report. </span>
+        </td>
+      </tr>
+      <tr class="mat-row-webhook" *ngIf="!showTimePicker">
+        <td class="mat-cell" class="columnName">
+          <span class="mainText">Time Range</span>
+        </td>
+        <td class="columnComponent">
+          <mat-radio-group aria-label="Select a TimeRange" (change)="onRangeChange($event)" [(ngModel)]="timeRange">
+            <mat-radio-button *ngIf="frequency === 'ONETIME'" class="form-control" style="margin: 1%;" value="absolute">Absolute</mat-radio-button>
+            <mat-radio-button class="form-control" style="margin: 1%;" value="relative">Relative</mat-radio-button>
+            <mat-radio-button class="form-control" style="margin: 1%;" value="other">Other</mat-radio-button>
+          </mat-radio-group>
+        <td>
+          <div *ngIf="timeRange === 'absolute' && frequency === 'ONETIME' ">
+            <label class="subText divDataLabels" class="infoText">Select Absolute TimeRange</label>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
+              <input matStartDate formControlName="start">
+              <input matEndDate formControlName="end">
+            </mat-date-range-input>
+            <mat-date-range-picker #picker></mat-date-range-picker>
+          </div>
+          <div *ngIf="timeRange === 'relative' ">
+            <label class="subText divDataLabels" class="infoText">Select Relative TimeRange</label>
+            <mat-select id='relative' class="form-control" required color="primary"
+              (selectionChange)="onTimeChange(relativeTime)" [(ngModel)]="relativeValue">
+              <mat-option *ngFor="let relativeTime of relativeRange" [value]="relativeTime.text" style="color:#0033A0">
+                {{relativeTime.text}}
+              </mat-option>
+            </mat-select>
+          </div>
+          <div *ngIf="timeRange === 'other' ">
+            <label class="subText divDataLabels" class="infoText">Select Other TimeRange</label>
+            <mat-select id='other' class="form-control" required color="primary"
+              (selectionChange)="onTimeChange($event)" [(ngModel)]="otherValue">
+              <mat-option *ngFor="let otherTime of otherRelativeRange" [value]="otherTime.text" style="color:#0033A0">
+                {{otherTime.text}}
+              </mat-option>
+            </mat-select>
+          </div>
+        </td>
+      </tr>
+
+      <tr class="mat-row-webhook" style="margin: 1%;">
+        <td class="mat-cell" class="columnName">
+          <span class="mainText">Mailing Details</span>
+        </td>
+        <td class="columnComponent">
+          <button mat-icon-button (click)="addEmailConfig()">
+              <mat-icon *ngIf="!emailDetails" title="Add Email" class="mat-icon material-icons">
+                  add_circle
+              </mat-icon>
+              <mat-icon *ngIf="emailDetails" title="Edit email" class="mat-icon material-icons">
+                  edit
+              </mat-icon>
+          </button>
+      </td>
+        <td>
+          <span class="infoText">Enter the email address details. </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

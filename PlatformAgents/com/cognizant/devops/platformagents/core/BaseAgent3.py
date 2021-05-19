@@ -19,27 +19,31 @@ Created on Jun 16, 2016
 @author: 146414
 '''
 
+from datetime import datetime
+import time
 import json
 import requests
-from apscheduler.schedulers.blocking import BlockingScheduler
-import sys
+import logging.handlers
 import os.path
+import sys
 import uuid
-from datetime import datetime
 from pytz import timezone
 import logging.handlers
-import time
 import hashlib
+import inspect
+import traceback
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from base64 import b64encode, b64decode
+from apscheduler.schedulers.blocking import BlockingScheduler
+from pytz import timezone
 from functools import wraps
 
 from .LoggingFilter import LoggingFilter
-from .MessageQueueProvider3 import MessageFactory
 from .CommunicationFacade3 import CommunicationFacade
+from .MessageQueueProvider3 import MessageFactory
 
 class BaseAgent(object):
     
@@ -55,7 +59,7 @@ class BaseAgent(object):
             self.timeLogger.info("ProcessingTime={}s".format(round(end - start, 2)))
             return result
         return wrapper
-       
+
     def __init__(self):
         try:
             self.shouldAgentRun = True;
@@ -69,50 +73,50 @@ class BaseAgent(object):
     def setupAgent(self):
         self.resolveConfigPath()
         self.loadConfig()
-        self.fetchAgentCredentials()
         self.setupLogging()
+        self.fetchAgentCredentials()
         self.loadTrackingConfig()
         self.loadCommunicationFacade()
         self.initializeMQ()
-        #self.configUpdateSubscriber()
-        self.subscriberForAgentControl()
+        # self.configUpdateSubscriber()
+        if self.webhookEnabled:
+            self.subscriberForWebhookAgent()
+        else:
+            self.subscriberForAgentControl()
         self.setupLocalCache()
         self.extractToolName()
         self.scheduleExtensions()
         self.execute()
         self.scheduleAgent()
-
+       
     def fetchAgentCredentials(self):
-        #self.baseLogger.info('Inside fetchAgentCredentials')
+        self.baseLogger.info('Inside fetchAgentCredentials')
         self.vaultFlag = self.config.get("vault").get("getFromVault", False)
         if self.vaultFlag:
             VaultCredentials = self.loadVaultCredentials()
             self.vaultJson = VaultCredentials.json()
             if "errors" in self.vaultJson:
-                self.publishHealthData(self.generateHealthData(systemFailure=True,note="BaseAgent: unable to fetchCredentials from vault"))
-                raise ValueError('BaseAgent: unable to fetchCredentials from vault')
-            
-    def getCredential(self,key):
+                raise ValueError('BaseAgent: unable to fetchCredentials')
+           
+    def getCredential(self, key):
         if self.vaultFlag:
-            vaultData=json.loads(self.vaultJson["data"]["value"])
+            vaultData = json.loads(self.vaultJson["data"]["value"])
             return vaultData[key]
-        else: 
+        else:
             return self.config.get(key, None)
-
+       
     def loadVaultCredentials(self):
-        agentId=self.config.get("agentId", '')
-        readTokenValue=self.config.get("vault").get("readToken", '')
-        secretEngine=self.config.get("vault").get("secretEngine", '')
-        vaultUrl=self.config.get("vault").get("vaultUrl", '')
-        reqHeaders = {'Accept':'application/json','X-Vault-Token':readTokenValue}
-        agentCredential = requests.get(vaultUrl, auth=None, headers=reqHeaders, data=None,proxies=None, verify=None)
+        agentId = self.config.get("agentId", '')
+        readTokenValue = self.config.get("vault").get("readToken", '')
+        secretEngine = self.config.get("vault").get("secretEngine", '')
+        vaultUrl = self.config.get("vault").get("vaultUrl", '')
+        reqHeaders = {'Accept': 'application/json', 'X-Vault-Token': readTokenValue}
+        agentCredential = requests.get(vaultUrl, auth=None, headers=reqHeaders, data=None, proxies=None, verify=None)
         # agentCredential=os.popen("curl -X GET -H 'X-Vault-Token: "+readTokenValue+"\'"+" -s "+vaultUrl+secretEngine+"/data/"+agentId).read()
         if "errors" in agentCredential:
-            self.publishHealthData(self.generateHealthData(systemFailure=True,note="BaseAgent: unable to load Vault Credentials"))
-            raise ValueError(' BaseAgent: unable to load Vault Credentials ')
+            raise ValueError('BaseAgent: unable to load Vault Credentials')
         return agentCredential
-        
-    
+
     def resolveConfigPath(self):
         try:
             filePresent = os.path.isfile('config.json')
@@ -136,7 +140,7 @@ class BaseAgent(object):
                 self.updateTrackingJson({})
         except Exception as ex:
             raise ValueError(ex)
-    
+
     def setupLogging(self):
         try:
             agentDir = os.path.dirname(sys.modules[self.__class__.__module__].__file__) + os.path.sep
@@ -149,6 +153,7 @@ class BaseAgent(object):
                     self.logFilePath = logDirPath + '/' + 'log_' + self.config.get('agentId') + '.log'
             self.agentId = self.config.get('agentId')
             self.toolName = self.config.get('toolName')
+            self.webhookEnabled = self.config.get('webhookEnabled', False)
             self.executionId = '--';
             self.functionName = '--'
             loggingSetting = self.config.get('loggingSetting', {})
@@ -175,8 +180,7 @@ class BaseAgent(object):
             self.timeLogger = logging.getLogger('timeLogger')
         except Exception as ex:
             raise ValueError(ex)
-        
-    
+
     def setupLocalCache(self):
         self.baseLogger.info('Inside setupLocalCache')
         self.dataRoutingKey = str(self.config.get('publish').get('data'))
@@ -188,8 +192,8 @@ class BaseAgent(object):
         isEpochTime = self.config.get('isEpochTimeFormat', False)
         if not isEpochTime:
             self.dateTimeLength = len(self.epochStartDateTime.strftime(self.config.get('timeStampFormat', None)))
-        self.buildTimeFormatLengthMapping()      
-    
+        self.buildTimeFormatLengthMapping()
+
     def buildTimeFormatLengthMapping(self):
         self.baseLogger.info('Inside buildTimeFormatLengthMapping')
         self.timeFormatLengthMapping = {}
@@ -197,17 +201,15 @@ class BaseAgent(object):
         if timeFieldMapping:
             for field in timeFieldMapping:
                 self.timeFormatLengthMapping[field] = len(self.epochStartDateTime.strftime(timeFieldMapping[field]))
-        
-    
+
     def extractToolName(self):
         self.baseLogger.info('Inside extractToolName')
         tokens = self.dataRoutingKey.split('.')
         self.categoryName = tokens[0]
         self.toolName = tokens[1]
-        self.categoryName = self.config.get('toolCategory', tokens[0])      
+        self.categoryName = self.config.get('toolCategory', tokens[0])
         self.toolName = self.config.get('toolName', tokens[1])
-         
-    
+
     def loadConfig(self):
         try:
             with open(self.configFilePath, 'r') as config_file:
@@ -216,75 +218,102 @@ class BaseAgent(object):
                 raise ValueError('BaseAgent: unable to load config JSON')
         except Exception as ex:
             raise ValueError(ex)
-        
+
     def loadTrackingConfig(self):
         self.baseLogger.info('Inside loadTrackingConfig')
-        with open(self.trackingFilePath, 'r') as config_file:    
+        with open(self.trackingFilePath, 'r') as config_file:
             self.tracking = json.load(config_file)
         if self.tracking == None:
             raise ValueError('BaseAgent: unable to load tracking JSON')
-        
+
     def loadCommunicationFacade(self):
         self.baseLogger.info('Inside loadCommunicationFacade')
         communicationFacade = CommunicationFacade();
-        config = self.config.get('communication',{})
+        config = self.config.get('communication', {})
         facadeType = config.get('type', None)
         sslVerify = config.get('sslVerify', True)
         self.responseType = config.get('responseType', 'JSON')
         enableValueArray = self.config.get('enableValueArray', False)
-        self.communicationFacade = communicationFacade.getCommunicationFacade(facadeType, sslVerify, self.responseType, enableValueArray)
-        
+        self.communicationFacade = communicationFacade.getCommunicationFacade(facadeType, sslVerify, self.responseType,
+                                                                              enableValueArray)
+
     def initializeMQ(self):
         self.baseLogger.info('Inside initializeMQ')
         mqConfig = self.config.get('mqConfig', None)
         if mqConfig == None:
             raise ValueError('BaseAgent: unable to initialize MQ. mqConfig is not found')
-        
+
         user = mqConfig.get('user', None)
-        mqPass =  mqConfig.get('password', None)
+        mqPass = mqConfig.get('password', None)
         host = mqConfig.get('host', None)
         exchange = mqConfig.get('exchange', None)
-        agentCtrlXchg  = mqConfig.get('agentControlXchg', None)
-        
-        self.messageFactory = MessageFactory(user,mqPass,host,exchange)
+        agentCtrlXchg = mqConfig.get('agentControlXchg', None)
+
+        self.messageFactory = MessageFactory(user, mqPass, host, exchange)
         if self.messageFactory == None:
             raise ValueError('BaseAgent: unable to initialize MQ. messageFactory is Null')
-        
-        self.agentCtrlMessageFactory = MessageFactory(user,mqPass,host,agentCtrlXchg)
+
+        self.agentCtrlMessageFactory = MessageFactory(user, mqPass, host, agentCtrlXchg)
 
     '''
     Subscribe for Agent START/STOP exchange and queue
     '''
+
     def subscriberForAgentControl(self):
         self.baseLogger.info('Inside subscriberForAgentControl')
         routingKey = self.config.get('subscribe').get('agentCtrlQueue')
+
         def callback(ch, method, properties, data):
-            self.baseLogger.info("Data received in subscriberForAgentControl .... ")
-            self.baseLogger.info(data)
-            #Update the config file and cache.
+            # Update the config file and cache.
             action = data
-            if "STOP" == action.decode():
+            if "STOP" == action:
                 self.shouldAgentRun = False
-            ch.basic_ack(delivery_tag = method.delivery_tag)
-            #self.baseLogger.info(self.shouldAgentRun)
-            self.baseLogger.info(self.shouldAgentRun)
+                self.publishHealthData(self.generateHealthData(note="Agent is in STOP mode"))
+            ch.basic_ack(delivery_tag=method.delivery_tag)
+
         self.agentCtrlMessageFactory.subscribe(routingKey, callback)
-           
+        
+    def subscriberForWebhookAgent(self):
+        self.baseLogger.info('Inside subscriberForWebhookAgent')
+        routingKey = self.config.get('subscribe').get("webhookPayloadDataQueue")
+
+        # logging.debug("AgentId: " + str(self.agentId) + "exceId:" + str(self.executionId) + " " + str(data))
+        def callback(ch, method, properties, data):
+            # Update the config file and cache.
+            self.baseLogger.info('Inside subscriberForWebhookAgent callback')
+            try:
+                self.processWebhook(data)
+                ch.basic_ack(delivery_tag=method.delivery_tag)
+            except Exception as ex:
+                self.baseLogger.info(" subscriberForWebhookAgent ")
+                self.baseLogger.info(ex)
+                self.publishHealthDataForExceptions(ex)
+            finally:
+                '''If agent receive the STOP command, Python program should exit gracefully after current data collection is complete.  '''
+                if self.shouldAgentRun == False:
+                    os._exit(0)
+        
+        self.messageFactory.publish(routingKey, {})
+        self.agentCtrlMessageFactory.subscribe(routingKey, callback)
+
     '''
     Subscribe for Engine Config Changes. Any changes to respective agent will be consumed and processed here.
     '''
+
     def configUpdateSubscriber(self):
-        self.baseLogger.info('Inside executeAgentExtensions')
+        self.baseLogger.info('Inside configUpdateSubscriber')
         routingKey = self.config.get('subscribe').get('config')
+
         def callback(ch, method, properties, data):
-            #Update the config file and cache.
+            # Update the config file and cache.
             updatedConfig = json.loads(data)
             self.updateJsonFile(self.configFilePath, updatedConfig)
-            self.config = updatedConfig 
+            self.config = updatedConfig
             self.setupLocalCache()
-            ch.basic_ack(delivery_tag = method.delivery_tag)
+            ch.basic_ack(delivery_tag=method.delivery_tag)
+
         self.messageFactory.subscribe(routingKey, callback)
-                
+
     '''
         Supported metadata attributes:
         {
@@ -293,7 +322,6 @@ class BaseAgent(object):
             uniqeKey: String --> comma separated node properties
         }
     '''
-    
     def getMQDataPktSize(self, data):
         self.baseLogger.info('Inside getMQDataPktSize')
         pckSize = 0
@@ -326,37 +354,40 @@ class BaseAgent(object):
                 self.addDigitalSign(data)
             self.messageFactory.publish(self.dataRoutingKey, data, self.config.get('dataBatchSize', 100), metadata)
             self.logIndicator(self.PUBLISH_START, self.config.get('isDebugAllowed', False))
-            
+
     '''
-        This method validates data and 
-        removes any JSON which contains nested JSON object 
+        This method validates data and
+        removes any JSON which contains nested JSON object
         as an element value
     '''
-    def validateData(self, data):   
-        corrected_json_array =[]
+
+    def validateData(self, data):
+        corrected_json_array = []
         showErrorMessage = False
-        for each_json in data:    
+        for each_json in data:
             errorFlag = False
-            for element in each_json:        
-                if isinstance(each_json[element],dict):
+            for element in each_json:
+                if isinstance(each_json[element], dict):
                     errorFlag = True
                     showErrorMessage = True
-                    self.baseLogger.error('Value is not in expected format, nested JSON encountered.Rejecting: '+ str(each_json))                    
+                    self.baseLogger.error(
+                        'Value is not in expected format, nested JSON encountered.Rejecting: ' + str(each_json))
                     break;
             if not errorFlag:
                 corrected_json_array.append(each_json)
         if showErrorMessage:
-            self.publishHealthData(self.generateHealthData(note="Agent has encountered nested JSON, rejecting that node."))     
+            self.publishHealthData(
+                self.generateHealthData(note="Agent has encountered nested JSON, rejecting that node."))
         data = []
         data = corrected_json_array
         return data
-        
+
     def publishHealthData(self, data):
         self.baseLogger.info('Inside publishHealthData')
         self.addExecutionId(data, self.executionId)
         self.messageFactory.publish(self.healthRoutingKey, data)
-    
-    def addTimeStampField(self, data, timeStampField=None, timeStampFormat=None, isEpochTime=False,isExtension=False):
+
+    def addTimeStampField(self, data, timeStampField=None, timeStampFormat=None, isEpochTime=False, isExtension=False):
         if timeStampField is None:
             timeStampField = self.config.get('timeStampField')
         if timeStampFormat is None:
@@ -377,7 +408,7 @@ class BaseAgent(object):
                     timeResponse = self.getRemoteDateTime(datetime.strptime(eventTime, timeStampFormat))
                 d['inSightsTime'] = timeResponse['epochTime']
                 d['inSightsTimeX'] = timeResponse['time']
-            
+
             if timeFieldMapping:
                 for field in timeFieldMapping:
                     timeFormat = timeFieldMapping[field]
@@ -386,38 +417,39 @@ class BaseAgent(object):
                     if value:
                         try:
                             value = value[:self.timeFormatLengthMapping[field]]
-                            d[outputField] = self.getRemoteDateTime(datetime.strptime(value, timeFormat)).get('epochTime')
+                            d[outputField] = self.getRemoteDateTime(datetime.strptime(value, timeFormat)).get(
+                                'epochTime')
                         except Exception as ex:
-                            self.baseLogger.error('Unable to parse timestamp field '+ field)
+                            self.baseLogger.error('Unable to parse timestamp field ' + field)
                             self.baseLogger.error(ex)
-            
+
             d['toolName'] = self.toolName;
-            d['categoryName'] = self.categoryName; 
-                        
+            d['categoryName'] = self.categoryName;
+
     def getRemoteDateTime(self, time):
         localDateTime = self.toolsTimeZone.localize(time)
         remoteDateTime = localDateTime.astimezone(self.insightsTimeZone)
         response = {
-                    'epochTime' : int((remoteDateTime - self.epochStartDateTime).total_seconds()),
-                    'time' : remoteDateTime.strftime('%Y-%m-%dT%H:%M:%SZ')
-                    }
+            'epochTime': int((remoteDateTime - self.epochStartDateTime).total_seconds()),
+            'time': remoteDateTime.strftime('%Y-%m-%dT%H:%M:%SZ')
+        }
         return response;
-    
+
     def addExecutionId(self, data, executionId):
         self.baseLogger.info('Inside addExecutionId')
         for d in data:
             d['execId'] = executionId
-            
+
     def addDigitalSign(self, data):
         self.baseLogger.info('Inside addDigitalSign')
         dataString = ''
         for d in data:
             for key in sorted(d.keys()):
-                if(key !="digitalSignature" and d[key]!= None):
-                    #print(key,"--->",d[key])
-                    if type(d[key])== str:
+                if (key != "digitalSignature" and d[key] != None):
+                    # print(key,"--->",d[key])
+                    if type(d[key]) == str:
                         dataString += d[key]
-                    elif type(d[key])==list:
+                    elif type(d[key]) == list:
                         for each in d[key]:
                             dataString += str(each)
                     elif type(d[key]) == bool:
@@ -425,94 +457,101 @@ class BaseAgent(object):
                     else:
                         dataString += str(d[key])
             hex = hashlib.sha256(dataString.encode('utf-8')).hexdigest()
-            #print(hex)
+            # print(hex)
             hex_signature = self.rsaEncrypt(hex)
-            
+
             d['digitalSignature'] = hex_signature.decode('utf-8')
-            #print(d['digitalSignature'])
+            # print(d['digitalSignature'])
             dataString = ''
-    
+
     def rsaEncrypt(self, hexdigest):
-        #print("+++++++++++++++++++++++++++++++++hexdigest")
-        #print(hexdigest)
+        # print("+++++++++++++++++++++++++++++++++hexdigest")
+        # print(hexdigest)
         if "INSIGHTS_HOME" in os.environ:
-            publicKeyPath = os.environ['INSIGHTS_HOME']+'/.InSights/BlockChainCerts/public_key.pem'
+            publicKeyPath = os.environ['INSIGHTS_HOME'] + '/.InSights/BlockChainCerts/public_key.pem'
         with open(publicKeyPath, 'rb') as key_file:
             public_key = serialization.load_pem_public_key(
-            key_file.read(),
-            backend=default_backend()
-        )
+                key_file.read(),
+                backend=default_backend()
+            )
         encrypted = public_key.encrypt(
-        hexdigest.encode('utf-8'),
-        padding.OAEP(
-            mgf=padding.MGF1(algorithm=hashes.SHA1()),
-            algorithm=hashes.SHA256(),
-            label=None
-        ))
+            hexdigest.encode('utf-8'),
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA1()),
+                algorithm=hashes.SHA256(),
+                label=None
+            ))
         return b64encode(encrypted)
-    
+
     def updateTrackingJson(self, data):
-        #Update the tracking json file and cache.
+        # Update the tracking json file and cache.
         self.updateJsonFile(self.trackingFilePath, data)
-            
+
     def updateJsonFile(self, jsonFile, data):
         with open(jsonFile, 'w') as outfile:
             json.dump(data, outfile, indent=4, sort_keys=True)
-        
-    def getResponse(self, url, method, userName, password, data, authType='BASIC', reqHeaders=None, responseTupple=None,proxies=None):
-        return self.communicationFacade.communicate(url, method, userName, password, data, authType, reqHeaders, responseTupple,proxies)        
-   
+
+    def getResponse(self, url, method, userName, password, data, authType='BASIC', reqHeaders=None, responseTupple=None,
+                    proxies=None):
+        return self.communicationFacade.communicate(url, method, userName, password, data, authType, reqHeaders,
+                                                    responseTupple, proxies)
+
     def parseResponse(self, template, response, injectData={}):
-        return self.communicationFacade.processResponse(template, response, injectData, self.config.get('useResponseTemplate',False))
-    
+        return self.communicationFacade.processResponse(template, response, injectData,
+                                                        self.config.get('useResponseTemplate', False))
+
     def getResponseTemplate(self):
         self.baseLogger.info('Inside getResponseTemplate')
-        return self.config.get('dynamicTemplate', {}).get('responseTemplate',None)
-    
-    def generateHealthData(self, ex=None, systemFailure=False,note=None, additionalProperties=None):
+        return self.config.get('dynamicTemplate', {}).get('responseTemplate', None)
+
+    def generateHealthData(self, ex=None, systemFailure=False, note=None, additionalProperties=None):
         data = []
         currentTime = self.getRemoteDateTime(datetime.utcnow())
         tokens = self.dataRoutingKey.split('.')
         self.categoryName = tokens[0]
         self.toolName = tokens[1]
-        health_basic = { 'toolName' : self.config.get('toolName', tokens[1]), 'categoryName' : self.config.get('toolCategory', tokens[0]), 'agentId' : self.config.get('agentId'), 'inSightsTimeX' : currentTime['time'], 'inSightsTime' : currentTime['epochTime'], 'executionTime' : int((datetime.now() - self.executionStartTime).total_seconds() * 1000)}
+        health_basic = {'toolName': self.config.get('toolName', tokens[1]),
+                        'categoryName': self.config.get('toolCategory', tokens[0]),
+                        'agentId': self.config.get('agentId'), 'inSightsTimeX': currentTime['time'],
+                        'inSightsTime': currentTime['epochTime'],
+                        'executionTime': int((datetime.now() - self.executionStartTime).total_seconds() * 1000)}
         if additionalProperties != None:
-            data_json = {key: value for (key, value) in (health_basic.items() + additionalProperties.items())}
+            data_json = {key: value for (key, value) in (list(health_basic.items()) + list(additionalProperties.items()))}
             health_basic_str = json.dumps(data_json)
             health = json.loads(health_basic_str)
         else:
-            health = health_basic 
+            health = health_basic
         if systemFailure:
             health['status'] = 'failure'
             health['message'] = 'Agent is shutting down'
         elif ex != None:
             health['status'] = 'failure'
-            health['message'] = 'Error occurred: '+str(ex)
-            self.baseLogger.error(ex)
+            health['message'] = 'Error occurred: ' + str(ex)
+            self.baseLogger.error("AgentId: " + str(self.agentId) + "exceId:" + str(self.executionId) + " " + str(ex))
         else:
             health['status'] = 'success'
             if note != None:
                 health['message'] = note
         data.append(health)
-        self.baseLogger.info(data)
+        self.baseLogger.error("-----------------------------> "+str(data))
         return data
-    
+
     def scheduleAgent(self):
         self.baseLogger.info('Inside scheduleAgent')
         if not hasattr(self, 'scheduler'):
             scheduler = BlockingScheduler()
             self.scheduler = scheduler
-            self.scheduledJob = scheduler.add_job(self.execute,'interval', seconds=60*self.runSchedule)
+            self.scheduledJob = scheduler.add_job(self.execute, 'interval', seconds=60 * self.runSchedule)
             try:
                 scheduler.start()
             except (KeyboardInterrupt, SystemExit):
                 self.publishHealthData(self.generateHealthData(systemFailure=True))
-                
+
         else:
             scheduler = self.scheduler
             schedulerStatus = self.config.get('schedulerStatus', None)
             if schedulerStatus == 'UPDATE_SCHEDULE':
-                self.scheduledJob.reschedule('interval', seconds=60*self.runSchedule)
+                self.scheduledJob.reschedule('interval', seconds=60 * self.runSchedule)
             elif schedulerStatus == 'STOP':
                 scheduler.shutdown()
             elif schedulerStatus == 'PAUSE':
@@ -523,21 +562,23 @@ class BaseAgent(object):
                 scheduler.start()
             else:
                 pass
-    
+
     def scheduleExtensions(self):
         self.baseLogger.info('Inside scheduleExtensions')
         '''
         Schedule the extensions from here
         '''
+
     '''
     Register the agent extensions. All the extensions will be called after the time interval specified using duration (in minutes)
     '''
+
     def registerExtension(self, name, func, duration):
         self.baseLogger.info('Inside registerExtension')
         if not hasattr(self, 'extensions'):
             self.extensions = {}
         self.extensions[name] = {'func': func, 'duration': duration}
-    
+
     @timed.__func__
     def execute(self):
         self.baseLogger.info('In execute method, Agent is in START mode')
@@ -545,30 +586,29 @@ class BaseAgent(object):
             self.executionStartTime = datetime.now()
             self.logIndicator(self.EXECUTION_START, self.config.get('isDebugAllowed', False))
             self.executionId = str(uuid.uuid1())
+            self.baseLogger.info('Inside execute executionId'+self.executionId)
             self.process()
             self.executeAgentExtensions()
-            self.publishHealthData(self.generateHealthData(note="Agent started successfully "))
+            self.publishHealthData(self.generateHealthData())
+            
         except Exception as ex:
+            self.baseLogger.error(ex)
             self.publishHealthDataForExceptions(ex)
         finally:
             '''If agent receive the STOP command, Python program should exit gracefully after current data collection is complete.  '''
             if self.shouldAgentRun == False:
-                self.baseLogger.info('executing agent stop and publish health message health message  ....   ')
-                try:
-                    self.publishHealthData(self.generateHealthData(note="Agent is in STOP mode"))
-                    os._exit(0)
-                except Exception as ex:
-                    self.baseLogger.error(ex)
+                os._exit(0)
 
     '''
-        This method publishes health node for an exception and 
-        Writes exception inside log file of corresponding Agent 
+        This method publishes health node for an exception and
+        Writes exception inside log file of corresponding Agent
     '''
-    def publishHealthDataForExceptions(self, ex):
-        self.baseLogger.error(ex)
-        self.publishHealthData(self.generateHealthData(ex=ex))
+                
+    def publishHealthDataForExceptions(self, ex, additionalProperties=None):
+        self.baseLogger.error(ex) 
+        self.publishHealthData(self.generateHealthData(ex=ex, additionalProperties=additionalProperties))
         self.logIndicator(self.EXECUTION_ERROR, self.config.get('isDebugAllowed', False))
-    
+
     def executeAgentExtensions(self):
         self.baseLogger.info('Inside executeAgentExtensions')
         if hasattr(self, 'extensions'):
@@ -586,7 +626,8 @@ class BaseAgent(object):
                     executeExtension = True
                 else:
                     currentEpochTime = self.getRemoteDateTime(datetime.now()).get('epochTime')
-                    lastRunEpochTime = self.getRemoteDateTime(datetime.strptime(lastRunTime, '%Y-%m-%d %H:%M:%S')).get('epochTime')
+                    lastRunEpochTime = self.getRemoteDateTime(datetime.strptime(lastRunTime, '%Y-%m-%d %H:%M:%S')).get(
+                        'epochTime')
                     if currentEpochTime >= (lastRunEpochTime + duration):
                         executeExtension = True
                     else:
@@ -595,27 +636,33 @@ class BaseAgent(object):
                     func = extension.get('func')
                     func()
                     agentExtensionsTracking[name] = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
-                    self.updateTrackingJson(self.tracking)
                     
-        
+                    self.updateTrackingJson(self.tracking)
+
     def process(self):
         self.baseLogger.info('Inside process')
         '''
         Override process in Agent class
         '''
-    
+        
+    def processWebhook(self,data):
+        self.baseLogger.info('Inside processWebhook')
+        '''
+        Override process in Agent class
+        '''
+
     EXECUTION_START = 1
     PUBLISH_START = 2
     EXECUTION_ERROR = 3
     SETUP_ERROR = 4
-    
+
     def logIndicator(self, indicator, isDebugAllowed=False):
         if isDebugAllowed:
-            if indicator == self.EXECUTION_START :
+            if indicator == self.EXECUTION_START:
                 sys.stdout.write('.')
-            elif indicator == self.PUBLISH_START :
+            elif indicator == self.PUBLISH_START:
                 sys.stdout.write('*')
-            elif indicator == self.EXECUTION_ERROR :
+            elif indicator == self.EXECUTION_ERROR:
                 sys.stdout.write('|')
-            elif indicator == self.SETUP_ERROR :
+            elif indicator == self.SETUP_ERROR:
                 sys.stdout.write('#')

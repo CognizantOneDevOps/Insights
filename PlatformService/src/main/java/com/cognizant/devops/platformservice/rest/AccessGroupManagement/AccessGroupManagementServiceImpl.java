@@ -17,6 +17,8 @@ package com.cognizant.devops.platformservice.rest.AccessGroupManagement;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +31,7 @@ import org.springframework.stereotype.Service;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.dal.vault.VaultHandler;
+import com.cognizant.devops.platformdal.grafanadatabase.GrafanaDatabaseDAL;
 import com.cognizant.devops.platformservice.rest.es.models.DashboardModel;
 import com.cognizant.devops.platformservice.rest.es.models.DashboardResponse;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
@@ -46,6 +49,7 @@ public class AccessGroupManagementServiceImpl {
 	private HttpServletRequest httpRequest;
 	GrafanaHandler grafanaHandler = new GrafanaHandler();
 	VaultHandler vaultHandler = new VaultHandler();
+	GrafanaDatabaseDAL grafanaDBDAL = new GrafanaDatabaseDAL();
 	
 
 	
@@ -100,5 +104,29 @@ public class AccessGroupManagementServiceImpl {
 			log.error("Error in Parsing Grafana URL", e);
 		}
 		return parsedUrl;
+	}
+
+	public List<JsonObject> getDashboardByOrg(int orgid) {
+		List<JsonObject> returnResponse = new ArrayList<>();
+		List<Object[]> records =  grafanaDBDAL.fetchDashboardDetailsByOrgId(orgid);
+		records.stream().forEach(record -> {
+			JsonObject rec = new JsonObject();
+			rec.addProperty("uid",(String) record[0]);
+			rec.addProperty("title",(String) record[1]);
+			rec.addProperty("orgId", orgid);
+			returnResponse.add(rec);
+		});
+		return returnResponse;
+	}
+
+	public JsonObject getDashboardByUid(String uuid,int orgid) {
+		JsonObject returnResponse = new JsonObject() ;
+		JsonObject dashboardJson= new JsonObject();
+		List<Object[]> records =  grafanaDBDAL.fetchDashboardDetailsByUUId(uuid,orgid);
+		for (Object[] objects : records) {
+			dashboardJson= new JsonParser().parse(String.valueOf(objects[1])).getAsJsonObject();
+		}
+		returnResponse.add("dashboard", dashboardJson);
+		return returnResponse;
 	}
 }

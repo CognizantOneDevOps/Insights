@@ -54,5 +54,9 @@
 	{
 		"queryName": "SystemNotification_Execute",
 		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TASK\"(taskid, componentname, dependency, description, mqchannel, workflowtype) SELECT nextval('hibernate_sequence'), 'com.cognizant.devops.platformreports.assessment.core.SystemNotificationDetailSubscriber', -1, 'SystemNotification_Execute', 'WORKFLOW.SYSTEM_TASK.SYSTEMNOTIFICATION.EXECUTION', 'SYSTEM' WHERE NOT EXISTS (SELECT taskid FROM public.\"INSIGHTS_WORKFLOW_TASK\" WHERE description = 'SystemNotification_Execute');"
+	},
+	{
+		"queryName":"update Agent for Webhook",
+		"sqlQuery":"Update public.agent_configuration set iswebhook= false where iswebhook is null;"
 	}
 ]

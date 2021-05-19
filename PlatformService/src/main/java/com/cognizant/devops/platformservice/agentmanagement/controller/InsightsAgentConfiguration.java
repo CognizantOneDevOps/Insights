@@ -47,14 +47,15 @@ public class InsightsAgentConfiguration {
 
 	@Autowired
 	AgentManagementService agentManagementService;
-
+	
+	@Deprecated
 	@PostMapping(value = "/registerAgent",produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject registerAgent(@RequestParam String toolName, @RequestParam String agentVersion,
 			@RequestParam String osversion, @RequestParam String configDetails, @RequestParam String trackingDetails) {
 		String message = null;
 		try {
 			message = agentManagementService.registerAgent(toolName, agentVersion, osversion, configDetails,
-					trackingDetails, false);
+					trackingDetails, false,false);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
@@ -75,8 +76,9 @@ public class InsightsAgentConfiguration {
 			String configDetails = registerAgentjson.get("configJson").getAsString();
 			String trackingDetails = registerAgentjson.get("trackingDetails").getAsString();
 			boolean vault = registerAgentjson.get("vault").getAsBoolean();
+			boolean isWebhook = registerAgentjson.get("isWebhook").getAsBoolean();
 			message = agentManagementService.registerAgent(toolName, agentVersion, osversion, configDetails,
-					trackingDetails, vault);
+					trackingDetails, vault,isWebhook);
 			return PlatformServiceUtil.buildSuccessResponseWithData(message);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
@@ -95,13 +97,14 @@ public class InsightsAgentConfiguration {
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
-
+	
+	@Deprecated
 	@PostMapping(value = "/updateAgent",produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject updateAgent(@RequestParam String agentId, @RequestParam String configJson,
 			@RequestParam String toolName, @RequestParam String agentVersion, @RequestParam String osversion) {
 		String message = null;
 		try {
-			message = agentManagementService.updateAgent(agentId, configJson, toolName, agentVersion, osversion, false);
+			message = agentManagementService.updateAgent(agentId, configJson, toolName, agentVersion, osversion, false, false);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
@@ -121,8 +124,9 @@ public class InsightsAgentConfiguration {
 			String osversion = updateAgentJson.get("osversion").getAsString();
 			String configDetails = updateAgentJson.get("configJson").getAsString();
 			boolean vault = updateAgentJson.get("vault").getAsBoolean();
+			boolean isWebhook = updateAgentJson.get("isWebhook").getAsBoolean();
 			message = agentManagementService.updateAgent(agentId, configDetails, toolName, agentVersion, osversion,
-					vault);
+					vault,isWebhook);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
@@ -160,10 +164,10 @@ public class InsightsAgentConfiguration {
 	}
 
 	@GetMapping(value = "/getToolRawConfigFile",produces = MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody JsonObject getToolRawConfigFile(@RequestParam String version, @RequestParam String tool) {
+	public @ResponseBody JsonObject getToolRawConfigFile(@RequestParam String version, @RequestParam String tool, @RequestParam boolean isWebhook) {
 		String details = null;
 		try {
-			details = agentManagementService.getToolRawConfigFile(version, tool);
+			details = agentManagementService.getToolRawConfigFile(version, tool,isWebhook);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}

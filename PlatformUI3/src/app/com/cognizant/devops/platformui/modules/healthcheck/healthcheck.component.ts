@@ -280,7 +280,7 @@ export class HealthCheckComponent implements OnInit {
   enableEmailNotification(event: MatSlideToggleChange) {
     console.log(event.checked);
     var self = this;
-    var title = 'Enable Notification';
+    var title =  event.checked ? 'Enable Notification':'Disable Notification';
     var state = event.checked ? 'enable' : 'disable';
     var dialogmessage =
       'Are you sure you want to ' + state + ' Notification ?';

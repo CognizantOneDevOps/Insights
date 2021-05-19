@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformdal.pluginlogs;
+package com.cognizant.devops.platformdal.grafanadatabase;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -26,7 +26,7 @@ import org.hibernate.type.Type;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
 
-public class Neo4jPluginLogsDAL extends BaseDAL {
+public class GrafanaDatabaseDAL extends BaseDAL {
 
 	public List<Object[]> fetchDashboardDetails() {
 		Map<String,Object> parameters = new HashMap<>();
@@ -42,6 +42,25 @@ public class Neo4jPluginLogsDAL extends BaseDAL {
 		scalarList.put("name", StandardBasicTypes.STRING);
 		Map<String,Object> parameters = new HashMap<>();
 		return executeGrafanaSQLQueryAndRetunList("SELECT id,name FROM org",scalarList, parameters);
+	}
+	
+	public List<Object[]> fetchDashboardDetailsByOrgId(int orgid) {
+		Map<String,Object> parameters = new HashMap<>();
+		parameters.put("OrgId", orgid);
+		Map<String,Type> scalarList = new LinkedHashMap<>();
+		scalarList.put("uid", StandardBasicTypes.STRING);
+		scalarList.put("title", StandardBasicTypes.STRING);
+		return executeGrafanaSQLQueryAndRetunList("SELECT uid,title FROM dashboard where org_id=:OrgId ",scalarList, parameters);
+	}
+	
+	public List<Object[]> fetchDashboardDetailsByUUId(String uid,int orgid) {
+		Map<String,Object> parameters = new HashMap<>();
+		parameters.put("uid", uid);
+		parameters.put("orgid", orgid);
+		Map<String,Type> scalarList = new LinkedHashMap<>();
+		scalarList.put("uid", StandardBasicTypes.STRING);
+		scalarList.put("data", StandardBasicTypes.STRING);
+		return executeGrafanaSQLQueryAndRetunList("SELECT uid,data FROM dashboard where uid=:uid and org_id=:orgid ",scalarList, parameters);
 	}
 	
 }

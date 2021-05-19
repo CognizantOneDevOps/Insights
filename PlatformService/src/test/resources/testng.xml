@@ -40,7 +40,9 @@
 			<class
 				name="com.cognizant.devops.platformservice.test.fileManagement.FileManagementTest" />
             <class
-                    name="com.cognizant.devops.platformservice.test.upshiftassessment.UpshiftAssessmentServiceTest" />
+                name="com.cognizant.devops.platformservice.test.upshiftassessment.UpshiftAssessmentServiceTest" />
+             <class
+                name="com.cognizant.devops.platformservice.test.grafanadashboard.GrafanaDashboardReportTest" />
 		</classes>
 	</test>
 </suite>

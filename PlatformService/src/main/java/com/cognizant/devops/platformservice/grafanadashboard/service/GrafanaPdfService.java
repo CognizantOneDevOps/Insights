@@ -15,9 +15,15 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.grafanadashboard.service;
 
+import java.util.List;
+
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfig;
 import com.google.gson.JsonObject;
 
 public interface GrafanaPdfService {
 	public void saveGrafanaDashboardConfig(JsonObject detailsJson) throws InsightsCustomException;
+	public List<GrafanaDashboardPdfConfig> getAllGrafanaDashboardConfigs() throws InsightsCustomException;
+	public void updateGrafanaDashboardDetails(JsonObject detailsJson) throws InsightsCustomException;
+	public void deleteGrafanaDashboardDetails(int id) throws InsightsCustomException;
 }

@@ -52,6 +52,9 @@ import { ReportTemplateConfig } from './report-template/template-configuration/t
 import { ServerConfigurationComponent } from '@insights/app/modules/server-configuration/server-configuration.component';
 import { FileSystemComponent } from './filesystem/file-system.component';
 import { FileSystemConfigComponent } from './filesystem/file-system-configuration/filesystem-config.component';
+import { DashboardPdfDownloadComponent } from './dashboard-pdf-download/dashboard-pdf-download.component';
+import { DashboardListComponent } from './dashboard-pdf-download/dashboard-list/dash-list.component';
+import { EditDashboardComponent } from './dashboard-pdf-download/edit-dashboard/edit-dashboardcomponent';
 
 const homeRoutes: Routes = [
   {
@@ -91,7 +94,10 @@ const homeRoutes: Routes = [
       { path: 'template-configuration', component: ReportTemplateConfig },
       { path: 'server-configuration', component: ServerConfigurationComponent },
       { path: 'filesystem', component: FileSystemComponent },
-      { path: 'file-system-configuration', component: FileSystemConfigComponent }
+      { path: 'file-system-configuration', component: FileSystemConfigComponent },
+      { path:'dash-pdf-download',component:DashboardListComponent},
+      { path:'dash-pdf-config',component:DashboardPdfDownloadComponent},
+      { path:'edit-dashboard',component:EditDashboardComponent}
 
     ],
     canActivate: [AuthGuard]

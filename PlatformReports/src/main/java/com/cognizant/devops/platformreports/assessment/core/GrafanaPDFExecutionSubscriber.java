@@ -60,7 +60,6 @@ public class GrafanaPDFExecutionSubscriber extends WorkflowTaskSubscriberHandler
 
 			assessmentReportDTO = new InsightsAssessmentConfigurationDTO();
 			assessmentReportDTO.setIncomingTaskMessageJson(incomingTaskMessage);
-			assessmentReportDTO.setAsseementreportname(WorkflowTaskEnum.WorkflowType.GRAFANADASHBOARDPDFREPORT.getValue());
 			assessmentReportDTO.setExecutionId(executionId);
 			assessmentReportDTO.setWorkflowId(workflowId);
 			BasePDFProcessor chartHandler = ReportPDFVisualizationHandlerFactory

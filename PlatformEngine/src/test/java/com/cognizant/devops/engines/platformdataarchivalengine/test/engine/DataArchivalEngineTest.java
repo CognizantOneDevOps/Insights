@@ -49,7 +49,7 @@ public class DataArchivalEngineTest extends DataArchivalEngineData {
 			agentConfigDAL.saveAgentConfigFromUI(agentJson.get("agentId").getAsString(),
 					agentJson.get("toolCategory").getAsString(), agentJson.get("labelName").getAsString(),
 					agentJson.get("toolName").getAsString(), agentJson, agentJson.get("agentVersion").getAsString(),
-					agentJson.get("osversion").getAsString(), updateDate, vault);
+					agentJson.get("osversion").getAsString(), updateDate, vault,false);
 		} catch (Exception e) {
 			log.error("message  {} ", e);
 		}

@@ -20,6 +20,8 @@ import { AgentService } from '@insights/app/modules/admin/agent-management/agent
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { InsightsInitService } from '@insights/common/insights-initservice';
 
+
+
 @Component({
   selector: 'app-agent-configuration',
   templateUrl: './agent-configuration.component.html',
@@ -66,6 +68,8 @@ export class AgentConfigurationComponent implements OnInit {
   agentConfigstatus: string;
   agentConfigstatusCode: string;
   subTitleName: string;
+  selectedType: string;
+  isWebhook:boolean= false;
   subTitleInfoText: string;
   @ViewChild('fileInput') myFileDiv: ElementRef;
   regex = new RegExp("[a-zA-Z0-9_]*", 'gi');
@@ -76,6 +80,7 @@ export class AgentConfigurationComponent implements OnInit {
 	oldLabelHealth: string = "";
   color = 'accent';
   vault = false;
+  agentType=[];
   validSecretDetails = true;
   secretProperties = ["accessToken", "password","passwd","apiToken","secret_access_key","awsSecretkey","awsAccesskey","authtoken","access_key_id","neo4j_password","elasticsearch_passwd","docker_repo_passwd"];
   constructor(public config: InsightsInitService, public agentService: AgentService,
@@ -100,6 +105,7 @@ export class AgentConfigurationComponent implements OnInit {
   }
 
   initializeVariable() {
+    this.agentType=['Agent','Webhook'];
     if (this.receivedParam.type == "update") {
       this.btnValue = "Update";
       this.subTitleName = "Update an Agent"
@@ -111,7 +117,14 @@ export class AgentConfigurationComponent implements OnInit {
         this.selectedVersion = this.receivedParam.detailedArr.agentVersion;
         this.selectedTool = this.receivedParam.detailedArr.toolName;
         this.selectedAgentKey = this.receivedParam.detailedArr.agentKey;
+        this.isWebhook = this.receivedParam.detailedArr.iswebhook;
         this.getDbAgentConfig();
+        if(this.isWebhook){
+          this.selectedType = 'Webhook'
+        }else{
+          this.selectedType ='Agent'
+        }
+       
         this.showTrackingJsonUploadButton = false;
       }
     } else if (this.receivedParam.type == "new") {
@@ -160,6 +173,15 @@ export class AgentConfigurationComponent implements OnInit {
     self.showThrobber = false;
   }
 
+  checkType():void{
+    if(this.selectedType == 'Webhook'){
+      this.isWebhook=true;
+    } else {
+      this.isWebhook=false;
+    }
+    console.log('Inside checkType '+this.selectedType +'    '+this.isWebhook)
+  }
+
   versionOnChange(key, type): void {
     var self = this;
     if (type == "validate") {
@@ -172,7 +194,7 @@ export class AgentConfigurationComponent implements OnInit {
       self.showConfig = false;
       self.showMessage = "";
       self.configData = JSON.stringify(self.agentConfigItems);
-      self.agentService.getDocrootAgentConfig(key, self.selectedTool)
+      self.agentService.getDocrootAgentConfig(key, self.selectedTool, self.isWebhook)
         .then(function (vdata) {
           self.showConfig = true;
           self.versionChangeddata = JSON.parse(vdata.data);
@@ -201,7 +223,7 @@ export class AgentConfigurationComponent implements OnInit {
       self.showConfig = false;
       self.showMessage = "";
 
-      var agentConfigResponse = await self.agentService.getDocrootAgentConfig(version, toolName)
+      var agentConfigResponse = await self.agentService.getDocrootAgentConfig(version, toolName,this.isWebhook)
       //console.log(agentConfigResponse);
       //console.log(agentConfigResponse.data);
 
@@ -216,18 +238,18 @@ export class AgentConfigurationComponent implements OnInit {
         } else {
           self.buttonDisableStatus = false;
         }
-
       } else {
+        var message="-";
+        if ("message" in agentConfigResponse && agentConfigResponse.message.indexOf("Not_Webhook_Agent") !== -1) {
+          message = "This is not a webhook Agent";
+        } else {
+          message = "Something wrong with service, Please try again";
+        }
         self.buttonDisableStatus = true;
-        self.showMessage = "Something wrong with service, Please try again";
+        self.showMessage =message;
         self.messageDialog.showApplicationsMessage(self.showMessage, "ERROR");
       }
-    } /* else {
-      self.buttonDisableStatus = true;
-      self.showConfig = false;
-      self.showMessage = " <b> " + toolName.charAt(0).toUpperCase() + toolName.slice(1) + " </b> agent is already registered, Please select other tool.";
-      self.messageDialog.showApplicationsMessage(self.showMessage, "WARN");
-    } */
+    } 
   }
 
   getconfigDataParsed(data) {
@@ -285,9 +307,11 @@ export class AgentConfigurationComponent implements OnInit {
         self.showConfig = true;
         self.showThrobber = false;
         this.defaultConfigdata = JSON.parse(agentData.data.agentJson);
+        //console.log(this.defaultConfigdata)
         this.getconfigDataParsed(this.defaultConfigdata);
         this.configLabelMerge();
         this.vault = agentData.data.vault;
+        this.isWebhook =agentData.data.iswebhook;
       } else {
         self.showThrobber = false;
         self.showMessage = "Something wrong with service, Please try again";
@@ -354,8 +378,7 @@ export class AgentConfigurationComponent implements OnInit {
       if (agentId != oldAgentId) {
         self.messageDialog.showApplicationsMessage("You are not allow to change AgentId while update ", "ERROR");
         agentId = undefined;
-      }
-      else if (this.labelData != this.oldLabelData) {
+      }else if (this.labelData != this.oldLabelData) {
         this.validateLabel(this.labelData, "DATA");
       }
       else if (this.labelHealth != this.oldLabelHealth) {
@@ -380,6 +403,7 @@ export class AgentConfigurationComponent implements OnInit {
       self.configData = JSON.stringify(self.updatedConfigParamdata);
       var agentAPIRequestJson = {};
       let registerAgentRes: any;
+      console.log(this.selectedType)
       //console.log(this.configData)
       if (actionType == "Update") {
 
@@ -389,6 +413,7 @@ export class AgentConfigurationComponent implements OnInit {
         agentAPIRequestJson['agentVersion'] = self.selectedVersion
         agentAPIRequestJson['osversion'] = self.selectedOS
         agentAPIRequestJson['vault'] = this.vault
+        agentAPIRequestJson['isWebhook'] = this.isWebhook
         try {
           var updateAgentRes = await self.agentService.updateAgentV2(JSON.stringify(agentAPIRequestJson));
 
@@ -416,6 +441,7 @@ export class AgentConfigurationComponent implements OnInit {
         agentAPIRequestJson['configJson'] = self.configData
         agentAPIRequestJson['trackingDetails'] = self.trackingUploadedFileContentStr
         agentAPIRequestJson['vault'] = this.vault
+        agentAPIRequestJson['isWebhook'] = this.isWebhook
         try {
           registerAgentRes = await self.agentService.registerAgentV2(JSON.stringify(agentAPIRequestJson));
           self.agentConfigstatus = registerAgentRes.status;
@@ -532,6 +558,8 @@ export class AgentConfigurationComponent implements OnInit {
   }
 
   mergeConfigelement(versionChangeddataObj): void {
+    //console.log(versionChangeddataObj);
+    //console.log(this.defaultConfigdata);
     var self = this;
     var unknownKeys = [];
     /*Add Extra field*/
@@ -554,7 +582,7 @@ export class AgentConfigurationComponent implements OnInit {
     }
 
     /*Delete Unnecessay filed*/
-
+    /*
     for (var dkeys in self.defaultConfigdata) {
 
       if (self.findDataType(dkeys, self.defaultConfigdata) == 'object' && dkeys != "dynamicTemplate") {
@@ -575,6 +603,7 @@ export class AgentConfigurationComponent implements OnInit {
         }
       }
     }
+    */
     //console.log(JSON.stringify(self.defaultConfigdata));
     this.agentConfigItems = [];
     this.getconfigDataParsed(self.defaultConfigdata);

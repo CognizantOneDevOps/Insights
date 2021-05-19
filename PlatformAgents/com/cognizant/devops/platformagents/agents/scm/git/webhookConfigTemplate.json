@@ -1,0 +1,201 @@
+{
+	"dynamicTemplate": {
+		"timeFieldMapping": {
+			"startDate": "%Y-%m-%d",
+			"createdAt": "%Y-%m-%dT%H:%M:%SZ",
+			"updatedAt": "%Y-%m-%dT%H:%M:%SZ",
+			"closedAt": "%Y-%m-%dT%H:%M:%SZ",
+			"mergedAt": "%Y-%m-%dT%H:%M:%SZ",
+			"commitTime": "%Y-%m-%dT%H:%M:%SZ",
+			"since": "%Y-%m-%dT%H:%M:%SZ",
+			"until": "%Y-%m-%dT%H:%M:%SZ",
+			"consumptionTime": "%Y-%m-%dT%H:%M:%SZ"
+		},
+		"commit": {
+			"commitResponseTemplate": {
+				"repository": {
+					"name": "repoName"
+				},
+				"commits":[{
+					"id": "commitId",
+					"message": "commitMessage",
+					"author": {
+			    	"name": "authorName" }
+				}],
+				"commitTime": "commitTime",
+				"branchName": "branchName"
+			},
+			"commitMetadata": {
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"repoName",
+					"commitId",
+					"gitType"
+				]
+			}
+		},
+		"pullRequest": {
+			"insightsTimeXFieldMapping": {
+				"timefield": "updatedAt",
+				"isEpoch": false,
+				"timeformat": "%Y-%m-%dT%H:%M:%SZ"
+			},
+			"pullReqResponseTemplate": {
+				"number": "pullReqId",
+				"state": "pullReqState",
+				"head": {
+					"sha": "headSHA",
+					"ref": "originBranch",
+					"repo": {
+					"fork": "isForked"
+					}
+				},
+				"base": {
+					"sha": "baseSHA",
+					"ref": "baseBranch"
+				},
+				"isMerged": "isMerged",
+				"originBranchAlmKeys": "originBranchAlmKeys",
+				"merge_commit_sha": "mergedSHA",
+				"commit": "commit",
+				"created_at": "createdAt",
+				"updated_at": "updatedAt",
+				"closed_at": "closedAt",
+				"merged_at": "mergedAt"
+			},
+			"pullRequestMetaData": {
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"repoName",
+					"pullReqId",
+					"gitType"
+				]
+			}
+		},
+		"branch": {
+			"insightsTimeXFieldMapping": {
+				"timefield": "consumptionTime",
+				"isEpoch": false,
+				"timeformat": "%Y-%m-%dT%H:%M:%SZ"
+			},
+			"branchMetadata": {
+				"labels": ["GIT_BRANCH"],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"repoName",
+					"branchName"
+				]
+			}
+		},
+		"extensions": {
+			"commitFileDetails": {
+				"insightsTimeXFieldMapping": {
+					"timefield": "commitTime",
+					"isEpoch": false,
+					"timeformat": "%Y-%m-%dT%H:%M:%SZ"
+				},
+				"runSchedule": 60,
+				"relationMetadata": {
+					"relation": {
+						"properties": [
+							"commitTime",
+							"authorName",
+							"status"
+						],
+						"name": "FILE_HAS_COMMITS",
+						"source": {
+							"labels": [
+								"LATEST"
+							],
+							"constraints": [
+								"commitId"
+							]
+						},
+						"destination": {
+							"labels": [
+								"FILE_CHANGE"
+							],
+							"constraints": [
+								"filepathHash",
+								"filename"
+							],
+							"selectedProperties": [
+								"inSightsTimeX",
+								"inSightsTime",
+								"toolName",
+								"categoryName",
+								"fileExtension" ]
+						}
+					}
+				}
+			},"commitBranchRelation": {
+				"relationMetadata": {
+					"relation": {
+						"properties": [
+							"commitTime",
+							"authorName"
+						],
+						"name": "BRANCH_HAS_COMMITS",
+						"source": {
+							"labels": [
+								"LATEST"
+							],
+							"constraints": [
+								"branchName",
+								"repoName",
+								"commitId"
+							]
+						},
+						"destination": {
+							"labels": [
+								"GIT_BRANCH", "LATEST"
+							],
+							"constraints": [
+								"branchName",
+								"repoName"
+							],
+							"selectedProperties": [
+								"inSightsTimeX",
+								"inSightsTime",
+								"toolName",
+								"categoryName" ]
+						}
+					}
+				}
+			},"PullReqBranchRelation": {
+				"relationMetadata": {
+					"relation": {
+						"properties": [
+							"commits",
+							"mergedSHA"
+						],
+						"name": "BRANCH_HAS_PULL_REQUESTS",
+						"source": {
+							"labels": [
+								"LATEST"
+							],
+							"constraints": [
+								"originBranch",
+								"repoName"
+							]
+						},
+						"destination": {
+							"labels": [
+								"GIT_BRANCH", "LATEST"
+							],
+							"constraints": [
+								"branchName",
+								"repoName"
+							],
+							"selectedProperties": [
+								"inSightsTimeX",
+								"inSightsTime",
+								"toolName",
+								"categoryName" ]
+						}
+					}
+				}
+			}
+		}
+	}
+}

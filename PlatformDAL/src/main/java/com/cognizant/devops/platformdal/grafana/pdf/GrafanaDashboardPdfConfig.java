@@ -45,7 +45,7 @@ public class GrafanaDashboardPdfConfig {
 	@Column(name = "EMAIL")
 	private String email;
 
-	@Column(name = "VARIABLES")
+	@Column(name = "VARIABLES", length = 10000)
 	private String variables;
 	
 	@Column(name = "DASHBOARD_JSON", length = 50000)
@@ -53,6 +53,12 @@ public class GrafanaDashboardPdfConfig {
 	
 	@Column(name = "STATUS")
 	private String status;
+	
+	@Column(name = "SCHEDULE_TYPE")
+	private String scheduleType;
+	
+	@Column(name = "EMAIL_BODY", length = 1000)
+	private String emailbody;
 	
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "workflowId", referencedColumnName = "workflowId")
@@ -63,6 +69,10 @@ public class GrafanaDashboardPdfConfig {
 
 	@Column(name = "UPDATED_DATE")
 	private Long updatedDate = 0L;
+	
+	@Column(name = "SOURCE")
+	private String source;
+	
 
 	public int getId() {
 		return id;
@@ -119,6 +129,22 @@ public class GrafanaDashboardPdfConfig {
 	public void setStatus(String status) {
 		this.status = status;
 	}
+	
+	public String getScheduleType() {
+		return scheduleType;
+	}
+
+	public void setScheduleType(String scheduleType) {
+		this.scheduleType = scheduleType;
+	}
+
+	public String getEmailbody() {
+		return emailbody;
+	}
+
+	public void setEmailbody(String emailbody) {
+		this.emailbody = emailbody;
+	}
 
 	public InsightsWorkflowConfiguration getWorkflowConfig() {
 		return workflowConfig;
@@ -143,6 +169,16 @@ public class GrafanaDashboardPdfConfig {
 	public void setUpdatedDate(Long updatedDate) {
 		this.updatedDate = updatedDate;
 	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+	}
+	
+	
 	
 
 }

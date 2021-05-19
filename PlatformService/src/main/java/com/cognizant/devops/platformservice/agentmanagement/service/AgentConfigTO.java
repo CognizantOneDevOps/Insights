@@ -50,6 +50,8 @@ public class AgentConfigTO implements Serializable {
 	
 	private boolean vault;
 	
+	private Boolean iswebhook = Boolean.FALSE;
+	
 	
 	public int getId() {
 		return id;
@@ -100,6 +102,10 @@ public class AgentConfigTO implements Serializable {
 	}
 
 	public Boolean isDataUpdateSupported() {
+		return dataUpdateSupported;
+	}
+	
+	public Boolean getDataUpdateSupported() {
 		return dataUpdateSupported;
 	}
 
@@ -154,6 +160,12 @@ public class AgentConfigTO implements Serializable {
 	public void setVault(boolean vault) {
 		this.vault = vault;
 	}
-	
-	
+
+	public Boolean getIswebhook() {
+		return iswebhook;
+	}
+
+	public void setIswebhook(Boolean iswebhook) {
+		this.iswebhook = iswebhook;
+	}
 }

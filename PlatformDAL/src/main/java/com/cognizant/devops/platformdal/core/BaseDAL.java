@@ -406,7 +406,6 @@ public class BaseDAL implements IBaseDAL {
 	 */
 	private void printHibernateStatistics(long startTime, Object sourceProperty, int rowCount) {
 		long endTime=System.nanoTime();
-		logger.debug(" startTime {} endTime {} ",startTime,endTime);
 		long processingTime = TimeUnit.MILLISECONDS.convert( endTime - startTime, TimeUnit.NANOSECONDS );
 		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
 		StackTraceElement stackTrace = stacktrace[3];;

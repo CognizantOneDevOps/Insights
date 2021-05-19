@@ -1,0 +1,9 @@
+[Unit]
+Description=Promtail service
+
+[Service]
+Type=simple
+ExecStart=/opt/Promtail/promtail-linux-amd64 -config.file=/opt/Promtail/promtail-local-config.yaml -config.expand-env=true
+
+[Install]
+WantedBy=multi-user.target

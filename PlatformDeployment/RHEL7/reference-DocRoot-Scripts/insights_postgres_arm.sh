@@ -29,15 +29,12 @@ sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/i
 sudo cp pg_hba.conf /var/lib/pgsql/9.5/data/pg_hba.conf
 sudo systemctl start  postgresql-9.5.service
 sudo useradd grafana
-#echo "Native system user 'grafana' is created. Need to set password for 'grafana' user."
-#echo -n "Password: "
-#read -s NATIVE_SYSTEM_USER_GRAFANA_PASSWORD
 sudo usermod --password $1 grafana
 echo  :> dbscript.sql
 chmod +x dbscript.sql
 printf '\n'
 printf 'Writing to dbscript.sql file'
-echo "CREATE USER grafana WITH PASSWORD '$NATIVE_SYSTEM_USER_GRAFANA_PASSWORD' SUPERUSER;">dbscript.sql
+echo "CREATE USER grafana WITH PASSWORD '$1' SUPERUSER;">dbscript.sql
 echo "CREATE DATABASE grafana WITH OWNER grafana TEMPLATE template0 ENCODING 'SQL_ASCII' TABLESPACE  pg_default LC_COLLATE  'C' LC_CTYPE  'C' CONNECTION LIMIT  -1;">>dbscript.sql
 echo "CREATE DATABASE insight WITH OWNER grafana TEMPLATE template0 ENCODING 'SQL_ASCII' TABLESPACE  pg_default LC_COLLATE  'C' LC_CTYPE  'C' CONNECTION LIMIT  -1;">>dbscript.sql
 printf '\n'

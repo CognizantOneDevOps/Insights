@@ -32,6 +32,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+
 @ComponentScan(basePackages = { "com.cognizant.devops.platformservice.*" })
 @Configuration
 public class CommonBeanConfiguration {
@@ -77,7 +79,7 @@ public class CommonBeanConfiguration {
 		list.add(MediaType.APPLICATION_OCTET_STREAM);
 		return list;
 	}
-
+	
 	/**
 	 * used for CORS validation, A container for CORS configuration to validate
 	 * against the actual origin, HTTP methods, and headers of a given request.
@@ -88,7 +90,11 @@ public class CommonBeanConfiguration {
 	public CorsConfigurationSource corsConfigurationSource() {
 		LOG.debug("Setting up corsConfigurationSource ");
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(Arrays.asList("*"));
+		List<String> allowedOriginHost = new ArrayList<>();
+		for (String hostName : ApplicationConfigProvider.getInstance().getTrustedHosts()) {
+			allowedOriginHost.add(hostName);
+		}
+		configuration.setAllowedOrigins(allowedOriginHost);
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "OPTIONS", "PUT", "DELETE", "PATCH"));
 		configuration.setAllowCredentials(true);
 		configuration.setAllowedHeaders(Arrays.asList("*"));
@@ -106,6 +112,7 @@ public class CommonBeanConfiguration {
 	 */
 	@Bean(name = "filterMultipartResolver")
 	public CommonsMultipartResolver multipartResolver() {
+		LOG.debug(" In multipartResolver ");
 		CommonsMultipartResolver resolver = new CommonsMultipartResolver();
 		resolver.setDefaultEncoding("utf-8");
 		resolver.setMaxUploadSize(2197152);

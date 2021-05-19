@@ -410,9 +410,12 @@ tr.mat-footer-row, tr.mat-row-dynamic{
     font-size: 15px;
     color:  #00b140;
     font-weight:bold;
-    vertical-align:sub;
     padding-left: 19px;
-    padding-top: 10px;
+    justify-content: left;
+    align-items: center;
+    white-space: nowrap;
+    text-align: left;
+    margin-top: 1%;
 }
 .input-file {
     -webkit-appearance: initial;
@@ -430,16 +433,8 @@ tr.mat-footer-row, tr.mat-row-dynamic{
     right: 50px;
 }
 
-/* .mat-button-focus-overlay {
-   background-color:unset !important;
-  }
 
-  .mat-icon-button:focus{
-    box-shadow: 0 0 unset !important;
-    transition:none !important;
-    background-color: unset !important;
-    -webkit-tap-highlight-color:unset !important;
-}*/
+
 
 
 

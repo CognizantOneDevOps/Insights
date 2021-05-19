@@ -42,6 +42,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -147,9 +148,14 @@ public class GrafanaAuthenticationTest extends AbstractTestNGSpringContextTests 
 		headers.put(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, "GET, POST, OPTIONS, PUT, DELETE, PATCH");
 		headers.put(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "*");
 		MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPostWithRequestParam(
-				"/user/authenticate", "", headers);
+				"/user/authenticate", "", headers,false);
 
 		ResultActions action = this.mockMvc.perform(builder.with(csrf().asHeader()));
+		
+		MvcResult result = action.andReturn();
+		String content = result.getResponse().getContentAsString();
+		log.debug("In loginWithCorrectCredentials Response  ======================= {} ",content);
+		
 		action.andExpect(status().isOk());
     }
 
@@ -164,27 +170,39 @@ public class GrafanaAuthenticationTest extends AbstractTestNGSpringContextTests 
 		headers.put(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, "GET, POST, OPTIONS, PUT, DELETE, PATCH");
 		headers.put(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "*");
 		MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPostWithRequestParam("/user/authenticate",
-				"", headers);
+				"", headers,false);
 
 		ResultActions action = this.mockMvc.perform(builder.with(csrf().asHeader()));
+		
+		MvcResult result = action.andReturn();
+		String content = result.getResponse().getContentAsString();
+		log.debug("In loginWithIncorrectCredentials Response  ======================= {} ",content);
+		
 		action.andExpect(status().is(AuthenticationUtils.UNAUTHORISE));
 	}
 
 	@Test(priority = 3)
 	public void loginWithIncorrectHost() throws Exception {
+		log.debug("In loginWithIncorrectHost =======================");
 		this.mockMvc = getMacMvc();
 		Map<String, String> headers = new HashMap<>();
 		headers.put("Cookie", cookiesString);
 		headers.put("Authorization", testAuthData.get(AUTHORIZATION));
-		headers.put(HttpHeaders.ORIGIN, "http://localhost55.com:8080");
-		headers.put(HttpHeaders.HOST, "localhost55");
+		
 		headers.put(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, "GET, POST, OPTIONS, PUT, DELETE, PATCH");
 		headers.put(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "*");
 		MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPostWithRequestParam("/user/authenticate",
-				"", headers);
+				"", headers,true);
+		
+		builder.header(HttpHeaders.ORIGIN, "http://localhost55.com:8080");
+		builder.header(HttpHeaders.HOST, "localhost55");
 
 		ResultActions action = this.mockMvc.perform(builder.with(csrf().asHeader()));
-		action.andExpect(status().is(AuthenticationUtils.INFORMATION_MISMATCH));
+		MvcResult result = action.andReturn();
+		String content = result.getResponse().getContentAsString();
+	    log.debug("In loginWithIncorrectHost Response  ======================= {} ",content);
+	    
+		action.andExpect(status().is(403));
 	}
 
 	@Test(priority = 4)
@@ -199,7 +217,7 @@ public class GrafanaAuthenticationTest extends AbstractTestNGSpringContextTests 
 		headers.put(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, "GET, POST, OPTIONS, PUT, DELETE, PATCH");
 		headers.put(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "*");
 		MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPostWithRequestParam("/user/authenticate",
-				"", headers);
+				"", headers,false);
 
 		ResultActions action = this.mockMvc.perform(builder.with(csrf().asHeader()));
 		action.andExpect(status().is(HttpServletResponse.SC_BAD_REQUEST));
@@ -212,9 +230,13 @@ public class GrafanaAuthenticationTest extends AbstractTestNGSpringContextTests 
 	}
 
 	private MockHttpServletRequestBuilder mockHttpServletRequestBuilderPostWithRequestParam(String url, String content,
-			Map<String, String> headers) {
-		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post(url).cookie(httpRequest.getCookies());
-		
+			Map<String, String> headers, boolean incorrectHost) {
+		MockHttpServletRequestBuilder builder ;
+		if(!incorrectHost) {
+			builder= MockMvcRequestBuilders.post(url).header(HttpHeaders.ORIGIN,"http://localhost:8080").cookie(httpRequest.getCookies());
+		}else {
+			builder= MockMvcRequestBuilders.post(url).header(HttpHeaders.ORIGIN,"http://localhost55:8880").cookie(httpRequest.getCookies());
+		}
 		for(Map.Entry<String, String> entry : headers.entrySet()) {
 			builder.header(entry.getKey(), entry.getValue());
 		}

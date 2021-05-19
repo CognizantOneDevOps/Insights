@@ -180,6 +180,8 @@
 	"enableBrancheDeletion": false,
 	"enableDataValidation": true,
 	"enableCommitFileUpdation": true,
+	"default_branch": "master",
+	"fetchMetaData": false,
 	"toolCategory": "SCM",
 	"toolsTimeZone": "GMT",
 	"insightsTimeZone": "Asia/Kolkata",

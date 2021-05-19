@@ -67,4 +67,5 @@ public class GrafanaPdfController {
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
+	
 }

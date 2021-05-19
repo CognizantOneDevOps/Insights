@@ -16,6 +16,9 @@
 echo "#################### Installing Tomcat9.0.36 ####################"
 source /etc/environment
 source /etc/profile
+wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+chmod +x ./jq
+sudo cp jq /usr/bin
 cd $INSIGHTS_APP_ROOT_DIRECTORY
 sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformUI3.zip -O PlatformUI3.zip
 sudo unzip PlatformUI3.zip && sudo rm -rf PlatformUI3.zip
@@ -24,6 +27,13 @@ sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/i
 sudo tar -zxvf apache-tomcat.tar.gz
 sudo cp -R ./app $INSIGHTS_APP_ROOT_DIRECTORY/apache-tomcat/webapps
 sudo rm -rf PlatformUI3
+export myextip=$(wget -qO- icanhazip.com)
+echo $myextip
+ServiceEndpoint="http://$myextip:8080"
+grafanaEndpoint="http://$myextip:3000/grafana"
+#update uiConfig.json
+jq --arg serviceHost $ServiceEndpoint '(.serviceHost) |= $serviceHost' $INSIGHTS_APP_ROOT_DIRECTORY/apache-tomcat/webapps/app/config/uiConfig.json >  $INSIGHTS_APP_ROOT_DIRECTORY/apache-tomcat/webapps/app/config/uiConfig.json.tmp && mv $INSIGHTS_APP_ROOT_DIRECTORY/apache-tomcat/webapps/app/config/uiConfig.json.tmp $INSIGHTS_APP_ROOT_DIRECTORY/apache-tomcat/webapps/app/config/uiConfig.json -f
+jq --arg grafanaHost $grafanaEndpoint '(.grafanaHost) |= $grafanaHost' $INSIGHTS_APP_ROOT_DIRECTORY/apache-tomcat/webapps/app/config/uiConfig.json >  $INSIGHTS_APP_ROOT_DIRECTORY/apache-tomcat/webapps/app/config/uiConfig.json.tmp && mv $INSIGHTS_APP_ROOT_DIRECTORY/apache-tomcat/webapps/app/config/uiConfig.json.tmp $INSIGHTS_APP_ROOT_DIRECTORY/apache-tomcat/webapps/app/config/uiConfig.json -f
 sudo cp PlatformService.war $INSIGHTS_APP_ROOT_DIRECTORY/apache-tomcat/webapps
 sudo rm -rf PlatformService.war
 cd apache-tomcat

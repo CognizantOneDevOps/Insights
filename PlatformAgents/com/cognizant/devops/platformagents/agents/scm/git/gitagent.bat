@@ -15,15 +15,29 @@ the License.
 :comment
 pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\git
 setlocal ENABLEDELAYEDEXPANSION
+:agent_type will be set after UI registration
+set AGENTTYPE=__AGENT_TYPE__
 for /f "delims=" %%i in ('python -V ^2^>^&^1') do (
    set PYTHON_VERSION=%%i
    if "!PYTHON_VERSION:~0,8!" EQU "Python 2" ( 
       echo Detected python 2 version
-	  python -c "from  __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.git.GitAgent import GitAgent; GitAgent()"
-   ) else (
+      if "%AGENTTYPE%" EQU "Agent" (
+      	echo Running Agent Python 2 ------------------------------------------------
+	  	python -c "from  __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.git.GitAgent import GitAgent; GitAgent()"
+  	  ) else (
+  	  	echo Running Webhook Python 2 ----------------------------------------------
+  	    python -c "from  __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.git.GitWebhookAgent import GitWebhookAgent; GitWebhookAgent()"
+  	  )
+  	) else (
       if "!PYTHON_VERSION:~0,8!" EQU "Python 3" ( 
          echo Detected python 3 version
-		 python -c "from  __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.git.GitAgent3 import GitAgent; GitAgent()"
+          if "%AGENTTYPE%" EQU "Agent" (
+          		echo Running Agent Python 3 ------------------------------------------------
+		 		python -c "from  __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.git.GitAgent3 import GitAgent; GitAgent()"
+      	   ) else (
+      	   		echo Running Webhook Python 3 ----------------------------------------------
+		  	    python -c "from  __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.git.GitWebhookAgent3 import GitWebhookAgent; GitWebhookAgent()"
+		   )
       ) else ( 
          echo python version not supported 
       )

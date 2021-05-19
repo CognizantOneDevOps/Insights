@@ -126,15 +126,16 @@ export class ContentConfigAddition implements OnInit {
           this.valComparisonCategory() ? this.onClickSave() : this.messageDialog.showApplicationsMessage("Message should contain Positive,Negative and Neutral Messages", "ERROR");
           break;
         case 'THRESHOLD':
-          if (this.validateJson(this.threshold)) {
+          if (this.validateThresholdCategory()) {
             let actionArr = ['COUNT', 'PERCENTAGE', 'AVERAGE'];
             if (actionArr.includes(this.action)) {
-              this.valStandardCategory() ? this.onClickSave() : this.messageDialog.showApplicationsMessage("Message should contain Content and Neutral Messages", "ERROR");
+             this.valStandardCategory() ? this.onClickSave() : this.messageDialog.showApplicationsMessage("Message should contain Content and Neutral Messages", "ERROR") 
+             
             } else {
               this.messageDialog.showApplicationsMessage("Action should be Count,Percentage or Average", "ERROR");
             }
           } else {
-            this.messageDialog.showApplicationsMessage('Threshold value is in incorrect json format', 'ERROR');
+             this.messageDialog.showApplicationsMessage("Threshold should contain only integer values", "ERROR")
           }
           break;
         case 'THRESHOLD_RANGE':
@@ -181,7 +182,7 @@ export class ContentConfigAddition implements OnInit {
   validateJson(message) {
     try {
       JSON.parse(message);
-    } catch (e) {
+    } catch (e) {      
       return false;
     }
     return true;
@@ -201,6 +202,13 @@ export class ContentConfigAddition implements OnInit {
     let msgArr = Object.keys(JSON.parse(this.thresholds));
     return this.valArrayEquality(thresholds, msgArr);
   }
+
+  validateThresholdCategory()
+  {  
+   return !isNaN(Number(this.threshold));
+  } 
+
+  
   validateContentData() {
     let valid = false;
     switch (this.category) {

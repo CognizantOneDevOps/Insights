@@ -126,6 +126,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			
 			GrafanaDashboardPdfConfig grafanaDashboardPdfConfig = grafanaDashboardConfigDAL.fetchGrafanaDashboardDetailsByWorkflowId(assessmentReportDTO.getWorkflowId());
 			log.debug("Worlflow Detail ==== GrafanaDashboardPdfConfig from UI ===== {} ",grafanaDashboardPdfConfig);
+			assessmentReportDTO.setAsseementreportname(grafanaDashboardPdfConfig.getTitle());
 			String exportedFilePath = assessmentReportDTO.getPdfReportDirPath() + File.separator
 					+ assessmentReportDTO.getAsseementreportname() + "." + ReportEngineUtils.REPORT_TYPE;
 			assessmentReportDTO.setPdfExportedFilePath(exportedFilePath);

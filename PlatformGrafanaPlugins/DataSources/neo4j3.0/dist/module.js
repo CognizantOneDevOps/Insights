@@ -2385,15 +2385,12 @@ function (_super) {
     var logInfo = {};
     cypherQuery['statements'] = statements;
     cypherQuery['metadata'] = metadata;
+    logInfo['eventName'] = 'data-request';
     logInfo['panelId'] = options.panelId;
     logInfo['dashboardId'] = options.dashboardId;
     logInfo['datasourceId'] = this.datasourceId;
     logInfo['datasourceType'] = this.type;
     logInfo['datasourceName'] = this.name;
-    logInfo['userId'] = this.userId;
-    logInfo['userName'] = this.userName;
-    logInfo['email'] = this.email;
-    logInfo['orgId'] = this.orgId;
     logInfo['timestamp'] = new Date().toISOString();
 
     try {
@@ -2443,7 +2440,6 @@ function (_super) {
 
     logInfo['query'] = cypherQuery;
     var startTime = Date.now();
-    console.log('start-', startTime);
 
     if (queries.length) {
       var req = Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getBackendSrv"])().datasourceRequest({
@@ -2452,19 +2448,18 @@ function (_super) {
         data: cypherQuery
       }).then(function (res) {
         var endTime = Date.now();
-        console.log('end-', endTime);
         logInfo['time_ms'] = endTime - startTime;
         logInfo['panelQuery'] = true;
+        logInfo['requestId'] = options.requestId;
 
         if (_this.logging) {
           try {
-            Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getBackendSrv"])().datasourceRequest({
-              method: 'POST',
-              url: _this.serviceUrl,
-              data: logInfo
-            }).then(function (res) {
-              console.log(res);
-            });
+            logInfo['userId'] = _this.userId;
+            logInfo['userName'] = _this.userName;
+            logInfo['email'] = _this.email;
+            logInfo['orgId'] = _this.orgId;
+
+            _this.logDashboardInfo(logInfo);
           } catch (e) {
             console.log(e);
           }
@@ -2487,23 +2482,49 @@ function (_super) {
         }
       });
       streams.push(Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["from"])(req));
-    }
+    } //console.log(logInfo);
 
-    console.log(logInfo);
+
     return rxjs__WEBPACK_IMPORTED_MODULE_3__["merge"].apply(void 0, Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])(streams));
   };
 
-  DataSource.prototype.getUserDetailsPerDashboardHit = function () {
-    var _this = this;
-
+  DataSource.prototype.logDashboardInfo = function (logInfo) {
     Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getBackendSrv"])().datasourceRequest({
-      method: 'GET',
-      url: '/api/user'
+      method: 'POST',
+      url: this.serviceUrl,
+      data: logInfo
     }).then(function (res) {
-      _this.userId = res.data.id;
-      _this.userName = res.data.name;
-      _this.email = res.data.email;
-      _this.orgId = res.data.orgId;
+      console.log(res);
+    });
+  };
+
+  DataSource.prototype.getUserDetailsPerDashboardHit = function () {
+    return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"])(this, void 0, void 0, function () {
+      var _this = this;
+
+      return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"])(this, function (_a) {
+        switch (_a.label) {
+          case 0:
+            return [4
+            /*yield*/
+            , Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getBackendSrv"])().datasourceRequest({
+              method: 'GET',
+              url: '/api/user'
+            }).then(function (res) {
+              _this.userId = res.data.id;
+              _this.userName = res.data.name;
+              _this.email = res.data.email;
+              _this.orgId = res.data.orgId;
+            })];
+
+          case 1:
+            _a.sent();
+
+            return [2
+            /*return*/
+            ];
+        }
+      });
     });
   };
 
