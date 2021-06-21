@@ -40,7 +40,7 @@ public class SpringAccessDeniedHandler implements AccessDeniedHandler {
 	@Override
 	public void handle(HttpServletRequest request, HttpServletResponse response,
 			AccessDeniedException accessDeniedException) throws IOException, ServletException {
-		log.error(accessDeniedException);
+		log.error("SpringAccessDeniedHandler ",accessDeniedException);
 		String msg = PlatformServiceUtil.buildFailureResponse("Access Denied").toString();
 		PrintWriter writer = response.getWriter();
 		writer.write(msg);

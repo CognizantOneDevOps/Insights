@@ -20,29 +20,26 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.rabbitmq.client.AMQP.Exchange.DeclareOk;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 
 public class EngineTestData {
 	private static Logger log = LogManager.getLogger(EngineTestData.class);
@@ -66,30 +63,21 @@ public class EngineTestData {
 	public static String jenkinLabelName = "JENKINS_UNTEST";
 	public static String saveDataConfig = "{\"destination\":{\"toolName\":\"JENKINS\",\"toolCategory\":\"CI\",\"labelName\":\"JENKINS_UNTEST\",\"fields\":[\"scmcommitId\"]},\"source\":{\"toolName\":\"GIT\",\"toolCategory\":\"SCM\",\"labelName\":\"GIT_UNTEST\",\"fields\":[\"commitId\"]},\"relationName\":\"TEST_FROM_GIT_TO_JENKINS\",\"relationship_properties\":[],\"isSelfRelation\":false}";
 	public static String saveEnrichmentData = "[{\"queryName\":\"Add test to GIT_UNTEST\",\"cypherQuery\":\"match(n:GIT_UNTEST) where not exists (n.test) set n.test=\\\"completed\\\" return count(n)\",\"runSchedule\":10,\"lastExecutionTime\":\"2020/12/16 11:48 AM\",\"recordsProcessed\":0,\"queryProcessingTime\":1598}]";
-	
+
 	public static JsonObject getJsonObject(String jsonString) {
 		Gson gson = new Gson();
 		JsonElement jelement = gson.fromJson(jsonString.trim(), JsonElement.class);
 		return jelement.getAsJsonObject();
 	}
 
-	public static void publishMessage(String queueName, String routingKey, String playload) {
-	
-		ConnectionFactory factory = new ConnectionFactory();
-		MessageQueueDataModel messageQueueConfig = ApplicationConfigProvider.getInstance().getMessageQueue();
-		factory.setHost(messageQueueConfig.getHost());
-		factory.setUsername(messageQueueConfig.getUser());
-		factory.setPassword(messageQueueConfig.getPassword());
+	public static void publishMessage(String queueName, String routingKey, String playload) throws InsightsCustomException {
 		String exchangeName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentExchange();
-
 		Connection connection = null;
 		Channel channel = null;
 		try {
-			connection = factory.newConnection();
+			connection = RabbitMQConnectionProvider.getConnection();
 			channel = connection.createChannel();
 		} catch (IOException e) {
-			log.error(e);
-		} catch (TimeoutException e) {
 			log.error(e);
 		}
 
@@ -97,23 +85,23 @@ public class EngineTestData {
 		message = message.substring(1, message.length() - 1).replace("\\", "");
 		try {
 			DeclareOk exchangeResp = channel.exchangeDeclarePassive(exchangeName);
-			channel.queueDeclare(queueName, true, false, false, null);
+			channel.queueDeclare(queueName, true, false, false, RabbitMQConnectionProvider.getQueueArguments());
 			channel.queueBind(queueName, exchangeName, routingKey);
 			channel.basicPublish(exchangeName, routingKey, null, message.getBytes());
-			connection.close();
+			//connection.close();
 		} catch (IOException e) {
 
 			/*
-			 * if exception raised means exchange doesen't exists creating
-			 * exchange in next block
+			 * if exception raised means exchange doesen't exists creating exchange in next
+			 * block
 			 */
 
 			try {
 				channel.exchangeDeclare(exchangeName, MQMessageConstants.EXCHANGE_TYPE);
-				channel.queueDeclare(queueName, true, false, false, null);
+				channel.queueDeclare(queueName, true, false, false, RabbitMQConnectionProvider.getQueueArguments());
 				channel.queueBind(queueName, exchangeName, routingKey);
 				channel.basicPublish(exchangeName, routingKey, null, message.getBytes());
-				connection.close();
+				//connection.close();
 			} catch (IOException e1) {
 				log.error(e1);
 			}
@@ -121,39 +109,33 @@ public class EngineTestData {
 		}
 
 	}
-	
-	public static Map readNeo4JData(String nodeName , String compareFlag)
-	{
-		Map map=null;
+
+	public static Map readNeo4JData(String nodeName, String compareFlag) {
+		Map map = null;
 		GraphDBHandler dbHandler = new GraphDBHandler();
-		String query = "MATCH (n:"+nodeName+") where n."+compareFlag+"='CM-7569369619' return n";
+		String query = "MATCH (n:" + nodeName + ") where n." + compareFlag + "='CM-7569369619' return n";
 		log.debug(" query  {} ", query);
 		GraphResponse neo4jResponse;
-		//JsonArray parentArray = new JsonArray();
+		// JsonArray parentArray = new JsonArray();
 		try {
-		
-		neo4jResponse = dbHandler.executeCypherQuery(query);
 
-		JsonElement tooldataObject = neo4jResponse.getJson().get("results")
-					                        .getAsJsonArray().get(0)
-					                        .getAsJsonObject().get("data")
-					                        .getAsJsonArray()
-					                        .get(0).getAsJsonObject()
-					                        .get("row");			
+			neo4jResponse = dbHandler.executeCypherQuery(query);
 
-		String finalJson = tooldataObject.toString().replace("[", "").replace("]", "");
-		
-		Gson gson = new Gson();
+			JsonElement tooldataObject = neo4jResponse.getJson().get("results").getAsJsonArray().get(0)
+					.getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row");
 
-	    map = gson.fromJson(finalJson, Map.class);
-		}
-		catch (InsightsCustomException e) {
+			String finalJson = tooldataObject.toString().replace("[", "").replace("]", "");
+
+			Gson gson = new Gson();
+
+			map = gson.fromJson(finalJson, Map.class);
+		} catch (InsightsCustomException e) {
 			log.error(e);
-		} 
-		return map;				
-	  
+		}
+		return map;
+
 	}
-	
+
 	public static CorrelationConfiguration loadCorrelation(String config) {
 		JsonParser parser = new JsonParser();
 		JsonObject json = (JsonObject) parser.parse(config);
@@ -186,7 +168,7 @@ public class EngineTestData {
 
 		return correlationConfig;
 	}
-	
+
 	public static InsightsConfigFiles createDataEnrichmentData() {
 		InsightsConfigFiles configFile = new InsightsConfigFiles();
 		configFile.setFileName("DataEnrichmentTest");

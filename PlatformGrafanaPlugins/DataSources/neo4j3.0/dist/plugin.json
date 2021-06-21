@@ -22,7 +22,7 @@
     ],
     "screenshots": [],
     "version": "1.0.0",
-    "updated": "2021-05-04"
+    "updated": "2021-05-25"
   },
 
   "dependencies": {
@@ -31,12 +31,24 @@
   },
   "routes": [
     {
-      "path": "platform",
-      "url": "https://api.example.com",
+      "path": "platformservice",
+      "method": "*",
+      "url": "{{ .JsonData.path }}",
       "headers": [
         {
           "name": "Authorization",
-          "content": "Bearer {{ .SecureJsonData.apiToken }}"
+          "content": "{{Basic .SecureJsonData.apiKey }}"
+        }
+      ]
+    },
+    {
+      "path": "neo4jLog",
+      "method": "*",
+      "url": "{{ .JsonData.serviceUrl }}",
+      "headers": [
+        {
+          "name": "PLAFORM_AUTHORIZATION",
+          "content": "{{Basic .JsonData.basicPassword }}"
         }
       ]
     }

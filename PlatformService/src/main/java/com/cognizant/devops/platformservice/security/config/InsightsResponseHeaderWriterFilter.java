@@ -33,7 +33,7 @@ import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 
 public class InsightsResponseHeaderWriterFilter extends OncePerRequestFilter {
 
-	private static Logger LOG = LogManager.getLogger(InsightsResponseHeaderWriterFilter.class);
+	private static Logger log = LogManager.getLogger(InsightsResponseHeaderWriterFilter.class);
 
 	/**
 	 * used to validate and write header in response header
@@ -41,11 +41,11 @@ public class InsightsResponseHeaderWriterFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		LOG.debug(" Inside Filter == InsightsResponseHeaderWriter  ........ {}  method {} ", request.getRequestURL(),
+		log.debug(" Inside Filter == InsightsResponseHeaderWriter  ........ {}  method {} ", request.getRequestURL(),
 				request.getMethod());
 		writeHeaders(request, response);
 		filterChain.doFilter(request, response);
-		LOG.debug(" Write Header in InsightsResponseHeaderWriterFilter ============ Completed");
+		log.debug(" Write Header in InsightsResponseHeaderWriterFilter ============ Completed");
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class InsightsResponseHeaderWriterFilter extends OncePerRequestFilter {
 				}
 			}
 		} catch (Exception e) {
-			LOG.error("Invalid detail in  InsightsResponseHeaderWriter {}", e.getMessage());
+			log.error("Invalid detail in  InsightsResponseHeaderWriter {}", e.getMessage());
 			String msg = PlatformServiceUtil
 					.buildFailureResponse("Invalid detail in  InsightsResponseHeaderWriter" + e)
 					.toString();

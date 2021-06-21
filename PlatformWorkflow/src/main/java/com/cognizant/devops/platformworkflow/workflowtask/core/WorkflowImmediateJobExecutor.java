@@ -101,6 +101,15 @@ public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInter
 					workflowProcessing.updateWorkflowDetails(workflowConfig.getWorkflowId(),
 							WorkflowTaskEnum.WorkflowStatus.TASK_INITIALIZE_ERROR.toString(), false);
 					Thread.currentThread().interrupt();
+				}catch (Exception e) {
+					log.error(e);
+					log.debug(" Worlflow Detail ====  workflow failed to execute due exception {}  ",
+							workflowConfig.getWorkflowId());
+					InsightsStatusProvider.getInstance()
+							.createInsightStatusNode("WorkflowEmmediateJobExecutorfailed to execute due to exception "+e.getMessage()
+									+ workflowConfig.getWorkflowId(), PlatformServiceConstants.FAILURE);
+					workflowProcessing.updateWorkflowDetails(workflowConfig.getWorkflowId(),
+							WorkflowTaskEnum.WorkflowStatus.TASK_INITIALIZE_ERROR.toString(), false);
 				}
 			}
 			InsightsStatusProvider.getInstance().createInsightStatusNode("WorkflowImmediateJobExecutor completed. ",

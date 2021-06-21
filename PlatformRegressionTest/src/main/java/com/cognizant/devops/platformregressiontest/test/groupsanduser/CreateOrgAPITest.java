@@ -22,8 +22,10 @@ import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
 import com.cognizant.devops.platformregressiontest.test.common.CommonUtils;
 import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
+
 import io.restassured.RestAssured;
 import io.restassured.http.Header;
 import io.restassured.http.Method;

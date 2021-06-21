@@ -432,7 +432,7 @@ public class ReportConfigDAL extends BaseDAL {
 		try {
 			Map<String,Object> parameters = new HashMap<>();
 			return getResultList(
-					"FROM InsightsAssessmentConfiguration CE",
+					"FROM InsightsAssessmentConfiguration CE ORDER by CE.asseementreportname ASC",
 					InsightsAssessmentConfiguration.class,
 					parameters);
 		} catch (Exception e) {

@@ -28,15 +28,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformservice.security.config.grafana.GrafanaUserDetailsUtil;
 
 public class InsightsAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
-	private static Logger Log = LogManager.getLogger(InsightsAuthenticationFilter.class);
+	private static Logger log = LogManager.getLogger(InsightsAuthenticationFilter.class);
 
 	public InsightsAuthenticationFilter(final String matcher, AuthenticationManager authenticationManager) {
 		super(matcher);
@@ -55,16 +53,16 @@ public class InsightsAuthenticationFilter extends AbstractAuthenticationProcessi
 	 */
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
+		log.debug(" Inside InsightsAuthenticationFilter, attemptAuthentication ==== ");
 		Authentication authentication = null;
 		InsightsAuthenticationTokenUtils authenticationtokenUtils = new InsightsAuthenticationTokenUtils();
 
 		if (ApplicationConfigProvider.getInstance().getAutheticationProtocol().equalsIgnoreCase("SAML")) {
-			authentication = authenticationtokenUtils.authenticationSAMLData(request, response);
+			authentication = authenticationtokenUtils.authenticateSAMLData(request, response);
 		} else if (AuthenticationUtils.IS_NATIVE_AUTHENTICATION) {
-			UserDetails user = GrafanaUserDetailsUtil.getUserDetails(request);
-			authentication = authenticationtokenUtils.authenticationNativeGrafana(user);
+			authentication = authenticationtokenUtils.authenticateGrafanaJWTData(request, response);
 		} else if (ApplicationConfigProvider.getInstance().getAutheticationProtocol().equalsIgnoreCase("JWT")) {
-			authentication = authenticationtokenUtils.authenticationJWTData(request, response);
+			authentication = authenticationtokenUtils.authenticateJWTData(request, response);
 		}
 		if (authentication != null) {
 			authentication = getAuthenticationManager().authenticate(authentication);
@@ -80,7 +78,7 @@ public class InsightsAuthenticationFilter extends AbstractAuthenticationProcessi
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication authResult) throws IOException, ServletException {
 		authResult.getAuthorities().forEach(
-				b -> Log.debug("In successfulAuthentication GrantedAuthority ==== {} ", b.getAuthority()));
+				b -> log.debug("In successfulAuthentication GrantedAuthority ==== {} ", b.getAuthority()));
 		SecurityContextHolder.getContext().setAuthentication(authResult);
 		chain.doFilter(request, response);
 	}
@@ -92,12 +90,12 @@ public class InsightsAuthenticationFilter extends AbstractAuthenticationProcessi
 	@Override
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) throws IOException, ServletException {
-		Log.error("unsuccessfulAuthentication ====", authException);
+		log.error("unsuccessfulAuthentication ====", authException);
 		Throwable exceptionClass = authException.getCause();
 		if (exceptionClass != null && exceptionClass.getClass().getName().contains("AccountExpiredException")) {
 			AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.TOKEN_EXPIRE_CODE, "Token Expire ");
 		} else {
-			Log.error(" Error while validating authentication {} ", authException.getMessage());
+			log.error(" Error while validating authentication {} ", authException.getMessage());
 			AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.UNAUTHORISE,
 					"Authentication not successful, Please relogin " + authException.getMessage());
 		}

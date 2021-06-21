@@ -29,16 +29,16 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 
 public class InsightsKerberosAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
-	private static Logger Log = LogManager.getLogger(InsightsKerberosAuthenticationFailureHandler.class);
+	private static Logger log = LogManager.getLogger(InsightsKerberosAuthenticationFailureHandler.class);
 
 	/**
-	 * Used to redirect after unautheticated
+	 * Used to redirect after unauthenticated
 	 */
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException exception) throws IOException, ServletException {
 
-		Log.error("Invalid request in InsightsAuthenticationException for kerberos ", exception);
+		log.error("Invalid request in InsightsAuthenticationException for kerberos ", exception);
 		AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.SECURITY_CONTEXT_CODE,
 				"Authentication not successful ,Please relogin ");
 

@@ -44,14 +44,14 @@ public class InsightsSAMLAuthenticationProviderImpl extends SAMLAuthenticationPr
     private boolean excludeCredential = false;
     
 	/**
-	 * Used to autheticate initial SAML login request, It will redirect user to
-	 * service provider login URL and then fetch necessay user detail.
+	 * Used to authenticate initial SAML login request, It will redirect user to
+	 * service provider login URL and then fetch necessary user detail.
 	 * It also create ExpiringUsernameAuthenticationToken and set it in spring
 	 * security context
 	 * 
 	 */
 	@Override
-	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+	public Authentication authenticate(Authentication authentication) {
 		
 		log.debug(" Inside InsightsSAMLAuthenticationProviderImpl === ");
 

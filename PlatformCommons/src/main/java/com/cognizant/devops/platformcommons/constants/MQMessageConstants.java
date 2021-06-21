@@ -22,4 +22,9 @@ public interface MQMessageConstants  {
 	 String ROUTING_KEY_FOR_HEALTH = "HEALTH";
 	 String ROUTING_KEY_SEPERATOR = "\\.";
 	 String MESSAGE_ENCODING = "UTF-8";
+	 String RECOVER_EXCHANGE_NAME ="iRecover";
+	 String RECOVER_EXCHANGE_TYPE ="fanout";
+	 String RECOVER_QUEUE="INSIGHTS_RECOVER_QUEUE";
+	 String RECOVER_ROUNTINGKEY_QUEUE="INSIGHTS.RECOVER.QUEUE";
+	 String RECOVER_EXCHANGE_PROPERTY= "x-dead-letter-exchange";
 }

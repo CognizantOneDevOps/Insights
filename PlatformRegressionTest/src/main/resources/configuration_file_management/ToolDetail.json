@@ -1,0 +1,143 @@
+[
+{
+  
+    "toolName":"INFERENCE",
+	"label":"INFERENCE:CONFIG:PRODUCTIVITY"
+  },
+  {
+  
+    "toolName":"GIT",
+	"label":"SCM:GIT:DATA"
+  },
+  {
+  
+    "toolName":"GITLAB",
+	"label":"SCM:GITLAB:DATA"
+  },
+  {
+  
+    "toolName":"SVN",
+	"label":"SCM:SVN:DATA"
+  },
+  {
+  
+    "toolName":"TFS",
+	"label":"SCM:TFS:DATA"
+  },
+  {
+  
+    "toolName":"BITBUCKET",
+	"label":"SCM:BITBUCKET:DATA"
+  },
+   {
+      "toolName":"BITBUCKETCLOUD",
+	"label":"SCM:BITBUCKETCLOUD:DATA"
+  },
+   {
+  
+    "toolName":"AWSCODECOMMIT",
+	"label":"SCM:AWSCODECOMMIT:DATA"
+  },
+  
+  {
+    "toolName" : "JIRA",
+    "label": "ALM:JIRA:DATA"
+  },
+  {
+    "toolName" : "PIVOTALTRACKER",
+    "label": "ALM:PIVOTALTRACKER:DATA"
+  },
+  {
+    "toolName" : "RALLY",
+    "label": "ALM:RALLY:DATA"
+  },
+  {
+    "toolName" : "QTEST",
+    "label": "ALM:QTEST:DATA"
+  },
+  {
+    "toolName" : "VERSIONONE",
+    "label": "ALM:VERSIONONE:DATA"
+  },
+  {
+    "toolName" : "HP",
+    "label": "ALM:HP:DATA"
+  },
+  {
+    "toolName" : "BAMBOO",
+    "label": "CI:BAMBOO:DATA"
+  },
+  {
+    "toolName" : "JENKINS",
+    "label": "CI:JENKINS:DATA"
+  },
+  {
+    "toolName" : "TEAMCITY",
+    "label": "CI:TEAMCITY:DATA"
+  },
+  {
+    "toolName" : "AWSCODEBUILD",
+    "label": "CI:AWSCODEBUILD:DATA"
+  },
+  {
+    "toolName" : "CIRCLECI",
+    "label": "CI:CIRCLECI:DATA"
+  },
+  {
+    "toolName" : "CITFS",
+    "label": "CI:CITFS:DATA"
+  },
+  {
+    "toolName" : "JENKINSLOGPARSER",
+    "label": "CI:JENKINSLOGPARSER:DATA"
+  },
+   {
+    "toolName" : "SNOW",
+    "label": "ITSM:SNOW:DATA"
+  },
+  {
+    "toolName" : "AWS",
+    "label": "ENVIRONMENT:AWS:DATA"
+  },
+  {
+    "toolName" : "AWSCODEDEPLOY",
+    "label": "DEPLOYMENT:AWSCODEDEPLOY:DATA"
+  },
+  {
+    "toolName" : "AWSCODEDEPIPELINE",
+    "label": "DEPLOYMENT:AWSCODEDEPIPELINE:DATA"
+  },
+   {
+    "toolName" : "BUILDMASTER",
+    "label": "DEPLOYMENT:BUILDMASTER:DATA"
+  },
+  {
+    "toolName" : "RUNDECK",
+    "label": "DEPLOYMENT:RUNDECK:DATA"
+  },
+    {
+    "toolName" : "UCD",
+    "label": "DEPLOYMENT:UCD:DATA"
+  },
+  {
+    "toolName" : "XLDEPLOY",
+    "label": "DEPLOYMENT:XLDEPLOY:DATA"
+  },
+   {
+    "toolName" : "SONAR",
+    "label": "CODEQUALITY:SONAR:DATA"
+  },
+  {
+    "toolName" : "NEXUS",
+    "label": "ARTIFICALMANAGEMENT:NEXUS:DATA"
+  },
+  {
+    "toolName" : "ARTIFACTORY",
+    "label": "ARTIFICALMANAGEMENT:ARTIFACTORY:DATA"
+  },
+  {
+    "toolName" : "DYNATRACE",
+    "label": "APPMONITORING:DYNATRACE:DATA"
+  }
+  
+]

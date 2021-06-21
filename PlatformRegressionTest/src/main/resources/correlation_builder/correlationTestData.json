@@ -1,0 +1,15 @@
+{
+	"correlationBuiler": "Co-Relation Builder",
+	"agentManagement": "Agent Management",
+	"webhookConfiguration": "Webhook Configuration",
+	"sourceTool": "GIT",
+	"sourceLabel": "GIT",
+	"destinationTool": "GIT",
+	"destinationLabel": "GIT",
+	"correlationName": "new_correlation",
+	"correlationNameAlphaNumeric": "test_a1pha_numer1c",
+	"correlationNameSpecialCharacter": "@test_special_character",
+	"sourceToolProperties": "repoType, gitType, repoName",
+	"destinationToolProperties": "maxCorrelationTime, inSightsTimeX, commit",
+	"propertyNames": "new_property_01, new_property_02, new_property_03"
+}

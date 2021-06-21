@@ -47,28 +47,28 @@ public class SubscriberStatusLogger {
 	}
 
 	public boolean createSubsriberStatusNode(String message, String status) {
-	try {
+		try {
 			String version = "";
 			version = SubscriberStatusLogger.class.getPackage().getImplementationVersion();
-			log.debug(" Subscriber version = {} port = {} contextPath ={} " + version + "  port  "
-					+ ServerProperties.port + "   " + ServerProperties.contextPath);
+			log.debug("Subscriber version = {} port = {} contextPath ={}", version, ServerProperties.port,
+					ServerProperties.contextPath);
 			Map<String, String> extraParameter = new HashMap<String, String>(0);
 			createComponentStatusNode(version, message, status, extraParameter);
 		} catch (Exception e) {
-			log.error(" Unable to create node " + e.getMessage());
+			log.error("Unable to create node {}", e.getMessage());
 		}
 		return Boolean.TRUE;
 	}
-	
+
 	public boolean createComponentStatusNode(String version, String message, String status,
 			Map<String, String> parameter) {
-		boolean response=Boolean.FALSE;
+		boolean response = Boolean.FALSE;
 		try {
 			String utcdate = getUtcTime(WebHookConstants.TIMEZONE);
 			JsonObject jsonObj = new JsonObject();
-			jsonObj.addProperty("version", version==null?"-":version);
+			jsonObj.addProperty("version", version == null ? "-" : version);
 			jsonObj.addProperty("message", message);
-			jsonObj.addProperty("inSightsTime",System.currentTimeMillis());
+			jsonObj.addProperty("inSightsTime", System.currentTimeMillis());
 			jsonObj.addProperty("inSightsTimeX", utcdate);
 			jsonObj.addProperty("instanceName", AppProperties.instanceName);
 			jsonObj.addProperty("serverPort", ServerProperties.port);
@@ -76,18 +76,18 @@ public class SubscriberStatusLogger {
 				jsonObj.addProperty("contextPath", ServerProperties.contextPath);
 			}
 			jsonObj.addProperty(WebHookConstants.STATUS, status);
-			for (Map.Entry<String,String> entry: parameter.entrySet()){
+			for (Map.Entry<String, String> entry : parameter.entrySet()) {
 				jsonObj.addProperty(entry.getKey(), entry.getValue());
 			}
-			log.debug("  message " + jsonObj.toString());
+			log.debug("  message {}", jsonObj.toString());
 			WebHookMessagePublisher.getInstance().publishHealthData(jsonObj.toString().getBytes(),
 					WebHookConstants.WEBHOOK_SUBSCRIBER_HEALTH_QUEUE,
 					WebHookConstants.WEBHOOK_SUBSCRIBER_HEALTH_ROUTING_KEY);
-			response =Boolean.TRUE;
+			response = Boolean.TRUE;
 		} catch (Exception e) {
-			log.error("Unable to create Node  createComponentStatusNode " + e);
+			log.error("Unable to create Node  createComponentStatusNode {}", e);
 		}
-		log.debug("  response for publishHealthData " + response);
+		log.debug("  response for publishHealthData {}", response);
 		return response;
 	}
 

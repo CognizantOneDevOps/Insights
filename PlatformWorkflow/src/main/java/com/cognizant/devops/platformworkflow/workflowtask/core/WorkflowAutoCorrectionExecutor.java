@@ -45,6 +45,8 @@ public class WorkflowAutoCorrectionExecutor implements Job, ApplicationConfigInt
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		
+		log.debug(" Worlflow Detail ====  Schedular Inside WorkflowAutoCorrectionExecutor  ");
+		
 		InsightsStatusProvider.getInstance().createInsightStatusNode("Started WorkflowAutoCorrectionExecutor",
 				PlatformServiceConstants.SUCCESS);
 		try {

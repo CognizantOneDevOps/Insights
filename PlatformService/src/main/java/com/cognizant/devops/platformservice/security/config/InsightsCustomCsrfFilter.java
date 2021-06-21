@@ -31,7 +31,7 @@ import org.springframework.web.util.WebUtils;
 
 public class InsightsCustomCsrfFilter extends OncePerRequestFilter {
 
-	private static Logger LOG = LogManager.getLogger(InsightsCustomCsrfFilter.class);
+	private static Logger log = LogManager.getLogger(InsightsCustomCsrfFilter.class);
 
 	/**
 	 * Filter used to extract CSRF token and add it in response header
@@ -40,20 +40,19 @@ public class InsightsCustomCsrfFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		LOG.debug(" Inside Filter == CustomCsrfFilter token ........ {} method {} ", request.getRequestURL(),
+		log.debug(" Inside Filter == CustomCsrfFilter token ........ {} method {} ", request.getRequestURL(),
 				request.getMethod());
 		CsrfToken csrf = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
 		if (csrf != null) {
 			Cookie cookie = WebUtils.getCookie(request, AuthenticationUtils.CSRF_COOKIE_NAME);
 			String token = csrf.getToken();
-			//LOG.debug("CsrfToken value in CustomCsrfFilter arg0 {} ", token);
 			if (cookie == null || token != null && !token.equals(cookie.getValue())) {
 				cookie = new Cookie(AuthenticationUtils.CSRF_COOKIE_NAME, token);
 				cookie.setPath("/");
 				response.addCookie(cookie);
 			}
 		} else {
-			LOG.error(" csrf token is empty for url {}  ", request.getRequestURL());
+			log.error(" csrf token is empty for url {}  ", request.getRequestURL());
 		}
 		filterChain.doFilter(request, response);
 	}

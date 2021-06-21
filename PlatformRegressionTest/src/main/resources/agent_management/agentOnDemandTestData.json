@@ -1,0 +1,27 @@
+{
+	"dataset": [
+		{
+			"isOnlineRegistration": "true",
+			"onlineRegistrationMode": "nexus",
+			"offlineAgentPath": "C:/downloads/Agents",
+			"unzipPath": "C:/agents/PlatformAgents",
+			"agentExchange": "iAgent",
+			"agentPkgQueue": "INSIGHTS.AGENTS.PACKAGE",
+			"browseRepoUrl": "",
+			"downloadRepoUrl": "",
+			"agentManagement": "Agent Management",
+			"osName": "Windows",
+			"version": "v8.1-SNAPSHOT",
+			"typeName": "Agent",
+			"toolName": "git",
+			"mqUser": "",
+			"mqPassword": "",
+			"agentId": "on_demand_agent",
+			"dataLabelName": "SCM.GIT_ONDEMAND.DATA",
+			"healthLabelName": "SCM.GIT_ONDEMAND.HEALTH",
+			"accessToken": "",
+			"getRepos": "",
+			"commitsBaseEndPoint": ""
+		}
+	]
+}

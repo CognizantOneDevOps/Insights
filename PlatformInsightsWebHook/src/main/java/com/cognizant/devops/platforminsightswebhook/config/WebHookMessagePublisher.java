@@ -55,8 +55,9 @@ public class WebHookMessagePublisher {
 	}
 
 	public void initilizeMq() throws TimeoutException, IOException {
-		LOG.debug(" In initilizeMq ======== host = {} user = {} passcode = {} exchangeName= {} ", AppProperties.mqHost,
-				AppProperties.mqUser, AppProperties.mqPassword, AppProperties.mqExchangeName);
+		LOG.debug(" In initilizeMq ======== host = {} port = {} user = {} passcode = {} exchangeName= {} enableDeadLetterExchange = {}",
+				AppProperties.mqHost, AppProperties.port, AppProperties.mqUser, AppProperties.mqPassword,
+				AppProperties.mqExchangeName,AppProperties.enableDeadLetterExchange);
 		try {
 			this.exchangeName = AppProperties.mqExchangeName;
 			this.routingKey = WebHookConstants.WEBHOOK_EVENTDATA;
@@ -64,12 +65,17 @@ public class WebHookMessagePublisher {
 			factory.setHost(AppProperties.mqHost);
 			factory.setUsername(AppProperties.mqUser);
 			factory.setPassword(AppProperties.mqPassword);
+			factory.setPort(AppProperties.port);
 			connection = factory.newConnection();
-			SubscriberStatusLogger.getInstance()
-					.createSubsriberStatusNode(
-							" Instance Name " + AppProperties.instanceName
-							+ " : Connection with Rabbit Mq for host "
-							+ AppProperties.mqHost + " established successfully. ", WebHookConstants.SUCCESS);
+			Channel channelForDeadLetter = connection.createChannel();
+			channelForDeadLetter.exchangeDeclare(WebHookConstants.RECOVER_EXCHANGE_NAME, WebHookConstants.RECOVER_EXCHANGE_TYPE, true);
+			channelForDeadLetter.queueDeclare(WebHookConstants.RECOVER_QUEUE, true, false, false, null);
+			channelForDeadLetter.queueBind(WebHookConstants.RECOVER_QUEUE, WebHookConstants.RECOVER_EXCHANGE_NAME, WebHookConstants.RECOVER_ROUNTINGKEY_QUEUE);
+			channelForDeadLetter.close();
+			SubscriberStatusLogger.getInstance().createSubsriberStatusNode(
+					" Instance Name " + AppProperties.instanceName + " : Connection with Rabbit Mq for host "
+							+ AppProperties.mqHost + " established successfully. ",
+					WebHookConstants.SUCCESS);
 		} catch (Exception e) {
 			LOG.error("Error while initilize mq ", e);
 			SubscriberStatusLogger.getInstance().createSubsriberStatusNode(
@@ -95,8 +101,14 @@ public class WebHookMessagePublisher {
 				LOG.debug(" data published in queue {}" ,webHookMqChannelName);
 			} else {
 				channel = connection.createChannel();
+				Map<String, Object> args = new HashMap<>();
+				
+				if(AppProperties.enableDeadLetterExchange) {
+					args.put(WebHookConstants.RECOVER_EXCHANGE_PROPERTY, WebHookConstants.RECOVER_EXCHANGE_NAME);
+				}
+				
 				channel.exchangeDeclare(exchangeName, WebHookConstants.EXCHANGE_TYPE, true);
-				channel.queueDeclare(webHookMqChannelName, true, false, false, null);
+				channel.queueDeclare(webHookMqChannelName, true, false, false, args);
 				channel.queueBind(webHookMqChannelName, exchangeName, webHookMqChannelName);
 				channel.basicPublish(exchangeName, webHookMqChannelName, null, data);
 				LOG.debug(" data published first time in queue  {}", webHookMqChannelName);
@@ -114,11 +126,16 @@ public class WebHookMessagePublisher {
 		channel = connection.createChannel();
 		try {
 			channel = connection.createChannel();
+			Map<String, Object> args = new HashMap<>();
+			if(AppProperties.enableDeadLetterExchange) {
+				args.put(WebHookConstants.RECOVER_EXCHANGE_PROPERTY, WebHookConstants.RECOVER_EXCHANGE_NAME);
+			}
+			
 			channel.exchangeDeclare(exchangeName, WebHookConstants.EXCHANGE_TYPE, true);
-			channel.queueDeclare(webHookHealthqueueName, true, false, false, null);
+			channel.queueDeclare(webHookHealthqueueName, true, false, false, args);
 			channel.queueBind(webHookHealthqueueName, exchangeName, webHookHealthRoutingKey);
 			channel.basicPublish(exchangeName, webHookHealthRoutingKey, null, data);
-			LOG.debug(" Health data published first time in queue {}" , webHookHealthRoutingKey);
+			LOG.debug(" Health data published first time in queue {}", webHookHealthRoutingKey);
 		} catch (Exception e) {
 			LOG.error("Error while publishEventAction ", e);
 		}finally {
@@ -136,7 +153,7 @@ public class WebHookMessagePublisher {
 				}
 			}
 			if (connection != null) {
-				connection.close();
+				//connection.close();
 			}
 		} catch (IOException |TimeoutException e) {
 			LOG.error(e.getMessage());

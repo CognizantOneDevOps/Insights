@@ -18,10 +18,12 @@ package com.cognizant.devops.engines.platformwebhookengine.message.subscriber;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
-import com.cognizant.devops.engines.platformwebhookengine.message.factory.EngineSubscriberResponseHandler;
+import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.engines.platformwebhookengine.parser.InsightsWebhookParserFactory;
 import com.cognizant.devops.engines.platformwebhookengine.parser.InsightsWebhookParserInterface;
 import com.cognizant.devops.engines.util.WebhookEventProcessing;
@@ -52,9 +54,10 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 	@Override
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body)
 			throws IOException {
-
+		String message = new String(body, StandardCharsets.UTF_8);
 		try {
-			String message = new String(body, StandardCharsets.UTF_8);
+			long startTime = System.nanoTime();
+			
 			if (!message.equalsIgnoreCase("") || !message.isEmpty()) {
 				InsightsWebhookParserInterface webHookParser = InsightsWebhookParserFactory
 						.getParserInstance(this.webhookConfig.getToolName());
@@ -77,9 +80,9 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 						dbHandler.bulkCreateNodes(toolData, null, query);
 						getChannel().basicAck(envelope.getDeliveryTag(), false);
 					}
-
+					
 				} else {
-					log.error("Unmatched Response Template found for {} ", this.webhookConfig.getWebHookName());
+					log.error(" Unmatched Response Template found for {} ", this.webhookConfig.getWebHookName());
 					EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
 							"No Webhook Nodes are inserted in DB for " + this.webhookConfig.getWebHookName(),
 							PlatformServiceConstants.FAILURE);
@@ -88,17 +91,20 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 				log.error(" No valid payload found for webhook  message{} {} ", this.webhookConfig.getWebHookName(),
 						message);
 			}
-			log.debug(" {} webhook data processed successfully ", this.webhookConfig.getWebHookName());
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=WebhookEngine toolName={} category={} WebHookName={} routingKey={} dataSize={} execId={} ProcessingTime={} {} webhook data processed successfully ",this.webhookConfig.getToolName(),"-",this.webhookConfig.getWebHookName(),this.webhookConfig.getMQChannel(),0,"-",processingTime, this.webhookConfig.getWebHookName());
 		} catch (Exception e) {
-			log.error(e);
+			log.error("Error in payload {} ",message);
+			log.error(" toolName={} agentId={} routingKey={} Error while storing Webhook data",this.webhookConfig.getToolName(),this.webhookConfig.getWebHookName(),this.webhookConfig.getMQChannel(),e);
 			EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
 					"Exception while pasring or DB issues " + e.getMessage(), PlatformServiceConstants.FAILURE);
+			getChannel().basicReject(envelope.getDeliveryTag(), false);
 		}
 	}
 
 	// Execution of the Query in which node updation in Neo4j is required,based on
 	// the unique property.
-	private void updateNeo4jNode(List<JsonObject> toolData, WebHookConfig webhookConfig2) {
+	private void updateNeo4jNode(List<JsonObject> toolData, WebHookConfig webhookConfig2) throws Exception {
 		try {
 			String finalQuery = "";
 			for (JsonObject jsonObject : toolData) {
@@ -114,12 +120,13 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 				finalQuery = query.toString();
 				JsonObject graphresponse = dbHandler.createNodesWithSingleData(jsonObject, finalQuery);
 				if (graphresponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0) {
-					log.error("Unable to insert nodes for routing key: {} and webhook Name {} , error occured: {} ",
+					log.error(" toolName={} agentId={} routingKey={} Unable to insert nodes for routing key: {} and webhook Name {} , error occured: {} ",this.webhookConfig.getToolName(),this.webhookConfig.getWebHookName(),this.webhookConfig.getMQChannel(),
 							webhookConfig2.getMQChannel(), webhookConfig2.getWebHookName(), graphresponse);
 				}
 			}
 		} catch (Exception e) {
-			log.error(" Error while featching DB record  ", e);
+			log.error(" toolName={} agentId={} routingKey={} Error while featching DB record  ",this.webhookConfig.getToolName(),this.webhookConfig.getWebHookName(),this.webhookConfig.getMQChannel(), e);
+			throw e;
 		}
 	}
 

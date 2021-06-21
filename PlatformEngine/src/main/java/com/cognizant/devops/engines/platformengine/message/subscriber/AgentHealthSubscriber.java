@@ -95,16 +95,17 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 							}
 						}
 						dataList.add(jsonObject);
+						log.debug(" Type=AgentEngine toolName={} category={} agentId={} routingKey={} dataSize={} execId={} ProcessingTime={} Agent Health message processed.",jsonObject.get("toolName"),jsonObject.get("categoryName"),jsonObject.get("agentId"),"-",0,jsonObject.get("execId"),0);
 					}
 				}
 				String healthLabels = ":LATEST:" + routingKey.replace(".", ":");
-				createHealthNodes(dbHandler, routingKey, dataList, agentId, healthLabels, 10, "LATEST");
+				createHealthNodes(routingKey, dataList, agentId, healthLabels, 10, "LATEST");
 
-				if (isFailure) {
+				if (Boolean.TRUE.equals(isFailure)) {
 					String failureLabels = routingKey.replace(".", ":");
 					failureLabels = failureLabels.replace("HEALTH", "HEALTH_FAILURE");
 					String healthFailureLabels = ":LATEST_FAILURE:" + failureLabels;
-					createHealthNodes(dbHandler, routingKey, failedDataList, agentId, healthFailureLabels, 20,
+					createHealthNodes(routingKey, failedDataList, agentId, healthFailureLabels, 20,
 							"LATEST_FAILURE");
 				}
 
@@ -113,6 +114,7 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 			}
 		} catch (InsightsCustomException e) {
 			log.error(e);
+			getChannel().basicReject(envelope.getDeliveryTag(), false);
 		}
 	}
 
@@ -124,7 +126,7 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 	 * @param nodeLabels
 	 * @throws InsightsCustomException
 	 */
-	private void createHealthNodes(GraphDBHandler dbHandler, String routingKey, List<JsonObject> dataList,
+	private void createHealthNodes(String routingKey, List<JsonObject> dataList,
 			String agentId, String nodeLabels, int nodeCount, String latestLabel) throws InsightsCustomException {
 		String healthQuery;
 		// For Sequential/successive agent health publishing where agentId is not null

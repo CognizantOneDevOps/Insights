@@ -279,8 +279,9 @@ public class ApplicationConfigCache {
 	 */
 	public static boolean saveConfigFile(JsonObject serverConfigFile) throws InsightsCustomException {
 		File configFile = new File(ConfigOptions.CONFIG_FILE_RESOLVED_PATH);
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		try (FileWriter file = new FileWriter(configFile)) {
-			file.write(serverConfigFile.toString());
+			file.write(gson.toJson(serverConfigFile));
 			file.flush();
 		} catch (Exception e) {
 			log.error("Error writing modified json file", e);

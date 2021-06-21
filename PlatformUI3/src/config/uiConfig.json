@@ -1,21 +1,11 @@
 {
-	"showBusinessMapping": true,
 	"showAuditReporting": true,
 	"showWebhookConfiguration": true,
 	"enableInsightsToolbar": true,
 	"enableLogoutButton": true,
 	"autheticationProtocol": "NativeGrafana",
-	"agentsOsList": {
-		"Windows": "windows",
-		"RHEL/CentOS": "linux",
-		"Ubuntu": "Ubuntu"
-	},
-	"singleSignOnConfig": {
-		"loginURL": "/PlatformService/saml/login",
-		"logoutURL": "/PlatformService/saml/logout",
-		"jwtTokenOriginURL": "http://localhost:8282"
-	},
+	"jwtTokenOriginServerURL":"http://localhost:8282",
 	"serviceHost": "http://localhost:8080",
 	"grafanaHost": "http://localhost:3000",
-	"webhookHost": "http://localhost"
+	"webhookHost": "http://localhost/webhook"
 }

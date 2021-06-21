@@ -1,0 +1,27 @@
+{
+	"dataset": [
+		{
+			"isOnlineRegistration": "true",
+			"onlineRegistrationMode": "nexus",
+			"offlineAgentPath": "C:/downloads/Agents",
+			"unzipPath": "C:/agents/PlatformAgents",
+			"agentExchange": "iAgent",
+			"agentPkgQueue": "INSIGHTS.AGENTS.PACKAGE",
+			"browseRepoUrl": "",
+			"downloadRepoUrl": "",
+			"agentManagement": "Agent Management",
+			"osName": "Windows",
+			"version": "v8.0",
+			"typeName": "Agent",
+			"toolName": "git",
+			"mqUser": "",
+			"mqPassword": "",
+			"agentId": "release_agent_01",
+			"dataLabelName": "SCM.GIT_RELEASE.DATA",
+			"healthLabelName": "SCM.GIT_RELEASE.HEALTH",
+			"accessToken": "",
+			"getRepos": "",
+			"commitsBaseEndPoint": ""
+		}
+	]
+}

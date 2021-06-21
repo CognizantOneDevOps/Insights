@@ -40,7 +40,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 @RestController
-@RequestMapping("/datasource")
+@RequestMapping("/externalApi")
 public class Neo4jPluginLogsController {
 
 	private static final String CHART_TYPE = "chartType";
@@ -88,7 +88,7 @@ public class Neo4jPluginLogsController {
 
 	}
 
-	@PostMapping(value = "/logDashboardInfo", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/Neo4jPluginLog/logDashboardInfo", produces = MediaType.APPLICATION_JSON_VALUE)
 	public void logDashboardInfo(@RequestBody JsonObject dashboardDetails) {
 		String panelId = dashboardDetails.get("panelId").getAsString();
 		int dashboardId = dashboardDetails.get("dashboardId").getAsInt();

@@ -28,7 +28,9 @@ import javax.ws.rs.core.NewCookie;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -37,6 +39,8 @@ import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
+import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationException;
+import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationToken;
 import com.cognizant.devops.platformservice.security.config.SpringAuthority;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -46,6 +50,12 @@ import com.google.gson.JsonParser;
 
 public class GrafanaUserDetailsUtil {
 	private static final Logger log = LogManager.getLogger(GrafanaUserDetailsUtil.class);
+	
+	static Map<String, String> grafanaResponseCookies = new HashMap<>();
+	
+	private GrafanaUserDetailsUtil() {
+		
+	}
 
 	/**
 	 * used to validate grafana user detail and add grafana cookies in request
@@ -57,9 +67,33 @@ public class GrafanaUserDetailsUtil {
 	public static UserDetails getUserDetails(HttpServletRequest request) {
 		log.debug(" Inside getUserDetails function call!");
 		ApplicationConfigProvider.performSystemCheck();
-		String token = ValidationUtils.cleanXSS(request.getHeader(AuthenticationUtils.AUTH_HEADER_KEY)); // 
+		
+		String token = AuthenticationUtils.extractAndValidateAuthToken(request);
+		
+		return checkGrafanaAuthentication(token,request);
+	}
+	
+	public static Authentication getUserDetails(String token) {
+		log.debug(" Inside getUserDetails function call with token!");
+		grafanaResponseCookies = new HashMap<>();
+		ApplicationConfigProvider.performSystemCheck();
+		UserDetails user = checkGrafanaAuthentication(token,null);
+		
+		InsightsAuthenticationToken authenticationGrafana = null;
+		if (user == null) {
+			log.error(" Invalid Authentication for native Grafana ");
+			throw new InsightsAuthenticationException(" Invalid Invalid Authentication for native Grafana ");
+		} else {
+			authenticationGrafana = new InsightsAuthenticationToken(user,grafanaResponseCookies, user.getPassword(), user.getAuthorities());
+			log.debug("In InsightsAuthenticationToken in grafana validation GrantedAuthority ==== {} ",
+					authenticationGrafana.getAuthorities());
+			SecurityContextHolder.getContext().setAuthentication(authenticationGrafana);
+		}
+		return authenticationGrafana;
+	}
+
+	private static UserDetails checkGrafanaAuthentication(String token,HttpServletRequest request) {
 		String authHeader = ValidationUtils.decryptAutharizationToken(token);
-		Map<String, String> grafanaResponseCookies = new HashMap<>();
 		Map<String, String> headers = new HashMap<>();
 		String userName = null;
 		String credential = null;
@@ -95,8 +129,10 @@ public class GrafanaUserDetailsUtil {
 				log.debug("GrafanaUserDetailsUtil ==== Application role is found to be NULL");
 				mappedAuthorities.add(SpringAuthority.valueOf("INVALID"));
 			}
-
-			request.setAttribute("responseHeaders", grafanaResponseCookies);
+			
+			if(request!=null) {
+				request.setAttribute("responseHeaders", grafanaResponseCookies);
+			}
 			return new User(userName, credential, true, true, true, true, mappedAuthorities);
 
 		} catch (Exception e) {

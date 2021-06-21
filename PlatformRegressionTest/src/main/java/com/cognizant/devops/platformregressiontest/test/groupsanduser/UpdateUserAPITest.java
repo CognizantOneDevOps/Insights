@@ -16,14 +16,20 @@
 package com.cognizant.devops.platformregressiontest.test.groupsanduser;
 
 import java.io.IOException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
 import com.cognizant.devops.platformregressiontest.test.common.CommonUtils;
 import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import io.restassured.RestAssured;
 import io.restassured.http.Header;
 import io.restassured.http.Method;
@@ -36,6 +42,7 @@ public class UpdateUserAPITest extends GroupsAndUserTestData {
 
 	String jSessionID;
 	String xsrfToken;
+	String getOrgUsers = "{}";
 
 	@BeforeMethod
 	public void onInit() throws InterruptedException, IOException {
@@ -44,8 +51,48 @@ public class UpdateUserAPITest extends GroupsAndUserTestData {
 		xsrfToken = CommonUtils.getXSRFToken(jSessionID);
 	}
 
-	@Test(priority = 1, dataProvider = "updateuserdataprovider")
+	@Test(priority = 1)
+	public void getOrgsUsers() {
+
+		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("getOrgUsers");
+		RequestSpecification httpRequest = RestAssured.given();
+
+		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
+		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
+				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
+		httpRequest.queryParams("orgId", CommonUtils.getProperty("orgId1"));
+
+		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
+
+		Response response = httpRequest.request(Method.POST, "/");
+
+		String getOrgUserResponse = response.getBody().asString();
+
+		log.debug("getOrgUserResponse : {}", getOrgUserResponse);
+
+		getOrgUsers = getOrgUserResponse;
+
+		int statusCode = response.getStatusCode();
+		Assert.assertEquals(statusCode, 200);
+		Assert.assertTrue(getOrgUserResponse.contains("status"), "success");
+
+	}
+
+	@Test(priority = 2, dataProvider = "updateuserdataprovider")
 	public void editUser(String orgId, String userId, String role) {
+
+		String searchUserId = "-1";
+
+		JsonArray getOrgUsersResponse = new JsonParser().parse(getOrgUsers).getAsJsonObject().get("data")
+				.getAsJsonArray();
+
+		for (JsonElement jsonElement : getOrgUsersResponse) {
+			if (jsonElement.getAsJsonObject().get("login").getAsString().equalsIgnoreCase(userId)) {
+				searchUserId = jsonElement.getAsJsonObject().get("userId").getAsString();
+				break;
+			}
+		}
 
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("updateUser");
 		RequestSpecification httpRequest = RestAssured.given();
@@ -56,7 +103,7 @@ public class UpdateUserAPITest extends GroupsAndUserTestData {
 				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
 		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
 
-		httpRequest.queryParams("orgId", orgId, "userId", userId, "role", role);
+		httpRequest.queryParams("orgId", orgId, "userId", searchUserId, "role", role);
 
 		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 
@@ -72,7 +119,7 @@ public class UpdateUserAPITest extends GroupsAndUserTestData {
 
 	}
 
-	@Test(priority = 2)
+	@Test(priority = 3)
 	public void editUserFail() {
 
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("updateUser");

@@ -53,6 +53,27 @@ case $opt in
 		        	;;   
 				esac
 		        ;;
+		[dD][oO][cC][kK][eE][rR][aA][lL][pP][iI][nN][eE])
+                case $action in 
+                	[uU][nN][iI][nN][sS][tT][aA][lL][lL])
+                		sh +x /etc/init.d/$agentservice stop
+						rm -R /etc/init.d/$agentservice
+						echo "Service un-installation step completed"
+		            ;;
+		         	*)
+		         		echo "Git Running on Linux..."
+						cp -p $INSIGHTS_AGENT_HOME/PlatformAgents/$toolName/$agentservice/$agentservice.sh  /etc/init.d/$agentservice
+						chmod +x /etc/init.d/$agentservice
+						sh +x /etc/init.d/$agentservice status
+						sh +x /etc/init.d/$agentservice stop
+						sh +x /etc/init.d/$agentservice status
+						sh +x /etc/init.d/$agentservice start
+						sh +x /etc/init.d/$agentservice status
+						
+						echo "Service installaton steps completed"
+		        	;;   
+				esac
+		        ;;
         [uU][bB][uU][nN][tT][uU])
 		     case $action in 
                 [uU][nN][iI][nN][sS][tT][aA][lL][lL]) 

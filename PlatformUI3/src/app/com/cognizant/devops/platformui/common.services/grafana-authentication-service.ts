@@ -57,7 +57,7 @@ export class GrafanaAuthenticationService implements IAuthenticationService {
     }
     public getTemplateByQuery(query:any): Promise<any>{
         var restHandler = this.restCallHandlerService;
-        return restHandler.get("GET_TEMPLATE_BY_QUERY",{ 'query': query });
+        return restHandler.postWithData("GET_TEMPLATE_BY_QUERY", query ,"",{'Content-Type':'application/json'}).toPromise();
 
     }
     public fetchDashboardConfigs(): Promise<any> {

@@ -2,3 +2,4 @@ mqHost=localhost
 mqUser = iSight
 mqPassword = iSight
 mqExchangeName=iSight
+port=5672

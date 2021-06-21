@@ -40,7 +40,7 @@ public class InsightsKerberosAuthenticationProvider implements AuthenticationPro
 	private UserDetailsChecker userDetailsChecker = new AccountStatusUserDetailsChecker();
 
 	@Override
-	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+	public Authentication authenticate(Authentication authentication) {
 		KerberosServiceRequestToken responseAuth=null;
 		try {
 			KerberosServiceRequestToken auth = (KerberosServiceRequestToken) authentication;

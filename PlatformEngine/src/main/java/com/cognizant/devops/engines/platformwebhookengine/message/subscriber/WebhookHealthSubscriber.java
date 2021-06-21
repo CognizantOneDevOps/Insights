@@ -16,15 +16,14 @@
 package com.cognizant.devops.engines.platformwebhookengine.message.subscriber;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
-import com.cognizant.devops.engines.platformwebhookengine.message.factory.EngineSubscriberResponseHandler;
-import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
+import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -36,6 +35,7 @@ import com.rabbitmq.client.Envelope;
 
 public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 	private static Logger log = LogManager.getLogger(WebhookHealthSubscriber.class);
+	
 
 	public WebhookHealthSubscriber(String routingKey) throws Exception {
 		super(routingKey);
@@ -45,17 +45,22 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body)
 			throws IOException {
 		GraphDBHandler dbHandler = new GraphDBHandler();
-		String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
+		String message = new String(body, StandardCharsets.UTF_8);
 		String routingKey = envelope.getRoutingKey();
 		log.debug(" {}  Received  {} : {}", consumerTag, routingKey, message);
-		List<JsonObject> dataList = new ArrayList<JsonObject>();
+		List<JsonObject> dataList = new ArrayList<>();
 		JsonElement json = new JsonParser().parse(message);
 		if (json.isJsonObject()) {
 			log.debug("This is normal json object for webhook health ");
 			dataList.add(json.getAsJsonObject());
 		}
-
+		
+		
+		JsonObject messageObj = json.getAsJsonObject();
 		try {
+			
+			log.debug("Type=WebhookHealth {} routingKey={} status={} serverPort={}"
+					,messageObj.get("message").getAsString(),routingKey,messageObj.get("status").getAsString(),messageObj.get("serverPort").getAsString());
 			if (!dataList.isEmpty()) {
 				String healthLabels = ":" + routingKey.replace(".", ":");
 				boolean isRecordUpdate = createHealthNodes(dbHandler, dataList, healthLabels);
@@ -70,7 +75,9 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 						PlatformServiceConstants.FAILURE);
 			}
 		} catch (InsightsCustomException e) {
-			log.error(e);
+			log.error("Type=WebhookHealth routingKey={} message={}  status={} serverPort={} error={}"
+					,routingKey,messageObj.get("message").getAsString(),messageObj.get("status").getAsString(),messageObj.get("serverPort").getAsString(),e);
+			getChannel().basicReject(envelope.getDeliveryTag(), false);
 		}
 
 	}

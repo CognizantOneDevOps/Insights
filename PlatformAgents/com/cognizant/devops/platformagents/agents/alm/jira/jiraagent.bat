@@ -15,15 +15,29 @@ the License.
 :comment
 pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\jira
 setlocal ENABLEDELAYEDEXPANSION
+:AGENTTYPE will be set after UI registration
+set AGENTTYPE=__AGENT_TYPE__
 for /f "delims=" %%i in ('python -V ^2^>^&^1') do (
    set PYTHON_VERSION=%%i
    if "!PYTHON_VERSION:~0,8!" EQU "Python 2" ( 
       echo Detected python 2 version
-	  python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.jira.JiraAgent import JiraAgent; JiraAgent()"
-   ) else (
+      if "%AGENTTYPE%" EQU "Agent" (
+      	echo Running Agent Python 2 ------------------------------------------------
+	  	python -c "from  __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.jira.JiraAgent import JiraAgent; JiraAgent()"
+  	  ) else (
+  	  	echo Running Webhook Python 2 ----------------------------------------------
+  	    python -c "from  __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.jira.JiraWebhookAgent import JiraWebhookAgent; JiraWebhookAgent()"
+  	  )
+  	) else (
       if "!PYTHON_VERSION:~0,8!" EQU "Python 3" ( 
          echo Detected python 3 version
-		 python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.jira.JiraAgent3 import JiraAgent; JiraAgent()"
+          if "%AGENTTYPE%" EQU "Agent" (
+          		echo Running Agent Python 3 ------------------------------------------------
+		 		python -c "from  __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.jira.JiraAgent3 import JiraAgent; JiraAgent()"
+      	   ) else (
+      	   		echo Running Webhook Python 3 ----------------------------------------------
+		  	    python -c "from  __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.jira.JiraWebhookAgent3 import JiraWebhookAgent; JiraWebhookAgent()"
+		   )
       ) else ( 
          echo python version not supported 
       )

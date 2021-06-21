@@ -46,7 +46,7 @@ class JiraAgent(BaseAgent):
          issueModificationTimelineCaptureDate=self.tracking.get("issueModificationTimelineCaptureDate", lastUpdated).split(" ")[0]
          issueModificationTimelineCaptureDate = parser.parse(issueModificationTimelineCaptureDate)
          issueStatusFilter = self.config.get('dynamicTemplate',dict()).get('issueStatusFilter',list())
-         changeLog = self.config.get('changeLog',None)
+         changeLog = self.config.get('dynamicTemplate',dict()).get('changeLog',None)
          if changeLog:
              jiraIssuesUrl = jiraIssuesUrl+'&expand=changelog'
              changeLogFields = changeLog['fields']
@@ -88,12 +88,13 @@ class JiraAgent(BaseAgent):
                  parsedIssue[0]['outwardIssuesMetaData'] = outwardIssuesMetaData
                  if sprintField:
                      self .processSprintInformation(parsedIssue, issue, isIssueStatusFilter, sprintField,self.tracking)
+                 
                  for field in fieldsList:
                      if field not in parsedIssue[0]:
-                         parsedIssue[0][field] = None
+                        parsedIssue[0][field] = None
                      data += parsedIssue
                      if changeLog:
-                         workLogData += self.processChangeLog(issue, changeLogFields, changeLogResponseTemplate, startFromDate, enableIssueModificationTimeline, issueModificationTimeline, issueModificationTimelineCaptureDate)
+                        workLogData += self.processChangeLog(issue, changeLogFields, changeLogResponseTemplate, startFromDate, enableIssueModificationTimeline, issueModificationTimeline, issueModificationTimelineCaptureDate)
              maxResults = response['maxResults']
              total = response['total']
              startAt = response['startAt']
@@ -107,7 +108,7 @@ class JiraAgent(BaseAgent):
                  self.publishToolsData(data, jiraKeyMetadata)
                  #self.publishToolsData(data)
                  if len(workLogData) > 0:
-                     insighstTimeXFieldMapping = self.config.get('changeLog', {}).get('insightsTimeXFieldMapping',None)
+                     insighstTimeXFieldMapping = self.config.get('dynamicTemplate',dict()).get('changeLog', {}).get('insightsTimeXFieldMapping',None)
                      timeStampField=insighstTimeXFieldMapping.get('timefield',None)
                      timeStampFormat=insighstTimeXFieldMapping.get('timeformat',None)
                      isEpoch=insighstTimeXFieldMapping.get('isEpoch',None); 
@@ -143,7 +144,7 @@ class JiraAgent(BaseAgent):
         endDate = parser.parse(lastUpdatedDate) + datetime.timedelta(hours=24)
         endDate = endDate.strftime('%Y-%m-%d %H:%M')
         jiraIssuesUrl = baseUrl+"?jql=updated>='"+lastUpdatedDate+"' AND updated<'"+endDate+"' ORDER BY updated ASC&maxResults="+str(self.config.get("dataFetchCount", 1000))+'&fields='+fields
-        changeLog = self.config.get('changeLog', None)
+        changeLog = self.config.get('dynamicTemplate',dict()).get('changeLog', None)
         if changeLog:
             jiraIssuesUrl = jiraIssuesUrl + '&expand=changelog'
         return jiraIssuesUrl
@@ -573,7 +574,7 @@ class JiraAgent(BaseAgent):
             self.getResponse(url, 'GET', userName, password, None)
             return True 
         except Exception as err:
-            if 'Sprint done not exists' in err.message:
+            if 'Sprint does not exist' in err.message:
                 return False
             else:
                 return  True 

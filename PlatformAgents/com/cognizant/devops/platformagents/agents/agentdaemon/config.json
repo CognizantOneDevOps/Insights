@@ -6,10 +6,12 @@
   },
   "mqConfig": {
     "host": "127.0.0.1",
+    "port": 5672,
     "password": "iSight",
     "user": "iSight",
     "exchange": "iSight",
-    "agentExchange":"iAgent"
+    "agentExchange":"iAgent",
+    "enableDeadLetterExchange":false
   },
   "publish": {
     "data": "DAEMONAGENT.AGENTDAEMON.DATA",

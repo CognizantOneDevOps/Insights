@@ -19,7 +19,7 @@
 		"authToken": "",
 		"boltEndPoint": "bolt://localhost:7687",
 		"maxIdleConnections": 25,
-		"logQueryIfProcessingTimeGreaterThanInMS":5
+		"logQueryIfProcessingTimeGreaterThanInMS": 5
 	},
 	"postgre": {
 		"userName": "",
@@ -33,15 +33,17 @@
 	},
 	"messageQueue": {
 		"host": "localhost",
+		"port": 5672,
 		"user": "",
 		"password": "",
-		"prefetchCount": 5
+		"prefetchCount": 5,
+		"enableDeadLetterExchange":false
 	},
 	"agentDetails": {
 		"isOnlineRegistration": true,
 		"onlineRegistrationMode": "nexus",
-		"browseRepoUrl": "https://infra.cogdevops.com:8443/service/rest/repository/browse/docroot/insights_install/release",
-		"downloadRepoUrl": "https://infra.cogdevops.com:8443/repository/docroot/insights_install/release",
+		"browseRepoUrl": "https://infra.cogdevops.com/service/rest/repository/browse/docroot/insights_install/release",
+		"downloadRepoUrl": "https://infra.cogdevops.com/repository/docroot/insights_install/release",
 		"nexusUserName": "",
 		"nexusPassword": "",
 		"docrootUrl": "https://platform.cogdevops.com//insights_install/release",

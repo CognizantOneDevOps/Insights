@@ -24,7 +24,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -38,22 +37,6 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 @Configuration
 public class CommonBeanConfiguration {
 	private static Logger LOG = LogManager.getLogger(CommonBeanConfiguration.class);
-
-	/**
-	 * This method is used to create message source based on
-	 * src/main/resources/messages
-	 * 
-	 * @return
-	 */
-	@Bean
-	public ReloadableResourceBundleMessageSource messageSource() {
-		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-		messageSource.setBasenames("classpath:/messages/build/msg", "classpath:/messages/deploy/msg",
-				"classpath:/messages/codequality/msg", "i18n");
-		messageSource.setDefaultEncoding("UTF-8");
-		messageSource.setCacheSeconds(120);
-		return messageSource;
-	}
 
 	/**
 	 * used to read and write byte arrays based on filter
@@ -79,7 +62,7 @@ public class CommonBeanConfiguration {
 		list.add(MediaType.APPLICATION_OCTET_STREAM);
 		return list;
 	}
-	
+
 	/**
 	 * used for CORS validation, A container for CORS configuration to validate
 	 * against the actual origin, HTTP methods, and headers of a given request.
@@ -94,6 +77,7 @@ public class CommonBeanConfiguration {
 		for (String hostName : ApplicationConfigProvider.getInstance().getTrustedHosts()) {
 			allowedOriginHost.add(hostName);
 		}
+		LOG.debug("Setting up corsConfigurationSource, Allow Origin host are {} ", allowedOriginHost);
 		configuration.setAllowedOrigins(allowedOriginHost);
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "OPTIONS", "PUT", "DELETE", "PATCH"));
 		configuration.setAllowCredentials(true);
@@ -105,8 +89,8 @@ public class CommonBeanConfiguration {
 
 	/**
 	 * used for initialization of MultipartResolver ,MultipartResolver check files
-	 * in our application it apply before initialization.
-	 * It restirct any unwanted file attact in our application.
+	 * in our application it apply before initialization. It restirct any unwanted
+	 * file attact in our application.
 	 * 
 	 * @return
 	 */

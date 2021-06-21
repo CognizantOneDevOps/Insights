@@ -16,6 +16,7 @@
 package com.cognizant.devops.platformregressiontest.test.groupsanduser;
 
 import java.io.IOException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
@@ -24,6 +25,9 @@ import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformregressiontest.test.common.CommonUtils;
 import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 import io.restassured.RestAssured;
 import io.restassured.http.Header;
@@ -37,6 +41,7 @@ public class DeleteUserAPITest extends GroupsAndUserTestData {
 
 	String jSessionID;
 	String xsrfToken;
+	String getOrgUsers="{}";
 
 	@BeforeMethod
 	public void onInit() throws InterruptedException, IOException {
@@ -63,7 +68,9 @@ public class DeleteUserAPITest extends GroupsAndUserTestData {
 
 		String getOrgUserResponse = response.getBody().asString();
 
-		log.debug("getOrgUserResponse" + getOrgUserResponse);
+		log.debug("getOrgUserResponse : {}", getOrgUserResponse);
+		
+		getOrgUsers=getOrgUserResponse;
 
 		int statusCode = response.getStatusCode();
 		Assert.assertEquals(statusCode, 200);
@@ -71,9 +78,21 @@ public class DeleteUserAPITest extends GroupsAndUserTestData {
 
 	}
 
-	@Test(priority = 2, dataProvider = "updateuserdataprovider")
-	public void deleteUser(String orgId, String userId, String role) {
-
+	@Test(priority = 3, dataProvider = "userdataprovider")
+	public void deleteUser(String name, String email, String userName, String password,
+			 String role, String orgName, String orgId) {
+		String userId="-1";
+		
+		JsonArray getOrgUsersResponse = new JsonParser().parse(getOrgUsers).getAsJsonObject().get("data").getAsJsonArray();
+		
+		for (JsonElement jsonElement : getOrgUsersResponse) {
+			if(jsonElement.getAsJsonObject().get("login").getAsString().equalsIgnoreCase(userName)) {
+				userId = jsonElement.getAsJsonObject().get("userId").getAsString();
+				break;
+			}
+		}
+		
+		log.debug(" userName {} userId selected for delete  {} ",userName,userId);
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("deleteUser");
 		RequestSpecification httpRequest = RestAssured.given();
 
@@ -90,7 +109,7 @@ public class DeleteUserAPITest extends GroupsAndUserTestData {
 
 		String deleteUser = response.getBody().asString();
 
-		log.debug("deleteUser" + deleteUser);
+		log.debug("deleteUser  {} ",  deleteUser);
 
 		int statusCode = response.getStatusCode();
 		Assert.assertEquals(statusCode, 200);

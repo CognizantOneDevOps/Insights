@@ -1,0 +1,28 @@
+{
+	"reportId": "600",
+	"reportName": "REPORT_SONAR_JENKINS_PROD",
+	"description": "Regression Testing",
+	"isActive": true,
+	"file": "REPORT_SONAR_JENKINS_PROD",
+	"visualizationutil": "Fusion",
+	"kpiConfigs": [
+		{
+			"kpiId": 102109,
+			"visualizationConfigs": [
+				{
+					"vType": "msbar2d_102109",
+					"vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN   apoc.date.format( n.recordDate ,'s','MM/dd','IST') as Date , n.Failure as Failure, n.Success as Success ORDER BY Date DESC"
+				}
+			]
+		},
+		{
+			"kpiId": 113104,
+			"visualizationConfigs": [
+				{
+					"vType": "mscolumn2d_113104",
+					"vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  apoc.date.format( n.recordDate ,'s','MM/dd','IST') as Date , n.Bugs as Bugs,n.Vulnerablilities as Vulnerablilities,n.CodeSmell as CodeSmell ORDER BY n.executionId ASC limit 2"
+				}
+			]
+		}
+	]
+}

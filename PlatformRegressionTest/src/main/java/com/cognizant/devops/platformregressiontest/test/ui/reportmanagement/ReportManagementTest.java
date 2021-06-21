@@ -15,8 +15,9 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.ui.reportmanagement;
 
+import java.io.File;
+
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -25,54 +26,48 @@ import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectMod
 
 public class ReportManagementTest extends LoginAndSelectModule {
 
-	AssessmentReportConfiguration clickAllButton;
+	AssessmentReportConfiguration assessmentReportPage;
 
 	@BeforeTest
 	public void setUp() {
 		initialization();
-		getData(ConfigOptionsTest.REPORT_JSON_FILE);
-		selectMenuOption(LoginAndSelectModule.testData.get("reportManagement"));		
-		clickAllButton = new AssessmentReportConfiguration();
+		getData(ConfigOptionsTest.REPORT_MANAGEMENT_DIR + File.separator + ConfigOptionsTest.REPORT_JSON_FILE);
+		selectMenuOption("Report Management");
+		assessmentReportPage = new AssessmentReportConfiguration();
 	}
 
 	@Test(priority = 1)
 	public void addReport() {
 
-		Assert.assertTrue(clickAllButton.addNewReport(), "Not able to add Report");
-		Assert.assertTrue(clickAllButton.navigateToReportsLandingPage(),
+		Assert.assertTrue(assessmentReportPage.addNewReport(), "Not able to add Report");
+		Assert.assertTrue(assessmentReportPage.navigateToReportsLandingPage(),
 				"Not able to navigate to reports landing page");
 	}
 
 	@Test(priority = 2)
 	public void duplicateRecordError() {
 
-		Assert.assertTrue(clickAllButton.navigateToReportsLandingPage(), "ReportName already exists");
+		Assert.assertTrue(assessmentReportPage.navigateToReportsLandingPage(), "ReportName already exists");
 
 	}
 
 	@Test(priority = 3)
 	public void updateReport() throws InterruptedException {
 
-		Assert.assertTrue(clickAllButton.editReport(), "Not able to navigate to landing page");
+		Assert.assertTrue(assessmentReportPage.editReport(), "Not able to navigate to landing page");
 
 	}
 
 	@Test(priority = 4)
 	public void inActiveReport() throws InterruptedException {
 
-		Assert.assertTrue(clickAllButton.inActiveReport(), "Not able to navigate to reports landing page");
+		Assert.assertTrue(assessmentReportPage.inActiveReport(), "Not able to navigate to reports landing page");
 
 	}
 
 	@Test(priority = 5)
 	public void deleteReport() {
-		Assert.assertTrue(clickAllButton.deleteReport(), "Not able to delete the report");
-	}
-
-	@AfterTest
-	public void tearDown() {
-
-		driver.quit();
+		Assert.assertTrue(assessmentReportPage.deleteReport(), "Not able to delete the report");
 	}
 
 }

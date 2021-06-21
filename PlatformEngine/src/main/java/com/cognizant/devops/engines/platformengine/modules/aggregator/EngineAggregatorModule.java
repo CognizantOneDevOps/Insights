@@ -32,7 +32,6 @@ import com.cognizant.devops.engines.platformengine.message.subscriber.AgentDataS
 import com.cognizant.devops.engines.platformengine.message.subscriber.AgentHealthSubscriber;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
@@ -105,15 +104,16 @@ public class EngineAggregatorModule extends TimerTask implements ApplicationConf
 				keyPattern = enrichTool.get("keyPattern").getAsString();
 				sourceProperty = enrichTool.get("sourceProperty").getAsString();
 			}
-			log.debug(" dataRoutingKey {} Tool Info {}" ,dataRoutingKey , toolName);
+			log.debug(" Type=AgentEngine toolName={} category={} agentId={} routingKey={} dataSize={} execId={} ProcessingTime={} dataRoutingKey {} Tool Info {}" ,toolName,agentConfig.getToolCategory(),agentConfig.getAgentKey(),dataRoutingKey,0,"-",0,dataRoutingKey,toolName);
 
 			if (dataRoutingKey != null && !registry.containsKey(dataRoutingKey)) {
 				try {
 					registry.put(dataRoutingKey, new AgentDataSubscriber(dataRoutingKey,
 							agentConfig.getToolCategory(), agentConfig.getLabelName(), toolName, businessMappingList,isEnrichmentRequired, targetProperty,
-							keyPattern,sourceProperty));
+							keyPattern,sourceProperty,agentConfig.getAgentKey()));
+					log.debug(" Type=AgentEngine toolName={} category={} agentId={} routingKey={} dataSize={} execId={} ProcessingTime={} Successfully registered data subscriber for routing key: {}  " ,toolName,agentConfig.getToolCategory(),agentConfig.getAgentKey(),dataRoutingKey,0,"-",0,dataRoutingKey);
 				} catch (Exception e) {
-					log.error("Unable to add data subscriber for routing key: {} " , dataRoutingKey, e);
+					log.error(" toolName={} category={} agentId={} routingKey={} Unable to add data subscriber for routing key: {} " ,toolName,agentConfig.getToolCategory(),agentConfig.getAgentKey(),dataRoutingKey, dataRoutingKey, e);
 					EngineStatusLogger.getInstance().createEngineStatusNode(
 							" Error occured while executing aggragator for data queue subscriber " + e.getMessage(),
 							PlatformServiceConstants.FAILURE);
@@ -133,8 +133,9 @@ public class EngineAggregatorModule extends TimerTask implements ApplicationConf
 				try {
 					graphDBHandler.executeCypherQuery("MERGE (n" + nodeLabels + ") return n");
 					registry.put(healthRoutingKey, new AgentHealthSubscriber(healthRoutingKey));
+					log.debug(" Type=AgentEngine toolName={} category={} agentId={} routingKey={} dataSize={} execId={} ProcessingTime={} Successfully registered health subscriber for routing key: {}  " ,toolName,agentConfig.getToolCategory(),agentConfig.getAgentKey(),healthRoutingKey,0,"-",0,healthRoutingKey);
 				} catch (Exception e) {
-					log.error("Unable to add subscriber for routing key: {}", healthRoutingKey, e);
+					log.error(" toolName={} category={} agentId={} routingKey={} Unable to add health subscriber for routing key: {}",toolName,agentConfig.getToolCategory(),agentConfig.getAgentKey(),healthRoutingKey,healthRoutingKey, e);
 					EngineStatusLogger.getInstance().createEngineStatusNode(
 							" Error occured while executing aggragator for health queue subscriber  " + e.getMessage(),
 							PlatformServiceConstants.FAILURE);
@@ -145,7 +146,7 @@ public class EngineAggregatorModule extends TimerTask implements ApplicationConf
 			}
 
 		} catch (Exception e) {
-			log.error("Unable to add subscriber for routing key:. {}", agentConfig.getAgentKey(), e);
+			log.error("Unable to add subscriber for routing key: {}",agentConfig.getAgentKey(), e);
 			EngineStatusLogger.getInstance().createEngineStatusNode(
 					" Error occured while executing aggragator  " + agentConfig.getAgentKey() + e.getMessage(),
 					PlatformServiceConstants.FAILURE);

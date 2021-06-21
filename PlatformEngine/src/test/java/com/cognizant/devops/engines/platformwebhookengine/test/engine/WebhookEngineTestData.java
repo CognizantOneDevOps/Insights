@@ -28,10 +28,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
 import com.cognizant.devops.platformdal.webhookConfig.WebhookDerivedConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -43,10 +44,9 @@ import com.google.gson.JsonParser;
 import com.rabbitmq.client.AMQP.Exchange.DeclareOk;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 
 public class WebhookEngineTestData {
-	
+
 	/*
 	 * Webhook test data
 	 */
@@ -112,50 +112,42 @@ public class WebhookEngineTestData {
 		return setWebhookDerivedConfigs;
 	}
 
-	
-	
 	public JsonObject getJsonObject(String jsonString) {
 		Gson gson = new Gson();
 		JsonElement jelement = gson.fromJson(jsonString.trim(), JsonElement.class);
 		return jelement.getAsJsonObject();
 	}
-	
+
 	@SuppressWarnings("unused")
 	public void publishMessage(String queueName, String routingKey, String playload)
-			throws IOException, TimeoutException {
-
-		ConnectionFactory factory = new ConnectionFactory();
-		MessageQueueDataModel messageQueueConfig = ApplicationConfigProvider.getInstance().getMessageQueue();
-		factory.setHost(messageQueueConfig.getHost());
-		factory.setUsername(messageQueueConfig.getUser());
-		factory.setPassword(messageQueueConfig.getPassword());
+			throws IOException, TimeoutException, InsightsCustomException {
 		String exchangeName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentExchange();
 		Connection connection = null;
 		Channel channel = null;
-		connection = factory.newConnection();
+		connection = RabbitMQConnectionProvider.getConnection();
 		channel = connection.createChannel();
 		String message = new GsonBuilder().disableHtmlEscaping().create().toJson(playload);
 		message = message.substring(1, message.length() - 1).replace("\\", "");
 		DeclareOk exchangeResp;
 		try {
 			exchangeResp = channel.exchangeDeclarePassive(exchangeName);
-			channel.queueDeclare(queueName, true, false, false, null);
+			channel.queueDeclare(queueName, true, false, false, RabbitMQConnectionProvider.getQueueArguments());
 			channel.queueBind(queueName, exchangeName, routingKey);
 			channel.basicPublish(exchangeName, routingKey, null, message.getBytes());
-			connection.close();
+			//connection.close();
 		} catch (IOException e) {
 
 			/*
-			 * if exception raised means exchange doesen't exists creating
-			 * exchange in next block
+			 * if exception raised means exchange doesen't exists creating exchange in next
+			 * block
 			 */
 
 			try {
 				channel.exchangeDeclare(exchangeName, MQMessageConstants.EXCHANGE_TYPE);
-				channel.queueDeclare(queueName, true, false, false, null);
+				channel.queueDeclare(queueName, true, false, false, RabbitMQConnectionProvider.getQueueArguments());
 				channel.queueBind(queueName, exchangeName, routingKey);
 				channel.basicPublish(exchangeName, routingKey, null, message.getBytes());
-				connection.close();
+				//connection.close();
 			} catch (IOException e1) {
 				LOG.error(e1);
 			}
@@ -163,34 +155,29 @@ public class WebhookEngineTestData {
 		}
 
 	}
-	
+
 	@SuppressWarnings("rawtypes")
-	public static Map readNeo4JData(String nodeName , String compareFlag)
-	{
-	
-		Map map=null;
+	public static Map readNeo4JData(String nodeName, String compareFlag) {
+
+		Map map = null;
 		ObjectMapper mapper = new ObjectMapper();
 		GraphDBHandler dbHandler = new GraphDBHandler();
 		String query = "MATCH (n:" + nodeName + ") where n." + compareFlag
 				+ "='8ea6c42b96d5c0ffdaf3622720450e2d5def75e6' return n";
 		GraphResponse neo4jResponse;
 		try {
-		neo4jResponse = dbHandler.executeCypherQuery(query);
-		JsonElement tooldataObject = neo4jResponse.getJson().get("results")
-					                        .getAsJsonArray().get(0)
-					                        .getAsJsonObject().get("data")
-					                        .getAsJsonArray()
-					                        .get(0).getAsJsonObject()
-					                        .get("row");			
+			neo4jResponse = dbHandler.executeCypherQuery(query);
+			JsonElement tooldataObject = neo4jResponse.getJson().get("results").getAsJsonArray().get(0)
+					.getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row");
 
-		String finalJson = tooldataObject.toString().replace("[", "").replace("]", "");
-		//Gson gson = new Gson();
-			//map = gson.fromJson(finalJson, Map.class); GraphDB
+			String finalJson = tooldataObject.toString().replace("[", "").replace("]", "");
+			// Gson gson = new Gson();
+			// map = gson.fromJson(finalJson, Map.class); GraphDB
 			map = mapper.readValue(finalJson, Map.class);
 		} catch (Exception e) {
 			LOG.error(e);
-		} 
-		return map;				
+		}
+		return map;
 	}
-	
+
 }

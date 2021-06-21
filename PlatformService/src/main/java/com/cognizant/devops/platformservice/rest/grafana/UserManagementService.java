@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.rest.grafana;
 
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
@@ -74,6 +77,10 @@ public class UserManagementService {
 		JsonObject request = new JsonObject();
 		request.addProperty("role", role);
 		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
+		String authString = ApplicationConfigProvider.getInstance().getGrafana().getAdminUserName() + ":"
+				+ ApplicationConfigProvider.getInstance().getGrafana().getAdminUserPassword();
+		String encodedString = Base64.getEncoder().encodeToString(authString.getBytes());
+		headers.put("Authorization", "Basic " + encodedString);
 		return grafanaHandler.grafanaPatch(PATH + orgId + "/users/" + userId, request, headers);
 	}
 
@@ -81,6 +88,10 @@ public class UserManagementService {
 	public String deleteOrganizationUser(@RequestParam int orgId, @RequestParam int userId, @RequestParam String role) throws InsightsCustomException {
 		log.debug("%n%nInside deleteOrganizationUser method call");
 		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
+		String authString = ApplicationConfigProvider.getInstance().getGrafana().getAdminUserName() + ":"
+				+ ApplicationConfigProvider.getInstance().getGrafana().getAdminUserPassword();
+		String encodedString = Base64.getEncoder().encodeToString(authString.getBytes());
+		headers.put("Authorization", "Basic " + encodedString);
 		return grafanaHandler.grafanaDelete(PATH + orgId + "/users/" + userId, headers);
 		
 	}

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,6 +48,7 @@ public class WebhookOfflineEventProcessing extends TimerTask implements Applicat
 	WebHookConfigDAL dal = new WebHookConfigDAL();
 	private GraphDBHandler dbHandler = new GraphDBHandler();
 	private static Logger log = LogManager.getLogger(WebhookOfflineEventProcessing.class);
+	
 
 	@Override
 	public void run() {
@@ -100,11 +102,19 @@ public class WebhookOfflineEventProcessing extends TimerTask implements Applicat
 				}
 			if (checkDueMaxEventProcessTime(eventNode.get("eventTimestamp").getAsLong())
 										|| webhookEventProcessing.doEvent()) {
+									long startTime = System.nanoTime();
 									updateNeo4jNode(webhookEventConfig.getLabelName(), uuid);
+									long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
 									log.debug("Webhook Offline Event Processing ==== Event processed successfully for payloads {}",eventNode);
+									log.debug("Type=WebhookEngine toolName={} category={} WebHookName={} routingKey={} dataSize={} execId={} ProcessingTime={} {} webhook data processed successfully "
+											,webhookEventConfig.getToolName(),"-",webhookEventConfig.getWebHookName(),webhookEventConfig.getMQChannel()
+											,0,"-",processingTime, webhookEventConfig.getWebHookName());
 			}}
 						}catch (Exception e) {
 							log.error("Webhook Offline Event Processing ====== something went wrong while offline processing");
+							log.error("Type=WebhookEngine toolName={} category={} WebHookName={} routingKey={} dataSize={} execId={} ProcessingTime={} ={} "
+									,webhookEventConfig.getToolName(),"-",webhookEventConfig.getWebHookName(),webhookEventConfig.getMQChannel()
+									,0,"-",0, e.getMessage());
 						}
 		}
 		}

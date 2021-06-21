@@ -32,14 +32,14 @@ import com.cognizant.devops.platformservice.rest.querycaching.service.QueryCachi
 import com.google.gson.JsonObject;
 
 @RestController
-@RequestMapping("/datasource")
+@RequestMapping("/externalApi")
 public class QueryCachingController {
 
 	private static Logger log = LogManager.getLogger(QueryCachingServiceImpl.class);
 	@Autowired
 	QueryCachingService queryCachingService;
 
-	@PostMapping(value = "/neo4jds", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/datasource/neo4jds", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject getNeo4jDatasource(HttpServletRequest request) {
 		String payloadRequest = null;
 		JsonObject results = new JsonObject();

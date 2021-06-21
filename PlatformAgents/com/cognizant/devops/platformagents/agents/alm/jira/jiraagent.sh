@@ -30,76 +30,91 @@
 #export INSIGHTS_AGENT_HOME=/home/ec2-user/insightsagents
 source /etc/profile
 python_version="$(python -V 2>&1)"
+#agent_type will be set after UI registration
+agent_type=__AGENT_TYPE__
 detectPythonVersion()
 {
      if echo "$1" | grep -q "Python 2"; then
       echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.jira.JiraAgent import JiraAgent; JiraAgent()" &
-     elif echo "$1" | grep -q "Python 3"; then
+		  if [ $agent_type = "Agent" ]; then
+			echo "Running Agent Python 2 ------------------------------------------------"
+			python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.jira.JiraAgent import JiraAgent; JiraAgent()" &
+		  else
+			echo "Running Webhook Python 2 ----------------------------------------------"
+			python -c "from  __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.jira.JiraWebhookAgent import JiraWebhookAgent; JiraWebhookAgent()" &
+		  fi
+  	 elif echo "$1" | grep -q "Python 3"; then
       echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.jira.JiraAgent3 import JiraAgent; JiraAgent()" &
+		  if [ $agent_type = "Agent" ]; then
+			echo "Running Agent Python 3 ------------------------------------------------"
+			python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.jira.JiraAgent3 import JiraAgent; JiraAgent()" &
+		  else
+			echo "Running Webhook Python 3 ----------------------------------------------"
+			python -c "from  __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.jira.JiraWebhookAgent3 import JiraWebhookAgent; JiraWebhookAgent()" &
+		  fi
      else
       echo "python version not supported"
 	  exit 1;
      fi
+
 
 }
 
 case "$1" in
   start)
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsJiraAgent already running"
+     echo "__AGENT_KEY__ already running"
     else
-     echo "Starting InSightsJiraAgent"
+     echo "Starting __AGENT_KEY__"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/jira
 	 echo $python_version
      detectPythonVersion "$python_version"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsJiraAgent Started Sucessfully"
+     echo "__AGENT_KEY__ Started Sucessfully"
     else
-     echo "InSightsJiraAgent Failed to Start"
+     echo "__AGENT_KEY__ Failed to Start"
     fi
     ;;
   stop)
-    echo "Stopping InSightsJiraAgent"
+    echo "Stopping __AGENT_KEY__"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
     else
-     echo "InSightsJiraAgent already in stopped state"
+     echo "__AGENT_KEY__ already in stopped state"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsJiraAgent Failed to Stop"
+     echo "__AGENT_KEY__ Failed to Stop"
     else
-     echo "InSightsJiraAgent Stopped"
+     echo "__AGENT_KEY__ Stopped"
     fi
     ;;
   restart)
-    echo "Restarting InSightsJiraAgent"
+    echo "Restarting __AGENT_KEY__"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsJiraAgent stopping"
+     echo "__AGENT_KEY__ stopping"
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
-     echo "InSightsJiraAgent stopped"
-     echo "InSightsJiraAgent starting"
+     echo "__AGENT_KEY__ stopped"
+     echo "__AGENT_KEY__ starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/jira
 	 echo $python_version
      detectPythonVersion "$python_version"
-     echo "InSightsJiraAgent started"
+     echo "__AGENT_KEY__ started"
     else
-     echo "InSightsJiraAgent already in stopped state"
-     echo "InSightsJiraAgent starting"
+     echo "__AGENT_KEY__ already in stopped state"
+     echo "__AGENT_KEY__ starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/jira
 	 echo $python_version
      detectPythonVersion "$python_version"
-     echo "InSightsJiraAgent started"
+     echo "__AGENT_KEY__ started"
     fi
     ;;
   status)
-    echo "Checking the Status of InSightsJiraAgent"
+    echo "Checking the Status of __AGENT_KEY__"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsJiraAgent is running"
+     echo "__AGENT_KEY__ is running"
     else
-     echo "InSightsJiraAgent is stopped"
+     echo "__AGENT_KEY__ is stopped"
     fi
     ;;
   *)

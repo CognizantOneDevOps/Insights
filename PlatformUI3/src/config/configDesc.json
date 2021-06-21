@@ -1,4 +1,10 @@
 {
+	"agentsOsList": {
+		"Windows": "windows",
+		"RHEL/CentOS": "linux",
+		"Docker/Alpine": "dockerAlpine",
+		"Ubuntu": "Ubuntu"
+	},
 	"desriptions": {
 		"mqConfig": "Message Queue Config",
 		"subscribe": "Subscribe",
@@ -35,5 +41,21 @@
 		"ldapConfiguration": "Ldap Configuration",
 		"webhookEngine": "Webhook Engine",
 		"applicationLogLevel": "Application Log Level"
+	},
+	"NativeGrafana": {
+		"loginURL": "/PlatformService/user/authenticate",
+		"logoutURL": "/PlatformService/user/logout"
+	},
+	"SAML": {
+		"loginURL": "/PlatformService/saml/login",
+		"logoutURL": "/PlatformService/saml/logout"
+	},
+	"Kerberos": {
+		"loginURL": "/PlatformService/user/insightsso/kerberosLogin",
+		"logoutURL": ""
+	},
+	"JWT": {
+		"loginURL": "/PlatformService/user/insightsso/authenticateJWT",
+		"logoutURL": "/PlatformService/user/insightsso/logout"
 	}
 }

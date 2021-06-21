@@ -13,7 +13,7 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>8.0</version>
+		<version>8.1</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -21,7 +21,7 @@
 	<artifactId>PlatformWorkflow</artifactId>
 	<packaging>jar</packaging>
 	<name>PlatformWorkflow</name>
-	<version>8.0</version>
+	<version>8.1</version>
 	<description>PlatformWorkflow to implement workflow in Insights enviroment </description>
 	<url>http://maven.apache.org</url>
 
@@ -64,12 +64,12 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>8.0</version>
+			<version>8.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>8.0</version>
+			<version>8.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>

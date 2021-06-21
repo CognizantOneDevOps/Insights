@@ -24,12 +24,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
-import com.cognizant.devops.engines.platformwebhookengine.message.factory.EngineSubscriberResponseHandler;
+import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.engines.platformwebhookengine.message.subscriber.WebHookDataSubscriber;
 import com.cognizant.devops.engines.platformwebhookengine.message.subscriber.WebhookHealthSubscriber;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfigDAL;
@@ -38,7 +37,11 @@ public class WebHookEngineAggregatorModule extends TimerTask  implements Applica
 	private static Logger log = LogManager.getLogger(WebHookEngineAggregatorModule.class.getName());
 	
 	private static Map<String, EngineSubscriberResponseHandler> registry = new HashMap<>();
+	private Map<String,String> loggingInfo = new HashMap<>();
 	private static final String WEBHOOK_HEALTH_ROUTING_KEY = "WEBHOOKSUBSCRIBER_HEALTH";
+	private static  final String TOOL_NAME ="toolName";
+	private static final String AGENT_ID ="agentId";
+	
 
 	@Override
 	public void run() {
@@ -49,6 +52,8 @@ public class WebHookEngineAggregatorModule extends TimerTask  implements Applica
 			WebHookConfigDAL webhookConfigDal = new WebHookConfigDAL();
 			List<WebHookConfig> allWebhookConfigurations = webhookConfigDal.getAllActiveWebHookConfigurations();
 			for (WebHookConfig webhookConfig : allWebhookConfigurations) {
+				loggingInfo.put(TOOL_NAME, webhookConfig.getToolName());
+				loggingInfo.put(AGENT_ID, webhookConfig.getWebHookName());
 				registerAggragators(webhookConfig);
 			}
 			registerWebhookHealthAggragators(WEBHOOK_HEALTH_ROUTING_KEY);
@@ -67,7 +72,7 @@ public class WebHookEngineAggregatorModule extends TimerTask  implements Applica
 		try {
 			if (dataRoutingKey != null && !registry.containsKey(dataRoutingKey)) {
 				registry.put(dataRoutingKey, new WebHookDataSubscriber(webhookConfig, dataRoutingKey));
-				log.debug("Webhook {} subscribed successfully ", webhookConfig.getWebHookName());
+				log.debug(" Type=WebhookEngine toolName={} category={} WebHookName={} routingKey={} dataSize={} execId={} ProcessingTime={} Webhook {} subscribed successfully ",loggingInfo.get(TOOL_NAME),"-",loggingInfo.get(AGENT_ID),dataRoutingKey,0,"-",0, webhookConfig.getWebHookName());
 				EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
 						"Webhook " + webhookConfig.getWebHookName() + " subscribed successfully ",
 						PlatformServiceConstants.SUCCESS);
@@ -79,7 +84,7 @@ public class WebHookEngineAggregatorModule extends TimerTask  implements Applica
 			EngineStatusLogger.getInstance().createWebhookEngineStatusNode("Unable to subscribed Webhook "
 					+ webhookConfig.getWebHookName() + " Error Detail :" + e.getMessage(),
 					PlatformServiceConstants.FAILURE);
-			log.error("Unable to add subscriber for routing key: ", e);
+			log.error(" toolName={} agentId={} routingKey={} Unable to add subscriber for routing key: ",loggingInfo.get(TOOL_NAME),loggingInfo.get(AGENT_ID),dataRoutingKey, e);
 		}
 	}
 
@@ -87,7 +92,7 @@ public class WebHookEngineAggregatorModule extends TimerTask  implements Applica
 		try {
 			if (healthRoutingKey != null && !registry.containsKey(healthRoutingKey)) {
 				registry.put(healthRoutingKey, new WebhookHealthSubscriber(healthRoutingKey));
-				log.debug("Webhook Hea2lth Queue subscribed successfully{} ", healthRoutingKey);
+				log.debug(" Type=WebhookEngine toolName={} category={} WebHookName={} routingKey={} dataSize={} execId={} ProcessingTime={} Webhook Health Queue subscribed successfully{} ",loggingInfo.get(TOOL_NAME),"-",loggingInfo.get(AGENT_ID),healthRoutingKey,0,"-",0, healthRoutingKey);
 				EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
 						"Webhook  Health Queue " + healthRoutingKey + " subscribed successfully ",
 						PlatformServiceConstants.SUCCESS);
@@ -95,7 +100,7 @@ public class WebHookEngineAggregatorModule extends TimerTask  implements Applica
 		} catch (Exception e) {
 			EngineStatusLogger.getInstance().createWebhookEngineStatusNode("Unable to subscribed Webhook Health Queue "
 					+ healthRoutingKey + " Error Detail :" + e.getMessage(), PlatformServiceConstants.FAILURE);
-			log.error("Unable to add health subscriber for routing key: ", e);
+			log.error(" toolName={} agentId={} routingKey={} Unable to add health subscriber for routing key: ",loggingInfo.get(TOOL_NAME),loggingInfo.get(AGENT_ID),healthRoutingKey, e);
 
 		}
 	}

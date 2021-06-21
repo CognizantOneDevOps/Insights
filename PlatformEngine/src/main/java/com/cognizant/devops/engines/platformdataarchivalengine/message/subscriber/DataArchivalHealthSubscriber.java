@@ -19,6 +19,8 @@ package com.cognizant.devops.engines.platformdataarchivalengine.message.subscrib
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,6 +44,7 @@ public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandle
 	private static Logger log = LogManager.getLogger(DataArchivalHealthSubscriber.class.getName());
 	GraphDBHandler dbHandler = new GraphDBHandler();
 	DataArchivalConfigDal dataArchivalConfigDal = new DataArchivalConfigDal();
+	private Map<String,String> loggingInfo = new ConcurrentHashMap<>();
 
 	public DataArchivalHealthSubscriber(String routingKey) throws Exception {
 		super(routingKey);
@@ -50,30 +53,34 @@ public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandle
 	@Override
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body)
 			throws IOException {
+		
 		String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
-		String routingKey = envelope.getRoutingKey();
-		log.debug(" Received :{} {} {}", consumerTag, routingKey, message);
-		List<JsonObject> dataList = new ArrayList<>();
-		List<JsonObject> failedDataList = new ArrayList<>();
-		Boolean isFailure = false;
-		String healthStatus = "";
-		JsonElement json = new JsonParser().parse(message);
-		JsonObject messageJson = json.getAsJsonArray().get(0).getAsJsonObject();
-		String agentId = messageJson.get("agentId").getAsString();
-		String toolName = messageJson.get("toolName").getAsString();
-		messageJson.addProperty("toolName", toolName);
-		String categoryName = messageJson.get("categoryName").getAsString();
-		messageJson.addProperty("category", categoryName);
-		if (messageJson.has("status")) {
-			healthStatus = messageJson.get("status").getAsString();
-			if (healthStatus.equalsIgnoreCase("failure")) {
-				isFailure = true;
-				failedDataList.add(messageJson);
-			}
-		}
-		dataList.add(messageJson);
-
 		try {
+			String routingKey = envelope.getRoutingKey();
+			List<JsonObject> dataList = new ArrayList<>();
+			List<JsonObject> failedDataList = new ArrayList<>();
+			Boolean isFailure = false;
+			String healthStatus = "";
+			JsonElement json = new JsonParser().parse(message);
+			JsonObject messageJson = json.getAsJsonArray().get(0).getAsJsonObject();
+			String agentId = messageJson.get("agentId").getAsString();
+			String toolName = messageJson.get("toolName").getAsString();
+			messageJson.addProperty("toolName", toolName);
+			String categoryName = messageJson.get("categoryName").getAsString();
+			messageJson.addProperty("category", categoryName);
+			loggingInfo.put("toolName", toolName);
+			loggingInfo.put("category", categoryName);
+			loggingInfo.put("agentId", agentId);
+			loggingInfo.put("execId", messageJson.get("execId").getAsString());
+			log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Received :{} {} {}",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),"-",loggingInfo.get("execId"), consumerTag, routingKey, message);
+			if (messageJson.has("status")) {
+				healthStatus = messageJson.get("status").getAsString();
+				if (healthStatus.equalsIgnoreCase("failure")) {
+					isFailure = true;
+					failedDataList.add(messageJson);
+				}
+			}
+			dataList.add(messageJson);
 			String healthLabels = ":LATEST:" + routingKey.replace(".", ":");
 			createHealthNodes(dataList, agentId, healthLabels, 10, "LATEST");
 			if (isFailure) {
@@ -84,10 +91,10 @@ public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandle
 				updateErrorStateInArchivalRecord(messageJson);
 			}
 			getChannel().basicAck(envelope.getDeliveryTag(), false);
+			log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Data Archival Health message processed.",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),"-",loggingInfo.get("execId"));
 		} catch (InsightsCustomException e) {
-			log.error("Error occured in Data Archival Health Subscriber",e);
-			log.error("Health message: {} ",message);
-			getChannel().basicAck(envelope.getDeliveryTag(), false);
+			log.error(" toolName={} category={} agentId={} execId={} Error occured in Data Archival Health Subscriber.Health message: {}",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),loggingInfo.get("execId"),message,e);
+			getChannel().basicReject(envelope.getDeliveryTag(), false);
 		}
 
 	}
@@ -102,11 +109,12 @@ public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandle
 					dataArchivalConfigDal.updateArchivalStatus(messageJson.get(DataArchivalConstants.ARCHIVALNAME).getAsString(),
 							DataArchivalStatus.ERROR.toString());
 				}
+				log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Updated Error state in Data Archival record.",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),"-",loggingInfo.get("execId"));
 			} else {
-				log.error("Archival name not provided");
+				log.error(" toolName={} category={} agentId={} execId={} Archival name not provided",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),loggingInfo.get("execId"));
 			}
 		} else {
-			log.error("Archival name property not present in message");
+			log.error(" toolName={} category={} agentId={} execId={} Archival name property not present in message",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),loggingInfo.get("execId"));
 		}
 	}
 	private void createHealthNodes(List<JsonObject> dataList, String agentId, String nodeLabels, int nodeCount,
@@ -131,7 +139,7 @@ public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandle
 			dbHandler.executeQueryWithData(healthQuery, dataList);
 		}
 		if (graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0) {
-			log.error("Unable to insert health nodes for routing key: {} error {}  ", nodeLabels, graphResponse);
+			log.error(" toolName={} category={} agentId={} execId={} Unable to insert health nodes for routing key: {} error {}  ",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),loggingInfo.get("execId"), nodeLabels, graphResponse);
 			EngineStatusLogger.getInstance().createDataArchivalStatusNode(
 					"Unable to insert health nodes for routing key: " + nodeLabels, PlatformServiceConstants.FAILURE);
 		}

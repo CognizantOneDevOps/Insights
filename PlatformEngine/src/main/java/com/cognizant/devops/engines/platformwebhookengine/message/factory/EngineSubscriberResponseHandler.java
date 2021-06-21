@@ -21,6 +21,7 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Envelope;
 
+@Deprecated
 public abstract class EngineSubscriberResponseHandler {
 	private Channel channel;
 	private EngineSubscriberResponseHandler engineSubscriberResponseHandler;

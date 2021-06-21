@@ -32,6 +32,7 @@ import com.cognizant.devops.platformcommons.dal.vault.VaultHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.config.PlatformServiceStatusProvider;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -41,7 +42,7 @@ public class ServerConfigServiceImpl {
 	
 	private static final Logger log = LogManager.getLogger(ServerConfigServiceImpl.class);
 	VaultHandler vaultHandler = new VaultHandler();
-	Gson gson = new Gson();
+	 Gson gson = new GsonBuilder().setPrettyPrinting().create();
 	
 	/** This method fetch and validate server config data
 	 * @return

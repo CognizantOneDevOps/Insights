@@ -17,14 +17,17 @@
 package com.cognizant.devops.platformregressiontest.test.agentmanagement;
 
 import java.io.IOException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
 import com.cognizant.devops.platformregressiontest.test.common.CommonUtils;
 import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
 import com.google.gson.JsonObject;
+
 import io.restassured.RestAssured;
 import io.restassured.http.Header;
 import io.restassured.http.Method;
@@ -67,6 +70,7 @@ public class UpdateAgentAPITest extends AgentTestData {
 		requestParam.addProperty("configJson", configJson);
 		requestParam.addProperty("trackingDetails", "");
 		requestParam.addProperty("vault", vault);
+		requestParam.addProperty("isWebhook", false);	
 
 		httpRequest.header("Content-Type", "application/json");
 		httpRequest.body(requestParam);
@@ -103,6 +107,7 @@ public class UpdateAgentAPITest extends AgentTestData {
 		requestParam.addProperty("configJson", configJson);
 		requestParam.addProperty("trackingDetails", "");
 		requestParam.addProperty("vault", vault);
+		requestParam.addProperty("isWebhook", false);	
 
 		httpRequest.header("Content-Type", "application/json");
 		httpRequest.body(requestParam);

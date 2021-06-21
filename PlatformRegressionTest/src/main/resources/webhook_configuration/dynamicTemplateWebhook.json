@@ -1,0 +1,11 @@
+{
+    "ref": "refGIT",
+    "repository": {
+        "name": "repositoryName"
+    },
+    "commits": [{
+        "id": "commitIdDY",
+        "url": "commitURLDY",
+        "timestamp": "commitTimeDY"
+    }]
+}

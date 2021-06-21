@@ -63,7 +63,6 @@ public class PlatformServiceUtil {
 		JsonObject jsonResponse = new JsonObject();
 		jsonResponse.addProperty(PlatformServiceConstants.STATUS, PlatformServiceConstants.SUCCESS);
 		jsonResponse.add(PlatformServiceConstants.DATA, new Gson().toJsonTree(data));
-		//JsonObject validatedData = ValidationUtils.validateStringForHTMLContent(jsonResponse);
 		JsonObject validatedData = ValidationUtils.replaceHTMLContentFormString(jsonResponse);
 		if (validatedData == null) {
 			validatedData = buildFailureResponse(PlatformServiceConstants.INVALID_RESPONSE_DATA);
@@ -72,6 +71,7 @@ public class PlatformServiceUtil {
 	}
 
 	public static JsonObject buildFailureResponse(String message) {
+		log.error("Error while running API message {} ",message);
 		JsonObject jsonResponse = new JsonObject();
 		jsonResponse.addProperty(PlatformServiceConstants.STATUS, PlatformServiceConstants.FAILURE);
 		jsonResponse.addProperty(PlatformServiceConstants.MESSAGE, message);
@@ -79,6 +79,7 @@ public class PlatformServiceUtil {
 	}
 
 	public static JsonObject buildFailureResponseWithStatusCode(String message, String statusCode) {
+		log.error("Error while running API statusCode {} message {} ",statusCode,message);
 		JsonObject jsonResponse = new JsonObject();
 		jsonResponse.addProperty(PlatformServiceConstants.STATUS, PlatformServiceConstants.FAILURE);
 		jsonResponse.addProperty(PlatformServiceConstants.MESSAGE, message);
@@ -101,21 +102,19 @@ public class PlatformServiceUtil {
 	}
 
 
-	public static Cookie[] validateCookies(Cookie[] request_cookies) {
+	public static Cookie[] validateCookies(Cookie[] requestcookies) {
 		Cookie[] cookiesArray = null;
 		Cookie cookie = null;
 		int cookiesArrayLength = 0;
-		List<Cookie> cookiesList = new ArrayList<Cookie>();
-		if (request_cookies != null) {
-			// log.debug("Request Cookies length " + request_cookies.length);
-			for (int i = 0; i < request_cookies.length; i++) {
-				cookie = request_cookies[i];
+		List<Cookie> cookiesList = new ArrayList<>();
+		if (requestcookies != null) {
+			for (int i = 0; i < requestcookies.length; i++) {
+				cookie = requestcookies[i];
 				log.debug(" cookie {} {} ", cookie.getName(), cookie.getValue());
 				if (AuthenticationUtils.MASTER_COOKIES_KEY_LIST.contains(cookie.getName())) {
 					cookie.setMaxAge(30 * 60);
 					cookie.setHttpOnly(true);
 					cookie.setValue(ValidationUtils.cleanXSSWithHTMLCheck(cookie.getValue()));
-					//cookies[i] = cookie;
 					cookiesList.add(cookie);
 					cookiesArrayLength = cookiesArrayLength + 1;
 				} else {
@@ -124,23 +123,20 @@ public class PlatformServiceUtil {
 			}
 			cookiesArray = new Cookie[cookiesArrayLength];
 			cookiesArray = cookiesList.toArray(cookiesArray);
-			// log.debug("Request return Cookies length " + cookies.length);
 		} else {
-			cookiesArray = request_cookies;
+			cookiesArray = requestcookies;
 			log.warn("No cookies founds");
 		}
 		return cookiesArray;
 	}
 
 	public static Map<String, String> getRequestCookies(HttpServletRequest httpRequest) {
-		Map<String, String> cookieMap = new HashMap<String, String>(0);
+		Map<String, String> cookieMap = new HashMap<>(0);
 		Cookie cookie = null;
 		Cookie[] cookiesList = httpRequest.getCookies();
 		if (cookiesList != null) {
-			// log.debug("Request Cookies length " + request_cookies.length);
 			for (int i = 0; i < cookiesList.length; i++) {
 				cookie = cookiesList[i];
-				//log.debug(" cookie " + cookie.getName() + " " + cookie.getValue());
 				if (AuthenticationUtils.MASTER_COOKIES_KEY_LIST.contains(cookie.getName())) {
 					cookie.setMaxAge(30 * 60);
 					cookie.setHttpOnly(true);
@@ -283,7 +279,7 @@ public class PlatformServiceUtil {
 		GrafanaHandler grafanaHandler = new GrafanaHandler();
 		Map<String, String> requestCookies = new HashMap<>(0);
 		String authHeader = ValidationUtils
-				.decryptAutharizationToken(httpRequest.getHeader(AuthenticationUtils.AUTH_HEADER_KEY));
+				.decryptAutharizationToken(AuthenticationUtils.extractAndValidateAuthToken(httpRequest));
 		String decodedAuthHeader = new String(Base64.getDecoder().decode(authHeader.split(" ")[1]), StandardCharsets.UTF_8);
 		String[] authTokens = decodedAuthHeader.split(":");
 		JsonObject loginRequestParams = new JsonObject();
@@ -297,10 +293,6 @@ public class PlatformServiceUtil {
 		return requestCookies;
 	}
 
-	/*public static String getGrafanaURL(String urlPart) {
-		return ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + urlPart;
-	}*/
-	
 	/**
 	 * Method to get FileType
 	 * 

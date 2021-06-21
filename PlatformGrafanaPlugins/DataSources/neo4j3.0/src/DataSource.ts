@@ -32,6 +32,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   email: any;
   orgId: any;
   logging: any;
+  tokenEnabled: any;
   
   constructor(instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>, private templateSrv) {
     super(instanceSettings);
@@ -41,7 +42,10 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     this.serviceUrl = instanceSettings.jsonData.serviceUrl;
     this.datasourceId = instanceSettings.id;
     this.logging = instanceSettings.jsonData.logging;
-    this.getUserDetailsPerDashboardHit();
+    this.tokenEnabled = instanceSettings.jsonData.authToken;
+    if(this.logging){
+        this.getUserDetailsPerDashboardHit();
+    }
   }
 
   /**provides ability to test connection from connection settings page . */
@@ -59,7 +63,13 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       }]
     };
     let testQuery = JSON.stringify(queryJson);
-    return getBackendSrv().datasourceRequest({ url: this.url, method: 'POST', data: testQuery }).then((res: any) => {
+    let routePath = '';
+    if(this.tokenEnabled){
+      routePath = this.url + `/platformservice`;
+    }else{
+      routePath = this.url
+    }
+    return getBackendSrv().datasourceRequest({ url: routePath, method: 'POST', data: testQuery }).then((res: any) => {
       let data = res.data;
       if (res.status === 200) {
         if (data && data.results.length > 0) {
@@ -126,11 +136,16 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     logInfo['query'] = cypherQuery;
     let startTime = Date.now();
     if (queries.length) {
-      
+      let routePath = '';
+      if (this.tokenEnabled) {
+        routePath = this.url + `/platformservice`;
+      } else {
+        routePath = this.url
+      }
       const req: Promise<any> = getBackendSrv()
         .datasourceRequest({
           method: 'POST',
-          url: this.url,
+          url: routePath,
           data: cypherQuery
         })
         .then((res: any) => {
@@ -172,7 +187,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   private logDashboardInfo(logInfo: {}) {
     getBackendSrv().datasourceRequest({
       method: 'POST',
-      url: this.serviceUrl,
+      url: this.url+'/neo4jLog',
       data: logInfo
     })
       .then((res: any) => {

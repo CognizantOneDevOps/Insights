@@ -281,7 +281,7 @@ public class AccessGroupManagement {
 				 * if the user exists then we are getting the list of orgs in which the user is
 				 * already present
 				 */
-				String apiUrlUserOrgs = PlatformServiceConstants.API_USER + jsonResponseName.get("id").getAsInt() + "/orgs";
+				String apiUrlUserOrgs = "/api/users/"+ jsonResponseName.get("id").getAsInt() + "/orgs";
 				Map<String, String> headersUserOrgs = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 				String responseUserOrgs = grafanaHandler.grafanaGet(apiUrlUserOrgs, headersUserOrgs);
 				JsonArray userOrgs = new JsonParser().parse(responseUserOrgs).getAsJsonArray();
@@ -378,6 +378,7 @@ public class AccessGroupManagement {
 			}
 
 		} catch (Exception e) {
+			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
 
@@ -498,12 +499,12 @@ public class AccessGroupManagement {
 		return new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create().toJson(dashboardResponse);
 	}
 	
-	@GetMapping(value = "/getTemplateQueryResults", produces = MediaType.APPLICATION_JSON_VALUE)
-	public JsonObject getTemplateQueryResults(@RequestParam String query) throws InsightsCustomException {
-		log.debug("%n%nInside getTemplateQueryResults method call {} == ",query);
+	@PostMapping(value = "/getTemplateQueryResults", produces = MediaType.APPLICATION_JSON_VALUE)
+	public JsonObject getTemplateQueryResults(@RequestBody String queryJson) throws InsightsCustomException {
+		log.debug("%n%nInside getTemplateQueryResults method call  ==== ");
+		JsonObject query = new JsonParser().parse(queryJson).getAsJsonObject();
 		GraphDBHandler dbHandler = new GraphDBHandler();
-		JsonObject neo4jResponse = dbHandler.executeCypherQueryForJsonResponse(query);
-		log.debug("getTemplateQueryResults ===== response received from neo4j {}", neo4jResponse);
+		JsonObject neo4jResponse = dbHandler.executeCypherQueryForJsonResponse(query.get("query").getAsString());
 		return neo4jResponse;
 	}
 		
@@ -518,7 +519,7 @@ public class AccessGroupManagement {
 		headers.put("Authorization", authHeader);
 		headers.put("x-grafana-org-id", String.valueOf(orgId));
         String response = grafanaHandler.grafanaGet("/api/dashboards/uid/"+uuid, headers);
-        return PlatformServiceUtil.buildSuccessResponseWithData(new JsonParser().parse(response));
+        return PlatformServiceUtil.buildSuccessResponseWithHtmlData(new JsonParser().parse(response));
     }
 	@GetMapping(value = "/getDashboardByDBUid", produces = MediaType.APPLICATION_JSON_VALUE)
     public JsonObject getDashboardByDBUid(@RequestParam String uuid,@RequestParam int orgId)  {

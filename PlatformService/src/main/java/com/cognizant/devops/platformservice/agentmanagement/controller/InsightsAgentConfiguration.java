@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,22 +46,22 @@ public class InsightsAgentConfiguration {
 
 	@Autowired
 	AgentManagementService agentManagementService;
-	
+
 	@Deprecated
-	@PostMapping(value = "/registerAgent",produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/registerAgent", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject registerAgent(@RequestParam String toolName, @RequestParam String agentVersion,
 			@RequestParam String osversion, @RequestParam String configDetails, @RequestParam String trackingDetails) {
 		String message = null;
 		try {
 			message = agentManagementService.registerAgent(toolName, agentVersion, osversion, configDetails,
-					trackingDetails, false,false);
+					trackingDetails, false, false);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 
-	@PostMapping(value = "/2.0/registerAgent",produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/2.0/registerAgent", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject registerAgentV2(@RequestBody String registerAgentJson) {
 		String message = null;
 
@@ -78,7 +77,7 @@ public class InsightsAgentConfiguration {
 			boolean vault = registerAgentjson.get("vault").getAsBoolean();
 			boolean isWebhook = registerAgentjson.get("isWebhook").getAsBoolean();
 			message = agentManagementService.registerAgent(toolName, agentVersion, osversion, configDetails,
-					trackingDetails, vault,isWebhook);
+					trackingDetails, vault, isWebhook);
 			return PlatformServiceUtil.buildSuccessResponseWithData(message);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
@@ -86,7 +85,7 @@ public class InsightsAgentConfiguration {
 
 	}
 
-	@PostMapping(value = "/uninstallAgent",produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/uninstallAgent", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject uninstallAgent(@RequestParam String agentId, @RequestParam String toolName,
 			@RequestParam String osversion) {
 		String message = null;
@@ -97,21 +96,22 @@ public class InsightsAgentConfiguration {
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
-	
+
 	@Deprecated
-	@PostMapping(value = "/updateAgent",produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/updateAgent", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject updateAgent(@RequestParam String agentId, @RequestParam String configJson,
 			@RequestParam String toolName, @RequestParam String agentVersion, @RequestParam String osversion) {
 		String message = null;
 		try {
-			message = agentManagementService.updateAgent(agentId, configJson, toolName, agentVersion, osversion, false, false);
+			message = agentManagementService.updateAgent(agentId, configJson, toolName, agentVersion, osversion, false,
+					false);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 
-	@PostMapping(value = "/2.0/updateAgent",produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/2.0/updateAgent", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject updateAgent(@RequestBody String updateAgentJsonRequest) {
 		String message = null;
 		try {
@@ -126,14 +126,14 @@ public class InsightsAgentConfiguration {
 			boolean vault = updateAgentJson.get("vault").getAsBoolean();
 			boolean isWebhook = updateAgentJson.get("isWebhook").getAsBoolean();
 			message = agentManagementService.updateAgent(agentId, configDetails, toolName, agentVersion, osversion,
-					vault,isWebhook);
+					vault, isWebhook);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 
-	@PostMapping(value = "/startStopAgent",produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/startStopAgent", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject startStopAgent(@RequestParam String agentId, @RequestParam String toolName,
 			@RequestParam String osversion, @RequestParam String action) {
 		String message = null;
@@ -145,7 +145,7 @@ public class InsightsAgentConfiguration {
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 
-	@GetMapping(value = "/getSystemAvailableAgentList",produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/getSystemAvailableAgentList", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getSystemAvailableAgentList() {
 		Map<String, ArrayList<String>> agentDetails;
 		try {
@@ -163,18 +163,19 @@ public class InsightsAgentConfiguration {
 		return PlatformServiceUtil.buildSuccessResponseWithData(agentDetails);
 	}
 
-	@GetMapping(value = "/getToolRawConfigFile",produces = MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody JsonObject getToolRawConfigFile(@RequestParam String version, @RequestParam String tool, @RequestParam boolean isWebhook) {
+	@GetMapping(value = "/getToolRawConfigFile", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject getToolRawConfigFile(@RequestParam String version, @RequestParam String tool,
+			@RequestParam boolean isWebhook) {
 		String details = null;
 		try {
-			details = agentManagementService.getToolRawConfigFile(version, tool,isWebhook);
+			details = agentManagementService.getToolRawConfigFile(version, tool, isWebhook);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithHtmlData(details);
 	}
 
-	@GetMapping(value = "/getRegisteredAgents",produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/getRegisteredAgents", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getRegisteredAgents() {
 		List<AgentConfigTO> agentList;
 		try {
@@ -185,7 +186,7 @@ public class InsightsAgentConfiguration {
 		return PlatformServiceUtil.buildSuccessResponseWithData(agentList);
 	}
 
-	@GetMapping(value = "/getRegisteredAgentDetail",produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/getRegisteredAgentDetail", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getAgentDetails(@RequestParam String agentId) {
 		AgentConfigTO agentDetails;
 		try {

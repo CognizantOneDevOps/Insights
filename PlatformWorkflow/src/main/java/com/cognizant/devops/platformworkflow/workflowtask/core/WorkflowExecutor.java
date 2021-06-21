@@ -91,6 +91,14 @@ public class WorkflowExecutor implements Job , ApplicationConfigInterface{
 							PlatformServiceConstants.FAILURE);
 					workflowProcessing.updateWorkflowDetails(workflowConfig.getWorkflowId(),
 							WorkflowTaskEnum.WorkflowStatus.TASK_INITIALIZE_ERROR.toString(), false);
+				}catch (Exception e) {
+					log.error(e);
+					log.debug(" Worlflow Detail ====  workflow failed to execute due to exception {}  ",
+							workflowConfig.getWorkflowId());
+					InsightsStatusProvider.getInstance().createInsightStatusNode("WorkflowExecutor failed due to exception: "+workflowConfig.getWorkflowId(),
+							PlatformServiceConstants.FAILURE);
+					workflowProcessing.updateWorkflowDetails(workflowConfig.getWorkflowId(),
+							WorkflowTaskEnum.WorkflowStatus.TASK_INITIALIZE_ERROR.toString(), false);
 				}
 			}
 			InsightsStatusProvider.getInstance().createInsightStatusNode(" Completed WorkflowExecutor ",

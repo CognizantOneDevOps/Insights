@@ -58,7 +58,7 @@ import com.cognizant.devops.platformservice.security.config.jwt.SpringJWTAccessD
 @Conditional(InsightsJWTBeanInitializationCondition.class)
 public class InsightsSecurityConfigurationAdapterJWT extends WebSecurityConfigurerAdapter {
 
-	private static Logger LOG = LogManager.getLogger(InsightsSecurityConfigurationAdapterJWT.class);
+	private static Logger log = LogManager.getLogger(InsightsSecurityConfigurationAdapterJWT.class);
 
 	@Autowired
 	private SpringJWTAccessDeniedHandler springAccessDeniedHandler;
@@ -68,14 +68,14 @@ public class InsightsSecurityConfigurationAdapterJWT extends WebSecurityConfigur
 
 	DefaultSpringSecurityContextSource contextSource;
 
-	String AUTH_TYPE = "JWT";
+	static final String AUTHTYPE = "JWT";
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		LOG.debug("message Inside InsightsSecurityConfigurationAdapter, AuthenticationManagerBuilder **** {} ",
+		log.debug("message Inside InsightsSecurityConfigurationAdapter, AuthenticationManagerBuilder **** {} ",
 				ApplicationConfigProvider.getInstance().getAutheticationProtocol());
-		if (AUTH_TYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
-			LOG.debug("message Inside InsightsSecurityConfigurationAdapter, check authentication provider **** ");
+		if (AUTHTYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
+			log.debug("message Inside InsightsSecurityConfigurationAdapter, check authentication provider **** ");
 			ApplicationConfigProvider.performSystemCheck();
 			auth.authenticationProvider(jwtAuthenticationProvider());
 		}
@@ -83,10 +83,10 @@ public class InsightsSecurityConfigurationAdapterJWT extends WebSecurityConfigur
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		LOG.debug("message Inside InsightsSecurityConfigurationAdapter ,HttpSecurity **** {} ",
+		log.debug("message Inside InsightsSecurityConfigurationAdapter ,HttpSecurity **** {} ",
 				ApplicationConfigProvider.getInstance().getAutheticationProtocol());
-		if (AUTH_TYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
-			LOG.debug("message Inside InsightsSecurityConfigurationAdapter,HttpSecurity check **** ");
+		if (AUTHTYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
+			log.debug("message Inside InsightsSecurityConfigurationAdapter,HttpSecurity check **** ");
 
 			http.cors().and().authorizeRequests().antMatchers("/datasources/**").permitAll().antMatchers("/admin/**")
 					.access("hasAuthority('Admin')").antMatchers("/traceability/**").access("hasAuthority('Admin')")
@@ -110,6 +110,7 @@ public class InsightsSecurityConfigurationAdapterJWT extends WebSecurityConfigur
 	public void configure(WebSecurity web) throws Exception {
 		web.ignoring().antMatchers("/settings/getLogoImage");
 		web.ignoring().antMatchers("/datasource/**");
+		web.ignoring().antMatchers("/externalApi/**");
 	}
 
 	/**
@@ -121,7 +122,7 @@ public class InsightsSecurityConfigurationAdapterJWT extends WebSecurityConfigur
 	@Bean
 	@Conditional(InsightsJWTBeanInitializationCondition.class)
 	public FilterChainProxy insightsFilter() throws Exception {
-		LOG.debug("message Inside FilterChainProxy, initial bean InsightsSecurityConfigurationAdapterJWT **** ");
+		log.debug("message Inside FilterChainProxy, initial bean InsightsSecurityConfigurationAdapterJWT **** ");
 
 		List<Filter> filters = new ArrayList<>();
 		filters.add(0, new InsightsCustomCsrfFilter());

@@ -46,7 +46,7 @@ public class DataArchivalAggregatorModule extends TimerTask implements Applicati
 	private static Map<String, EngineSubscriberResponseHandler> registry = new HashMap<>();
 	AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 	DataArchivalConfigDal dataArchivalConfigDal = new DataArchivalConfigDal();
-
+	private Map<String,String> loggingInfo = new HashMap<>();
 	@Override
 	public void run() {
 		log.debug("Data Archival Aggregator Module start");
@@ -59,6 +59,10 @@ public class DataArchivalAggregatorModule extends TimerTask implements Applicati
 				JsonObject config = (JsonObject) new JsonParser().parse(agentConfig.getAgentJson());
 				JsonObject publishJson = config.get("publish").getAsJsonObject();
 				String dataRoutingKey = publishJson.get("data").getAsString();
+				loggingInfo.put("toolName", config.get("toolName").getAsString());
+				loggingInfo.put("category", config.get("toolCategory").getAsString());
+				loggingInfo.put("agentId", config.get("agentId").getAsString());
+				loggingInfo.put("routingKey", dataRoutingKey);
 				registerDataAggregator(dataRoutingKey);
 				String healthRoutingKey = publishJson.get("health").getAsString();
 				registerHealthAggregator(healthRoutingKey);
@@ -70,7 +74,7 @@ public class DataArchivalAggregatorModule extends TimerTask implements Applicati
 			EngineStatusLogger.getInstance().createDataArchivalStatusNode(
 					" Error occured while executing data archival aggregator  " + e.getMessage(), PlatformServiceConstants.FAILURE);
 		}
-
+		log.debug("Data Archival Aggregator Module completed");
 	}
 
 	private void performExpiredRecordCheck(String routingKey) {
@@ -102,12 +106,13 @@ public class DataArchivalAggregatorModule extends TimerTask implements Applicati
 
 		if (dataRoutingKey != null && !registry.containsKey(dataRoutingKey)) {
 			try {
-				registry.put(dataRoutingKey, new DataArchivalDataSubscriber(dataRoutingKey));
+				registry.put(dataRoutingKey, new DataArchivalDataSubscriber(dataRoutingKey,loggingInfo.get("agentId")));
+				log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Data archival data queue {} subscribed successfully ",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),loggingInfo.get("routingKey"),"-",dataRoutingKey);
 				EngineStatusLogger.getInstance().createDataArchivalStatusNode(
 						" Data archival data queue " + dataRoutingKey + " subscribed successfully ",
 						PlatformServiceConstants.SUCCESS);
 			} catch (Exception e) {
-				log.error("Unable to add subscriber for routing key:{} ", dataRoutingKey, e);
+				log.error(" toolName={} category={} agentId={} routingKey={} Unable to add subscriber for routing key:{} ",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),loggingInfo.get("routingKey"),dataRoutingKey, e);
 				EngineStatusLogger.getInstance().createDataArchivalStatusNode(
 						" Error occured while executing aggragator for data queue subscriber " + e.getMessage(),
 						PlatformServiceConstants.FAILURE);
@@ -120,11 +125,12 @@ public class DataArchivalAggregatorModule extends TimerTask implements Applicati
 		if (healthRoutingKey != null && !registry.containsKey(healthRoutingKey)) {
 			try {
 				registry.put(healthRoutingKey, new DataArchivalHealthSubscriber(healthRoutingKey));
+				log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Data archival health queue {} subscribed successfully ",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),healthRoutingKey,"-",healthRoutingKey);
 				EngineStatusLogger.getInstance().createDataArchivalStatusNode(
 						" Data Archival Agent health queue " + healthRoutingKey + " subscribed successfully ",
 						PlatformServiceConstants.SUCCESS);
 			} catch (Exception e) {
-				log.error("Unable to add subscriber for routing key:{}" ,healthRoutingKey, e);
+				log.error(" toolName={} category={} agentId={} routingKey={} Unable to add subscriber for routing key:{}" ,loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),healthRoutingKey,healthRoutingKey, e);
 				EngineStatusLogger.getInstance().createDataArchivalStatusNode(
 						" Error occured while executing aggregator for Data archival health queue subscriber  "
 								+ e.getMessage(),

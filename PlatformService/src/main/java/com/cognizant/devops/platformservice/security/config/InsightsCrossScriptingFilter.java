@@ -33,16 +33,16 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class InsightsCrossScriptingFilter extends OncePerRequestFilter {
-	private static Logger LOG = LogManager.getLogger(InsightsCrossScriptingFilter.class);
+	private static Logger log = LogManager.getLogger(InsightsCrossScriptingFilter.class);
 
 	/**
-	 * This filter is used to validate Header,Cookies and Paramater for each and
-	 * every reuest
+	 * This filter is used to validate Header,Cookies and Parameter for each and
+	 * every request
 	 */
 	@Override
 	protected void doFilterInternal(HttpServletRequest httpRequest, HttpServletResponse httpResponce,
 			FilterChain filterChain) {
-		LOG.info("Inside Filter == InsightsCrossScriptingFilter ............... {} method {}  ",
+		log.info("Inside Filter == InsightsCrossScriptingFilter ............... {} method {}  ",
 				httpRequest.getRequestURL(),
 				httpRequest.getMethod());
 
@@ -50,12 +50,12 @@ public class InsightsCrossScriptingFilter extends OncePerRequestFilter {
 			validateHeaders(httpRequest, httpResponce);
 			RequestWrapper requestMapper = new RequestWrapper(httpRequest, httpResponce);
 			filterChain.doFilter(requestMapper, httpResponce);
-			LOG.debug("Completed .. in InsightsCrossScriptingFilter");
+			log.debug("Completed .. in InsightsCrossScriptingFilter");
 
 		} catch (Exception e) {
 			String msg;
 			if (e.getMessage().contains("InsightsCustomException")) {
-				LOG.error(
+				log.error(
 						"Invalid request in InsightsCustomException CrossScriptingFilter  InsightsCustomException {} ",
 						e.getMessage());
 				JsonParser parser = new JsonParser();
@@ -66,26 +66,26 @@ public class InsightsCrossScriptingFilter extends OncePerRequestFilter {
 						.toString();
 				AuthenticationUtils.setResponseMessage(httpResponce, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
 			} else if (e.getMessage().contains("InsightsAuthenticationException")) {
-				LOG.error(
+				log.error(
 						"Invalid request in InsightsAuthenticationException CrossScriptingFilter InsightsAuthenticationException {} ",
 						e.getMessage());
 				AuthenticationUtils.setResponseMessage(httpResponce, AuthenticationUtils.SECURITY_CONTEXT_CODE,
 						"Authentication not successful ,Please relogin ");
 			} else if (e.getMessage().contains("UnknownHostException")) {
-				LOG.error(
+				log.error(
 						"Invalid request in InsightsAuthenticationException CrossScriptingFilter UnknownHostException {} ",
 						e.getMessage());
 				AuthenticationUtils.setResponseMessage(httpResponce, AuthenticationUtils.INFORMATION_MISMATCH,
 						e.getMessage());
 			} else {
-				LOG.error("Invalid request in CrossScriptingFilter {}", e.getMessage());
+				log.error("Invalid request in CrossScriptingFilter {}", e.getMessage());
 				msg = PlatformServiceUtil.buildFailureResponse(
 								"Invalid request,Someting is wrong in cookies,Header or Parameter" + e.getMessage())
 						.toString();
 				AuthenticationUtils.setResponseMessage(httpResponce, HttpServletResponse.SC_BAD_REQUEST, msg);
 			}
 		}
-		LOG.info("Out doFilter CrossScriptingFilter ...............");
+		log.info("Out doFilter CrossScriptingFilter ...............");
 	}
 
 	/**
@@ -96,18 +96,18 @@ public class InsightsCrossScriptingFilter extends OncePerRequestFilter {
 	 * @throws UnknownHostException
 	 */
 	public void validateHeaders(HttpServletRequest request, HttpServletResponse response) throws UnknownHostException {
-		LOG.info(" InsightsCrossScriptingFilter validate header ............... ");
+		log.info(" InsightsCrossScriptingFilter validate header ............... ");
 		String origin = request.getHeader(HttpHeaders.ORIGIN);
 		String host = AuthenticationUtils.getHost(request);
-		LOG.debug(" host and origin information ===== {}  origin {}", host, origin);
+		log.debug(" host and origin information ===== {}  origin {}", host, origin);
 		if (host == null) {
-			LOG.error(" Invalid request " + PlatformServiceConstants.HOST_NOT_FOUND);
+			log.error(" Invalid request " + PlatformServiceConstants.HOST_NOT_FOUND);
 			AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.INFORMATION_MISMATCH,
 					PlatformServiceConstants.HOST_NOT_FOUND);
 			throw new UnknownHostException(PlatformServiceConstants.HOST_NOT_FOUND);
 		}
 		if (!ApplicationConfigProvider.getInstance().getTrustedHosts().contains(host)) {
-			LOG.error(" Invalid request " + PlatformServiceConstants.INVALID_REQUEST_ORIGIN);
+			log.error(" Invalid request " + PlatformServiceConstants.INVALID_REQUEST_ORIGIN);
 			AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.INFORMATION_MISMATCH,
 					PlatformServiceConstants.INVALID_REQUEST_ORIGIN);
 			throw new UnknownHostException(PlatformServiceConstants.INVALID_REQUEST_ORIGIN);

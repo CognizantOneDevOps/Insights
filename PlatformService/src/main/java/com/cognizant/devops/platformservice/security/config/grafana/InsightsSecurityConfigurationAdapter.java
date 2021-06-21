@@ -37,11 +37,11 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
@@ -66,9 +66,6 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 	@Autowired
 	private AuthenticationUtils authenticationUtils;
 
-	@Autowired
-	private GrafanaUserDetailsService userDetailsService;
-
 	DefaultSpringSecurityContextSource contextSource;
 
 	private static final String AUTH_TYPE = "NativeGrafana";
@@ -80,7 +77,7 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 		if (AUTH_TYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
 			log.debug("message Inside InsightsSecurityConfigurationAdapter, check authentication provider **** ");
 			ApplicationConfigProvider.performSystemCheck();
-			auth.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
+			auth.authenticationProvider(new NativeInitialAuthenticationProvider());
 		}
 	}
 
@@ -90,19 +87,26 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 				ApplicationConfigProvider.getInstance().getAutheticationProtocol());
 		if (AUTH_TYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
 			log.debug("message Inside InsightsSecurityConfigurationAdapter,HttpSecurity check **** ");
+			
+			http.cors();
+			http.csrf().ignoringAntMatchers(AuthenticationUtils.CSRF_IGNORE.toArray(new String[0]))
+					.csrfTokenRepository(authenticationUtils.csrfTokenRepository())
+					.and().addFilterAfter(new InsightsCustomCsrfFilter(), CsrfFilter.class);
 
-			http.cors().and().authorizeRequests().antMatchers("/datasources/**").permitAll().antMatchers("/admin/**")
-					.access("hasAuthority('Admin')").antMatchers("/traceability/**").access("hasAuthority('Admin')")
-					.antMatchers("/configure/loadConfigFromResources").permitAll().antMatchers("/**").authenticated() // .permitAll()
-					.and().exceptionHandling().accessDeniedHandler(springAccessDeniedHandler).and().httpBasic()
-					.disable()
+			http.exceptionHandling().accessDeniedHandler(springAccessDeniedHandler).and().httpBasic().disable(); //.authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+			http.addFilterBefore(new InsightsGrafanaAuthenticationFilter("/user/authenticate", authenticationInitialManager()), BasicAuthenticationFilter.class);
+			http.addFilterBefore(new InsightsGrafanaAuthenticationFilter("/externalApi/**", authenticationInitialManager()), BasicAuthenticationFilter.class);
+			http.addFilterAfter(insightsFilter(), BasicAuthenticationFilter.class);
+			
+			http.headers().frameOptions().sameOrigin().and().sessionManagement().maximumSessions(1).and()
+			.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
+			
+			http.anonymous().disable().authorizeRequests().antMatchers("/datasources/**").permitAll().antMatchers("/admin/**")
+			.access("hasAuthority('Admin')").antMatchers("/traceability/**").access("hasAuthority('Admin')")
+			//.antMatchers("/user/authenticate**").hasAnyAuthority("Admin,Editor,Viewer")
+			.antMatchers("/configure/loadConfigFromResources").permitAll().antMatchers("/**").authenticated();
 
-					.csrf().ignoringAntMatchers(AuthenticationUtils.CSRF_IGNORE.toArray(new String[0]))
-					.csrfTokenRepository(authenticationUtils.csrfTokenRepository()).and()
-					.addFilterBefore(insightsFilter(), BasicAuthenticationFilter.class)
-
-					.headers().frameOptions().sameOrigin().and().sessionManagement().maximumSessions(1).and()
-					.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
+			http.logout().logoutSuccessUrl("/");
 		}
 	}
 
@@ -125,7 +129,20 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 	@Conditional(InsightsNativeBeanInitializationCondition.class)
 	public FilterChainProxy insightsFilter() throws Exception {
 		log.debug("message Inside FilterChainProxy, initial bean InsightsSecurityConfigurationAdapter **** ");
+		
+	
+		
+		List<Filter> filtersForLogin = new ArrayList<>();
+		filtersForLogin.add(0, new InsightsCustomCsrfFilter());
+		filtersForLogin.add(1, new InsightsCrossScriptingFilter());
+		filtersForLogin.add(2, insightsInitialProcessingFilter());
+		filtersForLogin.add(3, new InsightsResponseHeaderWriterFilter());
 
+		AuthenticationUtils.setSecurityFilterchain(
+				new DefaultSecurityFilterChain(new AntPathRequestMatcher("/user/authenticate"), filtersForLogin));
+		AuthenticationUtils.setSecurityFilterchain(
+				new DefaultSecurityFilterChain(new AntPathRequestMatcher("/externalApi/**"), filtersForLogin));
+		 
 		List<Filter> filters = new ArrayList<>();
 		filters.add(0, new InsightsCustomCsrfFilter());
 		filters.add(1, new InsightsCrossScriptingFilter());
@@ -137,7 +154,7 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 
 		return new FilterChainProxy(AuthenticationUtils.getSecurityFilterchains());
 	}
-
+	
 	/**
 	 * Used to configure authentication Filter for all Request Matcher
 	 * 
@@ -147,6 +164,14 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 	public InsightsAuthenticationFilter insightsProcessingFilter() throws Exception {
 		return new InsightsAuthenticationFilter("/**", authenticationManager());
 	}
+	
+	@Bean
+	@Conditional(InsightsNativeBeanInitializationCondition.class)
+	public InsightsGrafanaAuthenticationFilter insightsInitialProcessingFilter() {
+		InsightsGrafanaAuthenticationFilter initialAuthProcessingFilter = new InsightsGrafanaAuthenticationFilter("/user/authenticate/");
+		initialAuthProcessingFilter.setAuthenticationManager(new ProviderManager(Arrays.asList(new NativeInitialAuthenticationProvider())));
+		return initialAuthProcessingFilter;
+	}
 
 	/**
 	 * Used to set authenticationManager Native Grafana
@@ -154,5 +179,9 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 	@Override
 	protected AuthenticationManager authenticationManager() throws Exception {
 		return new ProviderManager(Arrays.asList(new NativeAuthenticationProvider()));
+	}
+	
+	protected AuthenticationManager authenticationInitialManager()  {
+		return new ProviderManager(Arrays.asList(new NativeInitialAuthenticationProvider()));
 	}
 }

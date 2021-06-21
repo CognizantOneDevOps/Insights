@@ -176,7 +176,6 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
             this.toolData.push([toolArr[i].label, initial, initial, initial+toolArr[i].value, initial+toolArr[i].value]);
             initial = initial+toolArr[i].value;
         }
-        console.log("toolArr" + this.toolData);
     }
     createDivelement() {
         const createDiv = this.renderer.createElement('div');
@@ -336,8 +335,8 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
             this.isDatainProgress = false;
         } else if (this.cacheMap.has(clickedElement.uuid)) {
             this.map = new Map<String, Object[]>();
-            let data = this.cacheMap.get(clickedElement.uuid);
-            data.forEach(element => {
+            let cacheData = this.cacheMap.get(clickedElement.uuid);
+            cacheData.pipeline.forEach(element => {
                 let key = element.order + "_" + element.toolName;
                 if (this.map.has(key)) {
                     this.map.get(key).push(element);
@@ -346,6 +345,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
                     this.map.set(key, [element]);
                 }
             });
+            this.prepareSummaryDetail(cacheData.summary);
             this.globalMap = this.map;
             this.isDatainProgress = false;
         }
@@ -355,7 +355,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
                    // setTimeout(()=>{this.isDatainProgress=true},8000); 
                    this.map = new Map<String, Object[]>(); 
                     let res = data.data.pipeline;
-                    //this.cacheMap.set(clickedElement.uuid, res);
+                    this.cacheMap.set(clickedElement.uuid, data.data);
                     console.log(data)
                     this.globalData = res;
                     res.forEach(element => {

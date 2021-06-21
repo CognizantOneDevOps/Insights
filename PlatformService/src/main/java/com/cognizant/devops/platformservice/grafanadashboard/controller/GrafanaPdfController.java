@@ -34,7 +34,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 @RestController
-@RequestMapping("/datasource")
+@RequestMapping("/externalApi")
 public class GrafanaPdfController {
 
 	static Logger log = LogManager.getLogger(GrafanaPdfController.class);

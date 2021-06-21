@@ -25,7 +25,7 @@ import sys
 
 class MessageFactory:
         
-    def __init__(self, user, password, host, exchange):
+    def __init__(self, user, password, host, exchange, port=None,enableDeadLetterExchange=False):
         #credentials = pika.PlainCredentials(user, password)
         #self.connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=host))
         #self.exchange = exchange
@@ -34,14 +34,27 @@ class MessageFactory:
         self.password = password
         self.host = host
         self.exchange = exchange
+        if port != None : 
+            self.port = port
+        else:
+            self.port = 5672
+        if enableDeadLetterExchange:
+            self.declareDeadLetterExchange()
+            self.arguments={"x-dead-letter-exchange" : "iRecover"}
+        else:
+            self.arguments={}
         
     def subscribe(self, routingKey, callback, seperateThread=True):
         def subscriberThread():
             credentials = pika.PlainCredentials(self.user, self.password)
-            connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=self.host))
+            connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=self.host,port=self.port))
             channel = connection.channel()
+            queueName = routingKey.replace('.','_')
             channel.exchange_declare(exchange=self.exchange, exchange_type='topic', durable=True)
-            channel.basic_consume(callback,queue=routingKey,no_ack=False)
+            channel.queue_declare(queue=queueName, passive=False, durable=True, exclusive=False, auto_delete=False, arguments=self.arguments)
+            channel.queue_bind(queue=queueName, exchange=self.exchange, routing_key=routingKey, arguments=None)
+            channel.basic_qos(prefetch_count=5)
+            channel.basic_consume(routingKey,callback,auto_ack=False)
             channel.start_consuming()
         if seperateThread:
             thread.start_new_thread(subscriberThread, ())
@@ -51,12 +64,12 @@ class MessageFactory:
     def publish(self, routingKey, data, batchSize=None, metadata=None):
         if data != None:
             credentials = pika.PlainCredentials(self.user, self.password)
-            connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=self.host))
+            connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=self.host,port=self.port))
             channel = connection.channel()
             
             queueName = routingKey.replace('.','_')
             channel.exchange_declare(exchange=self.exchange, exchange_type='topic', durable=True)
-            channel.queue_declare(queue=queueName, passive=False, durable=True, exclusive=False, auto_delete=False, arguments=None)
+            channel.queue_declare(queue=queueName, passive=False, durable=True, exclusive=False, auto_delete=False, arguments=self.arguments)
             channel.queue_bind(queue=queueName, exchange=self.exchange, routing_key=routingKey, arguments=None)
             #channel.exchange_declare(exchange=self.exchange, type='topic', exchange_type='topic', durable=True)
             #self.exchange = exchange
@@ -102,3 +115,18 @@ class MessageFactory:
     
     def closeConnection(self):
         self.connection.close()
+        
+    def declareDeadLetterExchange(self):
+        
+        credentials = pika.PlainCredentials(self.user, self.password)
+        connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=self.host,port=self.port))
+       
+        #Create dead letter queue 
+        channel = connection.channel()
+        channel.exchange_declare(exchange='iRecover',exchange_type='fanout', durable=True)
+ 
+        channel.queue_declare(queue='INSIGHTS_RECOVER_QUEUE', passive=False, durable=True, exclusive=False, auto_delete=False, arguments=None)
+
+        channel.queue_bind(exchange='iRecover',
+                           routing_key='INSIGHTS.RECOVER.QUEUE', # x-dead-letter-routing-key
+                           queue='INSIGHTS_RECOVER_QUEUE')

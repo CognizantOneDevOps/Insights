@@ -21,12 +21,10 @@ import java.util.concurrent.TimeoutException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
 import com.cognizant.devops.platformworkflow.workflowtask.utils.MQMessageConstants;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 
 public class WorkflowTaskPublisherFactory {
 	private static Logger LOG = LogManager.getLogger(WorkflowTaskPublisherFactory.class);
@@ -40,23 +38,14 @@ public class WorkflowTaskPublisherFactory {
 	 * 
 	 * @param routingKey
 	 * @param data
+	 * @throws InsightsCustomException 
 	 * @throws Exception
 	 */
-	public static void publish(String routingKey, String data) throws IOException, TimeoutException {
-		try {
-			ConnectionFactory factory = new ConnectionFactory();
-			MessageQueueDataModel messageQueueConfig = ApplicationConfigProvider.getInstance().getMessageQueue();
-			factory.setHost(messageQueueConfig.getHost());
-			factory.setUsername(messageQueueConfig.getUser());
-			factory.setPassword(messageQueueConfig.getPassword());
-			try (Connection connection = factory.newConnection(); Channel channel = connection.createChannel()) {
-				String queueName = routingKey.replace(".", "_");
-				channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE, true);
-				channel.queueDeclare(queueName, true, false, false, null);
-				channel.queueBind(queueName, MQMessageConstants.EXCHANGE_NAME, routingKey);
-				channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, data.getBytes());
-				LOG.debug("Worlflow Detail ==== data published time in queue {}", routingKey);
-			}
+	public static void publish(String routingKey, String data) throws InsightsCustomException {
+		String queueName = routingKey.replace(".", "_");
+		try (Channel channel = RabbitMQConnectionProvider.getChannel(routingKey, queueName, MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE)) {
+			channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, data.getBytes());
+			LOG.debug("Worlflow Detail ==== data published time in queue {}", routingKey);
 		} catch (IOException | TimeoutException e) {
 			LOG.debug("data not publish in queue");
 		}

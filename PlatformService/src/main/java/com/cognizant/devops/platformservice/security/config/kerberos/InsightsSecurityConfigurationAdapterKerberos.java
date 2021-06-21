@@ -66,7 +66,7 @@ import com.cognizant.devops.platformservice.security.config.saml.ResourceLoaderS
 @Conditional(InsightsKerberosBeanInitializationCondition.class)
 public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityConfigurerAdapter {
 
-	private static Logger LOG = LogManager.getLogger(InsightsSecurityConfigurationAdapterKerberos.class);
+	private static Logger log = LogManager.getLogger(InsightsSecurityConfigurationAdapterKerberos.class);
 
 	private SingleSignOnConfig singleSignOnConfig = ApplicationConfigProvider.getInstance().getSingleSignOnConfig();
 
@@ -86,7 +86,7 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 	 */
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		LOG.debug("message Inside InsightsSecurityConfigurationAdapterKerberos, AuthenticationManagerBuilder **** {} ",
+		log.debug("message Inside InsightsSecurityConfigurationAdapterKerberos, AuthenticationManagerBuilder **** {} ",
 				ApplicationConfigProvider.getInstance().getAutheticationProtocol());
 		if (AUTH_TYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
 			auth.authenticationProvider(kerberosAuthenticationProvider())
@@ -99,10 +99,10 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 	 */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		LOG.debug("message Inside InsightsSecurityConfigurationAdapterKerberos,HttpSecurity **** {} ",
+		log.debug("message Inside InsightsSecurityConfigurationAdapterKerberos,HttpSecurity **** {} ",
 				ApplicationConfigProvider.getInstance().getAutheticationProtocol());
 		if (AUTH_TYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
-			LOG.debug("message Inside SAMLAuthConfig, check http security **** ");
+			log.debug("message Inside SAMLAuthConfig, check http security **** ");
 
 			http.cors();
 			http.csrf().ignoringAntMatchers(AuthenticationUtils.CSRF_IGNORE.toArray(new String[0]))
@@ -128,7 +128,7 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 	@Bean
 	@Conditional(InsightsKerberosBeanInitializationCondition.class)
 	public FilterChainProxy kerberosFilter() throws Exception {
-		LOG.debug("message Inside InsightsSecurityConfigurationAdapterKerberos FilterChainProxy, initial bean **** ");
+		log.debug("message Inside InsightsSecurityConfigurationAdapterKerberos FilterChainProxy, initial bean **** ");
 
 		List<Filter> filters = new ArrayList<>();
 		filters.add(0, new InsightsCustomCsrfFilter());
@@ -143,7 +143,7 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 				.listIterator();
 		while (securityFilters.hasNext()) {
 			SecurityFilterChain as = securityFilters.next();
-			LOG.debug("message Inside FilterChainProxy{}, initial bean name ****",
+			log.debug("message Inside FilterChainProxy{}, initial bean name ****",
 					Arrays.toString(as.getFilters().toArray()));
 		}
 
@@ -157,6 +157,7 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 	public void configure(WebSecurity web) throws Exception {
 		web.ignoring().antMatchers("/settings/getLogoImage");
 		web.ignoring().antMatchers("/datasource/**");
+		web.ignoring().antMatchers("/externalApi/**");
 	}
 
 	/**
@@ -206,7 +207,7 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 	@Conditional(InsightsKerberosBeanInitializationCondition.class)
 	public InsightsSpnegoEntryPoint spnegoEntryPoint() {
 		InsightsSpnegoEntryPoint spnegoEntryPoint = new InsightsSpnegoEntryPoint(
-				"/user/insightsso/getKerberosUserDetail");// "/klogin"
+				"/user/insightsso/getKerberosUserDetail");
 
 		return spnegoEntryPoint;
 	}
@@ -219,7 +220,7 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 	@Bean
 	@Conditional(InsightsKerberosBeanInitializationCondition.class)
 	public SimpleUrlAuthenticationFailureHandler authenticationFailureHandler() {
-		LOG.debug(" Inside authenticationFailureHandler ==== ");
+		log.debug(" Inside authenticationFailureHandler ==== ");
 		return new InsightsKerberosAuthenticationFailureHandler();
 	}
 

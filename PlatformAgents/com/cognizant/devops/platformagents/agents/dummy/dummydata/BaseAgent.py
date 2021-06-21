@@ -167,8 +167,9 @@ class BaseAgent(object):
         host = mqConfig.get('host', None)
         exchange = mqConfig.get('exchange', None)
         agentCtrlXchg  = mqConfig.get('agentControlXchg', None)
+        enableDeadLetterExchange = mqConfig.get('enableDeadLetterExchange', False)
         
-        self.messageFactory = MessageFactory(user,mqPass,host,exchange)
+        self.messageFactory = MessageFactory(user,mqPass,host,exchange,enableDeadLetterExchange=enableDeadLetterExchange)
         if self.messageFactory == None:
             raise ValueError('BaseAgent: unable to initialize MQ. messageFactory is Null')
         

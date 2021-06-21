@@ -18,32 +18,24 @@ package com.cognizant.devops.engines.platformengine.message.factory;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
 import com.google.gson.GsonBuilder;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 
 public class MessagePublisherFactory {
-	private MessagePublisherFactory(){
-		
+	private MessagePublisherFactory() {
+
 	}
-	
-	public static void publish(String routingKey, Object data) throws IOException, TimeoutException {
-		ConnectionFactory factory = new ConnectionFactory();
-        MessageQueueDataModel messageQueueConfig = ApplicationConfigProvider.getInstance().getMessageQueue();
-		factory.setHost(messageQueueConfig.getHost());
-        factory.setUsername(messageQueueConfig.getUser());
-		factory.setPassword(messageQueueConfig.getPassword());
-        try (Connection connection = factory.newConnection();
-        						Channel channel = connection.createChannel()){
-        					channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE);
-        					String message = new GsonBuilder().disableHtmlEscaping().create().toJson(data);
-        					channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, message.getBytes());
-        				} 
+
+	public static void publish(String routingKey, String data) throws IOException, TimeoutException, InsightsCustomException {
+		String queueName = routingKey.replace(".", "_");
+		try (Connection connection = RabbitMQConnectionProvider.getConnection();
+				Channel channel = RabbitMQConnectionProvider.getChannel(routingKey, queueName, MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE)) {
+			String message = new GsonBuilder().disableHtmlEscaping().create().toJson(data);
+			channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, message.getBytes());
+		}
 	}
 }
-
-

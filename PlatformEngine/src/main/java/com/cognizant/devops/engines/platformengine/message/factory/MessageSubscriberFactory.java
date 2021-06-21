@@ -21,65 +21,37 @@ import java.util.concurrent.TimeoutException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
-import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
 public class MessageSubscriberFactory {
 	private static final Logger log = LogManager.getLogger(MessageSubscriberFactory.class);
-	private ConnectionFactory factory;
-	private Connection connection;
-	private static MessageSubscriberFactory instance = new MessageSubscriberFactory();
+	private static MessageSubscriberFactory instance=null ;
 
-	private void initConnectionFactory() {
-		MessageQueueDataModel messageQueueConfig = ApplicationConfigProvider.getInstance().getMessageQueue();
-		factory = new ConnectionFactory();
-		factory.setHost(messageQueueConfig.getHost());
-		factory.setUsername(messageQueueConfig.getUser());
-		factory.setPassword(messageQueueConfig.getPassword());
-		try {
-			connection = factory.newConnection();
-			try (Channel channel = connection.createChannel()) {
-				channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE, true);
-			}
-		} catch (IOException e) {
-			log.error("Unable to create MQ connection", e);
-			EngineStatusLogger.getInstance().createEngineStatusNode(
-					"Exception while creating Message Queue connection " + e.getMessage(),
-					PlatformServiceConstants.FAILURE);
-		} catch (TimeoutException e) {
-			log.error("Unable to create MQ connection within specified time.", e);
-			EngineStatusLogger.getInstance().createEngineStatusNode(
-					"Exception while creating Message queue connection" + e.getMessage(),
-					PlatformServiceConstants.FAILURE);
+	private MessageSubscriberFactory() {
+			
+	}
 
+	public static MessageSubscriberFactory getInstance() throws InsightsCustomException {
+		if(instance != null) {
+			return instance;
+		}else {
+			instance= new MessageSubscriberFactory();
+			return instance;
 		}
 	}
 
-	private MessageSubscriberFactory() {
-		initConnectionFactory();
-	}
-
-	public static MessageSubscriberFactory getInstance() {
-		return instance;
-	}
-
 	public void registerSubscriber(String routingKey, final EngineSubscriberResponseHandler responseHandler)
-			throws IOException {
-		Channel channel = connection.createChannel();
+			throws IOException, InsightsCustomException {
 		String queueName = routingKey.replace(".", "_");
-		channel.queueDeclare(queueName, true, false, false, null);
-		channel.queueBind(queueName, MQMessageConstants.EXCHANGE_NAME, routingKey);
-		channel.basicQos(ApplicationConfigProvider.getInstance().getMessageQueue().getPrefetchCount());
+		Channel channel = RabbitMQConnectionProvider.getChannel(routingKey, queueName,MQMessageConstants.EXCHANGE_NAME,MQMessageConstants.EXCHANGE_TYPE);
 		responseHandler.setChannel(channel);
 		log.debug("prefetchCount {} for routingKey {} ",
 				ApplicationConfigProvider.getInstance().getMessageQueue().getPrefetchCount(), routingKey);

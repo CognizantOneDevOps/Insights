@@ -249,7 +249,7 @@ export class EditDashboardComponent implements OnInit {
             query.query = query.query.replace(key, JSON.stringify(value));
           }
         }
-        this.asyncOptions = await this.grafanaService.getTemplateByQuery(encodeURIComponent(query.query));
+        this.asyncOptions = await this.grafanaService.getTemplateByQuery({'query':query.query});
         this.asyncOptions.results[0].data.forEach(element => {
           optionData.push(element.row[0]);
         });
@@ -344,7 +344,7 @@ export class EditDashboardComponent implements OnInit {
       if(!(query.query.includes('$'))){
         let optionData=[];
         let asyncOptions:any;
-        asyncOptions = await this.grafanaService.getTemplateByQuery(query.query);
+        asyncOptions = await this.grafanaService.getTemplateByQuery({'query':query.query});
         asyncOptions.results[0].data.forEach(element => {
           optionData.push(element.row[0]);
         });
@@ -358,7 +358,7 @@ export class EditDashboardComponent implements OnInit {
         for (let [key, value] of this.globalMap.entries()) {
           query.query = query.query.replace(key, JSON.stringify(value));
         }
-          asyncOptions = await this.grafanaService.getTemplateByQuery(encodeURIComponent(query.query));
+          asyncOptions = await this.grafanaService.getTemplateByQuery({'query':query.query});
           asyncOptions.results[0].data.forEach(element => {
             optionData.push(element.row[0]);
           });

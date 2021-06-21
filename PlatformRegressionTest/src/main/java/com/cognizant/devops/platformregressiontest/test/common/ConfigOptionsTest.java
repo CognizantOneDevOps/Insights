@@ -19,11 +19,33 @@ public interface ConfigOptionsTest {
 
 	String PROP_FILE = "regression_test.properties";	
 	String AGENT_JSON_FILE = "agentTestData.json";
+	String AGENT_ONDEMAND_JSON_FILE = "agentOnDemandTestData.json";
+	String AGENT_RELEASE_JSON_FILE = "agentReleaseData.json";
+	String LOGIN_JSON_FILE = "login.json";
+	String AGENT_OFFLINE_JSON_FILE = "agentOfflineTestData.json";
 	String REPORT_JSON_FILE = "reportTestData.json";
+	String REPORT_CONFIGURATION_FILE="ReportConfiguration.xlsx";
+	String CORRELATION_JSON_FILE = "correlationTestData.json";
+	String EVENTCONFIG_JSON_FILE = "eventConfigWebhook.json";
+	String HEALTHCHECK_JSON_FILE = "healthCheckTestData.json";
+	String GROUP_JSON_FILE = "groupTestData.json";
+	String ADD_CONFIG_FILES = "addConfigFiles.json";
+	String ARCHIVAL_JSON_FILE = "dataArchival.json";
+	String WEBHOOK_JSON_FILE = "webhook.json";
+	String CONFIGURATION_JSON_FILE = "configurationFileManagementTestData.json";
+	String DYNAMICRESPONSE_JSON_FILE = "dynamicTemplateWebhook.json";
 	String TESTDATA_FILE = "Test_Data.xlsx";
 	String INSIGHTS_HOME = "INSIGHTS_HOME";
 	String CONFIG_DIR = ".InSights";
 	String AUTO_DIR = "Automation";
+	String AGENT_DIR = "agent_management";
+	String LOGIN_DIR = "login";
+	String HEALTH_CHECK_DIR = "health_check";
+	String WEBHOOK_CONFIG_DIR = "webhook_configuration";
+	String CONFIGURATION_FILE_DIR = "configuration_file_management";
+	String GROUPS_AND_USERS_DIR = "groups_and_user";
+	String CORRELATION_BUILDER_DIR = "correlation_builder";
+	String REPORT_MANAGEMENT_DIR = "report_management";
 	String CHROME_DIR = "chromedriver_win32";
 	String DRIVER_FILE = "chromedriver.exe";
 	String TESTNG_FILE = "testng.xml";
@@ -34,4 +56,5 @@ public interface ConfigOptionsTest {
 	String GRAFANA_COOKIES_ROLE = "grafanaRole";
 	String CONTENT_HEADER_KEY = "Content-Type";
 	String CONTENT_TYPE_VALUE = "application/json";
+	String REPORT_CONFIG_FOLDER="reportConfig";
 }

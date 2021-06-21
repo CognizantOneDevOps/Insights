@@ -113,15 +113,15 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
     function receiveMessage(event) {
       console.log(" in receiveMessage ngAfterViewInit event origin " + event.origin)
       //console.log(event.source)
-      if (event.origin == InsightsInitService.singleSignOnConfig.jwtTokenOriginURL) {
+      if (event.origin == InsightsInitService.jwtTokenOriginServerURL) {
         console.log(event.data)
         self.eventData = event.data;
         console.log(event)
         console.log(" origin " + event.origin)
-        console.log(" event origin " + InsightsInitService.singleSignOnConfig.jwtTokenOriginURL + "  " + event.origin);
+        console.log(" event origin " + InsightsInitService.jwtTokenOriginServerURL + "  " + event.origin);
         self.callJWTAUTH();
       } else {
-        //console.error(" JWT token origin mismatched " + InsightsInitService.singleSignOnConfig.jwtTokenOriginURL + "  " + event.origin)
+        //console.error(" JWT token origin mismatched " + InsightsInitService.jwtTokenOriginServerURL + "  " + event.origin)
       }
     }
     if (InsightsInitService.autheticationProtocol == AutheticationProtocol.JWT.toString()) {
@@ -202,8 +202,11 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
             this.cookies = "";
             console.log(grafcookies);
             for (var key in grafcookies) {
-              //this.cookieService.put(key, grafcookies[key], { storeUnencoded: true, path: '/' });//, expires: date
-              this.cookieService.set(key, grafcookies[key], 0, '/');
+              if (key != "jtoken" && key != "postLogoutURL" && key != "insights-sso-givenname") {
+                this.cookieService.set(key, grafcookies[key], 0, '/');
+              }else if (key == "jtoken") {
+                this.dataShare.setAuthorizationToken(grafcookies["jtoken"]);
+              }
             }
 
             this.loginGrafana();

@@ -344,7 +344,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 				page.waitForResponse(PROXY_URL_PATTERN);
 
 				byte[] image = page.waitForSelector("body > img").get().asElement().screenshot();
-				log.debug("Worlflow Detail ==== Image  ===== {} ",image);
+				//log.debug("Worlflow Detail ==== Image  ===== {} ",image);
 				imageList.add(image);
 				//page.screenshot(new Page.ScreenshotOptions().withPath(Paths.get("screenshot-"+idx + ".png")));
 

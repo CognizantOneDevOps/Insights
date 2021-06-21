@@ -53,7 +53,7 @@ public class ProcessMasterData {
 				return masterDataFileCount;
 			}
 			for (File masterDataFile : masterDataFiles) {
-				log.debug("masterDataFile {} ", masterDataFile.getName());
+				log.debug("masterDataFile ==== {} ", masterDataFile.getName());
 				if (masterDataFile.isFile()) { // this line removes other directories/folders
 					String masterDataFileName = masterDataFile.getName();
 					if (hasJsonFileExtension(masterDataFileName)) {
@@ -63,6 +63,7 @@ public class ProcessMasterData {
 				}
 			}
 		} catch (FileNotFoundException e) {
+			log.error(e);
 			log.error("File not found");
 		}
 		return masterDataFileCount;
@@ -101,10 +102,13 @@ public class ProcessMasterData {
 				}
 			}
 		} catch (FileNotFoundException e) {
+			log.error(e);
 			log.error("Master data file not found.", e);
 		} catch (IOException e) {
+			log.error(e);
 			log.error("Unable to read master data file.", e);
 		} catch (IllegalStateException | JsonSyntaxException ex) {
+			log.error(ex);
 			log.error(masterDataFile.getName(), "{} file is not as per expected format ", ex);
 			return Boolean.FALSE;
 		}
@@ -122,6 +126,7 @@ public class ProcessMasterData {
 		try {
 			masterDataDal.processMasterDataQuery(masterDataQueryModel.getSqlQuery());
 		} catch (Exception e) {
+			log.error(e);
 			log.error("SQL exception occured while inserting the master data", e);
 		}
 

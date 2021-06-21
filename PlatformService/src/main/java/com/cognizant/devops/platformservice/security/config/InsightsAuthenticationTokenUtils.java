@@ -35,11 +35,10 @@ import org.springframework.security.providers.ExpiringUsernameAuthenticationToke
 import org.springframework.security.saml.SAMLCredential;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 
 public class InsightsAuthenticationTokenUtils {
 
-	private static Logger Log = LogManager.getLogger(InsightsAuthenticationTokenUtils.class);
+	private static Logger log = LogManager.getLogger(InsightsAuthenticationTokenUtils.class);
 
 	/**
 	 * used to create AbstractAuthenticationToken for Native Grafana
@@ -47,18 +46,42 @@ public class InsightsAuthenticationTokenUtils {
 	 * @param user
 	 * @return
 	 */
-	public Authentication authenticationNativeGrafana(UserDetails user) {
+	public Authentication authenticateNativeGrafana(UserDetails user) {
 		UsernamePasswordAuthenticationToken authenticationGrafana = null;
 		if (user == null) {
-			Log.error(" Invalid Authentication for native Grafana ");
+			log.error(" Invalid Authentication for native Grafana ");
 			throw new InsightsAuthenticationException(" Invalid Invalid Authentication for native Grafana ");
 		} else {
 			authenticationGrafana = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-			Log.debug("In InsightsAuthenticationToken in grafana validation GrantedAuthority ==== {} ",
+			log.debug("In InsightsAuthenticationToken in grafana validation GrantedAuthority ==== {} ",
 					authenticationGrafana.getAuthorities());
 			SecurityContextHolder.getContext().setAuthentication(authenticationGrafana);
 		}
 		return authenticationGrafana;
+	}
+	
+	/**
+	 * used to create AbstractAuthenticationToken for Grafana JWT data
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	public Authentication authenticateGrafanaJWTData(HttpServletRequest request, HttpServletResponse response) {
+		log.debug(" Inside authenticationGrafanaJWTData , url ==== {} ", request.getRequestURI());
+		String authToken = AuthenticationUtils.extractAndValidateAuthToken(request, response);
+		SecurityContext context = SecurityContextHolder.getContext();
+		Authentication auth = context.getAuthentication();
+		if (auth != null) {
+			InsightsAuthenticationToken jwtAuthenticationToken = new InsightsAuthenticationToken(authToken,
+					auth.getDetails(), auth.getCredentials(), auth.getAuthorities());
+			log.debug(" Inside authenticationGrafanaJWTData , authorities ==== {} ", auth.getAuthorities());
+			return jwtAuthenticationToken;
+		} else {
+			AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.SECURITY_CONTEXT_CODE,
+					"Authentication not successful ,Please relogin ");
+			return null;
+		}
 	}
 
 	/**
@@ -68,15 +91,16 @@ public class InsightsAuthenticationTokenUtils {
 	 * @param response
 	 * @return
 	 */
-	public Authentication authenticationSAMLData(HttpServletRequest request, HttpServletResponse response) {
-		Log.debug(" Inside authenticationSAMLData , url ==== {} ", request.getRequestURI());
-		String auth_token = extractAndValidateAuthToken(request, response);
+	public Authentication authenticateSAMLData(HttpServletRequest request, HttpServletResponse response) {
+		log.debug(" Inside authenticationSAMLData , url ==== {} ", request.getRequestURI());
+		String authToken = AuthenticationUtils.extractAndValidateAuthToken(request, response);
 		SecurityContext context = SecurityContextHolder.getContext();
 		Authentication auth = context.getAuthentication();
 		if (auth != null) {
 			SAMLCredential credentials = (SAMLCredential) auth.getCredentials();
-			InsightsAuthenticationToken jwtAuthenticationToken = new InsightsAuthenticationToken(auth_token,
+			InsightsAuthenticationToken jwtAuthenticationToken = new InsightsAuthenticationToken(authToken,
 					auth.getDetails(), credentials, auth.getAuthorities());
+			log.debug(" Inside authenticationSAMLData , authorities ==== {} ", auth.getAuthorities());
 			return jwtAuthenticationToken;
 		} else {
 			AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.SECURITY_CONTEXT_CODE,
@@ -92,47 +116,27 @@ public class InsightsAuthenticationTokenUtils {
 	 * @param response
 	 * @return
 	 */
-	public Authentication authenticationJWTData(HttpServletRequest request, HttpServletResponse response) {
-		Log.debug(" Inside authenticationJWTData , url ==== {} ", request.getRequestURI());
-		String auth_token = extractAndValidateAuthToken(request, response);
+	public Authentication authenticateJWTData(HttpServletRequest request, HttpServletResponse response) {
+		log.debug(" Inside authenticationJWTData , url ==== {} ", request.getRequestURI());
+		String authToken = AuthenticationUtils.extractAndValidateAuthToken(request, response);
 		SecurityContext context = SecurityContextHolder.getContext();
 		Authentication auth = context.getAuthentication();
+		InsightsAuthenticationToken jwtAuthenticationToken = null;
 		if (auth != null) {
 			Object credentials = auth.getCredentials();
-			InsightsAuthenticationToken jwtAuthenticationToken = new InsightsAuthenticationToken(auth_token,
+			jwtAuthenticationToken=new InsightsAuthenticationToken(authToken,
 					auth.getDetails(), credentials, auth.getAuthorities());
-			return jwtAuthenticationToken;
 		} else {
-			//UserDetails user = GrafanaUserDetailsUtil.getUserDetails(request);user.getAuthorities()
-			InsightsAuthenticationToken jwtAuthenticationToken = new InsightsAuthenticationToken(auth_token, null, null,
+			jwtAuthenticationToken= new InsightsAuthenticationToken(authToken, null, null,
 					null);
-			/*AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.SECURITY_CONTEXT_CODE,
-					"Authentication not successful ,Please relogin ");*/
-			return jwtAuthenticationToken;
 		}
+		return jwtAuthenticationToken;
 	}
 
-	/**
-	 * Extract and validate authrization token
-	 * 
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	private String extractAndValidateAuthToken(HttpServletRequest request, HttpServletResponse response) {
-		String auth_token = request.getHeader(AuthenticationUtils.AUTH_HEADER_KEY);
-		if (auth_token == null || auth_token.isEmpty()) {
-			Log.error(" InsightsAuthenticationFilter Authorization is empty or not found ");
-			String msg = PlatformServiceUtil.buildFailureResponse("Unauthorized Access ,Invalid Credentials..")
-					.toString();
-			AuthenticationUtils.setResponseMessage(response, HttpServletResponse.SC_BAD_REQUEST, msg);
-		}
-		return auth_token;
-	}
-
+	
 	/**
 	 * Used to set AbstractAuthenticationToken when user role change mainly for
-	 * Switch Org scenerio.
+	 * Switch Org scenario.
 	 * 
 	 * @param grafanaCurrentOrgRole
 	 */
@@ -144,21 +148,25 @@ public class InsightsAuthenticationTokenUtils {
 		if (AuthenticationUtils.IS_NATIVE_AUTHENTICATION) {
 			Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(),
 					updatedAuthorities);
-			Log.debug("Get Credentials output {} output new   {}", auth, newAuth);
+			log.debug("In successfulAuthentication Older SAML GrantedAuthority ==== {} ", auth.getAuthorities());
+			log.debug("In successfulAuthentication SAML GrantedAuthority ==== {} ", updatedAuthorities);
 			SecurityContextHolder.getContext().setAuthentication(newAuth);
 		} else if ("SAML".equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
 			Object principal = auth.getPrincipal();
 			Date expDate = new Date(System.currentTimeMillis() + 60 * 60 * 1000);
 			ExpiringUsernameAuthenticationToken autharization = new ExpiringUsernameAuthenticationToken(expDate,
 					principal, auth.getCredentials(), updatedAuthorities);
+			log.debug("In successfulAuthentication Older SAML GrantedAuthority ==== {} ", auth.getAuthorities());
+			log.debug("In successfulAuthentication SAML GrantedAuthority ==== {} ", updatedAuthorities);
+
 			SecurityContextHolder.getContext().setAuthentication(autharization);
 		}else if ("Kerberos".equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
 			SecurityContext context = SecurityContextHolder.getContext();
 			KerberosServiceRequestToken authKerberos = (KerberosServiceRequestToken) context.getAuthentication();
 			KerberosServiceRequestToken responseAuth = new KerberosServiceRequestToken(authKerberos.getDetails(), authKerberos.getTicketValidation(),
 					updatedAuthorities, authKerberos.getToken());
-			Log.debug("In successfulAuthentication Older Kerberos GrantedAuthority ==== {} ", authKerberos);
-			Log.debug("In successfulAuthentication Kerberos GrantedAuthority ==== {} ", responseAuth);
+			log.debug("In successfulAuthentication Older Kerberos GrantedAuthority ==== {} ", auth.getAuthorities());
+			log.debug("In successfulAuthentication Kerberos GrantedAuthority ==== {} ", updatedAuthorities);
 
 			SecurityContextHolder.getContext().setAuthentication(responseAuth);
 		} else if ("JWT".equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
@@ -167,8 +175,8 @@ public class InsightsAuthenticationTokenUtils {
 
 			InsightsAuthenticationToken responseAuth = new InsightsAuthenticationToken(authKerberos.getPrincipal(),
 					authKerberos.getDetails(), authKerberos.getCredentials(), updatedAuthorities);
-			Log.debug("In successfulAuthentication JWT Older GrantedAuthority ==== {} ", authKerberos);
-			Log.debug("In successfulAuthentication JWT GrantedAuthority ==== {} ", responseAuth);
+			log.debug("In successfulAuthentication JWT Older GrantedAuthority ==== {} ", auth.getAuthorities());
+			log.debug("In successfulAuthentication JWT GrantedAuthority ==== {} ", updatedAuthorities);
 
 			SecurityContextHolder.getContext().setAuthentication(responseAuth);
 		}

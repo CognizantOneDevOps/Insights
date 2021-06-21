@@ -18,11 +18,13 @@ package com.cognizant.devops.platformreports.assessment.upshift.core;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsAssessmentConfigurationDTO;
@@ -40,7 +42,7 @@ public class UpshiftAssessmentExecutionSubscriber extends WorkflowTaskSubscriber
     InsightsAssessmentConfigurationDTO assessmentReportDTO = null;
     private WorkflowDAL workflowDAL = new WorkflowDAL();
 
-    public UpshiftAssessmentExecutionSubscriber(String routingKey) throws IOException {
+    public UpshiftAssessmentExecutionSubscriber(String routingKey) throws IOException, TimeoutException, InsightsCustomException {
         super(routingKey);
     }
 

@@ -46,6 +46,19 @@ public class GrafanaDashboardReportController {
 	@Autowired
 	GrafanaPdfService grafanaPdfServiceImpl;
 	
+	@PostMapping(value = "/exportPDF/getDashboardAsPDF", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject publishGrafanaDashboardDetails(@RequestBody String dashboardDetails) {
+		log.debug("Dashboard details to generate pdf == {}", dashboardDetails);
+		String message = null;
+		try {
+			JsonObject detailsJson = new JsonParser().parse(dashboardDetails).getAsJsonObject();
+			grafanaPdfServiceImpl.saveGrafanaDashboardConfig(detailsJson);
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+		return PlatformServiceUtil.buildSuccessResponseWithData(message);
+	}
+	
 	@GetMapping(value = "/exportPDF/fetchGrafanaDashboardConfigs", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject fetchGrafanaDashboardConfigs(){
 		List<GrafanaDashboardPdfConfig> result = null;

@@ -1,0 +1,64 @@
+{
+	"dataset": [
+		{
+			"agentManagement": "Agent Management",
+			"osName": "Windows",
+			"version": "v8.0",
+			"typeName": "Agent",
+			"toolName": "git",
+			"mqUser": "",
+			"mqPassword": "",
+			"agentId": "release_agent_01",
+			"dataLabelName": "SCM.GIT_RELEASE.DATA",
+			"healthLabelName": "SCM.GIT_RELEASE.HEALTH",
+			"accessToken": "",
+			"getRepos": "",
+			"commitsBaseEndPoint": ""
+		},
+		{
+			"agentManagement": "Agent Management",
+			"osName": "Windows",
+			"version": "v8.0",
+			"typeName": "Agent",
+			"toolName": "git",
+			"mqUser": "",
+			"mqPassword": "",
+			"agentId": "release_agent_02",
+			"dataLabelName": "SCM.GIT_RELEASE.DATA",
+			"healthLabelName": "SCM.GIT_RELEASE.HEALTH",
+			"accessToken": "",
+			"getRepos": "",
+			"commitsBaseEndPoint": ""
+		},
+		{
+			"agentManagement": "Agent Management",
+			"osName": "Windows",
+			"version": "v8.0",
+			"typeName": "Agent",
+			"toolName": "git",
+			"mqUser": "",
+			"mqPassword": "",
+			"agentId": "elastictransfer",
+			"dataLabelName": "SCM.GIT_ELASTICTRANSFER.DATA",
+			"healthLabelName": "SCM.GIT_ELASTICTRANSFER.HEALTH",
+			"accessToken": "",
+			"getRepos": "",
+			"commitsBaseEndPoint": ""
+		},
+		{
+			"agentManagement": "Agent Management",
+			"osName": "Windows",
+			"version": "v8.0",
+			"typeName": "Agent",
+			"toolName": "git",
+			"mqUser": "",
+			"mqPassword": "",
+			"agentId": "neo4jarchival",
+			"dataLabelName": "SCM.GIT_NEO4J.DATA",
+			"healthLabelName": "SCM.GIT_NEO4J.HEALTH",
+			"accessToken": "",
+			"getRepos": "",
+			"commitsBaseEndPoint": ""
+		}
+	]
+}

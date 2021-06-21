@@ -30,7 +30,7 @@ import org.springframework.security.web.util.UrlUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-public class InsightsSpnegoEntryPoint  implements AuthenticationEntryPoint { //extends GenericFilterBean
+public class InsightsSpnegoEntryPoint  implements AuthenticationEntryPoint { 
 	private static final Log LOG = LogFactory.getLog(InsightsSpnegoEntryPoint.class);
 
 	private final String forwardUrl;

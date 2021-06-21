@@ -39,15 +39,18 @@ export const defaultQuery: Partial<MyQuery> = {
  * These are options configured for each DataSource instance
  */
 export interface MyDataSourceOptions extends DataSourceJsonData {
+  basicPassword: string;
   logging: any ;
   path?: string;
   serviceUrl?: any;
+  authToken: any;
 }
 
 /**
  * Value that is used in the backend, but never sent over HTTP to the frontend
  */
 export interface MySecureJsonData {
+  basicPassword: string;
   apiKey?: string;
 }
 
@@ -55,4 +58,6 @@ export const defaults: MyDataSourceOptions = {
   logging :true,
   path: '',
   serviceUrl : 'http://localhost:8080/PlatformService/datasource/logDashboardInfo',
+  authToken : true,
+  basicPassword: ''
 }

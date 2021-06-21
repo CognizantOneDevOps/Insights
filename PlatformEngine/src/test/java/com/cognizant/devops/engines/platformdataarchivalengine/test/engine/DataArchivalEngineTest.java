@@ -98,7 +98,7 @@ public class DataArchivalEngineTest extends DataArchivalEngineData {
 	}
 
 	@Test(priority = 1)
-	public void testSaveURLForArchivalRecord() throws IOException, TimeoutException, InterruptedException {
+	public void testSaveURLForArchivalRecord() throws IOException, TimeoutException, InterruptedException, InsightsCustomException {
 		try {
 			publishDataArchivalDetails(routingKey, urlMessage);
 			Thread.sleep(2000);

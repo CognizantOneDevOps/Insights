@@ -31,33 +31,30 @@
 
   <form #frmagentconfig="ngForm" class="form">
     <div class="arrange-horizontally button-row">
-      <div> <label class="mainText"> Operating System </label> </div>
-      <div>
-        <mat-select required [(ngModel)]="selectedOS" name="selectedOS" [disabled]="btnValue == 'Update'" class="form-control" placeholder="Select OS" (ngModelChange)="versionOnChange(selectedVersion, 'validate')"
-          style="width:150px;">
+      <div style="width:25%;">
+        <mat-select required [(ngModel)]="selectedOS" name="selectedOS" [disabled]="btnValue == 'Update'" class="form-control" placeholder="Operating System" (ngModelChange)="versionOnChange(selectedVersion, 'validate')"
+          style="width:80%;">
           <mat-option *ngFor="let os of osLists | keyvalue" value="{{os.value}}">{{os.key}}</mat-option>
           </mat-select>
       </div>
 
-      <div> <label class="mainText"> Type </label> </div>
-      <div>
+      <div style="width:25%;">
         <mat-select required [(ngModel)]="selectedType" name="selectedType" [disabled]="btnValue == 'Update'" class="form-control" placeholder="Select Type"  (ngModelChange)="checkType()"
-          style="width:150px;">
+          style="width:80%;">
           <mat-option *ngFor="let type of agentType " value="{{type}}">{{type}}</mat-option>
           </mat-select>
       </div>
 
-      <div> <label class="mainText"> Version of the Agent </label> </div>
-      <div>
-        <mat-select required [(ngModel)]="selectedVersion" name="selectedVersion" class="form-control" placeholder="Select Version"
-          (ngModelChange)="versionOnChange(selectedVersion, btnValue)" style="width:150px;">
+      <div style="width:25%;">
+        <mat-select required [(ngModel)]="selectedVersion" name="selectedVersion" class="form-control" placeholder="Version"
+          (ngModelChange)="versionOnChange(selectedVersion, btnValue)" style="width:80%;">
           <mat-option *ngFor="let key of versionList" value="{{key}}">{{key}}</mat-option>
           </mat-select>
       </div>
-      <div> <label class="mainText"> Tool </label> </div>
-      <div>
-        <mat-select required [(ngModel)]="selectedTool" name="selectedTool" class="form-control" placeholder="Select Tool" (ngModelChange)="getAgentConfig(selectedVersion, selectedTool)"
-          style="width:150px;" [disabled]="btnValue == 'Update'">
+
+      <div style="width:25%;">
+        <mat-select required [(ngModel)]="selectedTool" name="selectedTool" class="form-control" placeholder="Tool" (ngModelChange)="getAgentConfig(selectedVersion, selectedTool)"
+          style="width:80%;" [disabled]="btnValue == 'Update'">
           <mat-option *ngFor=" let tool of toolsArr | keyvalue" value="{{tool.value}}">{{tool.value}}</mat-option>
           </mat-select>
       </div>

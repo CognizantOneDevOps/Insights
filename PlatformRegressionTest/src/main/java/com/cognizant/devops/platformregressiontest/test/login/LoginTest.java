@@ -16,39 +16,74 @@
 package com.cognizant.devops.platformregressiontest.test.login;
 
 import java.io.File;
-import java.util.concurrent.TimeUnit;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import com.cognizant.devops.platformregressiontest.test.common.CommonUtils;
 import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
+import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectModule;
 
-public class LoginTest {
+public class LoginTest extends LoginAndSelectModule {
 
+	private static final Logger log = LogManager.getLogger(LoginTest.class);
+	LoginConfiguration clickAllActionButton;
+
+	String line = "============================================================================================================================================================";
+
+	@BeforeTest
+	public void setUp() {
+		initialization();
+		getData(ConfigOptionsTest.LOGIN_DIR + File.separator + ConfigOptionsTest.LOGIN_JSON_FILE);
+		clickAllActionButton = new LoginConfiguration();
+	}
+
+	/**
+	 * Assert true if login was not successful
+	 */
 	@Test(priority = 1)
-	public void login() throws Exception {
+	public void loginWithInvalidCredentials() {
+		log.info(line);
+		Assert.assertTrue(clickAllActionButton.loginWithInvalidCredentials(),
+				"Login failed due to incorrect credentials.");
+	}
 
-		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator + File.separator
-				+ ConfigOptionsTest.AUTO_DIR + File.separator + ConfigOptionsTest.CHROME_DIR + File.separator
-				+ ConfigOptionsTest.DRIVER_FILE;
-		System.setProperty("webdriver.chrome.driver", path);
+	/**
+	 * Assert true if login was successful
+	 * @throws InterruptedException 
+	 */
+	@Test(priority = 2)
+	public void loginWithValidCredentials() throws InterruptedException {
+		log.info(line);
+		Assert.assertTrue(clickAllActionButton.loginWithValidCredentials(), "Login successful.");
+	}
+	
+	/**
+	 * Assert true if logout was successful
+	 * @throws InterruptedException 
+	 */
+	@Test(priority = 3)
+	public void checkLogoutFunctionality() throws InterruptedException {
+		log.info(line);
+		Assert.assertTrue(clickAllActionButton.checkLogoutFunctionality(), "Login successful.");
+	}
 
-		WebDriver driver = new ChromeDriver();
-		driver.manage().window().maximize();
-		driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
-		driver.navigate().to(CommonUtils.getProperty("baseURI") + "/app");
-		driver.findElement(By.xpath("//input[contains(@name,'username')]")).sendKeys("admin");
-		driver.findElement(By.xpath("//input[contains(@autocomplete,'new-password')]")).sendKeys("admin");
+	/**
+	 * This method will be executed just after any function/method with @Test
+	 * annotation ends.
+	 * @throws InterruptedException 
+	 */
+	@AfterClass
+	public void afterClass() throws InterruptedException {
+		log.info(line);
+		driver.findElement(By.xpath("//input[contains(@name,'username')]")).sendKeys(LoginAndSelectModule.testData.get("username"));
+		driver.findElement(By.xpath("//input[contains(@autocomplete,'new-password')]")).sendKeys(LoginAndSelectModule.testData.get("password"));
 		driver.findElement(By.xpath("//button[contains(@class,'sigBtn')]")).click();
-		Thread.sleep(4000);
-		driver.findElement(By.xpath("(//p[contains(@class,'line-child')])[4]")).click();
 		Thread.sleep(2000);
-		driver.findElement(By.xpath("(//p[contains(@class, 'mat-list-text')])[3]")).click();
-		Assert.assertEquals(driver.getTitle(), "Insights");
 	}
 
 }

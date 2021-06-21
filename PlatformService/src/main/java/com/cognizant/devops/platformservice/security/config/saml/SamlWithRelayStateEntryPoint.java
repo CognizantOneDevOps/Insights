@@ -26,7 +26,7 @@ public class SamlWithRelayStateEntryPoint extends SAMLEntryPoint {
 
 
 	/**
-	 * used to forword to UI application after API validation
+	 * used to forward to UI application after API validation
 	 */
     @Override
     protected WebSSOProfileOptions getProfileOptions(SAMLMessageContext context, AuthenticationException exception) {

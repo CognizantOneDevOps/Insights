@@ -16,18 +16,19 @@
 package com.cognizant.devops.engines.platformengine.message.subscriber;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.ProcessingException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,9 +38,7 @@ import com.cognizant.devops.engines.platformengine.modules.aggregator.BusinessMa
 import com.cognizant.devops.engines.util.DataEnrichUtils;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
-import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -65,12 +64,13 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 	private String keyPattern;
 	private String sourceProperty;
 	private Boolean isEnrichmentRequired;
-	List<BusinessMappingData> businessMappingList = new ArrayList<BusinessMappingData>(0);
+	private String agentId;
+	List<BusinessMappingData> businessMappingList = new ArrayList<>(0);
+	private Map<String,String> loggingInfo = new ConcurrentHashMap<>();
 
-	public AgentDataSubscriber(String routingKey, String category,
-			String labelName, String toolName, List<BusinessMappingData> businessMappingList,
-			boolean isEnrichmentRequired, String targetProperty, String keyPattern, String sourceProperty)
-			throws Exception {
+	public AgentDataSubscriber(String routingKey, String category, String labelName, String toolName,
+			List<BusinessMappingData> businessMappingList, boolean isEnrichmentRequired, String targetProperty,
+			String keyPattern, String sourceProperty, String agentId) throws Exception {
 		super(routingKey);
 		this.category = category;
 		this.toolName = toolName;
@@ -80,6 +80,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		this.targetProperty = targetProperty;
 		this.keyPattern = keyPattern;
 		this.sourceProperty = sourceProperty;
+		this.agentId = agentId;
 	}
 
 	public void setMappingData(List<BusinessMappingData> businessMappingList) {
@@ -89,88 +90,94 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 	@Override
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body)
 			throws IOException {
-		ApplicationConfigProvider.performSystemCheck();
-		boolean enableOnlineDatatagging = ApplicationConfigProvider.getInstance().isEnableOnlineDatatagging();
-		String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
-		String routingKey = envelope.getRoutingKey();
-		log.debug("Data ==== Routing key in data {} received data size {} message {} ", routingKey, message.length(),message);
-		List<String> labels = new ArrayList<String>();
-		labels.add("RAW");
-		if (this.labelName == null) {
-			labels.addAll(Arrays.asList(routingKey.split(MQMessageConstants.ROUTING_KEY_SEPERATOR)));
-		} else {
-			labels.add(this.category.toUpperCase());
-			labels.add(this.toolName.toUpperCase());
-			labels.add(this.labelName);
-			labels.add("DATA");
-		}
-
-		List<JsonObject> dataList = new ArrayList<JsonObject>();
-		JsonElement json = new JsonParser().parse(message);
-		boolean dataUpdateSupported = false;
-		String uniqueKey = "";
-		JsonObject relationMetadata = null;
-		if (json.isJsonObject()) {
-			JsonObject messageObject = json.getAsJsonObject();
-			json = messageObject.get("data");
-			if (messageObject.has("metadata")) {
-				JsonObject metadata = messageObject.get("metadata").getAsJsonObject();
-				if (metadata.has(AgentDataConstants.LABELS)) {
-					JsonArray additionalLabels = metadata.get(AgentDataConstants.LABELS).getAsJsonArray();
-					for (JsonElement additionalLabel : additionalLabels) {
-						String label = additionalLabel.getAsString();
-						if (!labels.contains(label)) {
-							labels.add(label);
-						}
-					}
-				}
-				if (metadata.has("dataUpdateSupported")) {
-					dataUpdateSupported = metadata.get("dataUpdateSupported").getAsBoolean();
-				}
-				if (metadata.has("uniqueKey")) {
-					JsonArray uniqueKeyArray = metadata.getAsJsonArray("uniqueKey");
-					StringBuffer keys = new StringBuffer();
-					for (JsonElement key : uniqueKeyArray) {
-						keys.append(key.getAsString()).append(",");
-					}
-					keys.delete(keys.length() - 1, keys.length());
-					uniqueKey = keys.toString();
-				}
-				if (metadata.has("relation")) {
-					relationMetadata = metadata.get("relation").getAsJsonObject();
-				}
+		String message = new String(body, StandardCharsets.UTF_8);
+		try {
+			ApplicationConfigProvider.performSystemCheck();
+			long startTime = System.nanoTime();
+			boolean enableOnlineDatatagging = ApplicationConfigProvider.getInstance().isEnableOnlineDatatagging();
+			String routingKey = envelope.getRoutingKey();
+			log.debug(
+					" Type=AgentEngine toolName={} category={} agentId={} routingKey={} dataSize={} execId={} ProcessingTime={} Data ==== Routing key in data {} received data size {} ",
+					toolName, category, agentId, routingKey, message.length(), "-", 0, routingKey, message.length());
+			List<String> labels = new ArrayList<>();
+			labels.add("RAW");
+			if (this.labelName == null) {
+				labels.addAll(Arrays.asList(routingKey.split(MQMessageConstants.ROUTING_KEY_SEPERATOR)));
+			} else {
+				labels.add(this.category.toUpperCase());
+				labels.add(this.toolName.toUpperCase());
+				labels.add(this.labelName);
+				labels.add("DATA");
 			}
-		}
 
-		if (json.isJsonArray()) {
-			JsonArray asJsonArray = json.getAsJsonArray();
-			JsonObject dataWithproperty;
-			for (JsonElement e : asJsonArray) {
-				if (e.isJsonObject()) {
-					dataWithproperty = e.getAsJsonObject();
-					// Below Code has the ability to add derived properties as part of Nodes
-					if (this.isEnrichmentRequired && e.getAsJsonObject().has(sourceProperty)) {
-						JsonElement sourceElem = e.getAsJsonObject().get(sourceProperty);
-						if (sourceElem.isJsonPrimitive()) {
-							String enrichedData = DataEnrichUtils.dataExtractor(sourceElem.getAsString(), keyPattern);
-							if (enrichedData != null) {
-								dataWithproperty.addProperty(targetProperty, enrichedData);
+			List<JsonObject> dataList = new ArrayList<>();
+			JsonElement json = new JsonParser().parse(message);
+			boolean dataUpdateSupported = false;
+			String uniqueKey = "";
+			JsonObject relationMetadata = null;
+			if (json.isJsonObject()) {
+				JsonObject messageObject = json.getAsJsonObject();
+				json = messageObject.get("data");
+				if (messageObject.has("metadata")) {
+					JsonObject metadata = messageObject.get("metadata").getAsJsonObject();
+					if (metadata.has(AgentDataConstants.LABELS)) {
+						JsonArray additionalLabels = metadata.get(AgentDataConstants.LABELS).getAsJsonArray();
+						for (JsonElement additionalLabel : additionalLabels) {
+							String label = additionalLabel.getAsString();
+							if (!labels.contains(label)) {
+								labels.add(label);
 							}
 						}
 					}
-					if (enableOnlineDatatagging) {
-						JsonObject jsonWithLabel = applyDataTagging(dataWithproperty);
-						if (jsonWithLabel != null) {
-							dataList.add(jsonWithLabel);// finalJson
-						} else {
-							dataList.add(dataWithproperty);
+					if (metadata.has("dataUpdateSupported")) {
+						dataUpdateSupported = metadata.get("dataUpdateSupported").getAsBoolean();
+					}
+					if (metadata.has("uniqueKey")) {
+						JsonArray uniqueKeyArray = metadata.getAsJsonArray("uniqueKey");
+						StringBuffer keys = new StringBuffer();
+						for (JsonElement key : uniqueKeyArray) {
+							keys.append(key.getAsString()).append(",");
 						}
-					} else {
-						dataList.add(dataWithproperty);
+						keys.delete(keys.length() - 1, keys.length());
+						uniqueKey = keys.toString();
+					}
+					if (metadata.has("relation")) {
+						relationMetadata = metadata.get("relation").getAsJsonObject();
 					}
 				}
 			}
-			try {
+
+			if (json.isJsonArray()) {
+				JsonArray asJsonArray = json.getAsJsonArray();
+				JsonObject dataWithproperty;
+				for (JsonElement e : asJsonArray) {
+					if (e.isJsonObject()) {
+						dataWithproperty = e.getAsJsonObject();
+						loggingInfo.put("execId", dataWithproperty.get("execId").getAsString());
+						// Below Code has the ability to add derived properties as part of Nodes
+						if (Boolean.TRUE.equals(this.isEnrichmentRequired) && e.getAsJsonObject().has(sourceProperty)) {
+							JsonElement sourceElem = e.getAsJsonObject().get(sourceProperty);
+							if (sourceElem.isJsonPrimitive()) {
+								String enrichedData = DataEnrichUtils.dataExtractor(sourceElem.getAsString(),
+										keyPattern);
+								if (enrichedData != null) {
+									dataWithproperty.addProperty(targetProperty, enrichedData);
+								}
+							}
+						}
+						if (enableOnlineDatatagging) {
+							JsonObject jsonWithLabel = applyDataTagging(dataWithproperty);
+							if (jsonWithLabel != null) {
+								dataList.add(jsonWithLabel);// finalJson
+							} else {
+								dataList.add(dataWithproperty);
+							}
+						} else {
+							dataList.add(dataWithproperty);
+						}
+					}
+				}
+
 				String cypherQuery = "";
 				String queryLabel = "";
 				for (String label : labels) {
@@ -191,38 +198,36 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 				for (List<JsonObject> chunk : partitionList) {
 					JsonObject graphResponse = dbHandler.bulkCreateNodes(chunk, labels, cypherQuery);
 					if (graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0) {
-						log.error("Unable to insert nodes for routing key: {} " + routingKey + ", error occured: "
-								+ graphResponse);
+						log.error("Unable to insert nodes for routing key: {}  error occured: {} ", routingKey,
+								graphResponse);
 					}
 				}
+				long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+				log.debug(
+						" Type=AgentEngine toolName={} category={} agentId={} routingKey={} dataSize={} execId={} ProcessingTime={} Data ==== Processingtime={} ms",
+						toolName, category, agentId, "-", 0, loggingInfo.get("execId"), processingTime, processingTime);
 				getChannel().basicAck(envelope.getDeliveryTag(), false);
-			} catch (ProcessingException e) {
-				log.error("ProcessingException occured  ", e);
-				getChannel().basicNack(envelope.getDeliveryTag(), false, true);
-			} catch (InsightsCustomException e) {
-				log.error("InsightsCustomException occured  ", e);
-			} catch (Exception e) {
-				log.error("Exception occured  ", e);
 			}
+		} catch (ProcessingException e) {
+			log.error(" toolName={} category={} agentId={} execId={} ProcessingException occured ", toolName, category,
+					agentId, loggingInfo.get("execId"), e);
+			getChannel().basicNack(envelope.getDeliveryTag(), false, true);
+		} catch (InsightsCustomException e) {
+			log.error("Error in payload {} ",message);
+			log.error(" toolName={} category={} agentId={} execId={} InsightsCustomException occured  ", toolName,
+					category, agentId, loggingInfo.get("execId"), e);
+			getChannel().basicReject(envelope.getDeliveryTag(), false);
+		} catch (Exception e) {
+			log.error("Error in payload {} ",message);
+			log.error(" toolName={} category={} agentId={} execId={} Exception occured  ", toolName, category, agentId,
+					loggingInfo.get("execId"), e);
+			getChannel().basicReject(envelope.getDeliveryTag(), false);
 		}
 	}
 
-	private JsonObject mergeProperty(JsonElement e, String jsonStr) {
-		JsonParser jsonParser = new JsonParser();
-		JsonObject jsonObj = (JsonObject) jsonParser.parse(jsonStr);
-		Map<String, String> metaDataJson = new Gson().fromJson(jsonObj, HashMap.class);
-		Map<String, String> agentJson = new Gson().fromJson(e.getAsJsonObject(), HashMap.class);
-		Map<String, String> finalobj = new HashMap<String, String>();
-		finalobj.putAll(metaDataJson);
-		finalobj.putAll(agentJson);
-		String resultJson = new Gson().toJson(finalobj);
-		JsonObject finalJson = (JsonObject) jsonParser.parse(resultJson);
-		return finalJson;
-	}
-
 	private JsonObject applyDataTagging(JsonObject asJsonObject) {
-		List<String> selectedBusinessMappingArray = new ArrayList<String>(0);
-		Map<String, String> labelMappingMap = new TreeMap<String, String>();
+		List<String> selectedBusinessMappingArray = new ArrayList<>(0);
+		Map<String, String> labelMappingMap = new TreeMap<>();
 		for (BusinessMappingData businessMappingData : businessMappingList) {
 			Map<String, String> map = businessMappingData.getPropertyMap();
 			int totalCount = businessMappingData.getPropertyMap().size();
@@ -269,71 +274,9 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		return asJsonObject;
 	}
 
-	private Map<String, Map<String, NodeData>> getMetaData(GraphDBHandler dbHandler) {
-		List<NodeData> nodes = null;
-		Map<String, NodeData> nodepropertyMap = null;
-		Map<String, Map<String, NodeData>> metaDataMap = new HashMap<String, Map<String, NodeData>>();
-		try {
-			GraphResponse response = dbHandler.executeCypherQuery("MATCH (n:METADATA:DATATAGGING) return n");
-			nodes = response.getNodes();
-		} catch (InsightsCustomException e) {
-			log.error(e);
-		}
-		if (nodes.size() > 0) {
-			for (NodeData node : nodes) {
-				StringBuilder labelVal = new StringBuilder();
-				StringBuilder key = new StringBuilder();
-				nodepropertyMap = new HashMap<String, NodeData>();
-
-				if (null != node.getProperty(AgentDataConstants.PROPERTY_1)
-						&& !node.getProperty(AgentDataConstants.PROPERTY_1).isEmpty()) {
-					key.append(node.getProperty(AgentDataConstants.PROPERTY_1));
-					key.append(AgentDataConstants.COLON);
-				}
-				if (null != node.getProperty(AgentDataConstants.PROPERTY_2)
-						&& !node.getProperty(AgentDataConstants.PROPERTY_2).isEmpty()) {
-					key.append(node.getProperty(AgentDataConstants.PROPERTY_2));
-					key.append(AgentDataConstants.COLON);
-				}
-				if (null != node.getProperty(AgentDataConstants.PROPERTY_3)
-						&& !node.getProperty(AgentDataConstants.PROPERTY_3).isEmpty()) {
-					key.append(node.getProperty(AgentDataConstants.PROPERTY_3));
-					key.append(AgentDataConstants.COLON);
-				}
-				if (null != node.getProperty(AgentDataConstants.PROPERTY_4)
-						&& !node.getProperty(AgentDataConstants.PROPERTY_4).isEmpty()) {
-					key.append(node.getProperty(AgentDataConstants.PROPERTY_4));
-					key.append(AgentDataConstants.COLON);
-				}
-				if (null != node.getProperty(AgentDataConstants.PROPERTYVALUE_1)
-						&& !node.getProperty(AgentDataConstants.PROPERTYVALUE_1).isEmpty()) {
-					labelVal.append(node.getProperty(AgentDataConstants.PROPERTYVALUE_1));
-					labelVal.append(AgentDataConstants.COLON);
-				}
-				if (null != node.getProperty(AgentDataConstants.PROPERTYVALUE_2)
-						&& !node.getProperty(AgentDataConstants.PROPERTYVALUE_2).isEmpty()) {
-					labelVal.append(node.getProperty(AgentDataConstants.PROPERTYVALUE_2));
-					labelVal.append(AgentDataConstants.COLON);
-				}
-				if (null != node.getProperty(AgentDataConstants.PROPERTYVALUE_3)
-						&& !node.getProperty(AgentDataConstants.PROPERTYVALUE_3).isEmpty()) {
-					labelVal.append(node.getProperty(AgentDataConstants.PROPERTYVALUE_3));
-					labelVal.append(AgentDataConstants.COLON);
-				}
-				if (null != node.getProperty(AgentDataConstants.PROPERTYVALUE_4)
-						&& !node.getProperty(AgentDataConstants.PROPERTYVALUE_4).isEmpty()) {
-					labelVal.append(node.getProperty(AgentDataConstants.PROPERTYVALUE_4));
-				}
-
-				nodepropertyMap.put(StringUtils.stripEnd(labelVal.toString(), AgentDataConstants.COLON), node);
-				metaDataMap.put(StringUtils.stripEnd(key.toString(), AgentDataConstants.COLON), nodepropertyMap);
-			}
-		}
-		return metaDataMap;
-	}
 
 	private <T> List<List<T>> partitionList(List<T> list, final int size) {
-		List<List<T>> parts = new ArrayList<List<T>>();
+		List<List<T>> parts = new ArrayList<>();
 		final int N = list.size();
 		for (int i = 0; i < N; i += size) {
 			parts.add(getPartitionSubList(list, i, size, N));
@@ -342,7 +285,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 	}
 
 	private <T> ArrayList<T> getPartitionSubList(List<T> list, int index, int size, final int N) {
-		return new ArrayList<T>(list.subList(index, Math.min(N, index + size)));
+		return new ArrayList<>(list.subList(index, Math.min(N, index + size)));
 	}
 
 	private String buildCypherQuery(String labels, String fieldName) {

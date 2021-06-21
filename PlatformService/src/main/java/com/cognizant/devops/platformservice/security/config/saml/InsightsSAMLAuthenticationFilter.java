@@ -29,7 +29,7 @@ import org.springframework.web.filter.GenericFilterBean;
 
 public class InsightsSAMLAuthenticationFilter extends GenericFilterBean {
 
-	private static Logger LOG = LogManager.getLogger(InsightsSAMLAuthenticationFilter.class);
+	private static Logger log = LogManager.getLogger(InsightsSAMLAuthenticationFilter.class);
 
 	/**
 	 * This authentication filter used to handle all SAML login request
@@ -37,7 +37,7 @@ public class InsightsSAMLAuthenticationFilter extends GenericFilterBean {
 	@Override
 	public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
 			throws IOException, ServletException {
-		LOG.debug(" Inside InsightsSAMLAuthenticationFilter ");
+		log.debug(" Inside InsightsSAMLAuthenticationFilter ");
 		chain.doFilter(request, response);
 	}
 }

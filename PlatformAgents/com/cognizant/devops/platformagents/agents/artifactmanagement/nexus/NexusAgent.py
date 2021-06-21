@@ -61,7 +61,7 @@ class NexusAgent(BaseAgent):
                 fetchNextPage= False;                    
             else :
                 fetchNextPage= True;
-                newFirstEndPoint = FirstEndPointURL+'&continuationToken='+str(continuationToken)
+                newFirstEndPoint = FirstEndPoint+'&continuationToken='+str(continuationToken)
                 nexIDs = self.getResponse(newFirstEndPoint, 'GET', self.userid, self.passwd, None)
 
     def prepareAndPublish(self, nexIDs, tracking):

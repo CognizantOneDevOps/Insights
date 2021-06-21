@@ -42,10 +42,12 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.traceabilitydashboard.constants.TraceabilityConstants;
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.JWSVerifier;
+import com.nimbusds.jose.KeyLengthException;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -57,8 +59,8 @@ public class TokenProviderUtility {
 	private static Logger log = LogManager.getLogger(TokenProviderUtility.class);
 	private String signingKey = ApplicationConfigProvider.getInstance().getSingleSignOnConfig()
 			.getTokenSigningKey();
-	public static CacheManager cacheManager = null;
-	public static Cache<String, String> tokenCache = null;
+	static CacheManager cacheManager = null;
+	static Cache<String, String> tokenCache = null;
 
 	public TokenProviderUtility() {
 		signingKey = ApplicationConfigProvider.getInstance().getSingleSignOnConfig()
@@ -73,7 +75,7 @@ public class TokenProviderUtility {
 	 * used to initilize cache
 	 */
 	@PostConstruct
-	public void initilizeTokenCache() {
+	public synchronized void initilizeTokenCache() {
 		log.debug("Inside initilizeTokenCache of tokenProviderUtility ==== ");
 		if (TokenProviderUtility.cacheManager == null) {
 			TokenProviderUtility.cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
@@ -96,38 +98,21 @@ public class TokenProviderUtility {
 	}
 
 	/**
-	 * used to create token and add it in customize cache
+	 * used to create token and add it in customize cache,This will use default expiration time 
 	 * 
-	 * @param ssoname
+	 * @param userName
 	 * @return
 	 */
-	public String createToken(String ssoname) {
+	public String createToken(String userName) {
 		String strJWTToken = "";
 		log.debug("Inside Create token === ");
 		try {
-			String username = ValidationUtils.cleanXSS(ssoname);
+			String username = ValidationUtils.cleanXSS(userName);
 			String id = UUID.randomUUID().toString().replace("-", "");
 			Date now = new Date();
 			Date expDate = new Date(System.currentTimeMillis() + AuthenticationUtils.TOKEN_TIME * 60 * 1000);
 
-			// Create HMAC signer
-			JWSSigner signer = new MACSigner(signingKey.getBytes());
-
-			// Prepare JWT with claims set
-			JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().subject(username).jwtID(id).issueTime(now)
-					.issuer("cognizant.com").expirationTime(expDate).build();
-
-			SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
-
-			// Apply the HMAC protection
-			signedJWT.sign(signer);
-
-			// Serialize to compact form, produces something like
-			strJWTToken = signedJWT.serialize();
-
-			log.debug("token created with id {} {}", id, strJWTToken);
-
-			TokenProviderUtility.tokenCache.put(id, strJWTToken);
+			strJWTToken = createAndStoreToken(username, id, now, expDate);
 
 		} catch (CacheWritingException e) {
 			log.error(e);
@@ -136,6 +121,61 @@ public class TokenProviderUtility {
 			log.error(e);
 			log.error("Error While creating JWT token ==== {} ", e.getMessage());
 		}
+		return strJWTToken;
+	}
+	
+	
+	/**
+	 * used to create token and add it in customize cache,This will use custom expiration time 
+	 * 
+	 * @param userName
+	 * @return
+	 */
+	public String createToken(String userName,int tokenTime) {
+		String strJWTToken = "";
+		log.debug("Inside Create token with tokenTime {} === ",tokenTime);
+		try {
+			String username = ValidationUtils.cleanXSS(userName);
+			String id = UUID.randomUUID().toString().replace("-", "");
+			Date now = new Date();
+			Date expDate = new Date(System.currentTimeMillis() + tokenTime * 60 * 1000);
+
+			strJWTToken = createAndStoreToken(username, id, now, expDate);
+
+		} catch (CacheWritingException e) {
+			log.error(e);
+			log.error("CacheWritingException While writing token in cache  ==== {} ", e.getMessage());
+		} catch (Exception e) {
+			log.error(e);
+			log.error("Error While creating JWT token ==== {} ", e.getMessage());
+		}
+		return strJWTToken;
+	}
+	
+	
+	
+
+	private String createAndStoreToken(String username, String id, Date now, Date expDate)
+			throws KeyLengthException, JOSEException {
+		String strJWTToken;
+		// Create HMAC signer
+		JWSSigner signer = new MACSigner(signingKey.getBytes());
+
+		// Prepare JWT with claims set
+		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().subject(username).jwtID(id).issueTime(now)
+				.issuer("cognizant.com").expirationTime(expDate).build();
+
+		SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
+
+		// Apply the HMAC protection
+		signedJWT.sign(signer);
+
+		// Serialize to compact form, produces something like
+		strJWTToken = signedJWT.serialize();
+
+		//log.debug("token created with id {} {}", id, strJWTToken)
+
+		TokenProviderUtility.tokenCache.put(id, strJWTToken);
 		return strJWTToken;
 	}
 
@@ -153,12 +193,11 @@ public class TokenProviderUtility {
 		boolean isVerify = Boolean.FALSE;
 		boolean isTokenExistsInCache = Boolean.FALSE;
 		boolean validateTokenDate = Boolean.FALSE;
-		// log.debug(" In verifyToken ");
 		try {
 			String authToken = ValidationUtils.cleanXSS(token);
 			if (authToken == null || authToken.isEmpty()) {
-				log.error("authToken is null or empty");
-				throw new InsightsCustomException("authToken is null or empty");
+				log.error("verifyToken authToken is null or empty");
+				throw new InsightsCustomException(" verifyTokenauthToken is null or empty");
 			}
 
 			// parse the JWS and verify its HMAC
@@ -177,16 +216,12 @@ public class TokenProviderUtility {
 			if (tokenValueFromCache == null) {
 				log.debug("No token found in cache");
 			} else if (tokenValueFromCache.equalsIgnoreCase(authToken)) {
-				// log.debug("Token value matched in cache === ");
 				isTokenExistsInCache = Boolean.TRUE;
 			} else {
 				log.error("Token value not matched in cache=== ");
 			}
 
-			// log.debug("alice after " + signedJWT.getJWTClaimsSet().getSubject());
-			// log.debug("cognizant.com " + signedJWT.getJWTClaimsSet().getIssuer());
-			// log.debug("Exceperation Time after " +
-			// signedJWT.getJWTClaimsSet().getExpirationTime());
+			 log.debug("user alice after {} + Exceperation Time after {} " , signedJWT.getJWTClaimsSet().getSubject(),signedJWT.getJWTClaimsSet().getExpirationTime());
 			log.debug("Check date of token with current date {} ",
 					new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime()));// after
 			validateTokenDate = new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime());// after
@@ -194,20 +229,16 @@ public class TokenProviderUtility {
 		} catch (Exception e) {
 			log.error(e);
 			log.error(" Exception while validating token {} ", e.getMessage());
-			isVerify = Boolean.FALSE;
 			throw new InsightsCustomException("Exception while varifing token ==== " + e.getMessage());
 		}
 
 		if (!isVerify) {
 			log.debug("Token signuture not match ");
-			isVerify = Boolean.FALSE;
 			throw new AuthorizationServiceException("Token signuture not match");
 		} else if (!isTokenExistsInCache) {
 			log.error("Token Not matched ");
-			isVerify = Boolean.FALSE;
 			throw new AuthenticationCredentialsNotFoundException("Token not found in cache");
 		} else if (!validateTokenDate) {
-			isVerify = Boolean.FALSE;
 			throw new AccountExpiredException("Token Expire");
 		} else {
 			log.debug("Token verified sucessfully ==== ");
@@ -248,20 +279,18 @@ public class TokenProviderUtility {
 
 			claims = signedJWT.getJWTClaimsSet();
 
-			log.debug("alice  after  username  {} ", signedJWT.getJWTClaimsSet().getSubject());
-			log.debug(" domain {} ", signedJWT.getJWTClaimsSet().getIssuer()); // cognizant.com
-			log.debug("Exceperation Time after  {}", signedJWT.getJWTClaimsSet().getExpirationTime());
-			log.debug("Check date of token with current date {} ",
-					new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime()));// after
+			log.debug(" username in message  {} ", signedJWT.getJWTClaimsSet().getSubject());
+			//log.debug(" domain {} ", signedJWT.getJWTClaimsSet().getIssuer()) cognizant.com
+			//log.debug("Expiration Time after  {}", signedJWT.getJWTClaimsSet().getExpirationTime())
+			//log.debug("Check date of token with current date {} ",
+			//		new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime()))// after
 			validateTokenDate = new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime());// after
 
 			if (!isVerify) {
 				log.debug("Token signuture not match ");
-				isVerify = Boolean.FALSE;
 				throw new AuthorizationServiceException("Token signuture not match");
 			} else if (!validateTokenDate) {
-				isVerify = Boolean.FALSE;
-				throw new AccountExpiredException("Token Expire");
+				throw new AccountExpiredException("Session Expire");
 			} else {
 				log.debug("Token verified sucessfully ==== ");
 				isVerify = Boolean.TRUE;
@@ -284,7 +313,7 @@ public class TokenProviderUtility {
 	 * @return
 	 * @throws Exception
 	 */
-	public boolean deleteToken(String csrfauthToken) throws Exception {
+	public boolean deleteToken(String csrfauthToken)  {
 		Boolean isTokenRemoved = Boolean.FALSE;
 		try {
 			SignedJWT signedJWT = SignedJWT.parse(csrfauthToken);

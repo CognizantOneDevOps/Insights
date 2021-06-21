@@ -1,0 +1,16 @@
+{
+   "config":[
+    {
+        "event":"jira:issue_deleted",
+		"query":[
+				 "match(n:ALM:JIRA_AGENT:DATA) where n.key='{jiraKey}' set n.isDeleted =true return n "
+			    ]
+    },
+{
+		"event":"jira:issue_updated",
+		"query":[
+				  "match(n:ALM:JIRA_AGENT:DATA) where n.key={jiraKey} set n.isDeleted =true return n"
+				]
+		 }
+	 ]
+}

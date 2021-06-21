@@ -16,8 +16,6 @@
 # Turn on a case-insensitive matching (-s set nocasematch)
 opt=$1
 action=$2
-config=$(cat com/cognizant/devops/platformagents/agents/agentdaemon/config.json| tr -d '\n'| tr -d '\r') 
-echo $config
 echo "$opt"
 case $opt in
         [lL][Ii][nN][uU][Xx])
@@ -37,16 +35,31 @@ case $opt in
 				sudo service  InSightsDaemonAgent status
 				sudo service  InSightsDaemonAgent start
 				sudo service  InSightsDaemonAgent status
-				sudo rm Daemonagent_db.sql
-				sudo echo  :> Daemonagent_db.sql
-				sudo chmod +x Daemonagent_db.sql
-				echo 'write file '
-				sudo echo "INSERT INTO public.agent_configuration(id, agent_id, agent_json, agent_key, agent_status, agent_version,data_update_supported, os_version, tool_category, tool_name,unique_key, update_date) VALUES (100, 0,'$config','daemon-1523257126' ,'' ,'' , FALSE,'' , 'DAEMONAGENT', 'AGENTDAEMON', 'daemon-1523257126', current_date);">Daemonagent_db.sql
-				psql -U postgres -d "insight" -f Daemonagent_db.sql
 				echo "Service installation steps completed"
                 ;;
 		  esac
 		  ;;
+		[dD][oO][cC][kK][eE][rR][aA][lL][pP][iI][nN][eE])
+                case $action in 
+                	[uU][nN][iI][nN][sS][tT][aA][lL][lL])
+                		sh +x /etc/init.d/InSightsDaemonAgent stop
+						rm -R /etc/init.d/InSightsDaemonAgent
+						echo "Service un-installation step completed"
+		            ;;
+		         	*)
+		         		echo "Daemon Running on Alpine..."
+						cp -p InSightsDaemonAgent.sh  /etc/init.d/InSightsDaemonAgent
+						chmod +x /etc/init.d/InSightsDaemonAgent
+						sh +x /etc/init.d/InSightsDaemonAgent status
+						sh +x /etc/init.d/InSightsDaemonAgent stop
+						sh +x /etc/init.d/InSightsDaemonAgent status
+						sh +x /etc/init.d/InSightsDaemonAgent start
+						sh +x /etc/init.d/InSightsDaemonAgent status
+						
+						echo "Service installaton steps completed"
+		        	;;   
+				esac
+		        ;;
         [uU][bB][uU][nN][tT][uU])
 	       case $action in 
              [uU][nN][iI][nN][sS][tT][aA][lL][lL])
@@ -59,12 +72,6 @@ case $opt in
 				cp -xp InSightsDaemonAgent.service /etc/systemd/system
 				systemctl enable InSightsDaemonAgent
 				systemctl start InSightsDaemonAgent
-				sudo rm Daemonagent_db.sql
-				sudo echo  :> Daemonagent_db.sql
-				sudo chmod +x Daemonagent_db.sql
-				echo 'write file '
-				sudo echo "INSERT INTO public.agent_configuration(id, agent_id, agent_json, agent_key, agent_status, agent_version,data_update_supported, os_version, tool_category, tool_name,unique_key, update_date) VALUES (100, 0,'$config','daemon-1523257126' ,'' ,'' , FALSE,'' , 'DAEMONAGENT', 'AGENTDAEMON', 'daemon-1523257126', current_date);">Daemonagent_db.sql
-				psql -U postgres -d "insight" -f Daemonagent_db.sql
 				echo "Service installation steps completed"
                 ;;
 		   esac

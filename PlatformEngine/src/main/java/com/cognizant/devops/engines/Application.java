@@ -33,7 +33,6 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 
 /**
  * Engine execution will start from Application. 1. Load the iSight config 2.

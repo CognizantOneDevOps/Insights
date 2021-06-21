@@ -46,6 +46,15 @@ public class AppProperties {
 	@Value("${app.instance_name}")
 	public static String instanceName;
 
+	@Value("${app.port}")
+	public static int port = 5672;
+	
+	@Value("${app.enableDeadLetterExchange}")
+	public static boolean enableDeadLetterExchange = false;
+	
+	
+	
+
 	public static String getMqHost() {
 		return mqHost;
 	}
@@ -84,6 +93,22 @@ public class AppProperties {
 
 	public void setInstanceName(String instanceName) {
 		this.instanceName = instanceName;
+	}
+
+	public static int getPort() {
+		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
+	}
+
+	public  boolean isEnableDeadLetterExchange() {
+		return enableDeadLetterExchange;
+	}
+
+	public  void setEnableDeadLetterExchange(boolean enableDeadLetterExchange) {
+		this.enableDeadLetterExchange = enableDeadLetterExchange;
 	}
 
 }

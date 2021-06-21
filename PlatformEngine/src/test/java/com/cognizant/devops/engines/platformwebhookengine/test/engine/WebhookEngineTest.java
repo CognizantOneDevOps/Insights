@@ -59,7 +59,7 @@ public class WebhookEngineTest {
 	}
 
 	@Test(priority = 1)
-	public void testPublishDataToMQ() throws IOException, TimeoutException, InterruptedException {
+	public void testPublishDataToMQ() throws IOException, TimeoutException, InterruptedException, InsightsCustomException {
 		/*
 		 * Push Data to MQ *
 		 */
@@ -196,11 +196,11 @@ public class WebhookEngineTest {
 		//webhookConfigDAL.deleteWebhookConfigurations(webhookEngineTestData.webhookNameException);
 		// Cleaning Neo4J 
 		GraphDBHandler dbHandler = new GraphDBHandler();
-		String query = "MATCH (p:" + webhookEngineTestData.labelName + ") where p.webhookName="
-				+ webhookEngineTestData.webhookName + " delete p";
+		String query = "MATCH (p:" + webhookEngineTestData.labelName + ") where p.webhookName='"
+				+ webhookEngineTestData.webhookName + "' delete p";
 		String queryDeleteHeathData = "MATCH (p:" + webhookEngineTestData.WEBHOOK_SUBSCRIBER_HEALTH_ROUTING_KEY
-				+ ") where p.instanceName="
-				+ webhookEngineTestData.healthMessageInstanceName + " delete p";
+				+ ") where p.instanceName='"
+				+ webhookEngineTestData.healthMessageInstanceName + "' delete p";
 		try {
 			dbHandler.executeCypherQuery(query);
 			dbHandler.executeCypherQuery(queryDeleteHeathData);

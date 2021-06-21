@@ -33,12 +33,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.AuthorizationServiceException;
+import org.springframework.security.authentication.AccountExpiredException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.stereotype.Component;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
+import com.nimbusds.jwt.JWTClaimsSet;
 
 @Component("authenticationUtils")
 public class AuthenticationUtils {
@@ -67,8 +74,11 @@ public class AuthenticationUtils {
 	public static final String RESPONSE_HEADER_KEY = "responseHeaders";
 	public static final Integer SESSION_TIME = 60;
 	public static final String AUTH_HEADER_KEY = "Authorization";
+	public static final String CUSTOM_AUTH_HEADER_KEY = "PLAFORM_AUTHORIZATION";
 	public static final String SSO_USER_HEADER_KEY = "insights-sso-givenname";
 	public static final String SSO_LOGOUT_URL = "postLogoutURL";
+	public static final String JTOKEN="jtoken";
+	
 	
 	public static final String KERBEROS_AUTH_HEADER_KEY = "authorization";
 
@@ -82,7 +92,7 @@ public class AuthenticationUtils {
 
 	public static final List<String> SET_VALUES = Collections.unmodifiableList(Arrays.asList(GRAFANA_COOKIES_ORG, "grafana_user", GRAFANA_ROLE_KEY,
 			"grafana_remember", "grafana_sess", CSRF_COOKIE_NAME , "JSESSIONID",  GRAFANA_SESSION_KEY, GRAFANA_WEBAUTH_HTTP_REQUEST_HEADER,
-			GRAFANA_WEBAUTH_USERKEY_NAME, SSO_USER_HEADER_KEY ));
+			GRAFANA_WEBAUTH_USERKEY_NAME, SSO_USER_HEADER_KEY,JTOKEN ));
 	public static final Set<String> MASTER_COOKIES_KEY_LIST = Collections.unmodifiableSet(new HashSet<String>(SET_VALUES));
 
 	public static final String JSON_FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.json)$";
@@ -185,4 +195,75 @@ public class AuthenticationUtils {
 		}
 		return SpringAuthority.valueOf("Viewer");
 	}
+	
+	/**
+	 * Extract and validate authrization token
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	public static String extractAndValidateAuthToken(HttpServletRequest request, HttpServletResponse response) {
+		String platformAuth = request.getHeader(AuthenticationUtils.CUSTOM_AUTH_HEADER_KEY);
+		String authToken = "";
+		if("".equals(platformAuth) || platformAuth==null) {
+			authToken = ValidationUtils.cleanXSS(request.getHeader(AuthenticationUtils.AUTH_HEADER_KEY));
+		}else {
+			log.debug(" Featching record from custom Auth header {} ",request.getHeader(AuthenticationUtils.CUSTOM_AUTH_HEADER_KEY));
+			authToken = ValidationUtils.cleanXSS(request.getHeader(AuthenticationUtils.CUSTOM_AUTH_HEADER_KEY));
+		}
+		if (authToken == null || authToken.isEmpty()) {
+			log.error(" InsightsAuthenticationFilter Authorization is empty or not found ");
+			String msg = PlatformServiceUtil.buildFailureResponse("Unauthorized Access ,Invalid Credentials..")
+					.toString();
+			AuthenticationUtils.setResponseMessage(response, HttpServletResponse.SC_BAD_REQUEST, msg);
+		}
+		return authToken;
+	}
+	
+	public static  String extractAndValidateAuthToken(HttpServletRequest request) {
+		String platformAuth = request.getHeader(AuthenticationUtils.CUSTOM_AUTH_HEADER_KEY);
+		String authToken = "";
+		if("".equals(platformAuth) || platformAuth==null) {
+			authToken = ValidationUtils.cleanXSS(request.getHeader(AuthenticationUtils.AUTH_HEADER_KEY));
+		}else {
+			log.debug(" Featching record from custom Auth header only request {} ",request.getHeader(AuthenticationUtils.CUSTOM_AUTH_HEADER_KEY));
+			authToken = ValidationUtils.cleanXSS(request.getHeader(AuthenticationUtils.CUSTOM_AUTH_HEADER_KEY));
+		}
+		if (authToken == null || authToken.isEmpty()) {
+			throw new InsightsAuthenticationException(" InsightsAuthenticationFilter Authorization is empty or not found ");
+		}
+		return authToken;
+	}
+	
+	public static JWTClaimsSet validateIncomingToken(Object principal) {
+		JWTClaimsSet jwtClaimsSet = null;
+		try {
+			TokenProviderUtility tokenProviderUtility = new TokenProviderUtility();
+			jwtClaimsSet =tokenProviderUtility.verifyAndFetchCliaimsToken(principal.toString());
+			log.debug(" isTokenVarified and claims are ==== {} ", jwtClaimsSet);
+		} catch (InsightsCustomException e) {
+			log.error(e);
+			log.error(" Exception while varifing token " + e.getMessage(), e);
+			throw new InsightsAuthenticationException(e.getMessage());
+		} catch (AuthorizationServiceException e) {
+			log.error(e);
+			log.error(" Exception while validating token {}", e.getMessage());
+			throw new InsightsAuthenticationException(e.getMessage(), e);
+		} catch (AuthenticationCredentialsNotFoundException e) {
+			log.error(e);
+			log.error(" Token not found in cache {} ", e.getMessage());
+			throw new InsightsAuthenticationException(e.getMessage(), e);
+		} catch (AccountExpiredException e) {
+			log.error(e);
+			log.error(" Token Expire {}", e.getMessage());
+			throw new InsightsAuthenticationException(e.getMessage(), e);
+		} catch (Exception e) {
+			log.error(e);
+			log.error(" Error while validating token {} ", e.getMessage());
+			throw new InsightsAuthenticationException(e.getMessage(), e);
+		}
+		return jwtClaimsSet ;
+	}
+
 }

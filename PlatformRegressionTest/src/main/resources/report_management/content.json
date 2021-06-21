@@ -1,0 +1,81 @@
+[
+	{
+		"contentId": 3123,
+		"expectedTrend": "UPWARDS",
+		"contentName": "Total Number of builds",
+		"kpiId": "232",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "TotalNumberBuild",
+		"message": {
+			"contentMessage": "There were {TotalNumberBuild} builds captured in the last run ",
+			"neutralMessage": "No Build(s) data captured in the last run."
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 17136,
+		"isActive": "TRUE",
+		"expectedTrend": "UPWARDS",
+		"contentName": "Average Code Coverage w.r.t threshold ",
+		"kpiId": 235,
+		"noOfResult": 15,
+		"threshold": 100,
+		"action": "AVERAGE",
+		"directionOfThreshold": "ABOVE",
+		"resultField": "AvgCodeCoverage",
+		"message": {
+			"contentMessage": "Average Code Coverage had been {actualdirection} the defined threshold in the past {week} weeks",
+			"neutralMessage": "No code quality data captured in the last run."
+		}
+	},
+	{
+		"contentId": 17139,
+		"isActive": "TRUE",
+		"expectedTrend": "UPWARDS",
+		"contentName": "Avg  Code Coverage w.r.t zone ",
+		"kpiId": 237,
+		"noOfResult": 15,
+		"resultField": "AvgCodeCoverage",
+		"thresholds": {
+			"red": 60,
+			"amber": 70,
+			"green": 80
+		},
+		"action": "COUNT",
+		"directionOfThreshold": "ABOVE",
+		"message": {
+			"contentMessage": "Average Code Coverage  w.r.t zones are red {red}, amber {amber} , green {green}",
+			"neutralMessage": "No Code Coverage data captured in the last run."
+		}
+	},
+	{
+		"contentId": 6126,
+		"expectedTrend": "DOWNWARDS",
+		"contentName": "Maximum Build Time",
+		"kpiId": "126",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "MaxBuildTime",
+		"message": {
+			"positive": "Maximum Build time has decreased to {current:MaxBuildTime}s from {previous:MaxBuildTime}s",
+			"negative": "Maximum Build time has increased to {current:MaxBuildTime}s from {previous:MaxBuildTime}s",
+			"neutral": "Maximum Build time has remain same to {MaxBuildTime}s"
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 20153,
+		"isActive": "TRUE",
+		"expectedTrend": "UPWARDS",
+		"contentName": "Maximum Number of Defects",
+		"kpiId": 148,
+		"noOfResult": 15,
+		"action": "MAX",
+		"resultField": "totalDefect",
+		"message": {
+			"contentMessage": "Total Number of Defects were maximum on {maxDate} day in last {week} week(s) and was {result}",
+			"neutralMessage": "No Defects data captured in the last run."
+		}
+	}
+]

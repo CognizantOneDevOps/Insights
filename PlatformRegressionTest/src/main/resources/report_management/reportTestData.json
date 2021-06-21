@@ -2,7 +2,7 @@
    "reportManagement":"Report Management",
    "reportName":"REPORT_BI_WEEKLY_TEST",
    "title":"REPORT SPRINT SCORECARD",
-   "sprintScoreCardTemplate":"REPORT_SPRINT_SCORECARD",
+   "sprintScoreCardTemplate":"REPORT_SONAR_JENKINS_PROD",
    "oneTimeFrequency":"ONETIME",
    "BiWeeklyFrequency":"BI_WEEKLY_SPRINT",
    "triWeeklyFrequency":"TRY_WEEKLY_SPRINT",
@@ -11,10 +11,10 @@
    "year":"2020",
    "month":"MAY",
    "date":"4",
-   "mailFrom":"abc@xyz.com",
-   "mailTo":"abc@xyz.com",
-   "ccMail":"abc@xyz.com",
-   "bccMail":"abc@xyz.com",
+   "mailFrom":"",
+   "mailTo":"",
+   "ccMail":"",
+   "bccMail":"",
    "subject":"SPRINT_REPORT",
    "bodyTemplate":"Do not reply"
 }

@@ -55,7 +55,6 @@ export class HomeComponent implements OnInit {
   userCurrentOrg: string = '';
   showAdminTab: boolean = false;
   isToolbarDisplay: boolean = InsightsInitService.enableInsightsToolbar;
-  showBusinessMapping: boolean = false;
   isValidUser: boolean = false;
   showLogoutButton: boolean = true;
   iframeStyle = 'width:100%; height:500px;';
@@ -424,7 +423,7 @@ export class HomeComponent implements OnInit {
               isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
               showMenu: true,
               title: "Configuration File Management",
-              isAdminMenu: false
+              isAdminMenu: true
             },
             {
               displayName: 'Group & Users',
@@ -449,7 +448,7 @@ export class HomeComponent implements OnInit {
               iconName: 'feature',
               route: 'InSights/Home/businessmapping',
               isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-              showMenu: InsightsInitService.showBusinessMapping,
+              showMenu: true,
               title: "Business Mapping",
               isAdminMenu: true
             },
@@ -459,7 +458,7 @@ export class HomeComponent implements OnInit {
               isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
               showMenu: true,
               title: "Report Configuration",
-              isAdminMenu: false,
+              isAdminMenu: true,
               children:[
                 {
                   displayName: 'Kpi Configuration',
@@ -468,7 +467,7 @@ export class HomeComponent implements OnInit {
                   isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
                   showMenu: true,
                   title: "Kpi Creation",
-                  isAdminMenu: false
+                  isAdminMenu: true
                 },
                 {
                   displayName: 'Content Configuration',
@@ -477,7 +476,7 @@ export class HomeComponent implements OnInit {
                   isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
                   showMenu: true,
                   title: "Content Configuration",
-                  isAdminMenu: false
+                  isAdminMenu: true
                 },
                 {
                   displayName: 'Report Template Configuration',
@@ -486,7 +485,7 @@ export class HomeComponent implements OnInit {
                   isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
                   showMenu: true,
                   title: "Report Template Configuration",
-                  isAdminMenu: false
+                  isAdminMenu: true
                 }
               ]
             },
@@ -515,7 +514,7 @@ export class HomeComponent implements OnInit {
                isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
                showMenu: true,
                title: "Forecasting",
-               isAdminMenu: false
+               isAdminMenu: true
             }       
           ]
         }

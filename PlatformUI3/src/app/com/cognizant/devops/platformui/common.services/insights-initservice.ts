@@ -26,7 +26,7 @@ import { LogService } from '@insights/common/log-service';
 export class InsightsInitService {
 
     location: Location;
-    autheticationProtocolList = ['SAML', 'NativeGrafana', 'Kerberos', 'JWT']
+    autheticationProtocolList = ["SAML", "NativeGrafana", "Kerberos", "JWT"]
     static serviceHost: String;
     static grafanaHost: String;
     static webhookHost: String;
@@ -34,7 +34,6 @@ export class InsightsInitService {
     static configDesc = {};
     static showAuditReporting = false;
     static showWebhookConfiguration = false;
-    static showBusinessMapping = true;
     static autheticationProtocol = "NativeGrafana";
     static singleSignOnConfig;
     static enableInsightsToolbar = true;
@@ -43,6 +42,8 @@ export class InsightsInitService {
     static mlDataTypes = {};
     static version;
     static serverConfig = {};
+    static jwtTokenOriginServerURL ={};
+    static configDescResponse : any;
     
 
     constructor(location: Location, private http: HttpClient,
@@ -50,8 +51,8 @@ export class InsightsInitService {
     }
 
     public async initMethods() {
-        const result1 = await this.loadUiServiceLocation();
-        const result2 = await this.loadAgentConfigDesc();
+        const result1 = await this.loadAgentConfigDesc();
+        const result2 = await this.loadUiServiceLocation();
         const result3 = await this.loadImageHandler();
     }
 
@@ -59,9 +60,12 @@ export class InsightsInitService {
         var self = this;
         var agentConfigJsonUrl = "config/configDesc.json"
         let gentConfigResponse = await this.getJSONUsingObservable(agentConfigJsonUrl).toPromise();
-        InsightsInitService.configDesc = gentConfigResponse.desriptions;
-        InsightsInitService.mlDataTypes = gentConfigResponse.mlDataTypes;
-        InsightsInitService.serverConfig = gentConfigResponse.serverConfig;
+        var defaultConfigdata = JSON.stringify(gentConfigResponse);
+        InsightsInitService.configDescResponse=JSON.parse(defaultConfigdata);
+        InsightsInitService.configDesc = InsightsInitService.configDescResponse.desriptions;
+        InsightsInitService.mlDataTypes = InsightsInitService.configDescResponse.mlDataTypes;
+        InsightsInitService.serverConfig = InsightsInitService.configDescResponse.serverConfig;
+        InsightsInitService.agentsOsList = InsightsInitService.configDescResponse.agentsOsList;
 
     }
     private async loadUiServiceLocation() {
@@ -90,15 +94,15 @@ export class InsightsInitService {
             InsightsInitService.webhookHost = UIConfigResponse.webhookHost;
         }
 
-        InsightsInitService.agentsOsList = UIConfigResponse.agentsOsList;
         InsightsInitService.showAuditReporting = UIConfigResponse.showAuditReporting;
         InsightsInitService.showWebhookConfiguration = UIConfigResponse.showWebhookConfiguration;
-        InsightsInitService.showBusinessMapping = UIConfigResponse.showBusinessMapping;
-        if (this.autheticationProtocolList.indexOf(UIConfigResponse.autheticationProtocol) <= 0) {
+        InsightsInitService.jwtTokenOriginServerURL = UIConfigResponse.jwtTokenOriginServerURL;
+        console.info("Selected authetication Protocol is "+UIConfigResponse.autheticationProtocol);
+        if (this.autheticationProtocolList.indexOf(UIConfigResponse.autheticationProtocol) < 0) {
             console.error("Please provide valid authetication Protocol from list " + String(this.autheticationProtocolList));
         }
         InsightsInitService.autheticationProtocol = UIConfigResponse.autheticationProtocol;
-        InsightsInitService.singleSignOnConfig = UIConfigResponse.singleSignOnConfig
+        InsightsInitService.singleSignOnConfig = InsightsInitService.configDescResponse[UIConfigResponse.autheticationProtocol];
         InsightsInitService.enableInsightsToolbar = UIConfigResponse.enableInsightsToolbar
         //InsightsInitService.isDebugModeEnable = UIConfigResponse.isDebugModeEnable
         InsightsInitService.enableLogoutButton = UIConfigResponse.enableLogoutButton

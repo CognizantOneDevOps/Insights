@@ -22,7 +22,7 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 
 public class InsightsKerberosBeanInitializationCondition implements Condition {
-	String SSO_TYPE = "Kerberos";
+	static final String SSOTYPE = "Kerberos";
 	
 	/**
 	 * Used to initiate bean based on AUTH_TYPE of Authentication protocol
@@ -30,6 +30,6 @@ public class InsightsKerberosBeanInitializationCondition implements Condition {
 	 */
 	@Override
 	public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-		return SSO_TYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol());
+		return SSOTYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol());
 	}
 }

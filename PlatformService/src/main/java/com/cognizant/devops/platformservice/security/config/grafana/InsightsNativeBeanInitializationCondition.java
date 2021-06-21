@@ -22,8 +22,7 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 
 public class InsightsNativeBeanInitializationCondition implements Condition {
-	//private static Logger Log = LogManager.getLogger(InsightsNativeBeanInitializationCondition.class);
-	String AUTH_TYPE = "NativeGrafana";
+	static final String  AUTH_TYPE = "NativeGrafana";
 	
 	/**
 	 * Used to initiate bean based on AUTH_TYPE of Authentication protocol

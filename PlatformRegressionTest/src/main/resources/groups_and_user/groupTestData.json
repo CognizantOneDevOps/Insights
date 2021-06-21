@@ -1,0 +1,17 @@
+{
+  "groupsAndUser" : "Group & Users",
+  "name" : "",
+  "email" : "",
+  "userName" : "",
+  "password" :"",
+  "role1" : "Editor",
+  "roleUpdate" : "Admin",
+  "err_name" : "",
+  "err_email" : "ain2",
+  "err_userName" : "@#$%",
+  "err_password" :"",
+  "accessGroup1" : "SampleTesting 1",
+  "accessGroup2" : "SampleTesting 2",
+  "accessGroup3" : "SampleTesting 3",
+  "roleChange" : "Viewer"
+}

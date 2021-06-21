@@ -57,6 +57,11 @@ public class DataExtractor {
 	private static String sourceTool = null;
 	private static String destinationTool = null;
 	private int dataBatchSize = 2000;
+	private String execId = null;
+
+	public void setExecId(String execId) {
+		this.execId = execId;
+	}
 
 	public void execute() {
 		CorrelationConfig correlationConfig = ApplicationConfigProvider.getInstance().getCorrelations();
@@ -155,8 +160,7 @@ public class DataExtractor {
 					log.debug(bulkCreateNodes);
 				}
 				resultCount = resultCount - dataBatchSize;
-				log.debug("Processed " + processedRecords + " SCM records, time taken: "
-						+ (System.currentTimeMillis() - st) + " ms");
+				log.debug(" Type=Correlator execId={} Processed {} SCM records, time taken: {} ms",execId,processedRecords,(System.currentTimeMillis() - st));
 			}
 		} catch (InsightsCustomException e) {
 			log.error("Unable to extract " + sourceTool + " keys from SCM Commit messages", e);
@@ -176,8 +180,7 @@ public class DataExtractor {
 				processedRecords = response.getJson().get(ConfigOptions.RESULTS).getAsJsonArray().get(0).getAsJsonObject()
 						.get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray().get(0)
 						.getAsInt();
-				log.debug("Processed " + processedRecords + " SCM records, time taken: "
-						+ (System.currentTimeMillis() - st) + " ms");
+				log.debug(" Type=Correlator execId={} Processed {} SCM records, time taken: {} ms",execId,processedRecords,(System.currentTimeMillis() - st));
 			}
 		} catch (InsightsCustomException e) {
 			log.error("Unable to extract " + sourceTool + " keys from SCM Commit messages", e);

@@ -1,0 +1,25 @@
+[
+	{
+		"kpiId": 252,
+		"name": "Avg all employee productivity for threshold ",
+		"toolName": "PRODUCTIVITY",
+		"category": "THRESHOLD",
+		"group": "PRODUCTIVITY",
+		"isActive": true,
+		"DBQuery": "MATCH (n:PRODUCTIVITY) where n.completionDateEpochTime > {startTime} AND n.completionDateEpochTime < {endTime} WITH n.completionDateEpochTime as completionDateEpochTime, avg(n.storyPoints*8) as StoryPoint, avg(n.authorTimeSpent) as authorTimeSpent  return   completionDateEpochTime, StoryPoint, authorTimeSpent, round((toFloat(StoryPoint)/authorTimeSpent)*100) as Productivity",
+		"resultField": "Productivity",
+		"datasource": "NEO4J"
+	},
+	{
+		"kpiId": 253,
+		"name": "Avg all employee productivity for threshold ",
+		"toolName": "PRODUCTIVITY",
+		"category": "THRESHOLD_RANGE",
+		"group": "PRODUCTIVITY",
+		"isActive": true,
+		"DBQuery": "MATCH (n:PRODUCTIVITY) where n.completionDateEpochTime > {startTime} AND n.completionDateEpochTime < {endTime} WITH n.completionDateEpochTime as completionDateEpochTime, avg(n.storyPoints*8) as StoryPoint, avg(n.authorTimeSpent) as authorTimeSpent  return   completionDateEpochTime, StoryPoint, authorTimeSpent, round((toFloat(StoryPoint)/authorTimeSpent)*100) as Productivity",
+		"resultField": "Productivity",
+		"datasource": "NEO4J"
+	}
+	
+]

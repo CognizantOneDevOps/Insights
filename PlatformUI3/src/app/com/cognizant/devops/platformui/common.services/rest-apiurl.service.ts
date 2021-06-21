@@ -98,7 +98,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         //this.addEndPoint("SAVE_DATAPURGING_SETTING", '/PlatformService/admin/settings/saveSettingsConfiguration');
         this.addEndPoint("GET_DASHBOARD_BY_UID", '/PlatformService/accessGrpMgmt/getDashboardByUid');
         this.addEndPoint("GET_TEMPLATE_BY_QUERY", '/PlatformService/accessGrpMgmt/getTemplateQueryResults');
-        this.addEndPoint("SAVE_GRAFANA_DASHBOARD_CONFIG",'/PlatformService/datasource/exportPDF/getDashboardAsPDF')
+        this.addEndPoint("SAVE_GRAFANA_DASHBOARD_CONFIG",'/PlatformService/dashboardReport/exportPDF/getDashboardAsPDF')
         this.addEndPoint("FETCH_DASHBOARD_CONFIGS",'/PlatformService/dashboardReport/exportPDF/fetchGrafanaDashboardConfigs')
         this.addEndPoint("UPDATE_DASHBOARD_CONFIGS",'/PlatformService/dashboardReport/exportPDF/updateDashboardConfig')
         this.addEndPoint("DELETE_DASHBOARD_CONFIGS",'/PlatformService/dashboardReport/exportPDF/deleteDashboardConfig')

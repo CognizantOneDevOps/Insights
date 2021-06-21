@@ -1,0 +1,326 @@
+{
+  "dynamicTemplate": {
+  		"fetchProjectMetadata": false,
+		"timeFieldMapping": {
+			"creationDate": "%Y-%m-%dT%H:%M:%S",
+			"changeDate": "%Y-%m-%dT%H:%M:%S",
+			"resolutionsdate": "%Y-%m-%dT%H:%M:%S",
+			"sprintStartDate": "%Y-%m-%dT%H:%M:%S",
+			"sprintEndDate": "%Y-%m-%dT%H:%M:%S",
+			"sprintCompleteDate": "%Y-%m-%dT%H:%M:%S",
+			"releaseDate": "%Y-%m-%d",
+			"startDate": "%Y-%m-%d",
+			"userStartDate": "%d/%b/%y",
+			"userReleaseDate": "%d/%b/%y",
+			"duedate": "%Y-%m-%d",
+			"timelineDate": "%Y-%m-%d"
+		},
+		"responseTemplate": {
+			"key": "key",
+			"self": "issueAPI",
+			"fields": {
+				"issuetype": {
+					"name": "issueType"
+				},
+				"customfield_10026": "storyPoints",
+				"customfield_10014": "epicKey",
+				"customfield_10011": "epicName",
+				"descriptions": "description",
+				"timespent": "timespent",
+				"project": {
+					"key": "projectKey",
+					"name": "projectName"
+				},
+				"fixVersions": [
+					{
+						"id": "fixVersions"
+					}
+				],
+				"versions": [
+					{
+						"id": "versions"
+					}
+				],
+				"aggregratetimespent": "aggregatetimespent",
+				"resolutions": {
+					"name": "resolutions"
+				},
+				"resolutiondate": "resolutionsdate",
+				"created": "creationDate",
+				"priority": {
+					"name": "priority"
+				},
+				"labels": "labels",
+				"timeestimate": "timeestimate",
+				"aggregatetimeoriginalestimate": "aggregatetimeoriginalestimate",
+				"issueLinks": [
+					{
+						"outwardIssue": {
+							"key": "outwardIssues"
+						}
+					},
+					{
+						"inwardIssue": {
+							"key": "inwardIssues"
+						}
+					}
+				],
+				"assignee": {
+					"name": "assigneeID",
+					"emailAddress": "assigneeEmail",
+					"displayName": "assigneeDisplayName"
+				},
+				"parent": {
+					"key": "parentKey"
+				},
+				"updated": "lastUpdated",
+				"status": {
+					"name": "status"
+				},
+				"attachment": [
+					{
+						"content": "Attachment"
+					}
+				],
+				"customfield_10020": [
+					{
+						"name": "SprintName",
+						"id": "sprints",
+						"boardId": "boards"
+					}
+				],
+				"summary": "summary",
+				"creator": {
+					"name": "creatorName",
+					"emailAddress": "creatorEmail",
+					"displayName": "creatorDisplayName"
+				},
+				"subtasks": [
+					{
+						"key": "subtasks"
+					}
+				],
+				"reporter": {
+					"name": "reporterName",
+					"emailAddress": "reporterEmail",
+					"displayName": "reporterDisplayName"
+				},
+				"environment": "environment",
+				"duedate": "duedate",
+				"progress": {
+					"progress": "progressTimeSec",
+					"total": "totalTimeSec",
+					"percent": "percentComplete"
+				}
+			}
+		},
+		"metaData": {
+			"dataUpdateSupported": true,
+			"uniqueKey": [
+				"key"
+			]
+		},
+		"extensions": {
+			"sprints": {
+				"insightsTimeXFieldMapping": {
+					"timefield": "sprintCompleteDate",
+					"isEpoch": false,
+					"timeformat": "%Y-%m-%dT%H:%M:%S"
+				},
+				"runSchedule": 60,
+				"boardApiUrl": "https://<JIRA_HOST>/rest/agile/1.0/board",
+				"sprintResponseTemplate": {
+					"id": "sprintId",
+					"state": "state",
+					"name": "sprintName",
+					"startDate": "sprintStartDate",
+					"endDate": "sprintEndDate",
+					"completeDate": "sprintCompleteDate",
+					"originBoardId": "boardId"
+				},
+				"sprintMetadata": {
+					"labels": [
+						"SPRINT"
+					],
+					"dataUpdateSupported": true,
+					"uniqueKey": [
+						"boardId",
+						"sprintId"
+					]
+				}
+			},
+			"releaseDetails": {
+				"insightsTimeXFieldMapping": {
+					"timefield": "releaseDate",
+					"isEpoch": false,
+					"timeformat": "%Y-%m-%d"
+				},
+				"runSchedule": 720,
+				"jiraProjectApiUrl": "https://<JIRA_HOST>/rest/api/2/project",
+				"jiraReleaseResponseTemplate": {
+					"id": "versionId",
+					"name": "versionName",
+					"description": "description",
+					"archived": "archived",
+					"released": "released",
+					"startDate": "startDate",
+					"releaseDate": "releaseDate",
+					"overdue": "overdue",
+					"userStartDate": "userStartDate",
+					"userReleaseDate": "userReleaseDate",
+					"projectId": "projectId"
+				},
+				"releaseVersionsMetadata": {
+					"labels": [
+						"RELEASE"
+					],
+					"dataUpdateSupported": true,
+					"uniqueKey": [
+						"versionId",
+						"projectId"
+					]
+				}
+			},
+			"sprintIssueRelation": {
+				"sprintResponseTemplate": {
+					"id": "sprintId",
+					"state": "state",
+					"name": "sprintName",
+					"startDate": "sprintStartDate",
+					"endDate": "sprintEndDate",
+					"completeDate": "sprintCompleteDate",
+					"boardId": "boardId"
+				},
+				"relationMetadata": {
+					"relation": {
+						"properties": [
+							"sprintName",
+							"state"
+						],
+						"name": "SPRINT_HAS_ISSUES",
+						"source": {
+							"labels": [
+								"SPRINT"
+							],
+							"constraints": [
+								"sprintId",
+								"boardId"
+							],
+							"selectedProperties": [
+								"state",
+								"sprintName",
+								"sprintStartDate",
+								"sprintEndDate",
+								"sprintCompleteDate"
+							]
+						},
+						"destination": {
+							"labels": [
+								"LATEST"
+							],
+							"constraints": [
+								"key",
+								"projectKey"
+							]
+						}
+					}
+				}
+			},
+			"IssueChangeLogRelation": {
+				"relationMetadata": {
+					"relation": {
+						"properties": [
+							"authorName",
+							"changeDate",
+							"changedfield"
+						],
+						"name": "JIRA_ISSUE_HAS_CHANGELOG",
+						"source": {
+							"labels": [
+								"LATEST"
+							],
+							"constraints": [
+								"key",
+								"projectKey"
+							]
+						},
+						"destination": {
+							"labels": [
+								"CHANGE_LOG"
+							],
+							"constraints": [
+								"issueKey",
+								"changeId",
+								"changedfield"
+							]
+						}
+					}
+				}
+			},
+			"projectDetails": {
+				"jiraProjectResponseTemplate": {
+					"id": "projectId",
+					"key": "projectKey",
+					"name": "projectName",
+					"projectCategory": {
+						"name": "projectCategory"
+					},
+					"projectTypeKey": "projectType"
+				},
+				"projectMetadata": {
+					"labels": [
+						"PROJECT"
+					],
+					"dataUpdateSupported": true,
+					"uniqueKey": [
+						"projectId"
+					]
+				}
+			},
+			"boardResponseTemplate": {
+				"id": "boardId",
+				"name": "boardName",
+				"type": "boardType"
+			}
+		},
+		"changeLog": {
+			"metadata": {
+				"labels": [
+					"CHANGE_LOG"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"issueKey",
+					"changeId",
+					"changedfield"
+				]
+			},
+			"insightsTimeXFieldMapping": {
+				"timefield": "changeDate",
+				"isEpoch": false,
+				"timeformat": "%Y-%m-%dT%H:%M:%S"
+			},
+			"responseTemplate": {
+				"user": {
+					"displayName": "authorName"
+				},
+				"changelog": {
+					"id": "changeId"
+				},
+				"issue": {
+					"key": "issueKey",
+					"fields": {
+						"updated": "changeDate"
+					}
+				}
+			},
+			"changeLogItemTemplate": {
+				"field": "changedfield",
+				"from": "from",
+				"fromString": "fromString",
+				"to": "to",
+				"toString": "toString"
+			}
+		}
+	}
+}

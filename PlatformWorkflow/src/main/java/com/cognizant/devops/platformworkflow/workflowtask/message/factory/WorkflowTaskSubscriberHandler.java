@@ -16,6 +16,7 @@
 package com.cognizant.devops.platformworkflow.workflowtask.message.factory;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
@@ -26,6 +27,8 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
 import com.cognizant.devops.platformworkflow.workflowtask.core.InsightsStatusProvider;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowDataHandler;
 import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowTaskInitializationException;
@@ -44,7 +47,8 @@ public abstract class WorkflowTaskSubscriberHandler {
 	protected String statusLog = "{}";
 	WorkflowDataHandler workflowStateProcess;
 
-	public WorkflowTaskSubscriberHandler(String routingKey) throws IOException {
+	public WorkflowTaskSubscriberHandler(String routingKey)
+			throws IOException, InsightsCustomException {
 		engineSubscriberResponseHandler = this;
 		this.workflowStateProcess = new WorkflowDataHandler();
 		registerSubscriber(routingKey);
@@ -56,16 +60,15 @@ public abstract class WorkflowTaskSubscriberHandler {
 	 * Register workflow task as rabbit mq subscriber
 	 * 
 	 * @param routingKey
+	 * @throws TimeoutException
+	 * @throws InsightsCustomException
 	 * @throws Exception
 	 */
-	public void registerSubscriber(String routingKey) throws IOException {
+	public void registerSubscriber(String routingKey) throws IOException, InsightsCustomException {
 
 		try {
-			channel = WorkflowTaskSubscriberFactory.getInstance().getConnection().createChannel();
 			String queueName = routingKey.replace(".", "_");
-			channel.queueDeclare(queueName, true, false, false, null);
-			channel.queueBind(queueName, MQMessageConstants.EXCHANGE_NAME, routingKey);
-			channel.basicQos(ApplicationConfigProvider.getInstance().getMessageQueue().getPrefetchCount());
+			channel = RabbitMQConnectionProvider.getChannel(routingKey, queueName, MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE);
 			setChannel(channel);
 
 			log.debug("prefetchCount {} ",
@@ -134,7 +137,7 @@ public abstract class WorkflowTaskSubscriberHandler {
 	private synchronized int workflowTaskPreProcesser(byte[] body) {
 		int exectionHistoryId = -1;
 		try {
-			String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
+			String message = new String(body, StandardCharsets.UTF_8);
 			Map<String, Object> requestMessage = WorkflowUtils.convertJsonObjectToMap(message);
 
 			boolean isWorkflowTaskRetry = (boolean) requestMessage.get(WorkflowUtils.RETRY_JSON_PROPERTY);
@@ -168,7 +171,7 @@ public abstract class WorkflowTaskSubscriberHandler {
 	private synchronized void workflowTaskPostProcesser(byte[] body, int exectionHistoryId, String status) {
 		String workflowId = "";
 		try {
-			String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
+			String message = new String(body, StandardCharsets.UTF_8);
 
 			log.debug("Worlflow Detail ==== workflowTaskPostProcesser message handleDelivery ===== {} ", message);
 			Map<String, Object> requestMessage = WorkflowUtils.convertJsonObjectToMap(message);
@@ -203,7 +206,7 @@ public abstract class WorkflowTaskSubscriberHandler {
 	 */
 	private synchronized void workflowTaskErrorHandler(byte[] body, int exectionHistoryId) {
 		try {
-			String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
+			String message = new String(body, StandardCharsets.UTF_8);
 			log.debug("Worlflow Detail ==== Error Handler  ===== {} ", message);
 			Map<String, Object> requestMessage = WorkflowUtils.convertJsonObjectToMap(message);
 			String workflowId = String.valueOf(requestMessage.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID));

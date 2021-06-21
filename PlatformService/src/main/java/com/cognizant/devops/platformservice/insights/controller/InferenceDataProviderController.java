@@ -40,7 +40,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 @RestController
-@RequestMapping("/datasource/inference")
+@RequestMapping("/externalApi")
 public class InferenceDataProviderController {
 	public static final String VECTORSCHEDULE ="vectorSchedule";
 	public static final String VECTORTYPE= "vectorType";
@@ -52,7 +52,7 @@ public class InferenceDataProviderController {
 	@Autowired
 	InsightsInferenceService insightsInferenceReportService;
 
-	@PostMapping(value = "/data", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/inference/data", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonArray getInferenceData(HttpServletRequest request) {
 		LOG.debug(
 				" inside getInferenceData call /datasource/inference/data ============================================== ");
@@ -86,7 +86,7 @@ public class InferenceDataProviderController {
 		return result;
 	}
 
-	@GetMapping(value = "/data/testDataSource", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/inference/data/testDataSource", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject checkInferenceDS() {
 		JsonObject result = new JsonObject();
 		result.addProperty("result", "success");
@@ -94,7 +94,7 @@ public class InferenceDataProviderController {
 	}
 
 	/** for Grafana 7.1.0 **/
-	@PostMapping(value = "/data/v7", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/inference/data/v7", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonArray getInferenceData7(HttpServletRequest request) {
 		LOG.debug(
 				" inside getInferenceData call /datasource/inference/data ============================================== ");
@@ -131,7 +131,7 @@ public class InferenceDataProviderController {
 	}
 
 	/** for Grafana 7.1.0 and InferencePanel Report **/
-	@PostMapping(value = "/data/report", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/inference/data/report", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonArray getInferenceReportData(HttpServletRequest request) {
 		LOG.debug(
 				" inside getInferenceData call /datasource/inference/data/report/getInferenceReportData ========================== ");
@@ -158,9 +158,17 @@ public class InferenceDataProviderController {
 		}
 		return result;
 	}
+	
+	/** for Grafana 7.1.0 **/
+	@PostMapping(value = "/inference/data/report/testDataSource", produces = MediaType.APPLICATION_JSON_VALUE)
+	public JsonObject checkInferenceDSReport() {
+		JsonObject result = new JsonObject();
+		result.addProperty("result", "success");
+		return result;
+	}
 
 	/** for Grafana 7.1.0 **/
-	@PostMapping(value = "/data/v7/testDataSource", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/inference/data/v7/testDataSource", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject checkInferenceDS7() {
 		JsonObject result = new JsonObject();
 		result.addProperty("result", "success");

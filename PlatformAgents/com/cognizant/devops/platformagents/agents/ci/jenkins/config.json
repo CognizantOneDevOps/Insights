@@ -38,7 +38,12 @@
 			  "userName": "userName"
 	        }
 	      ],
-		  "ceTaskId": "sonarTaskID"
+		  "ceTaskId": "sonarTaskID",
+		  "lastBuiltRevision" : 
+		   {
+               "SHA1" : "scmCommitId2"
+                       
+           }
 	    },
 	    {
 	      "remoteUrls": [
@@ -49,7 +54,7 @@
 	    "url": "sonarUrl"
 	    }
 	  ],
-	  "changeSet": {
+	  "changeSets": [{
 	    "items": [
 	      {
 	        "commitId": "scmCommitId",
@@ -60,7 +65,7 @@
 	      }
 	    ],
 	    "kind": "scmKind"
-	  },
+	  }],
 	  "duration": "duration",
 	  "id": "buildNumber",
 	  "number": "number",

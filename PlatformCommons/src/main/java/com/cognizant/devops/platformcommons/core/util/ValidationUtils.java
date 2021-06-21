@@ -251,7 +251,7 @@ public class ValidationUtils {
 				String passkey = authHeaderToken.substring(authHeaderToken.length() - 15, authHeaderToken.length());
 				authTokenDecrypt = AES256Cryptor.decrypt(auth, passkey);
 			} else {
-				log.error(" Invalid token start with basic ");
+				log.debug(" Token starts with basic ");
 				authTokenDecrypt=authHeaderToken;
 			}
 		} catch (Exception e) {

@@ -53,9 +53,9 @@ public class WebConfig {
 	@DependsOn("appPropertiesLoad")
 	public ServletRegistrationBean<HttpServlet> webhookServlet() {
 		LOG.debug(
-				" In webhookServlet  ======== instanceName ={} host = {} user = {} passcode = {} exchangeName= {} serverPort = {} context = {}",
-				AppProperties.instanceName, AppProperties.mqHost, AppProperties.mqUser, AppProperties.mqPassword,
-				AppProperties.mqExchangeName,
+				" In webhookServlet  ======== instanceName ={} host = {} port = {} user = {} passcode = {} exchangeName= {} serverPort = {} context = {}",
+				AppProperties.instanceName, AppProperties.mqHost, AppProperties.port, AppProperties.mqUser, AppProperties.mqPassword,
+				AppProperties.mqExchangeName, 
 				ServerProperties.port, ServerProperties.contextPath);
 		try {
 			WebHookMessagePublisher.getInstance().initilizeMq();

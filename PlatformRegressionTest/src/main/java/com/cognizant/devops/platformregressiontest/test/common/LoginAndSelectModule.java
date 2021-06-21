@@ -27,7 +27,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.SkipException;
+import org.testng.annotations.AfterSuite;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -41,25 +43,22 @@ public class LoginAndSelectModule {
 	public static Map<String, String> testData = new HashMap<>();
 
 	public static void initialization() {
-
-		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator + File.separator
-				+ ConfigOptionsTest.AUTO_DIR + File.separator + ConfigOptionsTest.CHROME_DIR + File.separator
-				+ ConfigOptionsTest.DRIVER_FILE;
-		System.setProperty("webdriver.chrome.driver", path);
-		driver = new ChromeDriver();
-		driver.manage().window().maximize();
-		driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
-		driver.navigate().to(CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("baseURL"));
-		driver.findElement(By.xpath("//input[contains(@name,'username')]"))
-				.sendKeys(CommonUtils.getProperty("username"));
-		driver.findElement(By.xpath("//input[contains(@autocomplete,'new-password')]"))
-				.sendKeys(CommonUtils.getProperty("password"));
-		driver.findElement(By.xpath("//button[contains(@class,'sigBtn')]")).click();
-
+		if (driver == null) {
+			String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator + File.separator
+					+ ConfigOptionsTest.AUTO_DIR + File.separator + ConfigOptionsTest.CHROME_DIR + File.separator
+					+ ConfigOptionsTest.DRIVER_FILE;
+			ChromeOptions options = new ChromeOptions();
+			options.setExperimentalOption("excludeSwitches", new String[] { "enable-automation" });
+			System.setProperty("webdriver.chrome.driver", path);
+			driver = new ChromeDriver(options);
+			driver.manage().window().maximize();
+			driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+			driver.manage().timeouts().pageLoadTimeout(40, TimeUnit.SECONDS);
+			driver.navigate().to(CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("baseURL"));
+		}
 	}
 
 	/* Selects module above Configuration on UI */
-	
 	public static void selectMenuOption(String optionName) {
 		List<WebElement> menuList = driver.findElements(By.xpath("//p[contains(@class,'line-child')]"));
 		for (WebElement reuqiredOption : menuList) {
@@ -71,13 +70,11 @@ public class LoginAndSelectModule {
 
 		}
 	}
-	
-	/* Selects modules under Configuration on UI */
 
-	public static void selectModuleUnderConfiguration(String moduleName) {
-		driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
+	/* Selects modules under Configuration on UI */
+	public static void selectModuleOnClickingConfig(String moduleName) throws InterruptedException {
+		Thread.sleep(1000);
 		driver.findElement(By.xpath("//a[@title='Configuration']")).click();
-		driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
 		List<WebElement> menuList = driver.findElements(By.xpath("//p[contains(@class,'line-child')]"));
 		for (WebElement reuqiredOption : menuList) {
 			if (reuqiredOption.getText().equals(moduleName)) {
@@ -88,25 +85,31 @@ public class LoginAndSelectModule {
 		}
 	}
 
-	public static void selectModuleUnderReportConfiguration(String moduleName) {
-		driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
-		driver.findElement(By.xpath("//a[@title='Configuration']")).click();
-		driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
-		driver.findElement(By.xpath("//p[text()='Report Configuration ']")).click();
-		driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
+	/* Selects modules under Configuration on UI */
+	public static void selectModuleUnderConfiguration(String moduleName) {
 		List<WebElement> menuList = driver.findElements(By.xpath("//p[contains(@class,'line-child')]"));
 		for (WebElement reuqiredOption : menuList) {
 			if (reuqiredOption.getText().equals(moduleName)) {
 				reuqiredOption.click();
 				break;
 			}
+		}
+	}
 
+	public static void selectModuleKPIConfiguration(String moduleName) {
+		driver.findElement(By.xpath("//p[text()='Report Configuration ']")).click();
+		List<WebElement> menuList = driver.findElements(By.xpath("//p[contains(@class,'line-child')]"));
+		for (WebElement reuqiredOption : menuList) {
+			if (reuqiredOption.getText().equals(moduleName)) {
+				reuqiredOption.click();
+				break;
+			}
 		}
 	}
 
 	public static String getData(String jsonFile) {
 		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator + ConfigOptionsTest.AUTO_DIR
-				+ File.separator +jsonFile;
+				+ File.separator + jsonFile;
 		JsonElement jsonData;
 		try {
 			jsonData = new JsonParser().parse(new FileReader(path));
@@ -117,4 +120,10 @@ public class LoginAndSelectModule {
 		return jsonFile;
 	}
 
+	@AfterSuite
+	public void tearDown() {
+		if (driver != null) {
+			driver.quit();
+		}
+	}
 }

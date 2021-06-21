@@ -16,6 +16,7 @@
 package com.cognizant.devops.platformservice.security.config.kerberos;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Arrays;
@@ -148,8 +149,8 @@ public class InsightsKerberosServiceRequestToken extends AbstractAuthenticationT
 			throw new IllegalStateException("Unauthenticated or no response token");
 
 		try {
-			return new String(Base64.encode(ticketValidation.responseToken()), "UTF-8");
-		} catch (UnsupportedEncodingException e) {
+			return new String(Base64.encode(ticketValidation.responseToken()), StandardCharsets.UTF_8);
+		} catch (Exception e) {
 			throw new IllegalStateException("Unable to encode response token", e);
 		}
 	}

@@ -24,14 +24,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
 import com.cognizant.devops.platformcommons.constants.DataArchivalConstants;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.cognizant.devops.platformdal.dataArchivalConfig.DataArchivalConfigDal;
@@ -40,7 +39,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 
 @Service("dataArchivalService")
 public class DataArchivalServiceImpl implements DataArchivalService {
@@ -87,7 +85,7 @@ public class DataArchivalServiceImpl implements DataArchivalService {
 						.getSpecificArchivalRecord(archivalName);
 				if (dataArchivalRecord == null) {
 					JsonObject publishDataJson = new JsonObject();
-					publishDataJson.addProperty(DataArchivalConstants.ARCHIVALNAME , archivalName);
+					publishDataJson.addProperty(DataArchivalConstants.ARCHIVALNAME, archivalName);
 					publishDataJson.addProperty("startDate", startDate);
 					publishDataJson.addProperty("endDate", endDate);
 					publishDataJson.addProperty("daysToRetain", daysToRetain);
@@ -215,8 +213,7 @@ public class DataArchivalServiceImpl implements DataArchivalService {
 					|| status.equalsIgnoreCase(DataArchivalStatus.TERMINATED.toString())) {
 				dataArchivalConfigdal.deleteArchivalRecord(archivalName);
 			} else {
-				throw new InsightsCustomException(
-						"Archival record cannot be deleted as container is created.");
+				throw new InsightsCustomException("Archival record cannot be deleted as container is created.");
 			}
 		} catch (Exception e) {
 			log.error("Error while deleting archived data {} ", e.getMessage());
@@ -267,30 +264,13 @@ public class DataArchivalServiceImpl implements DataArchivalService {
 	 * @param publishDataJson
 	 * @throws IOException
 	 * @throws TimeoutException
+	 * @throws InsightsCustomException
 	 */
 	public void publishDataArchivalDetails(String routingKey, String publishDataJson)
-			throws IOException, TimeoutException {
-		try {
-						ConnectionFactory factory = new ConnectionFactory();
-						MessageQueueDataModel messageQueueConfig = ApplicationConfigProvider.getInstance().getMessageQueue();
-						factory.setHost(messageQueueConfig.getHost());
-						factory.setUsername(messageQueueConfig.getUser());
-						factory.setPassword(messageQueueConfig.getPassword());
-						Connection connection = factory.newConnection();
-						try{
-							Channel channel = connection.createChannel();
-							String queueName = routingKey.replace(".", "_");
-						channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE, true);
-						channel.queueDeclare(queueName, true, false, false, null);
-						channel.queueBind(queueName, MQMessageConstants.EXCHANGE_NAME, routingKey);
-						channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, publishDataJson.getBytes());
-						channel.close();
-						}finally {
-						connection.close();
-					}} catch (IOException |TimeoutException e) {
-						//no code
-					}
-			 
-			}
-
+			throws IOException, TimeoutException, InsightsCustomException {
+		String queueName = routingKey.replace(".", "_");
+		try (Channel channel = RabbitMQConnectionProvider.getChannel(routingKey, queueName, MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE)) {
+			channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, publishDataJson.getBytes());
+		}
+	}
 }

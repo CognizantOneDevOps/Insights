@@ -29,7 +29,12 @@ public class MessageQueueDataModel implements Serializable {
 
 	@Pattern(regexp = "^(?!\\s*$).+", message = "MessageQueueDataModel password authToken must not be blank")
 	private String password;
+
+	private int port = 5672;
+
 	private int prefetchCount = 10;
+	
+	private boolean enableDeadLetterExchange = false; 
 
 	public String getHost() {
 		return host;
@@ -61,5 +66,21 @@ public class MessageQueueDataModel implements Serializable {
 
 	public void setPrefetchCount(int prefetchCount) {
 		this.prefetchCount = prefetchCount;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
+	}
+
+	public boolean isEnableDeadLetterExchange() {
+		return enableDeadLetterExchange;
+	}
+
+	public void setEnableDeadLetterExchange(boolean enableDeadLetterExchange) {
+		this.enableDeadLetterExchange = enableDeadLetterExchange;
 	}
 }

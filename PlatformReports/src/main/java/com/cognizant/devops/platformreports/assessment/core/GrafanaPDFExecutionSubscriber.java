@@ -18,11 +18,13 @@ package com.cognizant.devops.platformreports.assessment.core;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformreports.assessment.dal.ReportPDFVisualizationHandlerFactory;
@@ -41,7 +43,7 @@ public class GrafanaPDFExecutionSubscriber extends WorkflowTaskSubscriberHandler
 	InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfiguration();
 	InsightsAssessmentConfigurationDTO assessmentReportDTO = null;
 
-	public GrafanaPDFExecutionSubscriber(String routingKey) throws IOException {
+	public GrafanaPDFExecutionSubscriber(String routingKey) throws IOException, TimeoutException, InsightsCustomException {
 		super(routingKey);
 	}
 

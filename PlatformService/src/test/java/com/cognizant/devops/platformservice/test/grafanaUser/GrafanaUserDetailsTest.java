@@ -46,7 +46,6 @@ import com.google.gson.JsonSyntaxException;
 public class GrafanaUserDetailsTest {
 	private static final String AUTHORIZATION = "authorization";
 
-	GrafanaUserDetailsUtil grafanaUser = new GrafanaUserDetailsUtil();
 	GrafanaUserDetailsTestData userDetailsTestData = new GrafanaUserDetailsTestData();
 	
 	Map<String, String> testAuthData = new HashMap<>();

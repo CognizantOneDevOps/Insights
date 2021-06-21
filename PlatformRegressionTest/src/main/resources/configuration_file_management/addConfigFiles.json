@@ -1,0 +1,20 @@
+{
+	"dataset": [
+		{
+			"configurationFile": "Configuration File Management",
+			"filename": "ToolDetail",
+			"filetype": "JSON",
+			"module": "TOOLDETAIL",
+			"filepath": "ToolDetail.json",
+			"updatedfilepath": "ToolDetail.json"
+		},
+		{
+			"configurationFile": "Configuration File Management",
+			"filename": "Correlation",
+			"filetype": "JSON",
+			"module": "CORRELATION",
+			"filepath": "correlation.json",
+			"updatedfilepath": "correlation.json"
+		}
+	]
+}

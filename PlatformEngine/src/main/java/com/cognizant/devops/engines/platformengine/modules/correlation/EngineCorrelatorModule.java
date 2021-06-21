@@ -47,6 +47,7 @@ public class EngineCorrelatorModule extends TimerTask implements ApplicationConf
 				correlationsExecutor.execute();
 				isCorrelationExecutionInProgress = false;
 			}
+			log.debug("Correlation Execution Completed");
 			EngineStatusLogger.getInstance().createEngineStatusNode("Correlation Execution Completed",
 					PlatformServiceConstants.SUCCESS);
 		} catch (Exception e) {

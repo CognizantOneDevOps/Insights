@@ -122,10 +122,14 @@ export class DataSharedService {
       || InsightsInitService.autheticationProtocol == AutheticationProtocol.JWT.toString()) {
       this.storage.set("Authorization", strAuthorization);
     } else if (InsightsInitService.autheticationProtocol == AutheticationProtocol.NativeGrafana.toString()) {
-      var auth_uuid = uuid();
-      auth_uuid = auth_uuid.substring(0, 15);
-      var auth = this.encryptData(auth_uuid, strAuthorization) + auth_uuid;
-      this.storage.set("Authorization", auth);
+      if(strAuthorization.indexOf("Basic")!=-1){
+          var auth_uuid = uuid();
+          auth_uuid = auth_uuid.substring(0, 15);
+          var auth = this.encryptData(auth_uuid, strAuthorization) + auth_uuid;
+          this.storage.set("Authorization", auth);
+      }else{
+        this.storage.set("Authorization", strAuthorization)
+      }
     }
   }
 

@@ -22,8 +22,7 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 
 public class InsightsJWTBeanInitializationCondition implements Condition {
-	//private static Logger Log = LogManager.getLogger(InsightsJWTBeanInitializationCondition.class);
-	String AUTH_TYPE = "JWT";
+	static final String AUTHTYPE = "JWT";
 	
 	/**
 	 * Used to initiate bean based on AUTH_TYPE of Authentication protocol
@@ -31,6 +30,6 @@ public class InsightsJWTBeanInitializationCondition implements Condition {
 	 */
 	@Override
 	public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-		return AUTH_TYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol());
+		return AUTHTYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol());
 	}
 }

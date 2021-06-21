@@ -93,12 +93,19 @@ class AgentDaemonExecutor:
         host = mqConfig.get('host', None)
         agentCtrlXchg  = mqConfig.get('agentExchange', None)
         routingKey = self.config.get('subscribe').get('agentPkgQueue')
+        port = mqConfig.get('port', 5672)
+        enableDeadLetterExchange = mqConfig.get('enableDeadLetterExchange', False)
+        if enableDeadLetterExchange:
+            self.declareDeadLetterExchange()
+            arguments={"x-dead-letter-exchange" : "iRecover"}
+        else:
+            arguments={}
         
         credentials = pika.PlainCredentials(user, password)
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=host))
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=host, port=port))
         self.channel = self.connection.channel()
         self.channel.exchange_declare(exchange=agentCtrlXchg, exchange_type='topic', durable=True)
-        self.channel.queue_declare(queue=routingKey, passive=False, durable=True, exclusive=False, auto_delete=False, arguments=None)
+        self.channel.queue_declare(queue=routingKey, passive=False, durable=True, exclusive=False, auto_delete=False, arguments=arguments)
         self.channel.queue_bind(queue=routingKey, exchange=agentCtrlXchg, routing_key=routingKey, arguments=None)
     
     def generateHealthData(self, ex=None, systemFailure=False,note=None):
@@ -122,15 +129,22 @@ class AgentDaemonExecutor:
                
     def publishDaemonHealthData(self, data):
         mqConfig = self.config.get('mqConfig', None)
+        port = mqConfig.get('port', 5672)
+        enableDeadLetterExchange = mqConfig.get('enableDeadLetterExchange', False)
+        if enableDeadLetterExchange:
+            arguments={"x-dead-letter-exchange" : "iRecover"}
+        else:
+            arguments={}
+            
         healthExchange = mqConfig.get('exchange', None)
         healthRoutingKey = self.config.get('publish').get('health')
         healthQueue = healthRoutingKey.replace('.','_')
         credentials = pika.PlainCredentials(mqConfig.get('user', None), 
                                             mqConfig.get('password', None))
-        connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=mqConfig.get('host', None)))
+        connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=mqConfig.get('host', None), port=port))
         channel = connection.channel()
         channel.exchange_declare(exchange=healthExchange, exchange_type='topic', durable=True)
-        channel.queue_declare(queue=healthQueue, passive=False, durable=True, exclusive=False, auto_delete=False, arguments=None)
+        channel.queue_declare(queue=healthQueue, passive=False, durable=True, exclusive=False, auto_delete=False, arguments=arguments)
         channel.queue_bind(queue=healthQueue, exchange=healthExchange, routing_key=healthRoutingKey, arguments=None)
         dataJson = json.dumps(data)
         channel.basic_publish(exchange=healthExchange,routing_key=healthRoutingKey,body=dataJson,properties=pika.BasicProperties(delivery_mode=2))
@@ -209,7 +223,31 @@ class AgentDaemonExecutor:
                     'epochTime' : (remoteDateTime - self.epochStartDateTime).total_seconds(),
                     'time' : remoteDateTime.strftime('%Y-%m-%dT%H:%M:%SZ')
                     }
-        return response;   
+        return response; 
+     
+    def declareDeadLetterExchange(self):
+        
+        mqConfig = self.config.get('mqConfig', None)
+        if mqConfig == None:
+            raise ValueError('BaseAgent: unable to initialize MQ. mqConfig is not found')
+        
+        user = mqConfig.get('user', None)
+        password = mqConfig.get('password', None)
+        host = mqConfig.get('host', None)
+        port = mqConfig.get('port', 5672)
+        
+        credentials = pika.PlainCredentials(user, password)
+        connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=host, port=port))
+       
+        #Create dead letter queue 
+        channel = connection.channel()
+        channel.exchange_declare(exchange='iRecover',exchange_type='fanout', durable=True)
+ 
+        channel.queue_declare(queue='INSIGHTS_RECOVER_QUEUE', passive=False, durable=True, exclusive=False, auto_delete=False, arguments=None)
+
+        channel.queue_bind(exchange='iRecover',
+                           routing_key='INSIGHTS.RECOVER.QUEUE', # x-dead-letter-routing-key
+                           queue='INSIGHTS_RECOVER_QUEUE') 
 
 if __name__=="__main__":
     AgentDaemonExecutor()

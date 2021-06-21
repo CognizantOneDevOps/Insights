@@ -22,7 +22,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
@@ -66,14 +68,17 @@ public class OfflineDataProcessingExecutor extends TimerTask implements Applicat
 	private static final String JSON_FILE_EXTENSION = "json";
 	private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT).withZone(InsightsUtils.zoneId);
 	InsightsConfigFilesDAL configFilesDAL = new InsightsConfigFilesDAL();
+	private Map<String,String> loggingInfo = new ConcurrentHashMap<>();
 	@Override
 	public void run() {
 		try {
 			ApplicationConfigInterface.loadConfiguration();
+			loggingInfo.put("execId", String.valueOf(System.currentTimeMillis()));
 			executeOfflineProcessing();
-			EngineStatusLogger.getInstance().createEngineStatusNode("Offline Data Procesing completed",PlatformServiceConstants.SUCCESS);
+			log.debug(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} ProcessingTime={} processedRecords={} Offline Data Processing completed",loggingInfo.get("execId"),"-","-",0,0);
+			EngineStatusLogger.getInstance().createEngineStatusNode("Offline Data Processing completed",PlatformServiceConstants.SUCCESS);
 		} catch (Exception e) {
-			log.error(e);
+			log.error("Offline Data Procesing has some issue",e);
 			EngineStatusLogger.getInstance().createEngineStatusNode("Offline Data Procesing has some issue",
 					PlatformServiceConstants.FAILURE);
 		}
@@ -89,6 +94,7 @@ public class OfflineDataProcessingExecutor extends TimerTask implements Applicat
 		for (InsightsConfigFiles eachFile : configFile) {
 				if (eachFile.getFileType().equalsIgnoreCase(FileDetailsEnum.ConfigurationFileType.JSON.name())) {
 					jsonFileCount++;
+					loggingInfo.put("fileName",eachFile.getFileName());
 					processOfflineConfiguration(eachFile);
 				}
 		}				
@@ -124,10 +130,11 @@ public class OfflineDataProcessingExecutor extends TimerTask implements Applicat
 						DataEnrichmentModel[].class));
 				for (DataEnrichmentModel dataEnrichmentModel : dataEnrichmentModels) {
 					String cypherQuery = dataEnrichmentModel.getCypherQuery();
-					log.debug("Cypher query : {} ",cypherQuery);
+					loggingInfo.put("queryName", dataEnrichmentModel.getQueryName().trim().replace(" ", "_"));
+					log.debug(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} ProcessingTime={} processedRecords={} Cypher query : {} ",loggingInfo.get("execId"),loggingInfo.get("fileName"),loggingInfo.get("queryName"),0,0,cypherQuery);
 					Long runSchedule = dataEnrichmentModel.getRunSchedule();
 					if (cypherQuery == null || cypherQuery.isEmpty() || runSchedule == null )  {
-						log.error(dataEnrichmentModel.getQueryName() , "{} doesn't have either cypherQuery or runSchedule attribute.");
+						log.error(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} {} doesn't have either cypherQuery or runSchedule attribute.",loggingInfo.get("execId"),loggingInfo.get("fileName"),loggingInfo.get("queryName"),dataEnrichmentModel.getQueryName());
 						continue;
 					}
 					if (isQueryScheduledToRun(dataEnrichmentModel.getRunSchedule(),
@@ -142,10 +149,10 @@ public class OfflineDataProcessingExecutor extends TimerTask implements Applicat
 				jsonFile.setFileData(new Gson().toJson(dataEnrichmentModels).getBytes());
 				configFilesDAL.updateConfigurationFile(jsonFile);
 		} catch (IllegalStateException | JsonSyntaxException  ex) {
-			log.error(jsonFile.getFileName(), "{} file is not as per expected format ", ex);
+			log.error(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} {} file is not as per expected format ",loggingInfo.get("execId"),loggingInfo.get("fileName"),loggingInfo.get("queryName"),jsonFile.getFileName(), ex);
 			return false;
 		} catch (Exception e) {
-			log.error(jsonFile.getFileName(), "{} error while loading file ", e);
+			log.error(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} {} error while loading file ",loggingInfo.get("execId"),loggingInfo.get("fileName"),loggingInfo.get("queryName"),jsonFile.getFileName(), e);
 			return false;
 		}
 		return true;
@@ -182,7 +189,7 @@ public class OfflineDataProcessingExecutor extends TimerTask implements Applicat
 				JsonObject sprintResponseJson = sprintResponse.getJson();
 				processedRecords = sprintResponseJson.getAsJsonArray("results").get(0).getAsJsonObject()
 						.getAsJsonArray("data").get(0).getAsJsonObject().getAsJsonArray("row").get(0).getAsInt();
-				log.debug(" Processed {}", processedRecords);
+				log.debug(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} ProcessingTime={} processedRecords={} Processed Records = {}",loggingInfo.get("execId"),loggingInfo.get("fileName"),loggingInfo.get("queryName"),0, processedRecords,processedRecords);
 				recordCount = recordCount + processedRecords;
 			}
 			long queryExecutionEndTime = System.currentTimeMillis();
@@ -191,8 +198,9 @@ public class OfflineDataProcessingExecutor extends TimerTask implements Applicat
 				dataEnrichmentModel.setRecordsProcessed(recordCount);
 				dataEnrichmentModel.setQueryProcessingTime(queryProcessingTime);
 			}
+			log.debug(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} ProcessingTime={} processedRecords={} Offline Query processed records={} ",loggingInfo.get("execId"),loggingInfo.get("fileName"),loggingInfo.get("queryName"), queryProcessingTime,processedRecords,processedRecords);
 		} catch (UnsupportedOperationException | IllegalStateException | IndexOutOfBoundsException | InsightsCustomException ex) {
-			log.error(cypherQuery, " {} - query processing failed", ex);
+			log.error(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} {} - query processing failed",loggingInfo.get("execId"),loggingInfo.get("fileName"),loggingInfo.get("queryName"),cypherQuery, ex);
 			return false;
 		} 
 		return true;
@@ -231,7 +239,7 @@ public class OfflineDataProcessingExecutor extends TimerTask implements Applicat
 					return true;
 				}
 			} catch (Exception e) {
-				log.error("Unable to parse the CRON expression:{} ",cronSchedule, e);
+				log.error(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} Unable to parse the CRON expression:{} ",loggingInfo.get("execId"),loggingInfo.get("fileName"),loggingInfo.get("queryName"),cronSchedule, e);
 			}
 		}else {
 			if (dateTime != null && now != null) {

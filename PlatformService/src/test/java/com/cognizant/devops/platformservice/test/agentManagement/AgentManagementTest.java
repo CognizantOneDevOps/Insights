@@ -48,16 +48,6 @@ public class AgentManagementTest extends AgentManagementTestData{
 	public static final AgentManagementServiceImpl agentManagementServiceImpl =
 												new AgentManagementServiceImpl();
 	private static Logger log = LogManager.getLogger(AgentManagementTestData.class);
-
-	private JsonObject getProperties() {
-		Gson gson = new Gson();
-		JsonElement jsonElement = gson.fromJson(agentManagementTestData.configDetails.trim(), JsonElement.class);
-		JsonObject json = jsonElement.getAsJsonObject();
-		json.addProperty("osversion", osversion);
-		json.addProperty("agentVersion", agentVersion);
-		json.addProperty("toolName", toolName.toUpperCase());
-		return json;
-	}
 	
 	@BeforeClass
 	public void prepareData() throws InsightsCustomException {
@@ -117,7 +107,6 @@ public class AgentManagementTest extends AgentManagementTestData{
 			    ArrayList<String> toolNameList = entry.getValue();
 			    Assert.assertTrue(toolNameList.size()>0);
 			    Assert.assertTrue(toolNameList.contains("git"));
-			    //Assert.assertTrue(toolNameList.contains("pivotalTracker"));
 		    }
 		}
 		
@@ -126,12 +115,10 @@ public class AgentManagementTest extends AgentManagementTestData{
 	@Test(priority = 3)
 	public void testGetToolRawConfigFile() throws InsightsCustomException {
 		
-		String version ="v5.2";
-		String tool = "git";
 		try {
 			ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
 			AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
-			String configJson = agentServiceImpl.getToolRawConfigFile(version, tool,false);
+			String configJson = agentServiceImpl.getToolRawConfigFile(version, gitTool,false);
 			
 			Gson gson = new Gson();
 			JsonElement jsonElement = gson.fromJson(configJson.trim(), JsonElement.class);
@@ -148,11 +135,9 @@ public class AgentManagementTest extends AgentManagementTestData{
 	@Test(priority = 4)
 	public void testGetToolRawConfigFileForOfflineRegistration() throws InsightsCustomException {
 		
-//		String version ="v5.2";
-//		String tool = "pivotalTracker";
 		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
 		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
-		String configJson = agentServiceImpl.getToolRawConfigFile(version, toolName,false);
+		String configJson = agentServiceImpl.getToolRawConfigFile(version, gitTool,false);
 
 		Gson gson = new Gson();
 		JsonElement jsonElement = gson.fromJson(configJson.trim(), JsonElement.class);
@@ -166,10 +151,9 @@ public class AgentManagementTest extends AgentManagementTestData{
 		
 		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		String expectedOutcome = "SUCCESS";
-		
-		String response = agentServiceImpl.registerAgent(agentManagementTestData.toolName, 
-							agentManagementTestData.agentVersion, agentManagementTestData.osversion, 
-							agentManagementTestData.configDetails, agentManagementTestData.trackingDetails, false,false);
+		String oldVersion = "v7.2";
+		String response = agentServiceImpl.registerAgent(gitTool, oldVersion, osversion, 
+				configDetails, trackingDetails, false,false);
 		
 		Assert.assertEquals(expectedOutcome, response);
 			
@@ -181,9 +165,8 @@ public class AgentManagementTest extends AgentManagementTestData{
 		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		String expectedOutcome = "Agent Id already exsits.";
 		
-		String response = agentServiceImpl.registerAgent(agentManagementTestData.toolName, 
-							agentManagementTestData.agentVersion, agentManagementTestData.osversion, 
-							agentManagementTestData.configDetails, agentManagementTestData.trackingDetails, false,false);
+		String response = agentServiceImpl.registerAgent(gitTool, 
+							version, osversion, configDetails, trackingDetails, false,false);
 		
 		Assert.assertEquals(expectedOutcome, response);
 			
@@ -195,9 +178,8 @@ public class AgentManagementTest extends AgentManagementTestData{
 		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		String expectedOutcome = "Agent Id and Tool name cannot be the same.";
 		
-		String response = agentServiceImpl.registerAgent(agentManagementTestData.toolName, 
-							agentManagementTestData.agentVersion, agentManagementTestData.osversion, 
-							agentManagementTestData.configDetailsWithSameIDs, agentManagementTestData.trackingDetails, false,false);
+		String response = agentServiceImpl.registerAgent(gitTool, 
+							version, osversion, configDetailsWithSameIDs, trackingDetails, false,false);
 		
 		Assert.assertEquals(expectedOutcome, response);
 			
@@ -209,9 +191,8 @@ public class AgentManagementTest extends AgentManagementTestData{
 		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		String expectedOutcome = "Invalid data label Name, it should contain only alphanumeric character,underscore & dot";
 		
-		String response = agentServiceImpl.registerAgent(agentManagementTestData.toolName, 
-							agentManagementTestData.agentVersion, agentManagementTestData.osversion, 
-							agentManagementTestData.configDetailsWithInvalidDataLabel, agentManagementTestData.trackingDetails, false,false);
+		String response = agentServiceImpl.registerAgent(gitTool, 
+							version, osversion, configDetailsWithInvalidDataLabel, trackingDetails, false,false);
 		
 		Assert.assertEquals(expectedOutcome, response);
 			
@@ -223,9 +204,9 @@ public class AgentManagementTest extends AgentManagementTestData{
 		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		String expectedOutcome = "Invalid health label Name, it should contain only alphanumeric character,underscore & dot";
 		
-		String response = agentServiceImpl.registerAgent(agentManagementTestData.toolName, 
-							agentManagementTestData.agentVersion, agentManagementTestData.osversion, 
-							agentManagementTestData.configDetailsWithInvalidHealthLabel, agentManagementTestData.trackingDetails, false, false);
+		String response = agentServiceImpl.registerAgent(gitTool, 
+							version, osversion, 
+							configDetailsWithInvalidHealthLabel, trackingDetails, false, false);
 		
 		Assert.assertEquals(expectedOutcome, response);
 			
@@ -255,8 +236,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		String action = "START";
 		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		String expectedOutput = "SUCCESS";
-		String response = agentServiceImpl.startStopAgent(agentManagementTestData.agentId, agentManagementTestData.toolName,
-							agentManagementTestData.osversion, action);
+		String response = agentServiceImpl.startStopAgent(agentId, gitTool,osversion, action);
 		Assert.assertNotNull(response);
 		Assert.assertEquals(response, expectedOutput);
 	}
@@ -267,8 +247,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		String action = "STOP";
 		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		String expectedOutput = "SUCCESS";
-		String response = agentServiceImpl.startStopAgent(agentManagementTestData.agentId, agentManagementTestData.toolName, 
-																					agentManagementTestData.osversion, action);
+		String response = agentServiceImpl.startStopAgent(agentId, gitTool, osversion, action);
 		Assert.assertNotNull(response);
 		Assert.assertEquals(response, expectedOutput);
 	}
@@ -279,8 +258,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		String action = "REGISTER";
 		String osversion = "WINDOWS";
 		String expectedOutput = "SUCCESS";
-		String response = agentManagementServiceImpl.startStopAgent(agentManagementTestData.agentId, agentManagementTestData.toolName,
-																									osversion, action);
+		String response = agentManagementServiceImpl.startStopAgent(agentId, gitTool, osversion, action);
 		Assert.assertNotNull(response);
 		Assert.assertEquals(response, expectedOutput);
 	}
@@ -291,8 +269,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		String action = "REGISTER";
 		String osversion = "LINUX";
 		String expectedOutput = "SUCCESS";
-		String response = agentManagementServiceImpl.startStopAgent(agentManagementTestData.agentId, agentManagementTestData.toolName,
-																									osversion, action);
+		String response = agentManagementServiceImpl.startStopAgent(agentId, gitTool,osversion, action);
 		Assert.assertNotNull(response);
 		Assert.assertEquals(response, expectedOutput);
 	}
@@ -303,7 +280,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		String action = "REGISTER";
 		String osversion = "WINDOWS";
 		String expectedOutput = "SUCCESS";
-		String response = agentManagementServiceImpl.startStopAgent("123456ASC", agentManagementTestData.toolName, osversion, action);
+		String response = agentManagementServiceImpl.startStopAgent("123456ASC", gitTool, osversion, action);
 		Assert.assertNotNull(response);
 		Assert.assertEquals(response, expectedOutput);
 	}
@@ -313,9 +290,9 @@ public class AgentManagementTest extends AgentManagementTestData{
 		
 		AgentConfig agentConfig = new AgentConfig();
 		AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-		agentConfig = agentConfigDAL.getAgentConfigurations(agentManagementTestData.agentId);
+		agentConfig = agentConfigDAL.getAgentConfigurations(agentId);
 		AgentConfigTO agentConfigDetails = new AgentConfigTO();
-		agentConfigDetails = agentManagementServiceImpl.getAgentDetails(agentManagementTestData.agentId);
+		agentConfigDetails = agentManagementServiceImpl.getAgentDetails(agentId);
 		Assert.assertNotNull(agentConfigDetails.getAgentId());
 		Assert.assertEquals(agentConfigDetails.getToolCategory(), "SCM");
 		
@@ -326,7 +303,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 
 		AgentConfig agentConfig = new AgentConfig();
 		AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-		AgentConfigTO agentConfigDetails = agentManagementServiceImpl.getAgentDetails(agentManagementTestData.agentId);
+		AgentConfigTO agentConfigDetails = agentManagementServiceImpl.getAgentDetails(agentId);
 	}
 	
 	@Test(priority = 19)
@@ -334,26 +311,89 @@ public class AgentManagementTest extends AgentManagementTestData{
 		
 		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
 		AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
-		agentManagementServiceImpl.updateAgent(agentManagementTestData.agentId, configDetails, agentManagementTestData.toolName, 
-																agentManagementTestData.agentVersion, agentManagementTestData.osversion, false,false);
+		agentManagementServiceImpl.updateAgent(agentId, configDetails, gitTool, 
+																version, osversion, false,false);
 	}
 	
 	@Test(priority = 20)
+	public void testUpdateAgentVersion() throws InsightsCustomException {
+		String expectedOutcome = "SUCCESS";
+		//String version = "v8.0";
+		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
+		AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
+		String response = agentManagementServiceImpl.updateAgent(agentId, configDetails, gitTool, version, osversion, false,false);
+		Assert.assertEquals(expectedOutcome, response);
+	}
+	
+	@Test(priority = 21)
 	public void testUninstallAgent() throws InsightsCustomException{
 
 		String expectedOutCome = "SUCCESS"; 
-		String response = agentManagementServiceImpl.uninstallAgent(agentManagementTestData.agentId, agentManagementTestData.toolName, 
-																							agentManagementTestData.osversion);
+		String response = agentManagementServiceImpl.uninstallAgent(agentId, gitTool, osversion);
 		Assert.assertEquals(expectedOutCome, response);
 		
 	}
-	@Test(priority = 21, expectedExceptions = InsightsCustomException.class)
+	
+	@Test(priority = 22, expectedExceptions = InsightsCustomException.class)
 	public void testUninstallAgentForException() throws InsightsCustomException{
 
 		String expectedOutCome =  "No entity found for query";
-		String response = agentManagementServiceImpl.uninstallAgent("12345fghj", agentManagementTestData.toolName, 
-																							agentManagementTestData.osversion);
+		String response = agentManagementServiceImpl.uninstallAgent("12345fghj", gitTool, osversion);
 		Assert.assertEquals(expectedOutCome, response);
+	}
+	
+	@Test(priority = 23) 
+	public void testRegisterWebhookAgent() throws InsightsCustomException {
+		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
+		String expectedOutcome = "SUCCESS";
+		String configJson = agentServiceImpl.getToolRawConfigFile(version, gitTool,true);
+		String response = agentServiceImpl.registerAgent(gitTool, version, osversion, 
+				webhookConfigDetails, tracking, false,true);
+		
+		Assert.assertEquals(expectedOutcome, response);
+		
+			
+	}
+	
+	@Test(priority = 24, expectedExceptions = InsightsCustomException.class) 
+	public void testRegisterIncorrectWebhookAgent() throws InsightsCustomException {
+		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
+		String toolname = "neo4jarchival";
+		String configJson = agentServiceImpl.getToolRawConfigFile(version, toolname,true);
+			
+	}
+	
+	@Test(priority = 25, expectedExceptions = InsightsCustomException.class) 
+	public void testRegisterWithInvalidAgentId() throws InsightsCustomException {
+		String expectedOutcome = "Agent Id has to be Alpha numeric with '_' as special character";
+		String response = agentManagementServiceImpl.registerAgent(gitTool, version, osversion, 
+				ConfigDetailsWithInvalidAgentId, trackingDetails, false,true);
+		
+		Assert.assertEquals(expectedOutcome, response);
+			
+	}
+	
+	@Test(priority = 26)
+	public void testUninstallWebhookAgent() throws InsightsCustomException{
+		String expectedOutCome = "SUCCESS"; 
+		String response = agentManagementServiceImpl.uninstallAgent(webhookAgentId, gitTool, osversion);
+		Assert.assertEquals(expectedOutCome, response);
+		
+	}
+	
+	@Test (priority = 27)
+	public void testgetRepoAvailableAgentList() throws InsightsCustomException {
+		
+		Map<String, ArrayList<String>> agentList = agentManagementServiceImpl.getRepoAvailableAgentList();
+		Assert.assertTrue(agentList.size() > 0);
+	}
+	
+	@Test(priority = 28, expectedExceptions = InsightsCustomException.class)
+	public void testUpdateAgentWithEmptyAgentId() throws InsightsCustomException {
+		
+		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
+		AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
+		agentManagementServiceImpl.updateAgent("", configDetails, gitTool, version, osversion, false,false);
 	}
 	
 	@AfterClass

@@ -15,16 +15,12 @@
  ******************************************************************************/
 package com.cognizant.devops.platformworkflow.workflowtask.message.factory;
 
-import java.io.IOException;
-import java.util.concurrent.TimeoutException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
 import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 
 public class WorkflowTaskSubscriberFactory {
 	private static final Logger log = LogManager.getLogger(WorkflowTaskSubscriberFactory.class);
@@ -33,28 +29,17 @@ public class WorkflowTaskSubscriberFactory {
 
 	/**
 	 * Initilize Rabbitmq subscriber connetion factory
+	 * @throws InsightsCustomException 
 	 */
-	private void initConnectionFactory() {
-		MessageQueueDataModel messageQueueConfig = ApplicationConfigProvider.getInstance().getMessageQueue();
-		try {
-			ConnectionFactory factory = new ConnectionFactory();
-			factory.setHost(messageQueueConfig.getHost());
-			factory.setUsername(messageQueueConfig.getUser());
-			factory.setPassword(messageQueueConfig.getPassword());
-			connection = factory.newConnection();
-		} catch (IOException e) {
-			log.error("Unable to create MQ connection", e);
-
-		} catch (TimeoutException e) {
-			log.error("Unable to create MQ connection within specified time.", e);
-		}
+	private void initConnectionFactory() throws InsightsCustomException {
+		connection = RabbitMQConnectionProvider.getConnection();
 	}
 
 	private WorkflowTaskSubscriberFactory() {
 
 	}
 
-	public static WorkflowTaskSubscriberFactory getInstance() {
+	public static WorkflowTaskSubscriberFactory getInstance() throws InsightsCustomException {
 		if (instance.connection == null) {
 			instance.initConnectionFactory();
 		}

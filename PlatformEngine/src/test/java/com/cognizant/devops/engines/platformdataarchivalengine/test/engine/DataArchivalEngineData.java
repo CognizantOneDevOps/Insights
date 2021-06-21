@@ -20,26 +20,23 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 
 public class DataArchivalEngineData {
 	private static Logger log = LogManager.getLogger(DataArchivalEngineData.class.getName());
@@ -89,21 +86,23 @@ public class DataArchivalEngineData {
 	}
 
 	public void publishDataArchivalDetails(String routingKey, String publishDataJson)
-			throws IOException, TimeoutException {
-		ConnectionFactory factory = new ConnectionFactory();
-		MessageQueueDataModel messageQueueConfig = ApplicationConfigProvider.getInstance().getMessageQueue();
-		factory.setHost(messageQueueConfig.getHost());
-		factory.setUsername(messageQueueConfig.getUser());
-		factory.setPassword(messageQueueConfig.getPassword());
-		Connection connection = factory.newConnection();
-		Channel channel = connection.createChannel();
-		String queueName = routingKey.replace(".", "_");
-		channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE, true);
-		channel.queueDeclare(queueName, true, false, false, null);
-		channel.queueBind(queueName, MQMessageConstants.EXCHANGE_NAME, routingKey);
-		channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, publishDataJson.getBytes());
-		channel.close();
-		connection.close();
+			throws InsightsCustomException, IOException, TimeoutException {
+		Connection connection = null;
+		Channel channel = null;
+		try {
+			connection = RabbitMQConnectionProvider.getConnection();
+			channel = connection.createChannel();
+			String queueName = routingKey.replace(".", "_");
+			channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE, true);
+			channel.queueDeclare(queueName, true, false, false, RabbitMQConnectionProvider.getQueueArguments());
+			channel.queueBind(queueName, MQMessageConstants.EXCHANGE_NAME, routingKey);
+			channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, publishDataJson.getBytes());
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		} finally {
+			channel.close();
+			//connection.close();
+		}
 	}
 
 	public Long getExpiryDate(Long createdOn, int daysToRetain) {

@@ -47,6 +47,7 @@ public class PublishEventTest {
 		p.load(reader);
 
 		AppProperties.mqHost = p.getProperty("mqHost");
+		AppProperties.port = Integer.parseInt(p.getProperty("port"));
 		AppProperties.mqUser = p.getProperty("mqUser");
 		AppProperties.mqPassword = p.getProperty("mqPassword");
 		AppProperties.mqExchangeName = p.getProperty("mqExchangeName");

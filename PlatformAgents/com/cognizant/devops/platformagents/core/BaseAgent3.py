@@ -248,12 +248,14 @@ class BaseAgent(object):
         host = mqConfig.get('host', None)
         exchange = mqConfig.get('exchange', None)
         agentCtrlXchg = mqConfig.get('agentControlXchg', None)
+        port = mqConfig.get('port', 5672)
+        enableDeadLetterExchange = mqConfig.get('enableDeadLetterExchange', False)
 
-        self.messageFactory = MessageFactory(user, mqPass, host, exchange)
+        self.messageFactory = MessageFactory(user, mqPass, host, exchange, port,enableDeadLetterExchange)
         if self.messageFactory == None:
             raise ValueError('BaseAgent: unable to initialize MQ. messageFactory is Null')
 
-        self.agentCtrlMessageFactory = MessageFactory(user, mqPass, host, agentCtrlXchg)
+        self.agentCtrlMessageFactory = MessageFactory(user, mqPass, host, agentCtrlXchg, port,enableDeadLetterExchange)
 
     '''
     Subscribe for Agent START/STOP exchange and queue
@@ -285,8 +287,8 @@ class BaseAgent(object):
                 self.processWebhook(data)
                 ch.basic_ack(delivery_tag=method.delivery_tag)
             except Exception as ex:
-                self.baseLogger.info(" subscriberForWebhookAgent ")
-                self.baseLogger.info(ex)
+                self.baseLogger.error(" subscriberForWebhookAgent ")
+                self.baseLogger.error(ex)
                 self.publishHealthDataForExceptions(ex)
             finally:
                 '''If agent receive the STOP command, Python program should exit gracefully after current data collection is complete.  '''
@@ -586,6 +588,7 @@ class BaseAgent(object):
             self.executionStartTime = datetime.now()
             self.logIndicator(self.EXECUTION_START, self.config.get('isDebugAllowed', False))
             self.executionId = str(uuid.uuid1())
+            self.publishHealthData(self.generateHealthData(note="Agent is in START mode with execution id "+ self.executionId))
             self.baseLogger.info('Inside execute executionId'+self.executionId)
             self.process()
             self.executeAgentExtensions()

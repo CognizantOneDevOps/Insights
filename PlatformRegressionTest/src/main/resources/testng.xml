@@ -3,46 +3,116 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
 
 <suite thread-count="1" name="suite" verbose="10">
-	<test name="platformregressiontest">
-		<classes>
-			<class
-				name="com.cognizant.devops.platformregressiontest.test.agentmanagement.RegisterAgentAPITest" />
-			<class
-				name="com.cognizant.devops.platformregressiontest.test.agentmanagement.UpdateAgentAPITest" />
-			<class
-				name="com.cognizant.devops.platformregressiontest.test.agentmanagement.StartStopAgentAPITest" />
-			<class
-				name="com.cognizant.devops.platformregressiontest.test.agentmanagement.DeleteAgentAPITest" />
-			<class
-				name="com.cognizant.devops.platformregressiontest.test.correlationbuilder.SaveCorrelationAPITest" />
-			<class
-				name="com.cognizant.devops.platformregressiontest.test.correlationbuilder.UpdateCorrelationAPITest" />
-			<class
-				name="com.cognizant.devops.platformregressiontest.test.correlationbuilder.DeleteCorrelationAPITest" />
-			<class
-				name="com.cognizant.devops.platformregressiontest.test.groupsanduser.CreateUserAPITest" />
-			<class
-				name="com.cognizant.devops.platformregressiontest.test.groupsanduser.SearchUserAPITest" />
-			<class
-				name="com.cognizant.devops.platformregressiontest.test.groupsanduser.AssignUserAPITest" />
-			<class
-				name="com.cognizant.devops.platformregressiontest.test.groupsanduser.UpdateUserAPITest" />
-			<class
-				name="com.cognizant.devops.platformregressiontest.test.groupsanduser.DeleteUserAPITest" />
-			<class
-				name="com.cognizant.devops.platformregressiontest.test.webhookconfiguration.SaveWebhookAPITest" />
-			<class
-				name="com.cognizant.devops.platformregressiontest.test.webhookconfiguration.UpdateWebhookAPITest" />
-			<class
-				name="com.cognizant.devops.platformregressiontest.test.webhookconfiguration.UpdateStatusWebhookAPITest" />
-			<class
-				name="com.cognizant.devops.platformregressiontest.test.webhookconfiguration.DeleteWebhookAPITest" />
-		</classes>
-	</test>
+
+	<test name="platformapitest">
+	<classes>
+		<class
+			name="com.cognizant.devops.platformregressiontest.test.agentmanagement.RegisterAgentAPITest" />
+		<class
+			name="com.cognizant.devops.platformregressiontest.test.agentmanagement.UpdateAgentAPITest" />
+		<class
+			name="com.cognizant.devops.platformregressiontest.test.agentmanagement.StartStopAgentAPITest" />
+		<class
+			name="com.cognizant.devops.platformregressiontest.test.agentmanagement.DeleteAgentAPITest" />
+		<class
+			name="com.cognizant.devops.platformregressiontest.test.correlationbuilder.SaveCorrelationAPITest" />
+		<class
+			name="com.cognizant.devops.platformregressiontest.test.correlationbuilder.UpdateCorrelationAPITest" />
+		<class
+			name="com.cognizant.devops.platformregressiontest.test.correlationbuilder.DeleteCorrelationAPITest" />
+		<class
+			name="com.cognizant.devops.platformregressiontest.test.groupsanduser.CreateUserAPITest" />
+		<class
+			name="com.cognizant.devops.platformregressiontest.test.groupsanduser.SearchUserAPITest" />
+		<class
+			name="com.cognizant.devops.platformregressiontest.test.groupsanduser.AssignUserAPITest" />
+		<class
+			name="com.cognizant.devops.platformregressiontest.test.groupsanduser.UpdateUserAPITest" />
+		<class
+			name="com.cognizant.devops.platformregressiontest.test.groupsanduser.DeleteUserAPITest" />
+		<class
+			name="com.cognizant.devops.platformregressiontest.test.webhookconfiguration.SaveWebhookAPITest" />
+		<class
+			name="com.cognizant.devops.platformregressiontest.test.webhookconfiguration.UpdateWebhookAPITest" />
+		<class
+			name="com.cognizant.devops.platformregressiontest.test.webhookconfiguration.UpdateStatusWebhookAPITest" />
+		<class
+			name="com.cognizant.devops.platformregressiontest.test.webhookconfiguration.DeleteWebhookAPITest" />
+	</classes>
+</test>
+
 	<test name="logintest">
+	<classes>
+		<class
+			name="com.cognizant.devops.platformregressiontest.test.login.LoginTest" />
+	</classes>
+ </test>
+ <test name="healthchecktest">
+	<classes>
+		<class
+			name="com.cognizant.devops.platformregressiontest.test.ui.healthcheck.HealthCheckTest" />
+	</classes>
+</test>
+
+	<test name="agentmanagementtest">
 		<classes>
 			<class
-				name="com.cognizant.devops.platformregressiontest.test.login.LoginTest" />
+				name="com.cognizant.devops.platformregressiontest.test.ui.agentmanagement.OnDemandTest" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.agentmanagement.ReleaseTest" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.agentmanagement.OfflineAgentTest" />
 		</classes>
 	</test>
+	<test name="configurationtestfilemanagement">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.configurationfilemanagement.ConfigurationFileManagementTest" />
+		</classes>
+	</test>
+	<test name="groupsandusertest">
+        <classes>
+            <class
+                name="com.cognizant.devops.platformregressiontest.test.ui.groupsanduser.GroupsAndUserTest" />
+        </classes>
+    </test> 
+	<test name="webhooktest">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.webhook.WebhookTest" />
+		</classes>
+	</test>
+	<test name="correlationbuildertest">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.correlationbuilder.CorrelationBuilderTest" />
+		</classes>
+	</test>
+
+	<test name="kpitest">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.reportmanagement.KpiConfigurationTest" />
+		</classes>
+	</test>
+
+	<test name="contenttest">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.reportmanagement.ContentConfigurationTest" />
+		</classes>
+	</test>
+
+	<test name="reporttemplatetest">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.reportmanagement.ReportTemplateConfigurationTest" />
+		</classes>
+	</test>
+	
+	<!-- <test name="reportmanagementtest"> <classes> <class name="com.cognizant.devops.platformregressiontest.test.ui.reportmanagement.AssessmentReportTest" 
+		/> </classes> </test> -->
+
+
+
 </suite>

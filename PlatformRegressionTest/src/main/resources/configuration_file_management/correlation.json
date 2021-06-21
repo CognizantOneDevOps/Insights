@@ -1,0 +1,32 @@
+[
+  {
+    "destination": {
+      "toolName": "JENKINS",
+      "fields": [
+        "scmCommitId", "lastBuiltRevision"
+      ]
+    },
+    "source": {
+      "toolName" : "GIT",
+      "fields": [
+        "commitId"
+      ]
+    },
+    "relationName" : "FROM_GIT_TO_JENKINS"
+  },
+  {
+    "destination": {
+      "toolName": "GIT",
+      "fields": [
+        "jiraKeys"
+      ]
+    },
+    "source": {
+      "toolName" : "JIRA",
+      "fields": [
+        "key"
+      ]
+    },
+    "relationName" : "FROM_JIRA_TO_GIT"
+  }
+]

@@ -47,6 +47,9 @@
 				"issuetype": {
 					"name": "issueType"
 				},
+				"customfield_10026": "storyPoints",
+				"customfield_10014": "epicKey",
+				"customfield_10011": "epicName",
 				"descriptions": "description",
 				"timespent": "timespent",
 				"project": {
@@ -306,56 +309,56 @@
 					]
 				}
 			}
-		}
-	},
-	"changeLog": {
-		"fields": [
-			"assignee",
-			"Sprint",
-			"status",
-			"Story Points",
-			"Key",
-			"Rank",
-			"project",
-			"issuetype",
-			"Version",
-			"Fix Version",
-			"timespent",
-			"Link",
-			"Acceptance Criteria",
-			"description"
-		],
-		"metadata": {
-			"labels": [
-				"CHANGE_LOG"
+		},
+		"changeLog": {
+			"fields": [
+				"assignee",
+				"Sprint",
+				"status",
+				"Story Points",
+				"Key",
+				"Rank",
+				"project",
+				"issuetype",
+				"Version",
+				"Fix Version",
+				"timespent",
+				"Link",
+				"Acceptance Criteria",
+				"description"
 			],
-			"dataUpdateSupported": true,
-			"uniqueKey": [
-				"issueKey",
-				"changeId",
-				"changedfield"
-			]
-		},
-		"insightsTimeXFieldMapping": {
-			"timefield": "changeDate",
-			"isEpoch": false,
-			"timeformat": "%Y-%m-%dT%H:%M:%S"
-		},
-		"responseTemplate": {
-			"id": "changeId",
-			"author": {
-				"name": "authorId",
-				"emailAddress": "authorEmail",
-				"displayName": "authorName"
+			"metadata": {
+				"labels": [
+					"CHANGE_LOG"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"issueKey",
+					"changeId",
+					"changedfield"
+				]
 			},
-			"created": "changeDate"
+			"insightsTimeXFieldMapping": {
+				"timefield": "changeDate",
+				"isEpoch": false,
+				"timeformat": "%Y-%m-%dT%H:%M:%S"
+			},
+			"responseTemplate": {
+				"id": "changeId",
+				"author": {
+					"name": "authorId",
+					"emailAddress": "authorEmail",
+					"displayName": "authorName"
+				},
+				"created": "changeDate"
+			}
 		}
 	},
 	"agentId": "",
 	"toolCategory": "ALM",	
 	"enableSprintReport": false,
 	"enableDataValidation": true,
-	"sprintField": "customfield_10021",
+	"sprintField": "customfield_10020",
 	"enableValueArray": true,
 	"isDebugAllowed": false,
 	"runSchedule": 30,

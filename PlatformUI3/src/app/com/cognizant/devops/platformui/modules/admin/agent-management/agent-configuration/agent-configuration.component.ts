@@ -180,6 +180,10 @@ export class AgentConfigurationComponent implements OnInit {
       this.isWebhook=false;
     }
     console.log('Inside checkType '+this.selectedType +'    '+this.isWebhook)
+    this.agentConfigItems = [];
+    this.selectedVersion = undefined
+    this.selectedTool = undefined;
+    this.showConfig = false;
   }
 
   versionOnChange(key, type): void {

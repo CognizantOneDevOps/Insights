@@ -123,7 +123,7 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 
 	DefaultSpringSecurityContextSource contextSource;
 
-	String AUTH_TYPE = "SAML";
+	static final String AUTHTYPE = "SAML";
 
 	@Autowired
 	private AuthenticationUtils authenticationUtils;
@@ -132,7 +132,7 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		LOG.debug("message Inside InsightsSecurityConfigurationAdapterSAML, AuthenticationManagerBuilder **** {} ",
 				ApplicationConfigProvider.getInstance().getAutheticationProtocol());
-		if (AUTH_TYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
+		if (AUTHTYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
 			LOG.debug("message Inside SAMLAuthConfig, check authentication provider **** ");
 			auth.authenticationProvider(samlAuthenticationProvider());
 		}
@@ -142,7 +142,7 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 	protected void configure(HttpSecurity http) throws Exception {
 		LOG.debug("message Inside InsightsSecurityConfigurationAdapterSAML,HttpSecurity **** {} ",
 				ApplicationConfigProvider.getInstance().getAutheticationProtocol());
-		if (AUTH_TYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
+		if (AUTHTYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
 			LOG.debug("message Inside SAMLAuthConfig, check http security **** ");
 
 			http.cors();
@@ -165,9 +165,10 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 
 	@Override
 	public void configure(WebSecurity web) throws Exception {
-		if (AUTH_TYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
+		if (AUTHTYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
 			web.ignoring().antMatchers("/settings/getLogoImage");
 			web.ignoring().antMatchers("/datasource/**");
+			web.ignoring().antMatchers("/externalApi/**");
 		}
 	}
 
@@ -385,7 +386,7 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 	 */
 	@Bean
 	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public InsightsSAMLAuthenticationFilter insightsSSOProcessingFilter() throws IOException {
+	public InsightsSAMLAuthenticationFilter insightsSSOProcessingFilter() {
 		 return new InsightsSAMLAuthenticationFilter();
 	}
 

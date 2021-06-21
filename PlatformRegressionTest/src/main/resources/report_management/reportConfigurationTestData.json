@@ -1,0 +1,12 @@
+{
+   "kpiConfiguration":"Kpi Configuration",
+   "kpiId":"1234",
+   "kpiName":"Total number of Defects",
+   "selectTool":"JIRA",
+   "selectCategory":"STANDARD",
+   "groupName":"ALM",
+   "inputDatasource":"NEO4J",
+   "dbQuery":"MATCH (n:JIRA:SPKDATA) WHERE  n.SPKstartTime >= {startTime}  and n.SPKstartTime < {endTime} and n.SPKvector='DEFECTS' RETURN count(n) as Defects",
+   "isActive":true,
+   "resultField":"Defects"
+}

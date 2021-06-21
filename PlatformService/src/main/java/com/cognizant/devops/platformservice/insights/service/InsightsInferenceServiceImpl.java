@@ -369,7 +369,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 			Map<Long, List<InferenceResultDetails>> kpiInferenceResultGrouped = inferenceDetailList.stream()
 					.collect(Collectors.groupingBy(InferenceResultDetails::getKpiID));
 
-			log.debug(" kpiInferenceResulGrouped {} ", kpiInferenceResultGrouped);
+			//log.debug(" kpiInferenceResulGrouped {} ", kpiInferenceResultGrouped);
 
 			for (Map.Entry<Long, List<InferenceResultDetails>> kipInferanceResult : kpiInferenceResultGrouped
 					.entrySet()) {

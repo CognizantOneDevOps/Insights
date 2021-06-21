@@ -16,13 +16,16 @@
 package com.cognizant.devops.platformregressiontest.test.agentmanagement;
 
 import java.io.IOException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
 import com.cognizant.devops.platformregressiontest.test.common.CommonUtils;
 import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
+
 import io.restassured.RestAssured;
 import io.restassured.http.Header;
 import io.restassured.http.Method;
@@ -42,7 +45,7 @@ public class DeleteAgentAPITest extends AgentTestData {
 		jSessionID = CommonUtils.getJsessionId();
 		xsrfToken = CommonUtils.getXSRFToken(jSessionID);
 	}
-
+	
 	@Test(priority = 1, dataProvider = "agentdeletedataprovider")
 	public void deleteAgent(String agentId, String toolName, String osversion, String action) {
 

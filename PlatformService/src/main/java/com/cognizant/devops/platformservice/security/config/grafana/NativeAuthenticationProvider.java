@@ -17,24 +17,44 @@ package com.cognizant.devops.platformservice.security.config.grafana;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.security.access.AuthorizationServiceException;
+import org.springframework.security.authentication.AccountExpiredException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
+import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationException;
 import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationToken;
+import com.cognizant.devops.platformservice.security.config.TokenProviderUtility;
 
 public class NativeAuthenticationProvider implements AuthenticationProvider {
-	private static Logger Log = LogManager.getLogger(NativeAuthenticationProvider.class);
+	private static Logger log = LogManager.getLogger(NativeAuthenticationProvider.class);
 
 	/**
 	 * Used to authenticate Native Grafana
 	 */
 	@Override
-	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-		Log.debug(" In NativeAuthenticationProvider first time login ... ");
-		/*Grafana Authentication is already done, 
-		This class is used to validate additional security like JWT token validation*/
+	public Authentication authenticate(Authentication authentication)  {
+		log.debug(" In NativeAuthenticationProvider subsequent time login ====");
+		/*
+		 * Grafana Authentication is already done, This class is used to validate
+		 * additional security like JWT token validation
+		 */
+		if (!supports(authentication.getClass())) {
+			throw new IllegalArgumentException(
+					"Only NativeAuthenticationProvider UsernamePasswordAuthenticationToken is supported, " + authentication.getClass() + " was attempted");
+		}
+
+		if (authentication.getPrincipal() == null) {
+			log.error("Authentication token is missing - authentication.getPrincipal() {} ",
+					authentication.getPrincipal());
+			throw new AuthenticationCredentialsNotFoundException("Authentication token is missing");
+		}
+		/* validate request token */
+		AuthenticationUtils.validateIncomingToken(authentication.getPrincipal());
 		return authentication;
 	}
 

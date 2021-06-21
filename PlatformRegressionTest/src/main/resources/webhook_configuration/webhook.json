@@ -1,0 +1,14 @@
+{
+	"webhookConfiguration": "Webhook Configuration",
+	"WebHookname": "Test_wf001",
+	"WebHookname1": "Test_wf002",
+	"ToolName": "GIT",
+	"ResponseTemplate": "sprint.name=sprintName,sprint.id=sprintId,sprint.originBoardId=boardId,webhookEvent=webhookEvent,issue.key=jiraKey",
+	"IncorrectLabelName": "scm",
+	"NodeProperty": "DATA",
+	"CorrectLabelName": "SCM:GIT:DATA",
+	"incorrectResponse": "non-Json message",
+	"DataFromat": "Json",
+	"TimeField": "2020-03-02T05:48:48Z",
+	"TimeFormat": "yyyy-MM-dd'T'HH:mm:ss'Z'"
+}
