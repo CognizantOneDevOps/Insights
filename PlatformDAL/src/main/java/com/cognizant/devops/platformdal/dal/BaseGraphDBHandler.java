@@ -16,10 +16,12 @@
 package com.cognizant.devops.platformdal.dal;
 
 import java.util.List;
-
+/*
 import org.neo4j.driver.v1.Session;
 import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.Transaction;
+
+import com.cognizant.devops.platformcommons.exception.DataDeleteException;
 
 public interface BaseGraphDBHandler{
 
@@ -33,3 +35,5 @@ public interface BaseGraphDBHandler{
     public Session getSession();
     public void closeSession(Session session);
 }
+
+*/

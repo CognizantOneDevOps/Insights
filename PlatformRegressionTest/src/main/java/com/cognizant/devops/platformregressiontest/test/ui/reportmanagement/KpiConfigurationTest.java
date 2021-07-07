@@ -41,11 +41,6 @@ public class KpiConfigurationTest extends LoginAndSelectModule {
 
 	}
 
-	// @BeforeMethod
-	public void beforeEachTestCase() {
-		driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
-	}
-
 	@Test
 	public void testKPILandingPage() {
 		kpiConfigurationPage.navigateToKPIConfigurationLandingPage();

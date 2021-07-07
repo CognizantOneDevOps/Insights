@@ -15,16 +15,10 @@
  *******************************************************************************/
 package com.cognizant.devops.platformservice.businessmapping.service;
 
-import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonObject;
 
 public interface BusinessMappingService {
 	
-	public JsonObject getAllHierarchyDetails();
-	
-	public JsonObject getHierarchyProperties(String level1,String level2,
-			 String level3, String level4) throws InsightsCustomException;
-
 	public JsonObject saveToolsMappingLabel(String agentMappingJson);
 
 	public JsonObject getToolsMappingLabel(String agentName);

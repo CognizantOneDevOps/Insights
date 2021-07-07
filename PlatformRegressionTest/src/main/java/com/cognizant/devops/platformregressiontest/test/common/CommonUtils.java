@@ -15,11 +15,16 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.common;
 
+import static io.restassured.RestAssured.given;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,9 +32,11 @@ import org.apache.logging.log4j.Logger;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import io.restassured.RestAssured;
 import io.restassured.http.Method;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
@@ -43,11 +50,13 @@ public class CommonUtils {
 
 	public static Properties props = null;
 
-	static String jSessionID = null;
-	static String xsrfToken;
+	public static String jSessionID = null;
+	public static String xsrfToken;
+	public static String jtoken;
+	public static Map<String, String> cookiesMap =new HashMap<>();
 
 	static {
-		loadProperties();		
+		loadProperties();
 	}
 
 	public static void loadProperties() {
@@ -72,23 +81,31 @@ public class CommonUtils {
 		return props.getProperty(key);
 	}
 
-	public static String getJsessionId() throws InterruptedException, IOException {
-		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + "/PlatformService/user/authenticate";
-		RequestSpecification httpRequest = RestAssured.given();
-
-		httpRequest.header("Authorization",
-				"U2FsdGVkX19WFjYlorGzpolzbX1Ro+f5XcvD3Lt5lzaEo3JvlyHNfIeRMwiApFgR99b74c48-f15e-4");
-		httpRequest.header("Content-Type", "application/json");
-		Response response = httpRequest.request(Method.GET, "/");
+	public static String getJsessionId() {
+		RestAssured.baseURI = CommonUtils.getProperty("baseURI");
+		Response response = given().header("Authorization", CommonUtils.getProperty("authorization")).and()
+				.header("Content-Type", "application/json").when().post("PlatformService/user/authenticate").then()
+				.extract().response();
 		String cookies = response.getCookies().toString();
 		Gson gson = new Gson();
 		JsonElement jelement = gson.fromJson(cookies.trim(), JsonElement.class);
 		JsonObject json = jelement.getAsJsonObject();
 		String jSessionId = json.get("JSESSIONID").getAsString();
 		log.debug("SessionID----------------------------> {}", jSessionId);
-		getXSRFToken(jSessionId);
 		jSessionID = jSessionId;
-
+		JsonPath responseJson = new JsonPath(response.getBody().asString());
+		log.info("responseJson--------------------------------> {}", responseJson.prettyPrint());
+		CommonUtils.jtoken = responseJson.getString("data.jtoken");
+		log.info("jtoken--------------------------------> {}", CommonUtils.jtoken);
+		getXSRFToken(jSessionId);
+		CommonUtils.cookiesMap.put("JSESSIONID",jSessionID);
+		String data = responseJson.get("data").toString();
+		log.info("data--------------------------------> {}", data);
+		parseAndgetMap(data);
+		String cookiesString = CommonUtils.cookiesMap.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
+				.collect(Collectors.joining(";"));
+		log.info("cookiesString--------------------------------> {}", cookiesString);
+		
 		return jSessionID;
 	}
 
@@ -98,7 +115,7 @@ public class CommonUtils {
 				+ "/PlatformService/admin/agentConfiguration/getRegisteredAgents";
 		RequestSpecification httpRequest = RestAssured.given();
 		httpRequest.cookie("JSESSIONID", jSessionId);
-		httpRequest.header("Authorization", CommonUtils.getProperty("authorization"));
+		httpRequest.header("Authorization",CommonUtils.jtoken);
 
 		httpRequest.header("Content-Type", "application/json");
 		Response response = httpRequest.request(Method.GET, "/");
@@ -108,8 +125,15 @@ public class CommonUtils {
 		JsonObject json = jelement.getAsJsonObject();
 		String Xsrf = json.get("XSRF-TOKEN").getAsString();
 		log.debug("XSRF----------------------------> {}", Xsrf);
-		xsrfToken = Xsrf;
+		CommonUtils.xsrfToken = Xsrf;
 		return Xsrf;
+	}
+	
+	public static void parseAndgetMap(String json) {
+	    JsonObject object = (JsonObject) new JsonParser().parse(json);
+	    for (Map.Entry<String,JsonElement> entry : object.entrySet()) {
+	    	CommonUtils.cookiesMap.put(entry.getKey(), entry.getValue().toString());
+	    }
 	}
 
 }

@@ -4,8 +4,10 @@
 
 <suite thread-count="1" name="suite" verbose="10">
 
-	<test name="platformapitest">
+	 <test name="platformapitest">
 	<classes>
+		<class
+				name="com.cognizant.devops.platformregressiontest.test.testnginitializer.TestNGInitializer" />
 		<class
 			name="com.cognizant.devops.platformregressiontest.test.agentmanagement.RegisterAgentAPITest" />
 		<class
@@ -39,9 +41,9 @@
 		<class
 			name="com.cognizant.devops.platformregressiontest.test.webhookconfiguration.DeleteWebhookAPITest" />
 	</classes>
-</test>
+</test> 
 
-	<test name="logintest">
+	 <test name="logintest">
 	<classes>
 		<class
 			name="com.cognizant.devops.platformregressiontest.test.login.LoginTest" />
@@ -82,13 +84,42 @@
 				name="com.cognizant.devops.platformregressiontest.test.ui.webhook.WebhookTest" />
 		</classes>
 	</test>
+	<test name="bulkupload">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.bulkupload.BulkUploadTest" />
+		</classes>
+	</test>
 	<test name="correlationbuildertest">
 		<classes>
 			<class
 				name="com.cognizant.devops.platformregressiontest.test.ui.correlationbuilder.CorrelationBuilderTest" />
 		</classes>
 	</test>
-
+	<test name="serverconfiguration">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.serverconfiguration.ServerConfigurationTest" />
+		</classes>
+	</test>
+	<test name="logosetting">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.logosetting.LogoSettingTest" />
+		</classes>
+	</test>
+	<test name="datadictionary">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.datadictionary.DataDictionaryTest" />
+		</classes>
+	</test>
+	<test name="loginwithcreatedcredentials">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.loginwithdifferentroles.LoginWithRolesTest" />
+		</classes>
+	</test>
 	<test name="kpitest">
 		<classes>
 			<class
@@ -110,9 +141,5 @@
 		</classes>
 	</test>
 	
-	<!-- <test name="reportmanagementtest"> <classes> <class name="com.cognizant.devops.platformregressiontest.test.ui.reportmanagement.AssessmentReportTest" 
-		/> </classes> </test> -->
-
-
-
+	
 </suite>

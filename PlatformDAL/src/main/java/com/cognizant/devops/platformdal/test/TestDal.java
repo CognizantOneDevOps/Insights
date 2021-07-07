@@ -15,19 +15,14 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.test;
 
-import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformdal.core.BaseDAL;
-import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
-import com.cognizant.devops.platformdal.workflow.InsightsWorkflowType;
-import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 
 public class TestDal extends BaseDAL {
-	final static Logger logger = LogManager.getLogger(TestDal.class);
+	static final Logger logger = LogManager.getLogger(TestDal.class);
 
 	static boolean isInteger(double number) {
 		return number % 1 == 0;// if the modulus(remainder of the division) of the argument(number) with 1 is 0 then return true otherwise false.
@@ -37,27 +32,10 @@ public class TestDal extends BaseDAL {
 		try {
 			logger.debug(" In TestDal");
 			ApplicationConfigCache.loadConfigCache();
-			TestDal testDALFeature = new TestDal();
-			testDALFeature.createWorkflowType();
+			//TestDal testDALFeature = new TestDal();
 		} catch (Exception e) {
 			logger.error("======================================");
 			e.fillInStackTrace();
-		}
-	}
-
-	private void createWorkflowType() {
-		InsightsWorkflowType workflowType = new InsightsWorkflowType();
-		WorkflowDAL workflowDAL = new WorkflowDAL();
-		workflowType.setWorkflowType("SYSTEM2");
-		try {
-			
-			List<InsightsWorkflowConfiguration> worlflowList = workflowDAL.getAllActiveWorkflowConfiguration();
-			logger.debug("Object save  worlflowList {} ",worlflowList);
-			int workflowTypeId = workflowDAL.saveWorkflowType(workflowType);
-			logger.debug("Object save {} ",workflowTypeId);
-		} catch (Exception e) {
-			logger.error(e);
-			throw e;
 		}
 	}
 }

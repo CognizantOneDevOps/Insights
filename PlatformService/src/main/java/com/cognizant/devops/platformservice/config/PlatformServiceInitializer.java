@@ -54,7 +54,7 @@ public class PlatformServiceInitializer implements WebApplicationInitializer {
 		try {
 			log.debug("Inside PlatformServiceInitializer onStartup ============================ ");
 			loadServerConfig();
-			ApplicationConfigCache.updateLogLevel(LogLevelConstants.PlatformService);
+			ApplicationConfigCache.updateLogLevel(LogLevelConstants.PLATFORMSERVICE);
 			disableSslVerification();
 
 			ProcessMasterData processMasterData = new ProcessMasterData();

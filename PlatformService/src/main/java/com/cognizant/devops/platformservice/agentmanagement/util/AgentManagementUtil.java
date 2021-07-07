@@ -149,6 +149,7 @@ public class AgentManagementUtil {
 			JsonElement jsonElement = parser.parse(new FileReader(configFile));
 			jsonObject = jsonElement.getAsJsonObject();
 		} catch (FileNotFoundException e) {
+			log.error(e);
 			throw new IOException("No Such file found -- " + configFile);
 		} 
 		return jsonObject;

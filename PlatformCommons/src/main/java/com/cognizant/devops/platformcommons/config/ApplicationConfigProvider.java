@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.google.gson.JsonObject;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -33,6 +31,11 @@ import javax.validation.constraints.NotEmpty;
  *
  */
 public class ApplicationConfigProvider implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1624602880L;
+	
 	private static ApplicationConfigProvider instance = new ApplicationConfigProvider();
 	private EndpointData endpointData = new EndpointData();
 	private SparkConfigurations sparkConfigurations = new SparkConfigurations();
@@ -46,8 +49,6 @@ public class ApplicationConfigProvider implements Serializable {
 	private String insightsTimeZone = "UTC";
 	@Valid
 	private PostgreData postgre = new PostgreData();
-	private String userId;
-	private String password;
 	private String proxyHost;
 	private int proxyPort;
 	private Date refreshTime;
@@ -55,13 +56,12 @@ public class ApplicationConfigProvider implements Serializable {
 	private boolean enableOnlineDatatagging = false;
 	private EmailConfiguration emailConfiguration = new EmailConfiguration();
 	private CorrelationConfig correlations = new CorrelationConfig();
-	private boolean enableFieldIndex;
-	private boolean enableOnlineBackup = false;
 	private AgentDetails agentDetails = new AgentDetails();
 	private QueryCache queryCache = new QueryCache();
 	private boolean enableAuditEngine = false;
 	private boolean enableWebHookEngine = false;
 	private boolean enableDataArchivalEngine = false;
+	@Valid
 	private SchedulerConfigData schedulerConfigInMin = new SchedulerConfigData();
 	private String driverLocation;
 
@@ -159,22 +159,6 @@ public class ApplicationConfigProvider implements Serializable {
 		this.postgre = postgre;
 	}
 
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
 	public Date getRefreshTime() {
 		return refreshTime;
 	}
@@ -237,22 +221,6 @@ public class ApplicationConfigProvider implements Serializable {
 
 	public void setCorrelations(CorrelationConfig correlations) {
 		this.correlations = correlations;
-	}
-
-	public boolean isEnableFieldIndex() {
-		return enableFieldIndex;
-	}
-
-	public void setEnableFieldIndex(boolean enableFieldIndex) {
-		this.enableFieldIndex = enableFieldIndex;
-	}
-
-	public boolean isEnableOnlineBackup() {
-		return enableOnlineBackup;
-	}
-
-	public void setEnableOnlineBackup(boolean enableOnlineBackup) {
-		this.enableOnlineBackup = enableOnlineBackup;
 	}
 
 	public boolean isEnableOnlineDatatagging() {

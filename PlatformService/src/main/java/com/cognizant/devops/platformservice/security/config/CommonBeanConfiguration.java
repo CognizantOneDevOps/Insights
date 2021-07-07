@@ -89,7 +89,7 @@ public class CommonBeanConfiguration {
 
 	/**
 	 * used for initialization of MultipartResolver ,MultipartResolver check files
-	 * in our application it apply before initialization. It restirct any unwanted
+	 * in our application it apply before initialization. It restrict any unwanted
 	 * file attact in our application.
 	 * 
 	 * @return

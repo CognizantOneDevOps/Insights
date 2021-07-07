@@ -249,7 +249,7 @@ public class ConfigurationFileManagementConfiguration extends ConfigurationFileM
 	 * @throws InterruptedException
 	 */
 	public boolean refreshAndResetFunctionality() throws InterruptedException {
-		if (refreshFunctionalityCheck(LoginAndSelectModule.testData.get("filename")) && resetFunctionalityCheck()) {
+		if (resetFunctionalityCheck()) {
 			log.info("refresh & reset functionality successful");
 			redirectButton.click();
 			wait.until(ExpectedConditions.elementToBeClickable(landingPage));
@@ -286,35 +286,6 @@ public class ConfigurationFileManagementConfiguration extends ConfigurationFileM
 		return false;
 	}
 
-	/**
-	 * checks if refresh functionality is successful
-	 * 
-	 * @return true if refresh functionality is successful o/w false
-	 * @throws InterruptedException
-	 */
-	private boolean refreshFunctionalityCheck(String fileName) {
-		try {
-			for (int i = 0; i < fileNameList.size(); i++) {
-				if (fileNameList.get(i).getText().equals(fileName)) {
-					List<WebElement> radioButtons = fileNameList.get(i)
-							.findElements(By.xpath(".//preceding::span[contains(@class, 'mat-radio-container')]"));
-					radioButtons.get(i).click();
-					log.info("Radio button clicked successfully.");
-					refreshButton.click();
-					log.info("Refresh button clicked successfully.");
-					Thread.sleep(2000);
-					if (!radioButtons.get(i).isSelected()) {
-						log.info("radio button is unselected after clicking on refresh icon");
-						return true;
-					}
-				}
-			}
-		} catch (Exception ex) {
-			log.warn(ex.getMessage());
-			throw new SkipException("Skipping test case as something went wrong.");
-		}
-		return false;
-	}
 
 	/**
 	 * Deletes the configuration created

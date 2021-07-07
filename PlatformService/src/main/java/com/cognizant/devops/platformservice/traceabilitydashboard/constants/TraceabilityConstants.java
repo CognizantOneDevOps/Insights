@@ -36,4 +36,11 @@ public final class TraceabilityConstants {
 	public static final String PIPELINE="pipeline";
 	public static final String METADATA = "metaData";
 	public static final String DISPLAY_PROPS_TEXT = "displayTextProperty";
+	public static final String TOOL_NAME = "toolName";
+	public static final String RECORD_COUNT = "recordCount";
+	public static final String COMBINED_SUMMARY ="combinedSummary";
+	public static final String COUNT = "count";
+	public static final String OTHER_PIPELINE = "Other";
+	public static final String ISSUE_TYPE = "issueType";
+	public static final String PROPERTY = "property";
 }

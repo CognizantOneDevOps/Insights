@@ -301,19 +301,22 @@ public class ReportTemplateConfigurationPage extends ReportTemplateObjectReposit
 		saveEl.click();
 		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 		wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
-		if (fillMandatoryDialogEl.isDisplayed()) {
+		try {
+			if (fillMandatoryDialogEl.isDisplayed()) {
 
-			btnOKEl.click();
-			navigateToReportTemplateLandingPage();
-			return true;
+				btnOKEl.click();
+				navigateToReportTemplateLandingPage();
+				return true;
+			}
+		} catch (Exception e) {
+			if (addKPIDialogEl.isDisplayed()) {
+
+				btnOKEl.click();
+				navigateToReportTemplateLandingPage();
+				return true;
+			}
 		}
 		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
-		if (addKPIDialogEl.isDisplayed()) {
-
-			btnOKEl.click();
-			navigateToReportTemplateLandingPage();
-			return true;
-		}
 
 		return false;
 

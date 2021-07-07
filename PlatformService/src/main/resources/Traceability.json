@@ -2,7 +2,7 @@
    "JIRA":{
       "uuid":"uuid",
       "order":2,
-	  "displayText":"Issue",
+	  "displayText":"Issues",
       "category":"ALM",
       "issueKey":"key",
       "property":"categoryName",
@@ -14,6 +14,7 @@
       "toolstatus":"status",
       "author":"reporter",
       "projectName":"projectName",
+	  "timestamp":"inSightsTime",
       "priority":"priority",
       "inSightsTimeX":"inSightsTimeX",
       "eventKey":"eventKey",
@@ -25,7 +26,7 @@
       ],
 	  "messages":[
 		 {
-            "Message":"Total  {0} in JIRA",
+            "Message":"Total {0} in JIRA",
             "Operation":"PROPERTY_COUNT",
             "OperandName":"issueType",
             "OperandValue":[
@@ -80,7 +81,8 @@
          "commitId",
          "property",
          "toolstatus"
-      ]
+      ],
+	  "excludeLabels":["FILE_CHANGE"]
    },
    "JENKINS":{
       "uuid":"uuid",
@@ -104,8 +106,9 @@
       ],
       "downtool":[
          "SONAR",
-         "RUNDECK",
-         "NEXUS"
+		 "NEXUS",
+         "RUNDECK"
+         
       ],
       "timelagParam":[
          "startTime",

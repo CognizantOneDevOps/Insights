@@ -18,7 +18,7 @@
 
 .form-control {
     padding: 6px 12px;
-    font-size: 13px;
+    font-size: 13px;   
     background-color: white;
     background-image: none;
     border: 1px solid #ccc;
@@ -30,25 +30,9 @@
     transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
     margin-left: 5px;
     margin-bottom: 5px;
-}
-.tableMainCss {
-    border-collapse:collapse !important;
-    border-spacing: 0px;
-} 
-.input-disabled{
-    color: rgba(0,0,0,.38);
-    background-color:#e1e3e7;
-    padding: 6px 12px;
-    font-size: 13px;
-    background-image: none;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
-    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-    margin-left: 5px;
+    text-align: left !important;
+    box-sizing: border-box !important;
+    height: 40% !important;
 }
 
 
@@ -84,10 +68,12 @@
     font-weight: 500;
     min-width: 50px;
 }
+
 .btnAlign{
-    margin-right: 7px; 
+    margin-right:1%; 
     float: right;
-    margin-bottom: 10px;
+    margin-bottom:1%;
+    align-content:right fixed;
 }
 
 
@@ -162,10 +148,13 @@
 }
 .searchbox
 {
-       font-size: 14px !important;
+    font-size: 14px !important;
     margin-left: 17px; 
     width: 330px;
-     margin-top: 1px 
+     margin-top: 1px; 
+   
+   
+    
 }
 .wrnTxt{
   color: #ff8f1c !important;
@@ -216,6 +205,9 @@ tr:nth-child(even)  {
 }
 
 .filterGroupCSS{
+   margin-right:2.5% !important;
+   text-align: right;
+   height:5%;
    float: right;
    width: 30%
 }

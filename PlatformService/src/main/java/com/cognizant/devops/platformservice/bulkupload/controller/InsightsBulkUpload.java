@@ -58,6 +58,7 @@ public class InsightsBulkUpload {
 		try {
 			status = bulkUploadService.uploadDataInDatabase(file, toolName, label, insightsTimeField,
 					insightsTimeFormat);
+			log.debug(" Upload tool data done {} successfully for tool  {} ",status,toolName);
 			return PlatformServiceUtil.buildSuccessResponse();
 		} catch (InsightsCustomException e) {
 			log.error(e.getMessage());
@@ -70,7 +71,7 @@ public class InsightsBulkUpload {
 	 *
 	 * @return ResponseBody
 	 */
-	@GetMapping(value = "/getToolJson",  produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/getToolJson",  produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getToolJson() {
 		Object details = null;
 		try {

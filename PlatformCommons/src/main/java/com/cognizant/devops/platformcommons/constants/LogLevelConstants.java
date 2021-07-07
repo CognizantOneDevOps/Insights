@@ -25,11 +25,11 @@ public interface LogLevelConstants {
 
 	String ROLLING_FILE_APPENDER = "RollingFile";
 	String CONSOLE_APPENDER = "Console";
-	String PlatformWebhookSubscriber = "PlatformWebhookSubscriber";
-	String PlatformEngine = "PlatformEngine";
-	String PlatformService = "PlatformService";
-	String PlatformReport = "PlatformReport";
-	String PlatformRegressionTest = "PlatformRegressionTest";
+	String PLATFORMWEBHOOKSUBSCRIBER = "PlatformWebhookSubscriber";
+	String PLATFORMENGINE = "PlatformEngine";
+	String PLATFORMSERVICE = "PlatformService";
+	String PLATFORMREPORT = "PlatformReport";
+	String PLATFORMREGRESSIONTEST = "PlatformRegressionTest";
 	public static final List<String> UPDATED_LOGGER_LIST = Collections
 			.unmodifiableList(Arrays.asList("com.cognizant", Strings.EMPTY));
 }

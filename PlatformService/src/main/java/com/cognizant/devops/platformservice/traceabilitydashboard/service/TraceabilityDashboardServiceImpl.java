@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -86,6 +85,8 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 	InsightsConfigFilesDAL configFilesDAL = new InsightsConfigFilesDAL();
 
 	HashMap<String, String> handOverTimeMap = new HashMap<>();	
+	HashMap<String, String> displayPropertyMap = new HashMap<>();
+	HashMap<String, JsonArray> toolWiseSummaryMap = new HashMap<>();
 	GsonBuilder gsonBuilder = new GsonBuilder();
 
 	private static final Logger LOG = LogManager.getLogger(TraceabilityDashboardServiceImpl.class.getName());
@@ -154,44 +155,47 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 			throws InsightsCustomException {
 		JsonArray pipeLineArray = new JsonArray();
 		JsonObject pipeLineObject = new JsonObject();
-		LinkedHashMap<String, String> sortedHandoverTimeMap = new LinkedHashMap<>();
+		JsonArray  sortedCombinedSummary= new JsonArray();
 		mapOfPayload= new HashMap<>();
+		toolWiseSummaryMap.clear();
 		Set<Entry<String, List<JsonObject>>> keyset = map.entrySet();
-		for (Map.Entry<String, List<JsonObject>> keyvaluePair : keyset) {
-			List<JsonObject> limitedList = keyvaluePair.getValue().stream().collect(Collectors.toList());
-			limitedList.forEach(pipeLineArray::add);
-			// Handover time object extraction and sorting
-			if (!handOverTimeMap.isEmpty()) {
-				try {
-					List<String> childNodes = getDownTool(keyvaluePair.getKey(), dataModel);
-					for (String eachNode : childNodes) {
-						//int childNodeCount = map.containsKey(eachNode)?map.get(eachNode).size():0; //+" ("+childNodeCount + ")"
-						String construct = keyvaluePair.getKey() + " To " + eachNode ;
-						LOG.debug("Construct timeline map for {} and {} ",keyvaluePair.getKey(),eachNode);
-						sortedHandoverTimeMap.put(construct, handOverTimeMap.get(construct));
-					}
-
-				} catch (InsightsCustomException e) {
-					LOG.debug(e.getMessage());
-				}
-			}
-
-		}
+		
 		/* Prepare Summary */
 		JsonObject summaryObj = prepareSummary(map, dataModel);
+		
+		/* Pipeline Response prepare metadata */
+		prepareMetaData();
+		
+		handOverTimeMap.forEach((k,v)->{                 
+	        LOG.debug(" handOverTimeMap handOverTime  key {} value {} ",k,v);
+	     });
+		
+		for (Map.Entry<String, List<JsonObject>> keyvaluePair : keyset) {
+			JsonObject combinedSummary = new JsonObject();
+			combinedSummary.addProperty(TraceabilityConstants.TOOL_NAME, keyvaluePair.getKey());
+			List<JsonObject> toolPayload=map.get(keyvaluePair.getKey());
+			combinedSummary.addProperty(TraceabilityConstants.RECORD_COUNT, Integer.toString(toolPayload.size()));
+			combinedSummary.addProperty("displayProperty",displayPropertyMap.get(keyvaluePair.getKey()));
+			combinedSummary.addProperty("handOverTime",handOverTimeMap.get(keyvaluePair.getKey()));
+			List<JsonObject> limitedList = keyvaluePair.getValue().stream().collect(Collectors.toList());
+			limitedList.forEach(pipeLineArray::add);
+			//Handover time object extraction and sorting
+			combinedSummary.add("summaryDetail",toolWiseSummaryMap.get(keyvaluePair.getKey()));
+			sortedCombinedSummary.add(combinedSummary);
+		}
+
 		JsonArray summaryArray = new JsonArray();
 		summaryArray.add(summaryObj);
-		/* Timelag Response */
-		JsonObject handOverTime = new JsonObject();
-		sortedHandoverTimeMap.forEach(handOverTime::addProperty);
-		JsonArray handOverArray = new JsonArray();
-		handOverArray.add(handOverTime);
-		/* Pipeline Response */
-		JsonObject displayProperty = prepareMetaData();
+		JsonObject displayPropertyObj= new JsonObject();
+		JsonObject displayToolProperty= new JsonObject();
+		displayPropertyMap.forEach(displayToolProperty::addProperty);
+		displayPropertyObj.add(TraceabilityConstants.DISPLAY_PROPS_TEXT, displayToolProperty);
+		
+		/* Pipeline Response, Timelag Response */
 		pipeLineObject.add(TraceabilityConstants.PIPELINE, pipeLineArray);
 		pipeLineObject.add(TraceabilityConstants.SUMMARY, summaryArray);
-		pipeLineObject.add(TraceabilityConstants.TIME_LAG, handOverArray);
-		pipeLineObject.add(TraceabilityConstants.METADATA, displayProperty);
+		pipeLineObject.add(TraceabilityConstants.METADATA, displayPropertyObj);
+		pipeLineObject.add(TraceabilityConstants.COMBINED_SUMMARY, sortedCombinedSummary);
 		return pipeLineObject;
 	}
      
@@ -274,7 +278,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 	 * @param sourceTool
 	 * @return
 	 */
-	public Map<String, List<String>> format(JsonObject resp, List<String> sourceTool) {
+	public Map<String, List<String>> format(JsonObject resp) {
 		Map<String, List<String>> mapOfToolAndUUIDS = new HashMap<>();
 		JsonElement val = null;
 		int dataArraySize = resp.getAsJsonArray(TraceabilityConstants.RESULTS).getAsJsonArray().get(0).getAsJsonObject()
@@ -298,7 +302,8 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 				payload.add(rowArray.get(2).getAsJsonObject());
 			}
 			if (null != val && !val.isJsonNull()) {
-				handOverTimeMap.put(sourceTool.get(0) + " To " + rowArray.get(0).getAsString(),
+				LOG.debug(" handOverTime actual values tool Name {} time {} ",rowArray.get(0).getAsString(),val.getAsLong());
+				handOverTimeMap.put(rowArray.get(0).getAsString(),
 						InsightsUtils.getDateTimeFromEpoch(val.getAsLong()));
 			}
 			mapOfToolAndUUIDS.put(rowArray.get(0).getAsString(), uuidList);
@@ -387,7 +392,6 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 	 */
 	private Map<String, List<JsonObject>> getMasterResponse(Map<String,List<JsonObject>> response, JsonObject dataModel) {
 
-		JsonArray finaltoolsArray = new JsonArray();
 		// Master Map contains toolname as string and list of toolpayload .
 		HashMap<String, List<JsonObject>> masterMap = new HashMap<>();
 		LinkedHashMap<String, List<JsonObject>> sortedmasterMap = new LinkedHashMap<>();		
@@ -424,7 +428,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 						/* Add toolStatus property explicitly if the object does not have it already */
 						if (formattedJsonObject.get("toolstatus") == null)
 							formattedJsonObject.addProperty("toolstatus", "Success");
-						formattedJsonObject.addProperty("count",
+						formattedJsonObject.addProperty(TraceabilityConstants.COUNT,
 								Integer.toString(toolPayload.size()));
 						toolsPayload.add(formattedJsonObject);
 
@@ -436,7 +440,6 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 					/* Add each tool list payload to mastermap with toolname as key */
 					masterMap.put(toolFromNeo4j, sortedPayload);
 
-					LOG.debug("Traceability ===== Master Response Received Successfully");
 				}
 			}
 		}
@@ -452,10 +455,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 		for (Map.Entry<String, List<JsonObject>> entry : list) {
 			sortedmasterMap.put(entry.getKey(), entry.getValue());
 		}
-		/* prepare the summary */
-		JsonObject finalObj = new JsonObject();
-		// check this as it is not being used
-		finalObj.add("data", finaltoolsArray);
+		LOG.debug("Traceability ===== Master Response Received Successfully");
 		return sortedmasterMap;
 	}
 	
@@ -477,13 +477,12 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 		HashMap<String, List<JsonObject>> map = masterMap;
 		JsonObject summaryObject = new JsonObject();
 		StringBuilder summaryMessage = new StringBuilder();
-		JsonArray messagesArray = new JsonArray();
 		summaryMessage.append("This search has fetched ");
 		for (Map.Entry<String, List<JsonObject>> entry : map.entrySet()) {
 			try {
 				String tool = entry.getKey();
 				List<JsonObject> payload = entry.getValue();
-				
+				JsonArray messagesArray = new JsonArray();
 				JsonObject summary = new JsonObject();
 				JsonObject toolObjectFromDataModel = dataModel.get(tool).getAsJsonObject();
 				String displayText = toolObjectFromDataModel.has("displayText")?toolObjectFromDataModel.get("displayText").getAsString():tool;
@@ -523,6 +522,8 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 							messagesArray.add(resp);
 						}
 					}
+					LOG.debug("prepareSummary toolWiseSummaryMap tool {} messagesArray {} ",tool,messagesArray);
+					toolWiseSummaryMap.put(tool, messagesArray);
 				}
 			} catch (Exception e) {
 				LOG.error(e);
@@ -530,7 +531,6 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 			}
 		}
 		summaryMessage.setLength(summaryMessage.length() - 2);
-		summaryObject.add("messages", messagesArray);
 		summaryObject.addProperty("Total", summaryMessage.toString());
 		return summaryObject;
 
@@ -595,7 +595,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 			
 				/* collect all parent or child uuids for current basenode. */
 				
-				tempMap.putAll(format(executeCypherQuery(cypher), Arrays.asList(tool)));
+				tempMap.putAll(format(executeCypherQuery(cypher)));
 				/* collect the tools as basetool for the next hop in drilldown */
 				labelsTemp.addAll(Arrays.asList(tool));
 
@@ -621,7 +621,8 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 		mapOfPayload= new HashMap<>();
 		cacheKey = toolName + "." + fieldName + "." + type + "." + fieldValue;
 		if (pipelineCache.get(cacheKey) != null) {
-			LOG.debug("Pipeline response loaded from cache");
+			LOG.debug("Pipeline response loaded from cache for key {} "
+					,cacheKey);
 			return new JsonParser().parse(pipelineCache.get(cacheKey)).getAsJsonObject();
 		} else {
 			try {
@@ -641,7 +642,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 				} else {
 					String cypher = buildCypherQuery(toolName, fieldName, toolCategory,
 							new ArrayList<String>(fieldValue), Collections.emptyList(), 6);
-					toolsListMap.putAll(format(executeCypherQuery(cypher), Collections.emptyList()));
+					toolsListMap.putAll(format(executeCypherQuery(cypher)));
 
 					/* Get the upTool and DownTool of the selected tool in UI */
 					List<String> upTools = getUpTool(toolName, dataModel);
@@ -653,7 +654,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 					String cypherQuery = buildCypherQuery(toolName, fieldName, toolCategory,
 							new ArrayList<String>(fieldValue), excludeLabels, 2);
 					JsonObject hopQueryOutput = executeCypherQuery(cypherQuery);
-					HashMap<String, List<String>> temp = (HashMap<String, List<String>>) format(hopQueryOutput,Arrays.asList(toolName));
+					HashMap<String, List<String>> temp = (HashMap<String, List<String>>) format(hopQueryOutput);
 
 					if (temp.size() > 0) {
 						uplinkMap = (HashMap<String, List<String>>) temp.entrySet().stream()
@@ -681,7 +682,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 					LOG.debug("Traceability data has been loaded successfully");
 					/* Filter MaterMap and send only first 4 JsonObjects for the tool */
 					JsonObject response = getPipeLineResponse(masterMap, dataModel);
-					if (type.equals("Other")) {
+					if (type.equals(TraceabilityConstants.OTHER_PIPELINE)) {
 						response = formatOrder(response);
 					}
 					LOG.debug("Pipeline response prepared successfully");
@@ -706,17 +707,17 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 		JsonArray pipelineArray = response.get("pipeline").getAsJsonArray();
 		for (JsonElement element : pipelineArray) {
 			JsonObject eachObj = element.getAsJsonObject();
-			if(!eachObj.has("property")) {
+			if(!eachObj.has(TraceabilityConstants.PROPERTY)) {
 				LOG.error("category(property) field not available in response json {}", eachObj);	
 			} 
-			if (eachObj.get("property").getAsString().equals("ALM") && eachObj.has("issueType")
-					&& eachObj.get("issueType").getAsString().equals("Epic")) {
+			if (eachObj.get(TraceabilityConstants.PROPERTY).getAsString().equals("ALM") && eachObj.has(TraceabilityConstants.ISSUE_TYPE)
+					&& eachObj.get(TraceabilityConstants.ISSUE_TYPE).getAsString().equals("Epic")) {
 				eachObj.addProperty("order", 1);
-				eachObj.addProperty("toolName", "Epic");
+				eachObj.addProperty(TraceabilityConstants.TOOL_NAME, "Epic");
 				epicCounter++;
-			} else if (eachObj.get("property").getAsString().equals("ALM") && eachObj.has("issueType")
-					&& !(eachObj.get("issueType").getAsString().equals("Epic"))) {
-				eachObj.addProperty("count", eachObj.get("count").getAsInt() - epicCounter);
+			} else if (eachObj.get(TraceabilityConstants.PROPERTY).getAsString().equals("ALM") && eachObj.has(TraceabilityConstants.ISSUE_TYPE)
+					&& !(eachObj.get(TraceabilityConstants.ISSUE_TYPE).getAsString().equals("Epic"))) {
+				eachObj.addProperty(TraceabilityConstants.COUNT, eachObj.get(TraceabilityConstants.COUNT).getAsInt() - epicCounter);
 			}
 		}
 		// append epic counter
@@ -743,13 +744,11 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 	private JsonObject processEpic(String toolName, String fieldName, String toolCategory, ArrayList<String> arrayList)
 			throws InsightsCustomException {
 
-		JsonObject responseObject = new JsonObject();
-		JsonArray issuesArray = new JsonArray();
-		String fieldValue = arrayList.get(0);
+		String epicfieldValue = arrayList.get(0);
 
 		// To get epic node response
 		String cypher = buildCypherQuery(toolName, fieldName, toolCategory,
-				new ArrayList<String>(Arrays.asList(fieldValue)), Collections.emptyList(), 4);
+				new ArrayList<String>(Arrays.asList(epicfieldValue)), Collections.emptyList(), 4);
 		JsonObject response = executeCypherQuery(cypher);
 		List<JsonObject> epic = formatResponse(response, toolName);
 		epic.forEach((eachObject) -> {
@@ -757,49 +756,17 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 			eachObject.addProperty("toolName", "Epic");
 		});
 
-		cypher = buildCypherQuery(toolName, fieldName, toolCategory, new ArrayList<String>(Arrays.asList(fieldValue)),
+		cypher = buildCypherQuery(toolName, fieldName, toolCategory, new ArrayList<String>(Arrays.asList(epicfieldValue)),
 				Collections.emptyList(), 5);
 		response = executeCypherQuery(cypher);
 		List<JsonObject> issues = formatResponse(response, toolName);
-		JsonArray payloadArray = new JsonArray();
-		JsonArray summaryArray = new JsonArray();
-		JsonArray timelagArray = new JsonArray();
+
 		List<String> uuids = new ArrayList<>();
 		issues.forEach(obj -> uuids.add(obj.get("uuid").getAsString()));		
 
 		JsonObject resp = getEpicPipeline(toolName, uuids);
-		JsonArray pipelineArray = resp.get(TraceabilityConstants.PIPELINE).getAsJsonArray();
-		for (JsonElement element : pipelineArray) {
-			JsonObject eachObj = element.getAsJsonObject();
-			if (!payloadArray.contains(eachObj)) {
-				payloadArray.add(eachObj);
-			}
-		}
-		JsonArray summary = resp.get(TraceabilityConstants.SUMMARY).getAsJsonArray();
-		for (JsonElement element : summary) {
-			JsonObject eachObj = element.getAsJsonObject();
-			if (!summaryArray.contains(eachObj)) {
-				summaryArray.add(eachObj);
-			}
-		}
-		JsonArray timelag = resp.get(TraceabilityConstants.TIME_LAG).getAsJsonArray();
-		for (JsonElement element : timelag) {
-			JsonObject eachObj = element.getAsJsonObject();
-			if (!timelagArray.contains(eachObj)) {
-				timelagArray.add(eachObj);
-			}
-		}
-
-		List<JsonObject> epicIssues = Stream.concat(epic.stream(), issues.stream()).collect(Collectors.toList());		
-		epicIssues.forEach(issuesArray::add);
-		JsonObject displayProperty = prepareMetaData();
-		responseObject.add(TraceabilityConstants.PIPELINE, pipelineArray);
-		responseObject.add(TraceabilityConstants.SUMMARY, summaryArray);
-		responseObject.add(TraceabilityConstants.TIME_LAG, timelagArray);
-		responseObject.add(TraceabilityConstants.METADATA, displayProperty);
-		cacheKey = toolName + "." + fieldName + "." + "Epic" + "." + arrayList;
-		pipelineCache.put(cacheKey, responseObject.toString());	
-		return responseObject;
+		pipelineCache.put(cacheKey, resp.toString());	
+		return resp;
 	}
 
 	
@@ -862,7 +829,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 		int count = responseArray.size();
 		for (int j = 0; j < count; j++) {
 			// find the toolname in neo4j response
-			LOG.debug("Data From Neo4J has been loaded properly");
+			LOG.debug("Data From Neo4J has been loaded properly for tool {} ",toolName);
 			JsonArray toolsArray = responseArray.get(j).getAsJsonObject().get("row").getAsJsonArray();
 			JsonObject toolPayloadFromDatamodel = dataModel.get(toolName).getAsJsonObject();
 			if (toolPayloadFromDatamodel != null) {
@@ -963,8 +930,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 	/** Used to return Display properties
 	 * @return
 	 */
-	private JsonObject prepareMetaData() {
-		JsonArray responseObj = new JsonArray();
+	private void prepareMetaData() {
 		JsonObject displayToolProperty = new JsonObject();
 		JsonObject displayProperty = new JsonObject();
 		try {
@@ -974,13 +940,12 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 				JsonObject toolObject = dataModel.getAsJsonObject(tName);
 				String toolDisplayText = toolObject.has(TraceabilityConstants.DISPLAYPROPSTEXT)?toolObject.get(TraceabilityConstants.DISPLAYPROPSTEXT).getAsString():tName;
 				displayToolProperty.addProperty(tName, toolDisplayText);
+				displayPropertyMap.put(tName, toolDisplayText);
 			}
 			displayProperty.add(TraceabilityConstants.DISPLAY_PROPS_TEXT, displayToolProperty);
-			responseObj.add(displayProperty);
 		} catch (Exception e) {
 			LOG.error("Treceability ==== responseObj");
 		}
-		return displayProperty;
 	}
 	
 	/** This will return exclude label list 
@@ -990,13 +955,24 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 	private List<String> getExcludeLabelList(String toolName) {
 		List<String> excludeLabels = new ArrayList<>() ;
 		if (dataModel.has(toolName) && dataModel.get(toolName).getAsJsonObject().has(TraceabilityConstants.EXCLUDE_LABEL_PROPERTY)) {
-			LOG.debug("Tool {} has excludeLabels list ",toolName,excludeLabels);
+			LOG.debug("Tool {} has excludeLabels list {}",toolName,excludeLabels);
 			JsonArray configuredExcludeLable = dataModel.get(toolName).getAsJsonObject().get(TraceabilityConstants.EXCLUDE_LABEL_PROPERTY).getAsJsonArray();
 			for (JsonElement stringExcludeLabel : configuredExcludeLable) {
 				excludeLabels.add(stringExcludeLabel.getAsString());
 			}
 		}
 		return excludeLabels;
+	}
+	
+	public boolean clearAllCacheValue() {
+		try {
+			pipelineCache.clear();
+			masterdataCache.clear();
+			return true;
+		} catch (Exception e) {
+			LOG.error(" Error while clearing cache value ",e);
+			return false;
+		}
 	}
 
 }

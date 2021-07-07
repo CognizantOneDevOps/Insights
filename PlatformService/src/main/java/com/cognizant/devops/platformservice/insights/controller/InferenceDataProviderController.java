@@ -46,46 +46,11 @@ public class InferenceDataProviderController {
 	public static final String VECTORTYPE= "vectorType";
 	private static Logger LOG = LogManager.getLogger(InferenceDataProviderController.class);
 
-	@Autowired
-	InsightsInferenceService insightsInferenceService;
 
 	@Autowired
 	InsightsInferenceService insightsInferenceReportService;
-
-	@PostMapping(value = "/inference/data", produces = MediaType.APPLICATION_JSON_VALUE)
-	public JsonArray getInferenceData(HttpServletRequest request) {
-		LOG.debug(
-				" inside getInferenceData call /datasource/inference/data ============================================== ");
-		String input = null;
-		List<InsightsInference> inferences = null;
-		try {
-			input = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-		} catch (Exception e) {
-			LOG.error(e);
-		}
-		JsonArray result = new JsonArray();
-		JsonArray inferenceInputFromPanel = new JsonParser().parse(input).getAsJsonArray();
-		for (JsonElement jsonElemFromDS : inferenceInputFromPanel.getAsJsonArray()) {
-			String schedule = jsonElemFromDS.getAsJsonObject().get(VECTORSCHEDULE).getAsString();
-			String vectorType = jsonElemFromDS.getAsJsonObject().get(VECTORTYPE).getAsString();
-			LOG.debug(" for vector type {} ", vectorType);
-			if (vectorType == null || "".equalsIgnoreCase(vectorType)) {
-				inferences = insightsInferenceService.getInferenceDetails(schedule);
-			} else {
-				inferences = insightsInferenceService.getInferenceDetailsVectorWise(schedule, vectorType);
-			}
-			JsonObject responseOutputFromES = PlatformServiceUtil.buildSuccessResponseWithData(inferences);
-			for (JsonElement jsonElemES : responseOutputFromES.get("data").getAsJsonArray()) {
-				if (((JsonObject) jsonElemES).get("heading").getAsString()
-						.equals(jsonElemFromDS.getAsJsonObject().get(VECTORTYPE).getAsString())) {
-					result.add(jsonElemES.getAsJsonObject());
-					break;
-				}
-			}
-		}
-		return result;
-	}
-
+	
+	
 	@GetMapping(value = "/inference/data/testDataSource", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject checkInferenceDS() {
 		JsonObject result = new JsonObject();
@@ -93,42 +58,6 @@ public class InferenceDataProviderController {
 		return result;
 	}
 
-	/** for Grafana 7.1.0 **/
-	@PostMapping(value = "/inference/data/v7", produces = MediaType.APPLICATION_JSON_VALUE)
-	public JsonArray getInferenceData7(HttpServletRequest request) {
-		LOG.debug(
-				" inside getInferenceData call /datasource/inference/data ============================================== ");
-		String input = null;
-		List<InsightsInference> inferences = null;
-		try {
-			input = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-		} catch (Exception e) {
-			LOG.error(e);
-		}
-		JsonArray result = new JsonArray();
-		JsonArray inferenceInputFromPanel = new JsonParser().parse(input).getAsJsonArray();
-		for (JsonElement jsonElemFromDS : inferenceInputFromPanel.getAsJsonArray()) {
-			String schedule = jsonElemFromDS.getAsJsonObject().get(VECTORSCHEDULE).getAsString();
-			String vectorType = jsonElemFromDS.getAsJsonObject().get(VECTORTYPE).getAsString();
-			LOG.debug(" for vector type {} ", vectorType);
-			if (vectorType == null || "".equalsIgnoreCase(vectorType)) {
-				inferences = insightsInferenceService.getInferenceDetails(schedule);
-			} else {
-				inferences = insightsInferenceService.getInferenceDetailsVectorWise(schedule, vectorType);
-			}
-			JsonObject responseOutputFromES = PlatformServiceUtil.buildSuccessResponseWithData(inferences);
-			for (JsonElement jsonElemES : responseOutputFromES.get("data").getAsJsonArray()) {
-				if (((JsonObject) jsonElemES).get("heading").getAsString()
-						.equals(jsonElemFromDS.getAsJsonObject().get(VECTORTYPE).getAsString())) {
-					JsonArray ja = new JsonArray();
-					ja.add(jsonElemES.getAsJsonObject());
-					result.add(ja);
-					break;
-				}
-			}
-		}
-		return result;
-	}
 
 	/** for Grafana 7.1.0 and InferencePanel Report **/
 	@PostMapping(value = "/inference/data/report", produces = MediaType.APPLICATION_JSON_VALUE)

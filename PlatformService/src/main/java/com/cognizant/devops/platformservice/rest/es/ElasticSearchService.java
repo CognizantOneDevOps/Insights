@@ -41,7 +41,7 @@ public class ElasticSearchService {
 	@Autowired
 	private HttpServletRequest context;
 
-	@GetMapping(value = "/data", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/data", produces = MediaType.APPLICATION_JSON_VALUE)
 	public String searchData(@RequestParam String query, @RequestParam(required = false, defaultValue = "0") int from,
 			@RequestParam(required = false, defaultValue = "100") int size) throws JsonSyntaxException, InsightsCustomException {
 		ElasticSearchDBHandler dbHandler = new ElasticSearchDBHandler();

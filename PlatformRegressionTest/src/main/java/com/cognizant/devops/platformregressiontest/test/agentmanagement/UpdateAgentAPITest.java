@@ -16,12 +16,9 @@
 
 package com.cognizant.devops.platformregressiontest.test.agentmanagement;
 
-import java.io.IOException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformregressiontest.test.common.CommonUtils;
@@ -38,16 +35,6 @@ public class UpdateAgentAPITest extends AgentTestData {
 
 	private static final Logger log = LogManager.getLogger(UpdateAgentAPITest.class);
 
-	String jSessionID;
-	String xsrfToken;
-
-	@BeforeMethod
-	public void onInit() throws InterruptedException, IOException {
-
-		jSessionID = CommonUtils.getJsessionId();
-		xsrfToken = CommonUtils.getXSRFToken(jSessionID);
-	}
-
 	@Test(priority = 1, dataProvider = "agentupdateprovider")
 	public void updateAgent(String agentId, String toolName, String agentVersion, String osversion, String configJson,
 			String vault) {
@@ -55,11 +42,12 @@ public class UpdateAgentAPITest extends AgentTestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("updateAgentBaseURI");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
-		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
-				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
-				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
-		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, CommonUtils.jSessionID,
+				ConfigOptionsTest.GRAFANA_COOKIES_ORG, CommonUtils.getProperty("grafanaOrg"),
+				ConfigOptionsTest.GRAFANA_COOKIES_ROLE, CommonUtils.getProperty("grafanaRole"),
+				ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken);
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.jtoken);
 
 		// Request payload sending along with post request
 		JsonObject requestParam = new JsonObject();
@@ -70,7 +58,7 @@ public class UpdateAgentAPITest extends AgentTestData {
 		requestParam.addProperty("configJson", configJson);
 		requestParam.addProperty("trackingDetails", "");
 		requestParam.addProperty("vault", vault);
-		requestParam.addProperty("isWebhook", false);	
+		requestParam.addProperty("isWebhook", false);
 
 		httpRequest.header("Content-Type", "application/json");
 		httpRequest.body(requestParam);
@@ -93,10 +81,11 @@ public class UpdateAgentAPITest extends AgentTestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("updateAgentBaseURI");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
-		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
-				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
-				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, CommonUtils.jSessionID,
+				ConfigOptionsTest.GRAFANA_COOKIES_ORG, CommonUtils.getProperty("grafanaOrg"),
+				ConfigOptionsTest.GRAFANA_COOKIES_ROLE, CommonUtils.getProperty("grafanaRole"),
+				ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken);
 
 		// Request payload sending along with post request
 		JsonObject requestParam = new JsonObject();
@@ -107,7 +96,7 @@ public class UpdateAgentAPITest extends AgentTestData {
 		requestParam.addProperty("configJson", configJson);
 		requestParam.addProperty("trackingDetails", "");
 		requestParam.addProperty("vault", vault);
-		requestParam.addProperty("isWebhook", false);	
+		requestParam.addProperty("isWebhook", false);
 
 		httpRequest.header("Content-Type", "application/json");
 		httpRequest.body(requestParam);

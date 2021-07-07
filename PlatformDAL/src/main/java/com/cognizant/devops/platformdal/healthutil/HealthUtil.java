@@ -74,7 +74,7 @@ public class HealthUtil {
 
 			if (serviceResponse != null && !("").equalsIgnoreCase(serviceResponse)) {
 				strResponse = "Response successfully recieved from " + apiUrl;
-				log.info("response:",serviceResponse);
+				log.info("response: {} ",serviceResponse);
 				if (serviceType.equalsIgnoreCase(ServiceStatusConstants.Neo4j)) {
 					json = (JsonObject) jsonParser.parse(serviceResponse);
 					version = json.get("neo4j_version").getAsString();

@@ -455,3 +455,28 @@ tr.asset-details-element-row:not(.asset-details-expanded-row):active {
 .asset-details-element-row td {
     border-bottom-width: 0;
 }
+
+
+#carddetails td, #carddetails th {   
+    padding: 8px; 
+    font-size: 12px;
+    padding-left: 20px;
+    width: 50%;text-align: center;
+    text-transform: capitalize;
+}
+  
+#carddetails tr:nth-child(even){background-color: #f2f2f2;}
+  
+#carddetails tr:hover {background-color: #ddd;}
+  
+#carddetails th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    
+    background-color: grey;
+    color: white;
+  }
+.carddetaildiv{
+    overflow:scroll;
+    height:100%;
+}

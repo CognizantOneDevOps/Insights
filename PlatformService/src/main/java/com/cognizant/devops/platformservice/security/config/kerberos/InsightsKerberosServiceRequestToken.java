@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.security.config.kerberos;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;

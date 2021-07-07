@@ -45,7 +45,7 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 	}
 
 	@Override
-	public Boolean saveConfig(String config) throws InsightsCustomException {
+	public boolean saveConfig(String config) throws InsightsCustomException {
 
 		CorrelationJson correlation = loadCorrelation(config);
 		CorrelationConfiguration correlationConfig = new CorrelationConfiguration();
@@ -79,7 +79,7 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 	}
 
 	@Override
-	public Boolean updateCorrelationStatus(String flagDeatils) throws InsightsCustomException {
+	public boolean updateCorrelationStatus(String flagDeatils) throws InsightsCustomException {
 
 		JsonParser parser = new JsonParser();
 		JsonObject json = (JsonObject) parser.parse(flagDeatils);
@@ -91,7 +91,7 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 	}
 
 	@Override
-	public Boolean deleteCorrelation(String relationName) throws InsightsCustomException {
+	public boolean deleteCorrelation(String relationName) throws InsightsCustomException {
 
 		JsonParser parser = new JsonParser();
 		JsonObject json = (JsonObject) parser.parse(relationName);

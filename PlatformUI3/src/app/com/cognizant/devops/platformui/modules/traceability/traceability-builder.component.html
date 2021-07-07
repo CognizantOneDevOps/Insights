@@ -14,7 +14,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ****************************************************************************** -->
-<div class="pageCss" style="cursor: pointer;">
+ <div class="pageCss" style="cursor: pointer;">
 	<div layout layout-align="left" class="titleStyle">
 		<div>
 			<a class="greenTitleTxt">Traceability Dashboard </a>
@@ -51,13 +51,13 @@
 			<div style="margin-left: 30px">
 				<button mat-raised-button (click)="getDetails()"
 					[disabled]="frmagentconfig.invalid || fieldValue == null" class="configureBut"
-					style="width: 150px; padding-left: 10px; padding-right: 10px;">
+					style="width: 90%; padding-left: 0.5%; padding-right: 0.5%;">
 					Search</button>
 				<br>
 			</div>
 			<div>
 				<button mat-raised-button (click)="clear()" class="configureBut"
-					style="width: 150px; padding-left: 10px; padding-right: 10px;">
+					style="width: 90%; padding-left: 0.5%; padding-right:0.5%;">
 					Clear</button>
 				<br>
 			</div>
@@ -71,8 +71,38 @@
 		<br>
 	</form>
 	<div class="others" layout="row" layout-align="start center" *ngIf="showDiv&& !displaySummary">
-		<mat-tab-group color="primary" class="healthcheck-tab-style" (selectedTabChange)="tabClick($event)"
-			 style="margin-top: 0.5%; width: 99% !important;">
+		<mat-tab-group color="primary" class="healthcheck-tab-style"
+			 style="margin-top: 0.5%; width: 99.5% !important;">
+			 <mat-tab label="Summary">
+				<div layout layout-align="left" class="sectionHeadingStyleTraceability">
+					<div layout>&nbsp; Summary</div>
+					<!--span class="sectionSubHeading">  &nbsp;   {{toolSummaryArray[0]}} </span-->
+				    <span class="sectionSubHeading">  &nbsp; (Shows pipeline inferences)</span>
+				</div>
+				<div class="summaryDiv"> {{toolSummaryArray[0]}}</div>
+			  			
+				<div class="container">
+					<div class="column">
+					  <div class="comment" *ngFor="let item of list1; let i = index">
+						<div *ngIf="i < list1.length-1" class="timeline" ><span class="downarrw"></span></div>
+						<div class="circled"><img src="icons/svg/traceability/{{item.toolName}}.svg" onError="this.src=item.toolName" class="socialimg"/></div>
+						<div class="itemContDiv">
+						 <div class="itemCont">{{item.toolName}}</div>
+						 <div class="pdb5">{{item.displayProperty}}:{{item.recordCount}}</div>       
+						</div>
+						<div class="divpd">
+						  <div class="refCnt">
+							<ul class="reflist" >
+								<li *ngFor="let summaryItems of item.summaryDetail; let j = index" >{{summaryItems}}</li>								
+							</ul>
+						</div>
+						  <div *ngIf="i>0"  class="handoverDiv"><span style="font-weight:bold">Avg. Handover Time: </span> <br/>{{item.handOverTime}}</div>
+						  <div class="clb"></div>
+					   </div>
+					  </div>
+					</div>
+				  </div>
+			</mat-tab>
 			<mat-tab label="Pipeline">
 				<div layout layout-align="left" class="sectionHeadingStyleTraceability">
 					<div layout>&nbsp; Pipeline View</div>
@@ -86,7 +116,7 @@
 							<div class="showTable"
 								(click)="showDetailsDialog(data.key.split('_')[1])">
 								<b><u>
-										{{data.key.split('_')[1]}} </u>({{data.value.length}}) </b> <br>
+									   {{data.key.split('_')[1]}} </u><br/>({{data.value.length}} <span>{{traceabilityData.data.metaData.displayTextProperty[data.key.split('_')[1]]}}</span>) </b> <br>
 							</div>
 
 							<div class="scroll">
@@ -102,9 +132,6 @@
 										</span>
 										<span (click)="showOnHoverDialog(i,epic)" style="height: 1px; color: blue;">
 											more info
-											<!-- <mat-icon svgIcon="info" title="View Details"
-												class="mat-icon material-icons">
-											</mat-icon><br> -->
 										</span>
 									</mat-card>
 								</div>
@@ -113,52 +140,9 @@
 					</div>
 				</div>
 			</mat-tab>
-			<mat-tab label="Summary">
-				<div layout layout-align="left" class="sectionHeadingStyleTraceability">
-					<div layout>&nbsp; Summary</div>
-					<span class="sectionSubHeading">  &nbsp; (Shows pipeline inferences)</span>
-				</div>
-				<div>
-					<div class="summarylist">
-						<ul>
-							<li style="color: #0033A0" *ngFor="let element of toolSummaryArray">{{element}}</li>
-						</ul>
-					</div>
-				</div>
-			</mat-tab>
-			<mat-tab label="Timeline">
-				<div layout layout-align="left" class="sectionHeadingStyleTraceability">
-					<div layout>&nbsp; Timeline</div>
-					<span class="sectionSubHeading">  &nbsp; (Average handover time between each stages) </span>
-				</div>
-				<div id="agentsTable" layout-align="center center">
-					<!-- Insights Agents Table -->
-					<table mat-table [dataSource]="timelagDataSource" class="matTableBorder">
-						<ng-container matColumnDef="Tools">
-							<th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> Tools </th>
-							<td mat-cell *matCellDef="let element"> {{element.Tools}} </td>
-						</ng-container>
-						<ng-container matColumnDef="Handover Time">
-							<th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> Handover Time</th>
-							<td mat-cell *matCellDef="let element"> {{element.HandoverTime}} </td>
-						</ng-container>
-						<tr mat-header-row *matHeaderRowDef="columnsToDisplay" class="tableHeaderCss"
-							style="height:40px">
-						</tr>
-						<tr mat-row *matRowDef="let row; columns: columnsToDisplay;"></tr>
-					</table>
-					<br>
-				</div>
-			</mat-tab>
-			<mat-tab label="Visual Representation">
-				<div layout layout-align="left" class="sectionHeadingStyleTraceability">
-					<div layout>&nbsp; Visual Representation</div>
-					<span class="sectionSubHeading">  &nbsp; (Visual representation of handover time) </span>
-				</div>
-				<div style="color: #0033A0;margin: 0.5%;">Total Number of Days: {{total}}</div>
-				<div *ngIf="gChart" id="chart_div" style="height: 50vh;overflow:hidden"></div>
-				<div id="chart-container" style="height: 80vh"></div>
-			</mat-tab>
+			
+			
+			
 		</mat-tab-group>
 	</div>
 </div>

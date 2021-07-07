@@ -1,0 +1,120 @@
+{
+    "vault": {
+      "getFromVault": false,
+      "secretEngine": "insights-kv",
+      "readToken": "vault_secret_token",
+      "vaultUrl": "http://Vault_Host:port/v1/"
+    },
+    "mqConfig": {
+      "user": "username for RabbitMq",
+	  "password": "password for RabbitMq",
+      "host": "127.0.0.1",
+      "exchange": "iSight",
+      "agentControlXchg": "iAgent"
+    },
+    "publish": {
+      "data": "CI.SPINNAKER.DATA",
+      "health": "CI.SPINNAKER.HEALTH"
+    },
+    "subscribe": {
+      "config": "CI.SPINNAKER.config"
+    },
+    "communication": {
+      "type": "REST",
+      "sslVerify": true,
+      "responseType": "JSON"
+    },
+    "dynamicTemplate": {
+      "timeFieldMapping": {
+        "startTime": "%Y-%m-%d"
+      },
+      "responseTemplate": {
+        "id": "pipelineExecutionId",
+        "application": "applicationName",
+        "name": "pipelineName",
+        "buildTime": "buildTime",
+        "startTime": "startTime",
+        "endTime": "endTime",
+        "status": "status",
+        "trigger": {
+          "type": "triggerType",
+          "user": "userName"
+        }
+      },
+      "stages": {
+        "id": "stageId",
+        "type": "stageType",
+        "startTime": "stageStartTime",
+        "status": "stageStatus"
+      },
+      "metadata": {
+        "executions": {
+          "dataUpdateSupported": true,
+          "uniqueKey": [
+            "pipelineExecutionId"
+          ]
+        }
+      },
+      "extensions": {
+        "relationMetadata": {
+          "relation": {
+            "properties": [
+              "pipelineExecutionId",
+              "stageType",
+              "stageStatus"
+            ],
+            "name": "EXECUTION_HAS_STAGE",
+            "source": {
+              "labels": [
+                "SPINNAKER"
+              ],
+              "constraints": [
+                "pipelineExecutionId"
+              ]
+            },
+            "destination": {
+              "labels": [
+                "STAGE"
+              ],
+              "constraints": [
+                "stageId"
+              ],
+              "selectedProperties": [
+                "inSightsTimeX",
+                "inSightsTime",
+                "toolName",
+                "categoryName",
+                "stageId",
+                "stageType",
+                "stageStartTime",
+                "stageStatus"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "agentId": "",
+    "toolCategory": "CI",
+    "runSchedule": 30,
+    "enableDataValidation": false,
+    "timeStampField": "buildTime",
+    "accessToken": "accessToken",
+    "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
+    "startFrom": "1609459200000",
+    "toolsTimeZone": "Asia/Kolkata",
+    "useResponseTemplate": true,
+    "isDebugAllowed": true,
+    "enableValueArray": false,
+    "isEpochTimeFormat": false,
+    "baseUrl": "https://127.0.0.1:8084/",
+    "agentSecretDetails": [
+      "accessToken"
+    ],
+    "loggingSetting": {
+      "logLevel": "INFO",
+      "maxBytes": 5000000,
+      "backupCount": 10
+    },
+    "auditing": false
+  }

@@ -1,0 +1,9 @@
+{
+	"dataDictionary": "Data Dictionary",
+	"agentManagement": "Agent Management",
+	"webhookConfiguration": "Webhook Configuration",
+	"sourceTool": "GIT",
+	"sourceLabel": "GIT",
+	"destinationTool": "GIT",
+	"destinationLabel": "GIT"
+}

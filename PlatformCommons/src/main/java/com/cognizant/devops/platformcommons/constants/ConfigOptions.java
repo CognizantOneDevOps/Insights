@@ -34,9 +34,6 @@ public interface ConfigOptions {
 	String SP = PlatformServiceConstants.SP_DECODED;
 	String RSA = PlatformServiceConstants.RSA_DECODED;
 	String FILE_SEPERATOR = File.separator;
-	// String CONFIG_FILE_RESOLVED_PATH =
-	// System.getProperty(ConfigOptions.PROPERTY_USER_HOME) + "\\" +
-	// ConfigOptions.CONFIG_DIR + "\\" + ConfigOptions.CONFIG_FILE;
 	String CONFIG_FILE_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR
 			+ FILE_SEPERATOR + ConfigOptions.CONFIG_FILE;
 	String BLOCKCHAIN_CONFIG_FILE_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR

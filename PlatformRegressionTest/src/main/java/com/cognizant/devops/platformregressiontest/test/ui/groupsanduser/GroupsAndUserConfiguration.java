@@ -263,7 +263,7 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 			password.sendKeys(LoginAndSelectModule.testData.get("password"));
 			selectRole.click();
 			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-			selectRole(LoginAndSelectModule.testData.get("roleUpdate"));
+			selectRole(LoginAndSelectModule.testData.get("roleAdmin"));
 			wait.until(ExpectedConditions.elementToBeClickable(saveButton));
 			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 			saveButton.click();
@@ -338,7 +338,7 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 		boolean userAssigned = false;
 		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 		redirectButton.click();
-		if (verifyAccessGroupName(LoginAndSelectModule.testData.get("accessGroup1"))
+		if (verifyAccessGroupName(LoginAndSelectModule.testData.get("accessGroup3"))
 				&& !verifyUserPresent(LoginAndSelectModule.testData.get("userName"))) {
 			wait.until(ExpectedConditions.elementToBeClickable(addUserButton));
 			addUserButton.click();
@@ -351,7 +351,7 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 			searchBox.sendKeys(LoginAndSelectModule.testData.get("userName"));
 			wait.until(ExpectedConditions.elementToBeClickable(accessGroup1));
 			accessGroup1.click();
-			selectAccessGroup(LoginAndSelectModule.testData.get("accessGroup1"));
+			selectAccessGroup(LoginAndSelectModule.testData.get("accessGroup3"));
 			selectRole1.click();
 			Thread.sleep(1000);
 			selectRole(LoginAndSelectModule.testData.get("roleUpdate"));
@@ -435,10 +435,10 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 			wait.until(ExpectedConditions.elementToBeClickable(accessGroup2));
 			accessGroup2.click();
 			Thread.sleep(2000);
-			selectAccessGroup(LoginAndSelectModule.testData.get("accessGroup3"));
+			selectAccessGroup(LoginAndSelectModule.testData.get("accessGroup1"));
 			selectRole2.click();
 			Thread.sleep(2000);
-			selectRole(LoginAndSelectModule.testData.get("roleUpdate"));
+			selectRole(LoginAndSelectModule.testData.get("role1"));
 			wait.until(ExpectedConditions.elementToBeClickable(saveButton));
 			saveButton.click();
 			wait.until(ExpectedConditions.elementToBeClickable(okButton));

@@ -34,7 +34,7 @@ class GitWebhookAgent(BaseAgent):
     
     @BaseAgent.timed
     def processWebhook(self,data):
-        self.baseLogger.info(" subscriberForWebhookAgent Process ======")
+        self.baseLogger.info(" inside GitWebhookAgent processWebhook ======")
         timeStampNow = lambda: dateTime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
         self.almRegEx = str(self.config.get("almKeyRegEx", ''))
         dataReceived = json.loads(data)
@@ -48,6 +48,7 @@ class GitWebhookAgent(BaseAgent):
             commitsBaseEndPoint = self.config.get("commitsBaseEndPoint", '')
             webhookTrackingDetails = {}
             self.tracking["webhookDetails"] = webhookTrackingDetails
+            self.baseLogger.info(" before fetching repo details ======")
             repos = self.getResponse(getReposUrl+'?per_page=100&sort=created&page=1', 'GET', None, None, None, reqHeaders=headers)
             repoPageNum = 1
             fetchNextPage = True
@@ -61,6 +62,7 @@ class GitWebhookAgent(BaseAgent):
                     branchPage = 1
                     fetchNextBranchPage = True
                     while fetchNextBranchPage:
+                        self.baseLogger.info(" fetching branch details for repo=",repoName)
                         getBranchesRestUrl = commitsBaseEndPoint+repoName+'/branches?page='+str(branchPage)
                         branchDetails = self.getResponse(getBranchesRestUrl, 'GET', None, None, None, reqHeaders=headers)
                         branchData = []
@@ -75,6 +77,7 @@ class GitWebhookAgent(BaseAgent):
                             webhookTrackingDetails[repoName].append(branch['name'])
                             branchData.append(branchDict)
                         
+                        self.baseLogger.info(" before publish branch metadata details ===")
                         self.publishBranchDetails(branchData)
                               
                         if len(branchDetails) == 30:
@@ -98,84 +101,80 @@ class GitWebhookAgent(BaseAgent):
         
          
     def processCommits(self, commitResponseData):
+        self.baseLogger.info(" inside processCommits method ======")
         timeStampNow = lambda: dateTime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
         dynamicTemplate = self.config.get('dynamicTemplate', {})
         commitsMetaData = dynamicTemplate.get('commit', {}).get('commitMetadata', {})
         commitBranchRelationMetadata = dynamicTemplate.get('extensions', {}).get('commitBranchRelation', {}).get('relationMetadata', {})
+        commitResponseTemplate = dynamicTemplate.get('commit', {}).get('commitResponseTemplate', {})
         default_branch = self.config.get('default_branch', None)
         if default_branch is None:
             default_branch =  commitResponseData.get("repository",dict()).get("default_branch")
         repoName = commitResponseData.get("repository",dict()).get("name")
         ref = commitResponseData.get("ref",None)
         branchName = ref.rsplit('/',1)[1]
-        data = []
+        finaldata = []
         commitFileDetails = []
         commitsList = []
         
         if (branchName == default_branch):
             commitsList.append(commitResponseData.get("head_commit",dict()))
+            default = True
         else:
             commitsList = commitResponseData.get("commits",list())
+            default = False
+        
+        metaData = {"repoName":repoName, "branchName":branchName, 
+                    'consumptionTime':timeStampNow(), "default":default}
         
         for commit in commitsList:
-            commitId = commit.get("id",None)
-            commitMessage = commit.get("message",None)
-            author = commit.get("author",dict()).get("name")
             timestamp = commit.get("timestamp",None)
             commitTime = parser.parse(timestamp, ignoretz=True).strftime("%Y-%m-%dT%H:%M:%SZ")
+            commitMessage = commit.get("message",None)
             almKeyIter = re.finditer(self.almRegEx, commitMessage)
             almKeys = [key.group(0) for key in almKeyIter]
-            
-            commitsDict = {
-                "repoName":repoName,
-                "branchName":branchName,
-                "commitId":commitId,
-                "commitMessage":commitMessage,
-                "commitTime":commitTime,
-                "author":author,
-                'consumptionTime':timeStampNow()
-            }
+            injectData = metaData.copy()
+            injectData["commitTime"] = commitTime
+            fileInjectData = {}
             
             if almKeys:
-                commitsDict.update({
+                injectData.update({
                 'gitType':'commit',
                 'almKeys' :almKeys
                 })
             else:
-                commitsDict.update({
+                injectData.update({
                 'gitType':'orphanCommit'
                 })
             
-            
-            data.append(commitsDict)
-            
-            fileDetailsDict = {
-                "commitId":commitId,
-                "commitMessage":commitMessage,
-                "authorName":author,
-                "commitTime":commitTime
-            }
-            
+            self.baseLogger.info(" before parseResponse commits details ===")
+            parsedData = self.parseResponse(commitResponseTemplate, commit)
+            fileInjectData = parsedData[0].copy()
+            parsedData[0].update(injectData)
+            finaldata += parsedData
+
+            fileInjectData["commitTime"] = commitTime
             modified = commit.get("modified",list())
             added = commit.get("added",list())
             removed = commit.get("removed",list())
             
             if len(modified) > 0:
-                commitFileDetails += self.commitFileProcess(modified, fileDetailsDict, "modified")
+                commitFileDetails += self.commitFileProcess(modified, fileInjectData, "modified")
             if len(added) > 0:
-                commitFileDetails += self.commitFileProcess(added, fileDetailsDict, "added")
+                commitFileDetails += self.commitFileProcess(added, fileInjectData, "added")
             if len(removed) > 0:
-                commitFileDetails += self.commitFileProcess(removed, fileDetailsDict, "removed")
+                commitFileDetails += self.commitFileProcess(removed, fileInjectData, "removed")
             
-
-        self.publishToolsData(data,commitsMetaData)
-        self.publishToolsData(data,commitBranchRelationMetadata)
+        self.baseLogger.info(" before publish commits details ====")
+        self.publishToolsData(finaldata,commitsMetaData)
+        self.publishToolsData(finaldata,commitBranchRelationMetadata)
         commitFileTemplate = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('commitFileDetails', None)
         relationMetadata = commitFileTemplate.get('relationMetadata')
         self.publishToolsData(commitFileDetails, relationMetadata)
-            
+        self.baseLogger.info(" commits details processing completed ======")
     
     def commitFileProcess(self, fileList, fileDetailsDict, status):
+        self.baseLogger.info(" inside commitFileProcess method ====")
         fileDetailsData = []
         
         for file in fileList:
@@ -190,6 +189,7 @@ class GitWebhookAgent(BaseAgent):
         return fileDetailsData
     
     def processBranchDetails(self, dataReceived):
+        self.baseLogger.info(" inside processBranchDetails ======")
         timeStampNow = lambda: dateTime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
         repoName = dataReceived.get("repository",dict()).get("name")
         ref = dataReceived.get("ref",None)
@@ -210,9 +210,13 @@ class GitWebhookAgent(BaseAgent):
             }
         
         branchData.append(branchDetailsDict)
+        self.baseLogger.info(" before publish branch details ======")
         self.publishBranchDetails(branchData)
+        self.baseLogger.info(" branch details processing completed ======")
+    
         
     def publishBranchDetails(self, branchData):
+        self.baseLogger.info(" inside publishBranchDetails method ======")
         dynamicTemplate = self.config.get('dynamicTemplate', {})
         branchMetaData = dynamicTemplate.get('branch', {}).get('branchMetadata', {})
         branchesinsighstTimeX = dynamicTemplate.get('branch',{}).get('insightsTimeXFieldMapping',None)
@@ -222,6 +226,7 @@ class GitWebhookAgent(BaseAgent):
         self.publishToolsData(branchData, branchMetaData, timestamp, timeformat,isEpoch,True)
         
     def processPullRequestDetails(self, dataReceived):
+        self.baseLogger.info(" inside processPullRequestDetails method ======")
         timeStampNow = lambda: dateTime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
         repoName = dataReceived.get("repository",dict()).get("name")
         pullReqDetails = dataReceived.get("pull_request",dict())
@@ -250,6 +255,7 @@ class GitWebhookAgent(BaseAgent):
         
         dynamicTemplate = self.config.get('dynamicTemplate', {})
         responseTemplate = dynamicTemplate.get('pullRequest', {}).get('pullReqResponseTemplate', {})
+        self.baseLogger.info(" before parseResponse pullrequest details ======")
         pullReqData = self.parseResponse(responseTemplate, pullReqDetails, injectData)
         
         pullReqMetaData = dynamicTemplate.get('pullRequest', {}).get('pullRequestMetaData', {})
@@ -258,10 +264,12 @@ class GitWebhookAgent(BaseAgent):
         pullReqtimeformat = pullReqinsighstTimeX.get('timeformat',None)
         pullReqisEpoch = pullReqinsighstTimeX.get('isEpoch',False)
         relationMetaData = dynamicTemplate.get('extensions', {}).get('PullReqBranchRelation', {}).get('relationMetadata', {})
+        self.baseLogger.info(" before publish PullRequest Details ======")
         self.publishToolsData(pullReqData, pullReqMetaData,pullReqtimestamp,pullReqtimeformat,pullReqisEpoch,True)
         pullReqData[0]["branchName"] = originBranch
         self.publishToolsData(pullReqData, relationMetaData,pullReqtimestamp,pullReqtimeformat,pullReqisEpoch,True)
-    
+        self.baseLogger.info(" PullRequest Details processing completed ======")
+
          
 
 if __name__ == "__main__":

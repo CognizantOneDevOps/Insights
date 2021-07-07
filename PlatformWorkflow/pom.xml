@@ -13,7 +13,7 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>8.1</version>
+		<version>8.2</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -21,7 +21,7 @@
 	<artifactId>PlatformWorkflow</artifactId>
 	<packaging>jar</packaging>
 	<name>PlatformWorkflow</name>
-	<version>8.1</version>
+	<version>8.2</version>
 	<description>PlatformWorkflow to implement workflow in Insights enviroment </description>
 	<url>http://maven.apache.org</url>
 
@@ -64,19 +64,13 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>8.1</version>
+			<version>8.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>8.1</version>
+			<version>8.2</version>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-compress</artifactId>
-			<version>1.19</version>
-		</dependency>
-
 		<dependency>
 			<groupId>com.rabbitmq</groupId>
 			<artifactId>amqp-client</artifactId>
@@ -91,11 +85,6 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
 			<version>2.12.1</version>
-		</dependency>
-		<dependency>
-			<groupId>com.beust</groupId>
-			<artifactId>jcommander</artifactId>
-			<version>1.48</version>
 		</dependency>
 	</dependencies>
 	<build>

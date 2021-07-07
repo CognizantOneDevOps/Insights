@@ -32,8 +32,8 @@ sudo echo INSIGHTS_WEBHOOK=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" INSIGHTS_WEBHOOK=`pwd` | sudo tee -a /etc/profile
 source /etc/environment
 source /etc/profile
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformInsightsWebHook.jar -O PlatformInsightsWebHook.jar
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/webhook_subscriber.properties -O webhook_subscriber.properties
+sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/release/latest/PlatformInsightsWebHook.jar -O PlatformInsightsWebHook.jar
+sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/webhook_subscriber.properties -O webhook_subscriber.properties
 
 sudo chmod a+w $INSIGHTS_APP_ROOT_DIRECTORY/insightsWebHook/webhook_subscriber.properties
 sudo yum install dos2unix
@@ -70,7 +70,7 @@ sudo nohup java -jar PlatformInsightsWebHook.jar > /dev/null 2>&1 &
 sleep 10
 sudo chmod -R 777 $INSIGHTS_APP_ROOT_DIRECTORY/insightsWebHook
 cd /etc/init.d/
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/InSightsWebHook.sh
+sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/InSightsWebHook.sh
 sudo mv InSightsWebHook.sh InSightsWebHook
 sudo chmod +x InSightsWebHook
 sudo chkconfig InSightsWebHook on

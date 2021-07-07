@@ -80,9 +80,7 @@
 		"isAuthRequired": true,
 		"smtpStarttlsEnable": true,
 		"mailFrom": "onedevops@cogdevops.com",
-		"mailTo": "",
 		"subject": "Health Status - {TimeOfReportGeneration}",
-		"emailBody": "Hi Team, Attaching the report File",
 		"systemNotificationSubscriber": ""
 	},
 	"correlations": {
@@ -95,10 +93,7 @@
 		"webhookEngineInterval": 10,
 		"engineAggregatorModuleInterval": 10,
 		"engineCorrelatorModuleInterval": 60,
-		"projectMapperModuleInterval": 10,
-		"dataPurgingExecutorInterval": 300,
 		"offlineDataProcessingExecutorInterval": 10,
-		"inferenceJobExecutor": 20,
 		"dataArchivalEngineInterval": 240
 	},
 	"singleSignOnConfig": {
@@ -127,13 +122,10 @@
 	},
 	"insightsServiceURL": "http://localhost:8080",
 	"insightsTimeZone": "UTC",
-	"userId": "",
-	"password": "",
 	"refreshTime": "Jan 22, 2017 5:04:25 PM",
-	"enableOnlineDatatagging": true,
+	"enableOnlineDatatagging": false,
 	"enableAuditEngine": false,
 	"enableDataArchivalEngine": false,
-	"enableOnlineBackup": false,
 	"autheticationProtocol": "NativeGrafana",
 	"pdfkey": "",
 	"applicationLogLevel": {

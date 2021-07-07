@@ -30,7 +30,6 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.initializeEndpoints();
     }
     public initializeEndpoints() {
-        //this.addEndPoint("ABOUT_READ", '/PlatformService/about/read');
 
         //For Health Check Page
         this.addEndPoint("HEALTH_TOOL", '/PlatformService/admin/health/detailHealth');
@@ -85,8 +84,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("SEARCH_DASHBOARD_FOLDERDETAIL", '/PlatformService/accessGrpMgmt/getDashboardsFoldersDetail');
         this.addEndPoint("GET_DASHBOARD_LIST_BY_ORG", '/PlatformService/accessGrpMgmt/getDashboardByOrg');
         //Business Mapping module under Admin section
-        this.addEndPoint("GET_ALL_HIERARCHY_DETAILS", '/PlatformService/admin/businessmapping/getAllHierarchyDetails');
-        this.addEndPoint("GET_HIERARCHY_PROPERTIES", '/PlatformService/admin/businessmapping/getHierarchyProperties');
+        
         this.addEndPoint("SAVE_TOOL_MAPPING", '/PlatformService/admin/businessmapping/saveToolsMapping');
         this.addEndPoint("GET_TOOL_MAPPING", '/PlatformService/admin/businessmapping/getToolsMapping');
         this.addEndPoint("EDIT_TOOL_MAPPING", '/PlatformService/admin/businessmapping/editToolsMapping');

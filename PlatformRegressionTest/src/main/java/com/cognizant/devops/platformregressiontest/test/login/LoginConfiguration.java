@@ -66,6 +66,7 @@ public class LoginConfiguration extends LoginObjectRepository {
 
 	public boolean checkLogoutFunctionality() {
 		driver.findElement(By.xpath("(//p[contains(@class, 'mat-list-text')])[3]")).click();
+		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 		if(driver.getTitle().equals("Insights")) {
 			return true;
 		}

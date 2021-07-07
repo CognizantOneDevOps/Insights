@@ -18,11 +18,11 @@ package com.cognizant.devops.platformservice.correlationbuilder.service;
 import java.util.List;
 
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.google.gson.JsonObject;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
+
 public interface CorrelationBuilderService {	
 	public List<CorrelationConfiguration> getAllCorrelations() throws InsightsCustomException;
-	public Boolean saveConfig(String configDetails)throws InsightsCustomException;
-	public Boolean deleteCorrelation(String relationName)throws InsightsCustomException;
-	public Boolean updateCorrelationStatus(String flagDeatils )throws InsightsCustomException;
+	public boolean saveConfig(String configDetails)throws InsightsCustomException;
+	public boolean deleteCorrelation(String relationName)throws InsightsCustomException;
+	public boolean updateCorrelationStatus(String flagDeatils )throws InsightsCustomException;
 }

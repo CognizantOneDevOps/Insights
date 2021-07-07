@@ -84,7 +84,7 @@ public class AgentObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//div[text() =  ' Error ']")
 	WebElement duplicateError;
 
-	@FindBy(xpath = "//span[text()=' CANCEL ']")
+	@FindBy(xpath = "//span[@class='mat-button-wrapper' and contains(text(), 'CANCEL')]")
 	WebElement cancelButton;
 
 	@FindBy(xpath = "//div[text()=' Cancel Agent ']")

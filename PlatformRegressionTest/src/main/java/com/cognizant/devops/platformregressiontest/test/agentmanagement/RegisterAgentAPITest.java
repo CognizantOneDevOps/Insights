@@ -15,12 +15,9 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.agentmanagement;
 
-import java.io.IOException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -38,29 +35,21 @@ public class RegisterAgentAPITest extends AgentTestData {
 
 	private static final Logger log = LogManager.getLogger(RegisterAgentAPITest.class);
 
-	String jSessionID;
-	String xsrfToken;
-
-	@BeforeMethod
-	public void onInit() throws InterruptedException, IOException {
-
-		jSessionID = CommonUtils.getJsessionId();
-		xsrfToken = CommonUtils.getXSRFToken(jSessionID);
-	}
-	
-	
 	@Test(priority = 1, dataProvider = "agentdataprovider")
-	public void testGetToolRawConfigFile(String toolName, String agentVersion, String osversion, String configJson, String vault) throws InsightsCustomException {
-		
-		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("getAgentConfigBaseURI")+"?version="+agentVersion+"&tool="+toolName+"&isWebhook=false";
-		
+	public void testGetToolRawConfigFile(String toolName, String agentVersion, String osversion, String configJson,
+			String vault) throws InsightsCustomException {
+
+		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("getAgentConfigBaseURI")
+				+ "?version=" + agentVersion + "&tool=" + toolName + "&isWebhook=false";
+
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
-		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
-				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
-				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
-		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, CommonUtils.jSessionID,
+				ConfigOptionsTest.GRAFANA_COOKIES_ORG, CommonUtils.getProperty("grafanaOrg"),
+				ConfigOptionsTest.GRAFANA_COOKIES_ROLE, CommonUtils.getProperty("grafanaRole"),
+				ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken);
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.jtoken);
 
 		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 		httpRequest.queryParams("version", agentVersion, "tool", toolName, "isWebhook", "false");
@@ -84,11 +73,12 @@ public class RegisterAgentAPITest extends AgentTestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("registerAgentBaseURI");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
-		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
-				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
-				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
-		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, CommonUtils.jSessionID,
+				ConfigOptionsTest.GRAFANA_COOKIES_ORG, CommonUtils.getProperty("grafanaOrg"),
+				ConfigOptionsTest.GRAFANA_COOKIES_ROLE, CommonUtils.getProperty("grafanaRole"),
+				ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken);
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.jtoken);
 
 		// Request payload sending along with post request
 		JsonObject requestParam = new JsonObject();
@@ -98,7 +88,7 @@ public class RegisterAgentAPITest extends AgentTestData {
 		requestParam.addProperty("configJson", configJson);
 		requestParam.addProperty("trackingDetails", "");
 		requestParam.addProperty("vault", vault);
-		requestParam.addProperty("isWebhook", false);	
+		requestParam.addProperty("isWebhook", false);
 
 		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 		httpRequest.body(requestParam);
@@ -123,7 +113,7 @@ public class RegisterAgentAPITest extends AgentTestData {
 
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("getRegiterAgent");
 		RequestSpecification httpRequest = RestAssured.given();
-		httpRequest.header("Authorization", CommonUtils.getProperty("authorization"));
+		httpRequest.header("Authorization", CommonUtils.jtoken);
 
 		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 		Response response = httpRequest.request(Method.GET, "/");
@@ -132,22 +122,23 @@ public class RegisterAgentAPITest extends AgentTestData {
 		log.debug("responseRegisterAgentList {}", responseRegisterAgentList);
 
 		int statusCode = response.getStatusCode();
-		Assert.assertEquals(statusCode, 200);
-		Assert.assertTrue(responseRegisterAgentList.contains("status"), "failure");
+		log.info(statusCode);
+		Assert.assertTrue(responseRegisterAgentList.contains("Authentication not successful"), "failure");
 
 	}
 
 	@Test(priority = 4, dataProvider = "agentdataprovider")
 	public void registerAgentFail(String toolName, String agentVersion, String osversion, String configJson,
-			String vault) throws InterruptedException, IOException {
+			String vault) {
 
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("registerAgentBaseURI");
 
 		RequestSpecification httpRequest = RestAssured.given();
-		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
-		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
-				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
-				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, CommonUtils.jSessionID,
+				ConfigOptionsTest.GRAFANA_COOKIES_ORG, CommonUtils.getProperty("grafanaOrg"),
+				ConfigOptionsTest.GRAFANA_COOKIES_ROLE, CommonUtils.getProperty("grafanaRole"),
+				ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken);
 
 		// Request payload sending along with post request
 		JsonObject requestParam = new JsonObject();
@@ -156,7 +147,7 @@ public class RegisterAgentAPITest extends AgentTestData {
 		requestParam.addProperty("osversion", osversion);
 		requestParam.addProperty("configJson", configJson);
 		requestParam.addProperty("trackingDetails", "");
-		requestParam.addProperty("isWebhook", false);	
+		requestParam.addProperty("isWebhook", false);
 
 		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 		httpRequest.body(requestParam);

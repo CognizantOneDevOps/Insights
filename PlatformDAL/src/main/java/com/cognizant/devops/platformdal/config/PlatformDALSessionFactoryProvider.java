@@ -39,22 +39,12 @@ import com.cognizant.devops.platformdal.assessmentreport.InsightsReportsKPIConfi
 import com.cognizant.devops.platformdal.assessmentreport.InsightsVisualizationConfig;
 import com.cognizant.devops.platformdal.autoML.AutoMLConfig;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
-import com.cognizant.devops.platformdal.dashboards.CustomDashboard;
 import com.cognizant.devops.platformdal.dataArchivalConfig.InsightsDataArchivalConfig;
-import com.cognizant.devops.platformdal.entity.definition.EntityDefinition;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfig;
-import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetails;
 import com.cognizant.devops.platformdal.icon.Icon;
-import com.cognizant.devops.platformdal.mapping.hierarchy.HierarchyMapping;
-import com.cognizant.devops.platformdal.mapping.projects.ProjectMapping;
-import com.cognizant.devops.platformdal.queryBuilder.QueryBuilderConfig;
-/*import com.cognizant.devops.platformdal.relationshipconfig.RelationshipConfigDAL;*/
 import com.cognizant.devops.platformdal.relationshipconfig.RelationshipConfiguration;
-import com.cognizant.devops.platformdal.settingsconfig.SettingsConfiguration;
-import com.cognizant.devops.platformdal.tools.layout.ToolsLayout;
 import com.cognizant.devops.platformdal.upshiftassessment.UpshiftAssessmentConfig;
-import com.cognizant.devops.platformdal.user.UserPortfolio;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformdal.webhookConfig.WebhookDerivedConfig;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
@@ -79,17 +69,8 @@ public class PlatformDALSessionFactoryProvider {
 	private synchronized static void initInSightsDAL(){
 		if(sessionFactory == null){
 			Configuration configuration = new Configuration();
-			configuration.addAnnotatedClass(UserPortfolio.class);
-			configuration.addAnnotatedClass(CustomDashboard.class);
-			configuration.addAnnotatedClass(ProjectMapping.class);
 			configuration.addAnnotatedClass(AgentConfig.class);
-			configuration.addAnnotatedClass(ToolsLayout.class);
-			configuration.addAnnotatedClass(EntityDefinition.class);
-			configuration.addAnnotatedClass(HierarchyDetails.class);
-			configuration.addAnnotatedClass(HierarchyMapping.class);
 			configuration.addAnnotatedClass(Icon.class);
-			configuration.addAnnotatedClass(SettingsConfiguration.class);
-			configuration.addAnnotatedClass(QueryBuilderConfig.class);
 			configuration.addAnnotatedClass(WebHookConfig.class);
 			configuration.addAnnotatedClass(CorrelationConfiguration.class);
 			configuration.addAnnotatedClass(RelationshipConfiguration.class);

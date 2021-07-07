@@ -14,9 +14,7 @@
  * the License.
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.common;
-
 public interface ConfigOptionsTest {
-
 	String PROP_FILE = "regression_test.properties";	
 	String AGENT_JSON_FILE = "agentTestData.json";
 	String AGENT_ONDEMAND_JSON_FILE = "agentOnDemandTestData.json";
@@ -25,12 +23,16 @@ public interface ConfigOptionsTest {
 	String AGENT_OFFLINE_JSON_FILE = "agentOfflineTestData.json";
 	String REPORT_JSON_FILE = "reportTestData.json";
 	String REPORT_CONFIGURATION_FILE="ReportConfiguration.xlsx";
+	String BULKUPLOAD_JSON_FILE = "bulkUpload_test_data.json";
 	String CORRELATION_JSON_FILE = "correlationTestData.json";
 	String EVENTCONFIG_JSON_FILE = "eventConfigWebhook.json";
 	String HEALTHCHECK_JSON_FILE = "healthCheckTestData.json";
+	String SERVERCONFIGURATION_JSON_FILE = "serverConfiguration.json";
+	String DATADICTIONARY_JSON_FILE = "dataDictionary.json";
 	String GROUP_JSON_FILE = "groupTestData.json";
 	String ADD_CONFIG_FILES = "addConfigFiles.json";
 	String ARCHIVAL_JSON_FILE = "dataArchival.json";
+	String LOGO_JSON_FILE = "logoSetting.json";
 	String WEBHOOK_JSON_FILE = "webhook.json";
 	String CONFIGURATION_JSON_FILE = "configurationFileManagementTestData.json";
 	String DYNAMICRESPONSE_JSON_FILE = "dynamicTemplateWebhook.json";
@@ -41,6 +43,10 @@ public interface ConfigOptionsTest {
 	String AGENT_DIR = "agent_management";
 	String LOGIN_DIR = "login";
 	String HEALTH_CHECK_DIR = "health_check";
+	String SERVERCONFIGURATION_DIR = "server_configuration";
+	String DATADICTIONARY_DIR = "data_dictionary";
+	String LOGOSETTING_DIR = "logo_setting";
+	String BULKUPLOAD_DIR = "bulk_upload";
 	String WEBHOOK_CONFIG_DIR = "webhook_configuration";
 	String CONFIGURATION_FILE_DIR = "configuration_file_management";
 	String GROUPS_AND_USERS_DIR = "groups_and_user";

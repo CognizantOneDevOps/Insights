@@ -23,15 +23,11 @@ import java.io.IOException;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -42,7 +38,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.FileDetailsEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
@@ -190,7 +185,7 @@ public class BulkUploadService implements IBulkUpload {
 	}
 
 	private <T> List<List<T>> partitionList(List<T> list, final int size) {
-		List<List<T>> parts = new ArrayList<List<T>>();
+		List<List<T>> parts = new ArrayList<>();
 		final int N = list.size();
 		for (int i = 0; i < N; i += size) {
 			parts.add(getPartitionSubList(list, i, size, N));

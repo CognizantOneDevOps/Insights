@@ -19,7 +19,6 @@ import java.io.File;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeTest;
@@ -61,16 +60,6 @@ public class LoginTest extends LoginAndSelectModule {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.loginWithValidCredentials(), "Login successful.");
 	}
-	
-	/**
-	 * Assert true if logout was successful
-	 * @throws InterruptedException 
-	 */
-	@Test(priority = 3)
-	public void checkLogoutFunctionality() throws InterruptedException {
-		log.info(line);
-		Assert.assertTrue(clickAllActionButton.checkLogoutFunctionality(), "Login successful.");
-	}
 
 	/**
 	 * This method will be executed just after any function/method with @Test
@@ -80,10 +69,6 @@ public class LoginTest extends LoginAndSelectModule {
 	@AfterClass
 	public void afterClass() throws InterruptedException {
 		log.info(line);
-		driver.findElement(By.xpath("//input[contains(@name,'username')]")).sendKeys(LoginAndSelectModule.testData.get("username"));
-		driver.findElement(By.xpath("//input[contains(@autocomplete,'new-password')]")).sendKeys(LoginAndSelectModule.testData.get("password"));
-		driver.findElement(By.xpath("//button[contains(@class,'sigBtn')]")).click();
-		Thread.sleep(2000);
 	}
 
 }

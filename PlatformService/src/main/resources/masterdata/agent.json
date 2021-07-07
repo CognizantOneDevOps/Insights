@@ -1,5 +1,4 @@
 [
-
 	{
 		"queryName":"Agent Demon",
 		"sqlQuery":"INSERT INTO public.agent_configuration(id, agent_json, agent_key, agent_status, agent_version, iswebhook,label_name, os_version, tool_category, tool_name, update_date, is_vault_enable) SELECT nextval('hibernate_sequence'), '{\"baseExtractionPath\":\"\",\"insightsTimeZone\": \"Asia/Kolkata\",\"loggingSetting\": {\"logLevel\": \"WARN\"},\"mqConfig\": {\"host\": \"127.0.0.1\",\"password\": \"iSight\",\"user\": \"iSight\",\"exchange\": \"iSight\",\"agentExchange\":\"iAgent\"},\"publish\": {\"data\": \"DAEMONAGENT.AGENTDAEMON.DATA\",\"health\": \"DAEMONAGENT.AGENTDAEMON.HEALTH\"},\"isDebugAllowed\": false,\"subscribe\": {\"agentPkgQueue\": \"INSIGHTS.AGENTS.PACKAGE\"}, \"toolCategory\" : \"AGENTDAEMON\",\"timeStampFormat\": \"%Y-%m-%dT%H:%M:%SZ\",\"toolsTimeZone\": \"GMT\"}', 'daemon-1523257126', 'START', '', FALSE, 'DAEMONAGENT', '', 'DAEMONAGENT', 'AGENTDAEMON', current_date, FALSE WHERE NOT EXISTS(SELECT agent_key from public.agent_configuration WHERE agent_key = 'daemon-1523257126');"
@@ -9,6 +8,4 @@
 		"queryName":"update Agent for Webhook",
 		"sqlQuery":"Update public.agent_configuration set iswebhook= false where iswebhook is null;"
 	}
-
-
 ]

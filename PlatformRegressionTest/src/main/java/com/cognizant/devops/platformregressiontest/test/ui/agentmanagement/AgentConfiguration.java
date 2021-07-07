@@ -217,6 +217,7 @@ public class AgentConfiguration extends AgentObjectRepository {
 		wait.until(ExpectedConditions.visibilityOf(healthLabelName)).clear();
 		healthLabelName.sendKeys(data.getHealthLabelName());
 		wait.until(ExpectedConditions.visibilityOf(update)).click();
+		wait.until(ExpectedConditions.visibilityOf(success));
 		success.isDisplayed();
 		wait.until(ExpectedConditions.visibilityOf(ok)).click();
 		log.info("{} updated successfully.", data.getAgentId());
@@ -229,7 +230,7 @@ public class AgentConfiguration extends AgentObjectRepository {
 		wait.until(ExpectedConditions.visibilityOf(ok)).click();
 		selectAgent(data);
 		wait.until(ExpectedConditions.visibilityOf(deleteAgent)).click();
-		wait.until(ExpectedConditions.visibilityOf(yes)).click();
+		wait.until(ExpectedConditions.elementToBeClickable(yes)).click();
 		Thread.sleep(1000);
 		if (!selectAgent(data)) {
 			log.info("{} deleted successfully.", data.getAgentId());

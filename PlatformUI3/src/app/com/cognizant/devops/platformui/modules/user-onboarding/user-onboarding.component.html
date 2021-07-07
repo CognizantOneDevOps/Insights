@@ -43,15 +43,13 @@
         {{record.name}}
       </mat-option>
     </mat-select>
-    <div class="filterGroupCSS" *ngIf=" showDetail ">
-      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search by Login ID or Email Address" class="form-control">
+    <div class="filterGroupCSS" *ngIf="showDetail">
+      <input  *ngIf="showDetail" matInput (keyup)="applyFilter($event.target.value)" placeholder="Search by Login ID or Email Address" class="form-control">
     </div>
   </div>
-
-  <div>
-    <div class="btnAlign">
+  <div class="btnAlign">
       <button mat-icon-button (click)="displayaccessGroupCreateField()">
-        <mat-icon title="Add New Access Group" style="margin-top: 12%;" class="mat-icon material-icons">
+        <mat-icon title="Add New Access Group" style="margin-top: 12% ;" class="mat-icon material-icons">
           add_circle
         </mat-icon>
 
@@ -108,6 +106,8 @@
            </mat-icon>
       </button>
     </div>
+  <div>
+  
     <div *ngIf=" showDetail ">
 
       <mat-radio-group [(ngModel)]="selectedUser ">

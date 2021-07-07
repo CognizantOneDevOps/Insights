@@ -13,17 +13,11 @@
 		},
 		"commit": {
 			"commitResponseTemplate": {
-				"repository": {
-					"name": "repoName"
-				},
-				"commits":[{
-					"id": "commitId",
-					"message": "commitMessage",
-					"author": {
-			    	"name": "authorName" }
-				}],
-				"commitTime": "commitTime",
-				"branchName": "branchName"
+				"id": "commitId",
+				"message": "commitMessage",
+				"author": {
+			    	"name": "authorName" 
+			     }
 			},
 			"commitMetadata": {
 				"dataUpdateSupported": true,
@@ -55,7 +49,7 @@
 					"ref": "baseBranch"
 				},
 				"isMerged": "isMerged",
-				"originBranchAlmKeys": "originBranchAlmKeys",
+				"originbranchAlmKeys": "originBranchAlmKeys",
 				"merge_commit_sha": "mergedSHA",
 				"commit": "commit",
 				"created_at": "createdAt",

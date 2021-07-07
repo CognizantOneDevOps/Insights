@@ -25,9 +25,7 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.dal.RestApiHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import sun.misc.BASE64Encoder;
 
@@ -70,22 +68,5 @@ public class SystemStatus {
 		Map<String, String> headers = new HashMap<>();
 		headers.put("Authorization", headerValue);
 		return RestApiHandler.doGet(url, headers);
-	}
-
-	public static String jerseyPostClientWithAuthentication(String url, String name, String password,
-			String authtoken, String data) throws InsightsCustomException {
-		String authStringEnc;
-		if (authtoken == null) {
-			String authString = name + ":" + password;
-			authStringEnc = new BASE64Encoder().encode(authString.getBytes());
-		} else {
-			authStringEnc = authtoken;
-		}
-		JsonObject requestJson = new  JsonParser().parse(data).getAsJsonObject();
-		JsonArray properties = new JsonArray();
-		String headerValue = "Basic " + authStringEnc;
-		Map<String, String> headers = new HashMap<>();
-		headers.put("Authorization", headerValue);
-		return RestApiHandler.doPost(url, requestJson, headers);
 	}
 }

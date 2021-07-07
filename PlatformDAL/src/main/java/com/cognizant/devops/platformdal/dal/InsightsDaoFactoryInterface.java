@@ -20,5 +20,5 @@ import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 public interface InsightsDaoFactoryInterface {
 	
 	public GraphDBHandler getNeo4jRESTDBHandler();
-	public BaseGraphDBHandler getNeo4jBoltDBHandler();
+	//public BaseGraphDBHandler getNeo4jBoltDBHandler();
 }

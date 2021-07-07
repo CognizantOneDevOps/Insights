@@ -164,10 +164,10 @@ class RestCommunicationFacade(object):
         elif keyType is str or keyType is str:
             responseObjType = type(responseObj)
             if responseObjType is dict:
-                logging.error('Dict object assignment to graph property is not allowed.')
-                logging.error('Graph Property Name: '+templateObj)
-                logging.error('Graph property value: '+json.dumps(responseObj))
-                sys.exit() 
+                logging.error('Incorrect Dict object assignment is not allowed.')
+                logging.error('Property Name: '+templateObj)
+                logging.error('Property value: '+json.dumps(responseObj))
+                raise ValueError('RestFacade: Unsupported dictionary data type found ') 
             else:
                 data[templateObj] = responseObj
             

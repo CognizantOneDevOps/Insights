@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.businessmapping.service.BusinessMappingService;
 import com.google.gson.JsonObject;
 
@@ -38,17 +37,6 @@ public class InsightsBusinessMapping {
 	static Logger log = LogManager.getLogger(InsightsBusinessMapping.class.getName());
 	@Autowired
 	BusinessMappingService businessMappingService;
-
-	@GetMapping(value = "/getAllHierarchyDetails",produces = MediaType.APPLICATION_JSON_VALUE)
-	public JsonObject getAllHierarchyDetails() {
-		return businessMappingService.getAllHierarchyDetails();
-	}
-
-	@GetMapping(value = "/getHierarchyProperties",produces = MediaType.APPLICATION_JSON_VALUE)
-	public JsonObject getHierarchyProperties(@RequestParam String level1, @RequestParam String level2,
-			@RequestParam String level3, @RequestParam String level4) throws InsightsCustomException {
-		return businessMappingService.getHierarchyProperties(level1, level2, level3, level4);
-	}
 	
 	@PostMapping(value = "/saveToolsMapping",produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject saveToolsMappingLabel(@RequestBody String agentMappingJson) {

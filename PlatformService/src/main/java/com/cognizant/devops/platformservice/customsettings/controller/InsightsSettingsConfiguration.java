@@ -24,9 +24,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,9 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformdal.icon.Icon;
 import com.cognizant.devops.platformdal.icon.IconDAL;
-import com.cognizant.devops.platformdal.settingsconfig.SettingsConfiguration;
 import com.cognizant.devops.platformservice.customsettings.ImageResponse;
-import com.cognizant.devops.platformservice.customsettings.service.SettingsConfigurationService;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonObject;
 
@@ -48,26 +44,6 @@ import com.google.gson.JsonObject;
 public class InsightsSettingsConfiguration {
 
 	private static final Logger LOG = LogManager.getLogger(InsightsSettingsConfiguration.class);
-
-	@Autowired	
-	SettingsConfigurationService settingsConfigurationService;
-
-	@PostMapping(value = "/saveSettingsConfiguration",produces = MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody JsonObject saveSettingsConfiguration(@RequestParam String settingsJson, @RequestParam String settingsType,
-													@RequestParam String activeFlag,@RequestParam String lastModifiedByUser) {
-		Boolean result = settingsConfigurationService.saveSettingsConfiguration(settingsJson,settingsType,activeFlag,lastModifiedByUser);
-		if (result) {
-			return PlatformServiceUtil.buildSuccessResponse();
-		} else {
-			return PlatformServiceUtil.buildFailureResponse("Unable to save or update Setting Configuration for the request");
-		}
-	}
-
-	@GetMapping(value = "/loadSettingsConfiguration",produces = MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody JsonObject loadSettingsConfiguration(@RequestParam String settingsType ) {
-		SettingsConfiguration settingsConfiguration = settingsConfigurationService.loadSettingsConfiguration(settingsType);		
-		return PlatformServiceUtil.buildSuccessResponseWithData(settingsConfiguration);
-	}
 
 	@PostMapping(value = "/uploadCustomLogo",headers=("content-type=multipart/*")
 			,produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -96,7 +72,7 @@ public class InsightsSettingsConfiguration {
 			imgResp.setImageType(fileExt);
 			return PlatformServiceUtil.buildSuccessResponseWithData(imgResp);
 		} else {
-			LOG.error("Invalid file   " + file.getName() + "  With extension  " + fileExt + " size " + file.getSize());
+			LOG.error("Invalid file  {} With extension  {} size{} " , file.getName() , fileExt , file.getSize());
 			return PlatformServiceUtil.buildFailureResponse(PlatformServiceConstants.INVALID_FILE);
 		}
 	}

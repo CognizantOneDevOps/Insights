@@ -36,27 +36,17 @@ public class CreateOrgAPITest extends GroupsAndUserTestData {
 
 	private static final Logger log = LogManager.getLogger(CreateOrgAPITest.class);
 
-	String jSessionID;
-	String xsrfToken;
-
-	@BeforeMethod
-	public void onInit() throws InterruptedException, IOException {
-
-		jSessionID = CommonUtils.getJsessionId();
-		xsrfToken = CommonUtils.getXSRFToken(jSessionID);
-	}
-
 	@Test(priority = 1)
 	public void createOrgs() {
 
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("createOrg");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
-		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, CommonUtils.jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
 				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
-				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
-		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
+				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken);
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.jtoken);
 		
 		httpRequest.queryParams("orgName", CommonUtils.getProperty("orgName"));
 
@@ -78,9 +68,9 @@ public class CreateOrgAPITest extends GroupsAndUserTestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("createOrg");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
-				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
+		httpRequest.header(new Header("XSRF-TOKEN", CommonUtils.xsrfToken));
+		httpRequest.cookies("JSESSIONID", CommonUtils.jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
+				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", CommonUtils.xsrfToken);
 		httpRequest.queryParams("orgName", CommonUtils.getProperty("orgName"));
 
 		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);

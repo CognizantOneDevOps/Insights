@@ -21,7 +21,7 @@ import java.util.List;
 import com.google.gson.JsonObject;
 
 public class GraphResponse {
-	private List<NodeData> nodes = new ArrayList<NodeData>();
+	private List<NodeData> nodes = new ArrayList<>();
 	private JsonObject json;
 	
 	public boolean addNode(NodeData data){

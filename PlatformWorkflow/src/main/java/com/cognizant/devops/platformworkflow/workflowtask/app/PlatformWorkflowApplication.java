@@ -43,7 +43,7 @@ public class PlatformWorkflowApplication implements ApplicationConfigInterface {
 	try {
 			ApplicationConfigInterface.loadConfiguration();
 			
-			ApplicationConfigCache.updateLogLevel(LogLevelConstants.PlatformReport);
+			ApplicationConfigCache.updateLogLevel(LogLevelConstants.PLATFORMREPORT);
 
 			InsightsStatusProvider.getInstance().createInsightStatusNode("Platform Workflow Application started. ",
 					PlatformServiceConstants.SUCCESS);

@@ -585,12 +585,20 @@ public class InsightsUtils {
 		
 	}
 
+	/** This method use in Traceability 
+	 * @param milliseconds
+	 * @return
+	 */
 	public static String getDateTimeFromEpoch(long milliseconds) {
 		String duration;
 		long days = TimeUnit.DAYS.convert(milliseconds, TimeUnit.MILLISECONDS);
+		long minutes = TimeUnit.MINUTES.convert(milliseconds, TimeUnit.MILLISECONDS);
+		long second = TimeUnit.SECONDS.convert(milliseconds, TimeUnit.MILLISECONDS);
 		long yrs = 0;
 		long month = 0;
-		if (days > 365) {
+		if(milliseconds ==0 ) {
+			duration ="";
+		}else if (days > 365) {
 			yrs = days / 365;
 			days = days - (365 * yrs);
 			if (days >= 30) // Calculate month
@@ -599,15 +607,20 @@ public class InsightsUtils {
 				days = days - (month * 30);
 			}
 			duration = yrs + " Yrs " + month + "Month(s) " + days + DAYS;
-		} else if (days >= 30 && days < 365) // Calculate month
-		{
+		} else if (days >= 30 && days < 365) { // Calculate month
 			month = days / 30;
 			days = days - (month * 30);
 			duration = month + "Month(s) " + days + DAYS;
-
-		} else if (days <= 1) {
-			duration = "1 Day ";
-		} else {
+		}else if (days <= 1  && minutes > 60) {
+			long hour = TimeUnit.HOURS.convert(milliseconds, TimeUnit.MILLISECONDS);
+			duration = hour +" minutes ";//less then 1 Day
+		} else if(minutes < 60 && minutes > 1 ){
+			duration = minutes +" minutes ";//less then 1 Day
+		}else if (minutes < 1 && second > 0){
+			duration = second +" second ";
+		}else if(second <= 0) {
+			duration =  " within a second ";
+		}else{
 			duration = days + DAYS;
 		}
 		return duration;

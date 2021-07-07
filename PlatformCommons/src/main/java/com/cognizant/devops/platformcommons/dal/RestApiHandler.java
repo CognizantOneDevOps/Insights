@@ -94,7 +94,8 @@ public class RestApiHandler {
 								cert.checkValidity();
 							}
 						} catch (Exception e) {
-							throw new CertificateException("Certificate not valid or trusted.");
+							log.error(e);
+							//throw new CertificateException("Certificate not valid or trusted.");
 						}
 			    }
 
@@ -105,7 +106,8 @@ public class RestApiHandler {
 								cert.checkValidity();
 							}
 						} catch (Exception e) {
-							throw new CertificateException("Certificate not valid or trusted.");
+							log.error(e);
+							//throw new CertificateException("Certificate not valid or trusted.");
 						}
 			    }
 			}};

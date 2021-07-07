@@ -21,14 +21,14 @@ echo "#################### Installing Postgres with configs , Databases and Role
 source /etc/environment
 source /etc/profile
 cd $INSIGHTS_APP_ROOT_DIRECTORY
-sudo rpm -ivh https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/postgres/pgdg.noarch.rpm
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/postgres/postgres_dependencies.zip
+sudo rpm -ivh https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/postgres/pgdg.noarch.rpm
+sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/postgres/postgres_dependencies.zip
 sudo unzip postgres_dependencies.zip && cd postgres_dependencies
 sudo rpm -ivh *.rpm
 sudo /usr/pgsql-9.5/bin/postgresql95-setup initdb
 sudo systemctl enable postgresql-9.5.service
 sudo chkconfig postgresql-9.5 on
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/postgres/pg_hba.conf
+sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/postgres/pg_hba.conf
 sudo cp pg_hba.conf /var/lib/pgsql/9.5/data/pg_hba.conf
 sudo systemctl start  postgresql-9.5.service
 sudo useradd grafana
@@ -40,7 +40,7 @@ echo  :> dbscript.sql
 chmod +x dbscript.sql
 printf '\n'
 printf 'Writing to dbscript.sql file'
-echo "CREATE USER grafana WITH PASSWORD '$NATIVE_SYSTEM_USER_GRAFANA_PASSWORD' SUPERUSER;">dbscript.sql
+echo "CREATE USER grafana WITH PASSWORD '"$NATIVE_SYSTEM_USER_GRAFANA_PASSWORD"' SUPERUSER;">dbscript.sql
 echo "CREATE DATABASE grafana WITH OWNER grafana TEMPLATE template0 ENCODING 'SQL_ASCII' TABLESPACE  pg_default LC_COLLATE  'C' LC_CTYPE  'C' CONNECTION LIMIT  -1;">>dbscript.sql
 echo "CREATE DATABASE insight WITH OWNER grafana TEMPLATE template0 ENCODING 'SQL_ASCII' TABLESPACE  pg_default LC_COLLATE  'C' LC_CTYPE  'C' CONNECTION LIMIT  -1;">>dbscript.sql
 printf '\n'

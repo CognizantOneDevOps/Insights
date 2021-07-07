@@ -59,6 +59,9 @@ public class ReportTemplateObjectRepository extends LoginAndSelectModule {
 
 	@FindBy(xpath = "//div[contains(text(),'mandatory fields')]")
 	WebElement fillMandatoryDialogEl;
+	
+	@FindBy(xpath = "//div[contains(text(), ' Error')]")
+	WebElement errorMessage;
 
 	@FindBy(xpath = "//div[contains(text(),'add kpi details')]")
 	WebElement addKPIDialogEl;

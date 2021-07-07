@@ -26,12 +26,12 @@ sudo echo INSIGHTS_ENGINE=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" INSIGHTS_ENGINE=`pwd` | sudo tee -a /etc/profile
 source /etc/environment
 source /etc/profile
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformEngine.jar -O PlatformEngine.jar
+sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/release/latest/PlatformEngine.jar -O PlatformEngine.jar
 sleep 2
 sudo nohup java -jar PlatformEngine.jar > /dev/null 2>&1 &
 sudo chmod -R 777 $INSIGHTS_APP_ROOT_DIRECTORY/insightsengine
 cd /etc/init.d/
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/InSightsEngine.sh
+sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/InSightsEngine.sh
 sudo mv InSightsEngine.sh InSightsEngine
 sudo chmod +x InSightsEngine
 sudo chkconfig InSightsEngine on

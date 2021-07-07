@@ -35,12 +35,13 @@ class GitLabIssueWebhookAgent(BaseAgent):
     
     @BaseAgent.timed
     def processWebhook(self,data):
-        self.baseLogger.info(" subscriberForWebhookAgent Process ======")
+        self.baseLogger.info(" inside GitlabIssue processWebhook ======")
         dataReceived = json.loads(data)
         if "event_type" in dataReceived and  dataReceived["event_type"] == "issue":
             self.processIssueDetails(dataReceived)
         
     def processIssueDetails(self, dataReceived):
+        self.baseLogger.info(" inside processIssueDetails method ======")
         dynamicTemplate = self.config.get('dynamicTemplate', {})
         responseTemplate = dynamicTemplate.get('issue', {}).get('issueResponseTemplate', {})
         issueMetadata = dynamicTemplate.get('issue', {}).get('issueMetadata', {})
@@ -52,7 +53,8 @@ class GitLabIssueWebhookAgent(BaseAgent):
         dataReceived["object_attributes"]["updated_at"] = updatedAt
         assigneeDict = {}
         labelDict = {}
-            
+         
+        self.baseLogger.info(" before parseResponse issue data ======")   
         parsedIssueResponse = self.parseResponse(responseTemplate, dataReceived)
         
         if "assignees" not in dataReceived :
@@ -63,6 +65,7 @@ class GitLabIssueWebhookAgent(BaseAgent):
         closed_at = dataReceived.get("object_attributes",{}).get("closed_at")
         if closed_at is None: parsedIssueResponse[0]["issueClosedDate"] = ""
         
+        self.baseLogger.info(" before publish issue data ======")
         self.publishToolsData(parsedIssueResponse, issueMetadata,timeStampField,timeStampFormat,isEpoch,True)
         
         action = dataReceived["object_attributes"]["action"]
@@ -72,8 +75,10 @@ class GitLabIssueWebhookAgent(BaseAgent):
                        "updatedById": parsedIssueResponse[0]["updatedById"],
                        "updatedAt": parsedIssueResponse[0]["updatedAt"]}
             self.processChangelog(dataReceived, changesMetaData)
+        self.baseLogger.info(" issue details processing completed ======")
                 
     def processChangelog(self, dataReceived, changesMetaData):
+        self.baseLogger.info(" inside processChangelog method ======")
         changeLogData = dataReceived.get("changes",{})
         dynamicTemplate = self.config.get('dynamicTemplate', {})
         responseTemplate = dynamicTemplate.get('issue', {}).get('issueResponseTemplate', {})
@@ -117,12 +122,15 @@ class GitLabIssueWebhookAgent(BaseAgent):
                 issueChangeDict["prev_"+changedfield] = prev_details
                 issueChangeDict["current_"+changedfield] = current_details
                 finalData.append(issueChangeDict)
+        self.baseLogger.info(" before publish issue changelog data ======")
         self.publishToolsData(finalData, metaData)
         for item in finalData:
             item.update( {"gitlab_webhookType":"issue"})
         self.publishToolsData(finalData, relationMetaData) 
+        self.baseLogger.info(" issue changelog processing completed ======")
         
     def updateMandatoryFields(self, field, template):
+        self.baseLogger.info(" inside updateMandatoryFields method ======")
         field_details = {}
         if field in template and type(template[field]) is list:
             field_details = template.get(field, list())[0].copy()

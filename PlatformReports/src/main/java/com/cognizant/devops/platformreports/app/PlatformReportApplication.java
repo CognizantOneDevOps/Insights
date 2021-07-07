@@ -46,7 +46,7 @@ public class PlatformReportApplication {
 			// Create Default users
 			ApplicationConfigProvider.performSystemCheck();
 
-			ApplicationConfigCache.updateLogLevel(LogLevelConstants.PlatformReport);
+			ApplicationConfigCache.updateLogLevel(LogLevelConstants.PLATFORMREPORT);
 	
 			PlatformWorkflowApplicationTest.testWorkflowExecutor();
 	

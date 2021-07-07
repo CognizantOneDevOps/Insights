@@ -209,7 +209,7 @@ public class AccessGroupManagement {
 	public JsonObject getCurrentUserOrgs() throws InsightsCustomException {
 		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 		String response = grafanaHandler.grafanaGet(PlatformServiceConstants.API_USER_ORGS, headers);
-		// log.debug(" response " + response);
+		log.debug("getCurrentUserOrgs response {} ",  response);
 		return PlatformServiceUtil.buildSuccessResponseWithData(new JsonParser().parse(response));
 	}
 

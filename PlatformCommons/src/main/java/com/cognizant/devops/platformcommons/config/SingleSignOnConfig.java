@@ -17,6 +17,9 @@ package com.cognizant.devops.platformcommons.config;
 
 import java.io.Serializable;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+
 public class SingleSignOnConfig implements Serializable {
 
 	/**
@@ -38,6 +41,7 @@ public class SingleSignOnConfig implements Serializable {
 	private String relayStateUrl;
 	private String defaultTargetUrl;
 	private String postLogoutURL;
+	@NotEmpty @NotBlank
 	private String tokenSigningKey;
 	private String servicePrincipalKerberos;
 	private String keyTabLocationKerberos;

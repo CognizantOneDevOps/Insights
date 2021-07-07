@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.groupsanduser;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +23,6 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformregressiontest.test.common.CommonUtils;
@@ -40,26 +38,16 @@ import io.restassured.specification.RequestSpecification;
 public class AssignUserAPITest extends GroupsAndUserTestData {
 
 	private static final Logger log = LogManager.getLogger(AssignUserAPITest.class);
-	String jSessionID;
-	String xsrfToken;
-
-	@BeforeMethod
-	public void onInit() throws InterruptedException, IOException {
-
-		jSessionID = CommonUtils.getJsessionId();
-		xsrfToken = CommonUtils.getXSRFToken(jSessionID);
-	}
+	
 	@Test(priority = 1, dataProvider = "assignuserdataprovider")
 	public void assignUser(String orgName, String orgId, String roleName, String userName) {
 
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("assignUser");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
-		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
-				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
-				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
-		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken));
+		httpRequest.cookies(CommonUtils.cookiesMap);
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.jtoken);
 
 		// Request payload sending along with post request
 		Map<String, Object> json = new HashMap<>();
@@ -92,10 +80,8 @@ public class AssignUserAPITest extends GroupsAndUserTestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("assignUser");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
-		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
-				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
-				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken));
+		httpRequest.cookies(CommonUtils.cookiesMap);
 
 		// Request payload sending along with post request
 		JsonObject requestParam = new JsonObject();

@@ -31,7 +31,7 @@ public class PlatformRegressionMain {
 
 	public static void main(String[] args) {
 
-		ApplicationConfigCache.updateLogLevel(LogLevelConstants.PlatformRegressionTest);
+		ApplicationConfigCache.updateLogLevel(LogLevelConstants.PLATFORMREGRESSIONTEST);
 
 		List<String> file = new ArrayList<>();
 

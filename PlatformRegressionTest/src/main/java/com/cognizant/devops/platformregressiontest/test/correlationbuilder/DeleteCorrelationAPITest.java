@@ -37,16 +37,6 @@ public class DeleteCorrelationAPITest extends CorrelationTestData {
 
 	private static final Logger log = LogManager.getLogger(DeleteCorrelationAPITest.class);
 
-	String jSessionID;
-	String xsrfToken;
-
-	@BeforeMethod
-	public void onInit() throws InterruptedException, IOException {
-
-		jSessionID = CommonUtils.getJsessionId();
-		xsrfToken = CommonUtils.getXSRFToken(jSessionID);
-	}
-
 	@Test(priority = 1, dataProvider = "correlationdeletedataprovider")
 	public void deleteCorrelation(String relationName) {
 
@@ -54,10 +44,10 @@ public class DeleteCorrelationAPITest extends CorrelationTestData {
 
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
-				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
-		httpRequest.header("Authorization", CommonUtils.getProperty("authorization"));
+		httpRequest.header(new Header("XSRF-TOKEN", CommonUtils.xsrfToken));
+		httpRequest.cookies("JSESSIONID", CommonUtils.jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
+				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", CommonUtils.xsrfToken);
+		httpRequest.header("Authorization", CommonUtils.jtoken);
 
 		// Request payload sending along with post request
 
@@ -86,10 +76,10 @@ public class DeleteCorrelationAPITest extends CorrelationTestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("deleteCorrelation");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
-				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
-		httpRequest.header("Authorization", CommonUtils.getProperty("authorization"));
+		httpRequest.header(new Header("XSRF-TOKEN", CommonUtils.xsrfToken));
+		httpRequest.cookies("JSESSIONID", CommonUtils.jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
+				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", CommonUtils.xsrfToken);
+		httpRequest.header("Authorization", CommonUtils.jtoken);
 
 		// Request payload sending along with post request
 

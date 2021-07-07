@@ -15,9 +15,6 @@
 	 ******************************************************************************/
 package com.cognizant.devops.platformservice.customsettings;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
 import java.util.Base64;
 
 import org.apache.logging.log4j.LogManager;
@@ -28,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformdal.icon.Icon;
 import com.cognizant.devops.platformdal.icon.IconDAL;
@@ -39,9 +35,7 @@ import com.google.gson.JsonObject;
 @RequestMapping("/settings")
 public class CustomAppSettings {
 
-	private static final String INSIGHTS_HOME = "INSIGHTS_HOME";
-
-	private static Logger LOG = LogManager.getLogger(CustomAppSettings.class);
+	private static Logger log = LogManager.getLogger(CustomAppSettings.class);
 
     @CrossOrigin
 	@GetMapping(value = "/getLogoImage" )
@@ -49,30 +43,25 @@ public class CustomAppSettings {
     	String base64 = "";
 		String imageType = "";
 		ImageResponse imgResp = new ImageResponse();
-		if(ApplicationConfigProvider.getInstance().getPostgre().getUserName()!=null 
-				&& !ApplicationConfigProvider.getInstance().getPostgre().getUserName().equals("")) {
-	    	Icon image = new IconDAL().fetchEntityData("logo");
-			if (null != image.getImageType()) {
-				imageType = image.getImageType();
+		try {
+			if(ApplicationConfigProvider.getInstance().getPostgre().getUserName()!=null 
+					&& !ApplicationConfigProvider.getInstance().getPostgre().getUserName().equals("")) {
+				Icon image = new IconDAL().fetchEntityData("logo");
+				if (null != image.getImageType()) {
+					imageType = image.getImageType();
+				}
+				if (null != image.getImage()) {
+					byte[] imageBytes = image.getImage();
+					base64 = Base64.getEncoder().encodeToString(imageBytes);
+				}
 			}
-			if (null != image.getImage()) {
-				byte[] imageBytes = image.getImage();
-				base64 = Base64.getEncoder().encodeToString(imageBytes);
-			}
+			imgResp.setEncodedString(base64);
+			imgResp.setImageType(imageType);
+			return PlatformServiceUtil.buildSuccessResponseWithData(imgResp);
+		} catch (Exception e) {
+			log.error(e);
+			log.error(" Unable to fetch image information  ",e);
+			return PlatformServiceUtil.buildSuccessResponseWithData(imgResp);
 		}
-		imgResp.setEncodedString(base64);
-		imgResp.setImageType(imageType);
-		return PlatformServiceUtil.buildSuccessResponseWithData(imgResp);
 	}
-
-	/* private File[] getFilesinDir() {
-		File dir = new File(System.getenv().get(INSIGHTS_HOME));
-        File[] dirFiles = dir.listFiles(new FilenameFilter() { 
-                 @Override
-				public boolean accept(File dir, String filename)
-                      { return filename.endsWith(".png") || filename.endsWith(".jpeg") || filename.endsWith(".jpg") || filename.endsWith(".svg"); }
-        } );
-		return dirFiles;
-	}*/
-	
 }

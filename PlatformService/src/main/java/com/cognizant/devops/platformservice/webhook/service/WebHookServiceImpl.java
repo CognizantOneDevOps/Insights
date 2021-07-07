@@ -91,7 +91,7 @@ public class WebHookServiceImpl implements IWebHook {
 	}
 
 	/**
-	 * Populatating the data received from the user into the Object of the entity class.
+	 * Populating the data received from the user into the Object of the entity class.
 	 * 
 	 * @param registerWebhookjson
 	 * @return

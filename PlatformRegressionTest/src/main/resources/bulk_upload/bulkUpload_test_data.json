@@ -1,0 +1,13 @@
+{
+   "bulkupload":"Bulk Upload",
+   "toolname":"GIT",
+   "timefield":"commitTime",
+   "incorrecttimefield":"commitTome",
+   "timefieldforNumericData":"completionDateEpochTime",
+   "correctTimezoneFormat":"yyyy-MM-dd'T'HH:mm:ssXXX",
+   "largefileSize":"C:\\Insights\\InSights_Windows\\Server2\\INSIGHTS_HOME\\Automation\\bulk_upload\\BulkUploadTest_largeSize.csv",
+   "correctGITfile":"C:\\Insights\\InSights_Windows\\Server2\\INSIGHTS_HOME\\Automation\\bulk_upload\\BulkUploadTest_GIT.csv",
+   "incorrectfiletype":"C:\\Insights\\InSights_Windows\\Server2\\INSIGHTS_HOME\\Automation\\bulk_upload\\bulkUpload_test_data.json",
+   "fileWithNullEpochTime":"C:\\Insights\\InSights_Windows\\Server2\\INSIGHTS_HOME\\Automation\\bulk_upload\\BulkUploadTest_GIT_NullEpochTime.csv",
+   "fileWithNumericValues":"C:\\Insights\\InSights_Windows\\Server2\\INSIGHTS_HOME\\Automation\\bulk_upload\\Bulk_Upload_Numeric_Values.csv"
+}

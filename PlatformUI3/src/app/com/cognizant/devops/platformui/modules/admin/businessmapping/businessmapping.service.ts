@@ -19,10 +19,7 @@ import { Observable } from 'rxjs';
 
 
 export interface IBusinessMappingService {
-    //loadServerHealthConfiguration(): Promise<any>;
-    //loadHealthConfigurations(toolName: string, toolCategory: string): Promise<any>;
-    getAllHierarchyMappings(): Promise<any>;
-    getHierarchyProperties(level1: string, level2: string, level3: string, level4: string): Promise<any>;
+    loadToolsAndCategories(): Promise<any>
 }
 
 
@@ -33,15 +30,6 @@ export class BusinessMappingService implements IBusinessMappingService {
     restHandler: any;
     constructor(private restCallHandlerService: RestCallHandlerService) {
         this.restHandler = this.restCallHandlerService;
-    }
-
-    getAllHierarchyMappings(): Promise<any> {
-
-        return this.restHandler.get("GET_ALL_HIERARCHY_DETAILS", { 'Content-Type': 'application/x-www-form-urlencoded' });
-    }
-
-    getHierarchyProperties(level1: string, level2: string, level3: string, level4: string): Promise<any> {
-        return this.restHandler.get("GET_HIERARCHY_PROPERTIES", { "level1": level1, "level2": level2, "level3": level3, "level4": level4 }, { 'Content-Type': 'application/x-www-form-urlencoded' });
     }
 
     loadToolsAndCategories(): Promise<any> {

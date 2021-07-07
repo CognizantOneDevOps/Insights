@@ -19,7 +19,7 @@ yum update
 source /etc/environment
 source /etc/profile
 cd $INSIGHTS_APP_ROOT_DIRECTORY
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/java/jdklinux.tar.gz
+sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/java/jdklinux.tar.gz
 sudo tar xzf jdklinux.tar.gz
 export JAVA_HOME=$INSIGHTS_APP_ROOT_DIRECTORY/jdklinux
 echo JAVA_HOME=$INSIGHTS_APP_ROOT_DIRECTORY/jdklinux  | sudo tee -a /etc/environment

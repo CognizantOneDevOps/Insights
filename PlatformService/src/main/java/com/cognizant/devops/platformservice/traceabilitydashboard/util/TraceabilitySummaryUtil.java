@@ -28,13 +28,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.apache.commons.text.StringSubstitutor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.owasp.esapi.util.CollectionsUtil;
 
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.google.gson.JsonArray;
@@ -43,7 +42,7 @@ import com.google.gson.JsonObject;
 
 public class TraceabilitySummaryUtil {
 
-	static Logger log = LogManager.getLogger(TraceabilitySummaryUtil.class.getName());
+	static Logger log = LogManager.getLogger(TraceabilitySummaryUtil.class);
 	static final String PATTERN ="[\\[\\](){}\"\\\"\"]";
 
 	public static String calTimeDiffrence(String operandName, List<JsonObject> toolRespPayload, String message)

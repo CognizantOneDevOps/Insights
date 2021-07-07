@@ -47,20 +47,6 @@ public class InsightsAgentConfiguration {
 	@Autowired
 	AgentManagementService agentManagementService;
 
-	@Deprecated
-	@PostMapping(value = "/registerAgent", produces = MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody JsonObject registerAgent(@RequestParam String toolName, @RequestParam String agentVersion,
-			@RequestParam String osversion, @RequestParam String configDetails, @RequestParam String trackingDetails) {
-		String message = null;
-		try {
-			message = agentManagementService.registerAgent(toolName, agentVersion, osversion, configDetails,
-					trackingDetails, false, false);
-		} catch (InsightsCustomException e) {
-			return PlatformServiceUtil.buildFailureResponse(e.toString());
-		}
-		return PlatformServiceUtil.buildSuccessResponseWithData(message);
-	}
-
 	@PostMapping(value = "/2.0/registerAgent", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject registerAgentV2(@RequestBody String registerAgentJson) {
 		String message = null;
@@ -91,20 +77,6 @@ public class InsightsAgentConfiguration {
 		String message = null;
 		try {
 			message = agentManagementService.uninstallAgent(agentId, toolName, osversion);
-		} catch (InsightsCustomException e) {
-			return PlatformServiceUtil.buildFailureResponse(e.toString());
-		}
-		return PlatformServiceUtil.buildSuccessResponseWithData(message);
-	}
-
-	@Deprecated
-	@PostMapping(value = "/updateAgent", produces = MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody JsonObject updateAgent(@RequestParam String agentId, @RequestParam String configJson,
-			@RequestParam String toolName, @RequestParam String agentVersion, @RequestParam String osversion) {
-		String message = null;
-		try {
-			message = agentManagementService.updateAgent(agentId, configJson, toolName, agentVersion, osversion, false,
-					false);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}

@@ -23,13 +23,11 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.query.Query;
 
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.core.BaseDAL;
-import com.cognizant.devops.platformdal.workflow.InsightsWorkflowExecutionHistory;
 
 public class ReportConfigDAL extends BaseDAL {
 	private static Logger log = LogManager.getLogger(ReportConfigDAL.class);

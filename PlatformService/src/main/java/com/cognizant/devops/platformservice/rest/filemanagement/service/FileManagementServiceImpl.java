@@ -30,6 +30,7 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFilesDAL;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
+import com.cognizant.devops.platformservice.traceabilitydashboard.service.TraceabilityDashboardServiceImpl;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -135,6 +136,12 @@ public class FileManagementServiceImpl {
 				configFilesDAL.updateConfigurationFile(configFileRecord);
 			} else {
 				throw new InsightsCustomException("File already exists in database.");
+			}
+			// used to clean up TRACEABILITY cache 
+			if(module.equalsIgnoreCase(FileDetailsEnum.FileModule.TRACEABILITY.toString())) {
+				log.debug(" Traceability Json updated, clear all value from cache ");
+				TraceabilityDashboardServiceImpl traceabilityObj = new TraceabilityDashboardServiceImpl();
+				traceabilityObj.clearAllCacheValue();
 			}
 			return "File uploaded";
 

@@ -31,13 +31,8 @@ public class EmailConfiguration implements Serializable {
 	private String smtpPassword;
 	private Boolean isAuthRequired;
 	private Boolean smtpStarttlsEnable;
-	private String emailVelocityTemplate;
 	private String mailFrom="";
-	private String mailTo;
 	private String subject="";
-	private String logo;
-	private String line;
-	private String footerLogo;
 	private String systemNotificationSubscriber="";
 	
 	
@@ -83,47 +78,17 @@ public class EmailConfiguration implements Serializable {
 	public void setSmtpStarttlsEnable(Boolean smtpStarttlsEnable) {
 		this.smtpStarttlsEnable = smtpStarttlsEnable;
 	}
-	public String getEmailVelocityTemplate() {
-		return emailVelocityTemplate;
-	}
-	public void setEmailVelocityTemplate(String emailVelocityTemplate) {
-		this.emailVelocityTemplate = emailVelocityTemplate;
-	}
 	public String getMailFrom() {
 		return mailFrom;
 	}
 	public void setMailFrom(String mailFrom) {
 		this.mailFrom = mailFrom;
 	}
-	public String getMailTo() {
-		return mailTo;
-	}
-	public void setMailTo(String mailTo) {
-		this.mailTo = mailTo;
-	}
 	public String getSubject() {
 		return subject;
 	}
 	public void setSubject(String subject) {
 		this.subject = subject;
-	}
-	public String getLogo() {
-		return logo;
-	}
-	public void setLogo(String logo) {
-		this.logo = logo;
-	}
-	public String getLine() {
-		return line;
-	}
-	public void setLine(String line) {
-		this.line = line;
-	}
-	public String getFooterLogo() {
-		return footerLogo;
-	}
-	public void setFooterLogo(String footerLogo) {
-		this.footerLogo = footerLogo;
 	}
 	public String getSystemNotificationSubscriber() {
 		return systemNotificationSubscriber;

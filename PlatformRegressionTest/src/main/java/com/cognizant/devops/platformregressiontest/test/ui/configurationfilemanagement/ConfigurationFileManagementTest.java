@@ -54,7 +54,7 @@ public class ConfigurationFileManagementTest extends LoginAndSelectModule {
 	 * @throws InterruptedException
 	 */
 	@BeforeTest
-	public void setUp() throws InterruptedException {
+	public void setUp() {
 		initialization();
 		getData(ConfigOptionsTest.CONFIGURATION_FILE_DIR + File.separator + ConfigOptionsTest.CONFIGURATION_JSON_FILE);
 		selectModuleUnderConfiguration(LoginAndSelectModule.testData.get("configurationFile"));

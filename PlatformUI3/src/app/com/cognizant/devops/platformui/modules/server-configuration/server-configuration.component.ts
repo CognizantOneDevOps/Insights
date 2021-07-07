@@ -50,7 +50,7 @@ export class ServerConfigurationComponent implements OnInit {
   authenticationProtocolList = ["SAML", "Kerberos", "NativeGrafana", "JWT"];
   requiredProperties = ["isVaultEnable", "vaultEndPoint", "secretEngine", "vaultToken", "endpoint", "authToken", "boltEndPoint", "grafanaEndpoint",
     "grafanaDBEndpoint", "userName", "password", "insightsDBUrl", "grafanaDBUrl", "host", "user", "password", "insightsServiceURL", "trustedHosts",
-    "autheticationProtocol", "adminUserPassword", "adminUserName"]
+    "autheticationProtocol", "adminUserPassword", "adminUserName","tokenSigningKey"]
   secretProperties = ["authToken", "password", "adminUserPassword", "smtpPassword", "nexusPassword"];
   constructor(public config: InsightsInitService, public serverconfigService: ServerConfigurationService,
     private router: Router, private route: ActivatedRoute,
@@ -132,8 +132,10 @@ export class ServerConfigurationComponent implements OnInit {
     var self = this;
     var message = "";
     this.updatedConfigParamdata = {};
+    console.log(configDetails);
     if (this.validateServerConfigData(configDetails)) {
       for (let configParamData of this.ServerConfigItems) {
+        console.log(configParamData)
         if (configParamData.key != "trustedHosts" && configParamData.key != "applicationLogLevel" && configParamData.type == "object") {
           this.item = {};
           for (let configinnerData of configParamData.children) {
@@ -194,6 +196,8 @@ export class ServerConfigurationComponent implements OnInit {
       this.messageDialog.showApplicationsMessage("Please fill authentication protocol. ", "ERROR");
     } else if (!(this.authenticationProtocolList.find(element => element === configDetails.autheticationProtocol))) {
       this.messageDialog.showApplicationsMessage("Please enter a valid authentication protocol. ", "ERROR");
+    } else if (configDetails.singleSignOnConfig_tokenSigningKey.length == 0 ) {
+      this.messageDialog.showApplicationsMessage("Please fill SingleSignOnConfig tokenSigningKey details. ", "ERROR");
     } else {
       return true;
     }

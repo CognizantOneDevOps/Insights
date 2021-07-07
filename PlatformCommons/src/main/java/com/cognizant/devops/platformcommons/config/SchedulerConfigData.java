@@ -24,10 +24,7 @@ public class SchedulerConfigData implements Serializable {
 	private int webhookEngineInterval = 10;
 	private int engineAggregatorModuleInterval = 10;
 	private int engineCorrelatorModuleInterval = 60;
-	private int projectMapperModuleInterval = 10;
-	private int dataPurgingExecutorInterval = 300;
 	private int offlineDataProcessingExecutorInterval = 10;
-	private int inferenceJobExecutor = 20;
 	private int dataArchivalEngineInterval = 240;
 	private int offlineWebhookEventProcessingInterval = 15;
 
@@ -63,36 +60,12 @@ public class SchedulerConfigData implements Serializable {
 		this.engineCorrelatorModuleInterval = engineCorrelatorModuleInterval;
 	}
 
-	public int getProjectMapperModuleInterval() {
-		return projectMapperModuleInterval;
-	}
-
-	public void setProjectMapperModuleInterval(int projectMapperModuleInterval) {
-		this.projectMapperModuleInterval = projectMapperModuleInterval;
-	}
-
-	public int getDataPurgingExecutorInterval() {
-		return dataPurgingExecutorInterval;
-	}
-
-	public void setDataPurgingExecutorInterval(int dataPurgingExecutorInterval) {
-		this.dataPurgingExecutorInterval = dataPurgingExecutorInterval;
-	}
-
 	public int getOfflineDataProcessingExecutorInterval() {
 		return offlineDataProcessingExecutorInterval;
 	}
 
 	public void setOfflineDataProcessingExecutorInterval(int offlineDataProcessingExecutorInterval) {
 		this.offlineDataProcessingExecutorInterval = offlineDataProcessingExecutorInterval;
-	}
-
-	public int getInferenceJobExecutor() {
-		return inferenceJobExecutor;
-	}
-
-	public void setInferenceJobExecutor(int inferenceJobExecutor) {
-		this.inferenceJobExecutor = inferenceJobExecutor;
 	}
 
 	public int getDataArchivalEngineInterval() {

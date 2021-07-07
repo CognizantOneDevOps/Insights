@@ -15,12 +15,9 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.groupsanduser;
 
-import java.io.IOException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformregressiontest.test.common.CommonUtils;
@@ -40,16 +37,7 @@ public class UpdateUserAPITest extends GroupsAndUserTestData {
 
 	private static final Logger log = LogManager.getLogger(UpdateUserAPITest.class);
 
-	String jSessionID;
-	String xsrfToken;
 	String getOrgUsers = "{}";
-
-	@BeforeMethod
-	public void onInit() throws InterruptedException, IOException {
-
-		jSessionID = CommonUtils.getJsessionId();
-		xsrfToken = CommonUtils.getXSRFToken(jSessionID);
-	}
 
 	@Test(priority = 1)
 	public void getOrgsUsers() {
@@ -57,10 +45,9 @@ public class UpdateUserAPITest extends GroupsAndUserTestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("getOrgUsers");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
-				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
-		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
+		httpRequest.header(new Header("XSRF-TOKEN", CommonUtils.xsrfToken));
+		httpRequest.cookies(CommonUtils.cookiesMap);
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.jtoken);
 		httpRequest.queryParams("orgId", CommonUtils.getProperty("orgId1"));
 
 		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
@@ -97,11 +84,9 @@ public class UpdateUserAPITest extends GroupsAndUserTestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("updateUser");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
-		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
-				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
-				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
-		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken));
+		httpRequest.cookies(CommonUtils.cookiesMap);
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.jtoken);
 
 		httpRequest.queryParams("orgId", orgId, "userId", searchUserId, "role", role);
 
@@ -125,10 +110,10 @@ public class UpdateUserAPITest extends GroupsAndUserTestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("updateUser");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
-		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, CommonUtils.jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
 				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
-				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
+				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken);
 
 		// Request payload sending along with post request
 		JsonObject requestParam = new JsonObject();

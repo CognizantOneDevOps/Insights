@@ -22,7 +22,7 @@ import java.nio.file.Paths;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,9 +35,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cognizant.devops.auditservice.audit.report.AuditReportScheduler;
 import com.cognizant.devops.auditservice.audit.service.AuditService;
+import com.cognizant.devops.auditservice.audit.service.AuditServiceImpl;
+import com.cognizant.devops.auditservice.audit.service.InsightsAuditInitializationCondition;
 import com.cognizant.devops.auditservice.audit.service.PdfWriter;
+import com.cognizant.devops.auditservice.audit.service.PdfWriterImpl;
 import com.cognizant.devops.platformcommons.constants.InsightsAuditConstants;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonArray;
@@ -45,21 +47,23 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 @RestController
+@Conditional(InsightsAuditInitializationCondition.class)
 @RequestMapping("traceability")
 public class AuditController {
 	private static Logger Log = LogManager.getLogger(AuditController.class);
 
-    @Autowired
-    AuditService auditServiceImpl;
     
-    @Autowired
-	PdfWriter pdfWriterImpl;
+    AuditService auditServiceImpl = new AuditServiceImpl();
+    
+    
+	PdfWriter pdfWriterImpl = new PdfWriterImpl();
 
     @GetMapping(value = "/getAssetInfo",produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public JsonObject searchAuditLogByAsset(@RequestParam String assetId) {
         JsonObject response;
         try {
+        	Log.debug(" Inside getAssetInfo searchAuditLogByAsset ====== ");
             response = auditServiceImpl.searchAuditLogByAsset(assetId);
             if (response.getAsJsonPrimitive(InsightsAuditConstants.STATUS_CODE).getAsString().equals("200"))
                 return PlatformServiceUtil.buildSuccessResponseWithData(response.getAsJsonArray("data"));
@@ -75,6 +79,7 @@ public class AuditController {
     public JsonObject searchAuditLogByDate(@RequestParam String startDate, @RequestParam String endDate, @RequestParam String toolName) {
         JsonObject response;
         try {
+        	Log.debug(" Inside getAllAssets searchAuditLogByDate ====== ");
             response = auditServiceImpl.searchAuditLogByDate(startDate, endDate, toolName);
             if (response.getAsJsonPrimitive(InsightsAuditConstants.STATUS_CODE).getAsString().equals("200"))
                 return PlatformServiceUtil.buildSuccessResponseWithData(response.getAsJsonArray("data"));
@@ -90,6 +95,7 @@ public class AuditController {
     public JsonObject getAssetHistory(@RequestParam String assetId) {
         JsonObject response = new JsonObject();
         try {
+        	Log.debug(" Inside getAssetHistory  ====== ");
             response = auditServiceImpl.getAssetHistory(assetId);
             if (response.getAsJsonPrimitive(InsightsAuditConstants.STATUS_CODE).getAsString().equals("200"))
                 return PlatformServiceUtil.buildSuccessResponseWithData(response.getAsJsonArray("data"));
@@ -110,6 +116,7 @@ public class AuditController {
 	public ResponseEntity<byte[]> getAuditReport(@RequestBody JsonObject assetsResults,@RequestParam String pdfName) {
 		ResponseEntity<byte[]>  response = null;
 		try {
+			Log.debug(" Inside getAuditReport  ====== ");
 			boolean validInput = false;
 			JsonArray jsonarray = assetsResults.get("data").getAsJsonArray();
 			for(JsonElement jsonelement: jsonarray) {
@@ -145,6 +152,7 @@ public class AuditController {
     public JsonObject getProcessFlow() {
         JsonObject response = new JsonObject();
         try {
+        	Log.debug(" Inside getProcessFlow  ====== ");
             response = auditServiceImpl.getProcessFlow();
         } catch (Exception e) {
             return PlatformServiceUtil.buildFailureResponse(e.toString());
@@ -185,19 +193,4 @@ public class AuditController {
 		}
 		return response;
 	}
-	
-	/**
-	 * Only for testing purpose . Will be removed later.
-	 */
-	@GetMapping(value = "/testQuery")
-	@ResponseBody
-	public void createReport(@RequestParam String reportName, @RequestParam String frequency) {
-		try {
-			AuditReportScheduler auditReportScheduler = new AuditReportScheduler();
-			auditReportScheduler.testReports(reportName, frequency);
-		} catch (Exception e) {
-			Log.error(e);
-		}
-	}
-
 }

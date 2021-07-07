@@ -5,6 +5,7 @@ import { MessageDialogService } from '@insights/app/modules/application-dialog/m
 import { DataSharedService } from '@insights/common/data-shared-service';
 import { ShowTraceabiltyDetailsDialog } from './traceabilty-show-details-dialog';
 import { TraceabiltyService } from './traceablity-builder.service';
+import { ImageHandlerService } from '@insights/common/imageHandler.service';
 
 @Component({
     selector: 'app-traceabilitydashboard',
@@ -52,6 +53,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
     globalData: any;
     filteredData = [];
     toolNameArr = [];
+    list1 = [];
     isSelected: string;
     selected = [false, false, false, false];
     selectedJira: number;
@@ -81,7 +83,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
     total: number;
 
     constructor(private dialog: MatDialog, public messageDialog: MessageDialogService,
-        private traceablityService: TraceabiltyService, private renderer: Renderer2, public dataShare: DataSharedService) {
+        private traceablityService: TraceabiltyService, private imageHandeler: ImageHandlerService, private renderer: Renderer2, public dataShare: DataSharedService) {
     }
 
     ngOnInit() {
@@ -96,95 +98,10 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
             });
     }
     ngAfterViewInit() {
-        this.tabClick();
+        //this.tabClick();
 
     }
-    tabClick() {
-        let google = (window as any).google;
-        let FusionCharts  = (window as any).FusionCharts;
-        if(FusionCharts === undefined){
-            this.gChart=true;
-            google.charts.load('current', { 'packages': ['corechart'] });
-            google.charts.setOnLoadCallback(this.drawChart(google));
-        }else{
-            this.gChart=false;
-            this.drawFusionChart();
-        }
-    }
-    drawFusionChart(){
-        let toolArr = [];
-        this.total=0;
-        this.toolTimelagArray.forEach(ele => {
-            let dataTool = {};
-            dataTool['label'] = ele.Tools;
-            dataTool['value'] = ele.HandoverTime;
-            this.total=this.total+Number(ele.HandoverTime.split('')[0]);
-            toolArr.push(dataTool);
-        });
-        let FusionCharts  = (window as any).FusionCharts;
-        FusionCharts.ready(function () {
-
-            let myChart = new FusionCharts({
-                type: "waterfall2d",
-                renderAt: "chart-container",
-                width: "100%",
-                height: "75%",
-                dataFormat: "json",
-                dataSource: {
-                    chart: {
-                        caption: "Fusion Chart",
-                        subcaption: "Timelag details",
-                        xaxisname: "ToolName",
-                        yaxisname: "Days",
-                        numbersuffix: "D",
-                        theme: "fusion"
-                    },
-                    data: toolArr
-                }
-
-            }).render();
-            console.log("My charts", myChart)
-
-        });
-    }
-    drawChart(google) {
-        let g = (window as any).google;
-        var data = g.visualization.arrayToDataTable(this.toolData, true);
-        var options = {
-            legend: 'none',
-            bar: { groupWidth: '75%' }, // Remove space between bars.
-            candlestick: {
-                fallingColor: { strokeWidth: 0, fill: '#0f9d58' }, // red
-                risingColor: { strokeWidth: 0, fill: '#0f9d58' }   // green
-            },
-        }
-        var chart = new g.visualization.CandlestickChart(document.getElementById('chart_div'));
-        chart.draw(data, options);
-    }
-    constructChartData(data){
-        let toolArr = [];
-        data.forEach(ele => {
-            let dataTool = {};
-            dataTool['label'] = ele.Tools;
-            dataTool['value'] = Number(ele.HandoverTime.split('')[0]);
-            toolArr.push(dataTool);
-        });
-
-        this.toolData = [];
-        let initial = 0;
-        for (let i = 0; i < toolArr.length; i++) {
-            this.toolData.push([toolArr[i].label, initial, initial, initial+toolArr[i].value, initial+toolArr[i].value]);
-            initial = initial+toolArr[i].value;
-        }
-    }
-    createDivelement() {
-        const createDiv = this.renderer.createElement('div');
-        // Set the id of the div
-        this.renderer.setProperty(createDiv, 'id', 'chart-container');
-        // Append the created div to the body element
-        this.renderer.appendChild(document.body, createDiv);
-        return createDiv;
-    }
+     
     getDetails() {
         this.list = [];
         this.toolSummaryArray = [];
@@ -257,22 +174,9 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
                     });
                     this.prepareSummaryDetail(data.data.summary);
                     
-                    if (data.data.timelag.length > 0) {
-                        var tempArr = []
-                        for (var element of data.data.timelag) {
-                            for (var key in element) {
-                                this.timelagData = { 'Tools': key, 'HandoverTime': element[key] }
-                                tempArr.push(this.timelagData)
-                            }
-                        }
-
-                        this.toolTimelagArray = tempArr
-                        this.constructChartData(this.toolTimelagArray);
-
-                        if (this.toolTimelagArray.length > 0) {
-                            this.isEnable = true;
-                        }
-                        this.timelagDataSource = this.toolTimelagArray;
+                    if (data.data.combinedSummary.length > 0) {
+                        this.list1 = data.data.combinedSummary;
+                        console.log(this.list1)
                     }
                     this.traceabilityData = data;
                     this.globalData = this.traceabilityData.data.pipeline;
@@ -314,12 +218,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
         if (data.length > 0) {
             this.toolSummaryArray = [];
             var totalMessage = data[0]['Total']
-            this.toolSummaryArray.push(totalMessage)
-            var messagesArr = data[0]['messages'];
-            for (let index = 0; index < messagesArr.length; index++) {
-                var object = messagesArr[index]
-                this.toolSummaryArray.push(object)
-            }
+            this.toolSummaryArray.push(totalMessage);
         }
     }
     onCardClickJira(index, event, key) {
@@ -335,8 +234,8 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
             this.isDatainProgress = false;
         } else if (this.cacheMap.has(clickedElement.uuid)) {
             this.map = new Map<String, Object[]>();
-            let cacheData = this.cacheMap.get(clickedElement.uuid);
-            cacheData.pipeline.forEach(element => {
+            let data = this.cacheMap.get(clickedElement.uuid);
+            data.forEach(element => {
                 let key = element.order + "_" + element.toolName;
                 if (this.map.has(key)) {
                     this.map.get(key).push(element);
@@ -345,7 +244,6 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
                     this.map.set(key, [element]);
                 }
             });
-            this.prepareSummaryDetail(cacheData.summary);
             this.globalMap = this.map;
             this.isDatainProgress = false;
         }
@@ -355,7 +253,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
                    // setTimeout(()=>{this.isDatainProgress=true},8000); 
                    this.map = new Map<String, Object[]>(); 
                     let res = data.data.pipeline;
-                    this.cacheMap.set(clickedElement.uuid, data.data);
+                    this.cacheMap.set(clickedElement.uuid, res);
                     console.log(data)
                     this.globalData = res;
                     res.forEach(element => {
@@ -371,21 +269,8 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
                     this.isDatainProgress=false;   
                   this.prepareSummaryDetail(data.data.summary);
                   
-                    if (data.data.timelag.length > 0) {
-                        var tempArr = []
-                        for (var element of data.data.timelag) {
-                            for (var key in element) {
-                                this.timelagData = { 'Tools': key, 'HandoverTime': element[key] }
-                                tempArr.push(this.timelagData)
-                            }
-                        }
-
-                        this.toolTimelagArray = tempArr
-                        this.constructChartData(this.toolTimelagArray);
-                        if (this.toolTimelagArray.length > 0) {
-                            this.isEnable = true;
-                        }
-                        this.timelagDataSource = this.toolTimelagArray;
+                    if (data.data.combinedSummary.length > 0) {
+                        this.list1 = data.data.combinedSummary;
                     }
 
                 });
@@ -424,7 +309,6 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
     }
 
     getAssetHistoryDetails(toolName: string, toolField: string, toolValue: string, type: string) {
-        debugger;
         this.isDatainProgress = true;
         this.cachestring = toolName + "." + toolField + "." + toolValue;
         var self = this;
@@ -447,21 +331,8 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
                             historyData.push(resultmap);
                         });
                         this.prepareSummaryDetail(data.data.summary);
-                        if (data.data.timelag.length > 0) {
-                            var tempArr = []
-                            for (var element of data.data.timelag) {
-                                for (var key in element) {
-                                    this.timelagData = { 'Tools': key, 'HandoverTime': element[key] }
-                                    tempArr.push(this.timelagData)
-                                }
-                            }
-
-                            this.toolTimelagArray = tempArr
-
-                            if (this.toolTimelagArray.length > 0) {
-                                this.isEnable = true;
-                            }
-                            this.timelagDataSource = this.toolTimelagArray;
+                        if (data.data.combinedSummary.length > 0) {
+                            this.list1 = data.data.combinedSummary;
                         }
                         this.traceabilityData = data;
                         this.constructObject(this.traceabilityData);
@@ -497,7 +368,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
         this.list = [];
         let custMap = {};
         this.traceabilityData.data.pipeline.map(element => {
-            element["moddate"] = new Date(element.timestamp);
+            //element["moddate"] = new Date(element.timestamp*1000);
             if (custMap[element.toolName]) {
                 let list = [...custMap[element.toolName]];
                 list.push(element);
@@ -567,6 +438,8 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
             this.pipeheight = this.pipeheight < l.child.length ? l.child.length : this.pipeheight;
         })
 
+       // console.log(this.list)
+        //this.list1.push(this.list[0]);
     }
 
     sortArray(list) {
@@ -612,21 +485,8 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
                             historyData.push(resultmap);
                         });
                         this.prepareSummaryDetail(data.data.summary);
-                        if (data.data.timelag.length > 0) {
-                            var tempArr = []
-                            for (var element of data.data.timelag) {
-                                for (var key in element) {
-                                    this.timelagData = { 'Tools': key, 'HandoverTime': element[key] }
-                                    tempArr.push(this.timelagData)
-                                }
-                            }
-
-                            this.toolTimelagArray = tempArr
-
-                            if (this.toolTimelagArray.length > 0) {
-                                this.isEnable = true;
-                            }
-                            this.timelagDataSource = this.toolTimelagArray;
+                        if (data.data.combinedSummary.length > 0) {
+                            this.list1 = data.data.combinedSummary;
                         }
                         this.traceabilityData = data;
                         this.workflow();
@@ -643,10 +503,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
                     this.isDatainProgress = false;
                 }
             });
-
-
-
-    }
+}
 
     eventLeave() {
         this.showModel = null;
@@ -697,7 +554,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
             width: '85%',
             height: '70%',
             disableClose: true,
-            data: { toolName: toolName, cachestring: dialogData, showToolDetail: true }
+            data: { toolName: toolName, cachestring: dialogData, showToolDetail: true, showSearch: true }
         });
     }
 
@@ -708,7 +565,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
             width: '35%',
             height: '50%',
             disableClose: true,
-            data: { cardData: dialogData, index: index, showCardDetail: true }
+            data: { cardData: dialogData, index: index, showCardDetail: true, showSearch: false }
         });
     }
 

@@ -15,17 +15,15 @@
  ******************************************************************************/
 package com.cognizant.devops.auditservice.audit.service;
 
+import static com.cognizant.devops.platformauditing.util.AuditServiceUtil.parseHistory;
+import static com.cognizant.devops.platformauditing.util.AuditServiceUtil.parseOutput;
+
 import com.cognizant.devops.platformauditing.api.InsightsAudit;
 import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonObject;
 
-import static com.cognizant.devops.platformauditing.util.AuditServiceUtil.parseHistory;
-import static com.cognizant.devops.platformauditing.util.AuditServiceUtil.parseOutput;
-
-import org.springframework.stereotype.Service;
-
-@Service("auditService")
+//@Service("auditService")
 public class AuditServiceImpl implements  AuditService{
 
     InsightsAudit insightAudit = new InsightsAuditImpl();

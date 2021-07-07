@@ -25,7 +25,6 @@ import com.cognizant.devops.engines.platformdataarchivalengine.modules.aggregato
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.modules.aggregator.EngineAggregatorModule;
 import com.cognizant.devops.engines.platformengine.modules.correlation.EngineCorrelatorModule;
-import com.cognizant.devops.engines.platformengine.modules.mapper.ProjectMapperModule;
 import com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing.OfflineDataProcessingExecutor;
 import com.cognizant.devops.engines.platformwebhookengine.offlineprocessing.WebhookOfflineEventProcessing;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
@@ -37,8 +36,7 @@ import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 /**
  * Engine execution will start from Application. 1. Load the iSight config 2.
  * Initialize Publisher and subscriber modules which receive data from tool 3.
- * Initialize Correlation Module. 4. Initialize ProjectMapperModule Module 5.
- * Initialize DataPurgingExecutor Module 6. Initialize
+ * Initialize Correlation Module. 4. Initialize ProjectMapperModule Module  6. Initialize
  * OfflineDataProcessingExecutor Module 7. Log Engine Health data in DB
  */
 public class Application implements ApplicationConfigInterface {
@@ -57,7 +55,7 @@ public class Application implements ApplicationConfigInterface {
 
 			ApplicationConfigInterface.loadConfiguration();
 
-			ApplicationConfigCache.updateLogLevel(LogLevelConstants.PlatformEngine);
+			ApplicationConfigCache.updateLogLevel(LogLevelConstants.PLATFORMENGINE);
 
 			// Subscribe for desired events. This used to consume data from tool queue.
 			Timer timerEngineAggregator = new Timer("EngineAggregatorModule");
@@ -73,12 +71,6 @@ public class Application implements ApplicationConfigInterface {
 					ApplicationConfigProvider.getInstance().getSchedulerConfigData().getEngineCorrelatorModuleInterval()
 							* 60 * 1000);
 
-			// Schedule the Project Mapping Module.
-			Timer timerProjectMapperModule = new Timer("ProjectMapperModule");
-			TimerTask projectMapperModuleTrigger = new ProjectMapperModule();
-			timerProjectMapperModule.schedule(projectMapperModuleTrigger, 0,
-					ApplicationConfigProvider.getInstance().getSchedulerConfigData().getProjectMapperModuleInterval()
-							* 60 * 1000);
 
 			// Schedule the OfflineDataProcessingExecutor job
 			Timer timerOfflineDataProcessingExecutor = new Timer("OfflineDataProcessingExecutor");
