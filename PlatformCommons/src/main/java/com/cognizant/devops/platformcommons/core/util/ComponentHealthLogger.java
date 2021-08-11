@@ -31,7 +31,7 @@ public abstract class ComponentHealthLogger {
 	private static final Logger log = LogManager.getLogger(ComponentHealthLogger.class);
 	private  static final String TIMEZONE = "GMT";
 	
-	public boolean createComponentStatusNode(String label,String version,String message,String status,Map<String,String> parameter){
+	public boolean createComponentStatusNode(String label,String version,String message,String status,Map<String,String> parameter) {
 		JsonObject response = null;
 		try {
 			String utcdate = InsightsUtils.getUtcTime(TIMEZONE);
@@ -50,7 +50,8 @@ public abstract class ComponentHealthLogger {
 			dataList.add(jsonObj);
 			response = SystemStatus.addSystemInformationInNeo4j(version, dataList, labels);
 		} catch (Exception e) {
-			log.error("Unable to create Node{} ",e.getMessage());
+			log.error("Unable to create service health Node {} ",e.getMessage());
+			throw new RuntimeException(e.getMessage());
 		}
 		if (response!=null) {
 			return Boolean.TRUE;

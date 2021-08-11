@@ -28,6 +28,7 @@ import javax.net.ssl.X509TrustManager;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
+import org.apache.log4j.MDC;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.util.Assert;
@@ -36,6 +37,7 @@ import org.springframework.web.WebApplicationInitializer;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
+import com.cognizant.devops.platformcommons.constants.LogMessageConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.masterdata.ProcessMasterData;
@@ -51,24 +53,41 @@ public class PlatformServiceInitializer implements WebApplicationInitializer {
 
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
+		long startTime = System.currentTimeMillis();
 		try {
+			MDC.put(LogMessageConstants.TYPE, LogMessageConstants.SERVICEINITIALIZATIONTYPE);
+			MDC.put(LogMessageConstants.PROCESSINGTIME, 0);
+			MDC.put(LogMessageConstants.TRACEID, "-");
+			MDC.put(LogMessageConstants.ENDPOINT, "-");
+			MDC.put(LogMessageConstants.HTTPMETHOD, "-");
 			log.debug("Inside PlatformServiceInitializer onStartup ============================ ");
+			
 			loadServerConfig();
+			
 			ApplicationConfigCache.updateLogLevel(LogLevelConstants.PLATFORMSERVICE);
+			
+			validateAutheticationProtocol();
+			
 			disableSslVerification();
-
+			
 			ProcessMasterData processMasterData = new ProcessMasterData();
 			processMasterData.executeMasterDataProcessing();
 
-			validateAutheticationProtocol();
 			servletContext.addFilter("InsightsResponseHeaderWriter", InsightsResponseHeaderWriterFilter.class)
 					.addMappingForUrlPatterns(null, false, "/*");
+			
 			PlatformServiceStatusProvider.getInstance().createPlatformServiceStatusNode(
 					"PlatformService Started Successfully", PlatformServiceConstants.SUCCESS);
 		} catch (Exception e) {
+			log.debug(" Error in starting PlatformService ",e);
 			PlatformServiceStatusProvider.getInstance().createPlatformServiceStatusNode(
 					"Error in starting PlatformService", PlatformServiceConstants.FAILURE);
 			Assert.isTrue(Boolean.FALSE, "Error in starting PlatformService " + e.getMessage());
+		}finally {
+			long processingTime = System.currentTimeMillis() - startTime;
+			MDC.put(LogMessageConstants.PROCESSINGTIME, processingTime);
+			log.debug("Inside PlatformServiceInitializer onStartup completed ============================ ");
+			MDC.put(LogMessageConstants.PROCESSINGTIME, 0);
 		}
 
 	}

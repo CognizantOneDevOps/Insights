@@ -1,0 +1,23 @@
+{
+   "isOnlineRegistration":"true",
+   "onlineRegistrationMode":"nexus",
+   "offlineAgentPath": "C:/downloads/Agents",
+   "unzipPath": "C:/agents/PlatformAgents",
+   "agentExchange":"iAgent",
+   "agentPkgQueue":"INSIGHTS.AGENTS.PACKAGE",
+   "browseRepoUrl":"",
+   "downloadRepoUrl":"",
+   "agentManagement":"Agent Management",
+   "osName":"Windows",
+   "version":"v8.0",
+   "typeName":"Agent",
+   "toolName":"dummydata",
+   "mqUser":"",
+   "mqPassword":"",
+   "agentId":"agent_dummy_data",
+   "dataLabelName":"DUMMY.DUMMYDATA.DATA",
+   "healthLabelName":"DUMMY.DUMMYDATA.HEALTH",
+   "trackingJson":"",
+   "healthQueueName":"DUMMY_DUMMYDATA_HEALTH",
+   "dataQueueName":"DUMMY_DUMMYDATA_DATA"
+}

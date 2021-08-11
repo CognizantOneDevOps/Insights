@@ -56,8 +56,10 @@ public class InsightsAuthenticationFilter extends AbstractAuthenticationProcessi
 		log.debug(" Inside InsightsAuthenticationFilter, attemptAuthentication ==== ");
 		Authentication authentication = null;
 		InsightsAuthenticationTokenUtils authenticationtokenUtils = new InsightsAuthenticationTokenUtils();
-
-		if (ApplicationConfigProvider.getInstance().getAutheticationProtocol().equalsIgnoreCase("SAML")) {
+		if(AuthenticationUtils.WEB_IGNORE_URLS.contains(request.getPathInfo())) {
+			authentication= new InsightsAuthenticationToken("", null, null,null);
+			return authentication;
+		}else if (ApplicationConfigProvider.getInstance().getAutheticationProtocol().equalsIgnoreCase("SAML")) {
 			authentication = authenticationtokenUtils.authenticateSAMLData(request, response);
 		} else if (AuthenticationUtils.IS_NATIVE_AUTHENTICATION) {
 			authentication = authenticationtokenUtils.authenticateGrafanaJWTData(request, response);

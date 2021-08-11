@@ -112,5 +112,10 @@
 "agentVersion": "v7.2",
 "labelName": "JENKINS",
 "toolName" : "JENKINS",
-"auditing": false
+"auditing": false,
+"enableProxy":false,
+"proxies":{
+    	"http":"",
+    	"https":""
+    }
 }

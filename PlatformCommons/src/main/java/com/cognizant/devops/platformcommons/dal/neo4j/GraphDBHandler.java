@@ -268,14 +268,14 @@ public class GraphDBHandler{
 			Set<String> queryList = getQueryListFromRequestJson(requestJson);
 			log.debug(
 					"Type=GraphDB className={} methodName={} lineNo={} "
-							+ "Datasource={} ProcessingTime={} rowCount={} queryList={}",
+							+ " Datasource={} processingTime={} rowCount={} queryList={}",
 					stackTrace.getFileName(), stackTrace.getMethodName(), stackTrace.getLineNumber(),
 					ApplicationConfigProvider.getInstance().getGraph().getEndpoint(), processingTime, rowCount,
 					queryList);
 		} else {
 			log.debug(
 					"Type=GraphDB className={} methodName={} lineNo={} "
-							+ "Datasource={} ProcessingTime={} rowCount={} ",
+							+ "Datasource={} processingTime={} rowCount={} ",
 					stackTrace.getFileName(), stackTrace.getMethodName(), stackTrace.getLineNumber(),
 					ApplicationConfigProvider.getInstance().getGraph().getEndpoint(), processingTime, rowCount);
 		}
@@ -287,7 +287,7 @@ public class GraphDBHandler{
 	void parseGraphResponseForError(JsonObject graphResponse,String requestJson) throws InsightsCustomException {
 		JsonArray errorMessage = graphResponse.getAsJsonArray("errors");
 		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-		StackTraceElement stackTrace = stacktrace[4];//maybe this number needs to be corrected
+		StackTraceElement stackTrace = stacktrace[4];
 		if (errorMessage != null && errorMessage.size() >= 1) {
 			for (JsonElement jsonElement : errorMessage) {
 				String errorMessageText = jsonElement.getAsJsonObject().get("message").getAsString();

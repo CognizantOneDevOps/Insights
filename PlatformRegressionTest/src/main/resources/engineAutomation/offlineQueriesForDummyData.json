@@ -1,0 +1,26 @@
+[
+   {
+      "queryName":"Process Jira issues for Sprint relations",
+      "cypherQuery":"match (n:JIRA:DATA) where exists(n.sprints) AND not exists(n.sprintProcessed) WITH distinct n limit 2000 set n.sprintProcessed=true WITH n, n.sprints as sprints UNWIND sprints as sprint WITH distinct sprint, collect(distinct n) as issues  MATCH (s:SPRINT {sprintId: (sprint)}) foreach (n in issues | MERGE (s)-[r:SPRINT_HAS_ISSUES]->(n) set r.offlineProcessed=true) return count(*)",
+      "runSchedule":30,
+      "lastExecutionTime":"2020/12/15 06:15 AM",
+      "recordsProcessed":0,
+      "queryProcessingTime":8
+   },
+   {
+      "queryName":"Add issues to the EPIC's relation ",
+      "cypherQuery":"MATCH (issues:JIRA:DATA) where exists (issues.epicKey) AND NOT exists (issues.epicsRelationProcessed) with issues limit 2000 SET issues.epicsRelationProcessed=true WITH issues MATCH (epic:JIRA:DATA) WHERE epic.key=issues.epicKey MERGE (epic)-[r:EPIC_HAS_ISSUES] ->(issues) set r.offlineProcessed=true return count(*)",
+      "runSchedule":30,
+      "lastExecutionTime":"2020/12/15 09:15 AM",
+      "recordsProcessed":0,
+      "queryProcessingTime":109
+   },
+   {
+      "queryName":"REQUIREMNT TO TEST CASE relation ",
+      "cypherQuery":"MATCH (testCase:QTEST:DATA) where exists (testCase.requirementId) AND NOT exists (testCase.requirementsRelationProcessed) with testCase limit 2000 SET testCase.requirementsRelationProcessed=true WITH testCase MATCH (requirement:QTEST:DATA) WHERE requirement.requirement_id=testCase.requirementId MERGE (requirement)-[r:REQUIREMENT_HAS_TESTCASE] ->(testCase) set r.offlineProcessed=true return count(*)",
+      "runSchedule":30,
+      "lastExecutionTime":"2020/12/15 09:15 AM",
+      "recordsProcessed":0,
+      "queryProcessingTime":109
+   }
+]

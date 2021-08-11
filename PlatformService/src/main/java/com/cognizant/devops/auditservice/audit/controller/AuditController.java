@@ -47,7 +47,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 @RestController
-@Conditional(InsightsAuditInitializationCondition.class)
+//@Conditional(InsightsAuditInitializationCondition.class)
 @RequestMapping("traceability")
 public class AuditController {
 	private static Logger Log = LogManager.getLogger(AuditController.class);

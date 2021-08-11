@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,7 +47,7 @@ public class MinMaxCategoryImpl extends BaseContentCategoryImpl {
 	 */
 	@Override
 	public void generateContent() {
-
+		long startTime = System.nanoTime();
 		List<InsightsKPIResultDetails> inferenceResults = getKPIExecutionResult();
 		InsightsContentDetail contentResult = null;
 		if (!inferenceResults.isEmpty()) {
@@ -61,6 +62,13 @@ public class MinMaxCategoryImpl extends BaseContentCategoryImpl {
 					contentConfigDefinition.getCategory(), contentConfigDefinition.getKpiId(),
 					contentResult.getInferenceText());
 			saveContentResult(contentResult);
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "ContentResult :" + contentConfigDefinition.getNoOfResult());
 		}
 	}
 
@@ -94,7 +102,7 @@ public class MinMaxCategoryImpl extends BaseContentCategoryImpl {
 		String comparisonField = getResultFieldFromContentDefination();
 
 		try {
-
+			long startTime = System.nanoTime();
 			InsightsKPIResultDetails minResultObject = Collections.min(inferenceResults,
 					Comparator.comparing(e -> (double) e.getResults().get(comparisonField)));
 			//double minValue = (double) minResultObject.getResults().get(comparisonField);
@@ -103,7 +111,7 @@ public class MinMaxCategoryImpl extends BaseContentCategoryImpl {
 			ReportEngineEnum.KPISentiment sentiment = ReportEngineEnum.KPISentiment.NEUTRAL;
 			InsightsKPIResultDetails resultFirstData = inferenceResults.get(0);
 			addTimeValueinResult(resultValuesMap, contentConfigDefinition.getSchedule());
-			String result = getResultValueForDisplay(minResultObject.getResults().get(comparisonField));
+			String result = getResultValueForDisplay(minResultObject.getResults().get(comparisonField));			
 			resultValuesMap.put("result", result);
 			resultValuesMap.put("minDate", dateOfMinValue);
 
@@ -121,11 +129,24 @@ public class MinMaxCategoryImpl extends BaseContentCategoryImpl {
 				log.debug(" inference text is null in category Min KPIId {} contentId {} result {} ",
 						getContentConfig().getKpiId(), getContentConfig().getContentId(), resultFirstData);
 			}
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "ContentResult :" + contentConfigDefinition.getNoOfResult());
 		} catch (Exception e) {
 			log.error(e);
-			log.error(" Errro while content processing for Min-Max KPIId {} contentId {} ",
+			log.error(" Error while content processing for Min-Max KPIId {} contentId {} ",
 					getContentConfig().getKpiId(), getContentConfig().getContentId());
-			throw new InsightsJobFailedException("Errro while content processing for Min-Max KPIId {} contentId {} " + e.getMessage());
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),0,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() + "Error while content processing for Min-Max" +e.getMessage()); 
+			
+			throw new InsightsJobFailedException("Error while content processing for Min-Max KPIId {} contentId {} " + e.getMessage());
 		}
 		
 
@@ -145,7 +166,7 @@ public class MinMaxCategoryImpl extends BaseContentCategoryImpl {
 		String comparisonField = getResultFieldFromContentDefination();
 
 		try {
-
+			long startTime = System.nanoTime();
 			InsightsKPIResultDetails maxResultObject = Collections.max(inferenceResults,
 					Comparator.comparing(e -> (double) e.getResults().get(comparisonField)));
 			//double maxValue = (double) maxResultObject.getResults().get(comparisonField);
@@ -173,10 +194,24 @@ public class MinMaxCategoryImpl extends BaseContentCategoryImpl {
 				log.debug(" inference text is null in category Max KPIId {} contentId {} result {} ",
 						getContentConfig().getKpiId(), getContentConfig().getContentId(), resultFirstData);
 			}
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "ContentResult :" + contentConfigDefinition.getNoOfResult());
+			
 		} catch (Exception e) {
 			log.error(e);
-			log.error(" Errro while content processing for category Min-Max KPIId {} contentId {} ",
+			log.error(" Error while content processing for category Min-Max KPIId {} contentId {} ",
 					getContentConfig().getKpiId(), getContentConfig().getContentId());
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),0,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "ContentResult :" + contentConfigDefinition.getNoOfResult() + " Error while content processing for category Min-Max" + e.getMessage() );
 		}
 
 		return inferenceContentResult;

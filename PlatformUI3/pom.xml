@@ -5,14 +5,14 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>8.2</version>
+		<version>8.3</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformUI3</artifactId>
-	<version>8.2</version>
+	<version>8.3</version>
 	<name>PlatformUI3</name>
 
 	<repositories>
@@ -34,7 +34,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
-			<version>1.19</version>
+			<version>1.21</version>
 		</dependency>
 	</dependencies>
 	<build>

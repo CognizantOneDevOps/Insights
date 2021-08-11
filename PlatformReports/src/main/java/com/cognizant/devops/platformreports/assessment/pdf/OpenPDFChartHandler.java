@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -74,6 +75,7 @@ public class OpenPDFChartHandler implements BasePDFProcessor {
 	
 	private void prepareAndExportPDFFile(InsightsAssessmentConfigurationDTO assessmentReportDTO) {
 		try {
+			long startTime = System.nanoTime();
 			Set<String> headerList = new LinkedHashSet<>();
 			List<String> rowValueList = new ArrayList<>();
 			JsonArray kpiResultArray = assessmentReportDTO.getVisualizationResult();
@@ -96,10 +98,16 @@ public class OpenPDFChartHandler implements BasePDFProcessor {
 			}
 			
 			exportPDFFile(headerList, rowValueList, assessmentReportDTO);
-			
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-","-","-",processingTime ,
+					"Preparedpdf data");
 
 		} catch (Exception e) {
 			log.error("Workflow Detail ==== error while processing pdf data  ", e);
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-","-","-",0 ,
+					"unable to prepare pdf data" +e.getMessage());
 			throw new InsightsJobFailedException(" unable to prepare pdf data " + e);
 		}
 		

@@ -17,7 +17,10 @@ package com.cognizant.devops.platformreports.assessment.content;
 
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsContentConfig;
 import com.cognizant.devops.platformreports.assessment.dal.ReportPostgresDataHandler;
 import com.cognizant.devops.platformreports.assessment.datamodel.ContentConfigDefinition;
@@ -26,6 +29,7 @@ import com.cognizant.devops.platformreports.exception.InsightsJobFailedException
 import com.google.gson.JsonArray;
 
 public class ContentExecutor implements Callable<Integer> {
+	private static Logger log = LogManager.getLogger(ContentExecutor.class);
 
 	private ContentConfigDefinition _contentConfigDTO;
 	
@@ -51,6 +55,7 @@ public class ContentExecutor implements Callable<Integer> {
 	}
 	
 	public static JsonArray executeContentJob(List<InsightsContentConfig> contentConfigList, InsightsKPIConfigDTO kpiConfigDTO) {
+		long startTime = System.nanoTime();
 		ReportPostgresDataHandler contentProcessing = new ReportPostgresDataHandler();
 		AssessmentReportContentProcesser contentProcessor = new AssessmentReportContentProcesser();
 		JsonArray failedContentJobs = new JsonArray();
@@ -64,14 +69,22 @@ public class ContentExecutor implements Callable<Integer> {
 					contentConfigDefinition.setSchedule(kpiConfigDTO.getSchedule());
 					contentConfigDefinition.setWorkflowId(kpiConfigDTO.getWorkflowId());
 					contentConfigDefinition.setReportId(kpiConfigDTO.getReportId());
-					contentConfigDefinition.setAssessmentId(kpiConfigDTO.getAssessmentId());
+					contentConfigDefinition.setAssessmentId(kpiConfigDTO.getAssessmentId());									
 					contentProcessor.executeContentData(contentConfigDefinition);
-				} else {
+					long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+					log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+							contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+							contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
+							" ContentId :" + contentConfigDefinition.getContentId() + " ContentName :" +contentConfigDefinition.getContentName() +
+							" action :" + contentConfigDefinition.getAction() 
+							+ " ContentResult :" + contentConfigDefinition.getNoOfResult());
+					
+				} else {					
 					throw new InsightsJobFailedException("Content execution failed");
 				}
-			} catch (InsightsJobFailedException e) {		
+			} catch (InsightsJobFailedException e) {	
 				
-				failedContentJobs.add(contentConfig.getContentId());
+				failedContentJobs.add(contentConfig.getContentId());				
 			}
 		}
 		return failedContentJobs;

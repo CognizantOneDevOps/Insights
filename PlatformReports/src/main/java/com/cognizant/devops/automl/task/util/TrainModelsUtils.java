@@ -192,7 +192,7 @@ public class TrainModelsUtils {
 			} else {
 				log.error("AutoML Executor === unable to parse data");
 				throw new InsightsCustomException("Error parsing data: " + usecase);
-			}
+			}			
 		} else {
 			log.error("Unable to upload data");
 			throw new InsightsCustomException("Error uploading data: " + usecase);

@@ -4,14 +4,14 @@
 	<Appenders>
 		<Console name="Console" >
 			<PatternLayout
-				pattern="t=%d{yyyy-MM-dd HH:mm:ss} lvl=%p [%t]:%c{1}.%M()%L :: message=%m%n" />
+				pattern="t=%d{yyyy-MM-dd HH:mm:ss:SSS} lvl=%p fileName=%c{1} methodName=%M() lineno=%L Type=%X{Type} traceId=%X{traceId} method=%X{httpMethod} endpoint=%X{endpoint} processingTime=%X{processingTime} message=%m%n" />
 		</Console>
 
 		<RollingFile name="PlatformService"
 			filename="${env:INSIGHTS_HOME}/logs/PlatformService/platformService.log"
 			filepattern="${env:INSIGHTS_HOME}/logs/PlatformService/platformService-%i.log">
 			<PatternLayout
-				pattern="t=%d{yyyy-MM-dd HH:mm:ss} lvl=%p [%t]:%c{1}.%M()%L :: message=%m%n" />
+				pattern="t=%d{yyyy-MM-dd HH:mm:ss:SSS} lvl=%p fileName=%c{1} methodName=%M() lineno=%L Type=%X{Type} traceId=%X{traceId} method=%X{httpMethod} endpoint=%X{endpoint} processingTime=%X{processingTime} message=%m%n" />
 			<Policies>
 				<SizeBasedTriggeringPolicy size="10 MB" />
 			</Policies>
@@ -87,6 +87,10 @@
 		</Logger>
 		
 		<Logger name="org.hibernate.stat" level="error" additivity="false">
+			<AppenderRef ref="Console" />
+		</Logger>
+		
+		<Logger name="org.springframework.web.servlet" level="error" additivity="false">
 			<AppenderRef ref="Console" />
 		</Logger>
 		

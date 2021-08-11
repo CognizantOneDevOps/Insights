@@ -29,6 +29,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -112,7 +113,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			String reportExecutionFile = AssessmentReportAndWorkflowConstants.REPORT_PDF_EXECUTION_RESOLVED_PATH + folderName;
 			assessmentReportDTO.setPdfReportDirPath(reportExecutionFile);
 			File reportExecutionFolder = new File(reportExecutionFile);
-			reportExecutionFolder.mkdir();
+			reportExecutionFolder.mkdir();			
 		} catch (Exception e) {
 			log.error(e);
 			throw new InsightsJobFailedException(
@@ -123,7 +124,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 
 	private void prepareAndExportPDFFile(InsightsAssessmentConfigurationDTO assessmentReportDTO) {
 		try {
-			
+			long startTime = System.nanoTime();
 			GrafanaDashboardPdfConfig grafanaDashboardPdfConfig = grafanaDashboardConfigDAL.fetchGrafanaDashboardDetailsByWorkflowId(assessmentReportDTO.getWorkflowId());
 			log.debug("Worlflow Detail ==== GrafanaDashboardPdfConfig from UI ===== {} ",grafanaDashboardPdfConfig);
 			assessmentReportDTO.setAsseementreportname(grafanaDashboardPdfConfig.getTitle());
@@ -137,11 +138,22 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 				}else {
 					printableDashboardAsPdf(assessmentReportDTO,grafanaDashboardPdfConfig, exportedFilePath);
 				}
-
+				long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
 				log.debug("Worlflow Detail ==== PDF generation completed for Type : ===== {} ",pdfType);
+				log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+						assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),
+						grafanaDashboardPdfConfig.getWorkflowConfig().getWorkflowType(),"-","-",processingTime,
+						" PDFType: " + grafanaDashboardPdfConfig.getPdfType() +
+						" Schedule: " +grafanaDashboardPdfConfig.getScheduleType() +
+						" Source: " +grafanaDashboardPdfConfig.getSource() +
+						" Status: " +grafanaDashboardPdfConfig.getStatus() +
+						" PDF generation completed");
 			}
 		} catch (Exception e) {
 			log.error("Workflow Detail ==== error while processing pdf data ", e);
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),
+					"-","-","-",0," unable to prepare pdf data " + e.getMessage());
 			throw new InsightsJobFailedException(" unable to prepare pdf data " + e);
 		}
 
@@ -164,6 +176,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 		String grafanaUrl = config.getAsJsonObject().get("dashUrl").getAsString().replace("<GRAFANA_URL>", grafanaEndpoint);
 		Playwright playwright = Playwright.create();
 		try {
+			long startTime = System.nanoTime();
 			BrowserType browserType = 	playwright.chromium();
 			LaunchOptions launchOptions = new LaunchOptions();
 			launchOptions.withHeadless(true);
@@ -271,14 +284,28 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 
 			saveToVisualizationContaner(assessmentReportDTO, pdf);
 			updateReportStatus(grafanaDashboardPdfConfig);
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),
+					grafanaDashboardPdfConfig.getWorkflowConfig().getWorkflowType(),"-","-",processingTime,
+					" PDFType: " + grafanaDashboardPdfConfig.getPdfType() +
+					" Schedule: " +grafanaDashboardPdfConfig.getScheduleType() +
+					" Source: " +grafanaDashboardPdfConfig.getSource() +
+					" Status: " +grafanaDashboardPdfConfig.getStatus());
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== Grafana Dashboard export as PDF Completed with error {} ", e.getMessage());
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),
+					"-","-","-",0," Grafana Dashboard export as PDF Completed with error " + e.getMessage());
 			throw new InsightsJobFailedException(e.getMessage());
 		}finally {
 			try {
 				playwright.close();
 			} catch (Exception e) {
 				log.error("Worlflow Detail ==== Unable to close Playwright {} ", e.getMessage());
+				log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+						assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),
+						"-","-","-",0," Unable to close Playwright " + e.getMessage());
 			}
 		}
 
@@ -294,6 +321,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 	private synchronized void printableDashboardAsPdf(InsightsAssessmentConfigurationDTO assessmentReportDTO, GrafanaDashboardPdfConfig grafanaDashboardPdfConfig, String exportedFilePath) {
 		Playwright playwright = Playwright.create();
 		try {
+			long startTime = System.nanoTime();
 			JsonParser jsonParser = new JsonParser();
 			JsonElement config = jsonParser.parse(grafanaDashboardPdfConfig.getDashboardJson());
 			String grafanaEndpoint = getGrafanaEndPoint();
@@ -371,14 +399,28 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			savePDFFile(extractedPdfFile, pdf);
 			saveToVisualizationContaner(assessmentReportDTO, pdf);
 			updateReportStatus(grafanaDashboardPdfConfig);
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),
+					grafanaDashboardPdfConfig.getWorkflowConfig().getWorkflowType(),"-","-",processingTime,
+					" PDFType: " + grafanaDashboardPdfConfig.getPdfType() +
+					" Schedule: " +grafanaDashboardPdfConfig.getScheduleType() +
+					" Source: " +grafanaDashboardPdfConfig.getSource() +
+					" Status: " +grafanaDashboardPdfConfig.getStatus());
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== Grafana Dashboard export as Printable PDF Completed with error {} ", e.getMessage());
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),
+					"-","-","-",0," Grafana Dashboard export as Printable PDF Completed with error " + e.getMessage());
 			throw new InsightsJobFailedException(e.getMessage());
 		}finally {
 			try {
 				playwright.close();
 			} catch (Exception e) {
 				log.error("Worlflow Detail ==== Unable to close Playwright {} ", e.getMessage());
+				log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+						assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),
+						"-","-","-",0," Unable to close Playwright " + e.getMessage());
 			}
 		}
 

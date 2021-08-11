@@ -59,9 +59,9 @@ public class DataArchivalAggregatorModule extends TimerTask implements Applicati
 				JsonObject config = (JsonObject) new JsonParser().parse(agentConfig.getAgentJson());
 				JsonObject publishJson = config.get("publish").getAsJsonObject();
 				String dataRoutingKey = publishJson.get("data").getAsString();
-				loggingInfo.put("toolName", config.get("toolName").getAsString());
-				loggingInfo.put("category", config.get("toolCategory").getAsString());
-				loggingInfo.put("agentId", config.get("agentId").getAsString());
+				loggingInfo.put("toolName", String.valueOf(config.get("toolName")));
+				loggingInfo.put("category", String.valueOf(config.get("toolCategory")));
+				loggingInfo.put("agentId", String.valueOf(config.get("agentId")));
 				loggingInfo.put("routingKey", dataRoutingKey);
 				registerDataAggregator(dataRoutingKey);
 				String healthRoutingKey = publishJson.get("health").getAsString();

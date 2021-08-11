@@ -76,7 +76,7 @@ public class ConfigurationFileManagementTest extends LoginAndSelectModule {
 	 * @throws InterruptedException
 	 */
 	@Test(priority = 1)
-	public void navigateToCorrelationBuilderLandingPage() {
+	public void navigateToConfigurationFileManagementLandingPage() {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.navigateToConfigurationLandingPage(), "Landing page is displayed");
 	}

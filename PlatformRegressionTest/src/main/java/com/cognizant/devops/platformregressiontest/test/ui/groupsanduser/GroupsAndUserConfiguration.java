@@ -247,7 +247,7 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 	 * @throws InterruptedException
 	 */
 	@SuppressWarnings("all")
-	public boolean addUser() {
+	public boolean addUser() throws InterruptedException {
 		boolean userAdded = false;
 		redirectButton.click();
 		if (verifyAccessGroupName("Main Org.") && !verifyUserPresent(LoginAndSelectModule.testData.get("userName"))) {
@@ -262,7 +262,7 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 			userName.sendKeys(LoginAndSelectModule.testData.get("userName"));
 			password.sendKeys(LoginAndSelectModule.testData.get("password"));
 			selectRole.click();
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+			Thread.sleep(1000);
 			selectRole(LoginAndSelectModule.testData.get("roleAdmin"));
 			wait.until(ExpectedConditions.elementToBeClickable(saveButton));
 			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
@@ -400,7 +400,7 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 	 */
 	public void selectRole(String roleName) {
 		for (WebElement role : selectRoleList) {
-			log.info("{} role clicked successfully.", role.getText());
+			log.info("{} role is seen successfully.", role.getText());
 			if ((role.getText()).equals(roleName)) {
 				log.info("{} role clicked", roleName);
 				wait.until(ExpectedConditions.elementToBeClickable(role));
@@ -652,6 +652,7 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 	 * @throws InterruptedException
 	 */
 	public boolean searchLoginID(String userName) {
+		searchBoxInLandingPage.clear();
 		searchBoxInLandingPage.sendKeys(userName);
 		try {
 			if (userDetailsTable.isDisplayed()) {

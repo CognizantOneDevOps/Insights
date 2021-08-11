@@ -388,5 +388,10 @@
 	},
 	"labelName": "JIRA",
 	"toolName": "JIRA",
-	"auditing": false
+	"auditing": false,
+	"enableProxy":false,
+  	"proxies":{
+    	"http":"",
+    	"https":""
+    }
 }

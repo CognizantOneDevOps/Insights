@@ -71,7 +71,7 @@ public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandle
 			loggingInfo.put("toolName", toolName);
 			loggingInfo.put("category", categoryName);
 			loggingInfo.put("agentId", agentId);
-			loggingInfo.put("execId", messageJson.get("execId").getAsString());
+			loggingInfo.put("execId",String.valueOf( messageJson.get("execId")));
 			log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Received :{} {} {}",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),"-",loggingInfo.get("execId"), consumerTag, routingKey, message);
 			if (messageJson.has("status")) {
 				healthStatus = messageJson.get("status").getAsString();

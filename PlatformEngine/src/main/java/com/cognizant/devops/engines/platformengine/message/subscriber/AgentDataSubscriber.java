@@ -152,8 +152,8 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 				JsonObject dataWithproperty;
 				for (JsonElement e : asJsonArray) {
 					if (e.isJsonObject()) {
-						dataWithproperty = e.getAsJsonObject();
-						loggingInfo.put("execId", dataWithproperty.get("execId").getAsString());
+						dataWithproperty = e.getAsJsonObject();						
+						loggingInfo.put("execId",String.valueOf(dataWithproperty.get("execId")));
 						// Below Code has the ability to add derived properties as part of Nodes
 						if (Boolean.TRUE.equals(this.isEnrichmentRequired) && e.getAsJsonObject().has(sourceProperty)) {
 							JsonElement sourceElem = e.getAsJsonObject().get(sourceProperty);

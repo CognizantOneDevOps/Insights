@@ -16,6 +16,7 @@
 package com.cognizant.devops.platformworkflow.workflowtask.core;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.PersistenceException;
 
@@ -53,7 +54,7 @@ public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInter
 			initilizeWorkflowTasks();
 			executeImmediateWorkflow();
 		} catch (Exception e) {
-			log.error(e);
+			log.error("Worlflow Detail Error === {}",e.getMessage());
 		}
 
 	}
@@ -64,15 +65,24 @@ public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInter
 	 * publish that in RabbitMq
 	 */
 	public void executeImmediateWorkflow() {
+		long startTime = System.nanoTime();
 		log.debug(" Worlflow Detail ====  Schedular Inside executeImmediateWorkflow  ");
 		InsightsStatusProvider.getInstance().createInsightStatusNode("WorkflowEmmediateJobExecutor started. ",
 				PlatformServiceConstants.SUCCESS);
 		List<InsightsWorkflowConfiguration> readyToRunWorkflow = workflowProcessing.getImmediateWorkFlowConfigs();
-
+       //same label with diff statis in case of error		
+		String workflowId ="-";
+		String workflowType= "-";
+		String status= "-";
+		Long lastRuntime = null;
+		Long nextRuntime = null;
+		String schedule= "-";
+		long executionId = System.currentTimeMillis();		
+		long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
 		if (!readyToRunWorkflow.isEmpty()) {
 			for (InsightsWorkflowConfiguration workflowConfig : readyToRunWorkflow) {
 				try {
-					long executionId = System.currentTimeMillis();
+					executionId = System.currentTimeMillis();
 					log.debug(" Worlflow Detail ==== WorkflowImmediateJobExecutor workflowId {} executionId {}  ",
 							workflowConfig.getWorkflowId(), executionId);
 					InsightsWorkflowTaskSequence firstworkflowTask = workflowProcessing
@@ -82,9 +92,15 @@ public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInter
 							firstworkflowTask.getWorkflowTaskEntity().getTaskId(), firstworkflowTask.getNextTask(),
 							firstworkflowTask.getSequence(), mqRequestJson);
 					workflowProcessing.publishMessageInMQ(firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),
-							mqRequestJson);
+							mqRequestJson);		
+							
 					Thread.sleep(1);
+					log.debug("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetryCount={} processingTime={} message={}"
+							,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),firstworkflowTask.getWorkflowTaskEntity().getDescription(),firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),workflowConfig.getStatus(),"-"
+							,"-",workflowConfig.getScheduleType(),"-",processingTime,"-");
+
 				} catch (WorkflowTaskInitializationException  | PersistenceException e) {
+					   //same label with diff statis in case of error
 					log.debug(" Worlflow Detail ====  workflow failed to execute due to MQ exception {}  ",
 							workflowConfig.getWorkflowId());
 					InsightsStatusProvider.getInstance()
@@ -92,7 +108,11 @@ public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInter
 									+ workflowConfig.getWorkflowId(), PlatformServiceConstants.FAILURE);
 					workflowProcessing.updateWorkflowDetails(workflowConfig.getWorkflowId(),
 							WorkflowTaskEnum.WorkflowStatus.TASK_INITIALIZE_ERROR.toString(), false);
+					log.debug("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetryCount={} processingTime={} message={}"
+							,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),"-","-",workflowConfig.getStatus(),"-"
+							,"-",workflowConfig.getScheduleType(),"-",processingTime,e.getMessage());				
 				}catch(InterruptedException e) {
+					   //same label with diff statis in case of error
 					log.debug(" Worlflow Detail ====  workflow failed to execute due to InterruptedException {}  ",
 							workflowConfig.getWorkflowId());
 					InsightsStatusProvider.getInstance()
@@ -101,7 +121,11 @@ public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInter
 					workflowProcessing.updateWorkflowDetails(workflowConfig.getWorkflowId(),
 							WorkflowTaskEnum.WorkflowStatus.TASK_INITIALIZE_ERROR.toString(), false);
 					Thread.currentThread().interrupt();
+					log.debug("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetryCount={} processingTime={} message={}"
+							,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),"-","-",workflowConfig.getStatus(),"-"
+							,"-",workflowConfig.getScheduleType(),"-",processingTime,e.getMessage());					
 				}catch (Exception e) {
+					   //same label with diff statis in case of error
 					log.error(e);
 					log.debug(" Worlflow Detail ====  workflow failed to execute due exception {}  ",
 							workflowConfig.getWorkflowId());
@@ -110,13 +134,18 @@ public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInter
 									+ workflowConfig.getWorkflowId(), PlatformServiceConstants.FAILURE);
 					workflowProcessing.updateWorkflowDetails(workflowConfig.getWorkflowId(),
 							WorkflowTaskEnum.WorkflowStatus.TASK_INITIALIZE_ERROR.toString(), false);
+					log.debug("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetryCount={} processingTime={} message={}"
+							,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),"-","-",workflowConfig.getStatus(),"-"
+							,"-",workflowConfig.getScheduleType(),"-",processingTime,e.getMessage());					
 				}
 			}
 			InsightsStatusProvider.getInstance().createInsightStatusNode("WorkflowImmediateJobExecutor completed. ",
 					PlatformServiceConstants.SUCCESS);
 		} else {
 			log.debug("Worlflow Detail ==== WorkflowImmediateJobExecutor No reports are currently on due to run ");
-
+			log.debug("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetryCount={} processingTime={} message={}"
+					,executionId,workflowId ,workflowType,status ,"-" ,"-" ,schedule,"-",processingTime,"-");
+			
 		}
 	}
 

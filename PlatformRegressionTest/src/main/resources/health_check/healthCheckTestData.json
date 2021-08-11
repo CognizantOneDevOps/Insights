@@ -32,5 +32,17 @@
 	"destinationToolProperties": "repoType, ProgramName, SprintID",
 	"propertyNames": "new_property_01, new_property_02, new_property_03",
 	"serviceCount": 3,
-	"selectToolName": "GIT"
+	"selectToolName": "GIT",
+	"sendEmailEnabled": "",
+	"smtpHostServer": "",
+	"smtpPort": "",
+	"smtpUserName": "",
+	"smtpPassword": "",
+	"isAuthRequired": "",
+	"smtpStarttlsEnable": "",
+	"mailFrom": "",
+	"mailTo": "",
+	"subject": "",
+	"emailBody": "",
+	"systemNotificationSubscriber": ""
 }

@@ -62,10 +62,10 @@ public class DataArchivalDataSubscriber extends EngineSubscriberResponseHandler 
 			message = new String(body, StandardCharsets.UTF_8);
 			JsonArray messageJson = parser.parse(message).getAsJsonObject().get("data").getAsJsonArray();
 			JsonObject updateURLJson = messageJson.get(0).getAsJsonObject();
-			loggingInfo.put("toolName", updateURLJson.get("toolName").getAsString());
-			loggingInfo.put("category", updateURLJson.get("categoryName").getAsString());
+			loggingInfo.put("toolName",String.valueOf(updateURLJson.get("toolName")));
+			loggingInfo.put("category",String.valueOf(updateURLJson.get("categoryName")));
 			loggingInfo.put("agentId", agentId);
-			loggingInfo.put("execId", updateURLJson.get("execId").getAsString());
+			loggingInfo.put("execId",String.valueOf(updateURLJson.get("execId")));
 			if (PlatformServiceConstants.SUCCESS.equalsIgnoreCase(updateURLJson.get("status").getAsString())) {
 				String containerID = updateURLJson.get(DataArchivalConstants.CONTAINERID).getAsString();
 				if (containerID.isEmpty()) {

@@ -235,6 +235,19 @@ public class BulkUploadTest extends BulkUploadTestData {
 		Assert.assertFalse(multipartFile.isEmpty());
 	}
 	
+	@Test(priority = 14)
+	public void testUploadDataWithoutTimesZoneFormatInDatabase() throws InsightsCustomException, IOException {
+		FileInputStream input = new FileInputStream(fileWithoutTimeZoneFormatEpochTimes);
+		MultipartFile multipartFile = new MockMultipartFile("file", fileWithoutTimeZoneFormatEpochTimes.getName(),
+				"text/plain", IOUtils.toByteArray(input));
+		boolean response = bulkUploadService.uploadDataInDatabase(multipartFile, bulkUploadTestData.toolName,
+				bulkUploadTestData.label, bulkUploadTestData.insightTimeField,
+				bulkUploadTestData.insightTimeWithoutTimeZoneFormat);
+		Assert.assertEquals(response, true);
+		Assert.assertFalse(multipartFile.isEmpty());
+		Assert.assertTrue(multipartFile.getSize() < filesizeMaxValue);
+	}
+	
 	@AfterTest
 	public void onDelete(){
 		try {

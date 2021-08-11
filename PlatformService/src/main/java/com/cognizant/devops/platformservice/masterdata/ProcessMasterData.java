@@ -62,9 +62,8 @@ public class ProcessMasterData {
 					}
 				}
 			}
-		} catch (FileNotFoundException e) {
-			log.error(e);
-			log.error("File not found");
+		} catch (Exception e) {
+			log.error("Error While execution master data query ",e);
 		}
 		return masterDataFileCount;
 	}
@@ -110,6 +109,10 @@ public class ProcessMasterData {
 		} catch (IllegalStateException | JsonSyntaxException ex) {
 			log.error(ex);
 			log.error(masterDataFile.getName(), "{} file is not as per expected format ", ex);
+			return Boolean.FALSE;
+		}catch (Exception ex) {
+			log.error(ex);
+			log.error("Exception while processing ", ex);
 			return Boolean.FALSE;
 		}
 		return Boolean.TRUE;

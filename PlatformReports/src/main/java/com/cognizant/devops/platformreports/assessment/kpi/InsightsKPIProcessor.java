@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.logging.log4j.LogManager;
@@ -48,7 +49,6 @@ public class InsightsKPIProcessor {
 	protected InsightsKPIConfigDTO kpiConfigDTO;
 
 	protected ReportGraphDataHandler reportGraphDBHandler = new ReportGraphDataHandler();
-
 	Gson gson = new Gson();
 	JsonParser jsonParser = new JsonParser();
 
@@ -94,8 +94,8 @@ public class InsightsKPIProcessor {
 			}
 
 			log.debug("Worlflow Detail ====  In processKPI for kpiId {} category {} queryModelList {}",
-					kpiDefinition.getKpiId(), kpiDefinition.getCategory(), queryModelList.size());
-
+					kpiDefinition.getKpiId(), kpiDefinition.getCategory(), queryModelList.size());			
+			long startTime = System.nanoTime();
 			for (QueryModel model : queryModelList) {
 				if (kpiDefinition.getCategory().equalsIgnoreCase(ReportEngineUtils.PREDICTION)) {
 					List<JsonObject> result = kPIQueryDataHandler.fetchKPIData(model.getQuery(), kpiDefinition, model);					
@@ -105,10 +105,14 @@ public class InsightsKPIProcessor {
 					listOfResultJson.addAll(kPIQueryDataHandler.fetchKPIData(model.getQuery(), kpiDefinition, model));
 				}
 			}
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					kpiDefinition.getExecutionId(),kpiDefinition.getWorkflowId(),kpiDefinition.getReportId() ,"-",kpiDefinition.getKpiId(),kpiDefinition.getCategory()
+					,processingTime," usecasename: " +kpiDefinition.getUsecaseName() + " schedule: " +kpiDefinition.getSchedule());
+			
 			
 			ReportDataHandler kPIResultDataHandler = ReportDataHandlerFactory
 					.getDataSource(ApplicationConfigProvider.getInstance().getAssessmentReport().getOutputDatasource());
-
 			log.debug("Worlflow Detail ====  Number of record fetch against kpi Id {} is {}", kpiDefinition.getKpiId(),
 					listOfResultJson.size());
 			if (!listOfResultJson.isEmpty()) {
@@ -120,6 +124,9 @@ public class InsightsKPIProcessor {
 			}
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== Some calculation job failed for kpiID -{} " , kpiDefinition.getKpiId(), e);
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					kpiDefinition.getExecutionId(),kpiDefinition.getWorkflowId(),kpiDefinition.getReportId() ,"-",kpiDefinition.getKpiId(),kpiDefinition.getCategory()
+					,0,"usecasename: " +kpiDefinition.getUsecaseName() + "schedule: " +kpiDefinition.getSchedule() + e.getMessage() );
 			throw new InsightsJobFailedException("Something went wrong with KPI query execution " + e.getMessage());
 		}
 		return ReportEngineEnum.StatusCode.SUCCESS.getValue();
@@ -127,6 +134,7 @@ public class InsightsKPIProcessor {
 
 	protected void getQueryWithScheduleDates(long nextRuntime, WorkflowTaskEnum.WorkflowSchedule schedule,
 			String neo4jQuery, long oneTimeEndDate, List<QueryModel> queryModelList) {
+		long startTime = System.nanoTime();
 		QueryModel queryModel = new QueryModel();
 		Map<String, Long> dateReplaceMap = new HashMap<>();
 		long fromDate = InsightsUtils.getStartFromTime(nextRuntime, schedule.name()) - 1;
@@ -142,12 +150,16 @@ public class InsightsKPIProcessor {
 		queryModel.setRecordDate(fromDate);
 		queryModel.setQuery(sub.replace(neo4jQuery));
 		queryModelList.add(queryModel);
-
+		long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+		log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+				kpiConfigDTO.getExecutionId(),kpiConfigDTO.getWorkflowId(),kpiConfigDTO.getReportId() ,"-",kpiConfigDTO.getKpiId(),kpiConfigDTO.getCategory()
+				,processingTime,"queryStartTime: " +fromDate+ "queryEndTime: "+toDate +"schedule: " +kpiConfigDTO.getSchedule());
+		
 	}
 
 	private void getQueryBySchedule(long nextRunTime, WorkflowTaskEnum.WorkflowSchedule schedule, int days,
 			String query, long endTime, List<QueryModel> queryModelList) {
-
+		long startTime = System.nanoTime();
 		Map<String, Long> dateReplaceMap = new HashMap<>();
 		List<String> neo4jQueries = new ArrayList<>();
 		if (days <= 31) {
@@ -168,7 +180,10 @@ public class InsightsKPIProcessor {
 				queryModelList.add(qmodel);
 				startDate = InsightsUtils.addDaysInGivenTime(startDate, 1);
 				endDate = InsightsUtils.addDaysInGivenTime(endDate, 1);
-
+				long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+				log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+						kpiConfigDTO.getExecutionId(),kpiConfigDTO.getWorkflowId(),kpiConfigDTO.getReportId() ,"-",kpiConfigDTO.getKpiId(),kpiConfigDTO.getCategory()
+						,processingTime,"queryStartTime: " +startDate+ "queryEndTime: "+endDate +"schedule: " +kpiConfigDTO.getSchedule());
 			}
 		} else {
 
@@ -189,7 +204,9 @@ public class InsightsKPIProcessor {
 				if (endDayOfTheWeek > endTime) {
 					endDayOfTheWeek = endTime;
 				}
-
+				log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+						kpiConfigDTO.getExecutionId(),kpiConfigDTO.getWorkflowId(),kpiConfigDTO.getReportId() ,"-",kpiConfigDTO.getKpiId(),kpiConfigDTO.getCategory()
+						,0,"queryStartTime: " +startOfTheDayInWeek+ "queryEndTime: "+endDayOfTheWeek +"schedule: " +kpiConfigDTO.getSchedule());
 			}
 		}
 	}

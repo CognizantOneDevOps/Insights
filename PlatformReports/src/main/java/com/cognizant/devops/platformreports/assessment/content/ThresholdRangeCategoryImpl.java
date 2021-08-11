@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,7 +45,7 @@ public class ThresholdRangeCategoryImpl extends BaseContentCategoryImpl {
 	 */
 	@Override
 	public void generateContent() {
-		
+		long startTime = System.nanoTime();
 		List<InsightsKPIResultDetails> inferenceResults = getKPIExecutionResult();
 		InsightsContentDetail contentResult = null;
 		if (!inferenceResults.isEmpty()) {
@@ -59,6 +60,13 @@ public class ThresholdRangeCategoryImpl extends BaseContentCategoryImpl {
 					contentConfigDefinition.getCategory(), contentConfigDefinition.getKpiId(),
 					contentResult.getInferenceText());
 			saveContentResult(contentResult);
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "ContentResult :" + contentConfigDefinition.getNoOfResult());
 		}
 	}
 
@@ -90,7 +98,7 @@ public class ThresholdRangeCategoryImpl extends BaseContentCategoryImpl {
 		InsightsContentDetail inferenceContentResult = null;
 		if (contentConfigDefinition.getThresholds() != null) {
 			try {
-
+				long startTime = System.nanoTime();
 				InsightsKPIResultDetails resultDetailObj = inferenceResults.get(0);
 				Map<String, Object> zoneWiseCountWithSentiment = getZoneWiseCountWithSentiment(inferenceResults);
 				Map<String, Object> resultValuesMap = new HashMap<>();
@@ -127,17 +135,36 @@ public class ThresholdRangeCategoryImpl extends BaseContentCategoryImpl {
 							" inference text is null for count And Percentage threshold-range KPIId {} contentId {} result {} ",
 							getContentConfig().getKpiId(), getContentConfig().getContentId(), resultDetailObj);
 				}
+				long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+				log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+						contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+						contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
+						"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+						"action :" + contentConfigDefinition.getAction() 
+						+ "ContentResult :" + contentConfigDefinition.getNoOfResult());
 			} catch (Exception e) {
 				log.error(e);
 				log.error(
-						" Errro while content processing for threshold-range countAndPercentageInferenceResult KPIId {} contentId {}",
+						" Error while content processing for threshold-range countAndPercentageInferenceResult KPIId {} contentId {}",
 						getContentConfig().getKpiId(), getContentConfig().getContentId());
-				throw new InsightsJobFailedException(" Errro while content processing for threshold-range KPIId {} contentId {}" + e.getMessage());
+				log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+						contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+						contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),0,
+						"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+						"action :" + contentConfigDefinition.getAction() 
+						+ "ContentResult :" + contentConfigDefinition.getNoOfResult() + " Error while content processing for threshold-range"  + e.getMessage());
+				throw new InsightsJobFailedException(" Error while content processing for threshold-range KPIId {} contentId {}");
 			}
 
 		} else {
 			log.error(" Errro while content processing for threshold-range KPIId {} contentId {}",
 					getContentConfig().getKpiId(), getContentConfig().getContentId());
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),0,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "ContentResult :" + contentConfigDefinition.getNoOfResult() + " Error while content processing for threshold-range");
 		}
 
 		return inferenceContentResult;

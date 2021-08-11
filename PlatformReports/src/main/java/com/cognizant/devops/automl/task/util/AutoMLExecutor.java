@@ -17,6 +17,7 @@ package com.cognizant.devops.automl.task.util;
 
 import java.io.File;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,6 +49,7 @@ public class AutoMLExecutor implements Callable<JsonObject> {
 
 		JsonObject response = new JsonObject();
 		try {
+			long startTime = System.nanoTime();
 			usecaseCSVFilePath = ConfigOptions.ML_DATA_STORAGE_RESOLVED_PATH + ConfigOptions.FILE_SEPERATOR
 					+ autoMlConfig.getUseCaseName() + ConfigOptions.FILE_SEPERATOR + autoMlConfig.getUseCaseFile();
 			File useCasecsvFile = new File(usecaseCSVFilePath);			
@@ -59,11 +61,20 @@ public class AutoMLExecutor implements Callable<JsonObject> {
 						autoMlConfig.getUseCaseName());
 				runAutoML(splitFrameResponse);
 				response.addProperty("Status", "Success");
+				long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+				log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}"
+						,"-",autoMlConfig.getWorkflowConfig().getWorkflowId(),autoMlConfig.getWorkflowConfig().getAssessmentConfig().getId(),autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",
+						processingTime,"modelId :" + autoMlConfig.getModelId() +"predictionType :" +autoMlConfig.getPredictionType() +
+						"predictionColumn :"+ autoMlConfig.getPredictionColumn()  + "status :" +autoMlConfig.getStatus());
 			}
 		} catch (InsightsCustomException e) {
 			log.error("AutoML Executor === Error while executing AutoML on usecase {}", autoMlConfig.getUseCaseName());
 			response.addProperty("Status", "Failure");
 			response.addProperty("errorLog", e.getMessage());
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}"
+					,"-",autoMlConfig.getWorkflowConfig().getWorkflowId(),autoMlConfig.getWorkflowConfig().getAssessmentConfig().getId(),autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",
+					0,"modelId :" + autoMlConfig.getModelId() +"predictionType :" +autoMlConfig.getPredictionType() +
+					"predictionColumn :"+ autoMlConfig.getPredictionColumn()  + "status :" +autoMlConfig.getStatus() + e.getMessage());
 		}
 		return response;
 	}
@@ -78,14 +89,24 @@ public class AutoMLExecutor implements Callable<JsonObject> {
 		JsonObject response = new JsonObject();
 		String usecase = autoMlConfig.getUseCaseName();
 		try {
+			long startTime = System.nanoTime();
 			JsonObject extractedDataFromCSV = trainUtils.getHeaders(file, usecase);
 			log.error("AutoML Executor === CSV data extracted succssfully for usecase {}", usecase);
 			if (extractedDataFromCSV.has("Header") && extractedDataFromCSV.has("Contents")) {
 				log.debug("AutoML Executor === CSV data extracted  {}", extractedDataFromCSV);
 				return extractedDataFromCSV;
 			}
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}"
+					,"-",autoMlConfig.getWorkflowConfig().getWorkflowId(),autoMlConfig.getWorkflowConfig().getAssessmentConfig().getId(),autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",
+					processingTime,"modelId :" + autoMlConfig.getModelId() + "predictionType :" +autoMlConfig.getPredictionType() +
+					"predictionColumn :"+ autoMlConfig.getPredictionColumn()  + "status :" +autoMlConfig.getStatus());
 		} catch (InsightsCustomException e) {
 			log.error("AutoML Executor === Error while extracting data from CSV for usecase {}", usecase);
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}"
+					,"-",autoMlConfig.getWorkflowConfig().getWorkflowId(),autoMlConfig.getWorkflowConfig().getAssessmentConfig().getId(),autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",
+					0,"modelId :" + autoMlConfig.getModelId() + "predictionType :" +autoMlConfig.getPredictionType() +
+					"predictionColumn :"+ autoMlConfig.getPredictionColumn()  + "status :" +autoMlConfig.getStatus() + e.getMessage());
 		}
 		return response;
 	}
@@ -122,6 +143,7 @@ public class AutoMLExecutor implements Callable<JsonObject> {
 
 		log.info("AutoML Executor === AutoML is running on usecase {} wait for a while to finish",
 				autoMlConfig.getUseCaseName());
+		long startTime = System.nanoTime();
 		JsonObject responseJson = new JsonParser().parse(dataFrameResponse).getAsJsonObject();
 		JsonArray destinationFrames = responseJson.get("destination_frames").getAsJsonArray();
 		String trainingFrame = destinationFrames.get(0).getAsJsonObject().get("name").getAsString();
@@ -133,9 +155,15 @@ public class AutoMLExecutor implements Callable<JsonObject> {
 			autoMlConfig.setStatus(AutoMLEnum.Status.LEADERBOARD_READY.name());
 			autoMlConfig.setModelId(modelId);
 			autoMlDAL.updateMLConfig(autoMlConfig);
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
 			log.info(
 					"AutoML Executor === AutoML on usecase {} is completed successfully and usecase is ready for leaderboard and prediction for modelId {}",
 					autoMlConfig.getUseCaseName(), modelId);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}"
+					,"-",autoMlConfig.getWorkflowConfig().getWorkflowId(),autoMlConfig.getWorkflowConfig().getAssessmentConfig().getId(),autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",
+					processingTime,"modelId :" + autoMlConfig.getModelId() + "predictionType :" +autoMlConfig.getPredictionType() +
+					"predictionColumn :"+ autoMlConfig.getPredictionColumn()  + "status :" +autoMlConfig.getStatus());
+			
 		}
 	}
 

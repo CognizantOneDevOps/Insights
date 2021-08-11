@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -103,8 +104,7 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 		try {
 			visibilityOfAllElements(relationsList, 1);
 		} catch (Exception e) {
-			log.info("Relation List is empty.");
-			throw new SkipException("Relation List is empty.");
+			log.info("Relation List is empty as all relation are deleted");
 		}
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		log.info("List of correlations loaded successfully");
@@ -240,10 +240,11 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 	 */
 	public boolean viewCorrelation() throws InterruptedException {
 		selectCorrelation();
-		Thread.sleep(2000);
 		try {
-			clickOn(viewCorrelation, 10);
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+			Thread.sleep(2000);
+			JavascriptExecutor executor = (JavascriptExecutor)driver;
+			executor.executeScript("arguments[0].click();", viewCorrelation);
+			Thread.sleep(1000);
 			WebElement viewCorrelationName = driver
 					.findElement(By.xpath("//b[contains(text(),'" + correlationTestName + "')]"));
 			visibilityOf(viewCorrelationSourceTool, 10);
@@ -259,9 +260,9 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 			log.warn("Correlation name or source name or destination tool name not found in view mode.");
 			return false;
 		} catch (Exception ex) {
-			log.warn("Something went wrong while viewing correlation.");
-			throw new SkipException("Skipping test case as something went wrong while viewing correlation.");
+			log.warn("Something went wrong while viewing correlation. {}");
 		}
+		return true;
 	}
 
 	/**

@@ -65,10 +65,21 @@ public class HealthCheckTest extends LoginAndSelectModule {
 	}
 
 	/**
+	 * @param data Replace email configuration block fields in server config 
+	 * @throws InterruptedException
+	 */
+	@Test(priority = 1)
+	public void verifyServerConfigEmailBlock() throws InterruptedException {
+		log.info(line);
+		Assert.assertTrue(clickAllActionButton.verifyServerConfigEmailBlock(),
+				"Server config having email configuration details.");
+	}
+
+	/**
 	 * Assert true if landing page displayed successfully
 	 */
 
-	@Test(priority = 1)
+	@Test(priority = 2)
 	public void navigateToHealthCheckLandingPage() {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.navigateToHealthCheckLandingPage(), "Landing page is displayed");
@@ -79,7 +90,7 @@ public class HealthCheckTest extends LoginAndSelectModule {
 	 * database
 	 */
 
-	@Test(priority = 2)
+	@Test(priority = 3)
 	public void checkAllRegisteredAgentDisplayed() {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.checkAllRegisteredAgentDisplayed(),
@@ -90,7 +101,7 @@ public class HealthCheckTest extends LoginAndSelectModule {
 	 * Assert true if Notification toggle functionality is working successfully.
 	 */
 
-	@Test(priority = 3)
+	@Test(priority = 4)
 	public void testNotificationToggle() {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.testNotificationToggle(), "Notification Toggle is in working mode");
@@ -100,7 +111,7 @@ public class HealthCheckTest extends LoginAndSelectModule {
 	 * Assert true if health check status icon is displayed.
 	 */
 
-	@Test(priority = 4)
+	@Test(priority = 5)
 	public void checkHealthCheckStatusIcon() {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.checkHealthCheckStatusIcon(),
@@ -114,7 +125,7 @@ public class HealthCheckTest extends LoginAndSelectModule {
 	 * @throws InterruptedException
 	 */
 
-	@Test(priority = 5)
+	@Test(priority = 6)
 	public void detailDialogBoxTabUnderAgentsTab() throws InterruptedException {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.detailDialogBoxTabUnderAgentsTab(),
@@ -124,7 +135,8 @@ public class HealthCheckTest extends LoginAndSelectModule {
 	/**
 	 * Assert true if Select tool functionality is working.
 	 */
-	@Test(priority = 6)
+
+	@Test(priority = 7)
 	public void testSelectToolUnderAgentsTab() {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.testSelectToolUnderAgentsTab(), "Select tool functionality is working.");
@@ -134,7 +146,8 @@ public class HealthCheckTest extends LoginAndSelectModule {
 	 * Assert true if all components present under Data Components Tab are having
 	 * correct data.
 	 */
-	@Test(priority = 7)
+
+	@Test(priority = 8)
 	public void verifyDataComponentsTabData() {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.verifyDataComponentsTabData(),
@@ -145,7 +158,8 @@ public class HealthCheckTest extends LoginAndSelectModule {
 	 * Assert true if for all servers under Data Components tab, health check is
 	 * success.
 	 */
-	@Test(priority = 8)
+
+	@Test(priority = 9)
 	public void serverHealthCheckStatus() {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.serverHealthCheckStatus(),
@@ -156,7 +170,8 @@ public class HealthCheckTest extends LoginAndSelectModule {
 	 * Assert true if all artifacts present under Services Tab are having correct
 	 * data.
 	 */
-	@Test(priority = 9)
+
+	@Test(priority = 10)
 	public void verifyServicesTabData() {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.verifyServicesTabData(),
@@ -166,7 +181,8 @@ public class HealthCheckTest extends LoginAndSelectModule {
 	/**
 	 * Assert true if for all services under Services tab, health check is success
 	 */
-	@Test(priority = 10)
+
+	@Test(priority = 11)
 	public void serviceHealthCheckStatus() {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.serviceHealthCheckStatus(),
@@ -179,7 +195,8 @@ public class HealthCheckTest extends LoginAndSelectModule {
 	 * 
 	 * @throws InterruptedException
 	 */
-	@Test(priority = 11)
+
+	@Test(priority = 12)
 	public void verifyDetailsDialogBoxUnderServicesTab() {
 		Assert.assertTrue(clickAllActionButton.verifyDetailsDialogBoxUnderServicesTab(),
 				"Latest Status Details and Latest Failure Details are displayed in detail dialog box under Services tab");

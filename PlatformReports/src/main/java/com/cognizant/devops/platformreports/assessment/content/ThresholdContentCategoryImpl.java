@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,7 +46,7 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 	 */
 	@Override
 	public void generateContent() {
-
+		long startTime = System.nanoTime();
 		List<InsightsKPIResultDetails> inferenceResults = getKPIExecutionResult();
 		InsightsContentDetail contentResult = null;
 		if (!inferenceResults.isEmpty()) {
@@ -60,6 +61,13 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 					contentConfigDefinition.getCategory(), contentConfigDefinition.getKpiId(),
 					contentResult.getInferenceText());
 			saveContentResult(contentResult);
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "ContentResult :" + contentConfigDefinition.getNoOfResult());
 		}
 	}
 
@@ -88,6 +96,7 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 	 * @return
 	 */
 	private InsightsContentDetail countInferenceResult(List<InsightsKPIResultDetails> inferenceResults) {
+		long startTime = System.nanoTime();
 		InsightsContentDetail inferenceContentResult = null;
 		Map<String, Object> resultValuesMap = new HashMap<>();
 		List<InsightsKPIResultDetails> listBelow = new ArrayList<>();
@@ -156,10 +165,23 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 						"Worlflow Detail ====   inference text is null for count and percentage threshold KPIId {} contentId {} result {} ",
 						getContentConfig().getKpiId(), getContentConfig().getContentId(), resultFirstData);
 			}
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "ContentResult :" + contentConfigDefinition.getNoOfResult());
 		} catch (Exception e) {
 			log.error(e);
 			log.error(" Errro while content processing for threshold KPIId {} contentId {} ",
 					getContentConfig().getKpiId(), getContentConfig().getContentId());
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),0,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "ContentResult :" + contentConfigDefinition.getNoOfResult() + "Exception while running neo4j operation" + e.getMessage());
 			throw new InsightsJobFailedException("Exception while running neo4j operation {} " + e.getMessage());
 		}
 
@@ -173,7 +195,7 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 	 * @return
 	 */
 	private InsightsContentDetail averageInferenceResult(List<InsightsKPIResultDetails> inferenceResults) {
-
+		long startTime = System.nanoTime();
 		Map<String, Object> resultValuesMap = new HashMap<>();
 		InsightsContentDetail inferenceContentResult = null;
 		String comparisonField = getResultFieldFromContentDefination();
@@ -218,10 +240,25 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 						getContentConfig().getKpiId(), getContentConfig().getContentId(), resultDetailObj);
 			}
 
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "ContentResult :" + contentConfigDefinition.getNoOfResult());
+			
 		} catch (Exception e) {
 			log.error(e);
-			log.error(" Errro while content processing for average threshold KPIId {} contentId {} ",
+			log.error(" Error while content processing for average threshold KPIId {} contentId {} ",
 					getContentConfig().getKpiId(), getContentConfig().getContentId());
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),0,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "ContentResult :" + contentConfigDefinition.getNoOfResult() + "Exception while running neo4j operation" + e.getMessage());
+			
 			throw new InsightsJobFailedException("Exception while running neo4j operation {} " + e.getMessage());
 		}
 

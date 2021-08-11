@@ -24,7 +24,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.SocketAddress;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,6 +43,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -65,7 +70,16 @@ public class AgentManagementUtil {
 			targetDir.mkdirs();
 		}
 		File zip = File.createTempFile("agent_", ".zip", targetDir);
-		try(InputStream in = new BufferedInputStream(filePath.openStream(), 1024);
+		URLConnection conn;
+		if(ApplicationConfigProvider.getInstance().getProxyConfiguration().isEnableProxy()) {
+			SocketAddress addr = new InetSocketAddress(ApplicationConfigProvider.getInstance().getProxyConfiguration().getProxyHost(), ApplicationConfigProvider.getInstance().getProxyConfiguration().getProxyPort());
+			Proxy proxy = new Proxy(Proxy.Type.HTTP, addr);
+			conn = filePath.openConnection(proxy);
+		}else{
+			conn = filePath.openConnection();
+		}
+
+		try(InputStream in = new BufferedInputStream(conn.getInputStream(), 1024);
 				OutputStream out = new BufferedOutputStream(new FileOutputStream(zip))){
 			copyInputStream(in, out);
 		}

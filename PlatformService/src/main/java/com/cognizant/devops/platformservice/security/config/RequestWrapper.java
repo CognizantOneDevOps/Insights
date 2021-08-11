@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
+import com.google.gson.JsonObject;
 
 /**
  * This class is responsible to validate Request Header, Cookies and Paramanter
@@ -42,7 +43,7 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
 	Boolean validationStatus = false;
 
 	/**
-	 * constructer to set HttpServletRequest and HttpServletResponse
+	 * Constructor to set HttpServletRequest and HttpServletResponse
 	 * 
 	 * @param servletRequest
 	 * @param servletResponse
@@ -77,15 +78,15 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
 	 * @param parameters
 	 */
 	public void validatAllHeaders() {
-		log.debug("In validatAllHeaders ");
+		
 		Enumeration<String> headerNames = request.getHeaderNames();
+		log.debug("In validateAllHeaders started ==== ");
 		while (headerNames.hasMoreElements()) {
 			String headerName = headerNames.nextElement();
 			String headersValue = request.getHeader(headerName);
-			log.debug("In validatAllHeaders {} headersValue  {} ", headerName, headersValue);
-			ValidationUtils.cleanXSS(headersValue);
+			ValidationUtils.cleanXSS(headerName,headersValue);
 		}
-		log.debug("In validatAllHeaders ==== Complated");
+		log.debug("In validatedAllHeaders  ====  Completed ");
 	}
 
 	/**

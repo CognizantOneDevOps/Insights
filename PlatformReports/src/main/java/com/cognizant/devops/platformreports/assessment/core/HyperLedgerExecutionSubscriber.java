@@ -86,7 +86,7 @@ public class HyperLedgerExecutionSubscriber extends WorkflowTaskSubscriberHandle
 			long startDateEpoch = 0;
 			if (workflowConfig.getScheduleType().equals(WorkflowTaskEnum.WorkflowSchedule.ONETIME.name())) {
 				startDate = workflowConfig.getAssessmentConfig().getStartDate();
-				endDate = workflowConfig.getAssessmentConfig().getEndDate();
+				endDate = workflowConfig.getAssessmentConfig().getEndDate();				
 			} else {
 				startDateEpoch = workflowConfig.getNextRun();
 				startDate = InsightsUtils.getStartFromTime(startDateEpoch, workflowConfig.getScheduleType()) - 1;
@@ -104,7 +104,7 @@ public class HyperLedgerExecutionSubscriber extends WorkflowTaskSubscriberHandle
 			chartHandler.generatePDF(assessmentReportDTO);
 			
 			
-			log.debug("Worlflow Detail ==== HyperLedgerExecutionSubscriber Completed  {} ", incomingTaskMessageJson);
+			log.debug("Worlflow Detail ==== HyperLedgerExecutionSubscriber Completed  {} ", incomingTaskMessageJson);			
 		} catch (InsightsJobFailedException ijfe) {
 			log.error("Worlflow Detail ==== HyperLedgerExecutionSubscriber Completed with error ", ijfe);
 			statusLog = ijfe.getMessage();

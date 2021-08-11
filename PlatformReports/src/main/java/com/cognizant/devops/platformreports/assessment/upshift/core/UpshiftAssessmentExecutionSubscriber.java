@@ -18,6 +18,7 @@ package com.cognizant.devops.platformreports.assessment.upshift.core;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.logging.log4j.LogManager;
@@ -49,6 +50,7 @@ public class UpshiftAssessmentExecutionSubscriber extends WorkflowTaskSubscriber
     @Override
     public void handleTaskExecution(byte[] body) throws IOException {
         try {
+        	long startTime = System.nanoTime();
             String incomingTaskMessage = new String(body, StandardCharsets.UTF_8);
             log.debug("Worlflow Detail ==== UpshiftAssessmentExecutionSubscriber started ... "
                     + "routing key  message handleDelivery ===== {} ", incomingTaskMessage);
@@ -67,8 +69,17 @@ public class UpshiftAssessmentExecutionSubscriber extends WorkflowTaskSubscriber
             BaseDataProcessor chartHandler = ReportDataProcessHandlerFactory
                     .getDataHandler("UPSHIFTASSESSMENT");
             chartHandler.processJson(assessmentReportDTO);
+            long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+            log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}"
+            		,executionId,workflowId,assessmentReportDTO.getReportId(),workflowConfig.getWorkflowType(),"-","-",processingTime,
+            		"Schedule :" +workflowConfig.getScheduleType() + "ReportName :" + assessmentReportDTO.getReportName() +
+            		"UpshiftAssessmentExecutionSubscriber Block");
         } catch (Exception e) {
             log.error("Worlflow Detail ==== GrafanaPDFExecutionSubscriber Completed with error ", e);
+            log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}"
+            		,assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getReportId(),workflowConfig.getWorkflowType(),"-","-",0,
+            		"Schedule :" +workflowConfig.getScheduleType() + "ReportName :" + assessmentReportDTO.getReportName() +
+            		"GrafanaPDFExecutionSubscriber Completed with error" +e.getMessage());
             throw new InsightsJobFailedException(e.getMessage());
         }
     }

@@ -337,12 +337,14 @@ public class ApplicationConfigCache {
 						"No Logger Appender with name " + serviceName + " defined in log4j.xml ");
 			}
 
-			log.debug(" logLevel : {} ====== appenderUpdated Name : {}  ==== appender file Name : {}  ", logLevel,
+			log.info(" logLevel : {} ====== appenderUpdated Name : {}  ==== appender file Name : {}  ", logLevel,
 					appenderServiceBase.getName(), appenderServiceBase.getFileName());
-
+			
+			/*
 			context.getConfiguration().getAppenders().forEach((key, appender) -> {
 				log.debug("file Appender information {} ", key);
 			});
+			*/
 
 			/*In LoggerConfig and in Configuration we are not allowed to update any object property like appenderRef 
 			 * so best way to delete that LoggerConfig and add it again 
@@ -366,7 +368,7 @@ public class ApplicationConfigCache {
 						|| updateLevelTransitiveDependency) {
 					addedLoggerLevel = Level.valueOf(logLevel);
 				}
-				log.error("Updated logger information {} {} ", addNewLooger.getKey(), addedLoggerLevel);
+				log.info("Updated logger information {} {} ", addNewLooger.getKey(), addedLoggerLevel);
 				AppenderRef newAppenderRef = AppenderRef.createAppenderRef(serviceName, addedLoggerLevel, null);
 				AppenderRef ref2 = AppenderRef.createAppenderRef(LogLevelConstants.CONSOLE_APPENDER,
 						addedLoggerLevel, null);
@@ -380,7 +382,7 @@ public class ApplicationConfigCache {
 				context.getConfiguration().addLogger(addNewLooger.getKey(), loggerConfig);
 				context.updateLoggers();
 			}
-
+			/*
 			context.getConfiguration().getLoggers().forEach((key, loggerConfig) -> {
 				log.error("logger level information Updated {} {} {} ", key, loggerConfig.getName(),
 						loggerConfig.getLevel());
@@ -388,6 +390,7 @@ public class ApplicationConfigCache {
 					log.error("   AppenderRef for log level {} is {} ", loggerConfig.getName(), appenderRef.getRef());
 				});
 			});
+			*/
 		} catch (Exception e) {
 			log.error(e);
 		}

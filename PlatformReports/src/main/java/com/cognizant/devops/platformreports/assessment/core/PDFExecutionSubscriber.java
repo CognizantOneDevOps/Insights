@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
@@ -64,6 +65,7 @@ public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 	@Override
 	public void handleTaskExecution(byte[] body) throws IOException {
 		try {
+			long startTime = System.nanoTime();
 			String incomingTaskMessage = new String(body, MQMessageConstants.MESSAGE_ENCODING);
 			log.debug(
 					"Worlflow Detail ==== PDFExecutionSubscriber started ... routing key  message handleDelivery ===== {} ",
@@ -76,16 +78,29 @@ public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 			log.debug("Worlflow Detail ==== PDFExecutionSubscriber Completed  {} ", incomingTaskMessage);
 			InsightsStatusProvider.getInstance().createInsightStatusNode("PDFExecutionSubscriber completed",
 					PlatformServiceConstants.SUCCESS);
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-","-","-",processingTime,
+					"reportId: "+assessmentReportDTO.getReportId() + "reportName: " +assessmentReportDTO.getReportName() + "VisualizationUtil" +
+					assessmentReportDTO.getVisualizationutil() + "PDFExecutionSubscriber Completed ");				
 		} catch (InsightsJobFailedException ijfe) {
 			log.error("Worlflow Detail ==== PDFExecutionSubscriber Completed with error ", ijfe);
 			InsightsStatusProvider.getInstance().createInsightStatusNode("PDFExecutionSubscriber Completed with error "+ijfe.getMessage(),
 					PlatformServiceConstants.FAILURE);
 			statusLog = ijfe.getMessage();
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-","-","-",0,
+					"reportId: "+assessmentReportDTO.getReportId() + "reportName: " +assessmentReportDTO.getReportName() + "VisualizationUtil" +
+					assessmentReportDTO.getVisualizationutil() + "PDFExecutionSubscriber Completed with error " + ijfe.getMessage());
 			throw ijfe;
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== PDFExecutionSubscriber Completed with error ", e);
 			InsightsStatusProvider.getInstance().createInsightStatusNode("PDFExecutionSubscriber Completed with error "+e.getMessage(),
 					PlatformServiceConstants.FAILURE);
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-","-","-",0,
+					"reportId: "+assessmentReportDTO.getReportId() + "reportName: " +assessmentReportDTO.getReportName() + "VisualizationUtil" +
+					assessmentReportDTO.getVisualizationutil() + "PDFExecutionSubscriber Completed with error " + e.getMessage());
 			throw new InsightsJobFailedException(e.getMessage());
 		}
 	}
@@ -183,6 +198,10 @@ public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 		// statusLog set here which is class variable of WorkflowTaskSubscriberHandler
 		statusLog = new Gson().toJson(statusObject);
 		log.error("Worlflow Detail ==== some of the Kpi's visualization is failed to execute statusLog {} ", statusLog);
+		log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+				assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-","-","-",0,
+				"reportId: "+assessmentReportDTO.getReportId() + "reportName: " +assessmentReportDTO.getReportName() + "VisualizationUtil" +
+				assessmentReportDTO.getVisualizationutil() + "some of the Kpi's visualization is failed to execute");		
 		throw new InsightsJobFailedException(
 				"Worlflow Detail ==== some of the Kpi's visualization is failed to execute");
 	}
@@ -195,6 +214,7 @@ public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 
 	private void setPDFDetailsInEmailHistory(JsonObject incomingTaskMessageJson) {
 		try {
+			long startTime = System.nanoTime();
 			String workflowId = incomingTaskMessageJson.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID)
 					.getAsString();
 			InsightsReportVisualizationContainer emailHistoryConfig = new InsightsReportVisualizationContainer();
@@ -215,8 +235,17 @@ public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 			}
 			emailHistoryConfig.setWorkflowConfig(workflowId);
 			workflowDAL.saveEmailExecutionHistory(emailHistoryConfig);
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-","-","-",processingTime,
+					"reportId: "+assessmentReportDTO.getReportId() + "reportName: " +assessmentReportDTO.getReportName() + "VisualizationUtil" +
+					assessmentReportDTO.getVisualizationutil() );
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== Error setting PDF details in Email History table");
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-","-","-",0,
+					"reportId: "+assessmentReportDTO.getReportId() + "reportName: " +assessmentReportDTO.getReportName() + "VisualizationUtil" +
+					assessmentReportDTO.getVisualizationutil() + "Error setting PDF details in Email History table" +e.getMessage());
 			throw new InsightsJobFailedException(
 					"Worlflow Detail ==== Error setting PDF details in Email History table");
 		}

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+
+<suite thread-count="1" name="suite" verbose="10">
+
+	<test name="testnginitializer">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.engineautomation.TestngInitializerTest" />
+		</classes>
+	</test>
+	<test name="logintest">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.login.LoginTest" />
+		</classes>
+	</test>
+	 <test name="addagentdummy">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.engineautomation.AddAgentTest" />
+		</classes>
+	</test>
+	<test name="addconfigurationfile">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.engineautomation.AddConfigurationFileTest" />
+		</classes>
+	</test>
+	<test name="DatabaseValidationTestCases">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.engineautomation.GraphDBCorrelationTest" />
+		</classes>
+	</test>
+	<test name="traceabilitydashboard">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.traceabilitydashboard.TraceabilityDashboardTest" />
+		</classes>
+	</test>
+	<test name="datacleanup">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.engineautomation.DataCleanupTest" />
+		</classes>
+	</test> 
+</suite>

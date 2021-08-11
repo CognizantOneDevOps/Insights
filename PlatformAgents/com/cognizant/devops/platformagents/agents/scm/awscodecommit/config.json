@@ -62,5 +62,10 @@
   },
   "osversion": "linux",
   "agentVersion": "v4.7",
-  "auditing": false
+  "auditing": false,
+  "enableProxy":false,
+  "proxies":{
+    	"http":"",
+    	"https":""
+    }
 }

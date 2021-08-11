@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.logging.log4j.LogManager;
@@ -38,6 +39,7 @@ import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
 import com.cognizant.devops.platformdal.healthutil.HealthUtil;
+import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformworkflow.workflowtask.core.InsightsStatusProvider;
@@ -51,16 +53,22 @@ public class SystemNotificationDetailSubscriber extends WorkflowTaskSubscriberHa
 	private static Logger log = LogManager.getLogger(SystemNotificationDetailSubscriber.class.getName());
 	HealthUtil healthUtil = new HealthUtil();
 	private WorkflowDAL workflowDAL = new WorkflowDAL();
+private InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfiguration();	
+	private long executionId;
 
 	public SystemNotificationDetailSubscriber(String routingKey) throws Exception {
 		super(routingKey);
 	}
 
 	@Override
-	public void handleTaskExecution(byte[] body) throws IOException {
+	public void handleTaskExecution(byte[] body) throws IOException {		
 		try {
+			long startTime = System.nanoTime();
 			String incomingTaskMessage = new String(body, StandardCharsets.UTF_8);
 			JsonObject incomingTaskMessageJson = new JsonParser().parse(incomingTaskMessage).getAsJsonObject();
+			String workflowId = incomingTaskMessageJson.get("workflowId").getAsString();
+			executionId = incomingTaskMessageJson.get("executionId").getAsLong();
+			workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
 			String htmlDataComponentResponseBuffer = componentHTML(healthUtil.getDataComponentStatus(), "Data Component");
 			String htmlServiceResponseBuffer = componentHTML(healthUtil.getServiceStatus(), "Services");
 			String htmlAgentResponseBuffer = getAgentHTML();
@@ -76,11 +84,16 @@ public class SystemNotificationDetailSubscriber extends WorkflowTaskSubscriberHa
 			setDetailsInEmailHistory(incomingTaskMessageJson, mailHTML);
 			InsightsStatusProvider.getInstance().createInsightStatusNode("SystemNotificationDetailSubscriber completed",
 					PlatformServiceConstants.SUCCESS);
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					executionId,workflowConfig.getWorkflowId(),"-",workflowConfig.getWorkflowType(),"-","-",processingTime,"-");					
 		} catch (InsightsJobFailedException ijfe) {
 			log.error("Worlflow Detail ==== SystemNotificationDetail Subscriber Completed with error ", ijfe);
 			InsightsStatusProvider.getInstance().createInsightStatusNode(
 					"SystemNotificationDetail Completed with error " + ijfe.getMessage(),
 					PlatformServiceConstants.FAILURE);
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					executionId,workflowConfig.getWorkflowId(),"-",workflowConfig.getWorkflowType(),"-","-",0,workflowConfig.getStatus() +"SystemNotificationDetail Subscriber Completed with error" +ijfe.getMessage());
 			statusLog = ijfe.getMessage();
 			throw ijfe;
 		} catch (Exception e) {
@@ -88,6 +101,9 @@ public class SystemNotificationDetailSubscriber extends WorkflowTaskSubscriberHa
 			InsightsStatusProvider.getInstance().createInsightStatusNode(
 					"SystemNotificationDetail Completed with error " + e.getMessage(),
 					PlatformServiceConstants.FAILURE);
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					executionId,workflowConfig.getWorkflowId(),"-",workflowConfig.getWorkflowType(),"-","-",0,
+					workflowConfig.getStatus() +"SystemNotificationDetail Subscriber Completed with error" +e.getMessage());
 			throw new InsightsJobFailedException(e.getMessage());
 		}
 

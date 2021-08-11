@@ -38,10 +38,8 @@ public class ContentConfigDefinition {
 	private long executionId;
 	private int assessmentId;
 	private int reportId;
-	private String workflowId;
-	private String resultField;
-	
-
+	private String workflowId;		
+	private String resultField;	
 	public String getThresholds() {
 		return thresholds;
 	}

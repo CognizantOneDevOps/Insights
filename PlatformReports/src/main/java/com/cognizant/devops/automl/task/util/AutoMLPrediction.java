@@ -21,6 +21,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
@@ -76,19 +77,27 @@ public class AutoMLPrediction {
 	public static List<JsonObject> predictRegression(List<JsonObject> data, JsonArray columnNames, String usecaseName)
 			throws IOException, PredictException {
 		List<JsonObject> predictionData = new ArrayList<>();
+		AutoMLConfig autoMLConfig = new AutoMLConfig();
+		
 		try {
-		    RegressionModelPrediction p = null;			
-			AutoMLConfig autoMLConfig = autoMlDAL.getMLConfigByUsecase(usecaseName);
+			long startTime = System.nanoTime();
+		    RegressionModelPrediction p = null;
+		    autoMLConfig = autoMlDAL.getMLConfigByUsecase(usecaseName);
 			String deployedMojoName = autoMLConfig.getMojoDeployed();
 			String predectionColumn = autoMLConfig.getPredictionColumn();			
-			
 			/* get mojo from database and write to temporary location */
 			String path =FileUtils.getTempDirectoryPath();
 			byte[] mojoData=autoMLConfig.getMojoDeployedZip();
 			File file = new File(path+usecaseName+".zip");
 			FileUtils.writeByteArrayToFile(file, mojoData);			
-			EasyPredictModelWrapper model = new EasyPredictModelWrapper(MojoModel.load(new TmpMojoReaderBackend(file)));			
+			EasyPredictModelWrapper model = new EasyPredictModelWrapper(MojoModel.load(new TmpMojoReaderBackend(file)));
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
 			log.debug("Worlflow Detail ====  Mojo {}  Loaded Successfully",deployedMojoName);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					"-",autoMLConfig.getWorkflowConfig().getWorkflowId(),autoMLConfig.getWorkflowConfig().getAssessmentConfig().getId(),autoMLConfig.getWorkflowConfig().getWorkflowType(),"-","-",processingTime,
+					"ModelId :" +autoMLConfig.getModelId() + "UsecaseName :" +autoMLConfig.getUseCaseName() + "PredictionColumn : " +autoMLConfig.getPredictionColumn()
+					 +"predictionType :" +autoMLConfig.getPredictionType()
+					+ "trainingPercentage : " + autoMLConfig.getTrainingPerc() + "status : " + autoMLConfig.getStatus() +"Mojo Loaded Successfully");
 			Gson gson = new Gson();
 			Type type = new TypeToken<Map<String, String>>() {
 
@@ -111,10 +120,17 @@ public class AutoMLPrediction {
 				object.addProperty("predictedColumn",predectionColumn);
 				object.addProperty("predictedValue", String.valueOf(p.value));
 				predictionData.add(object);			
-
+				
 			}
+			
 		} catch (Exception e) {
 			log.error(e);
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					"-",autoMLConfig.getWorkflowConfig().getWorkflowId(),autoMLConfig.getWorkflowConfig().getAssessmentConfig().getId(),autoMLConfig.getWorkflowConfig().getWorkflowType(),"-","-",0,
+					"ModelId :" +autoMLConfig.getModelId() + "UsecaseName :" +autoMLConfig.getUseCaseName() + "PredictionColumn : " +autoMLConfig.getPredictionColumn()
+					 +"predictionType :" +autoMLConfig.getPredictionType()
+					+ "trainingPercentage : " + autoMLConfig.getTrainingPerc() + "status : " + autoMLConfig.getStatus()
+					+"Something went wrong while executing regression prediction" + e.getMessage());
 			throw new PredictException("Something went wrong while executing regression prediction for "+ usecaseName + " " + e.getMessage());
 		}
 
@@ -124,9 +140,11 @@ public class AutoMLPrediction {
 	public static List<JsonObject> predictClassification(List<JsonObject> data, JsonArray columnNames, String usecaseName) throws PredictException
 	{
 		List<JsonObject> predictionData = new ArrayList<>();
+		AutoMLConfig autoMLConfig = new AutoMLConfig();		
 		try {
+			long startTime = System.nanoTime();
 			BinomialModelPrediction  p = null;
-			AutoMLConfig autoMLConfig = autoMlDAL.getMLConfigByUsecase(usecaseName);
+			autoMLConfig=autoMlDAL.getMLConfigByUsecase(usecaseName);
 			String deployedMojoName = autoMLConfig.getMojoDeployed();
 			String predectionColumn = autoMLConfig.getPredictionColumn();
 			/* get mojo from database and write to temporary location */
@@ -160,8 +178,20 @@ public class AutoMLPrediction {
 				predictionData.add(object);
 
 			}
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					"-",autoMLConfig.getWorkflowConfig().getWorkflowId(),autoMLConfig.getWorkflowConfig().getAssessmentConfig().getId(),autoMLConfig.getWorkflowConfig().getWorkflowType(),"-","-",processingTime,
+					"ModelId :" +autoMLConfig.getModelId() + "UsecaseName :" +autoMLConfig.getUseCaseName() + "PredictionColumn : " +autoMLConfig.getPredictionColumn()
+					 +"predictionType :" +autoMLConfig.getPredictionType()
+					+ "trainingPercentage : " + autoMLConfig.getTrainingPerc() + "status : " + autoMLConfig.getStatus());
 		} catch (Exception e) {
 			log.error(e);
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					"-",autoMLConfig.getWorkflowConfig().getWorkflowId(),autoMLConfig.getWorkflowConfig().getAssessmentConfig().getId(),autoMLConfig.getWorkflowConfig().getWorkflowType(),"-","-",0,
+					"ModelId :" +autoMLConfig.getModelId() + "UsecaseName :" +autoMLConfig.getUseCaseName() + "PredictionColumn : " +autoMLConfig.getPredictionColumn()
+					 +"predictionType :" +autoMLConfig.getPredictionType()
+					+ "trainingPercentage : " + autoMLConfig.getTrainingPerc() + "status : " + autoMLConfig.getStatus()+
+					"Something went wrong while executing classification prediction" +e.getMessage());
 			throw new PredictException("Something went wrong while executing classification prediction for "+ usecaseName + " " + e.getMessage());
 		}
 		return predictionData;

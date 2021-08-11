@@ -17,6 +17,7 @@ package com.cognizant.devops.platforminsightswebhook.events;
 
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
@@ -98,13 +99,16 @@ public class WebHookHandlerServlet extends HttpServlet {
 	 * @throws Exception
 	 */
 	private void processRequest(HttpServletRequest request) throws Exception {
+		long startTime = System.nanoTime();
 		JsonObject dataWithReqParam = getBody(request);
 		if (dataWithReqParam != null) {
 			String webHookMqChannelName = WebHookConstants.MQ_CHANNEL_PREFIX
 					.concat(dataWithReqParam.get(WebHookConstants.REQUEST_PARAM_KEY_WEBHOOKNAME).getAsString());
 			String res = dataWithReqParam.toString();
 			WebHookMessagePublisher.getInstance().publishEventAction(res.getBytes(), webHookMqChannelName);
-			log.debug(" Data successfully published in webhook name as ",webHookMqChannelName);
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug(" Data successfully published in webhook name as {} ",webHookMqChannelName);
+			log.debug("Type=Webhook  WebhookName={} MqChannel={} Size={} ProcessingTime={}",request.getParameter("webHookName"),webHookMqChannelName,res.getBytes().length,processingTime);
 		} else {
 			log.debug(" Request body is empty ");
 		}

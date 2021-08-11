@@ -49,13 +49,16 @@ public class GrafanaPdfServiceImpl implements GrafanaPdfService{
 	public void saveGrafanaDashboardConfig(JsonObject dashboardDetails) throws InsightsCustomException {
 			int id = -1;
 			WorkflowServiceImpl workflowService = new WorkflowServiceImpl();
-			boolean runImmediate = true;
-			boolean reoccurence = false;
-			boolean isActive = true;
+			boolean runImmediate = Boolean.TRUE;
+			boolean reoccurence = Boolean.FALSE;
+			boolean isActive = Boolean.TRUE;
 			String workflowType = WorkflowTaskEnum.WorkflowType.GRAFANADASHBOARDPDFREPORT.getValue();
 			JsonElement scheduleType = dashboardDetails.get("scheduleType");
 			String schedule = scheduleType == null ? 
 					WorkflowTaskEnum.WorkflowSchedule.ONETIME.name(): scheduleType.getAsString();
+			if(!schedule.equals(WorkflowTaskEnum.WorkflowSchedule.ONETIME.name())) {
+				reoccurence = Boolean.TRUE;
+			}
 			String workflowStatus = WorkflowTaskEnum.WorkflowStatus.NOT_STARTED.name();
 			String workflowId =  WorkflowTaskEnum.WorkflowType.GRAFANADASHBOARDPDFREPORT.getValue() + "_"
 															+ InsightsUtils.getCurrentTimeInSeconds();
@@ -111,13 +114,15 @@ public class GrafanaPdfServiceImpl implements GrafanaPdfService{
 	public void updateGrafanaDashboardDetails(JsonObject dashboardDetails) throws InsightsCustomException {
 
 		WorkflowServiceImpl workflowService = new WorkflowServiceImpl();
-		boolean runImmediate = true;
-		boolean reoccurence = false;
-		boolean isActive = true;
+		boolean runImmediate = Boolean.TRUE;
+		boolean reoccurence = Boolean.FALSE;
+		boolean isActive = Boolean.TRUE;
 		String workflowType = WorkflowTaskEnum.WorkflowType.GRAFANADASHBOARDPDFREPORT.getValue();
 		String schedule = dashboardDetails.get("scheduleType").getAsString();
 		String workflowStatus = WorkflowTaskEnum.WorkflowStatus.NOT_STARTED.name();
-		
+		if(!schedule.equals(WorkflowTaskEnum.WorkflowSchedule.ONETIME.name())) {
+			reoccurence = Boolean.TRUE;
+		}
 		GrafanaDashboardPdfConfig grafanaDashboardPdfConfig = grafanaDashboardConfigDAL.getWorkflowById(dashboardDetails.get("id").getAsInt());
 		InsightsWorkflowConfiguration workflowConfig = grafanaDashboardPdfConfig.getWorkflowConfig();
 		JsonObject emailDetailsJson = getEmailDetails(dashboardDetails);

@@ -52,7 +52,7 @@ public class InsightsKPIConfigDTO implements Serializable {
 	private long lastRunTime;
 	private long nextRunTime;
 	private long oneTimeReportStartTime;
-	private long oneTimeReportEndDate;
+	private long oneTimeReportEndDate;	
 
 	private Set<InsightsContentConfig> contentConfig = new HashSet<>(0);
 	

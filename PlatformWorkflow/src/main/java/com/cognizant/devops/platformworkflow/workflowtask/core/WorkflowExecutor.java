@@ -16,6 +16,7 @@
 package com.cognizant.devops.platformworkflow.workflowtask.core;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -53,7 +54,7 @@ public class WorkflowExecutor implements Job , ApplicationConfigInterface{
 			initilizeWorkflowTasks();
 			executeWorkflow();
 		} catch (InsightsCustomException e) {
-			log.error(e);
+			log.error(" Worlflow Detail Error ====  {}",e.getMessage());			
 		}
 	}
 
@@ -63,10 +64,11 @@ public class WorkflowExecutor implements Job , ApplicationConfigInterface{
 	 */
 	public void executeWorkflow() {
 		log.debug(" Worlflow Detail ====  Schedular Inside executeWorkflow  ");
+		long startTime = System.nanoTime();
 		InsightsStatusProvider.getInstance().createInsightStatusNode(" Started WorkflowExecutor ",
 				PlatformServiceConstants.SUCCESS);
 		List<InsightsWorkflowConfiguration> readyToRunWorkflow = workflowProcessing.getReadyToRunWorkFlowConfigs();
-
+		long processingTime =0;
 		if (!readyToRunWorkflow.isEmpty()) {
 			for (InsightsWorkflowConfiguration workflowConfig : readyToRunWorkflow) {
 				long executionId = System.currentTimeMillis();
@@ -84,13 +86,21 @@ public class WorkflowExecutor implements Job , ApplicationConfigInterface{
 					log.debug(" Worlflow Detail ==== before publish message executeWorkflow {} ", mqRequestJson);
 					workflowProcessing.publishMessageInMQ(firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),
 							mqRequestJson);
-				} catch (WorkflowTaskInitializationException | InterruptedException e) {
+					processingTime= TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+					log.debug("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetryCount={} isTaskRetry={} processingTime={} message={}"
+							,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),firstworkflowTask.getWorkflowTaskEntity().getDescription(),firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),workflowConfig.getStatus(),workflowConfig.getLastRun()
+							,workflowConfig.getNextRun(),workflowConfig.getScheduleType(),"-","-",processingTime,"-");			
+				} catch (WorkflowTaskInitializationException e) {
 					log.debug(" Worlflow Detail ====  workflow failed to execute due to MQ exception {}  ",
 							workflowConfig.getWorkflowId());
 					InsightsStatusProvider.getInstance().createInsightStatusNode("WorkflowExecutor failed due to exception: "+workflowConfig.getWorkflowId(),
 							PlatformServiceConstants.FAILURE);
 					workflowProcessing.updateWorkflowDetails(workflowConfig.getWorkflowId(),
 							WorkflowTaskEnum.WorkflowStatus.TASK_INITIALIZE_ERROR.toString(), false);
+					log.error("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetryCount={} isTaskRetry={} processingTime={} message={}"
+							,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),firstworkflowTask.getWorkflowTaskEntity().getDescription(),firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),workflowConfig.getStatus(),workflowConfig.getLastRun()
+							,workflowConfig.getNextRun(),workflowConfig.getScheduleType(),"-","-",processingTime,e.getMessage());
+					
 				}catch (Exception e) {
 					log.error(e);
 					log.debug(" Worlflow Detail ====  workflow failed to execute due to exception {}  ",
@@ -99,16 +109,18 @@ public class WorkflowExecutor implements Job , ApplicationConfigInterface{
 							PlatformServiceConstants.FAILURE);
 					workflowProcessing.updateWorkflowDetails(workflowConfig.getWorkflowId(),
 							WorkflowTaskEnum.WorkflowStatus.TASK_INITIALIZE_ERROR.toString(), false);
+					log.error("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetryCount={} isTaskRetry={} processingTime={} message={}"
+							,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),firstworkflowTask.getWorkflowTaskEntity().getDescription(),firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),workflowConfig.getStatus(),workflowConfig.getLastRun()
+							,workflowConfig.getNextRun(),workflowConfig.getScheduleType(),"-","-",processingTime,e.getMessage());
 				}
 			}
 			InsightsStatusProvider.getInstance().createInsightStatusNode(" Completed WorkflowExecutor ",
-					PlatformServiceConstants.SUCCESS);
+					PlatformServiceConstants.SUCCESS);			
 
 		} else {
 			log.debug("Worlflow Detail ==== WorkflowExecutor No reports are currently on due to run");
 			InsightsStatusProvider.getInstance().createInsightStatusNode(
 					" Error occured while initializing executeWorkflow  ", PlatformServiceConstants.FAILURE);
-			
 		}
 
 

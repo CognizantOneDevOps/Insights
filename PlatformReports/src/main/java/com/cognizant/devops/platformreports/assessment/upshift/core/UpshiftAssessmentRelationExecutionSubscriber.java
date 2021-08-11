@@ -19,6 +19,7 @@ package com.cognizant.devops.platformreports.assessment.upshift.core;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.logging.log4j.LogManager;
@@ -57,6 +58,7 @@ public class UpshiftAssessmentRelationExecutionSubscriber extends WorkflowTaskSu
 	public void handleTaskExecution(byte[] body) throws IOException {
 		UpshiftAssessmentConfig upshiftAssessmentConfig = null;
 		try {
+			long startTime = System.nanoTime();
 			String incomingTaskMessage = new String(body, StandardCharsets.UTF_8);
 			log.debug("Worlflow Detail ==== UpshiftAssessmentExecutionSubscriber started ... "
 					+ "routing key  message handleDelivery ===== {} ", incomingTaskMessage);
@@ -70,9 +72,24 @@ public class UpshiftAssessmentRelationExecutionSubscriber extends WorkflowTaskSu
 			
 			log.debug("Total nodes related: {}", numOfNodesRelated);
 			updateReportStatus(upshiftAssessmentConfig, WorkflowTaskEnum.UpshiftAssessmentStatus.COMPLETED.name());
+			 long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+	            log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+	            		"-",workflowConfig.getWorkflowId(),upshiftAssessmentConfig.getId(),workflowConfig.getWorkflowType(),"-","-",processingTime
+	            		,"UpshiftUuid :" +upshiftAssessmentConfig.getUpshiftUuid() +
+	            		"CreatedDate :" +upshiftAssessmentConfig.getCreatedDate() +
+	            		"UpdatedDate :"  +upshiftAssessmentConfig.getUpdatedDate() +
+	            		"fileName :" +upshiftAssessmentConfig.getFileName() +
+	            		"status :" +upshiftAssessmentConfig.getStatus()+ " UpshiftAssessmentExecutionSubscriber");			
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== GrafanaPDFExecutionSubscriber Completed with error ", e);
 			updateReportStatus(upshiftAssessmentConfig, WorkflowTaskEnum.UpshiftAssessmentStatus.ERROR.name());
+			 log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+	            		"-",workflowConfig.getWorkflowId(),upshiftAssessmentConfig.getId(),workflowConfig.getWorkflowType(),"-","-",0
+	            		,"UpshiftUuid :" +upshiftAssessmentConfig.getUpshiftUuid() +
+	            		"CreatedDate :" +upshiftAssessmentConfig.getCreatedDate() +
+	            		"UpdatedDate :"  +upshiftAssessmentConfig.getUpdatedDate() +
+	            		"fileName :" +upshiftAssessmentConfig.getFileName() +
+	            		"status :" +upshiftAssessmentConfig.getStatus()+ " UpshiftAssessmentExecutionSubscriber" +e.getMessage());
 			throw new InsightsJobFailedException(e.getMessage());
 		}
 	}
@@ -107,10 +124,19 @@ public class UpshiftAssessmentRelationExecutionSubscriber extends WorkflowTaskSu
 	 */
 	private void updateReportStatus(UpshiftAssessmentConfig upshiftAssessmentConfig, String status) {
 		if(upshiftAssessmentConfig != null) {
+			long startTime = System.nanoTime();
 			upshiftAssessmentConfig.setStatus(status);
 			upshiftAssessmentConfig.setWorkflowConfig(upshiftAssessmentConfig.getWorkflowConfig());
 			upshiftAssessmentConfig.setUpdatedDate(InsightsUtils.getCurrentTimeInEpochMilliSeconds());
 			upshiftAssessmentConfigDAL.updateUpshiftAssessmentConfig(upshiftAssessmentConfig);
-		}
+			 long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+	            log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+	            		"-",workflowConfig.getWorkflowId(),upshiftAssessmentConfig.getId(),workflowConfig.getWorkflowType(),"-","-",processingTime
+	            		,"UpshiftUuid :" +upshiftAssessmentConfig.getUpshiftUuid() +
+	            		"CreatedDate :" +upshiftAssessmentConfig.getCreatedDate() +
+	            		"UpdatedDate :"  +upshiftAssessmentConfig.getUpdatedDate() +
+	            		"fileName :" +upshiftAssessmentConfig.getFileName() +
+	            		"status :" +upshiftAssessmentConfig.getStatus());
+		}		
 	}
 }

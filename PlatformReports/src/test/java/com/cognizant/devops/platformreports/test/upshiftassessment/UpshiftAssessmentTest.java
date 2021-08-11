@@ -120,7 +120,6 @@ public class UpshiftAssessmentTest extends UpshiftAssessmentTestData {
         String finalJson = null;
         try {
             neo4jResponse = dbHandler.executeCypherQuery(query);
-            log.debug(" Upshift assessment  neo4jResponse  {} ", neo4jResponse.getJson());
             JsonArray data = neo4jResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject()
                     .get("data").getAsJsonArray();
             if (data.size() > 0) {

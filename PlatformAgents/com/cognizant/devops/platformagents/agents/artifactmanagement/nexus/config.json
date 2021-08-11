@@ -58,5 +58,10 @@
   "agentVersion": "v7.2",
   "labelName": "NEXUS",
   "toolName" : "NEXUS",
-  "auditing": false  
+  "auditing": false,
+  "enableProxy":false,
+  "proxies":{
+    	"http":"",
+    	"https":""
+    } 
 }

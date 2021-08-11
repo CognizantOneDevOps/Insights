@@ -46,7 +46,7 @@ public class QueryCachingController {
 		try {
 			payloadRequest = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
 			results = queryCachingService.getCacheResults(payloadRequest);
-		} catch (Exception e) {
+	} catch (Exception e) {
 			log.error(e);
 		}
 

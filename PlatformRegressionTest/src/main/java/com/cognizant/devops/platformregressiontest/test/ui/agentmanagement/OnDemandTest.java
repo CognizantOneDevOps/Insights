@@ -51,7 +51,6 @@ public class OnDemandTest extends LoginAndSelectModule {
 	public void setUp() throws InterruptedException {
 		initialization();
 		getData(ConfigOptionsTest.AGENT_DIR + File.separator + ConfigOptionsTest.AGENT_ONDEMAND_JSON_FILE);
-		selectModuleOnClickingConfig("Agent Management");
 		clickAllActionButton = new AgentConfiguration();
 	}
 

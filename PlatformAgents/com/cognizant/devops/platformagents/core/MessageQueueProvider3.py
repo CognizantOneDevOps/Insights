@@ -22,18 +22,17 @@ import pika
 import _thread
 import json
 import sys
+import logging.handlers
 
 class MessageFactory:
         
-    def __init__(self, user, password, host, exchange, port=None,enableDeadLetterExchange=False):
-        #credentials = pika.PlainCredentials(user, password)
-        #self.connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=host))
-        #self.exchange = exchange
-        #self.channels = {}
+    def __init__(self, user, password, host, exchange, port=None,prefetchCount=10,enableDeadLetterExchange=False):
+        logging.debug('Inside init of MessageFactory =======')
         self.user = user
         self.password = password
         self.host = host
         self.exchange = exchange
+        self.prefetchCount=prefetchCount
         if port != None : 
             self.port = port
         else:
@@ -43,19 +42,29 @@ class MessageFactory:
             self.arguments={"x-dead-letter-exchange" : "iRecover"}
         else:
             self.arguments={}
+        try:    
+            self.credentials = pika.PlainCredentials(self.user, self.password)
+            self.connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=self.credentials,host=self.host,port=self.port))
+        except pika.exceptions.ConnectionClosed as exc:
+            logging.error('In init connection closed... and restarted '+exc.__class__.__name__)
+            logging.error(str(exc))
+        except Exception as ex:
+            logging.error('In Exception connection closed... and restarted'+ex.__class__.__name__)
+            logging.error(str(ex))
         
     def subscribe(self, routingKey, callback, seperateThread=True):
         def subscriberThread():
             credentials = pika.PlainCredentials(self.user, self.password)
-            connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=self.host,port=self.port))
-            channel = connection.channel()
+            subconnection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=self.host,port=self.port))
+            channel = subconnection.channel()
             queueName = routingKey.replace('.','_')
             channel.exchange_declare(exchange=self.exchange, exchange_type='topic', durable=True)
             channel.queue_declare(queue=queueName, passive=False, durable=True, exclusive=False, auto_delete=False, arguments=self.arguments)
             channel.queue_bind(queue=queueName, exchange=self.exchange, routing_key=routingKey, arguments=None)
-            channel.basic_qos(prefetch_count=5)
+            channel.basic_qos(prefetch_count=self.prefetchCount)
             channel.basic_consume(routingKey,callback)
             channel.start_consuming()
+            channel.close()
         if seperateThread:
             _thread.start_new_thread(subscriberThread, ())
         else:
@@ -63,26 +72,29 @@ class MessageFactory:
             
     def publish(self, routingKey, data, batchSize=None, metadata=None):
         if data != None:
-            credentials = pika.PlainCredentials(self.user, self.password)
-            connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=self.host,port=self.port))
-            channel = connection.channel()
+            #credentials = pika.PlainCredentials(self.user, self.password)
+            #connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=self.host,port=self.port))
+            try:
+                if self.connection.is_closed:
+                    logging.debug('In publish block, Connection close .... restarting connection')
+                    self.credentials = pika.PlainCredentials(self.user, self.password)
+                    self.connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=self.credentials,host=self.host,port=self.port))
+                    
+                channelpub = self.connection.channel()
+            except Exception as ex:
+                logging.error('In publish block, for Exception connection closed and restarted ....'+ex.__class__.__name__)
+                logging.error(str(ex))
+                self.credentials = pika.PlainCredentials(self.user, self.password)
+                self.connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=self.credentials,host=self.host,port=self.port))
+                channelpub = self.connection.channel()
             
             queueName = routingKey.replace('.','_')
-            channel.exchange_declare(exchange=self.exchange, exchange_type='topic', durable=True)
-            channel.queue_declare(queue=queueName, passive=False, durable=True, exclusive=False, auto_delete=False, arguments=self.arguments)
-            channel.queue_bind(queue=queueName, exchange=self.exchange, routing_key=routingKey, arguments=None)
-            #channel.exchange_declare(exchange=self.exchange, type='topic', exchange_type='topic', durable=True)
-            #self.exchange = exchange
-            #self.channels = {}
-            #channel = self.channels.get(routingKey, None)
-            #if channel == None:
-            #    channel = self.connection.channel()
-            #    self.channels[routingKey] = channel
-            #    channel.exchange_declare(exchange=self.exchange, type='topic')
-            #sys.getsizeof(dataJson)
+            channelpub.exchange_declare(exchange=self.exchange, exchange_type='topic', durable=True)
+            channelpub.queue_declare(queue=queueName, passive=False, durable=True, exclusive=False, auto_delete=False, arguments=self.arguments)
+            channelpub.queue_bind(queue=queueName, exchange=self.exchange, routing_key=routingKey, arguments=None)
             if batchSize is None:
                 dataJson = self.buildMessageJson(data, metadata)
-                channel.basic_publish(exchange=self.exchange, 
+                channelpub.basic_publish(exchange=self.exchange, 
                                     routing_key=routingKey, 
                                     body=dataJson,
                                     properties=pika.BasicProperties(
@@ -92,13 +104,14 @@ class MessageFactory:
                 baches = list(self.chunks(data, batchSize))
                 for batch in baches:
                     dataJson = self.buildMessageJson(batch, metadata)
-                    channel.basic_publish(exchange=self.exchange, 
+                    channelpub.basic_publish(exchange=self.exchange, 
                                     routing_key=routingKey, 
                                     body=dataJson,
                                     properties=pika.BasicProperties(
                                         delivery_mode=2 #make message persistent
                                     ))
-            connection.close()        
+            #connection.close()
+            channelpub.close()        
     
     def buildMessageJson(self, data, metadata=None):
         messageJson = data
@@ -130,3 +143,4 @@ class MessageFactory:
         channel.queue_bind(exchange='iRecover',
                            routing_key='INSIGHTS.RECOVER.QUEUE', # x-dead-letter-routing-key
                            queue='INSIGHTS_RECOVER_QUEUE')
+        #connection.close()

@@ -55,7 +55,7 @@ class BaseAgent(object):
             start = time.time()
             result = func(self,*args, **kwargs)
             end = time.time()
-            self.functionName = func.__name__
+            self.funcName = func.__name__
             self.timeLogger.info("ProcessingTime={}s".format(round(end - start, 2)))
             return result
         return wrapper
@@ -78,15 +78,15 @@ class BaseAgent(object):
         self.loadTrackingConfig()
         self.loadCommunicationFacade()
         self.initializeMQ()
-        # self.configUpdateSubscriber()
+        self.setupLocalCache()
+        self.extractToolName()
+        self.subscriberForAgentControl()
+        
         if self.webhookEnabled:
             self.subscriberForWebhookAgent()
         else:
-            self.subscriberForAgentControl()
-        self.setupLocalCache()
-        self.extractToolName()
-        self.scheduleExtensions()
-        self.execute()
+            self.scheduleExtensions()
+            self.execute()
         self.scheduleAgent()
        
     def fetchAgentCredentials(self):
@@ -155,7 +155,9 @@ class BaseAgent(object):
             self.toolName = self.config.get('toolName')
             self.webhookEnabled = self.config.get('webhookEnabled', False)
             self.executionId = '--';
-            self.functionName = '--'
+            self.funcName = '--'
+            self.dataSize = 0
+            self.dataCount = 0
             loggingSetting = self.config.get('loggingSetting', {})
             maxBytes = loggingSetting.get('maxBytes', 1000 * 1000 * 5)
             backupCount = loggingSetting.get('backupCount', 1000)
@@ -163,10 +165,10 @@ class BaseAgent(object):
             handler = logging.handlers.RotatingFileHandler(self.logFilePath, maxBytes=maxBytes, backupCount=backupCount)
             
             formatters = {
-                'baseLogger': logging.Formatter('t=%(asctime)s - lvl=%(levelname)s - filename=%(filename)s  - funcName=%(funcName)s - lineno=%(lineno)s - toolName='+self.toolName+' - agentId='+self.agentId+' - execId=%(execId)s   - message=%(message)s'),
-                'timeLogger': logging.Formatter('t=%(asctime)s - lvl=%(levelname)s - functionName=%(functionName)s - toolName='+self.toolName+' - agentId='+self.agentId+' - execId=%(execId)s   - message=%(message)s'),
+                'baseLogger': logging.Formatter('t=%(asctime)s lvl=%(levelname)s filename=%(filename)s funcName=%(funcName)s lineno=%(lineno)s toolName='+self.toolName+' agentId='+self.agentId+' execId=%(execId)s dataSize=%(dataSize)s dataCount=%(dataCount)s message=%(message)s'),
+                'timeLogger': logging.Formatter('t=%(asctime)s lvl=%(levelname)s filename=%(filename)s funcName=%(funcName)s lineno=%(lineno)s toolName='+self.toolName+' agentId='+self.agentId+' execId=%(execId)s dataSize=%(dataSize)s dataCount=%(dataCount)s message=%(message)s'),
             }
-            default_formatter =logging.Formatter('t=%(asctime)s - lvl=%(levelname)s - filename=%(filename)s  - funcName=%(funcName)s - lineno=%(lineno)s - toolName='+self.toolName+' - agentId='+self.agentId+' - execId=%(execId)s   - message=%(message)s')
+            default_formatter =logging.Formatter('t=%(asctime)s lvl=%(levelname)s filename=%(filename)s funcName=%(funcName)s lineno=%(lineno)s toolName='+self.toolName+' agentId='+self.agentId+' execId=%(execId)s dataSize=%(dataSize)s dataCount=%(dataCount)s message=%(message)s')
             
             handler.setFormatter(LoggingFilter(self,formatters,default_formatter))
             handler.setLevel(loggingSetting.get('logLevel', logging.INFO))
@@ -234,6 +236,12 @@ class BaseAgent(object):
         sslVerify = config.get('sslVerify', True)
         self.responseType = config.get('responseType', 'JSON')
         enableValueArray = self.config.get('enableValueArray', False)
+        self.proxies = {}
+        enableProxy = self.config.get("enableProxy",False)
+        if enableProxy:
+            self.proxies = self.config.get("proxies",{})
+        else:
+           self.proxies=None
         self.communicationFacade = communicationFacade.getCommunicationFacade(facadeType, sslVerify, self.responseType,
                                                                               enableValueArray)
 
@@ -250,12 +258,13 @@ class BaseAgent(object):
         agentCtrlXchg = mqConfig.get('agentControlXchg', None)
         port = mqConfig.get('port', 5672)
         enableDeadLetterExchange = mqConfig.get('enableDeadLetterExchange', False)
+        prefetchCount = mqConfig.get('prefetchCount', 10)
 
-        self.messageFactory = MessageFactory(user, mqPass, host, exchange, port,enableDeadLetterExchange)
+        self.messageFactory = MessageFactory(user, mqPass, host, exchange, port, prefetchCount, enableDeadLetterExchange)
         if self.messageFactory == None:
             raise ValueError('BaseAgent: unable to initialize MQ. messageFactory is Null')
 
-        self.agentCtrlMessageFactory = MessageFactory(user, mqPass, host, agentCtrlXchg, port,enableDeadLetterExchange)
+        self.agentCtrlMessageFactory = MessageFactory(user, mqPass, host, agentCtrlXchg, port, prefetchCount, enableDeadLetterExchange)
 
     '''
     Subscribe for Agent START/STOP exchange and queue
@@ -267,7 +276,8 @@ class BaseAgent(object):
 
         def callback(ch, method, properties, data):
             # Update the config file and cache.
-            action = data
+            self.baseLogger.info('Inside subscriberForAgentControl message received '+str(data))
+            action = str(data.decode('utf-8'))
             if "STOP" == action:
                 self.shouldAgentRun = False
                 self.publishHealthData(self.generateHealthData(note="Agent is in STOP mode"))
@@ -276,7 +286,9 @@ class BaseAgent(object):
         self.agentCtrlMessageFactory.subscribe(routingKey, callback)
         
     def subscriberForWebhookAgent(self):
+        
         self.baseLogger.info('Inside subscriberForWebhookAgent')
+        self.executionStartTime = datetime.now()
         routingKey = self.config.get('subscribe').get("webhookPayloadDataQueue")
 
         # logging.debug("AgentId: " + str(self.agentId) + "exceId:" + str(self.executionId) + " " + str(data))
@@ -293,10 +305,13 @@ class BaseAgent(object):
             finally:
                 '''If agent receive the STOP command, Python program should exit gracefully after current data collection is complete.  '''
                 if self.shouldAgentRun == False:
+                    self.baseLogger.info(' subscriberForWebhookAgent STOP message received, Stopping Agent ')
                     os._exit(0)
         
-        self.messageFactory.publish(routingKey, {})
-        self.agentCtrlMessageFactory.subscribe(routingKey, callback)
+        #self.messageFactory.publish(routingKey, {})
+        self.messageFactory.subscribe(routingKey, callback)
+        self.logIndicator(self.EXECUTION_START, self.config.get('isDebugAllowed', False))
+        self.publishHealthData(self.generateHealthData(note="WebHook Agent is in START "))
 
     '''
     Subscribe for Engine Config Changes. Any changes to respective agent will be consumed and processed here.
@@ -338,17 +353,20 @@ class BaseAgent(object):
                          isExtension=False):
         if metadata:
             self.baseLogger.info(
-                    ' - DataSize=' + self.getMQDataPktSize(data) + " Bytes " + ' - DataType=Metadata' + ' - DataCount=' + str(self.pckLen))
+                     ' - DataType=Metadata')
             metadataType = type(metadata)
             if metadataType is not dict:
                 raise ValueError('BaseAgent: Dict metadata object is expected')
         else:
             self.baseLogger.info(
-                    ' - DataSize=' + self.getMQDataPktSize(data) + " Bytes " + ' - DataType=Regular' + ' - DataCount=' + str(self.pckLen))
+                    ' - DataType=Regular')  
         if data:
+            dataSize = self.getMQDataPktSize(data)
+            dataCount =  str(self.pckLen)
             enableDataValidation = self.config.get('enableDataValidation', False)
             if enableDataValidation:
                 data = self.validateData(data)
+                
             self.addExecutionId(data, self.executionId)
             self.addTimeStampField(data, timeStampField, timeStampFormat, isEpochTime, isExtension)
             auditing = self.config.get('auditing', False)
@@ -356,6 +374,12 @@ class BaseAgent(object):
                 self.addDigitalSign(data)
             self.messageFactory.publish(self.dataRoutingKey, data, self.config.get('dataBatchSize', 100), metadata)
             self.logIndicator(self.PUBLISH_START, self.config.get('isDebugAllowed', False))
+            self.dataSize = dataSize
+            self.dataCount= dataCount
+            self.baseLogger.info(
+                     'Publish Data')
+            self.dataSize = 0
+            self.dataCount= 0
 
     '''
         This method validates data and
@@ -494,9 +518,9 @@ class BaseAgent(object):
             json.dump(data, outfile, indent=4, sort_keys=True)
 
     def getResponse(self, url, method, userName, password, data, authType='BASIC', reqHeaders=None, responseTupple=None,
-                    proxies=None):
+                    proxiesParam=None):
         return self.communicationFacade.communicate(url, method, userName, password, data, authType, reqHeaders,
-                                                    responseTupple, proxies)
+                                                    responseTupple, proxies=self.proxies)
 
     def parseResponse(self, template, response, injectData={}):
         return self.communicationFacade.processResponse(template, response, injectData,
@@ -535,7 +559,7 @@ class BaseAgent(object):
             if note != None:
                 health['message'] = note
         data.append(health)
-        self.baseLogger.error("-----------------------------> "+str(data))
+        self.baseLogger.error("-->"+str(data))
         return data
 
     def scheduleAgent(self):
@@ -583,16 +607,19 @@ class BaseAgent(object):
 
     @timed.__func__
     def execute(self):
-        self.baseLogger.info('In execute method, Agent is in START mode')
+        self.baseLogger.info('In execute method ======= ')
         try:
-            self.executionStartTime = datetime.now()
-            self.logIndicator(self.EXECUTION_START, self.config.get('isDebugAllowed', False))
-            self.executionId = str(uuid.uuid1())
-            self.publishHealthData(self.generateHealthData(note="Agent is in START mode with execution id "+ self.executionId))
-            self.baseLogger.info('Inside execute executionId'+self.executionId)
-            self.process()
-            self.executeAgentExtensions()
-            self.publishHealthData(self.generateHealthData())
+            if not self.webhookEnabled:
+                self.executionStartTime = datetime.now()
+                self.logIndicator(self.EXECUTION_START, self.config.get('isDebugAllowed', False))
+                self.executionId = str(uuid.uuid1())
+                self.publishHealthData(self.generateHealthData(note="Agent is in START mode with execution id "+ self.executionId))
+                self.baseLogger.info('Inside execute executionId'+self.executionId)
+                self.process()
+                self.executeAgentExtensions()
+                self.publishHealthData(self.generateHealthData())
+            else:
+                self.baseLogger.info('WebhookEnabled no need to run execute method ')
             
         except Exception as ex:
             self.baseLogger.error(ex)

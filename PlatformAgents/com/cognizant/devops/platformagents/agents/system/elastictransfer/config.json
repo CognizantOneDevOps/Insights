@@ -99,5 +99,10 @@
         "readToken": "vault_secret_token",
         "secretEngine": "insights-kv",
         "vaultUrl": "http://Vault_Host:port/v1/"
+    },
+	"enableProxy":false,
+  	"proxies":{
+    	"http":"",
+    	"https":""
     }
 }

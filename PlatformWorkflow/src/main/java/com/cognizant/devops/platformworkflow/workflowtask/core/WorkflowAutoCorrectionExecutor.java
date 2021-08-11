@@ -49,6 +49,11 @@ public class WorkflowAutoCorrectionExecutor implements Job, ApplicationConfigInt
 		
 		InsightsStatusProvider.getInstance().createInsightStatusNode("Started WorkflowAutoCorrectionExecutor",
 				PlatformServiceConstants.SUCCESS);
+		String workflowId = "-";
+		String status = "-";
+		String schedule = "-";
+		String workflowType ="-";
+		Long lastruntime =null;			
 		try {
 			ApplicationConfigInterface.loadConfiguration();
 			List<InsightsWorkflowConfiguration> activeWorkflowList = workflowDAL.getAllActiveWorkflowConfiguration();
@@ -57,6 +62,11 @@ public class WorkflowAutoCorrectionExecutor implements Job, ApplicationConfigInt
 
 				long currentTime = InsightsUtils.getCurrentTimeInSeconds();
 				long nextRunTime = eachWorkflow.getNextRun();
+				workflowId = eachWorkflow.getWorkflowId();
+				status = eachWorkflow.getStatus();
+				schedule = eachWorkflow.getScheduleType();
+				workflowType =eachWorkflow.getWorkflowType();
+				lastruntime = eachWorkflow.getLastRun();				
 
 				/*
 				 * First check if current time is greater than nextruntime if yes then calculate
@@ -146,6 +156,8 @@ public class WorkflowAutoCorrectionExecutor implements Job, ApplicationConfigInt
 						log.debug("WorkflowAutoCorrection executor === correction performed on workflow : {} ",
 								eachWorkflow.getWorkflowId());
 						adjustedNextRunTime = 0;
+						log.debug("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetry={} isTaskRetry={} processingTime={} message={}"
+								,"-",workflowId,workflowType,"-","-",status,lastruntime ,nextRunTime,schedule,"-","-",0,"-");
 					} catch (Exception e) {
 						log.error(
 								"WorkflowAutoCorrection executor === correction failed to update on workflow : {} due to {}",
@@ -154,9 +166,13 @@ public class WorkflowAutoCorrectionExecutor implements Job, ApplicationConfigInt
 								"In WorkflowAutoCorrectionExecutor,correction failed to update on workflow: "
 										+ eachWorkflow.getWorkflowId() + "due to " + e.getMessage(),
 								PlatformServiceConstants.FAILURE);
+						log.error("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetry={} isTaskRetry={} processingTime={} message={}"
+								,"-",workflowId,workflowType,"-","-",status,lastruntime ,nextRunTime,schedule,"-","-",0,"-");
 					}
 				} else {
 					log.debug("WorkflowAutoCorrection executor === no workflows found for correction");
+					log.debug("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetry={} isTaskRetry={} processingTime={} message={}"
+							,"-",workflowId,workflowType,"-","-",status,lastruntime ,nextRunTime,schedule,"-","-",0,"-");
 					}
 
 				}
@@ -166,6 +182,8 @@ public class WorkflowAutoCorrectionExecutor implements Job, ApplicationConfigInt
 			log.error(e1);
 			InsightsStatusProvider.getInstance().createInsightStatusNode(
 					" Error occured while initializing   " + e1.getMessage(), PlatformServiceConstants.FAILURE);
+			log.error("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetry={} isTaskRetry={} processingTime={} message={}"
+					,"-",workflowId,workflowType,"-","-",status,lastruntime ,"-",schedule,"-","-",0,e1.getMessage());
 		}
 	}
 

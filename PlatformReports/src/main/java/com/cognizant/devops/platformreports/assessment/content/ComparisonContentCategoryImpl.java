@@ -17,6 +17,7 @@ package com.cognizant.devops.platformreports.assessment.content;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,6 +41,7 @@ public class ComparisonContentCategoryImpl extends BaseContentCategoryImpl {
 	 */
 	@Override
 	public void generateContent() {
+		long startTime = System.nanoTime();
 		List<InsightsKPIResultDetails> kpiResults = getKPIExecutionResult();
 		InsightsContentDetail contentResult = null;
 		if (!kpiResults.isEmpty()) {
@@ -54,6 +56,13 @@ public class ComparisonContentCategoryImpl extends BaseContentCategoryImpl {
 					contentConfigDefinition.getCategory(), contentConfigDefinition.getKpiId(),
 					contentResult.getInferenceText());
 			saveContentResult(contentResult);
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "ContentResult :" + contentConfigDefinition.getNoOfResult());
 		}
 	}
 
@@ -68,6 +77,7 @@ public class ComparisonContentCategoryImpl extends BaseContentCategoryImpl {
 		InsightsContentDetail inferenceContentResult = null;
 
 		try {
+			long startTime = System.nanoTime();
 			InsightsKPIResultDetails resultFirstData = kpiResultDetailsList.get(0);
 			String actualTrend = ReportEngineEnum.KPITrends.NOCHANGE.getValue();
 			ReportEngineEnum.KPISentiment sentiment = ReportEngineEnum.KPISentiment.NEUTRAL;
@@ -112,10 +122,23 @@ public class ComparisonContentCategoryImpl extends BaseContentCategoryImpl {
 						"Worlflow Detail ====  content text is null in comparison KPI KPIId {} contentId {} result {} ",
 						contentConfigDefinition.getKpiId(), contentConfigDefinition.getContentId(), resultFirstData);
 			}
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "ContentResult :" + contentConfigDefinition.getNoOfResult());
 		} catch (Exception e) {
 			log.error(e);
 			log.error("Worlflow Detail ====  Error while content processing comparison  KPIId {} contentId {} ",
 					contentConfigDefinition.getKpiId(), contentConfigDefinition.getContentId());
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),0,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" + contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "ContentResult :" + contentConfigDefinition.getNoOfResult()+" Error while content processing comparison " + e.getMessage());			
 			throw new InsightsJobFailedException("Error while content processing comparison  KPIId {} contentId {} " + e.getMessage());
 		}
 		return inferenceContentResult;

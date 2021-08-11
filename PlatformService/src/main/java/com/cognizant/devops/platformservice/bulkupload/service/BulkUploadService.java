@@ -353,7 +353,7 @@ public class BulkUploadService implements IBulkUpload {
 		if (isEpoch(recordFieldValue)) {
 			long timeStringval = new BigDecimal(recordFieldValue).longValue();
 			json.addProperty(PlatformServiceConstants.INSIGHTSTIME, timeStringval);
-			dateTimeFromEpoch = InsightsUtils.insightsTimeXFormat(timeStringval);
+			dateTimeFromEpoch = InsightsUtils.insightsTimeXFormatFromSeconds(timeStringval);
 			json.addProperty(PlatformServiceConstants.INSIGHTSTIMEX, dateTimeFromEpoch);
 			log.debug("No Time format required here.");
 		} else if (insightsTimeFormat.isEmpty()) {
@@ -365,7 +365,7 @@ public class BulkUploadService implements IBulkUpload {
 				if (insightsTimeFormat.equals(InsightsUtils.DATE_TIME_FORMAT)) {
 					json.addProperty(PlatformServiceConstants.INSIGHTSTIMEX, recordFieldValue);
 				} else {
-					dateTimeFromEpoch = InsightsUtils.insightsTimeXFormat(epochTime);
+					dateTimeFromEpoch = InsightsUtils.insightsTimeXFormatFromSeconds(epochTime);
 					json.addProperty(PlatformServiceConstants.INSIGHTSTIMEX, dateTimeFromEpoch);
 				}
 			} catch (InsightsCustomException ex) {

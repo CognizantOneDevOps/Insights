@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -81,6 +82,7 @@ public class ReportElasticSearchDataHandler implements ReportDataHandler {
 		List<InsightsKPIResultDetails> kpiResultDetailList = new ArrayList<>(0);
 		List<JsonObject> kpiResponce = new ArrayList<>();
 		try {
+			long startTime = System.nanoTime();
 			String query_type = "ES_" + contentConfigDefinition.getCategory().toString();
 			String esQuery = QueryEnum.valueOf(query_type).toString();
 			esQuery = esQuery.replace("%kpiId%", String.valueOf(contentConfigDefinition.getKpiId()))
@@ -91,8 +93,22 @@ public class ReportElasticSearchDataHandler implements ReportDataHandler {
 			creatingResultDetailFromESResponce(kpiResultDetailList, contentConfigDefinition, kpiResponce);
 			log.debug("Worlflow Detail ==== In ES, Number of KPI result record return {} ",
 					kpiResultDetailList.size());
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
+					"ContentId :" + contentConfigDefinition.getContentId() + 
+					"ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "Schedule :" + contentConfigDefinition.getSchedule());
 		} catch (Exception e) {
 			log.error(" Error while parsing and fetchKPIResultData for ES  ", e);
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),0,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "Schedule :" + contentConfigDefinition.getSchedule()+ " Error while parsing and fetchKPIResultData for ES " + e.getMessage());
 		}
 		return kpiResultDetailList;
 	}
@@ -120,6 +136,7 @@ public class ReportElasticSearchDataHandler implements ReportDataHandler {
 
 		for (JsonObject jsonObject : kpiResponce) {
 			try {
+				long startTime = System.nanoTime();
 				InsightsKPIResultDetails resultMapping = gson.fromJson(jsonObject, InsightsKPIResultDetails.class);
 				JsonArray columnProperty = jsonObject.get(ReportEngineUtils.COLUMN_PROPERTY).getAsJsonArray();
 				Map<String, Object> results = new HashMap<>();
@@ -134,6 +151,12 @@ public class ReportElasticSearchDataHandler implements ReportDataHandler {
 				}
 				resultMapping.setResults(results);
 				kpiResultDetailList.add(resultMapping);
+				long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+				log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+						contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+						contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
+						"schedule:" +contentConfigDefinition.getSchedule() +
+						"resultField:" +contentConfigDefinition.getResultField());						
 			} catch (Exception e) {
 				log.error(" Error while parsing inference result for ES ", e);
 			}

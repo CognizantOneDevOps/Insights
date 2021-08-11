@@ -49,8 +49,6 @@ public class ApplicationConfigProvider implements Serializable {
 	private String insightsTimeZone = "UTC";
 	@Valid
 	private PostgreData postgre = new PostgreData();
-	private String proxyHost;
-	private int proxyPort;
 	private Date refreshTime;
 	private List<String> trustedHosts = new ArrayList<>(3);
 	private boolean enableOnlineDatatagging = false;
@@ -72,6 +70,7 @@ public class ApplicationConfigProvider implements Serializable {
 	private AssessmentReport assessmentReport = new AssessmentReport();	
 	private WorkflowDetails workflowDetails = new WorkflowDetails();
 	private MlConfiguration mlConfiguration = new MlConfiguration();
+	private ProxyConfiguration proxyConfiguration = new ProxyConfiguration();
 
     private WebhookEngine webhookEngine= new WebhookEngine();
     private String pdfkey;
@@ -167,10 +166,6 @@ public class ApplicationConfigProvider implements Serializable {
 		this.refreshTime = refreshTime;
 	}
 
-	public String getProxyHost() {
-		return proxyHost;
-	}
-
 	public AgentDetails getAgentDetails() {
 		return agentDetails;
 	}
@@ -185,18 +180,6 @@ public class ApplicationConfigProvider implements Serializable {
 
 	public void setEmailConfiguration(EmailConfiguration emailConfiguration) {
 		this.emailConfiguration = emailConfiguration;
-	}
-
-	public void setProxyHost(String proxyHost) {
-		this.proxyHost = proxyHost;
-	}
-
-	public int getProxyPort() {
-		return proxyPort;
-	}
-
-	public void setProxyPort(int proxyPort) {
-		this.proxyPort = proxyPort;
 	}
 
 	public List<String> getTrustedHosts() {
@@ -333,6 +316,14 @@ public class ApplicationConfigProvider implements Serializable {
 
 	public void setMlConfiguration(MlConfiguration mlConfiguration) {
 		this.mlConfiguration = mlConfiguration;
+	}
+
+	public ProxyConfiguration getProxyConfiguration() {
+		return proxyConfiguration;
+	}
+
+	public void setProxyConfiguration(ProxyConfiguration proxyConfiguration) {
+		this.proxyConfiguration = proxyConfiguration;
 	}
 
 	public ApplicationLogLevel getApplicationLogLevel() {

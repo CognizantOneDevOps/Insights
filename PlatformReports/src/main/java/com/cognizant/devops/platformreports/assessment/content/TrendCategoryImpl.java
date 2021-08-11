@@ -18,6 +18,7 @@ package com.cognizant.devops.platformreports.assessment.content;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,6 +44,7 @@ public class TrendCategoryImpl extends BaseContentCategoryImpl {
 	 */
 	@Override
 	public void generateContent() {
+		long startTime = System.nanoTime();
 		List<InsightsKPIResultDetails> inferenceResults = getKPIExecutionResult();
 		InsightsContentDetail contentResult = null;
 		if (!inferenceResults.isEmpty()) {
@@ -57,6 +59,13 @@ public class TrendCategoryImpl extends BaseContentCategoryImpl {
 					contentConfigDefinition.getCategory(), contentConfigDefinition.getKpiId(),
 					contentResult.getInferenceText());
 			saveContentResult(contentResult);
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
+					" ContentId :" + contentConfigDefinition.getContentId() + " ContentName :" +contentConfigDefinition.getContentName() +
+					" action :" + contentConfigDefinition.getAction() 
+					+ " ContentResult :" + contentConfigDefinition.getNoOfResult());
 		}
 
 	}
@@ -89,7 +98,7 @@ public class TrendCategoryImpl extends BaseContentCategoryImpl {
 		Map<String, Object> resultValuesMap = new HashMap<>();
 		double resultValue = 0.0;
 		try {
-
+			long startTime = System.nanoTime();
 			ReportEngineEnum.KPISentiment sentiment = ReportEngineEnum.KPISentiment.NEUTRAL;
 			InsightsKPIResultDetails resultFirstData = inferenceResults.get(0);
 			addTimeValueinResult(resultValuesMap, contentConfigDefinition.getSchedule());
@@ -102,10 +111,25 @@ public class TrendCategoryImpl extends BaseContentCategoryImpl {
 
 			inferenceContentResult = prepareContentMessageAndResult(inferenceContentResult, resultValuesMap,
 					resultValue, sentiment, resultFirstData);
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),
+					"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
+					" ContentId :" + contentConfigDefinition.getContentId() + " ContentName :" +contentConfigDefinition.getContentName() +
+					" action :" + contentConfigDefinition.getAction() 
+					+ " ContentResult :" + contentConfigDefinition.getNoOfResult());
 		} catch (Exception e) {
 			log.error(e);
 			log.error(" Errro while content processing for trend KPIId {} contentId {} ",
 					getContentConfig().getKpiId(), getContentConfig().getContentId());
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId()
+					,"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),0,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "ContentResult :" + contentConfigDefinition.getNoOfResult() + " Exception while running neo4j operation" + e.getMessage() );			
 			throw new InsightsJobFailedException("Exception while running neo4j operation {} " + e.getMessage());
 		}
 
@@ -120,11 +144,13 @@ public class TrendCategoryImpl extends BaseContentCategoryImpl {
 	 * @param inferenceResults
 	 * @return
 	 */
+	
 	private InsightsContentDetail averageTrendResult(List<InsightsKPIResultDetails> inferenceResults) {
 
 		Map<String, Object> resultValuesMap = new HashMap<>();
 		InsightsContentDetail inferenceContentResult = null;
 		try {
+			long startTime = System.nanoTime();
 			String comparisonField = getResultFieldFromContentDefination();
 			InsightsKPIResultDetails resultDetailObj = inferenceResults.get(0);
 
@@ -138,11 +164,25 @@ public class TrendCategoryImpl extends BaseContentCategoryImpl {
 
 			inferenceContentResult = prepareContentMessageAndResult(inferenceContentResult, resultValuesMap,
 					resultValue, sentiment, resultDetailObj);
-
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),
+					"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "ContentResult :" + contentConfigDefinition.getNoOfResult());
 		} catch (Exception e) {
 			log.error(e);
 			log.error(" Errro while content processing for average trend KPIId {} contentId {} ",
 					getContentConfig().getKpiId(), getContentConfig().getContentId());
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),
+					"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),0,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "ContentResult :" + contentConfigDefinition.getNoOfResult() + "Exception while running neo4j operation" + e.getMessage());
 			throw new InsightsJobFailedException("Exception while running neo4j operation {} " + e.getMessage());
 		}
 

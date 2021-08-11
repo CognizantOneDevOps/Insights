@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformreports.assessment.content;
 
+import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,6 +35,7 @@ public class AssessmentReportContentProcesser {
 	 */
 	public void executeContentData(ContentConfigDefinition inferenceContentConfigDefinition) {
 		try {
+			long startTime = System.nanoTime();
 			BaseContentCategoryImpl baseContentAction;
 			if (inferenceContentConfigDefinition.getCategory() == ReportEngineEnum.ContentCategory.COMPARISON
 					|| inferenceContentConfigDefinition.getCategory() == ReportEngineEnum.ContentCategory.STANDARD) {
@@ -53,9 +55,26 @@ public class AssessmentReportContentProcesser {
 				throw new InsightsJobFailedException("Worlflow Detail ====  No content category executer defined");
 			}
 			baseContentAction.generateContent();
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					inferenceContentConfigDefinition.getExecutionId(),inferenceContentConfigDefinition.getWorkflowId(),inferenceContentConfigDefinition.getReportId()
+					,"-",
+					inferenceContentConfigDefinition.getKpiId(),inferenceContentConfigDefinition.getCategory(),processingTime,
+					" ContentId :" + inferenceContentConfigDefinition.getContentId() +
+					" ContentName :" +inferenceContentConfigDefinition.getContentName() +
+					" action :" + inferenceContentConfigDefinition.getAction() +  
+					" ContentResult :" + inferenceContentConfigDefinition.getNoOfResult());			
 		} catch (InsightsJobFailedException e) {
 			log.error("Worlflow Detail ====  Exception while execution content Id %d KPI Id {} exception {} ",
 					inferenceContentConfigDefinition.getContentId(), inferenceContentConfigDefinition.getKpiId(), e);
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					inferenceContentConfigDefinition.getExecutionId(),inferenceContentConfigDefinition.getWorkflowId(),inferenceContentConfigDefinition.getReportId()
+					,"-",
+					inferenceContentConfigDefinition.getKpiId(),inferenceContentConfigDefinition.getCategory(),0,
+					"ContentId :" + inferenceContentConfigDefinition.getContentId() +
+					"ContentName :" +inferenceContentConfigDefinition.getContentName() +
+					"action :" + inferenceContentConfigDefinition.getAction() +  
+					"ContentResult :" + inferenceContentConfigDefinition.getNoOfResult() + "Exception while execution content Id " + e.getMessage() );			
 			throw new InsightsJobFailedException("Exception while execution content Id");
 		}
 	}

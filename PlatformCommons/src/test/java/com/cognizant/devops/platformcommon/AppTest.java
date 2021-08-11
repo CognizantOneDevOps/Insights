@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformsearch;
+package com.cognizant.devops.platformcommon;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

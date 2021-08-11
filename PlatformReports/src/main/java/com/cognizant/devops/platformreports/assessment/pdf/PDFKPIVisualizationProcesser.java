@@ -92,6 +92,8 @@ public class PDFKPIVisualizationProcesser implements Callable<JsonObject> {
 		}
 		log.debug("Worlflow Detail ==== prepared Visualization responce for kpi {} ",
 				reportKpiConfig.getKpiConfig().getKpiId());
+		log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+				assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-",kpiId,"-",0,"Prepared Visualization responce for kpi");
 		return eachKPIObject;
 	}
 

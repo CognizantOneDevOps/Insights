@@ -408,7 +408,7 @@ public class BaseDAL implements IBaseDAL {
 		long endTime=System.nanoTime();
 		long processingTime = TimeUnit.MILLISECONDS.convert( endTime - startTime, TimeUnit.NANOSECONDS );
 		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-		StackTraceElement stackTrace = stacktrace[3];;
+		StackTraceElement stackTrace = stacktrace[3];
 		StackTraceElement stacktraceService = stacktrace[4];
 		
 		logger.debug(

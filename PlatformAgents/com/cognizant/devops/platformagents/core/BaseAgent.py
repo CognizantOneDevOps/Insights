@@ -55,7 +55,7 @@ class BaseAgent(object):
             start = time.time()
             result = func(self,*args, **kwargs)
             end = time.time()
-            self.functionName = func.__name__
+            self.funcName = func.__name__
             self.timeLogger.info("ProcessingTime={}s".format(round(end - start, 2)))
             return result
         return wrapper
@@ -154,8 +154,10 @@ class BaseAgent(object):
             self.agentId = self.config.get('agentId')
             self.toolName = self.config.get('toolName')
             self.webhookEnabled = self.config.get('webhookEnabled', False)
-            self.executionId = '--';
-            self.functionName = '--'
+            self.executionId = '--'
+            self.funcName = '--'
+            self.dataSize = 0
+            self.dataCount = 0
             loggingSetting = self.config.get('loggingSetting', {})
             maxBytes = loggingSetting.get('maxBytes', 1000 * 1000 * 5)
             backupCount = loggingSetting.get('backupCount', 1000)
@@ -163,10 +165,10 @@ class BaseAgent(object):
             handler = logging.handlers.RotatingFileHandler(self.logFilePath, maxBytes=maxBytes, backupCount=backupCount)
             
             formatters = {
-                'baseLogger': logging.Formatter('t=%(asctime)s - lvl=%(levelname)s - filename=%(filename)s  - funcName=%(funcName)s - lineno=%(lineno)s - toolName='+self.toolName+' - agentId='+self.agentId+' - execId=%(execId)s   - message=%(message)s'),
-                'timeLogger': logging.Formatter('t=%(asctime)s - lvl=%(levelname)s - functionName=%(functionName)s - toolName='+self.toolName+' - agentId='+self.agentId+' - execId=%(execId)s   - message=%(message)s'),
+                'baseLogger': logging.Formatter('t=%(asctime)s lvl=%(levelname)s filename=%(filename)s funcName=%(funcName)s lineno=%(lineno)s toolName='+self.toolName+' agentId='+self.agentId+' execId=%(execId)s dataSize=%(dataSize)s dataCount=%(dataCount)s message=%(message)s'),
+                'timeLogger': logging.Formatter('t=%(asctime)s lvl=%(levelname)s filename=%(filename)s funcName=%(funcName)s lineno=%(lineno)s toolName='+self.toolName+' agentId='+self.agentId+' execId=%(execId)s dataSize=%(dataSize)s dataCount=%(dataCount)s message=%(message)s'),
             }
-            default_formatter =logging.Formatter('t=%(asctime)s - lvl=%(levelname)s - filename=%(filename)s  - funcName=%(funcName)s - lineno=%(lineno)s - toolName='+self.toolName+' - agentId='+self.agentId+' - execId=%(execId)s   - message=%(message)s')
+            default_formatter =logging.Formatter('t=%(asctime)s lvl=%(levelname)s filename=%(filename)s funcName=%(funcName)s lineno=%(lineno)s toolName='+self.toolName+' agentId='+self.agentId+' execId=%(execId)s dataSize=%(dataSize)s dataCount=%(dataCount)s message=%(message)s')
             
             handler.setFormatter(LoggingFilter(self,formatters,default_formatter))
             handler.setLevel(loggingSetting.get('logLevel', logging.INFO))
@@ -336,19 +338,23 @@ class BaseAgent(object):
     @timed.__func__
     def publishToolsData(self, data, metadata=None, timeStampField=None, timeStampFormat=None, isEpochTime=False,
                          isExtension=False):
+
         if metadata:
             self.baseLogger.info(
-                    ' - DataSize=' + self.getMQDataPktSize(data) + " Bytes " + ' - DataType=Metadata' + ' - DataCount=' + str(self.pckLen))
+                     ' - DataType=Metadata')
             metadataType = type(metadata)
             if metadataType is not dict:
                 raise ValueError('BaseAgent: Dict metadata object is expected')
         else:
             self.baseLogger.info(
-                    ' - DataSize=' + self.getMQDataPktSize(data) + " Bytes " + ' - DataType=Regular' + ' - DataCount=' + str(self.pckLen))
+                    ' - DataType=Regular')  
         if data:
+            dataSize = self.getMQDataPktSize(data)
+            dataCount =  str(self.pckLen)
             enableDataValidation = self.config.get('enableDataValidation', False)
             if enableDataValidation:
                 data = self.validateData(data)
+                
             self.addExecutionId(data, self.executionId)
             self.addTimeStampField(data, timeStampField, timeStampFormat, isEpochTime, isExtension)
             auditing = self.config.get('auditing', False)
@@ -356,6 +362,12 @@ class BaseAgent(object):
                 self.addDigitalSign(data)
             self.messageFactory.publish(self.dataRoutingKey, data, self.config.get('dataBatchSize', 100), metadata)
             self.logIndicator(self.PUBLISH_START, self.config.get('isDebugAllowed', False))
+            self.dataSize = dataSize
+            self.dataCount= dataCount
+            self.baseLogger.info(
+                     'Publish Data')
+            self.dataSize = 0
+            self.dataCount= 0
 
     '''
         This method validates data and

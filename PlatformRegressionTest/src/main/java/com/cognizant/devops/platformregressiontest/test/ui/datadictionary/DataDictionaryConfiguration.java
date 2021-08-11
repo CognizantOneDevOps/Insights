@@ -64,8 +64,8 @@ public class DataDictionaryConfiguration extends DataDictionaryobjectRepository 
 		Thread.sleep(1000);
 		showCorrelation.click();
 		try {
-			wait.until(ExpectedConditions.visibilityOf(relationshipName));
-			if (relationshipName.isDisplayed()) {
+			Thread.sleep(1000);
+			if (driver.getPageSource().contains("Relationship Name")) {
 				log.info("Relationship between source and destination tool is displayed");
 				return true;
 			}

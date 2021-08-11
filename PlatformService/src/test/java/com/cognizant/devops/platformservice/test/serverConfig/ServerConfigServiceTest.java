@@ -49,7 +49,7 @@ public class ServerConfigServiceTest extends ServerConfigTestData {
 	@BeforeClass
 	public void prepareData() throws InsightsCustomException {
 		try {
-//			ApplicationConfigCache.loadConfigCache();
+		//	ApplicationConfigCache.loadConfigCache();
 		} catch (Exception e) {
 			log.error("message", e);
 		}

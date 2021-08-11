@@ -33,7 +33,7 @@ public class SystemStatus {
 	private static Logger log = LogManager.getLogger(SystemStatus.class.getName());
 
 	public static JsonObject addSystemInformationInNeo4j(String version, List<JsonObject> dataList,
-			List<String> labels) {
+			List<String> labels) throws Exception {
 		GraphDBHandler graphDBHandler = new GraphDBHandler();
 		JsonObject response = null;
 		try {
@@ -50,6 +50,7 @@ public class SystemStatus {
 
 		} catch (Exception e) {
 			log.error(" Neo4j Node not created{} " , e.getMessage());
+			throw e;
 		}
 
 		return response;

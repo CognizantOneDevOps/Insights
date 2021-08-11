@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -88,7 +89,7 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 	public List<JsonObject> fetchKPIData(String graphQuery, InsightsKPIConfigDTO kpiDefinition, QueryModel model) {
 		List<JsonObject> listOfResultJson = new ArrayList<>();
 		try {
-
+			long startTime = System.nanoTime();
 			log.debug("Worlflow Detail ==== graphQuery with date for KPI {} ==== is === {} ", kpiDefinition.getKpiId(),
 					graphQuery);
 			if (!kpiDefinition.getInputDatasource().isEmpty()) {
@@ -110,10 +111,17 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 				 * InsightsStatusProvider.getInstance().createInsightStatusNode(
 				 * "Neo4j query returned invalid result for the KPIID " +
 				 * kpiDefinition.getKpiId(), PlatformServiceConstants.FAILURE);
-				 */
+				 */				
 			}
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					kpiDefinition.getExecutionId(),kpiDefinition.getWorkflowId(),kpiDefinition.getReportId() ,"-",kpiDefinition.getKpiId(),
+					kpiDefinition.getCategory(),processingTime,"usecasename: " +kpiDefinition.getUsecaseName());
 		} catch (Exception e) {
 			log.error("Exception while running neo4j operation  ", e);
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					kpiDefinition.getExecutionId(),kpiDefinition.getWorkflowId(),kpiDefinition.getReportId() ,"-",kpiDefinition.getKpiId(),
+					kpiDefinition.getCategory(),0,"usecasename: " +kpiDefinition.getUsecaseName() +"Exception while running neo4j operation" + e.getMessage());
 			throw new InsightsJobFailedException("Exception while running neo4j operation  " + e.getMessage());
 		}
 		return listOfResultJson;

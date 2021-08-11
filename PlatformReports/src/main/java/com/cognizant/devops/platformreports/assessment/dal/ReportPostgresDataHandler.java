@@ -18,6 +18,7 @@ package com.cognizant.devops.platformreports.assessment.dal;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,6 +45,7 @@ public class ReportPostgresDataHandler {
 	public ContentConfigDefinition convertJsonToContentConfig(InsightsContentConfig contentDBConfig) {
 		ContentConfigDefinition contentConfig = null;
 		try {
+			long startTime = System.nanoTime();
 			ObjectMapper oMapper = new ObjectMapper();
 			JsonNode contentNode = oMapper.readTree(contentDBConfig.getContentJson());
 			if (contentNode.isObject()) {
@@ -71,10 +73,19 @@ public class ReportPostgresDataHandler {
 								.valueOf(String.valueOf(configMap.get("directionOfThreshold"))));
 					}
 					contentConfig.setCategory(ReportEngineEnum.ContentCategory.valueOf(contentDBConfig.getCategory()));
+					long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+					log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+							"-","-","-","-",contentDBConfig.getKpiConfig().getId(),"-",processingTime,
+							"ContentId :" +contentDBConfig.getId()+ "ContentName :"+contentDBConfig.getContentName() + "Category :" +contentDBConfig.getCategory()
+							);
 				}
-			}
+			}			
 		} catch (Exception e) {
 			log.error(e);
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					"-","-","-","-",contentDBConfig.getKpiConfig().getId(),"-",0,
+					"ContentId :" +contentDBConfig.getId()+ "ContentName :"+contentDBConfig.getContentName() + "Category :" +contentDBConfig.getCategory() +e.getMessage()
+					);
 		}
 		return contentConfig;
 	}

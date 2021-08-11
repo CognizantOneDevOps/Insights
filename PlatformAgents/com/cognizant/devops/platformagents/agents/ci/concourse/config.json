@@ -62,5 +62,10 @@
 		"maxBytes" : 5000000,
 		"backupCount" : 10
  },
- "auditing": false
+ "auditing": false,
+ "enableProxy":false,
+"proxies":{
+    	"http":"",
+    	"https":""
+    }
 }

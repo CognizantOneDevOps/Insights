@@ -102,7 +102,7 @@ public class EngineAggregatorModule extends TimerTask implements ApplicationConf
 				isEnrichmentRequired = enrichTool.get("isEnrichmentRequired").getAsBoolean();
 				targetProperty = enrichTool.get("targetProperty").getAsString();
 				keyPattern = enrichTool.get("keyPattern").getAsString();
-				sourceProperty = enrichTool.get("sourceProperty").getAsString();
+				sourceProperty = enrichTool.get("sourceProperty").getAsString();				
 			}
 			log.debug(" Type=AgentEngine toolName={} category={} agentId={} routingKey={} dataSize={} execId={} ProcessingTime={} dataRoutingKey {} Tool Info {}" ,toolName,agentConfig.getToolCategory(),agentConfig.getAgentKey(),dataRoutingKey,0,"-",0,dataRoutingKey,toolName);
 

@@ -22,6 +22,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import javax.activation.DataHandler;
 import javax.mail.BodyPart;
@@ -83,6 +84,7 @@ public class EmailProcesser implements Callable<JsonObject> {
 		Session session = Session.getDefaultInstance(props);
 		MimeMessage msg = new MimeMessage(session);
 		try {
+			long startTime = System.nanoTime();
 			msg.setSentDate(new Date());
 			msg.setSubject(mail.getSubject());
 			msg.setFrom(new InternetAddress(mail.getMailFrom(), EmailConstants.NOREPLY));
@@ -102,14 +104,19 @@ public class EmailProcesser implements Callable<JsonObject> {
 			msg = attachMsgBodyAndAttachFile(msg, mail);
 			sendFinalEmail(session, msg);
 			isMailSent = true;
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			logDebugStatement(mail,processingTime,"-");			
 		} catch (MessagingException e) {
 			log.error("Workflow Detail ==== ReportEmailSubscriber Unable to create Mime Message ===== ", e);
+			logErrorStatement(mail,e.getMessage());		
 			throw new InsightsCustomException("Unable to create Mime Message");
 		} catch (UnsupportedEncodingException e) {
 			log.error("Workflow Detail ==== ReportEmailSubscriber Message Encoding not supported ===== ", e);
+			logErrorStatement(mail,e.getMessage());			
 			throw new InsightsCustomException("Message Encoding not supported!");
 		} catch (Exception e) {
 			log.error("Workflow Detail ==== ReportEmailSubscriber Message ", e);
+			logErrorStatement(mail,e.getMessage());				
 			throw new InsightsCustomException(e.getMessage());
 		}
 		return isMailSent;
@@ -117,6 +124,7 @@ public class EmailProcesser implements Callable<JsonObject> {
 
 	public MimeMessage attachMsgBodyAndAttachFile(MimeMessage msg, MailReport mail) throws InsightsCustomException {
 		try {
+			long startTime = System.nanoTime();
 			String htmlText = mail.getMailBody();
 			Multipart multipart = new MimeMultipart();
 			// Create the attachment part
@@ -136,9 +144,12 @@ public class EmailProcesser implements Callable<JsonObject> {
 			multipart.addBodyPart(htmlBodyPart);
 			// Set the Multipart's to be the email's content
 			msg.setContent(multipart);
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
 			log.debug("Workflow Detail ==== ReportEmailSubscriber  Mime Message created =====  ");
+			logDebugStatement(mail,processingTime,"-");			
 		} catch (MessagingException | IOException e) {
 			log.error("Workflow Detail ==== ReportEmailSubscriber Unable to create Mime Message =====  ", e);
+			logErrorStatement(mail,e.getMessage());			
 			throw new InsightsCustomException("Unable to create Mime Message");
 		}
 		return msg;
@@ -167,6 +178,22 @@ public class EmailProcesser implements Callable<JsonObject> {
 				}
 			}
 		}
+	}
+	
+	private void logDebugStatement(MailReport mail,long processingTime,String message)
+	{
+		log.debug("Type = EmailProcesser mailTo={}  mailCC={} mailBCC={} emailAttachmentName={} "
+				+ "reportFilePath={} processingTime={} message={}" ,mail.getMailTo()
+				,mail.getMailCC(),mail.getMailBCC(),mail.getEmailAttachmentName()
+				,mail.getReportFilePath(),processingTime,message);
+	}
+	
+	private void logErrorStatement(MailReport mail,String message)
+	{
+		log.error("Type = EmailProcesser mailTo={}  mailCC={} mailBCC={} emailAttachmentName={} "
+				+ "reportFilePath={}  processingTime={} message={}" ,mail.getMailTo()
+				,mail.getMailCC(),mail.getMailBCC(),mail.getEmailAttachmentName()
+				,mail.getReportFilePath(),0,message);
 	}
 
 }

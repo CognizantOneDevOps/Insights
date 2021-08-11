@@ -129,12 +129,13 @@ class GitWebhookAgent(BaseAgent):
         
         for commit in commitsList:
             timestamp = commit.get("timestamp",None)
-            commitTime = parser.parse(timestamp, ignoretz=True).strftime("%Y-%m-%dT%H:%M:%SZ")
+            commitTime = parser.parse(timestamp, ignoretz=True).astimezone(self.insightsTimeZone).strftime("%Y-%m-%dT%H:%M:%SZ")
             commitMessage = commit.get("message",None)
             almKeyIter = re.finditer(self.almRegEx, commitMessage)
             almKeys = [key.group(0) for key in almKeyIter]
             injectData = metaData.copy()
             injectData["commitTime"] = commitTime
+            injectData["timestamp"] = timestamp
             fileInjectData = {}
             
             if almKeys:

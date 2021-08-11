@@ -208,5 +208,10 @@
 	},
 	"labelName": "GIT",
 	"toolName": "GIT",
-	"auditing": false
+	"auditing": false,
+    "enableProxy":false,
+    "proxies":{
+    	"http":"",
+    	"https":""
+    }
 }

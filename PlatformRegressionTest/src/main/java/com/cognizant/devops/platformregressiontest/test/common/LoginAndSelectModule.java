@@ -85,6 +85,19 @@ public class LoginAndSelectModule {
 		}
 	}
 
+	public static void selectModuleOnClickingDashboardgroups(String moduleName) throws InterruptedException {
+		Thread.sleep(1000);
+		driver.findElement(By.xpath("//p[contains(text(),'Dashboard Groups ')]")).click();
+		List<WebElement> menuList = driver.findElements(By.xpath("//p[contains(@class,'line-child')]"));
+		for (WebElement reuqiredOption : menuList) {
+			if (reuqiredOption.getText().equals(moduleName)) {
+				reuqiredOption.click();
+				break;
+			}
+
+		}
+	}
+
 	/* Selects modules under Configuration on UI */
 	public static void selectModuleUnderConfiguration(String moduleName) {
 		List<WebElement> menuList = driver.findElements(By.xpath("//p[contains(@class,'line-child')]"));

@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -75,7 +76,7 @@ public class FusionChartHandler implements BasePDFProcessor {
 	public void generatePDF(InsightsAssessmentConfigurationDTO assessmentReportDTO) {
 
 		try {
-
+			long startTime = System.nanoTime();
 			createPDFDirectory(assessmentReportDTO);
 
 			JsonArray finalTemplateJson = generateChartsConfig(assessmentReportDTO);
@@ -86,9 +87,18 @@ public class FusionChartHandler implements BasePDFProcessor {
 					assessmentReportDTO);
 			
 			exportPDFFile(finalTemplateJson, assessmentReportDTO, insightsReportPdfTableConfig);
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-","-","-",processingTime,
+					"reportId: "+assessmentReportDTO.getReportId() + "reportName: " +assessmentReportDTO.getReportName() + "VisualizationUtil" +
+					assessmentReportDTO.getVisualizationutil());
 
 		} catch (Exception e) {
 			log.error(e);
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-","-","-",0,
+					"reportId: "+assessmentReportDTO.getReportId() + "reportName: " +assessmentReportDTO.getReportName() + "VisualizationUtil" +
+					assessmentReportDTO.getVisualizationutil() + e.getMessage());
 			throw new InsightsJobFailedException(e.getMessage());
 		}
 
@@ -96,6 +106,7 @@ public class FusionChartHandler implements BasePDFProcessor {
 
 	private void createPDFDirectory(InsightsAssessmentConfigurationDTO assessmentReportDTO) {
 		try {
+			long startTime = System.nanoTime();
 			String folderName = assessmentReportDTO.getAsseementreportname() + "_"
 					+ assessmentReportDTO.getExecutionId();
 			assessmentReportDTO.setPdfReportFolderName(folderName);
@@ -103,10 +114,19 @@ public class FusionChartHandler implements BasePDFProcessor {
 					+ folderName;
 			assessmentReportDTO.setPdfReportDirPath(reportExecutionFile);
 			setReportExecutionFolder(assessmentReportDTO);
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-","-","-",processingTime,
+					"reportId: "+assessmentReportDTO.getReportId() + "reportName: " +assessmentReportDTO.getReportName() + "Foldername" +folderName
+					);
 		} catch (Exception e) {
 			log.error(e);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-","-","-",0,
+					"reportId: "+assessmentReportDTO.getReportId() + "reportName: " +assessmentReportDTO.getReportName() +"Unable to create pdf execution directory"
+					+ e.getMessage());
 			throw new InsightsJobFailedException(
-					"Unable to create pdf execution directory, message == " + e.getMessage());
+					"Unable to create pdf execution directory, message == " + e.getMessage());			
 		}
 	}
 
@@ -141,7 +161,7 @@ public class FusionChartHandler implements BasePDFProcessor {
 				String kpiId = eachKpiResult.get("kpiId").getAsString();
 				JsonArray kpiVisualizationArray = eachKpiResult.get("visualizationresult").getAsJsonArray();
 				log.debug("Worlflow Detail ====  generateChartsConfig for kpi {} kpiVisualizationArray  {} ", kpiId,
-						kpiVisualizationArray);
+						kpiVisualizationArray);			
 				for (JsonElement eachElement : kpiVisualizationArray) {
 					JsonObject eachVisualizationResult = eachElement.getAsJsonObject();
 					String vType = eachVisualizationResult.get("vType").getAsString();
@@ -229,7 +249,8 @@ public class FusionChartHandler implements BasePDFProcessor {
 		String templateHtmlPath = assessmentReportDTO.getPdfReportDirPath() + File.separator
 				+ assessmentReportDTO.getReportFilePath() + AssessmentReportAndWorkflowConstants.HTMLEXTENSION;
 		log.debug("Worlflow Detail ==== templateHtmlPath {} ", templateHtmlPath);
-		try {		
+		try {	
+			long startTime = System.nanoTime();
 			File render = new File(templateHtmlPath);
 			Document document = Jsoup.parse(render, "UTF-8");
 			String originalHTml = document.toString();
@@ -240,6 +261,11 @@ public class FusionChartHandler implements BasePDFProcessor {
 					printWriter.print(modifiedHtml);
 				}
 			}
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-","-","-",processingTime,
+					"reportId: "+assessmentReportDTO.getReportId() + "reportName: " +assessmentReportDTO.getReportName()
+					);
 		} catch (FileNotFoundException e) {
 			log.error("Worlflow Detail ==== Unable to update html template , report template html file not found", e);
 			throw new InsightsJobFailedException("Unable to update html template, report template html file not found "
@@ -318,6 +344,7 @@ public class FusionChartHandler implements BasePDFProcessor {
 	private void exportPDFFile(JsonArray finalTemplateJson, InsightsAssessmentConfigurationDTO assessmentReportDTO, InsightsReportPdfTableConfig insightsReportPdfTableConfig) {
 		Path zipPathVeriable = null;
 		try {
+			long startTime = System.nanoTime();
 			String url = ApplicationConfigProvider.getInstance().getAssessmentReport().getFusionExportAPIUrl();
 			String zipPath = assessmentReportDTO.getPdfReportDirPath() + ".zip";
 			Path sourceFolderPath = Paths.get(assessmentReportDTO.getPdfReportDirPath());
@@ -358,6 +385,11 @@ public class FusionChartHandler implements BasePDFProcessor {
 					headers, ReportEngineUtils.REPORT_MEDIA_TYPE, fusionFilePath);
 			if (fileUploadStatus) {
 				log.debug("Worlflow Detail ==== pdf File Saved {} ", fusionFilePath);
+				long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+				log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+						assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-","-","-",processingTime,
+						"reportId: "+assessmentReportDTO.getReportId() + "reportName: " +assessmentReportDTO.getReportName() + "VisualizationUtil" +
+						assessmentReportDTO.getVisualizationutil() + "FusionFilePath :" +fusionFilePath);
 				String fusion = assessmentReportDTO.getPdfReportDirPath() + File.separator
 						+ assessmentReportDTO.getAsseementreportname() + "_Fusion." + ReportEngineUtils.REPORT_TYPE;
 				String open = assessmentReportDTO.getPdfReportDirPath() + File.separator
@@ -381,6 +413,10 @@ public class FusionChartHandler implements BasePDFProcessor {
 				}
 			} else {
 				log.error("Worlflow Detail ==== Error while created pdf file {}", exportedFilePath);
+				log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+						assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-","-","-",0,
+						"reportId: "+assessmentReportDTO.getReportId() + "reportName: " +assessmentReportDTO.getReportName() + "VisualizationUtil" +
+						assessmentReportDTO.getVisualizationutil() + "FusionFilePath :" +fusionFilePath +"Error while created pdf file");
 				throw new InsightsJobFailedException(
 						"Unable to generate pdf, Please check pdf export server connectivity  ");
 			}

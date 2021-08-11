@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -70,6 +71,7 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 		JsonObject statusObject = null;
 		JsonObject incomingTaskMessage = new JsonParser().parse(message).getAsJsonObject();
 		try {
+			long startTime = System.nanoTime();
 			log.debug("Workflow Detail ==== ReportEmailSubscriber routing key message handleDelivery {} ===== ",
 					message);
 			InsightsEmailTemplates emailTemplate = workflowDAL
@@ -95,6 +97,9 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 					statusObject = updateFailedTaskStatusLog(failedJobs);
 					throw new InsightsJobFailedException("Unable to send an email");
 				}
+				long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+				log.debug("Type=EmailExecution  executionId={} workflowId={} ReportName={} mailto={} mailFrom={} ProcessingTime={} message={}",executionId ,workflowId,
+						"-",mailReportDTO.getMailTo(),mailReportDTO.getMailFrom(),processingTime, " AttachmentName: " + mailReportDTO.getEmailAttachmentName());
 			} else {
 				throw new InsightsJobFailedException("Email template not found!");
 			}
@@ -109,11 +114,17 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 			} else {
 				setStatusLog(e.getMessage());
 			}
+			log.error("Type=EmailExecution  executionId={} workflowId={} ReportName={} mailto={} mailFrom={} ProcessingTime={} message={}",executionId ,workflowId,
+					"-",mailReportDTO.getMailTo(),mailReportDTO.getMailFrom(),0, " AttachmentName :" + mailReportDTO.getEmailAttachmentName() +
+					"Failed to send email in ReportEmailSubscriber" + e.getMessage());			
 			throw new InsightsJobFailedException("Failed to send email in ReportEmailSubscriber");
 		} catch (Exception e) {
 			log.error("Workflow Detail ==== ReportEmailSubscriberEmail Send failed to execute Exception ===== ", e);
 			InsightsStatusProvider.getInstance().createInsightStatusNode("ReportEmailSubscriberEmail Completed with error "+e.getMessage(),
 					PlatformServiceConstants.FAILURE);
+			log.error("Type=EmailExecution  executionId={} workflowId={} ReportName={} mailto={} mailFrom={} ProcessingTime={} message={}",executionId ,workflowId,
+					"-",mailReportDTO.getMailTo(),mailReportDTO.getMailFrom(),0, " AttachmentName :" + mailReportDTO.getEmailAttachmentName() +
+					"  ReportEmailSubscriberEmail Send failed to execute Exception " + e.getMessage());
 		}
 
 	}
@@ -189,6 +200,9 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 		statusObject.add("log", logArray);
 		// statusLog set here which is class variable of WorkflowTaskSubscriberHandler
 		log.error("Workflow Detail ==== unable to send an email statusLog {}  ", statusLog);
+		log.error("Type=EmailExecution  executionId={} workflowId={} ReportName={} mailto={} mailFrom={} ProcessingTime={} message={}",executionId ,workflowId,
+				"-",mailReportDTO.getMailTo(),mailReportDTO.getMailFrom(),0, "AttachmentName :" + mailReportDTO.getEmailAttachmentName() +" statuslog :" + statusLog +
+				"Unable to send an email");
 		return statusObject;
 
 	}
@@ -244,7 +258,7 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 				emailHistoryConfig.setStatus(WorkflowTaskEnum.EmailStatus.IN_PROGRESS.toString());
 				emailHistoryConfig.setMailId(emailTemplate.getId());
 				workflowDAL.updateEmailExecutionHistory(emailHistoryConfig);
-				return collectInfoFromDataBase(incomingTaskMessage, emailHistoryConfig);
+				return collectInfoFromDataBase(incomingTaskMessage, emailHistoryConfig);				
 			} else {
 				throw new InsightsJobFailedException("No record found in Email History table");
 			}

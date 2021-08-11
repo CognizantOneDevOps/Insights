@@ -264,7 +264,7 @@ public class TokenProviderUtility {
 		boolean isVerify = Boolean.FALSE;
 		boolean validateTokenDate = Boolean.FALSE;
 		JWTClaimsSet claims = null;
-		log.debug(" In verifyAndFetchCliaimsToken method ");
+		log.debug(" In verifyAndFetchCliaimsToken method ==== ");
 		try {
 			String authToken = ValidationUtils.cleanXSS(token);
 			if (authToken == null || authToken.isEmpty()) {
@@ -279,7 +279,7 @@ public class TokenProviderUtility {
 
 			claims = signedJWT.getJWTClaimsSet();
 
-			log.debug(" username in message  {} ", signedJWT.getJWTClaimsSet().getSubject());
+			//log.debug(" userName in message  {} ", signedJWT.getJWTClaimsSet().getSubject());
 			//log.debug(" domain {} ", signedJWT.getJWTClaimsSet().getIssuer()) cognizant.com
 			//log.debug("Expiration Time after  {}", signedJWT.getJWTClaimsSet().getExpirationTime())
 			//log.debug("Check date of token with current date {} ",
@@ -301,7 +301,7 @@ public class TokenProviderUtility {
 			throw new InsightsCustomException("Exception while varifing token ==== " + e.getMessage());
 		}
 
-		log.debug(" is Token Verify  ====  {} ", isVerify);
+		//log.debug(" is Token Verify  ====  {} ", isVerify);
 
 		return claims;
 	}

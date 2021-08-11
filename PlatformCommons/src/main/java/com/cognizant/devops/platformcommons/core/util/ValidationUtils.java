@@ -209,6 +209,47 @@ public class ValidationUtils {
 		}
 		return value;
 	}
+	
+	/**
+	 * Strips any potential XSS threats out of the value
+	 * 
+	 * @param value
+	 * @param key
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	public static String cleanXSS(String key, String value) {
+		boolean isXSSPattern = Boolean.FALSE;
+		String valueWithXSSPattern = "";
+		if (value != null || !("").equals(value)) {
+			try {
+				boolean hasHTML = validateStringForHTMLContent(value);
+				if (hasHTML) {
+					isXSSPattern = true;
+				} else {
+					// match sections that match a pattern
+					for (Pattern scriptPattern : patterns) {
+						Matcher m = scriptPattern.matcher(value);
+						if (m.find()) {
+							isXSSPattern = true;
+							valueWithXSSPattern = value;
+							break;
+						}
+					}
+				}
+				if (isXSSPattern) {
+					log.error("Invalid pattern found in data value for key {}  ******  {} ",key , valueWithXSSPattern);
+					throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
+				}
+			} catch (RuntimeException e) {
+				log.error("Invalid pattern found in data value for key {} ==== {} ",key , valueWithXSSPattern);
+				throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
+			}
+		} else {
+			log.debug("In cleanXSS , value is empty for key {}  ",key);
+		}
+		return value;
+	}
 
 	public static String cleanXSSWithHTMLCheck(String value) {
 		Boolean isXSSPattern = Boolean.FALSE;

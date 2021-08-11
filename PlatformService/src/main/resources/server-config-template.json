@@ -136,5 +136,13 @@
 			"PlatformReport": "DEBUG",
 			"PlatformRegressionTest": "DEBUG"
 		}
+	},
+	"proxyConfiguration":{
+		"isEnableProxy":false,
+		"proxyHost":"",
+		"proxyPort":0,
+		"proxyUsername":"",
+		"proxyPassword":""
+	
 	}
 }

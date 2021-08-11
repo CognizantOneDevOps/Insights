@@ -15,10 +15,12 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.common;
 public interface ConfigOptionsTest {
-	String PROP_FILE = "regression_test.properties";	
+	String PROP_FILE = "regression_test.properties";
+	String TRACEABILITY_JSON_FILE = "traceability.json";
 	String AGENT_JSON_FILE = "agentTestData.json";
 	String AGENT_ONDEMAND_JSON_FILE = "agentOnDemandTestData.json";
 	String AGENT_RELEASE_JSON_FILE = "agentReleaseData.json";
+	String AGENT_DUMMY_DATA_JSON_FILE = "dummyDataAgent.json";
 	String LOGIN_JSON_FILE = "login.json";
 	String AGENT_OFFLINE_JSON_FILE = "agentOfflineTestData.json";
 	String REPORT_JSON_FILE = "reportTestData.json";
@@ -40,8 +42,10 @@ public interface ConfigOptionsTest {
 	String INSIGHTS_HOME = "INSIGHTS_HOME";
 	String CONFIG_DIR = ".InSights";
 	String AUTO_DIR = "Automation";
+	String ENGINE_AUTO_DIR ="engineAutomation";
 	String AGENT_DIR = "agent_management";
 	String LOGIN_DIR = "login";
+	String TRACEABILITY_DASHBOARD_DIR = "trceability_dashboard";
 	String HEALTH_CHECK_DIR = "health_check";
 	String SERVERCONFIGURATION_DIR = "server_configuration";
 	String DATADICTIONARY_DIR = "data_dictionary";

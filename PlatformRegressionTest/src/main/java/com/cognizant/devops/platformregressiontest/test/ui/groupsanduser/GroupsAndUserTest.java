@@ -83,9 +83,10 @@ public class GroupsAndUserTest extends LoginAndSelectModule {
 
 	/**
 	 * Assert true if user is created successfully else false
+	 * @throws InterruptedException 
 	 */
 	@Test(priority = 3)
-	public void addUser() {
+	public void addUser() throws InterruptedException {
 		Assert.assertTrue(clickAllActionButton.addUser(), "user has not been created");
 	}
 

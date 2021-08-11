@@ -1,0 +1,15 @@
+{
+	"configurationFile": "Configuration File Management",
+	"correlationfilename": "Correlation",
+	"filetype": "JSON",
+	"correlationmodule": "CORRELATION",
+	"correlationfilepath": "C:\\Insights\\InSights_Windows\\Server2\\INSIGHTS_HOME\\Automation\\engineAutomation\\correlation_demo.json",
+	"dataenrichmentfilename": "dataEnrichment",
+	"dataenrichmentmodule": "DATAENRICHMENT",
+	"dataenrichmentfilepath": "C:\\Insights\\InSights_Windows\\Server2\\INSIGHTS_HOME\\Automation\\engineAutomation\\offlineQueriesForDummyData.json",
+	"traceabilityfilename": "traceability",
+	"traceabilitymodule": "TRACEABILITY",
+	"traceabilityfilepath": "C:\\Insights\\InSights_Windows\\Server2\\INSIGHTS_HOME\\Automation\\engineAutomation\\Traceability_demo.json",
+	"agentId": "agent_dummy_data",
+	"timerPath":"C:\\Insights\\InSights_Windows\\Server2\\INSIGHTS_HOME\\Automation\\engineAutomation\\timer.txt"
+}

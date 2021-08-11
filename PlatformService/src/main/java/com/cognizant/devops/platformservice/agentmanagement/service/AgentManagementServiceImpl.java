@@ -73,14 +73,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
 
 @Service("agentManagementService")
 @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class AgentManagementServiceImpl implements AgentManagementService {
 
 	private static Logger log = LogManager.getLogger(AgentManagementServiceImpl.class);
-
+	boolean isProxyEnabled = ApplicationConfigProvider.getInstance().getProxyConfiguration().isEnableProxy();
 	AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 	VaultHandler vaultHandler = new VaultHandler();
 	String fileUnzipPath = ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath();
@@ -311,7 +310,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl();
 		Document doc;
 		try {
-			doc = Jsoup.connect(url).get();
+			doc = getDocrootConnection(url);
 			Elements rows = doc.getElementsByTag("a");
 			for (Element element : rows) {
 				if (null != element.text() && element.text().startsWith("v")) {
@@ -327,6 +326,20 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		return agentDetails;
 	}
 
+	/** This method is use to create docRoot connection based on proxy
+	 * @param url
+	 * @return
+	 * @throws IOException
+	 */
+	private Document getDocrootConnection(String url) throws IOException {
+		Document doc;
+		if(isProxyEnabled)
+			doc = Jsoup.connect(url).proxy(ApplicationConfigProvider.getInstance().getProxyConfiguration().getProxyHost(), ApplicationConfigProvider.getInstance().getProxyConfiguration().getProxyPort()).get();
+		else
+			doc = Jsoup.connect(url).get();
+		return doc;
+	}
+
 	@Override
 	public Map<String, ArrayList<String>> getRepoAvailableAgentList() throws InsightsCustomException {
 		Map<String, ArrayList<String>> agentDetails = new TreeMap<>();
@@ -334,7 +347,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getBrowseRepoUrl();
 		Document doc;
 		try {
-			doc = Jsoup.connect(url).get();
+			doc = getDocrootConnection(url);
 			Elements rows = doc.getElementsByTag("a");
 			for (Element element : rows) {
 				if (null != element.text() && element.text().startsWith("v")) {
@@ -392,7 +405,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 				+ AgentCommonConstant.AGENTS;
 		ArrayList<String> tools = new ArrayList<>();
 		try {
-			doc = Jsoup.connect(url).get();
+			doc = getDocrootConnection(url);
 			Elements rows = doc.getElementsByTag("a");
 			for (Element element : rows) {
 				if (null != element.text() && !(element.text().startsWith("Parent"))) {
@@ -411,7 +424,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 				+ AgentCommonConstant.AGENTS;
 		ArrayList<String> tools = new ArrayList<>();
 		try {
-			doc = Jsoup.connect(url).get();
+			doc = getDocrootConnection(url);
 			Elements rows = doc.getElementsByTag("a");
 			for (Element element : rows) {
 				if (null != element.text() && element.text().endsWith("/")) {
@@ -515,10 +528,12 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		} else {
 			configJsonObj.addProperty(AgentCommonConstant.WEBHOOK_ENABLED, false);
 		}
-		configJsonObj.get("mqConfig").getAsJsonObject().addProperty("port",
+		configJsonObj.get(AgentCommonConstant.MQCONFIG).getAsJsonObject().addProperty("port",
 				ApplicationConfigProvider.getInstance().getMessageQueue().getPort());
-		configJsonObj.get("mqConfig").getAsJsonObject().addProperty("enableDeadLetterExchange",
+		configJsonObj.get(AgentCommonConstant.MQCONFIG).getAsJsonObject().addProperty("enableDeadLetterExchange",
 				ApplicationConfigProvider.getInstance().getMessageQueue().isEnableDeadLetterExchange());
+		configJsonObj.get(AgentCommonConstant.MQCONFIG).getAsJsonObject().addProperty("prefetchCount",
+				ApplicationConfigProvider.getInstance().getMessageQueue().getPrefetchCount());
 		return configJsonObj.toString();
 	}
 

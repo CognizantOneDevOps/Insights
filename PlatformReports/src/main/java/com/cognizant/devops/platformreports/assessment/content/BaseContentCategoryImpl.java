@@ -18,6 +18,7 @@ package com.cognizant.devops.platformreports.assessment.content;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.commons.text.StringSubstitutor;
@@ -96,6 +97,7 @@ public abstract class BaseContentCategoryImpl {
 	 */
 	public void saveContentResult(InsightsContentDetail contentResult) {
 		try {
+			long startTime = System.nanoTime();
 			String json = oMapper.writeValueAsString(contentResult);
 			JsonObject contentDataJson = jsonParser.parse(json).getAsJsonObject();
 			if (!contentResult.getResultValuesMap().isEmpty() && contentDataJson != null) {
@@ -103,12 +105,32 @@ public abstract class BaseContentCategoryImpl {
 						.parse(oMapper.writeValueAsString(contentResult.getResultValuesMap())).getAsJsonObject();
 				contentDataJson = ReportEngineUtils.mergeTwoJson(contentDataJson, resultValueJson);
 			} else {
-				log.error("Worlflow Detail {}==== In Content, no result foundg and data json is null {} ",
-						contentResult.getResultValuesMap(), contentDataJson);
+				log.debug("Worlflow Detail {}==== In Content, no result foundg and data json is null {} ",
+				contentResult.getResultValuesMap(), contentDataJson);
+				log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+						contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+						contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),0,
+						"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+						"action :" + contentConfigDefinition.getAction() 
+						+ "ContentResult :" + contentConfigDefinition.getNoOfResult() + "In Content, no result foundg and data json is null");				
 			}
 			datasourceDataHandler.saveContentResult(contentDataJson);
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "ContentResult :" + contentConfigDefinition.getNoOfResult());
 		} catch (Exception e) {
 			log.error(" Error while saveContentResult ", e);
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),0,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "ContentResult :" + contentConfigDefinition.getNoOfResult() +"Error while saveContentResult " +e.getMessage() );
+			
 			throw new InsightsJobFailedException(
 					" Error while saveContentResult for content Id " + contentResult.getContentId());
 		}
@@ -190,12 +212,18 @@ public abstract class BaseContentCategoryImpl {
 			detail.setAssessmentId(contentConfigDefinition.getAssessmentId());
 			detail.setKpiName(kpiConfig.getKpiName());
 			detail.setToolName(kpiConfig.getToolname());
-			detail.setGroup(kpiConfig.getGroupName());
+			detail.setGroup(kpiConfig.getGroupName());			
 			detail.setResultTime(System.currentTimeMillis());
             detail.setResultTimeX(InsightsUtils.insightsTimeXFormat(System.currentTimeMillis()));
 			
 		} catch (Exception e) {
 			log.error(" Error while setNeutralContentDetail  ", e);
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),0,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "ContentResult :" + contentConfigDefinition.getNoOfResult() +"Error while setNeutralContentDetail " +e.getMessage() );			
 		}
 		return detail;
 	}

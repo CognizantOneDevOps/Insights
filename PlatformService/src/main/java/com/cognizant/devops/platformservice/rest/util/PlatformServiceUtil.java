@@ -107,10 +107,11 @@ public class PlatformServiceUtil {
 		Cookie cookie = null;
 		int cookiesArrayLength = 0;
 		List<Cookie> cookiesList = new ArrayList<>();
+		JsonObject cookiesValue = new JsonObject();
 		if (requestcookies != null) {
 			for (int i = 0; i < requestcookies.length; i++) {
 				cookie = requestcookies[i];
-				log.debug(" cookie {} {} ", cookie.getName(), cookie.getValue());
+				cookiesValue.addProperty(cookie.getName(), cookie.getValue());
 				if (AuthenticationUtils.MASTER_COOKIES_KEY_LIST.contains(cookie.getName())) {
 					cookie.setMaxAge(30 * 60);
 					cookie.setHttpOnly(true);
@@ -121,6 +122,7 @@ public class PlatformServiceUtil {
 					log.debug("Cookie Name Not found in master cookies list name as {}", cookie.getName());
 				}
 			}
+			//log.debug(" Request cookies are  {}  ", cookiesValue);
 			cookiesArray = new Cookie[cookiesArrayLength];
 			cookiesArray = cookiesList.toArray(cookiesArray);
 		} else {

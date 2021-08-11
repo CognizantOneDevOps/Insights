@@ -24,6 +24,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -60,7 +61,7 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 	private static Logger log = LogManager.getLogger(ReportKPISubscriber.class.getName());
 
 	private WorkflowDAL workflowDAL = new WorkflowDAL();
-	private InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfiguration();
+	private InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfiguration();	
 	private long executionId;
 
 	public ReportKPISubscriber(String routingKey) throws Exception {
@@ -70,7 +71,7 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 	@Override
 	public void handleTaskExecution(byte[] body) throws IOException {
 		try {
-
+			long startTime = System.nanoTime();
 			List<JsonObject> failedJobs = new ArrayList<>();
 			List<InsightsKPIConfig> kpiConfigList = new ArrayList<>();
 			List<Integer> contentList = new ArrayList<>();
@@ -105,22 +106,31 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 			if (!failedJobs.isEmpty()) {
 				updateFailedTaskStatusLog(failedJobs);
 			}
-
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					executionId,workflowId,workflowConfig.getAssessmentConfig().getId(),workflowConfig.getWorkflowType(),"-",
+					"-",processingTime,"usecasename: " + "-" + " schedule: " +workflowConfig.getScheduleType());			
 		} catch (InsightsJobFailedException e) {
 			log.error("Worlflow Detail ==== InsightsJobFailedException ==== ", e);
 			InsightsStatusProvider.getInstance().createInsightStatusNode("ReportKPI subscriber exception... "+e.getMessage(),
 					PlatformServiceConstants.FAILURE);
-			throw new InsightsJobFailedException("some of the Kpi's or Contents failed to execute " + e.getMessage());
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					executionId,"-","-","-","-","-",0,"Exception: " + e.getMessage());
+			throw new InsightsJobFailedException("Some of the Kpi's or Contents failed to execute " + e.getMessage());			
 		} catch (RejectedExecutionException e) {
 			log.error("Worlflow Detail ==== RejectedExecutionException ====  ", e);
 			InsightsStatusProvider.getInstance().createInsightStatusNode("ReportKPI subscriber exception "+e.getMessage(),
 					PlatformServiceConstants.FAILURE);
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					executionId,"-","-","-","-","-",0,"Exception:RejectedExecutionException " + e.getMessage());
 			throw new InsightsJobFailedException(
 					"some of the Kpi's or Contents failed to execute RejectedExecutionException " + e.getMessage());
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== handleTaskExecution ==== ", e);
 			InsightsStatusProvider.getInstance().createInsightStatusNode("ReportKPI subscriber exception "+e.getMessage(),
 					PlatformServiceConstants.FAILURE);
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					executionId,"-","-","-","-","-",0,"Exception:ReportKPI subscriber exception" + e.getMessage());
 			throw new InsightsJobFailedException(
 					"some of the Kpi's or Contents failed to execute Exception " + e.getMessage());
 		}
@@ -145,8 +155,9 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 				kpiConfigList.addAll(reportConfigDAL.getActiveKPIConfigurationsBasedOnKPIId(kpiList));
 			}
 			contentList.addAll(gson.fromJson(statusLog.get(AssessmentReportAndWorkflowConstants.CONTENT_ARRAY), type));
+			
 		} else {
-			log.error("Worlflow Detail ==== ReportKPISubscriber unable to parse retry message ", statusLog);
+			log.error("Worlflow Detail ==== ReportKPISubscriber unable to parse retry message ", statusLog);			
 		}
 	}
 
@@ -179,13 +190,13 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 				kpiConfigDTO.setOneTimeReportEndDate(workflowConfig.getAssessmentConfig().getEndDate());
 				kpiConfigDTO.setInputDatasource(assessmentInputDataSource);
 				kpiConfigDTO.setUsecaseName(kpiConfig.getUsecase());
-				kpiConfigDTO.setOutputDatasource(kpiConfig.getOutputDatasource());
+				kpiConfigDTO.setOutputDatasource(kpiConfig.getOutputDatasource());				
 
 				KPIExecutor kpirun = new KPIExecutor(kpiConfigDTO);
-				kpiListToExecute.add(kpirun);
+				kpiListToExecute.add(kpirun);				
 
 			} catch (Exception e) {
-				log.debug("Worlflow Detail ==== ReportKPISubscriber  Exception  after  thread complete  ");
+				log.debug("Worlflow Detail ==== ReportKPISubscriber  Exception  after  thread complete  ");				
 			}
 		}
 
@@ -225,7 +236,13 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 		for (int contentId : contentList) {
 			InsightsContentConfig contentConfig = contentProcessing.getContentConfig(contentId);
 			ContentConfigDefinition contentConfigDefinition = contentProcessing
-					.convertJsonToContentConfig(contentConfig);
+					.convertJsonToContentConfig(contentConfig);		
+			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"",
+					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),0,
+					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+					"action :" + contentConfigDefinition.getAction() 
+					+ "ContentResult :" + contentConfigDefinition.getNoOfResult());			
 			if (contentConfigDefinition != null) {
 				contentConfigDefinition.setExecutionId(executionId);
 				contentConfigDefinition
@@ -235,7 +252,15 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 				contentConfigDefinition.setAssessmentId(assessmentId);
 				contentListToExecute.add(new ContentExecutor(contentConfigDefinition));
 
-			} else {
+			} else
+			{
+				log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+						contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),
+						"-",
+						contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),0,
+						"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
+						"action :" + contentConfigDefinition.getAction() 
+						+ "ContentResult :" + contentConfigDefinition.getNoOfResult() + " Content execution failed");
 				throw new InsightsJobFailedException("Content execution failed");
 			}
 		}
@@ -289,13 +314,15 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 
 			}
 		}
-
 		statusObject.addProperty("executionId", executionId);
 		statusObject.addProperty("workflowId", workflowConfig.getWorkflowId());
 		statusObject.add("kpiList", kpiArray);
 		statusObject.add(AssessmentReportAndWorkflowConstants.CONTENT_ARRAY, contentArray);
 		// statusLog set here which is class variable of WorkflowTaskSubscriberHandler
 		statusLog = new Gson().toJson(statusObject);
+		log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+				executionId,workflowConfig.getWorkflowId(),"-",workflowConfig.getWorkflowType()
+				,"-", "-",0,"statusLog: "+ statusLog);
 		throw new InsightsJobFailedException("some of the Kpi's or Contents failed to execute");
 	}
 

@@ -133,6 +133,45 @@ public class HealthCheckObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//span[contains(text(),'OK')]")
 	WebElement ok;
 
+	@FindBy(xpath = "//span[contains(text(),'Email Configuration')]")
+	WebElement emailConfigurationBlock;
+
+	@FindBy(xpath = "((//td[@title='sendEmailEnabled']//span[text()='sendEmailEnabled'])//following::input)[1]")
+	WebElement sendEmailEnabled;
+
+	@FindBy(xpath = "((//td[@title='smtpHostServer']//span[text()='smtpHostServer'])//following::input)[1]")
+	WebElement smtpHostServer;
+
+	@FindBy(xpath = "((//td[@title='smtpPort']//span[text()='smtpPort'])//following::input)[1]")
+	WebElement smtpPort;
+
+	@FindBy(xpath = "((//td[@title='smtpUserName']//span[text()='smtpUserName'])//following::input)[1]")
+	WebElement smtpUserName;
+
+	@FindBy(xpath = "((//td[@title='smtpPassword']//span[text()='smtpPassword'])//following::input)[1]")
+	WebElement smtpPassword;
+
+	@FindBy(xpath = "((//td[@title='isAuthRequired']//span[text()='isAuthRequired'])//following::input)[1]")
+	WebElement isAuthRequired;
+
+	@FindBy(xpath = "((//td[@title='smtpStarttlsEnable']//span[text()='smtpStarttlsEnable'])//following::input)[1]")
+	WebElement smtpStarttlsEnable;
+
+	@FindBy(xpath = "((//td[@title='mailFrom']//span[text()='mailFrom'])//following::input)[1]")
+	WebElement mailFrom;
+
+	@FindBy(xpath = "((//td[@title='mailTo']//span[text()='mailTo'])//following::input)[1]")
+	WebElement mailTo;
+
+	@FindBy(xpath = "((//td[@title='subject']//span[text()='subject'])//following::input)[1]")
+	WebElement subject;
+
+	@FindBy(xpath = "((//td[@title='emailBody']//span[text()='emailBody'])//following::input)[1]")
+	WebElement emailBody;
+
+	@FindBy(xpath = "((//td[@title='systemNotificationSubscriber']//span//following::input)[1])")
+	WebElement systemNotificationSubscriber;
+
 	@FindBy(xpath = "//td[contains(@class,'agentKey')]")
 	List<WebElement> instanceIdList;
 

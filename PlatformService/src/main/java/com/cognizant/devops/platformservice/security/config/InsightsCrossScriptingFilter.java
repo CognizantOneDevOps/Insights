@@ -99,18 +99,20 @@ public class InsightsCrossScriptingFilter extends OncePerRequestFilter {
 		log.info(" InsightsCrossScriptingFilter validate header ............... ");
 		String origin = request.getHeader(HttpHeaders.ORIGIN);
 		String host = AuthenticationUtils.getHost(request);
-		log.debug(" host and origin information ===== {}  origin {}", host, origin);
 		if (host == null) {
 			log.error(" Invalid request " + PlatformServiceConstants.HOST_NOT_FOUND);
+			log.debug(" host and origin information ===== {}  origin {}", host, origin);
 			AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.INFORMATION_MISMATCH,
 					PlatformServiceConstants.HOST_NOT_FOUND);
 			throw new UnknownHostException(PlatformServiceConstants.HOST_NOT_FOUND);
 		}
 		if (!ApplicationConfigProvider.getInstance().getTrustedHosts().contains(host)) {
 			log.error(" Invalid request " + PlatformServiceConstants.INVALID_REQUEST_ORIGIN);
+			log.debug(" host and origin information ===== {}  origin {}", host, origin);
 			AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.INFORMATION_MISMATCH,
 					PlatformServiceConstants.INVALID_REQUEST_ORIGIN);
 			throw new UnknownHostException(PlatformServiceConstants.INVALID_REQUEST_ORIGIN);
 		}
+		log.debug("Host validated successfully ==== host and origin information ===== {}  origin {}", host, origin);
 	}
 }

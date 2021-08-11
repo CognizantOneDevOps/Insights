@@ -89,6 +89,8 @@ public class AuthenticationUtils {
 	public static final String CSRF_COOKIE_NAME = "XSRF-TOKEN";
 	public static final List<String> CSRF_IGNORE = Collections.unmodifiableList(Arrays.asList("/login/**", "/user/insightsso/authenticateSSO/**",
 			"/user/authenticate/**", "/user/insightsso/**", "/saml/**", "/externalApi/**"));
+	
+	public static final List<String> WEB_IGNORE_URLS = Collections.unmodifiableList(Arrays.asList("/settings/getLogoImage"));
 
 	public static final List<String> SET_VALUES = Collections.unmodifiableList(Arrays.asList(GRAFANA_COOKIES_ORG, "grafana_user", GRAFANA_ROLE_KEY,
 			"grafana_remember", "grafana_sess", CSRF_COOKIE_NAME , "JSESSIONID",  GRAFANA_SESSION_KEY, GRAFANA_WEBAUTH_HTTP_REQUEST_HEADER,
@@ -145,7 +147,6 @@ public class AuthenticationUtils {
 					hostInfo = url.getHost();
 				}
 			}
-			log.debug("host information {} ", hostInfo);
 			return hostInfo;
 		} catch (MalformedURLException e) {
 			log.error("Unable to retrive host information ",e);
@@ -241,7 +242,7 @@ public class AuthenticationUtils {
 		try {
 			TokenProviderUtility tokenProviderUtility = new TokenProviderUtility();
 			jwtClaimsSet =tokenProviderUtility.verifyAndFetchCliaimsToken(principal.toString());
-			log.debug(" isTokenVarified and claims are ==== {} ", jwtClaimsSet);
+			//log.debug(" isTokenVarified and claims are ==== {} ", jwtClaimsSet);
 		} catch (InsightsCustomException e) {
 			log.error(e);
 			log.error(" Exception while varifing token " + e.getMessage(), e);

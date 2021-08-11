@@ -17,6 +17,7 @@ package com.cognizant.devops.platformservice.security.config.grafana;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.Filter;
@@ -101,7 +102,7 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 			http.headers().frameOptions().sameOrigin().and().sessionManagement().maximumSessions(1).and()
 			.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
 			
-			http.anonymous().disable().authorizeRequests().antMatchers("/datasources/**").permitAll().antMatchers("/admin/**")
+			http.anonymous().disable().authorizeRequests().antMatchers("/datasources/**").permitAll().antMatchers("/settings/getLogoImage/**").permitAll().antMatchers("/admin/**")
 			.access("hasAuthority('Admin')").antMatchers("/traceability/**").access("hasAuthority('Admin')")
 			//.antMatchers("/user/authenticate**").hasAnyAuthority("Admin,Editor,Viewer")
 			.antMatchers("/configure/loadConfigFromResources").permitAll().antMatchers("/**").authenticated();
@@ -115,7 +116,7 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 	 */
 	@Override
 	public void configure(WebSecurity web) throws Exception {
-		web.ignoring().antMatchers("/settings/getLogoImage");
+		//web.ignoring().antMatchers("/settings/getLogoImage");
 		web.ignoring().antMatchers("/datasource/**");
 	}
 
@@ -130,9 +131,8 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 	public FilterChainProxy insightsFilter() throws Exception {
 		log.debug("message Inside FilterChainProxy, initial bean InsightsSecurityConfigurationAdapter **** ");
 		
-	
+		List<Filter> filtersForLogin = new LinkedList<>();
 		
-		List<Filter> filtersForLogin = new ArrayList<>();
 		filtersForLogin.add(0, new InsightsCustomCsrfFilter());
 		filtersForLogin.add(1, new InsightsCrossScriptingFilter());
 		filtersForLogin.add(2, insightsInitialProcessingFilter());
@@ -143,14 +143,14 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 		AuthenticationUtils.setSecurityFilterchain(
 				new DefaultSecurityFilterChain(new AntPathRequestMatcher("/externalApi/**"), filtersForLogin));
 		 
-		List<Filter> filters = new ArrayList<>();
+		List<Filter> filters = new LinkedList<>();
 		filters.add(0, new InsightsCustomCsrfFilter());
 		filters.add(1, new InsightsCrossScriptingFilter());
 		filters.add(2, insightsProcessingFilter());
 		filters.add(3, new InsightsResponseHeaderWriterFilter());
 
 		AuthenticationUtils
-				.setSecurityFilterchain(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/**"), filters));//chains.add
+				.setSecurityFilterchain(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/**"), filters));
 
 		return new FilterChainProxy(AuthenticationUtils.getSecurityFilterchains());
 	}

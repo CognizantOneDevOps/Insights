@@ -56,5 +56,10 @@
   "agentVersion": "v7.2",
   "labelName": "SONAR",
   "toolName": "SONAR",
-  "auditing": false
+  "auditing": false,
+  "enableProxy":false,
+  "proxies":{
+    	"http":"",
+    	"https":""
+    }
 }

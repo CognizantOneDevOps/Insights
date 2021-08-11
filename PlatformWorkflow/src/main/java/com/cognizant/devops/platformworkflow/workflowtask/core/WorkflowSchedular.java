@@ -93,12 +93,11 @@ public class WorkflowSchedular {
 			scheduler.scheduleJob(jobWorkflow, triggerWorkflow);
 			scheduler.scheduleJob(jobWorkflowRetry, triggeWorkflowRetry);
 			scheduler.scheduleJob(jobImmediateWorkflow, triggeImmediateWorkflow);
-			scheduler.scheduleJob(jobAutoWorkflowCorrection, triggeAutoWorkflowCorrection);
-
+			scheduler.scheduleJob(jobAutoWorkflowCorrection, triggeAutoWorkflowCorrection);        
 		} catch (SchedulerException e) {
-			log.error(e);
+			log.error("Error creating scheduler {}",e.getMessage());
 			InsightsStatusProvider.getInstance().createInsightStatusNode("Error creating scheduler "+e.getMessage(),
-					PlatformServiceConstants.FAILURE);
+					PlatformServiceConstants.FAILURE);		
 		}
 
 	}

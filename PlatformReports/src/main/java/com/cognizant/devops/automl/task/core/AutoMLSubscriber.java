@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.automl.task.util.AutoMLExecutor;
@@ -55,6 +56,7 @@ public class AutoMLSubscriber extends WorkflowTaskSubscriberHandler {
 	@Override
 	public void handleTaskExecution(byte[] body) throws IOException {
 		List<JsonObject> failedJobs = new ArrayList<>();
+		long startTime = System.nanoTime();
 		try {
 			String message = new String(body, StandardCharsets.UTF_8);
 			JsonObject incomingTaskMessage = new JsonParser().parse(message).getAsJsonObject();
@@ -71,6 +73,11 @@ public class AutoMLSubscriber extends WorkflowTaskSubscriberHandler {
 				mlTaskToExecute.add(autoMLExecutor);
 				/* segregate entire automl execution list into defined chunks */
 				List<List<Callable<JsonObject>>> kpiChunkList = WorkflowThreadPool.getChunk(mlTaskToExecute, 1);
+				log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+						executionId,autoMlConfig.getWorkflowConfig().getWorkflowId(),"-",autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",0,
+						" ModelId :" +autoMlConfig.getModelId() + " UsecaseName :" +autoMlConfig.getUseCaseName() + " PredictionColumn : " +autoMlConfig.getPredictionColumn() +
+						" PredictionType :" +autoMlConfig.getPredictionType()  
+	 					+ " TrainingPercentage : " + autoMlConfig.getTrainingPerc() + " status : " + autoMlConfig.getStatus());
 				/* submit each chunk to threadpool in a loop */
 				executeAutoMLChunks(kpiChunkList, failedJobs);
 				if (!failedJobs.isEmpty()) {
@@ -80,6 +87,11 @@ public class AutoMLSubscriber extends WorkflowTaskSubscriberHandler {
 			}
 		} catch (InsightsJobFailedException e) {
 			log.error("Worlflow Detail ==== InsightsJobFailedException ====  ", e);
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					executionId,autoMlConfig.getWorkflowConfig().getWorkflowId(),"-",autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",0,
+					"ModelId :" +autoMlConfig.getModelId() + " UsecaseName :" +autoMlConfig.getUseCaseName() + " PredictionColumn : " +autoMlConfig.getPredictionColumn() +
+					"predictionType :" +autoMlConfig.getPredictionType()  
+ 					+ "trainingPercentage : " + autoMlConfig.getTrainingPerc() + "status : " + autoMlConfig.getStatus() + "Auto ML task failed to execute" +e.getMessage());
 			throw new InsightsJobFailedException("Auto ML task failed to execute " + e.getMessage());
 		} catch (Exception e) {
 			JsonObject response = new JsonObject();
@@ -87,9 +99,19 @@ public class AutoMLSubscriber extends WorkflowTaskSubscriberHandler {
 			response.addProperty("errorLog", e.getMessage());
 			failedJobs.add(response);
 			updateFailedTaskStatusLog(failedJobs);
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					executionId,autoMlConfig.getWorkflowConfig().getWorkflowId(),"-",autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",0,
+					"ModelId :" +autoMlConfig.getModelId() + "UsecaseName :" +autoMlConfig.getUseCaseName() + "PredictionColumn : " +autoMlConfig.getPredictionColumn() 
+					 +"predictionType :" +autoMlConfig.getPredictionType()
+					+ "trainingPercentage : " + autoMlConfig.getTrainingPerc() + "status : " + autoMlConfig.getStatus() + e.getMessage());
 		}
-
+		long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
 		log.debug("Worlflow Detail ==== AutoML task completed successfully.");
+		log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+				executionId,autoMlConfig.getWorkflowConfig().getWorkflowId(),"-",autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",processingTime,
+				"ModelId :" +autoMlConfig.getModelId() + "UsecaseName :" +autoMlConfig.getUseCaseName() + "PredictionColumn : " +autoMlConfig.getPredictionColumn()
+				 +"predictionType :" +autoMlConfig.getPredictionType()
+				+ "trainingPercentage : " + autoMlConfig.getTrainingPerc() + "status : " + autoMlConfig.getStatus() + " AutoML task completed successfully.");
 	}
 
 	private void executeAutoMLChunks(List<List<Callable<JsonObject>>> chunkList, List<JsonObject> failedJobs)
@@ -111,6 +133,7 @@ public class AutoMLSubscriber extends WorkflowTaskSubscriberHandler {
 	}
 
 	private void updateFailedTaskStatusLog(List<JsonObject> failedJobs) {
+		long startTime = System.nanoTime();
 		JsonObject statusObject = new JsonObject();
 		JsonArray errorLog = new JsonArray();
 		failedJobs.forEach(failedJob -> errorLog.add(failedJob.get("errorLog").getAsString()));
@@ -121,6 +144,12 @@ public class AutoMLSubscriber extends WorkflowTaskSubscriberHandler {
 		autoMlDAL.updateMLConfig(autoMlConfig);
 		// statusLog set here which is class variable of WorkflowTaskSubscriberHandler
 		statusLog = new Gson().toJson(statusObject);
+		long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+		log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+				executionId,autoMlConfig.getWorkflowConfig().getWorkflowId(),"-",autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",processingTime,
+				"ModelId :" +autoMlConfig.getModelId() + "UsecaseName :" +autoMlConfig.getUseCaseName() + "PredictionColumn : " +autoMlConfig.getPredictionColumn()
+				 +"predictionType :" +autoMlConfig.getPredictionType()
+				+ "trainingPercentage : " + autoMlConfig.getTrainingPerc() + "status : " + autoMlConfig.getStatus() + "AutoML task failed to execute ");
 		throw new InsightsJobFailedException("AutoML task failed to execute  " + statusLog);
 		
 	}

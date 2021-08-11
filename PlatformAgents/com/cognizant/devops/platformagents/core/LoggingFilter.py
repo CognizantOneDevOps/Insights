@@ -21,14 +21,21 @@ class LoggingFilter(logging.Filter):
         self._formatters = formatters
         self._default_formatter = default_formatter
         self.execId = baseAgent.executionId
-        self.functionName = baseAgent.functionName
+        self.dataSize = baseAgent.dataSize
+        self.dataCount = baseAgent.dataCount
+        self.funcName = baseAgent.funcName
         self.baseAgent = baseAgent
+
         
     def filter(self, record):
-        if not hasattr(record,'execId') : 
+        if not hasattr(record,'execId') :
             record.execId = self.baseAgent.executionId
-        if not hasattr(record,'functionName') : 
-            record.functionName = self.baseAgent.functionName
+        if not hasattr(record, 'dataSize'):
+            record.dataSize = self.baseAgent.dataSize
+        if not hasattr(record, 'dataCount'):
+            record.dataCount = self.baseAgent.dataCount
+        if not hasattr(record,'funcName'):
+            record.funcName = self.baseAgent.funcName
         return True
     
     def format(self, record):
