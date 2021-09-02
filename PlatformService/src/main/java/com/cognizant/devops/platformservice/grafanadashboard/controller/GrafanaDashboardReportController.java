@@ -78,6 +78,7 @@ public class GrafanaDashboardReportController {
 				jsonobject.addProperty("variables", reportTemplate.getVariables());
 				jsonobject.addProperty("source", reportTemplate.getSource());
 				jsonobject.addProperty("workflowId", reportTemplate.getWorkflowConfig().getWorkflowId());
+				jsonobject.addProperty("orgName","");
 				jsonarray.add(jsonobject);
 			}
 			return PlatformServiceUtil.buildSuccessResponseWithData(jsonarray);

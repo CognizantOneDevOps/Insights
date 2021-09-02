@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -37,10 +37,13 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum.WorkflowType;
+import com.cognizant.devops.platformcommons.core.util.AES256Cryptor;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfig;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfigDAL;
+import com.cognizant.devops.platformdal.grafana.pdf.GrafanaOrgToken;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsAssessmentConfigurationDTO;
 import com.cognizant.devops.platformreports.assessment.util.ReportEngineUtils;
@@ -53,18 +56,16 @@ import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.BrowserType.LaunchOptions;
-import com.microsoft.playwright.Deferred;
 import com.microsoft.playwright.ElementHandle;
-import com.microsoft.playwright.Frame.LoadState;
 import com.microsoft.playwright.Page;
-import com.microsoft.playwright.Page.EventType;
 import com.microsoft.playwright.Page.NavigateOptions;
 import com.microsoft.playwright.Page.PdfOptions;
-import com.microsoft.playwright.Page.WaitForSelectorOptions.State;
 import com.microsoft.playwright.Playwright;
-import com.microsoft.playwright.Request;
-import com.microsoft.playwright.Response;
-import com.microsoft.playwright.Route.FulfillResponse;
+import com.microsoft.playwright.options.LoadState;
+import com.microsoft.playwright.options.Margin;
+import com.microsoft.playwright.options.Media;
+import com.microsoft.playwright.options.WaitForSelectorState;
+import com.microsoft.playwright.options.WaitUntilState;
 
 public class GrafanaPDFHandler implements BasePDFProcessor {
 
@@ -72,17 +73,15 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 	
 	private static final String HEADER_HTML = "header.html";
 	private static final String FOOTER_HTML = "footer.html";
-
-	private static final String TRACK_HORIZONTAL = ".track-horizontal";
-	private static final String PANEL_CONTENT = ".panel-content";
-	private static final String REACT_GRID_ITEM = ".react-grid-item";
-	private static final String DASHBOARD_CONTENT = ".dashboard-content";
-	private static final String REACT_GRID_LAYOUT = ".react-grid-layout";
-	private static final String VIEW = ".view";
-	private static final String PROXY_URL_PATTERN = "**/proxy/**";
 	private static final String DASHBOARD = "Dashboard";
 	
-	private static final int DASHBOARD_LOAD_TIME = 30000;
+	private static final String PDF_TYPE = " PDFType: ";
+	private static final String SCHEDULE = " Schedule: ";
+	private static final String SOURCE = " Source: ";
+	
+	private static final String STATUS = " Status: ";
+	
+	private static final int TRANSITION_TIME = 1000;
 
 	private WorkflowDAL workflowDAL = new WorkflowDAL();
 	private GrafanaDashboardPdfConfigDAL grafanaDashboardConfigDAL = new GrafanaDashboardPdfConfigDAL();
@@ -107,7 +106,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 
 	private void createPDFDirectory(InsightsAssessmentConfigurationDTO assessmentReportDTO) {
 		try {
-			String folderName = assessmentReportDTO.getAsseementreportname() + "_"
+			String folderName = WorkflowType.GRAFANADASHBOARDPDFREPORT + "_"
 					+ assessmentReportDTO.getExecutionId();
 			assessmentReportDTO.setPdfReportFolderName(folderName);
 			String reportExecutionFile = AssessmentReportAndWorkflowConstants.REPORT_PDF_EXECUTION_RESOLVED_PATH + folderName;
@@ -125,30 +124,30 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 	private void prepareAndExportPDFFile(InsightsAssessmentConfigurationDTO assessmentReportDTO) {
 		try {
 			long startTime = System.nanoTime();
-			GrafanaDashboardPdfConfig grafanaDashboardPdfConfig = grafanaDashboardConfigDAL.fetchGrafanaDashboardDetailsByWorkflowId(assessmentReportDTO.getWorkflowId());
-			log.debug("Worlflow Detail ==== GrafanaDashboardPdfConfig from UI ===== {} ",grafanaDashboardPdfConfig);
+			GrafanaDashboardPdfConfig grafanaDashboardPdfConfig = grafanaDashboardConfigDAL
+					.fetchGrafanaDashboardDetailsByWorkflowId(assessmentReportDTO.getWorkflowId());
+			log.debug("Worlflow Detail ==== GrafanaDashboardPdfConfig from UI ===== {} ", grafanaDashboardPdfConfig);
 			assessmentReportDTO.setAsseementreportname(grafanaDashboardPdfConfig.getTitle());
 			String exportedFilePath = assessmentReportDTO.getPdfReportDirPath() + File.separator
 					+ assessmentReportDTO.getAsseementreportname() + "." + ReportEngineUtils.REPORT_TYPE;
 			assessmentReportDTO.setPdfExportedFilePath(exportedFilePath);
-			if(grafanaDashboardPdfConfig!= null) {
-				String pdfType = grafanaDashboardPdfConfig.getPdfType();
-				if(pdfType.equals(DASHBOARD)) {
-					grafanaDashboardAsPdf(assessmentReportDTO,grafanaDashboardPdfConfig, exportedFilePath);
-				}else {
-					printableDashboardAsPdf(assessmentReportDTO,grafanaDashboardPdfConfig, exportedFilePath);
-				}
-				long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-				log.debug("Worlflow Detail ==== PDF generation completed for Type : ===== {} ",pdfType);
-				log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
-						assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),
-						grafanaDashboardPdfConfig.getWorkflowConfig().getWorkflowType(),"-","-",processingTime,
-						" PDFType: " + grafanaDashboardPdfConfig.getPdfType() +
-						" Schedule: " +grafanaDashboardPdfConfig.getScheduleType() +
-						" Source: " +grafanaDashboardPdfConfig.getSource() +
-						" Status: " +grafanaDashboardPdfConfig.getStatus() +
-						" PDF generation completed");
+			String pdfType = grafanaDashboardPdfConfig.getPdfType();
+			if (pdfType.equals(DASHBOARD)) {
+				grafanaDashboardAsPdf(assessmentReportDTO, grafanaDashboardPdfConfig, exportedFilePath);
+			} else {
+				printableDashboardAsPdf(assessmentReportDTO, grafanaDashboardPdfConfig, exportedFilePath);
 			}
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug("Worlflow Detail ==== PDF generation completed for Type : ===== {} ", pdfType);
+			log.debug(
+					"Type=TaskExecution executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					assessmentReportDTO.getExecutionId(), assessmentReportDTO.getWorkflowId(),
+					assessmentReportDTO.getConfigId(), grafanaDashboardPdfConfig.getWorkflowConfig().getWorkflowType(),
+					"-", "-", processingTime,
+					PDF_TYPE + grafanaDashboardPdfConfig.getPdfType() + SCHEDULE
+							+ grafanaDashboardPdfConfig.getScheduleType() + SOURCE
+							+ grafanaDashboardPdfConfig.getSource() + STATUS + grafanaDashboardPdfConfig.getStatus()
+							+ " PDF generation completed");
 		} catch (Exception e) {
 			log.error("Workflow Detail ==== error while processing pdf data ", e);
 			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
@@ -156,7 +155,6 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 					"-","-","-",0," unable to prepare pdf data " + e.getMessage());
 			throw new InsightsJobFailedException(" unable to prepare pdf data " + e);
 		}
-
 	}
 
 
@@ -172,64 +170,37 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 		JsonParser jsonParser = new JsonParser();
 		JsonElement config = jsonParser.parse(grafanaDashboardPdfConfig.getDashboardJson());
 		String grafanaEndpoint = getGrafanaEndPoint();
-		log.debug("Worlflow Detail ==== grafanaEndpoint from config ===== {} ",grafanaEndpoint);
+		int loadTime = config.getAsJsonObject().get("loadTime").getAsInt() * 1000;
+		log.debug("Worlflow Detail ==== LoadTIme configured for Grafana in milliseconds ===== {} ",loadTime);
 		String grafanaUrl = config.getAsJsonObject().get("dashUrl").getAsString().replace("<GRAFANA_URL>", grafanaEndpoint);
-		Playwright playwright = Playwright.create();
+		Playwright playwright = null;
 		try {
+			playwright = Playwright.create();
 			long startTime = System.nanoTime();
 			BrowserType browserType = 	playwright.chromium();
 			LaunchOptions launchOptions = new LaunchOptions();
-			launchOptions.withHeadless(true);
-			launchOptions.withDevtools(false);
-
-			String auth = getGrafanaAuth();
-			byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.ISO_8859_1));
-			String authHeader = "Basic " + new String(encodedAuth);
-			Map<String, String> headers = new HashMap<>();
-			headers.put("Authorization", authHeader);
-
+			launchOptions.setHeadless(Boolean.TRUE);
+			launchOptions.setDevtools(Boolean.FALSE);
+			
 			Browser browser = browserType.launch(launchOptions);
 			BrowserContext context = browser.newContext();
 			Page page = context.newPage();
 
+			Map<String, String> headers = getGrafanaHeaders(config);
+
 			page.setExtraHTTPHeaders(headers);
-			page.setDefaultNavigationTimeout(120000);//Basic time to load any dashboard in Grafana.
-
+			page.onRequest(request -> log.debug(">> {} {} ", request.method(), request.url()));
+		    page.onResponse(response -> log.debug("<< {} {} ",response.status(), response.url()));
+		    
 			NavigateOptions navigateOptions = new NavigateOptions();
-			navigateOptions.withWaitUntil(LoadState.NETWORKIDLE);
-			page.route("**", route -> route.continue_());
+			navigateOptions.setWaitUntil(WaitUntilState.NETWORKIDLE);
 
-			page.addListener(EventType.REQUEST, e -> log.debug("Request == {} ",((Request)e.data()).url()));
-			page.addListener(EventType.RESPONSE, e -> log.debug("Response == {} ",((Response)e.data()).url()));
-
-			/**To make sure all neo4j queries are returned**/
-			page.route(PROXY_URL_PATTERN, r -> r.fulfill(new FulfillResponse().withStatus(200)));
-			page.waitForResponse(grafanaUrl);
-			page.waitForNavigation();
 			page.navigate(grafanaUrl,navigateOptions);
-			log.debug("Starting Waiting for dashboard to load == in ms {} ",DASHBOARD_LOAD_TIME);
-			Thread.sleep(DASHBOARD_LOAD_TIME);
-			log.debug("Waiting exit post configured time to load Dashboard ");
-			Page.WaitForSelectorOptions waitForSelectorOptions = new Page.WaitForSelectorOptions();
-			waitForSelectorOptions.withState(State.ATTACHED);
-			Deferred<ElementHandle> event = page.waitForSelector(VIEW, new Page.WaitForSelectorOptions()
-					.withState(Page.WaitForSelectorOptions.State.ATTACHED));
-			event.get();
-			Deferred<ElementHandle> revent = page.waitForSelector(REACT_GRID_LAYOUT, new Page.WaitForSelectorOptions()
-					.withState(Page.WaitForSelectorOptions.State.ATTACHED));
-			revent.get();
-			Deferred<ElementHandle> devent = page.waitForSelector(DASHBOARD_CONTENT, new Page.WaitForSelectorOptions()
-					.withState(Page.WaitForSelectorOptions.State.ATTACHED));
-			devent.get();
-			Deferred<ElementHandle> ievent = page.waitForSelector(REACT_GRID_ITEM, new Page.WaitForSelectorOptions()
-					.withState(Page.WaitForSelectorOptions.State.ATTACHED));
-			ievent.get();
-			Deferred<ElementHandle> cevent = page.waitForSelector(PANEL_CONTENT, new Page.WaitForSelectorOptions()
-					.withState(Page.WaitForSelectorOptions.State.ATTACHED));
-			cevent.get();
-			Deferred<ElementHandle> sevent = page.waitForSelector(TRACK_HORIZONTAL, new Page.WaitForSelectorOptions()
-					.withState(Page.WaitForSelectorOptions.State.ATTACHED));
-			sevent.get();
+			page.waitForLoadState();
+			log.debug("Dashboard load time configured in milliseconds == {} ",loadTime);
+			log.debug("Waiting for dashboard to load == {} ",Instant.now());
+			page.waitForTimeout(loadTime);
+			log.debug("Waiting exit post configured time to load Dashboard == {} ", Instant.now());
 
 			page.evaluate("() => {for (el of document.getElementsByClassName('sidemenu')) {return el.hidden = true; };  }");
 			page.evaluate("() => {for (el of document.getElementsByClassName('navbar')) {return el.hidden = true; };  }");
@@ -263,17 +234,20 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 								+ "clearInterval(timer);resolve();}},300) "
 							+ "});"
 					+ "}");
-			page.waitForResponse(PROXY_URL_PATTERN);
+			log.debug("Waiting for dashboard to load completely before screenshot == {} ",Instant.now());
+			page.waitForTimeout(loadTime);
+			log.debug("Waiting time completed for dashboard == {} ",Instant.now());
+			page.waitForLoadState(LoadState.NETWORKIDLE);
 			PdfOptions pdfOptions =  new PdfOptions();
-			//pdfOptions.withPath(Paths.get(URLEncoder.encode(grafanaDashboardConfig.getTitle(),"UTF-8")+".pdf"));
-			pdfOptions.withPrintBackground(true);
-			pdfOptions.withWidth(dashboardwidth+"px");
-			pdfOptions.withHeight(dashboardlength+"px");
-			pdfOptions.withScale(1);
-			pdfOptions.withDisplayHeaderFooter(true);
-			pdfOptions.withHeaderTemplate(fetchTemplate(HEADER_HTML));
-			pdfOptions.withFooterTemplate(fetchTemplate(FOOTER_HTML));
-			pdfOptions.setMargin().withTop("90").withRight("0").withBottom("50").withLeft("0");
+			pdfOptions.setPrintBackground(Boolean.TRUE);
+			pdfOptions.setWidth(dashboardwidth+"px");
+			pdfOptions.setHeight(dashboardlength+"px");
+			pdfOptions.setScale(1);
+			pdfOptions.setDisplayHeaderFooter(true);
+			pdfOptions.setHeaderTemplate(fetchTemplate(HEADER_HTML));
+			pdfOptions.setFooterTemplate(fetchTemplate(FOOTER_HTML));
+			pdfOptions.setMargin(new Margin().setTop("90").setRight("0").setBottom("50").setLeft("0"));
+			page.emulateMedia(new Page.EmulateMediaOptions().setMedia(Media.SCREEN));
 			byte[] pdf = page.pdf(pdfOptions);
 			page.close();
 			context.close();
@@ -288,10 +262,10 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
 					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),
 					grafanaDashboardPdfConfig.getWorkflowConfig().getWorkflowType(),"-","-",processingTime,
-					" PDFType: " + grafanaDashboardPdfConfig.getPdfType() +
-					" Schedule: " +grafanaDashboardPdfConfig.getScheduleType() +
-					" Source: " +grafanaDashboardPdfConfig.getSource() +
-					" Status: " +grafanaDashboardPdfConfig.getStatus());
+					PDF_TYPE + grafanaDashboardPdfConfig.getPdfType() +
+					SCHEDULE + grafanaDashboardPdfConfig.getScheduleType() +
+					SOURCE + grafanaDashboardPdfConfig.getSource() +
+					STATUS + grafanaDashboardPdfConfig.getStatus());
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== Grafana Dashboard export as PDF Completed with error {} ", e.getMessage());
 			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
@@ -308,7 +282,17 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 						"-","-","-",0," Unable to close Playwright " + e.getMessage());
 			}
 		}
+	}
 
+	/** This method use to prepare Grafana header object 
+	 * @return map of headers 
+	 */
+	private Map<String, String> getGrafanaHeaders(JsonElement config) {
+		GrafanaOrgToken grafanaOrgToken = grafanaDashboardConfigDAL.getTokenByOrgId(config.getAsJsonObject().get("organisation").getAsInt());
+		String token = "Bearer "+AES256Cryptor.decrypt(grafanaOrgToken.getApiKey(),ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getTokenSigningKey());
+		Map<String, String> headers = new HashMap<>();
+		headers.put("Authorization", token);
+		return headers;
 	}
 
 	/**
@@ -319,11 +303,23 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 	 * @param exportedFilePath 
 	 */
 	private synchronized void printableDashboardAsPdf(InsightsAssessmentConfigurationDTO assessmentReportDTO, GrafanaDashboardPdfConfig grafanaDashboardPdfConfig, String exportedFilePath) {
-		Playwright playwright = Playwright.create();
+		Playwright playwright = null;
 		try {
+			playwright = Playwright.create();
 			long startTime = System.nanoTime();
+			BrowserType browserType = 	playwright.chromium();
+			LaunchOptions launchOptions = new LaunchOptions();
+			launchOptions.setHeadless(Boolean.TRUE);
+			launchOptions.setDevtools(Boolean.FALSE);
+			
+			Browser browser = browserType.launch(launchOptions);
+			BrowserContext context = browser.newContext();
+			Page page = context.newPage();
+			
 			JsonParser jsonParser = new JsonParser();
 			JsonElement config = jsonParser.parse(grafanaDashboardPdfConfig.getDashboardJson());
+			int loadTime = config.getAsJsonObject().get("loadTime").getAsInt() * 1000;
+			log.debug("Worlflow Detail ==== LoadTIme configured for Grafana in milliseconds ===== {} ",loadTime);
 			String grafanaEndpoint = getGrafanaEndPoint();
 			log.debug("Worlflow Detail ==== grafanaEndpoint from config ===== {} ",grafanaEndpoint);
 			JsonArray panelArray = config.getAsJsonObject().get("panelUrls").getAsJsonArray();
@@ -334,63 +330,46 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 				grafanaPanelList.add(panelUrl);
 			});
 
-			BrowserType browserType = 	playwright.chromium();
-			LaunchOptions launchOptions = new LaunchOptions();
-			launchOptions.withHeadless(true);
-			launchOptions.withDevtools(false);
-
-			String auth = getGrafanaAuth();
-			byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.ISO_8859_1));
-			String authHeader = "Basic " + new String(encodedAuth);
-			Map<String, String> headers = new HashMap<>();
-			headers.put("Authorization", authHeader);
-
-			Browser browser = browserType.launch(launchOptions);
-			BrowserContext context = browser.newContext(
-					new Browser.NewContextOptions().withViewport(1200, 800));
+			Map<String, String> headers = getGrafanaHeaders(config);
 
 			NavigateOptions navigateOptions = new NavigateOptions();
-			navigateOptions.withWaitUntil(LoadState.NETWORKIDLE);
-			Page page = context.newPage();
+			navigateOptions.setWaitUntil(WaitUntilState.NETWORKIDLE);
+			
 			List<byte[]> imageList = new ArrayList<>();
 			for(int idx=0;idx<grafanaPanelList.size();idx++) {
 
 				page.setExtraHTTPHeaders(headers);
-				page.setDefaultNavigationTimeout(120000);
+				page.waitForTimeout(TRANSITION_TIME);
 				page.setViewportSize(1200, 800);
-				page.route("**", route -> route.continue_());
+				page.route("**", route -> route.resume());
+				page.onRequest(request -> log.debug(">> {} {}  ", request.method(), request.url()));
+			    page.onResponse(response -> log.debug("<< {} {} ",response.status(), response.url()));
 				page.navigate(grafanaPanelList.get(idx),navigateOptions);
 				Page.WaitForSelectorOptions waitForSelectorOptions = new Page.WaitForSelectorOptions();
-				waitForSelectorOptions.withState(State.ATTACHED);
-				Deferred<ElementHandle> event = page.waitForSelector("body > img", new Page.WaitForSelectorOptions()
-						.withState(Page.WaitForSelectorOptions.State.ATTACHED));
-				event.get();
-				page.route(PROXY_URL_PATTERN, r -> {
-					r.fulfill(new FulfillResponse().withStatus(200));
-				});
-				page.waitForResponse(grafanaPanelList.get(idx));
-				page.waitForResponse(PROXY_URL_PATTERN);
-
-				byte[] image = page.waitForSelector("body > img").get().asElement().screenshot();
-				//log.debug("Worlflow Detail ==== Image  ===== {} ",image);
+				waitForSelectorOptions.setState(WaitForSelectorState.ATTACHED);
+				log.debug("Waiting for panel {} to load completely before screenshot == {} ",idx,Instant.now());
+				page.waitForTimeout(loadTime);
+				log.debug("Waiting time completed for dashboard == {} ",Instant.now());
+				page.evaluate("() => {for (el of document.getElementsByClassName('navbar')) {return el.hidden = true; };  }");
+				page.evaluate("() => {for (el of document.getElementsByClassName('submenu-controls')) {return el.hidden = true; };  }");
+				ElementHandle elementHandle = page.querySelector(".panel-wrapper.panel-wrapper--view");
+				page.waitForTimeout(TRANSITION_TIME);
+				byte[] image = elementHandle.screenshot();
 				imageList.add(image);
-				//page.screenshot(new Page.ScreenshotOptions().withPath(Paths.get("screenshot-"+idx + ".png")));
-
 			}
 			String dynamicTemplate = assessmentReportDTO.getPdfReportDirPath() + File.separator
 					+ assessmentReportDTO.getAsseementreportname() + "." + ReportEngineUtils.HTML_EXTENSION;
 			log.debug("Worlflow Detail ==== Generated DynamicTemplate.html name  ===== {} ",dynamicTemplate);
 			File extractedPdfFile = new File(exportedFilePath);
 			prepareHtml(imageList,dynamicTemplate, grafanaDashboardPdfConfig);
-
+			page = context.newPage();
 			page.navigate(new File(dynamicTemplate).getAbsolutePath());
 			PdfOptions pdfOptions =  new PdfOptions();
-			//pdfOptions.withPath(Paths.get(URLEncoder.encode(grafanaDashboardConfig.getTitle(),"UTF-8")+".pdf"));
-			pdfOptions.withPrintBackground(false);
-			pdfOptions.withDisplayHeaderFooter(true);
-			pdfOptions.withHeaderTemplate(fetchTemplate(HEADER_HTML));
-			pdfOptions.withFooterTemplate(fetchTemplate(FOOTER_HTML));
-			pdfOptions.setMargin().withTop("90").withRight("10").withBottom("50").withLeft("10");
+			pdfOptions.setPrintBackground(Boolean.TRUE);
+			pdfOptions.setDisplayHeaderFooter(true);
+			pdfOptions.setHeaderTemplate(fetchTemplate(HEADER_HTML));
+			pdfOptions.setFooterTemplate(fetchTemplate(FOOTER_HTML));
+			pdfOptions.setMargin(new Margin().setTop("90").setRight("10").setBottom("50").setLeft("10"));
 			byte[] pdf = page.pdf(pdfOptions);
 			page.close();
 			context.close();
@@ -403,10 +382,10 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
 					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),
 					grafanaDashboardPdfConfig.getWorkflowConfig().getWorkflowType(),"-","-",processingTime,
-					" PDFType: " + grafanaDashboardPdfConfig.getPdfType() +
-					" Schedule: " +grafanaDashboardPdfConfig.getScheduleType() +
-					" Source: " +grafanaDashboardPdfConfig.getSource() +
-					" Status: " +grafanaDashboardPdfConfig.getStatus());
+					PDF_TYPE + grafanaDashboardPdfConfig.getPdfType() +
+					SCHEDULE +grafanaDashboardPdfConfig.getScheduleType() +
+					SOURCE +grafanaDashboardPdfConfig.getSource() +
+					STATUS +grafanaDashboardPdfConfig.getStatus());
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== Grafana Dashboard export as Printable PDF Completed with error {} ", e.getMessage());
 			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
@@ -525,10 +504,6 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 		return render.toString();
 	}
 
-	private String getGrafanaAuth() {
-		return ApplicationConfigProvider.getInstance().getGrafana().getAdminUserName()+":"+
-				ApplicationConfigProvider.getInstance().getGrafana().getAdminUserPassword();
-	}
 
 	private String getGrafanaEndPoint() {
 		return ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint();

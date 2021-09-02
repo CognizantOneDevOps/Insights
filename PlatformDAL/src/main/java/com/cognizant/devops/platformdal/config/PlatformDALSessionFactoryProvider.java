@@ -42,6 +42,7 @@ import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfigurati
 import com.cognizant.devops.platformdal.dataArchivalConfig.InsightsDataArchivalConfig;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfig;
+import com.cognizant.devops.platformdal.grafana.pdf.GrafanaOrgToken;
 import com.cognizant.devops.platformdal.icon.Icon;
 import com.cognizant.devops.platformdal.relationshipconfig.RelationshipConfiguration;
 import com.cognizant.devops.platformdal.upshiftassessment.UpshiftAssessmentConfig;
@@ -94,6 +95,7 @@ public class PlatformDALSessionFactoryProvider {
 		    configuration.addAnnotatedClass(AutoMLConfig.class);
 		    configuration.addAnnotatedClass(GrafanaDashboardPdfConfig.class);
 		    configuration.addAnnotatedClass(UpshiftAssessmentConfig.class);
+		    configuration.addAnnotatedClass(GrafanaOrgToken.class);
 			PostgreData postgre = ApplicationConfigProvider.getInstance().getPostgre();
 			if(postgre != null){				
 				configuration.setProperty(AvailableSettings.USER, postgre.getUserName());

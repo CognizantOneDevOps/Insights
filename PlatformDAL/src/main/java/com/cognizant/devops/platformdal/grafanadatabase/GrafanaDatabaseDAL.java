@@ -47,10 +47,11 @@ public class GrafanaDatabaseDAL extends BaseDAL {
 	public List<Object[]> fetchDashboardDetailsByOrgId(int orgid) {
 		Map<String,Object> parameters = new HashMap<>();
 		parameters.put("OrgId", orgid);
+		parameters.put("isFolder", Boolean.FALSE);
 		Map<String,Type> scalarList = new LinkedHashMap<>();
 		scalarList.put("uid", StandardBasicTypes.STRING);
 		scalarList.put("title", StandardBasicTypes.STRING);
-		return executeGrafanaSQLQueryAndRetunList("SELECT uid,title FROM dashboard where org_id=:OrgId ",scalarList, parameters);
+		return executeGrafanaSQLQueryAndRetunList("SELECT uid,title FROM dashboard where org_id=:OrgId and is_folder=:isFolder",scalarList, parameters);
 	}
 	
 	public List<Object[]> fetchDashboardDetailsByUUId(String uid,int orgid) {

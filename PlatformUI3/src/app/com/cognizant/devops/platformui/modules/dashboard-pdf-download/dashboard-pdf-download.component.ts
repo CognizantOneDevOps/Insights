@@ -86,6 +86,7 @@ export class DashboardPdfDownloadComponent implements OnInit {
   isDatainProgress: boolean = false;
   showTimePicker: boolean = true;
   mailIconDisable: boolean = true;
+  loadTime: any;
 
   constructor(public router: Router, private grafanaService: GrafanaAuthenticationService, private landingService: LandingPageService,
     public reportmanagementservice: ReportManagementService, public messageDialog: MessageDialogService, private dialog: MatDialog,
@@ -113,7 +114,7 @@ export class DashboardPdfDownloadComponent implements OnInit {
   public async getOrgs() {
     this.currentUserWithOrgs = await this.grafanaService.getCurrentUserWithOrgs();
     if (this.currentUserWithOrgs.status === "success") {
-      this.orgArr = this.currentUserWithOrgs.data.orgArray;
+      this.orgArr = this.currentUserWithOrgs.data.orgArray.filter(org => org.role === 'Admin');
     }
   }
   async loadSchedule() {
@@ -130,7 +131,7 @@ export class DashboardPdfDownloadComponent implements OnInit {
   async getDashboardsByOrg(orgId) {
     this.dashboardList = [];
     this.dashOptions = [];
-    this.queryForRecentDashboards(orgId);
+    //this.queryForRecentDashboards(orgId);
     console.log(orgId)
     this.repsonseFromGrafana = await this.landingService.getDashboardList(orgId);
 
@@ -270,6 +271,16 @@ export class DashboardPdfDownloadComponent implements OnInit {
                 "query": list.query
               }
               this.queryArr.push(queryObj);
+            }else {
+              let customArray;
+              if(list.query.includes(",")){
+                customArray = list.query.split(',')
+              }else{
+                customArray = list.query
+              }
+
+              this.globalMap.set('$' + this.templateVariableArr[index].name, customArray);
+               this.totalMap.set('$' + this.templateVariableArr[index].name, customArray)
             }
           })
           this.getOptionsByQuery();
@@ -376,14 +387,14 @@ export class DashboardPdfDownloadComponent implements OnInit {
     if (dashboard.panels.length > 0) {
       dashboard.panels.forEach(x => {
         if (x.type !== 'row' && x.type !== 'text') {
-          this.urlArray.push(InsightsInitService.grafanaHost + '/render/d-solo/' + dashboard.uid + '/' + this.asyncResult.data.meta.slug + '?' +
-            'panelId=' + x.id + '&' + variables);
+          this.urlArray.push(InsightsInitService.grafanaHost + '/d/' + dashboard.uid + '/' + this.asyncResult.data.meta.slug + '?' +
+            'viewPanel=' + x.id + '&' + variables);
         } else if (x.type === 'row' && x.collapsed) {
           if (Array.isArray(x.panels)) {
             if (x.type !== 'text')
               x.panels.forEach(x => {
-                this.urlArray.push(InsightsInitService.grafanaHost + '/render/d-solo/' + dashboard.uid + '/' + this.asyncResult.data.meta.slug + '?' +
-                  'panelId=' + x.id + '&' + variables);
+                this.urlArray.push(InsightsInitService.grafanaHost + '/d/' + dashboard.uid + '/' + this.asyncResult.data.meta.slug + '?' +
+                  'viewPanel=' + x.id + '&' + variables);
               });
           }
         }
@@ -464,8 +475,8 @@ export class DashboardPdfDownloadComponent implements OnInit {
     }
     var self = this;
     var decode = InsightsInitService.grafanaHost + '/dashboard/script/iSight_ui3.js?url=' + InsightsInitService.grafanaHost + '/dashboard/db/' + this.asyncResult.data.meta.slug + '?' + this.urlString;
-    this.dashUrl = InsightsInitService.grafanaHost + '/dashboard/script/iSight_ui3.js?url=' + encodeURIComponent(InsightsInitService.grafanaHost + '/dashboard/db/' + this.asyncResult.data.meta.slug + '?' + this.urlString);
-    this.saveUrl = InsightsInitService.grafanaHost + '/dashboard/db/' + this.asyncResult.data.meta.slug + '?' + this.urlString;
+    this.dashUrl = InsightsInitService.grafanaHost + '/dashboard/script/iSight_ui3.js?url=' + encodeURIComponent(InsightsInitService.grafanaHost + '/dashboard/db/' + this.asyncResult.data.meta.slug+'?orgId='+ this.organisation+'&'+this.urlString);
+    this.saveUrl = InsightsInitService.grafanaHost + '/dashboard/db/' + this.asyncResult.data.meta.slug +'?orgId='+ this.organisation+'&'+ this.urlString;
     this.getUrlArray();
     const dialogRef = self.dialog.open(DashboardPreviewConfigDialog, {
       panelClass: "traceablity-show-details-dialog-container",
@@ -513,6 +524,7 @@ export class DashboardPdfDownloadComponent implements OnInit {
       saveObj['to'] = rangeData.end;
       variables = variables + 'from=' + absStartDt + ',to=' + absEndDt;
     }
+    saveObj['loadTime'] = this.loadTime;
     saveObj['title'] = this.emailDetails.mailSubject;
     saveObj['source'] = 'PLATFORM';
     saveObj['pdfType'] = [this.pdfType];

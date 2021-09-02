@@ -20,7 +20,9 @@ export interface MyQuery extends DataQuery {
 
 
 export const defaultQuery: Partial<MyQuery> = {
+  queryText: undefined,
   constant: 6.5,
+  cypherQuery: undefined,
   graph: false,
   timeseries: false,
   table: false,
@@ -31,7 +33,6 @@ export const defaultQuery: Partial<MyQuery> = {
   fixTime: false,
   cacheType: undefined,
   cacheValue: undefined,
-  serviceUrl: undefined
 };
  
 
@@ -39,10 +40,10 @@ export const defaultQuery: Partial<MyQuery> = {
  * These are options configured for each DataSource instance
  */
 export interface MyDataSourceOptions extends DataSourceJsonData {
+  path?: string;
   basicPassword: string;
   logging: any ;
-  path?: string;
-  serviceUrl?: any;
+  serviceUrl: any;
   authToken: any;
 }
 
@@ -50,14 +51,15 @@ export interface MyDataSourceOptions extends DataSourceJsonData {
  * Value that is used in the backend, but never sent over HTTP to the frontend
  */
 export interface MySecureJsonData {
-  basicPassword: string;
   apiKey?: string;
+  basicPassword: string;
 }
 
+/** changes*/
 export const defaults: MyDataSourceOptions = {
   logging :true,
   path: '',
-  serviceUrl : 'http://localhost:8080/PlatformService/datasource/logDashboardInfo',
+  serviceUrl : '',
   authToken : true,
   basicPassword: ''
 }

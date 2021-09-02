@@ -1,16 +1,15 @@
-import _ from 'lodash';
 
 import {
   MetricFindValue,
-  DataQueryRequest, 
-  DataSourceApi, 
+  DataQueryRequest,
   DataSourceInstanceSettings, 
   DataQueryResponse, 
   AnnotationQueryRequest,
-  AnnotationEvent
+  AnnotationEvent,
+  DataSourceApi
 } from '@grafana/data';
 
-import { getBackendSrv } from '@grafana/runtime';
+import { getBackendSrv, config } from '@grafana/runtime';
 
 import { MyQuery, MyDataSourceOptions } from './types';
 
@@ -27,14 +26,9 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   datasourceId: any;
   datasourceType: any;
   datasourceName: any;
-  userId: any;
-  userName: any;
-  email: any;
-  orgId: any;
   logging: any;
   tokenEnabled: any;
-  
-  constructor(instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>, private templateSrv) {
+  constructor(instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>, private templateSrv, private dashboardSrv, private timeSrv) {
     super(instanceSettings);
     this.type = instanceSettings.type;
     this.url = instanceSettings.url;
@@ -43,10 +37,8 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     this.datasourceId = instanceSettings.id;
     this.logging = instanceSettings.jsonData.logging;
     this.tokenEnabled = instanceSettings.jsonData.authToken;
-    if(this.logging){
-        this.getUserDetailsPerDashboardHit();
-    }
   }
+
 
   /**provides ability to test connection from connection settings page . */
   testDatasource() {
@@ -63,11 +55,9 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       }]
     };
     let testQuery = JSON.stringify(queryJson);
-    let routePath = '';
+    let routePath = this.url;
     if(this.tokenEnabled){
       routePath = this.url + `/platformservice`;
-    }else{
-      routePath = this.url
     }
     return getBackendSrv().datasourceRequest({ url: routePath, method: 'POST', data: testQuery }).then((res: any) => {
       let data = res.data;
@@ -90,7 +80,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     });
   }
 
-  query(options: DataQueryRequest<MyQuery>) {
+  query(options: DataQueryRequest<MyQuery>): Observable<DataQueryResponse> {
     const queries: any[] = [];
     const streams: Array<Observable<DataQueryResponse>> = [];
     const { range } = options;
@@ -99,9 +89,9 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     let cypherQuery = {};
     let statements = [] as any;
     let metadata = [] as any;
-    let logInfo = {};
     cypherQuery['statements'] = statements;
     cypherQuery['metadata'] = metadata;
+    let logInfo = {};
     logInfo['eventName'] = 'data-request';
     logInfo['panelId'] = options.panelId;
     logInfo['dashboardId'] = options.dashboardId;
@@ -109,7 +99,6 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     logInfo['datasourceType'] = this.type;
     logInfo['datasourceName'] = this.name;
     logInfo['timestamp'] = new Date().toISOString();
-    
     // Start streams and prepare queries
     for (const target of options.targets) {
       if (target.hide) {
@@ -133,14 +122,13 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
         datasourceId: this.id,
       });
     }
+    console.log(this.url)
     logInfo['query'] = cypherQuery;
     let startTime = Date.now();
     if (queries.length) {
-      let routePath = '';
+      let routePath = this.url;
       if (this.tokenEnabled) {
         routePath = this.url + `/platformservice`;
-      } else {
-        routePath = this.url
       }
       const req: Promise<any> = getBackendSrv()
         .datasourceRequest({
@@ -155,10 +143,23 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
           logInfo['requestId'] = options.requestId;
           if (this.logging) {
             try {
-              logInfo['userId'] = this.userId;
-              logInfo['userName'] = this.userName;
-              logInfo['email'] = this.email;
-              logInfo['orgId'] = this.orgId;
+              let user = config.bootData.user;
+              let dashboard = this.dashboardSrv.dashboard;
+              logInfo['userId'] = user.id;
+              logInfo['userName'] = user.name;
+              logInfo['email'] = user.email;
+              logInfo['orgId'] = user.orgId;
+              logInfo['orgName'] = user.orgName;
+              logInfo['uid'] = dashboard.uid;
+              logInfo['dashboardName'] = dashboard.title;
+              logInfo['panelCount'] = dashboard.panels.length;
+             
+              dashboard.panels.forEach(panel => {
+                if(panel.id === options.panelId){
+                  logInfo['panelName'] = panel.title;
+                  logInfo['chartType'] = panel.type;
+                }
+              });
               this.logDashboardInfo(logInfo);
             } catch (e) {
               console.log(e);
@@ -180,7 +181,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
         });
       streams.push(from(req));
     }
-    //console.log(logInfo);
+
     return merge(...streams);
   }
 
@@ -195,24 +196,15 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       });
   }
 
-  private async getUserDetailsPerDashboardHit() {
-  await getBackendSrv().datasourceRequest({
-      method: 'GET',
-      url: '/api/user',
-    }).then((res: any) => {
-        this.userId = res.data.id;
-        this.userName = res.data.name;
-        this.email = res.data.email;
-        this.orgId = res.data.orgId;
-      });
-
-  }
-
   metricFindQuery(query: string, options: any) {
     var cypherQuery = {};
     var statements = [] as any;
     cypherQuery['statements'] = statements;
-    query = addTimestampToQuery(query, null);
+    if(this.timeSrv && this.timeSrv.timeRange()){
+      let options = {range: this.timeSrv.timeRange()};
+      query = addTimestampToQuery(query, options);
+    }
+    //query = addTimestampToQuery(query, null);
     query = this.templateSrv.replace(query, {}, applyTemplateVariables);
     var resultDataContents = ["row"];
     var statement = {
@@ -269,7 +261,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     const event: AnnotationEvent = {
       time: date.valueOf(),
       text: 'foo',
-      tags: ['bar'],
+      tags: ['bar','foo'],
     };
 
     events.push(event);

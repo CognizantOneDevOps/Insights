@@ -52,10 +52,10 @@ export class DashboardListComponent implements OnInit {
   enableRefresh: boolean = false;
   MAX_ROWS_PER_TABLE = 10;
   orgArr= [];
-  orgName: any;
   isDatainProgress: boolean=false;
   disablebutton=[];
   timeZone: string = '';
+  count: number;
 
 
   constructor(public messageDialog: MessageDialogService,private grafanaService: GrafanaAuthenticationService,
@@ -96,7 +96,7 @@ export class DashboardListComponent implements OnInit {
         "status":this.selectedDashboard.status,
         "title":this.selectedDashboard.title,
         "variables":this.selectedDashboard.variables,
-        "orgName":this.orgName,
+        "orgName":this.selectedDashboard.orgName,
         "type":'edit',
         "dashboard":dashboardJson.dashboard,
         "organisation":dashboardJson.organisation,
@@ -110,7 +110,8 @@ export class DashboardListComponent implements OnInit {
          "receiverCCEmailAddress": dashboardJson.receiverCCEmailAddress, 
          "receiverBCCEmailAddress": dashboardJson.receiverBCCEmailAddress,
          "rangeText":dashboardJson.rangeText,
-         "workflowId": this.selectedDashboard.workflowId     
+         "workflowId": this.selectedDashboard.workflowId ,
+         "loadTime":  dashboardJson.loadTime   
       }
     };
     this.router.navigate(['InSights/Home/edit-dashboard'], navigationExtras);
@@ -142,13 +143,12 @@ export class DashboardListComponent implements OnInit {
       this.disablebutton.push(true);
     }
     this.isDatainProgress=false;
+    this.count = 0;
     this.dashConfigList.data.forEach(element => {
-      this.orgArr.forEach(org =>{
-        let dashJson=JSON.parse(element.dashboardJson);
-        if(org.orgId === Number(dashJson.organisation)){
-            this.orgName=org.name;
-        }  
-      })   
+      let dashJson=JSON.parse(element.dashboardJson);
+      let organisationObj = this.orgArr.filter(e => e.orgId === Number(dashJson.organisation));
+      this.dashboardDatasource.data[this.count].orgName = organisationObj[0].name;
+      this.count += 1;
     }); 
       this.dashboardDatasource.paginator = this.paginator;
     }

@@ -433,10 +433,12 @@ public class AccessGroupManagement {
 			if (dashboardsJsonArray.size() == 0) {
 				return PlatformServiceUtil.buildSuccessResponseWithData(finalJson);
 			}
-			String grafanaBaseUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaExternalEndPoint();
+			/*String grafanaBaseUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaExternalEndPoint();
 			if (grafanaBaseUrl == null) {
 				grafanaBaseUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint();
-			}
+			}*/
+			
+			String grafanaBaseUrl="INSIGHTS_GRAFANA_HOST";
 			String grafanaUrl = grafanaBaseUrl + "/dashboard/";
 			String grafanaIframeUrl = grafanaBaseUrl + "/dashboard/script/iSight_ui3.js?url=";
 			String grafanaDomainUrl = accessGrpMgmtServiceImpl.grafanaUrl(grafanaBaseUrl);
@@ -454,13 +456,10 @@ public class AccessGroupManagement {
 						dashboardData.get(PlatformServiceConstants.TITLE).getAsString());
 				datamodel.addProperty("id", dashboardData.get("id").getAsInt());
 				if ("dash-db".equals(dashboardData.get("type").getAsString())) {
-					if (grafanaVersion.contains("5.")) {
-						datamodel.addProperty("url",
-								(grafanaIframeUrl + grafanaDomainUrl + dashboardData.get("url").getAsString()));
-					} else {
+
 						datamodel.addProperty("url",
 								(grafanaIframeUrl + grafanaUrl + dashboardData.get("uri").getAsString()));
-					}
+					
 					if (dashboardData.get("isStarred").getAsBoolean()) {
 						starrreddashboardsArray.add(datamodel);
 					}
@@ -510,13 +509,8 @@ public class AccessGroupManagement {
 		
 	@GetMapping(value = "/getDashboardByUid", produces = MediaType.APPLICATION_JSON_VALUE)
     public JsonObject getDashboardByUid(@RequestParam String uuid,@RequestParam int orgId) throws InsightsCustomException {
-        log.debug("%n%nInside getDashboardByUid method call");//getGrafanaDashboardByAPIUid
-        String auth = ApplicationConfigProvider.getInstance().getGrafana().getAdminUserName()+":"+
-				ApplicationConfigProvider.getInstance().getGrafana().getAdminUserPassword();
-		byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.ISO_8859_1));
-		String authHeader = "Basic " + new String(encodedAuth);
-		Map<String, String> headers = new HashMap<>();
-		headers.put("Authorization", authHeader);
+        log.debug("%n%nInside getDashboardByUid method call changed");//getGrafanaDashboardByAPIUid
+		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 		headers.put("x-grafana-org-id", String.valueOf(orgId));
         String response = grafanaHandler.grafanaGet("/api/dashboards/uid/"+uuid, headers);
         return PlatformServiceUtil.buildSuccessResponseWithHtmlData(new JsonParser().parse(response));

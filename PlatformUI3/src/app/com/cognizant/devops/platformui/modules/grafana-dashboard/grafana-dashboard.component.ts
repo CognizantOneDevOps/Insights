@@ -67,10 +67,10 @@ export class GrafanaDashboardComponent implements OnInit {
 
     ngOnInit() {
         var url;
-        this.route.queryParams.subscribe(params => {
+            this.route.queryParams.subscribe(params => {
             url = params["dashboardURL"];
         });
-        this.dashboardUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+        this.dashboardUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url.replace("INSIGHTS_GRAFANA_HOST", InsightsInitService.grafanaHost.toString()));
     }
 
     setScrollBarPosition() {
@@ -120,6 +120,7 @@ export class GrafanaDashboardComponent implements OnInit {
 
         if (this.selectedDashboard != undefined) {
             this.selectedDashboard.iframeUrl = this.selectedDashboard.iframeUrl.replace("iSight.js", "iSight_ui3.js");
+            this.selectedDashboard.iframeUrl = this.selectedDashboard.iframeUrl.replace("INSIGHTS_GRAFANA_HOST", InsightsInitService.grafanaHost.toString());
             this.dashboardUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.selectedDashboard.iframeUrl);
         } else {
             this.dashboardUrl = this.sanitizer.bypassSecurityTrustResourceUrl(InsightsInitService.grafanaHost + '/dashboard/script/iSight_ui3.js?url=' + InsightsInitService.grafanaHost + '/?orgId=' + this.orgId);// 1/?orgId=3 3/d/DrPYuKJmz/dynatrace-data?orgId=

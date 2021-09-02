@@ -51,10 +51,10 @@ public class Neo4jPluginLogsController {
 	Cache<Integer, String> dashboardCache;
 	Cache<Integer, String> orgCache;
 	Cache<String, String> dashboardEventCache;
-	
+
 	public static final Long GRAFANA_DASHBOARD_CACHE_HEAP_SIZE_BYTES=1000000l;
 	static Logger log = LogManager.getLogger(Neo4jPluginLogsController.class);
-	
+
 	@Autowired
 	Neo4jPluginLogsService neo4jPluginLogsService;
 
@@ -78,7 +78,7 @@ public class Neo4jPluginLogsController {
 				.newCacheConfigurationBuilder(Integer.class, String.class,
 						ResourcePoolsBuilder.heap(GRAFANA_DASHBOARD_CACHE_HEAP_SIZE_BYTES))
 				.withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofHours(1L))));
-		
+
 		dashboardEventCache = cacheManager.createCache("dashboardEvent",
 				CacheConfigurationBuilder
 				.newCacheConfigurationBuilder(String.class, String.class,
@@ -92,29 +92,36 @@ public class Neo4jPluginLogsController {
 	public void logDashboardInfo(@RequestBody JsonObject dashboardDetails) {
 		String panelId = dashboardDetails.get("panelId").getAsString();
 		int dashboardId = dashboardDetails.get("dashboardId").getAsInt();
-		int orgId = dashboardDetails.get("orgId").getAsInt();
-		
-		if(dashboardCache.get(dashboardId) == null ) {
-			JsonObject dashboardJson = neo4jPluginLogsService.getDashboardDetails();
-			JsonArray recordArray = dashboardJson.get("records").getAsJsonArray();
-			recordArray.forEach(record -> dashboardCache.put(record.getAsJsonObject().get("id").getAsInt(),record.getAsJsonObject().get("dashboard").getAsString()));
-			if(orgCache.get(orgId) == null ) {
-				JsonObject orgJson = neo4jPluginLogsService.fetchOrgDetails();
-				JsonArray orgArray = orgJson.get("records").getAsJsonArray();
-				orgArray.forEach(record -> orgCache.put(record.getAsJsonObject().get("id").getAsInt(),record.getAsJsonObject().get(ORG_NAME).getAsString()));
-				dashboardDetails.addProperty(ORG_NAME, orgCache.get(orgId));
+		if(dashboardDetails.get("orgId") != null) {
+			int orgId = dashboardDetails.get("orgId").getAsInt();
+			if (!dashboardDetails.has(ORG_NAME)) {
+				if(dashboardCache.get(dashboardId) == null ) {
+					JsonObject dashboardJson = neo4jPluginLogsService.getDashboardDetails();
+					JsonArray recordArray = dashboardJson.get("records").getAsJsonArray();
+					recordArray.forEach(record -> dashboardCache.put(record.getAsJsonObject().get("id").getAsInt(),record.getAsJsonObject().get("dashboard").getAsString()));
+					if(orgCache.get(orgId) == null ) {
+						JsonObject orgJson = neo4jPluginLogsService.fetchOrgDetails();
+						JsonArray orgArray = orgJson.get("records").getAsJsonArray();
+						orgArray.forEach(record -> orgCache.put(record.getAsJsonObject().get("id").getAsInt(),record.getAsJsonObject().get(ORG_NAME).getAsString()));
+						dashboardDetails.addProperty(ORG_NAME, orgCache.get(orgId));
+					}else {
+						dashboardDetails.addProperty(ORG_NAME, orgCache.get(orgId));
+					}
+					processDashboardJsonForLog(dashboardDetails, panelId, dashboardCache.get(dashboardId));
+				}else {
+					String orgName = orgCache.get(orgId);
+					dashboardDetails.addProperty(ORG_NAME, orgName);
+					String dashboardJson = dashboardCache.get(dashboardId);
+					processDashboardJsonForLog(dashboardDetails, panelId, dashboardJson);
+				}
+				logDashboardView(dashboardDetails, dashboardId);
 			}else {
-				dashboardDetails.addProperty(ORG_NAME, orgCache.get(orgId));
+				log.info(dashboardDetails);
+				logDashboardView(dashboardDetails, dashboardId);
 			}
-			processDashboardJsonForLog(dashboardDetails, panelId, dashboardCache.get(dashboardId));
-		}else {
-			String orgName = orgCache.get(orgId);
-			dashboardDetails.addProperty(ORG_NAME, orgName);
-			String dashboardJson = dashboardCache.get(dashboardId);
-			processDashboardJsonForLog(dashboardDetails, panelId, dashboardJson);
 		}
-		logDashboardView(dashboardDetails, dashboardId);
 	}
+
 
 	private synchronized void logDashboardView(JsonObject dashboardDetails, int dashboardId) {
 		String cacheUserId = dashboardDetails.get("userId").getAsString();
@@ -142,7 +149,7 @@ public class Neo4jPluginLogsController {
 			dashboardDetails.addProperty("panelCount", dashboardJsonObject.get(PANELS).getAsJsonArray().size());
 			if("data-request".equals(eventType)) {
 				dashboardJsonObject.get(PANELS).getAsJsonArray().forEach(panel -> {
-					if(panel.getAsJsonObject().get("id").getAsInt() == Integer.parseInt(panelId)){
+					if(panel.getAsJsonObject().get("id").getAsLong() == Long.parseLong(panelId)){
 						dashboardDetails.addProperty(PANEL_NAME, panel.getAsJsonObject().get("title").getAsString());
 						dashboardDetails.addProperty(CHART_TYPE, panel.getAsJsonObject().get("type").getAsString());
 					}

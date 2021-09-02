@@ -113,5 +113,31 @@ public class GrafanaDashboardPdfConfigDAL extends BaseDAL {
 		}
 	}
 	
+	public int saveGrafanaOrgToken(GrafanaOrgToken grafanaOrgToken)
+    { 
+		int id = -1;
+		try  {
+			id = (int) save(grafanaOrgToken);
+			return id;
+		} catch (Exception e) {
+			log.error(e);
+			return id;
+		}
+    }
+	
+	public GrafanaOrgToken getTokenByOrgId(int orgId)
+    { 
+		try {
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("orgId", orgId);
+			return getUniqueResult( "FROM GrafanaOrgToken a WHERE a.orgId = :orgId",
+					GrafanaOrgToken.class,
+					parameters);
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
+		
+    }
 	
 }

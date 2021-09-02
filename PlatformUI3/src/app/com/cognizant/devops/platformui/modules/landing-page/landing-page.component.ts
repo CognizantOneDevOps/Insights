@@ -202,7 +202,7 @@ export class LandingPageComponent implements OnInit {
     let navigationExtras: NavigationExtras = {
       skipLocationChange: true,
       queryParams: {
-        "dashboardURL": item.url
+        "dashboardURL": item.url.replace("INSIGHTS_GRAFANA_HOST", InsightsInitService.grafanaHost.toString())
       }
     };
     this.router.navigate([route], navigationExtras);

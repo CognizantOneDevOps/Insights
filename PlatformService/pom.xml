@@ -11,14 +11,14 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>8.3</version>
+		<version>8.4</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>PlatformService</artifactId>
 	<groupId>com.cognizant.devops</groupId>
 	<packaging>war</packaging>
-	<version>8.3</version>
+	<version>8.4</version>
 	<name>PlatformService</name>
 
 	<properties>
@@ -171,7 +171,7 @@
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-ext-jdk15on</artifactId>
-			<version>1.64</version>
+			<version>1.67</version>
 		</dependency>
 
 		<dependency>
@@ -238,19 +238,19 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>8.3</version>
+			<version>8.4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformAuditing</artifactId>
-			<version>8.3</version>
+			<version>8.4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>8.3</version>
+			<version>8.4</version>
 		</dependency>
 
 		<dependency>

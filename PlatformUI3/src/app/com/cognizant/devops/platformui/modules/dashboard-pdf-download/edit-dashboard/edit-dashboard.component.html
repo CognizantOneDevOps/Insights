@@ -110,6 +110,60 @@
         </td>
       </tr>
 
+      <tr class="mat-row-webhook" *ngIf="pdfType==='Dashboard'">
+        <td class="mat-cell" class="columnName">
+          <span class="mainText">Load Time For Dashboard(in Sec)</span>
+          <span style="color:#ff0000;">*</span>
+        </td>
+        <td class="columnComponent">
+          <mat-select  [(ngModel)]="loadTime" style="margin:1%;" class="form-control" required placeholder="Select loadTime" color="primary">
+            <mat-option style="color:#0033A0" value="10">10</mat-option>
+            <mat-option style="color:#0033A0" value="15">15</mat-option>
+            <mat-option style="color:#0033A0" value="30">30</mat-option>
+            <mat-option style="color:#0033A0" value="60">60</mat-option>
+            <mat-option style="color:#0033A0" value="90">90</mat-option>
+            <mat-option style="color:#0033A0" value="120">120</mat-option>
+            <mat-option style="color:#0033A0" value="150">150</mat-option>
+            <mat-option style="color:#0033A0" value="180">180</mat-option>
+            <mat-option style="color:#0033A0" value="210">210</mat-option>
+            <mat-option style="color:#0033A0" value="240">240</mat-option>
+            <mat-option style="color:#0033A0" value="270">270</mat-option>
+            <mat-option style="color:#0033A0" value="300">300</mat-option>
+          </mat-select>
+          <mat-select *ngIf="pdfType==='Printable'" [(ngModel)]="loadTime" style="margin:1%;" class="form-control" required placeholder="Select loadTime" color="primary">
+            <mat-option style="color:#0033A0" value="3">3</mat-option>
+            <mat-option style="color:#0033A0" value="5">5</mat-option>
+            <mat-option style="color:#0033A0" value="8">8</mat-option>
+            <mat-option style="color:#0033A0" value="10">10</mat-option>
+            <mat-option style="color:#0033A0" value="15">15</mat-option>
+            <mat-option style="color:#0033A0" value="20">20</mat-option>
+          </mat-select>
+        </td>
+        <td>
+          <span class="infoText">Select a loadTime for entire dashboard</span>
+        </td>
+      </tr>
+
+      <tr class="mat-row-webhook" *ngIf="pdfType==='Printable'">
+        <td class="mat-cell" class="columnName">
+          <span class="mainText">Load Time For Dashboard(in Sec)</span>
+          <span style="color:#ff0000;">*</span>
+        </td>
+        <td class="columnComponent">
+          <mat-select  [(ngModel)]="loadTime" style="margin:1%;" class="form-control" required placeholder="Select loadTime" color="primary">
+            <mat-option style="color:#0033A0" value="3">3</mat-option>
+            <mat-option style="color:#0033A0" value="5">5</mat-option>
+            <mat-option style="color:#0033A0" value="8">8</mat-option>
+            <mat-option style="color:#0033A0" value="10">10</mat-option>
+            <mat-option style="color:#0033A0" value="15">15</mat-option>
+            <mat-option style="color:#0033A0" value="20">20</mat-option>
+          </mat-select>
+        </td>
+        <td>
+          <span class="infoText">Select a loadTime for each panel</span>
+        </td>
+      </tr>
+
       <tr class="mat-row-webhook" *ngIf="templateVariableArr.length>0">
         <td class="mat-cell" class="columnName">
           <span class="mainText">Filters</span>

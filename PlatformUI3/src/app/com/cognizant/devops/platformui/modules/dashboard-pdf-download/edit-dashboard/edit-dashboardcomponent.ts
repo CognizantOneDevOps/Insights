@@ -87,6 +87,7 @@ export class EditDashboardComponent implements OnInit {
   isDatainProgress: boolean=false;
   showTimePicker: boolean=true;
   scheduleList=['ONETIME','DAILY','WEEKLY','MONTHLY','YEARLY'];
+  loadTime: any;
 
 
   constructor(public router: Router, private grafanaService: GrafanaAuthenticationService, private landingService: LandingPageService,
@@ -118,6 +119,7 @@ export class EditDashboardComponent implements OnInit {
   }
   initialiseVariables(params){
       this.getDashboardsByOrg(Number(params.organisation));
+      this.loadTime = params.loadTime == undefined ?'30':params.loadTime;
       this.type=params.type;
       this.editData=params;
       this.organisation=params.organisation;
@@ -160,7 +162,7 @@ export class EditDashboardComponent implements OnInit {
   public async getOrgs() {
     this.currentUserWithOrgs = await this.grafanaService.getCurrentUserWithOrgs();
     if (this.currentUserWithOrgs.status === "success") {
-      this.orgArr = this.currentUserWithOrgs.data.orgArray;
+      this.orgArr = this.currentUserWithOrgs.data.orgArray.filter(org => org.role === 'Admin');
     }
   }
   async loadSchedule() {
@@ -177,18 +179,16 @@ export class EditDashboardComponent implements OnInit {
   async getDashboardsByOrg(orgId) {
     this.dashboardList = [];
     this.dashOptions = [];
-    this.queryForRecentDashboards(orgId);
-    this.repsonseFromGrafana = await this.landingService.searchDashboard();
+    console.log(orgId)
+    this.repsonseFromGrafana = await this.landingService.getDashboardList(orgId);
+
     if (this.repsonseFromGrafana.status == "success") {
       this.dashboardList = this.repsonseFromGrafana.data;
+      this.dashboardList.forEach(res => {
+        this.dashOptions.push(res);
+      });
     }
-    this.dashboardList.general.forEach(res => {
-      this.dashOptions.push(res);
-    });
-    this.dashboardList.starred.forEach(res => {
-      this.dashOptions.push(res);
-    });
-      this.dashboard=this.dashOptions.filter(dash=>dash.uid === this.editData.dashboard)[0].uid;
+    this.dashboard=this.dashOptions.filter(dash=>dash.uid === this.editData.dashboard)[0].uid;
   }
   public async onChangeVariables(event, data) {
     this.isDatainProgress=true;
@@ -320,6 +320,16 @@ export class EditDashboardComponent implements OnInit {
               "query": list.query
             }
             this.queryArr.push(queryObj);
+          }else {
+            let customArray;
+            if(list.query.includes(",")){
+              customArray = list.query.split(',')
+            }else{
+              customArray = list.query
+            }
+
+            this.globalMap.set('$' + this.templateVariableArr[index].name, customArray);
+             this.totalMap.set('$' + this.templateVariableArr[index].name, customArray)
           }
         })
         this.getOptionsByQuery();
@@ -332,7 +342,7 @@ export class EditDashboardComponent implements OnInit {
         }
       }
       this.templateVariableArr.forEach((element,index) => {
-        if(!element.multi){
+        if(!element.multi && element.hide !=2){
           this.templateVariableArr[index]['selectedValue'] = this.variableForm.get(element.name).value;
         }
       });
@@ -421,16 +431,15 @@ async queryForRecentDashboards(orgId) {
     variables=this.urlString;
     let dashboard=this.asyncResult.data.dashboard;
     if (dashboard.panels.length > 0) {
-      console.log("Dash"+dashboard.panels);
       dashboard.panels.forEach(x => {
         if (x.type !== 'row' && x.type !== 'text') {
-            this.urlArray.push(InsightsInitService.grafanaHost + '/render/d-solo/' + dashboard.uid + '/' + this.asyncResult.data.meta.slug + '?' +
+            this.urlArray.push(InsightsInitService.grafanaHost + '/d/' + dashboard.uid + '/' + this.asyncResult.data.meta.slug + '?' +
               'panelId=' + x.id + '&' + variables);
         } else if (x.type === 'row' && x.collapsed) {
           if (Array.isArray(x.panels)) {
             if(x.type!== 'text')
             x.panels.forEach(x => {
-              this.urlArray.push(InsightsInitService.grafanaHost + '/render/d-solo/' + dashboard.uid + '/' + this.asyncResult.data.meta.slug + '?' +
+              this.urlArray.push(InsightsInitService.grafanaHost + '/d/' + dashboard.uid + '/' + this.asyncResult.data.meta.slug + '?' +
                 'panelId=' + '&' + variables);
             });
           }
@@ -480,8 +489,9 @@ async queryForRecentDashboards(orgId) {
     }
     var self = this;
     var decode = InsightsInitService.grafanaHost + '/dashboard/script/iSight_ui3.js?url=' + InsightsInitService.grafanaHost + '/dashboard/db/'+this.asyncResult.data.meta.slug+'?'+ this.urlString;
-    this.dashUrl = InsightsInitService.grafanaHost + '/dashboard/script/iSight_ui3.js?url=' + encodeURIComponent(InsightsInitService.grafanaHost + '/dashboard/db/'+this.asyncResult.data.meta.slug+'?'+ this.urlString);
-    this.saveUrl = InsightsInitService.grafanaHost + '/dashboard/db/'+this.asyncResult.data.meta.slug+'?'+ this.urlString;
+    console.log('Preview dashboard url ', decode);
+    this.dashUrl = InsightsInitService.grafanaHost + '/dashboard/script/iSight_ui3.js?url=' + encodeURIComponent(InsightsInitService.grafanaHost + '/dashboard/db/'+this.asyncResult.data.meta.slug+'?orgId='+ this.organisation+'&'+ this.urlString);
+    this.saveUrl = InsightsInitService.grafanaHost + '/dashboard/db/'+this.asyncResult.data.meta.slug+'?orgId='+ this.organisation+'&'+this.urlString;
     this.getUrlArray();
     const dialogRef = self.dialog.open(DashboardPreviewConfigDialog, {
       panelClass: "traceablity-show-details-dialog-container",
@@ -527,6 +537,7 @@ async queryForRecentDashboards(orgId) {
       variables = variables + 'from=' + absStartDt + ',to=' + absEndDt;
     }
   }
+    saveObj['loadTime'] = this.loadTime;
     saveObj['id']=this.editData.id;
     saveObj['source']='PLATFORM';
     saveObj['workflowId']=this.editData.workflowId;
@@ -572,6 +583,7 @@ async queryForRecentDashboards(orgId) {
     this.disableSave=true;
     this.organisation = "" ;
     this.pdfType = ""; 
+    this.loadTime = "";
     this.dashboard = ""; 
     this.frequency = ""; 
     this.emailAdd = ""; 

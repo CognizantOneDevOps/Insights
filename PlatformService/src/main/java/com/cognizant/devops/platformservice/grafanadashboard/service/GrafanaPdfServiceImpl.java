@@ -16,26 +16,35 @@
 package com.cognizant.devops.platformservice.grafanadashboard.service;
 
 import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.EmailConfiguration;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.util.AES256Cryptor;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
+import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsEmailTemplates;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfig;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfigDAL;
+import com.cognizant.devops.platformdal.grafana.pdf.GrafanaOrgToken;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
+import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.workflow.service.WorkflowServiceImpl;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 @Service
 public class GrafanaPdfServiceImpl implements GrafanaPdfService{
@@ -44,6 +53,10 @@ public class GrafanaPdfServiceImpl implements GrafanaPdfService{
 
 	GrafanaDashboardPdfConfigDAL grafanaDashboardConfigDAL = new GrafanaDashboardPdfConfigDAL();
 	WorkflowDAL workflowConfigDAL = new WorkflowDAL();
+	GrafanaHandler grafanaHandler = new GrafanaHandler();
+	
+	@Autowired
+	private HttpServletRequest httpRequest;
 
 	@Override
 	public void saveGrafanaDashboardConfig(JsonObject dashboardDetails) throws InsightsCustomException {
@@ -87,6 +100,25 @@ public class GrafanaPdfServiceImpl implements GrafanaPdfService{
 			grafanaDashboardConfig.setCreatedDate(InsightsUtils.getCurrentTimeInEpochMilliSeconds());
 			grafanaDashboardConfig.setEmailbody(dashboardDetails.get("mailBodyTemplate") == null ? 
 				"*** Please do not reply to this mail. ****. \n*** System triggered email for reports ***":dashboardDetails.get("mailBodyTemplate").getAsString());
+			
+			
+			
+			GrafanaOrgToken token = grafanaDashboardConfigDAL.getTokenByOrgId(dashboardDetails.get("organisation").getAsInt());
+			if(token == null) {
+				GrafanaOrgToken grafanaOrgToken = new GrafanaOrgToken();
+				Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
+				headers.put("x-grafana-org-id", dashboardDetails.get("organisation").getAsString());
+				headers.put("Content-Type", "application/json");
+				JsonObject json = new JsonObject();
+				json.addProperty("name", "pdftoken");
+				json.addProperty("role", "Viewer");
+				String response = grafanaHandler.grafanaPost("/api/auth/keys",json, headers);
+				JsonObject apiObj = new JsonParser().parse(response).getAsJsonObject();
+				grafanaOrgToken.setOrgId(dashboardDetails.get("organisation").getAsInt());
+				grafanaOrgToken.setApiKey(AES256Cryptor.encrypt(apiObj.get("key").getAsString(),ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getTokenSigningKey()));
+				grafanaDashboardConfigDAL.saveGrafanaOrgToken(grafanaOrgToken);
+			}
+			
 			id = grafanaDashboardConfigDAL.saveGrafanaDashboardConfig(grafanaDashboardConfig);
 			log.debug(id);
 

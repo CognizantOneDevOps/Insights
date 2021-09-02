@@ -1,7 +1,6 @@
-import React from 'react';
-
 import { ExploreQueryFieldProps } from '@grafana/data';
 import { QueryField } from '@grafana/ui';
+import React from 'react';
 import { DataSource } from './DataSource';
 import { MyQuery, MyDataSourceOptions } from './types';
 
