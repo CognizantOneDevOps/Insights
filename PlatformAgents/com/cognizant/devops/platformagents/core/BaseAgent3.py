@@ -434,6 +434,11 @@ class BaseAgent(object):
                     timeResponse = self.getRemoteDateTime(datetime.strptime(eventTime, timeStampFormat))
                 d['inSightsTime'] = timeResponse['epochTime']
                 d['inSightsTimeX'] = timeResponse['time']
+            else:
+                eventTime = datetime.now()
+                timeResponse = self.getRemoteDateTime(eventTime)
+                d['inSightsTime'] = timeResponse['epochTime']
+                d['inSightsTimeX'] = timeResponse['time']
 
             if timeFieldMapping:
                 for field in timeFieldMapping:

@@ -78,14 +78,14 @@
 
 .textCss {
 	color: #0033A0;
-	font-size: 20px;
+	font-size: 15pt;
 	width: 400px;
 	display: list-item;
 }
 
 .middleTextColr {
 	color: #00B140;
-	font-size: 20px;
+	font-size: 16pt;
 }
 
 .inputGreyTextCss {
@@ -106,7 +106,7 @@
 .validCredTextCss {
 	font-size: 17px;
 	color: #0033A0;
-	margin-bottom: 20px;
+	margin-top: 20px;
 	/*  margin-left: 1px; */
 }
 

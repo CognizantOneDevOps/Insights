@@ -53,6 +53,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.Browser.NewContextOptions;
 import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.BrowserType.LaunchOptions;
@@ -90,7 +91,8 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 	@Override
 	public void generatePDF(InsightsAssessmentConfigurationDTO assessmentReportDTO) {
 		try {
-
+			
+			
 			createPDFDirectory(assessmentReportDTO);
 
 			prepareAndExportPDFFile(assessmentReportDTO);
@@ -122,10 +124,14 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 
 
 	private void prepareAndExportPDFFile(InsightsAssessmentConfigurationDTO assessmentReportDTO) {
+		GrafanaDashboardPdfConfig grafanaDashboardPdfConfig = null;
 		try {
 			long startTime = System.nanoTime();
-			GrafanaDashboardPdfConfig grafanaDashboardPdfConfig = grafanaDashboardConfigDAL
+			grafanaDashboardPdfConfig = grafanaDashboardConfigDAL
 					.fetchGrafanaDashboardDetailsByWorkflowId(assessmentReportDTO.getWorkflowId());
+			
+			updateReportStatus(grafanaDashboardPdfConfig, WorkflowTaskEnum.WorkflowStatus.IN_PROGRESS.name());
+			
 			log.debug("Worlflow Detail ==== GrafanaDashboardPdfConfig from UI ===== {} ", grafanaDashboardPdfConfig);
 			assessmentReportDTO.setAsseementreportname(grafanaDashboardPdfConfig.getTitle());
 			String exportedFilePath = assessmentReportDTO.getPdfReportDirPath() + File.separator
@@ -153,6 +159,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
 					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),
 					"-","-","-",0," unable to prepare pdf data " + e.getMessage());
+			updateReportStatus(grafanaDashboardPdfConfig, WorkflowTaskEnum.WorkflowStatus.ERROR.name());
 			throw new InsightsJobFailedException(" unable to prepare pdf data " + e);
 		}
 	}
@@ -183,7 +190,9 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			launchOptions.setDevtools(Boolean.FALSE);
 			
 			Browser browser = browserType.launch(launchOptions);
-			BrowserContext context = browser.newContext();
+			NewContextOptions contextOption = new NewContextOptions();
+			contextOption.setIgnoreHTTPSErrors(Boolean.TRUE);
+			BrowserContext context = browser.newContext(contextOption);
 			Page page = context.newPage();
 
 			Map<String, String> headers = getGrafanaHeaders(config);
@@ -204,6 +213,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 
 			page.evaluate("() => {for (el of document.getElementsByClassName('sidemenu')) {return el.hidden = true; };  }");
 			page.evaluate("() => {for (el of document.getElementsByClassName('navbar')) {return el.hidden = true; };  }");
+			page.evaluate("() => {for (el of document.getElementsByClassName('page-toolbar')) {return el.hidden = true; };  }");
 			page.evaluate("() => {for (el of document.getElementsByClassName('react-resizable-handle')) {return el.hidden = true; };  }");
 			page.evaluate("() => {for (el of document.getElementsByClassName('panel-info-corner')) {return el.hidden = true; };  }");
 			page.evaluate("() => {for (el of document.getElementsByClassName('submenu-controls')) {return el.hidden = true; };  }");
@@ -222,7 +232,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 					+ "let height_px= document.getElementsByClassName('react-grid-layout')[0].getBoundingClientRect().bottom; "
 					+ "let timer =setInterval(()=>{"
 							+ "var scrollHeight = height_px+160;"
-							+ "var element = document.querySelector('.view');"
+							+ "var element = document.querySelector('.view') == null ? document.querySelector('.scrollbar-view') : document.querySelector('.view');"
 							+ "element.scrollBy({"
 									+ " top: distance,"
 									+ "left: 0,"
@@ -257,7 +267,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			savePDFFile(extractedPdfFile, pdf);
 
 			saveToVisualizationContaner(assessmentReportDTO, pdf);
-			updateReportStatus(grafanaDashboardPdfConfig);
+			updateReportStatus(grafanaDashboardPdfConfig, WorkflowTaskEnum.WorkflowStatus.COMPLETED.name() );
 			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
 			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
 					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),
@@ -268,7 +278,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 					STATUS + grafanaDashboardPdfConfig.getStatus());
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== Grafana Dashboard export as PDF Completed with error {} ", e.getMessage());
-			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+			log.error("Type=TaskExecution executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
 					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),
 					"-","-","-",0," Grafana Dashboard export as PDF Completed with error " + e.getMessage());
 			throw new InsightsJobFailedException(e.getMessage());
@@ -313,7 +323,9 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			launchOptions.setDevtools(Boolean.FALSE);
 			
 			Browser browser = browserType.launch(launchOptions);
-			BrowserContext context = browser.newContext();
+			NewContextOptions contextOption = new NewContextOptions();
+			contextOption.setIgnoreHTTPSErrors(Boolean.TRUE);
+			BrowserContext context = browser.newContext(contextOption);
 			Page page = context.newPage();
 			
 			JsonParser jsonParser = new JsonParser();
@@ -377,7 +389,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			
 			savePDFFile(extractedPdfFile, pdf);
 			saveToVisualizationContaner(assessmentReportDTO, pdf);
-			updateReportStatus(grafanaDashboardPdfConfig);
+			updateReportStatus(grafanaDashboardPdfConfig, WorkflowTaskEnum.WorkflowStatus.COMPLETED.name());
 			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
 			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
 					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),
@@ -409,8 +421,8 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 	 * Update the status back to Grafana config
 	 * @param grafanaDashboardConfig
 	 */
-	private void updateReportStatus(GrafanaDashboardPdfConfig grafanaDashboardConfig) {
-		grafanaDashboardConfig.setStatus(WorkflowTaskEnum.WorkflowStatus.COMPLETED.name());
+	private void updateReportStatus(GrafanaDashboardPdfConfig grafanaDashboardConfig, String status) {
+		grafanaDashboardConfig.setStatus(status);
 		grafanaDashboardConfig.setWorkflowConfig(grafanaDashboardConfig.getWorkflowConfig());
 		grafanaDashboardConfig.setUpdatedDate(InsightsUtils.getCurrentTimeInEpochMilliSeconds());
 		grafanaDashboardConfigDAL.updateGrafanaDashboardConfig(grafanaDashboardConfig);

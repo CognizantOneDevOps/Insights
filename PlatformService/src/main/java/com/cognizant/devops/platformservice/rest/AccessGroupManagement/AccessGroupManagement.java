@@ -441,7 +441,6 @@ public class AccessGroupManagement {
 			String grafanaBaseUrl="INSIGHTS_GRAFANA_HOST";
 			String grafanaUrl = grafanaBaseUrl + "/dashboard/";
 			String grafanaIframeUrl = grafanaBaseUrl + "/dashboard/script/iSight_ui3.js?url=";
-			String grafanaDomainUrl = accessGrpMgmtServiceImpl.grafanaUrl(grafanaBaseUrl);
 			String grafanaVersion = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaVersion();
 			if (grafanaVersion == null) {
 				grafanaVersion = "7.0.3";

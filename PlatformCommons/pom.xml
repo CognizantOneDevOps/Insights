@@ -12,14 +12,14 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>8.4</version>
+		<version>8.5</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformCommons</artifactId>
-	<version>8.4</version>
+	<version>8.5</version>
 	<packaging>jar</packaging>
 
 	<name>PlatformCommons</name>

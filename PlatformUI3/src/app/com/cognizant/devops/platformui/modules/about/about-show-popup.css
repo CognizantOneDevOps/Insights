@@ -120,7 +120,7 @@ mat-dialog-content::-webkit-scrollbar-track {
 }
 
 .scrollData {
-	height: 82%;
+	height: 100%;
 	overflow-y: auto;
 	padding-bottom: 10px;
 }
@@ -166,7 +166,7 @@ mat-dialog-content::-webkit-scrollbar-track {
 .mat-dialog-actions-button {
 	float: right;
 	padding-right: 30px;
-	padding-bottom: 20px;
+	padding-bottom: 5px;
 }
 
 .mat-raised-button {
@@ -180,6 +180,7 @@ mat-dialog-content::-webkit-scrollbar-track {
 .aboutLogo {
 	display: flex; 
 	justify-content: center;
+	padding-top: 5px;
 }
 
 .heading1 {
@@ -194,13 +195,13 @@ mat-dialog-content::-webkit-scrollbar-track {
 }
 
 .aboutText {
-	font-size: 10pt;
+	font-size: 8pt;
 	margin-left: 20px;
-	padding-top: 10px;
+	padding-top: 5px;
 }
 
 .aboutText1 {
-	font-size: 10pt;
+	font-size: 9pt;
 	margin-left: 20px;
 	margin-right: 20px;
 }
@@ -209,7 +210,7 @@ mat-dialog-content::-webkit-scrollbar-track {
 	font-size: 8pt;
 }
 .gitLink {
-	font-size: 10pt;
+	font-size: 8pt;
 	margin-left: 20px;
 }
 
@@ -258,3 +259,6 @@ mat-dialog-content::-webkit-scrollbar-track {
 	margin-bottom: auto;
 	vertical-align: middle;
 }
+
+
+
