@@ -226,7 +226,7 @@ public class TokenProviderUtility {
 			} else {
 				claims = signedCacheTokenJWT.getJWTClaimsSet();
 
-				signedJWT.getJWTClaimsSet().getClaims().forEach((k,v) -> log.debug(" k ======== {} v ======== {} ",k,v));
+				//signedJWT.getJWTClaimsSet().getClaims().forEach((k,v) -> log.debug(" k ======== {} v ======== {} ",k,v));
 				
 				if(new Date().after(tokenValueFromCache.getSessionTime())) {
 					log.debug(" Token session expire {} ", tokenValueFromCache.getSessionTime());

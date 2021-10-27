@@ -234,7 +234,7 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 	}
 
 	/**
-	 * Used to initilize bean for saml entry point
+	 * Used to initialize bean for saml entry point
 	 * 
 	 * @return
 	 */

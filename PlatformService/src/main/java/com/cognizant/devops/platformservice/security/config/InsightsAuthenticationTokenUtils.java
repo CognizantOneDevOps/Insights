@@ -63,7 +63,7 @@ public class InsightsAuthenticationTokenUtils {
 		InsightsAuthenticationToken jwtAuthenticationToken = new InsightsAuthenticationToken(authToken,
 				claimMap.get(AuthenticationUtils.GRAFANA_DETAIL), null, updatedAuthorities);
 		
-		log.debug(" Inside GrafanaJWTAuthenticationData , authorities ==== {} ", jwtAuthenticationToken);
+		log.debug(" Inside GrafanaJWTAuthenticationData , authorities ==== {} ", updatedAuthorities);
 		return jwtAuthenticationToken;
 		
 	}

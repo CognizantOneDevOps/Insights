@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.Filter;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +42,6 @@ import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.csrf.CsrfFilter;
-import org.springframework.security.web.session.ConcurrentSessionFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
@@ -96,13 +96,13 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 					
 			http.exceptionHandling().accessDeniedHandler(springAccessDeniedHandler); 
 			
-			http.addFilterAfter(new InsightsCustomCsrfFilter(), CsrfFilter.class)
-			.addFilterBefore(new InsightsCrossScriptingFilter(), ConcurrentSessionFilter.class)
+			http
+			//.addFilterAfter(new InsightsCustomCsrfFilter(), CsrfFilter.class)
+			//.addFilterBefore(new InsightsCrossScriptingFilter(), ConcurrentSessionFilter.class)
 			.addFilterAfter(insightsFilter(), BasicAuthenticationFilter.class)
 			.addFilterAfter(new InsightsResponseHeaderWriterFilter(), BasicAuthenticationFilter.class);
 			
-			http.headers().frameOptions().sameOrigin().and().sessionManagement().maximumSessions(1).and()
-			.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
+			http.headers().frameOptions().sameOrigin();
 			
 			http.anonymous().disable().authorizeRequests().antMatchers("/datasources/**").permitAll().antMatchers("/admin/**")
 			.access("hasAuthority('Admin')").antMatchers("/traceability/**").access("hasAuthority('Admin')")
@@ -130,13 +130,33 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 	@Conditional(InsightsNativeBeanInitializationCondition.class)
 	public FilterChainProxy insightsFilter() throws Exception {
 		log.debug("message Inside FilterChainProxy, initial bean InsightsSecurityConfigurationAdapter **** ");
-	
+		
+		List<Filter> filterlogin = new ArrayList<>();
+		filterlogin.add(0, new InsightsCustomCsrfFilter());
+		filterlogin.add(1, new InsightsCrossScriptingFilter());
+		filterlogin.add(2, insightsInitialProcessingFilter());
+		filterlogin.add(3, new InsightsResponseHeaderWriterFilter());
+		
 		List<SecurityFilterChain> securityFilterchains = new ArrayList<>();
 		securityFilterchains.add(
-				new DefaultSecurityFilterChain(new AntPathRequestMatcher("/user/authenticate/**"), insightsInitialProcessingFilter()));
+				new DefaultSecurityFilterChain(new AntPathRequestMatcher("/user/authenticate/**"), filterlogin));
+		
+		List<Filter> filtersExteranl = new ArrayList<>();
+		filtersExteranl.add(0, new InsightsCustomCsrfFilter());
+		filtersExteranl.add(1, new InsightsCrossScriptingFilter());
+		filtersExteranl.add(2, insightsExternalProcessingFilter());
+		filtersExteranl.add(3, new InsightsResponseHeaderWriterFilter());
+		
 		securityFilterchains.add(
-				new DefaultSecurityFilterChain(new AntPathRequestMatcher("/externalApi/**"), insightsExternalProcessingFilter()));
-		securityFilterchains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/**"), insightsProcessingFilter()));
+				new DefaultSecurityFilterChain(new AntPathRequestMatcher("/externalApi/**"), filtersExteranl));
+		
+		List<Filter> filtersohter = new ArrayList<>();
+		filtersohter.add(0, new InsightsCustomCsrfFilter());
+		filtersohter.add(1, new InsightsCrossScriptingFilter());
+		filtersohter.add(2, insightsProcessingFilter());
+		filtersohter.add(3, new InsightsResponseHeaderWriterFilter());
+		
+		securityFilterchains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/**"), filtersohter));
 
 		return new FilterChainProxy(securityFilterchains);
 	}
