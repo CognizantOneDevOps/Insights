@@ -28,9 +28,7 @@ import javax.ws.rs.core.NewCookie;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -39,8 +37,6 @@ import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
-import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationException;
-import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationToken;
 import com.cognizant.devops.platformservice.security.config.SpringAuthority;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -67,29 +63,15 @@ public class GrafanaUserDetailsUtil {
 	public static UserDetails getUserDetails(HttpServletRequest request) {
 		log.debug(" Inside getUserDetails function call!");
 		ApplicationConfigProvider.performSystemCheck();
-		
 		String token = AuthenticationUtils.extractAndValidateAuthToken(request);
-		
 		return checkGrafanaAuthentication(token,request);
 	}
 	
-	public static Authentication getUserDetails(String token) {
+	public static UserDetails getUserDetails(String token) {
 		log.debug(" Inside getUserDetails function call with token!");
 		grafanaResponseCookies = new HashMap<>();
 		ApplicationConfigProvider.performSystemCheck();
-		UserDetails user = checkGrafanaAuthentication(token,null);
-		
-		InsightsAuthenticationToken authenticationGrafana = null;
-		if (user == null) {
-			log.error(" Invalid Authentication for native Grafana ");
-			throw new InsightsAuthenticationException(" Invalid Invalid Authentication for native Grafana ");
-		} else {
-			authenticationGrafana = new InsightsAuthenticationToken(user,grafanaResponseCookies, user.getPassword(), user.getAuthorities());
-			log.debug("In InsightsAuthenticationToken in grafana validation GrantedAuthority ==== {} ",
-					authenticationGrafana.getAuthorities());
-			SecurityContextHolder.getContext().setAuthentication(authenticationGrafana);
-		}
-		return authenticationGrafana;
+		return checkGrafanaAuthentication(token,null);
 	}
 
 	private static UserDetails checkGrafanaAuthentication(String token,HttpServletRequest request) {
@@ -183,7 +165,7 @@ public class GrafanaUserDetailsUtil {
 	 * @return
 	 * @throws InsightsCustomException
 	 */
-	private static List<NewCookie> getValidGrafanaSession(String userName, String password)
+	public static List<NewCookie> getValidGrafanaSession(String userName, String password)
 			throws InsightsCustomException {
 		GrafanaHandler grafanaHandler = new GrafanaHandler();
 		log.debug("Inside getValidGrafanaSession method call");
@@ -193,6 +175,14 @@ public class GrafanaUserDetailsUtil {
 		String loginApiUrl =  "/login";
 		return grafanaHandler.getGrafanaCookies(loginApiUrl, loginRequestParams, null);
 		
+	}
+
+	public static Map<String, String> getGrafanaResponseCookies() {
+		return grafanaResponseCookies;
+	}
+
+	public static void setGrafanaResponseCookies(Map<String, String> grafanaResponseCookies) {
+		GrafanaUserDetailsUtil.grafanaResponseCookies = grafanaResponseCookies;
 	}
 
 }

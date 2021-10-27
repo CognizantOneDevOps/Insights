@@ -86,6 +86,14 @@ export class DataSharedService {
     return this.storage.get("SsoUserName");
   }
 
+  public setUserOrgArray(orgArray: any) {
+    this.storage.set("UserOrgArray", orgArray);
+  }
+
+  public getUserOrgArray() {
+    return this.storage.get("UserOrgArray");
+  }
+
   public logoutInitilize() {
     if (InsightsInitService.autheticationProtocol == AutheticationProtocol.SAML.toString()
       || InsightsInitService.autheticationProtocol == AutheticationProtocol.JWT.toString()) {

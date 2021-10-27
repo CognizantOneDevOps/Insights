@@ -411,7 +411,7 @@ public class WorkflowDAL extends BaseDAL {
 			Map<String,Object> parameters = new HashMap<>();
 			parameters.put("workflowType", workflowType);
 			return getResultList(
-					"FROM InsightsWorkflowTask RE WHERE RE.workflowType.workflowType = :workflowType",
+					"FROM InsightsWorkflowTask RE WHERE RE.workflowType.workflowType = :workflowType ORDER BY RE.dependency ASC",
 					InsightsWorkflowTask.class,
 					parameters);
 		} catch (Exception e) {

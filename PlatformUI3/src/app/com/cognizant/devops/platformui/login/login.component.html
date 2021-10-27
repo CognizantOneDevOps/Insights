@@ -82,7 +82,7 @@
               </div>
               <mat-card-actions layout="row" class="buttonMar" layout-align="center center">
                 <div flex="60" flex-offset="15" class="logOnBtnAlign">
-                  <button mat-button class="md-raised md-primary sigBtnCss" [disabled]="loginForm.invalid" 
+                  <button mat-button [ngClass]=" { sigBtnCssDisable : (loginForm.invalid || loginRequestSent) ,  sigBtnCss : (!loginForm.invalid || !loginRequestSent) }" [disabled]="loginForm.invalid || loginRequestSent" 
                     (click)="userAuthentication()">LOG
                     ON</button>
                 </div>

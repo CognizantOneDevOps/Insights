@@ -1,0 +1,22 @@
+{
+	"dashboard": {
+		"elements": [
+			"() => {for (el of document.getElementsByClassName('sidemenu')) {return el.hidden = true; }; }",
+			"() => {for (el of document.getElementsByClassName('navbar')) {return el.hidden = true; }; }",
+			"() => {for (el of document.getElementsByClassName('page-toolbar')) {return el.hidden = true; }; }",
+			"() => {for (el of document.getElementsByClassName('react-resizable-handle')) {return el.hidden = true; };  }",
+			"() => {for (el of document.getElementsByClassName('panel-info-corner')) {return el.hidden = true; };  }",
+			"() => {document.querySelector(\"div.submenu-controls\")? document.querySelector(\"div.submenu-controls\").style.display = 'none':'';  }"
+		],
+		"width": "() => { return document.getElementsByClassName('react-grid-layout')[0].getBoundingClientRect().width; }",
+		"height": "() => { return document.getElementsByClassName('react-grid-layout')[0].getBoundingClientRect().bottom; }",
+		"screenshotElement": "async () => { await new Promise((resolve, reject) => {    let totalHeight=0;    let distance =100;    let height_px= document.getElementsByClassName('react-grid-layout')[0].getBoundingClientRect().bottom;    let timer =setInterval(()=>{    var scrollHeight = height_px+160;    var element = document.querySelector('.view') == null ? document.querySelector('.scrollbar-view') : document.querySelector('.view');    element.scrollBy({   top: distance,    left: 0,    behavior: 'smooth'    });    totalHeight += distance;    console.log('totalHeight', totalHeight);    if (totalHeight >= scrollHeight) {    clearInterval(timer);resolve();}},300)    });    }"
+	},
+	"Printable": {
+		"elements": [
+			"() => {for (el of document.getElementsByClassName('navbar')) {return el.hidden = true; };  }",
+			"() => {document.querySelector(\"div.submenu-controls\")? document.querySelector(\"div.submenu-controls\").style.display = 'none':'';  }"
+		],
+		"screenshotElement": ".panel-wrapper.panel-wrapper--view"
+	}
+}

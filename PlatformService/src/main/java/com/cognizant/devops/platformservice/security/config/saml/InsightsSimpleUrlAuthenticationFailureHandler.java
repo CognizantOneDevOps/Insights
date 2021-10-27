@@ -46,7 +46,7 @@ public class InsightsSimpleUrlAuthenticationFailureHandler extends SimpleUrlAuth
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException exception) throws IOException, ServletException {
-		String logoutURL = AuthenticationUtils.getLogoutURL(request, AuthenticationUtils.UNAUTHORISE,
+		String logoutURL = AuthenticationUtils.getLogoutURL(AuthenticationUtils.UNAUTHORISE,
 				"Unauthorized request , Authentication not successful ");
 		Log.debug(" logoutURL  in InsightsSimpleUrlAuthenticationFailureHandler ==== {} {} ", defaultFailureUrl,
 				logoutURL);

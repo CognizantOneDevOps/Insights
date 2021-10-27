@@ -26,6 +26,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatOption } from '@angular/material/core';
 import { TimeRange } from './../timeRangeJson';
 import { EmailConfigurationDialog } from '../../reportmanagement/report-configuration/email-configuration-dialog';
+import { DataSharedService } from '@insights/common/data-shared-service';
 
 export interface queryData {
   index: any;
@@ -40,7 +41,6 @@ export interface queryData {
 })
 export class EditDashboardComponent implements OnInit {
   dashboardForm: FormGroup;
-  currentUserWithOrgs: any;
   orgArr = [];
   asyncResult: any;
   dashboardList: any;
@@ -88,23 +88,33 @@ export class EditDashboardComponent implements OnInit {
   showTimePicker: boolean=true;
   scheduleList=['ONETIME','DAILY','WEEKLY','MONTHLY','YEARLY'];
   loadTime: any;
-
+  title: string;
+  enableEmail: boolean;
+  userName : string;
+  theme : string;
+  themes : any;
 
   constructor(public router: Router, private grafanaService: GrafanaAuthenticationService, private landingService: LandingPageService,
     public reportmanagementservice: ReportManagementService, public messageDialog: MessageDialogService, private dialog: MatDialog,
-    private el: ElementRef, private renderer: Renderer2, private formBuilder: FormBuilder, public relativeTime: TimeRange,public route:ActivatedRoute
+    private el: ElementRef, private renderer: Renderer2, private formBuilder: FormBuilder, public relativeTime: TimeRange,public route:ActivatedRoute,
+    public dataShare : DataSharedService
   ) { }
 
   ngOnInit() {
     this.type='';
     this.disableSave=true;
     this.getOrgs();
+    this.themes = {
+      dark : 'dark',
+      light : 'light'
+    };
    // this.loadSchedule();
     this.relativeRange = this.relativeTime.relativeJson;
     this.otherRelativeRange = this.relativeTime.otherRelativeJson;
     this.route.queryParams.subscribe(params => {
       this.initialiseVariables(params);
       this.getDashboardJson(params.dashboard);
+      this.userName = params.userName;
       });
     this.grafanaService.onOkSubject.subscribe(res => {
       if (res === 'OK') {
@@ -116,6 +126,11 @@ export class EditDashboardComponent implements OnInit {
         this.disableSave = true;
       }
     })
+    this.grafanaService.getEmailConfigurationStatus()
+    .then((response) => {
+      console.log(response.data);
+      this.enableEmail = response.data;
+    })
   }
   initialiseVariables(params){
       this.getDashboardsByOrg(Number(params.organisation));
@@ -126,7 +141,8 @@ export class EditDashboardComponent implements OnInit {
       this.pdfType=params.pdfType;
       this.frequency=params.scheduleType;
       this.timeRange=params.range;
-      this.mailSubject=params.title;
+      this.title = params.title;
+      this.theme = params.theme;
       if(this.timeRange === 'absolute'){
         this.range.controls['start'].setValue(params.from);
         this.range.controls['end'].setValue(params.to);
@@ -137,12 +153,12 @@ export class EditDashboardComponent implements OnInit {
       if(this.timeRange === 'other'){
         this.otherValue=params.rangeText;
       }
-      this.emailDetails={"senderEmailAddress": params.senderEmailAddress, 
-      "receiverEmailAddress": params.email, 
-      "mailSubject": params.mailSubject,
-      "mailBodyTemplate": params.mailBodyTemplate, 
-      "receiverCCEmailAddress": params.receiverCCEmailAddress, 
-      "receiverBCCEmailAddress": params.receiverBCCEmailAddress }
+      
+      if(params.emailDetails != null) {
+        this.emailDetails = JSON.parse(params.emailDetails);
+        console.log(this.emailDetails);
+      }
+      
       
       this.filterMap = new Map<any, String[]>();
       let varArr=[];
@@ -160,9 +176,10 @@ export class EditDashboardComponent implements OnInit {
       })
   }
   public async getOrgs() {
-    this.currentUserWithOrgs = await this.grafanaService.getCurrentUserWithOrgs();
-    if (this.currentUserWithOrgs.status === "success") {
-      this.orgArr = this.currentUserWithOrgs.data.orgArray.filter(org => org.role === 'Admin');
+    // this.currentUserWithOrgs = await this.grafanaService.getCurrentUserWithOrgs();
+    let currentUserWithOrgs = this.dataShare.getUserOrgArray();
+    if (currentUserWithOrgs  !== undefined) {
+      this.orgArr = currentUserWithOrgs.filter(org => org.role === 'Admin');
     }
   }
   async loadSchedule() {
@@ -269,16 +286,13 @@ export class EditDashboardComponent implements OnInit {
       });
       if (containsNull === true) {
         valid= false;
-        this.messageDialog.showApplicationsMessage("Please fill mandatory fields", "ERROR");
+        this.messageDialog.showApplicationsMessage("Please select filter details.", "ERROR");
         return;
-      } else {
-        valid= true;
       }
     }
-    if (this.organisation !== undefined && this.pdfType !== undefined && this.dashboard !== undefined &&
-      this.frequency !== undefined ) {
-        valid = true;
-    } else {
+    if (this.organisation == undefined || this.pdfType == undefined || this.dashboard == undefined ||
+      this.frequency == undefined || this.title == undefined || this.organisation === "" || this.pdfType === "" || this.dashboard === "" ||
+      this.frequency === "" || this.title === ""  ) {
       valid = false;
       this.messageDialog.showApplicationsMessage("Please fill mandatory fields", "ERROR");
     }
@@ -379,6 +393,10 @@ export class EditDashboardComponent implements OnInit {
   }
 }
 addEmailConfig() {
+  console.log(this.enableEmail)
+  if(!this.enableEmail) {
+    return;
+  }
     var self=this;
     const dialogRef = self.dialog.open(EmailConfigurationDialog, {
       panelClass: "showjson-dialog-container",
@@ -386,7 +404,7 @@ addEmailConfig() {
       disableClose: true,
       data: {
         screen:'dashboard',
-        subject:this.mailSubject,
+        subject:this.title,
         emailDetails: this.emailDetails,
         type:'edit'
       }
@@ -434,13 +452,13 @@ async queryForRecentDashboards(orgId) {
       dashboard.panels.forEach(x => {
         if (x.type !== 'row' && x.type !== 'text') {
             this.urlArray.push(InsightsInitService.grafanaHost + '/d/' + dashboard.uid + '/' + this.asyncResult.data.meta.slug + '?' +
-              'panelId=' + x.id + '&' + variables);
+              'panelId=' + x.id + '&' + variables + '&theme=' + this.theme);
         } else if (x.type === 'row' && x.collapsed) {
           if (Array.isArray(x.panels)) {
             if(x.type!== 'text')
             x.panels.forEach(x => {
               this.urlArray.push(InsightsInitService.grafanaHost + '/d/' + dashboard.uid + '/' + this.asyncResult.data.meta.slug + '?' +
-                'panelId=' + '&' + variables);
+                'panelId=' + '&' + variables  + '&theme=' + this.theme);
             });
           }
         }
@@ -490,8 +508,10 @@ async queryForRecentDashboards(orgId) {
     var self = this;
     var decode = InsightsInitService.grafanaHost + '/dashboard/script/iSight_ui3.js?url=' + InsightsInitService.grafanaHost + '/dashboard/db/'+this.asyncResult.data.meta.slug+'?'+ this.urlString;
     console.log('Preview dashboard url ', decode);
-    this.dashUrl = InsightsInitService.grafanaHost + '/dashboard/script/iSight_ui3.js?url=' + encodeURIComponent(InsightsInitService.grafanaHost + '/dashboard/db/'+this.asyncResult.data.meta.slug+'?orgId='+ this.organisation+'&'+ this.urlString);
-    this.saveUrl = InsightsInitService.grafanaHost + '/dashboard/db/'+this.asyncResult.data.meta.slug+'?orgId='+ this.organisation+'&'+this.urlString;
+    var dashboardUri = this.asyncResult.data.meta.url;
+    dashboardUri = dashboardUri.substring(dashboardUri.indexOf("/d"));
+    this.dashUrl = InsightsInitService.grafanaHost + '/dashboard/script/iSight_ui3.js?url=' + encodeURIComponent(InsightsInitService.grafanaHost +dashboardUri+'?orgId='+ this.organisation+'&'+ this.urlString + '&theme=' + this.theme);
+    this.saveUrl = InsightsInitService.grafanaHost + '/dashboard/db/'+this.asyncResult.data.meta.slug+'?orgId='+ this.organisation+'&'+this.urlString + '&theme=' + this.theme;
     this.getUrlArray();
     const dialogRef = self.dialog.open(DashboardPreviewConfigDialog, {
       panelClass: "traceablity-show-details-dialog-container",
@@ -500,6 +520,12 @@ async queryForRecentDashboards(orgId) {
       disableClose: true,
       data: {
         route: this.dashUrl,
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if(result == "confirm") {
+        this.save();
       }
     });
   }
@@ -541,24 +567,24 @@ async queryForRecentDashboards(orgId) {
     saveObj['id']=this.editData.id;
     saveObj['source']='PLATFORM';
     saveObj['workflowId']=this.editData.workflowId;
-    saveObj['title'] = this.emailDetails.mailSubject;
+    saveObj['title'] = this.title;
     saveObj['pdfType'] = [this.pdfType];
     saveObj['variables'] = variables;
     saveObj['dashUrl'] = this.saveUrl;
     saveObj['panelUrls'] = this.urlArray
     saveObj['metadata'] = metaObj;
-    saveObj['email'] = this.emailDetails.receiverEmailAddress;
-    saveObj['senderEmailAddress'] = this.emailDetails.senderEmailAddress;
-    saveObj['mailSubject'] = this.emailDetails.mailSubject;
-    saveObj['mailBodyTemplate'] = this.emailDetails.mailBodyTemplate;
-    saveObj['receiverCCEmailAddress'] = this.emailDetails.receiverCCEmailAddress;
-    saveObj['receiverBCCEmailAddress'] = this.emailDetails.receiverBCCEmailAddress;
+    //saveObj['email'] = this.emailDetails.receiverEmailAddress;
     saveObj['range'] = this.timeRange;
-    saveObj['emailBody'] = this.mailBody;
+    //saveObj['emailBody'] = this.mailBody;
     saveObj['scheduleType'] = this.frequency;
     saveObj['organisation'] = this.organisation;
     saveObj['dashboard'] = this.dashboard;
     saveObj['edit']=true;
+    saveObj['userName'] = this.userName;
+    saveObj['theme'] = this.theme;
+    if(this.emailDetails != null) {
+      saveObj['emailDetails'] = this.emailDetails;
+    }
 
     let requestObj=JSON.stringify(saveObj);
     var self = this;
@@ -573,9 +599,11 @@ async queryForRecentDashboards(orgId) {
           self.disableSave=true;
           self.messageDialog.showApplicationsMessage("Updated Successfully", "SUCCESS");
           self.router.navigateByUrl('InSights/Home/dash-pdf-download',{skipLocationChange:true});
+         } else if(response.status === 'failure') {
+           self.messageDialog.showApplicationsMessage(response.message, "ERROR");
          }
-          })
-        }
+          }) 
+        } 
     })
     this.isDatainProgress=true;
   }

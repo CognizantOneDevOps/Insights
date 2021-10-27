@@ -26,4 +26,6 @@ public interface GrafanaPdfService {
 	public List<GrafanaDashboardPdfConfig> getAllGrafanaDashboardConfigs() throws InsightsCustomException;
 	public void updateGrafanaDashboardDetails(JsonObject detailsJson) throws InsightsCustomException;
 	public void deleteGrafanaDashboardDetails(int id) throws InsightsCustomException;
+	public String updateDashboardPdfConfigStatus(JsonObject dashboardJson)throws InsightsCustomException;
+	public String setDashboardActiveState(JsonObject dashboardUpdateJson) throws InsightsCustomException;
 }

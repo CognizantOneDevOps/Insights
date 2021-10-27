@@ -182,6 +182,7 @@ export class HomeComponent implements OnInit {
       this.userDisplayName = this.dataShare.getCustomizeName(this.userName);
       this.userCurrentOrg = this.currentUserWithOrgs.data.userDetail.orgId;
       this.currentUserOrgsArray = this.currentUserWithOrgs.data.orgArray
+      this.dataShare.setUserOrgArray(this.currentUserOrgsArray);
       for (let orgData of this.currentUserOrgsArray) {
         if (orgData.orgId == this.userCurrentOrg) {
           this.selectedOrg = orgData.name;
@@ -580,9 +581,16 @@ export class HomeComponent implements OnInit {
     var self = this;
     self.defaultOrg = orgId;
     self.grafanaService.switchUserOrg(orgId).then(function (switchorgResponseData) {
+      console.log(switchorgResponseData);
       if (switchorgResponseData != null && switchorgResponseData.status == 'success') {
         self.selectedOrg = (selectedItem == undefined ? '' : selectedItem.displayName);
         self.selectedOrgName = self.dataShare.getCustomizeName(self.selectedOrg);
+        var token = switchorgResponseData.data.jtoken;
+        if(token != ""){
+          console.log(" previous token "+self.dataShare.getAuthorizationToken());
+          console.log(" new token "+token);
+          self.dataShare.setAuthorizationToken(token);
+        }
         var grafanaCurrentOrgRole;
         for (let orgData of self.currentUserOrgsArray) {
           if (orgData.orgId == orgId) {

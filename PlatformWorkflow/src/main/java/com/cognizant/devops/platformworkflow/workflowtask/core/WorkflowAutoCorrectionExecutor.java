@@ -46,9 +46,6 @@ public class WorkflowAutoCorrectionExecutor implements Job, ApplicationConfigInt
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		
 		log.debug(" Worlflow Detail ====  Schedular Inside WorkflowAutoCorrectionExecutor  ");
-		
-		InsightsStatusProvider.getInstance().createInsightStatusNode("Started WorkflowAutoCorrectionExecutor",
-				PlatformServiceConstants.SUCCESS);
 		String workflowId = "-";
 		String status = "-";
 		String schedule = "-";
@@ -176,8 +173,6 @@ public class WorkflowAutoCorrectionExecutor implements Job, ApplicationConfigInt
 					}
 
 				}
-			InsightsStatusProvider.getInstance().createInsightStatusNode("Completed WorkflowAutoCorrectionExecutor",
-					PlatformServiceConstants.SUCCESS);
 		} catch (InsightsCustomException e1) {
 			log.error(e1);
 			InsightsStatusProvider.getInstance().createInsightStatusNode(

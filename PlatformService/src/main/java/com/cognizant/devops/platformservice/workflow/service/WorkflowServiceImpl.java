@@ -187,6 +187,7 @@ public class WorkflowServiceImpl {
 				jsonobject.addProperty(AssessmentReportAndWorkflowConstants.TASK_ID, taskDetail.getTaskId());
 				jsonobject.addProperty("description", taskDetail.getDescription());
 				jsonobject.addProperty("dependency", taskDetail.getDependency());
+				jsonobject.addProperty("componentName", taskDetail.getCompnentName());
 				jsonarray.add(jsonobject);
 			}
 			return jsonarray;

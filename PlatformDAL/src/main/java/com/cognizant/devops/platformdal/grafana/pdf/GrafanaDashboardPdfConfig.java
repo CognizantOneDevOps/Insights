@@ -41,9 +41,6 @@ public class GrafanaDashboardPdfConfig {
 
 	@Column(name = "PDFTYPE")
 	private String pdfType;
-	
-	@Column(name = "EMAIL")
-	private String email;
 
 	@Column(name = "VARIABLES", length = 10000)
 	private String variables;
@@ -51,14 +48,8 @@ public class GrafanaDashboardPdfConfig {
 	@Column(name = "DASHBOARD_JSON", length = 50000)
 	private String dashboardJson;
 	
-	@Column(name = "STATUS")
-	private String status;
-	
 	@Column(name = "SCHEDULE_TYPE")
 	private String scheduleType;
-	
-	@Column(name = "EMAIL_BODY", length = 1000)
-	private String emailbody;
 	
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "workflowId", referencedColumnName = "workflowId")
@@ -98,14 +89,6 @@ public class GrafanaDashboardPdfConfig {
 		this.pdfType = pdfType;
 	}
 
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
 	public String getVariables() {
 		return variables;
 	}
@@ -121,14 +104,6 @@ public class GrafanaDashboardPdfConfig {
 	public void setDashboardJson(String dashboardJson) {
 		this.dashboardJson = dashboardJson;
 	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
-	}
 	
 	public String getScheduleType() {
 		return scheduleType;
@@ -136,14 +111,6 @@ public class GrafanaDashboardPdfConfig {
 
 	public void setScheduleType(String scheduleType) {
 		this.scheduleType = scheduleType;
-	}
-
-	public String getEmailbody() {
-		return emailbody;
-	}
-
-	public void setEmailbody(String emailbody) {
-		this.emailbody = emailbody;
 	}
 
 	public InsightsWorkflowConfiguration getWorkflowConfig() {

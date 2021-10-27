@@ -30,14 +30,14 @@
     </div>
     <div>
         <div class="btnAlign">
-            <button mat-icon-button (click)="downloadPDF()" [disabled]="!onRadioBtnSelect">
-                <mat-icon title="Download PDF" class="mat-icon material-icons">
-                    get_app
-                </mat-icon>
-            </button>
             <button mat-icon-button (click)="add()">
                 <mat-icon title="Configure a dashboard" class="mat-icon material-icons">
                     add_circle
+                </mat-icon>
+            </button>
+            <button mat-icon-button [disabled]="this.selectedIndex == -1 || this.selectedDashboard.status == 'IN_PROGRESS'" (click)="edit()">
+                <mat-icon title="Edit a dashboard" class="mat-icon material-icons">
+                    edit
                 </mat-icon>
             </button>
             <button mat-icon-button *ngIf="onRadioBtnSelect" (click)="delete()">
@@ -45,14 +45,19 @@
                     delete
                 </mat-icon>
             </button>
-            <button mat-icon-button [disabled]="!onRadioBtnSelect" (click)="edit()">
-                <mat-icon title="Edit a dashboard" class="mat-icon material-icons">
-                    edit
+            <button mat-icon-button (click)="restart()" [disabled]="this.selectedIndex == -1 || this.selectedDashboard.status != 'ABORTED'">
+                <mat-icon title="Restart" class="mat-icon material-icons">
+                    refresh
                 </mat-icon>
-            </button>
-            <button mat-icon-button (click)="refresh()" [disabled]="!onRadioBtnSelect">
-                <mat-icon title="Reset" class="mat-icon material-icons">
-                    cancel
+            </button>            
+            <button mat-icon-button (click)="downloadPDF()" [disabled]="disableDownload">
+                <mat-icon title="Download PDF" class="mat-icon material-icons">
+                    get_app
+                </mat-icon>
+            </button>           
+            <button mat-icon-button (click)="refresh()">
+                <mat-icon title="Refresh" class="mat-icon material-icons">
+                    restore
                 </mat-icon>
             </button>
         </div>
@@ -74,27 +79,27 @@
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"></th>
                         <td mat-cell *matCellDef="let element;let i=index; " style="width:5% !important">
                             <mat-radio-button [value]="element" [checked]="refreshRadio" color="primary"
-                                (click)="enableButtons(i)"></mat-radio-button>
+                                (change)="enableButtons($event, i)"></mat-radio-button>
                         </td>
                     </ng-container>
                     <ng-container matColumnDef="Title">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Title</th>
-                        <td mat-cell *matCellDef="let element" style="width:30% !important">
-                            {{element.title}}</td>
+                        <td mat-cell *matCellDef="let element" style="width:25% !important">
+                          {{element.title}}</td>
                     </ng-container>
                     <ng-container matColumnDef="Organisation">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Organisation</th>
-                        <td mat-cell *matCellDef="let element" style="width:20% !important">
+                        <td mat-cell *matCellDef="let element" style="width:18% !important">
                             {{element.orgName}}</td>
                     </ng-container>
                     <ng-container matColumnDef="PdfType">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Pdf Type</th>
-                        <td mat-cell *matCellDef="let element" style="width:15% !important">
+                        <td mat-cell *matCellDef="let element" style="width:14% !important">
                             {{element.pdfType}}</td>
                     </ng-container>
                     <ng-container matColumnDef="ScheduleType">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Schedule</th>
-                        <td mat-cell *matCellDef="let element" style="width:15% !important">
+                        <td mat-cell *matCellDef="let element" style="width:14% !important">
                             {{element.scheduleType}}</td>
                     </ng-container>
                     <ng-container matColumnDef="Status">
@@ -102,12 +107,24 @@
                         <td mat-cell *matCellDef="let element" style="width:15% !important">
                             {{element.status}}</td>
                     </ng-container>
+                    <ng-container matColumnDef="Active">
+                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">
+                            Active
+                        </th>
+                        <td mat-cell *matCellDef="let element;let i=index"
+                        style="width:12% !important;">
+                        <mat-slide-toggle (change)="updateStatus($event,element.id,element)"
+                            [(ngModel)]="element.isActive" [checked]="isActive" [disabled]="(selectedIndex != i + currentPageValue)"
+                            [matTooltip]="element.isActive?'Active':'Inactive'">
+                        </mat-slide-toggle>
+                        </td>
+                    </ng-container>
                     <ng-container matColumnDef="More">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Details</th>
                         <td mat-cell *matCellDef="let element;let i=index; " style="width:10% !important">
-                            <button mat-icon-button  (click)="showWorkflowHistoryDetailsDialog(element)" [disabled]="disablebutton[i]">
+                            <button mat-icon-button  (click)="showWorkflowHistoryDetailsDialog(element)" [disabled]="(selectedIndex != i + currentPageValue)">
                                 <mat-icon svgIcon="healthcheck_show_details"
-                                    [ngStyle]="{height: '20px', width: '20px'}">
+                                    [ngStyle]="{height: '20px', width: '20px', 'margin-bottom' : '10px', 'padding-left' : '0.8% !important'}">
                                 </mat-icon>
                             </button>
                         </td>
@@ -117,7 +134,8 @@
                 </table>
             </mat-radio-group>
             <div>
-                <mat-paginator #paginator [pageSize]="MAX_ROWS_PER_TABLE" showFirstLastButtons class="paginationStyle">
+                <mat-paginator (page)="changeCurrentPageValue()" #paginator [pageSize]="MAX_ROWS_PER_TABLE" showFirstLastButtons class="paginationStyle">
                 </mat-paginator>
             </div>
         </div>
+        

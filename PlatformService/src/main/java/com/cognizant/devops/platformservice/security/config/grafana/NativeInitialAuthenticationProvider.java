@@ -17,17 +17,14 @@ package com.cognizant.devops.platformservice.security.config.grafana;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.security.access.AuthorizationServiceException;
-import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationException;
 import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationToken;
-import com.cognizant.devops.platformservice.security.config.TokenProviderUtility;
 
 public class NativeInitialAuthenticationProvider implements AuthenticationProvider {
 	private static Logger log = LogManager.getLogger(NativeInitialAuthenticationProvider.class);
@@ -38,11 +35,6 @@ public class NativeInitialAuthenticationProvider implements AuthenticationProvid
 	@Override
 	public Authentication authenticate(Authentication authentication)  {
 		log.debug(" In Initial NativeInitialAuthenticationProvider first time login ==== ");
-		
-		/*
-		 * Grafana Authentication is already done, This class is used to validate
-		 * additional security like JWT token validation
-		 */
 		if (!supports(authentication.getClass())) {
 			throw new IllegalArgumentException(
 					"Only NativeAuthenticationProvider UsernamePasswordAuthenticationToken is supported, " + authentication.getClass() + " was attempted");
@@ -54,9 +46,20 @@ public class NativeInitialAuthenticationProvider implements AuthenticationProvid
 			throw new AuthenticationCredentialsNotFoundException("Authentication token is missing");
 		}
 		
-		authentication = GrafanaUserDetailsUtil.getUserDetails(String.valueOf(authentication.getPrincipal())); //UserDetails user
+		UserDetails userDetail = GrafanaUserDetailsUtil.getUserDetails(String.valueOf(authentication.getPrincipal())); //UserDetails user
 		
-		return authentication;
+		InsightsAuthenticationToken authenticationGrafana = null;
+		if (userDetail == null) {
+			log.error(" Invalid Authentication for native Grafana ");
+			throw new InsightsAuthenticationException(" Invalid Authentication for native Grafana ");
+		} else {
+			authenticationGrafana = new InsightsAuthenticationToken(userDetail,
+					GrafanaUserDetailsUtil.getGrafanaResponseCookies(),
+					userDetail.getPassword(), userDetail.getAuthorities());
+			log.debug("In InsightsAuthenticationToken in grafana validation GrantedAuthority ==== {} ",
+					authenticationGrafana.getAuthorities());
+		}
+		return authenticationGrafana;
 	}
 
 	/**

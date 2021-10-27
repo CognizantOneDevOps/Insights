@@ -29,16 +29,11 @@
     </div>
   </div>
   <div class="btnAlign">
-
     <button mat-icon-button (click)="onPreviewClick()">
-      <mat-icon svgIcon="view" title="View " style="margin-bottom: 25%;" class="mat-icon material-icons">
-        view </mat-icon>
+      <mat-icon title="Preview And Save " style="margin-top: 10%;" class="mat-icon material-icons">
+        save </mat-icon>
     </button>
-    <button mat-icon-button [disabled]="disableSave" (click)="save()">
-      <mat-icon title="Save" style="margin-top: 0%;" class="mat-icon material-icons">
-        save
-      </mat-icon>
-    </button>
+    
     <button mat-icon-button (click)="reset()">
       <mat-icon title="Refresh" style="margin-top: 10%;" class="mat-icon material-icons">
         cancel
@@ -98,6 +93,35 @@
         </td>
         <td>
           <span class="infoText">Select a Dashboard</span>
+        </td>
+      </tr>
+      <tr class="mat-row-webhook">
+        <td class="mat-cell" class="columnName">
+          <span class="mainText">Title</span>
+          <span style="color:#ff0000;">*</span>
+        </td>
+        <td class="columnComponent">
+          <input matinput maxlength="100" style="margin:1%;" class="form-control" [(ngModel)]="title" type="text"
+            autocomplete="off" placeholder="Enter Title">
+        </td>
+        <td class="info">
+          <span class="infoText">Enter Title</span>
+        </td>
+      </tr>
+      <tr class="mat-row-webhook" >
+        <td class="mat-cell" class="columnName">
+          <span class="mainText">Theme</span>
+          <span style="color: #ff0000;">*</span>
+        </td>
+        <td class="columnComponent">
+          <mat-select [(ngModel)]="theme" style="margin:1%;" class="form-control" required placeholder="Select Dashboard Theme"
+            color="primary" >
+            <mat-option [value]="themes.dark">Dark</mat-option>
+            <mat-option [value]="themes.light">Light</mat-option>
+          </mat-select>
+        </td>
+        <td class="info">
+          <span class="infoText">Select Dashboard Theme</span>
         </td>
       </tr>
       <tr class="mat-row-webhook">
@@ -288,7 +312,7 @@
       </tr>
       <tr class="mat-row-webhook" *ngIf="!showTimePicker">
         <td class="mat-cell" class="columnName">
-          <span class="mainText">Time Range</span>
+          <span class="mainText">Data Time Range</span>
           <span class="asteriskText">*</span>
         </td>
         <td class="columnComponent">
@@ -330,20 +354,20 @@
       <tr class="mat-row-webhook" style="margin:1%;">
         <td class="mat-cell" class="columnName">
           <span class="mainText">Mailing Details</span>
-          <span style="color:#ff0000;">*</span>
         </td>
         <td class="columnComponent">
-          <button mat-icon-button [disabled]="mailIconDisable">
-              <mat-icon *ngIf="!emailDetails" (click)="addEmailConfig()" title="Add Email" class="mat-icon material-icons">
-                  add_circle
-              </mat-icon>
-              <mat-icon *ngIf="emailDetails" (click)="editEmailConfig()" title="Edit email" class="mat-icon material-icons">
-                  edit
-              </mat-icon>
-          </button>
+          <button mat-icon-button [disabled]="(mailIconDisable ? true : title ? false : true)" >
+            <mat-icon *ngIf="!emailDetails" (click)="addEmailConfig()" title="Add Email" class="mat-icon material-icons">
+                add_circle
+            </mat-icon>
+            <mat-icon *ngIf="emailDetails" (click)="editEmailConfig()" title="Edit email" class="mat-icon material-icons">
+                edit
+            </mat-icon>
+        </button>
       </td>
         <td>
-          <span class="infoText">Enter the email address details. </span>
+          <span *ngIf="enableEmail" class="infoText">Enter the email address details.</span>
+          <span *ngIf="!enableEmail" class="infoText">Email  Server not configured. Please contact the admin</span>
         </td>
       </tr>
     </tbody>

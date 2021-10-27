@@ -20,7 +20,7 @@ import { RestCallHandlerService } from '@insights/common/rest-call-handler.servi
 import { LoginService } from '@insights/app/login/login.service';
 import { HttpErrorResponse } from "@angular/common/http";
 import { RestAPIurlService } from '@insights/common/rest-apiurl.service'
-import { CookieService } from 'ngx-cookie';
+import { CookieService } from 'ngx-cookie-service';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 
 
@@ -73,11 +73,13 @@ export class SSOLoginComponent implements OnInit {
             console.log("value is not define for cookie " + key);
           } else {
             if (key != "jtoken" && key != "postLogoutURL" && key != "insights-sso-givenname") {
-              this.cookieService.put(key, value, { storeUnencoded: true, path: '/' })
+              this.cookieService.set(key, value, 0, '/', null, false, 'None');
+              //this.cookieService.set(key, value, { storeUnencoded: true, path: '/', SameSite : 'None' })
             }
             if (key == "insights-sso-token") {
               this.dataShare.setWebAuthToken(resData["insights-sso-token"]);
-              this.cookieService.put("username", resData["insights-sso-token"], { storeUnencoded: true, path: '/' });
+              //this.cookieService.put("username", resData["insights-sso-token"], { storeUnencoded: true, path: '/' });
+              this.cookieService.set("username", resData["insights-sso-token"], 0, '/',null, false, 'None');
             } else if (key == "jtoken") {
               this.dataShare.setAuthorizationToken(resData["jtoken"]);
             } else if (key == "insights-sso-givenname") {

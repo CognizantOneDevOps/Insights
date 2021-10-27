@@ -65,8 +65,6 @@ public class WorkflowExecutor implements Job , ApplicationConfigInterface{
 	public void executeWorkflow() {
 		log.debug(" Worlflow Detail ====  Schedular Inside executeWorkflow  ");
 		long startTime = System.nanoTime();
-		InsightsStatusProvider.getInstance().createInsightStatusNode(" Started WorkflowExecutor ",
-				PlatformServiceConstants.SUCCESS);
 		List<InsightsWorkflowConfiguration> readyToRunWorkflow = workflowProcessing.getReadyToRunWorkFlowConfigs();
 		long processingTime =0;
 		if (!readyToRunWorkflow.isEmpty()) {
@@ -114,9 +112,6 @@ public class WorkflowExecutor implements Job , ApplicationConfigInterface{
 							,workflowConfig.getNextRun(),workflowConfig.getScheduleType(),"-","-",processingTime,e.getMessage());
 				}
 			}
-			InsightsStatusProvider.getInstance().createInsightStatusNode(" Completed WorkflowExecutor ",
-					PlatformServiceConstants.SUCCESS);			
-
 		} else {
 			log.debug("Worlflow Detail ==== WorkflowExecutor No reports are currently on due to run");
 			InsightsStatusProvider.getInstance().createInsightStatusNode(

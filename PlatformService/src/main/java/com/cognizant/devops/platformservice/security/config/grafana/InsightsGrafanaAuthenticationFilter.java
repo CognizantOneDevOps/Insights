@@ -30,82 +30,70 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.util.Assert;
 
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationToken;
-import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationTokenUtils;
 
 public class InsightsGrafanaAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
-	
+
 	private static Logger log = LogManager.getLogger(InsightsGrafanaAuthenticationFilter.class);
 
+	private String filterURL;
 
-    private String filterURL;
-  
-    public InsightsGrafanaAuthenticationFilter(String filterURL) {
-    	super(filterURL);
-        this.filterURL= filterURL;
-    }
-    
-    public InsightsGrafanaAuthenticationFilter(final String matcher, AuthenticationManager authenticationManager) {
+	public InsightsGrafanaAuthenticationFilter(String filterURL) {
+		super(filterURL);
+		this.filterURL = filterURL;
+	}
+
+	public InsightsGrafanaAuthenticationFilter(final String matcher, AuthenticationManager authenticationManager) {
 		super(matcher);
 		super.setAuthenticationManager(authenticationManager);
 	}
 
-    /**
-     * In case the login attribute is not present it is presumed that the call is made from the remote IDP
-     * and contains a SAML assertion which is processed and authenticated.
-     *
-     * @param request request
-     * @return authentication object in case SAML data was found and valid
-     * @throws AuthenticationException authentication failure
-     */
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
-    	log.debug("message Inside InsightsGrafanaAuthenticationFilter **** ");
-    	Authentication authentication = null;
-    	InsightsAuthenticationTokenUtils authenticationtokenUtils = new InsightsAuthenticationTokenUtils();
-    	String authToken = AuthenticationUtils.extractAndValidateAuthToken(request, response);
-		SecurityContext context = SecurityContextHolder.getContext();
-		Authentication auth = context.getAuthentication();
-		if (auth != null) {
-			List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
-			updatedAuthorities.add(AuthenticationUtils.getSpringAuthorityRole("Viewer"));
-			log.debug("message Inside if InsightsGrafanaAuthenticationFilter **** ");
-			authentication = new InsightsAuthenticationToken(authToken,auth.getDetails(), auth.getCredentials(), updatedAuthorities);
-			
-		} else {
-			log.debug("message Inside else InsightsGrafanaAuthenticationFilter **** ");
-			List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
-			updatedAuthorities.add(AuthenticationUtils.getSpringAuthorityRole("Viewer"));
-			authentication = new InsightsAuthenticationToken(authToken,null, null, updatedAuthorities);
-		}
+	/**
+	 * This used to validate Grafana user at first level 
+	 *
+	 * @param request request
+	 * @return authentication object in case SAML data was found and valid
+	 * @throws AuthenticationException authentication failure
+	 */
+	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
+		log.debug("message Inside InsightsGrafanaAuthenticationFilter **** ");
+		Authentication authentication = null;
+		String authToken = AuthenticationUtils.extractAndValidateAuthToken(request, response);
+		List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
+		updatedAuthorities.add(AuthenticationUtils.getSpringAuthorityRole("Viewer"));
+		authentication = new InsightsAuthenticationToken(authToken, null, null, updatedAuthorities);
 		authentication = getAuthenticationManager().authenticate(authentication);
+		updateSecurityContext(authentication);
+
+		log.debug("message Inside InsightsGrafanaAuthenticationFilter After authentication completed **** ");
 		return authentication;
-    }
+	}
 
-    /**
-     * Verifies that required entities were autowired or set.
-     */
-    @Override
-    public void afterPropertiesSet() {
-        super.afterPropertiesSet();
-        Assert.notNull(filterURL, "filter URL must be set");
-    }
+	/**
+	 * Verifies that required entities .
+	 */
+	@Override
+	public void afterPropertiesSet() {
+		super.afterPropertiesSet();
+		Assert.notNull(filterURL, "filter URL must be set");
+	}
 
-    /**
-	 * used when Authentication Provider return sucess
+	/**
+	 * used when Authentication Provider return successful Authentication
 	 *
 	 */
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication authResult) throws IOException, ServletException {
-		authResult.getAuthorities().forEach(
-				b -> log.debug("In successfulAuthentication InsightsGrafanaAuthenticationFilter GrantedAuthority ==== {} ", b.getAuthority()));
-		SecurityContextHolder.getContext().setAuthentication(authResult);
+		authResult.getAuthorities()
+				.forEach(b -> log.debug(
+						"In successfulAuthentication InsightsGrafanaAuthenticationFilter GrantedAuthority ==== {} ",
+						b.getAuthority()));
 		chain.doFilter(request, response);
 	}
 
@@ -125,6 +113,12 @@ public class InsightsGrafanaAuthenticationFilter extends AbstractAuthenticationP
 			AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.UNAUTHORISE,
 					"Authentication not successful, Please relogin " + authException.getMessage());
 		}
+	}
+
+	public void updateSecurityContext(Authentication authentication) {
+		org.springframework.security.core.context.SecurityContext context = SecurityContextHolder.createEmptyContext();
+		context.setAuthentication(authentication);
+		SecurityContextHolder.setContext(context);
 	}
 
 }

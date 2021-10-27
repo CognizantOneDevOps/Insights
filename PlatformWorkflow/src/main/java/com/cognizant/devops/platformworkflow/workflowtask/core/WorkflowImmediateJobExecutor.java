@@ -67,8 +67,6 @@ public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInter
 	public void executeImmediateWorkflow() {
 		long startTime = System.nanoTime();
 		log.debug(" Worlflow Detail ====  Schedular Inside executeImmediateWorkflow  ");
-		InsightsStatusProvider.getInstance().createInsightStatusNode("WorkflowEmmediateJobExecutor started. ",
-				PlatformServiceConstants.SUCCESS);
 		List<InsightsWorkflowConfiguration> readyToRunWorkflow = workflowProcessing.getImmediateWorkFlowConfigs();
        //same label with diff statis in case of error		
 		String workflowId ="-";
@@ -139,8 +137,6 @@ public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInter
 							,"-",workflowConfig.getScheduleType(),"-",processingTime,e.getMessage());					
 				}
 			}
-			InsightsStatusProvider.getInstance().createInsightStatusNode("WorkflowImmediateJobExecutor completed. ",
-					PlatformServiceConstants.SUCCESS);
 		} else {
 			log.debug("Worlflow Detail ==== WorkflowImmediateJobExecutor No reports are currently on due to run ");
 			log.debug("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetryCount={} processingTime={} message={}"

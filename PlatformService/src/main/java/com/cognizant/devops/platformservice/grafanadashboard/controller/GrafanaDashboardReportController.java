@@ -15,7 +15,9 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.grafanadashboard.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,9 +31,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfig;
 import com.cognizant.devops.platformservice.grafanadashboard.service.GrafanaPdfService;
+import com.cognizant.devops.platformservice.rest.AccessGroupManagement.AccessGroupManagement;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -46,7 +50,11 @@ public class GrafanaDashboardReportController {
 	@Autowired
 	GrafanaPdfService grafanaPdfServiceImpl;
 	
-	@PostMapping(value = "/exportPDF/getDashboardAsPDF", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Autowired
+	AccessGroupManagement accessGroupManagement;
+
+	
+	@PostMapping(value = "/exportPDF/saveDashboardAsPDF", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject publishGrafanaDashboardDetails(@RequestBody String dashboardDetails) {
 		log.debug("Dashboard details to generate pdf == {}", dashboardDetails);
 		String message = null;
@@ -63,24 +71,39 @@ public class GrafanaDashboardReportController {
 	public @ResponseBody JsonObject fetchGrafanaDashboardConfigs(){
 		List<GrafanaDashboardPdfConfig> result = null;
 		JsonArray jsonarray = new JsonArray();
+		JsonObject currentUserWithOrgs = new JsonObject();
+		Map<String, String> userOrgsMap = new HashMap<>();
 		try{
+			currentUserWithOrgs = accessGroupManagement.getCurrentUserWithOrgs();
+			JsonObject currentUserWithOrgsData = (JsonObject) currentUserWithOrgs.get("data");
+			JsonArray orgArray = (JsonArray) currentUserWithOrgsData.get("orgArray");
+			for(int i = 0; i < orgArray.size(); i++) {
+				JsonObject jsonObject = orgArray.get(i).getAsJsonObject();
+				userOrgsMap.put(jsonObject.get("orgId").toString(), jsonObject.get("name").getAsString());
+			}
 			result = grafanaPdfServiceImpl.getAllGrafanaDashboardConfigs();
-			for (GrafanaDashboardPdfConfig reportTemplate : result) {
+			for (GrafanaDashboardPdfConfig dashboardConfig : result) {
+				JsonParser parser = new JsonParser();
+				JsonObject dashJson = (JsonObject) parser.parse(dashboardConfig.getDashboardJson());
+				String orgId = dashJson.get("organisation").getAsString();
+				if(!userOrgsMap.containsKey(orgId)) {
+					continue;
+				}
 				JsonObject jsonobject = new JsonObject();
-				jsonobject.addProperty("id", reportTemplate.getId());
-				jsonobject.addProperty("dashboardJson", reportTemplate.getDashboardJson());
-				jsonobject.addProperty("email", reportTemplate.getEmail());
-				jsonobject.addProperty("emailbody", reportTemplate.getEmailbody());
-				jsonobject.addProperty("pdfType", reportTemplate.getPdfType());
-				jsonobject.addProperty("scheduleType", reportTemplate.getScheduleType());
-				jsonobject.addProperty("status", reportTemplate.getStatus());
-				jsonobject.addProperty("title", reportTemplate.getTitle());
-				jsonobject.addProperty("variables", reportTemplate.getVariables());
-				jsonobject.addProperty("source", reportTemplate.getSource());
-				jsonobject.addProperty("workflowId", reportTemplate.getWorkflowConfig().getWorkflowId());
-				jsonobject.addProperty("orgName","");
+				jsonobject.addProperty("id", dashboardConfig.getId());
+				jsonobject.addProperty("dashboardJson", dashboardConfig.getDashboardJson());
+				jsonobject.addProperty("pdfType", dashboardConfig.getPdfType());
+				jsonobject.addProperty("scheduleType", dashboardConfig.getScheduleType());
+				jsonobject.addProperty("status", dashboardConfig.getWorkflowConfig().getStatus());
+				jsonobject.addProperty("title", dashboardConfig.getTitle());
+				jsonobject.addProperty("variables", dashboardConfig.getVariables());
+				jsonobject.addProperty("source", dashboardConfig.getSource());
+				jsonobject.addProperty("workflowId", dashboardConfig.getWorkflowConfig().getWorkflowId());
+				jsonobject.addProperty("orgName", userOrgsMap.get(orgId));
+				jsonobject.addProperty("isActive", dashboardConfig.getWorkflowConfig().isActive());
 				jsonarray.add(jsonobject);
 			}
+			
 			return PlatformServiceUtil.buildSuccessResponseWithData(jsonarray);
 		} catch (Exception e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
@@ -110,6 +133,38 @@ public class GrafanaDashboardReportController {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
+	}
+
+	@PostMapping(value = "/updateDasboardStatus", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject updateDashboardStatus(@RequestBody String dashboardIdJsonString) {
+		String message = null;
+		try {
+			JsonParser parser = new JsonParser();
+			JsonObject dashboardIdJson = (JsonObject) parser.parse(dashboardIdJsonString);
+			message = grafanaPdfServiceImpl.updateDashboardPdfConfigStatus(dashboardIdJson);		
+			return PlatformServiceUtil.buildSuccessResponseWithData(message);
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+	}
+	
+	@GetMapping(value = "/getEmailConfigurationStatus", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject getEmailConfigurationStatus() {
+		Boolean isEmailConfigured = ApplicationConfigProvider.getInstance().getEmailConfiguration().getSendEmailEnabled();		
+		return PlatformServiceUtil.buildSuccessResponseWithData(isEmailConfigured);
+	}
+	
+	@PostMapping(value = "/setDashboardActiveState", produces = MediaType.APPLICATION_JSON_VALUE) 
+	public @ResponseBody  JsonObject setDashboardActiveState(@RequestBody String dashboardUpdateJsonString) {
+		String message = null;
+		try {
+			JsonParser parser = new JsonParser();
+			JsonObject dashboardUpdateJson = (JsonObject) parser.parse(dashboardUpdateJsonString);
+			message = grafanaPdfServiceImpl.setDashboardActiveState(dashboardUpdateJson);
+			return PlatformServiceUtil.buildSuccessResponseWithData(message);
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
 	}
 	
 }

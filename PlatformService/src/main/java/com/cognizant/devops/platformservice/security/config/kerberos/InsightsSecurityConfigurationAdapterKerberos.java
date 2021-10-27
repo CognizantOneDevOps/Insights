@@ -56,6 +56,7 @@ import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationFilter;
 import com.cognizant.devops.platformservice.security.config.InsightsCrossScriptingFilter;
 import com.cognizant.devops.platformservice.security.config.InsightsCustomCsrfFilter;
+import com.cognizant.devops.platformservice.security.config.InsightsExternalAPIAuthenticationFilter;
 import com.cognizant.devops.platformservice.security.config.InsightsResponseHeaderWriterFilter;
 import com.cognizant.devops.platformservice.security.config.saml.ResourceLoaderService;
 
@@ -129,7 +130,17 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 	@Conditional(InsightsKerberosBeanInitializationCondition.class)
 	public FilterChainProxy kerberosFilter() throws Exception {
 		log.debug("message Inside InsightsSecurityConfigurationAdapterKerberos FilterChainProxy, initial bean **** ");
-
+		
+		
+		List<Filter> filtersExternal = new ArrayList<>();
+		filtersExternal.add(0, new InsightsCustomCsrfFilter());
+		filtersExternal.add(1, new InsightsCrossScriptingFilter());
+		filtersExternal.add(2, insightsExternalProcessingFilter());
+		filtersExternal.add(3, new InsightsResponseHeaderWriterFilter());
+		
+		AuthenticationUtils.setSecurityFilterchain(
+				new DefaultSecurityFilterChain(new AntPathRequestMatcher("/externalApi/**"), filtersExternal));
+		
 		List<Filter> filters = new ArrayList<>();
 		filters.add(0, new InsightsCustomCsrfFilter());
 		filters.add(1, new InsightsCrossScriptingFilter());
@@ -155,9 +166,7 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 	 */
 	@Override
 	public void configure(WebSecurity web) throws Exception {
-		web.ignoring().antMatchers("/settings/getLogoImage");
 		web.ignoring().antMatchers("/datasource/**");
-		web.ignoring().antMatchers("/externalApi/**");
 	}
 
 	/**
@@ -280,5 +289,14 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 	@Conditional(InsightsKerberosBeanInitializationCondition.class)
 	public KerberosUserDetailsService kerberosUserDetailsService() {
 		return new KerberosUserDetailsService();
+	}
+	
+	/** This bean use to validate External Request 
+	 * @return
+	 */
+	@Bean
+	@Conditional(InsightsKerberosBeanInitializationCondition.class)
+	public InsightsExternalAPIAuthenticationFilter insightsExternalProcessingFilter() {
+		return new InsightsExternalAPIAuthenticationFilter();
 	}
 }

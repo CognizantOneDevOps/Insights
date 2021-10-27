@@ -24,6 +24,7 @@ import java.util.concurrent.TimeoutException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
@@ -31,6 +32,7 @@ import com.cognizant.devops.platformreports.assessment.dal.ReportPDFVisualizatio
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsAssessmentConfigurationDTO;
 import com.cognizant.devops.platformreports.assessment.pdf.BasePDFProcessor;
 import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
+import com.cognizant.devops.platformworkflow.workflowtask.core.InsightsStatusProvider;
 import com.cognizant.devops.platformworkflow.workflowtask.message.factory.WorkflowTaskSubscriberHandler;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -74,7 +76,17 @@ public class GrafanaPDFExecutionSubscriber extends WorkflowTaskSubscriberHandler
 					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),workflowConfig.getWorkflowType(),"-","-",
 					processingTime," ReportName :" +
 					assessmentReportDTO.getReportName() + " Visualizationutil :" +assessmentReportDTO.getVisualizationutil());			
-		}catch (Exception e) {
+		} catch (InsightsJobFailedException ie) {
+			log.error("Worlflow Detail ==== GrafanaPDFExecutionSubscriber Completed with error ", ie);
+			log.error("Type = Grafana PDF");
+			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),workflowConfig.getWorkflowType(),"-","-",
+					0," ReportName :" +
+					assessmentReportDTO.getReportName() + " Visualizationutil :" +assessmentReportDTO.getVisualizationutil() 
+					+"GrafanaPDFExecutionSubscriber Completed with error"  + ie.getMessage());
+			statusLog = ie.getMessage();
+			throw ie;
+		} catch (Exception e) {
 			log.error("Worlflow Detail ==== GrafanaPDFExecutionSubscriber Completed with error ", e);
 			log.error("Type = Grafana PDF");
 			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
@@ -85,5 +97,6 @@ public class GrafanaPDFExecutionSubscriber extends WorkflowTaskSubscriberHandler
 			throw new InsightsJobFailedException(e.getMessage());			
 		}
 	}
+	
 
 }

@@ -28,6 +28,8 @@ echo "Install Grafana"
 wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/scripts/insights_grafana.sh -O insights_grafana.sh && dos2unix insights_grafana.sh && sh insights_grafana.sh
 echo "Install Python 2.7.11 with required libraries needed for Insights"
 wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/scripts/insights_python3.sh -O insights_python3.sh && dos2unix insights_python3.sh && sh insights_python3.sh
+echo "Install Neo4j"
+wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/scripts/insights_neo4j.sh -O insights_neo4j.sh && dos2unix insights_neo4j.sh && sh insights_neo4j.sh
 echo "Install Erlang and RabbitMQ"
 wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/scripts/insights_rabbitmq.sh -O insights_rabbitmq.sh && dos2unix insights_rabbitmq.sh && sh insights_rabbitmq.sh
 echo "Install Tomcat "

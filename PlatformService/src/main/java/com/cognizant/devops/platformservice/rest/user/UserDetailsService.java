@@ -55,11 +55,12 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationToken;
-import com.cognizant.devops.platformservice.security.config.TokenProviderUtility;
+import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationTokenUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.nimbusds.jwt.JWTClaimsSet;
 
 @RestController
 @RequestMapping("/user")
@@ -70,9 +71,6 @@ public class UserDetailsService {
 	@Autowired
 	private HttpServletRequest httpRequest;
 
-	@Autowired
-	private TokenProviderUtility tokenProviderUtility;
-	
 	GrafanaHandler grafanaHandler = new GrafanaHandler();
 
 	/**used to authenticate Grafana User
@@ -89,7 +87,10 @@ public class UserDetailsService {
 		Map<String, String> responseHeadersgrafanaAttr = (Map<String, String>) authGrafana.getDetails();
 		if(responseHeadersgrafanaAttr!=null) {
 			UserDetails userDetail =(UserDetails) authGrafana.getPrincipal();
-			String jToken = getToken(userDetail.getUsername(),30);
+			Map<String, Object> params = new HashMap<>();
+			params.put(AuthenticationUtils.AUTHORITY, new ArrayList<>(authGrafana.getAuthorities()).get(0).getAuthority());
+			params.put(AuthenticationUtils.GRAFANA_DETAIL,authGrafana.getDetails());
+			String jToken = AuthenticationUtils.getToken(userDetail.getUsername(), AuthenticationUtils.SESSION_TIME, params);
 			responseHeadersgrafanaAttr.put(AuthenticationUtils.JTOKEN,jToken);
 			for (Map.Entry<String, String> entry : responseHeadersgrafanaAttr.entrySet()) {
 				ValidationUtils.cleanXSS(entry.getValue());
@@ -107,7 +108,6 @@ public class UserDetailsService {
 	@GetMapping(value = "/insightsso/authenticateSSO", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Object> authenticateSSOUser() throws InsightsCustomException {
-
 		log.debug("Inside authenticateSSOUser");
 
 		HttpHeaders httpHeaders = new HttpHeaders();
@@ -119,6 +119,8 @@ public class UserDetailsService {
 			String userid = credentials.getNameID().getValue();
 			String givenname = credentials
 					.getAttributeAsString("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname");
+			
+			log.debug(" userid for authenticateSSO {}  ",userid);
 
 			jsonResponse.addProperty("insights-user-fullname", givenname);
 
@@ -198,19 +200,26 @@ public class UserDetailsService {
 			SAMLCredential credentials = (SAMLCredential) auth.getCredentials();
 			Object principal = auth.getPrincipal();
 			String userid = credentials.getNameID().getValue();
+			
+			log.debug(" userid for getUserDetail {}  ",userid);
 
 			String grafanaCurrentOrgRole = validateGrafanaDetail(jsonResponse, userid);
+			List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
+			updatedAuthorities.add(AuthenticationUtils.getSpringAuthorityRole(grafanaCurrentOrgRole));
+			
+			Date expDate = new Date(System.currentTimeMillis() + 60 * 60 * 1000);
+			
+			Map<String, Object> params = new HashMap<>();
+			params.put(AuthenticationUtils.AUTHORITY, updatedAuthorities);
+			params.put("tokenExpiration",expDate);
 
-			String jToken = getToken(userid,AuthenticationUtils.TOKEN_TIME);
+			String jToken = AuthenticationUtils.getToken(userid, AuthenticationUtils.SESSION_TIME, params);
 			jsonResponse.addProperty(AuthenticationUtils.JTOKEN, jToken);
 
 			// set Authority to spring context
-			List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
-			updatedAuthorities.add(AuthenticationUtils.getSpringAuthorityRole(grafanaCurrentOrgRole));
-
-			Date expDate = new Date(System.currentTimeMillis() + 60 * 60 * 1000);
 			ExpiringUsernameAuthenticationToken autharization = new ExpiringUsernameAuthenticationToken(expDate,
 					principal, auth.getCredentials(), updatedAuthorities);
+			
 			SecurityContextHolder.getContext().setAuthentication(autharization);
 			Authentication auth2 = SecurityContextHolder.getContext().getAuthentication();
 			auth2.getAuthorities().forEach(a -> log.debug("GrantedAuthority  {} " , a.getAuthority()));
@@ -223,16 +232,6 @@ public class UserDetailsService {
 		return PlatformServiceUtil.buildSuccessResponseWithData(jsonResponse);
 	}
 
-	private String getToken(String userid,int tokenTime) {
-		String jToken ="";
-		try {
-			jToken= tokenProviderUtility.createToken(userid,tokenTime);
-		} catch (Exception e) {
-			log.error(e);
-		}
-		return jToken;
-	}
-	
 	/** used to get kerberos user detail 
 	 * @return
 	 * @throws InsightsCustomException
@@ -253,8 +252,6 @@ public class UserDetailsService {
 			String grafanaCurrentOrgRole = validateGrafanaDetail(jsonResponse, userid);
 			
 			/* This is extracted Authorization header from Kerberos System */
-			
-			//String token = AuthenticationUtils.extractAndValidateAuthToken(httpRequest);
 			String token = ValidationUtils.cleanXSS(httpRequest.getHeader(AuthenticationUtils.AUTH_HEADER_KEY));
 			jsonResponse.addProperty(AuthenticationUtils.JTOKEN, token);
 
@@ -293,6 +290,7 @@ public class UserDetailsService {
 		try {
 			SecurityContext context = SecurityContextHolder.getContext();
 			InsightsAuthenticationToken authJWT = (InsightsAuthenticationToken) context.getAuthentication();
+			log.debug("Inside authenticateJWT userid {}", authJWT);
 			if (authJWT != null) {
 				String userid = String.valueOf(authJWT.getDetails());
 
@@ -330,29 +328,37 @@ public class UserDetailsService {
 	@GetMapping(value = "/insightsso/getJWTUserDetail", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getJWTUserDetail() throws InsightsCustomException {
 
-		log.debug("Inside authenticateKerberos");
+		log.debug("Inside authenticateJWT  getJWTUserDetail");
 		JsonObject jsonResponse = new JsonObject();
 		try {
 			SecurityContext context = SecurityContextHolder.getContext();
 			InsightsAuthenticationToken authJWT = (InsightsAuthenticationToken) context.getAuthentication();
-
-			String userid = String.valueOf(authJWT.getDetails());
+			JWTClaimsSet detailData = (JWTClaimsSet) authJWT.getDetails();
+			String userid = detailData.getSubject();
 
 			log.debug("Inside getJWTUserDetail userid {}", userid);
-
+			
+			jsonResponse.addProperty(AuthenticationUtils.GRAFANA_WEBAUTH_HTTP_REQUEST_HEADER, userid);
 			String grafanaCurrentOrgRole = validateGrafanaDetail(jsonResponse, userid);
-
-			jsonResponse.addProperty(AuthenticationUtils.JTOKEN, String.valueOf(authJWT.getPrincipal()));
 
 			List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
 			updatedAuthorities.add(AuthenticationUtils.getSpringAuthorityRole(grafanaCurrentOrgRole));
+			
+			Map<String, Object> params = new HashMap<>();
+			params.put(AuthenticationUtils.AUTHORITY, grafanaCurrentOrgRole);
+			params.put("OriginalToken",String.valueOf(authJWT.getPrincipal()));
+			params.put("exp",detailData.getClaim("exp"));
+			String jToken = AuthenticationUtils.getToken(userid, AuthenticationUtils.SESSION_TIME, params);
 
 			InsightsAuthenticationToken jwtAuthenticationToken = new InsightsAuthenticationToken(authJWT.getPrincipal(),
-					userid, null, updatedAuthorities);
-			log.debug("In successfulAuthentication authenticateKerberos Kerberos GrantedAuthority ==== {} ",
-					jwtAuthenticationToken);
-
-			SecurityContextHolder.getContext().setAuthentication(jwtAuthenticationToken);
+					detailData, null, updatedAuthorities);
+			log.debug("In successfulAuthentication authenticateJWT Kerberos GrantedAuthority ==== {} ",
+					jwtAuthenticationToken.getAuthorities());
+					
+			jsonResponse.addProperty(AuthenticationUtils.JTOKEN, jToken);
+			
+			InsightsAuthenticationTokenUtils authenticationtokenUtils = new InsightsAuthenticationTokenUtils();
+			authenticationtokenUtils.updateSecurityContext(jwtAuthenticationToken);
 
 			httpRequest.setAttribute(AuthenticationUtils.RESPONSE_HEADER_KEY, jsonResponse);
 		} catch (Exception e) {
@@ -454,7 +460,7 @@ public class UserDetailsService {
 			grafanaHeaders.put("grafana_session", null);
 	
 			// Remove token
-			boolean isTokenRemoved = tokenProviderUtility.deleteToken(authToken);
+			boolean isTokenRemoved = AuthenticationUtils.deleteToken(authToken);
 			
 			if(isTokenRemoved) {
 				httpRequest.setAttribute("responseHeaders", grafanaHeaders);

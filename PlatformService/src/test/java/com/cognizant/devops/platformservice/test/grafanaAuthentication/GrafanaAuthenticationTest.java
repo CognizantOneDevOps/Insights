@@ -120,7 +120,7 @@ public class GrafanaAuthenticationTest extends AbstractTestNGSpringContextTests 
 			getData();
 			httpRequest.addHeader("Authorization", testAuthData.get(AUTHORIZATION));
 			cookiesMap = PlatformServiceUtil.getGrafanaCookies(httpRequest);
-		} catch (UnsupportedEncodingException e1) {
+		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
 
@@ -220,7 +220,7 @@ public class GrafanaAuthenticationTest extends AbstractTestNGSpringContextTests 
 				"", headers,false);
 
 		ResultActions action = this.mockMvc.perform(builder.with(csrf().asHeader()));
-		action.andExpect(status().is(HttpServletResponse.SC_BAD_REQUEST));
+		action.andExpect(status().is(HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
 	}
 
 	private MockMvc getMacMvc() {

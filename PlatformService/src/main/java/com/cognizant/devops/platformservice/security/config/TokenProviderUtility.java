@@ -17,6 +17,9 @@ package com.cognizant.devops.platformservice.security.config;
 
 import java.time.Duration;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
@@ -47,7 +50,6 @@ import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.JWSVerifier;
-import com.nimbusds.jose.KeyLengthException;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -60,7 +62,7 @@ public class TokenProviderUtility {
 	private String signingKey = ApplicationConfigProvider.getInstance().getSingleSignOnConfig()
 			.getTokenSigningKey();
 	static CacheManager cacheManager = null;
-	static Cache<String, String> tokenCache = null;
+	static Cache<String, TokenDataDTO> tokenCache = null;
 
 	public TokenProviderUtility() {
 		signingKey = ApplicationConfigProvider.getInstance().getSingleSignOnConfig()
@@ -87,9 +89,9 @@ public class TokenProviderUtility {
 
 			TokenProviderUtility.cacheManager.init();
 			if (TokenProviderUtility.tokenCache == null) {
-				TokenProviderUtility.tokenCache = cacheManager.createCache("pipeline",
+				TokenProviderUtility.tokenCache = cacheManager.createCache("cache",
 						CacheConfigurationBuilder
-								.newCacheConfigurationBuilder(String.class, String.class,
+								.newCacheConfigurationBuilder(String.class, TokenDataDTO.class,
 										ResourcePoolsBuilder.heap(TraceabilityConstants.PIPELINE_CACHE_HEAP_SIZE_BYTES))
 								.withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(
 										Duration.ofSeconds(TraceabilityConstants.PIPELINE_CACHE_EXPIRY_IN_SEC))));
@@ -97,22 +99,23 @@ public class TokenProviderUtility {
 		}
 	}
 
+	
 	/**
-	 * used to create token and add it in customize cache,This will use default expiration time 
+	 * used to create token and add it in customize cache,This will use custom expiration time 
 	 * 
 	 * @param userName
 	 * @return
 	 */
-	public String createToken(String userName) {
+	public String createToken(String userName,int tokenTime) {
 		String strJWTToken = "";
-		log.debug("Inside Create token === ");
+		log.debug("Inside Create token with tokenTime {} === ",tokenTime);
 		try {
 			String username = ValidationUtils.cleanXSS(userName);
 			String id = UUID.randomUUID().toString().replace("-", "");
 			Date now = new Date();
-			Date expDate = new Date(System.currentTimeMillis() + AuthenticationUtils.TOKEN_TIME * 60 * 1000);
+			Date expDate = new Date(System.currentTimeMillis() + (tokenTime * 60 * 1000));
 
-			strJWTToken = createAndStoreToken(username, id, now, expDate);
+			strJWTToken = createAndStoreToken(username, id, now, expDate, new HashMap<String, Object>(0));
 
 		} catch (CacheWritingException e) {
 			log.error(e);
@@ -131,16 +134,16 @@ public class TokenProviderUtility {
 	 * @param userName
 	 * @return
 	 */
-	public String createToken(String userName,int tokenTime) {
+	public String createToken(String userName,int tokenTime, Map<String, Object> claimparam) {
 		String strJWTToken = "";
 		log.debug("Inside Create token with tokenTime {} === ",tokenTime);
 		try {
 			String username = ValidationUtils.cleanXSS(userName);
 			String id = UUID.randomUUID().toString().replace("-", "");
 			Date now = new Date();
-			Date expDate = new Date(System.currentTimeMillis() + tokenTime * 60 * 1000);
+			Date expDate = new Date(System.currentTimeMillis() + (tokenTime * 60 * 1000));
 
-			strJWTToken = createAndStoreToken(username, id, now, expDate);
+			strJWTToken = createAndStoreToken(username, id, now, expDate,claimparam);
 
 		} catch (CacheWritingException e) {
 			log.error(e);
@@ -153,18 +156,21 @@ public class TokenProviderUtility {
 	}
 	
 	
-	
-
-	private String createAndStoreToken(String username, String id, Date now, Date expDate)
-			throws KeyLengthException, JOSEException {
+	private String createAndStoreToken(String username, String id, Date now, Date expDate, Map<String, Object> claimparams)
+			throws JOSEException {
 		String strJWTToken;
 		// Create HMAC signer
 		JWSSigner signer = new MACSigner(signingKey.getBytes());
 
 		// Prepare JWT with claims set
-		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().subject(username).jwtID(id).issueTime(now)
-				.issuer("cognizant.com").expirationTime(expDate).build();
-
+		JWTClaimsSet.Builder claimsSetBuilder = new JWTClaimsSet.Builder()
+				.subject(username).jwtID(id).issueTime(now).issuer("cognizant.com").expirationTime(expDate);
+		for (Entry<String, Object> entry : claimparams.entrySet()) {
+			claimsSetBuilder.claim(entry.getKey(), entry.getValue());
+		}
+		
+		JWTClaimsSet claimsSet = claimsSetBuilder.build();
+		
 		SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
 
 		// Apply the HMAC protection
@@ -172,82 +178,10 @@ public class TokenProviderUtility {
 
 		// Serialize to compact form, produces something like
 		strJWTToken = signedJWT.serialize();
+		TokenDataDTO tokenDetail = new TokenDataDTO(strJWTToken,expDate);
 
-		//log.debug("token created with id {} {}", id, strJWTToken)
-
-		TokenProviderUtility.tokenCache.put(id, strJWTToken);
+		TokenProviderUtility.tokenCache.put(id, tokenDetail);
 		return strJWTToken;
-	}
-
-	/**
-	 * Used to verify received token with cached token
-	 * 
-	 * @param token
-	 * @return
-	 * @throws AuthorizationServiceException
-	 * @throws AuthenticationCredentialsNotFoundException
-	 * @throws AccountExpiredException
-	 * @throws InsightsCustomException
-	 */
-	public boolean verifyToken(String token) throws InsightsCustomException {
-		boolean isVerify = Boolean.FALSE;
-		boolean isTokenExistsInCache = Boolean.FALSE;
-		boolean validateTokenDate = Boolean.FALSE;
-		try {
-			String authToken = ValidationUtils.cleanXSS(token);
-			if (authToken == null || authToken.isEmpty()) {
-				log.error("verifyToken authToken is null or empty");
-				throw new InsightsCustomException(" verifyTokenauthToken is null or empty");
-			}
-
-			// parse the JWS and verify its HMAC
-			SignedJWT signedJWT = SignedJWT.parse(authToken);
-			JWSVerifier verifier = new MACVerifier(signingKey);
-			isVerify = signedJWT.verify(verifier);
-
-			String id = signedJWT.getJWTClaimsSet().getJWTID();
-			String tokenValueFromCache = null;
-			if (TokenProviderUtility.tokenCache != null) {
-				tokenValueFromCache = TokenProviderUtility.tokenCache.get(id);
-			} else {
-				log.error("cache is not initilize properly");
-			}
-
-			if (tokenValueFromCache == null) {
-				log.debug("No token found in cache");
-			} else if (tokenValueFromCache.equalsIgnoreCase(authToken)) {
-				isTokenExistsInCache = Boolean.TRUE;
-			} else {
-				log.error("Token value not matched in cache=== ");
-			}
-
-			 log.debug("user alice after {} + Exceperation Time after {} " , signedJWT.getJWTClaimsSet().getSubject(),signedJWT.getJWTClaimsSet().getExpirationTime());
-			log.debug("Check date of token with current date {} ",
-					new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime()));// after
-			validateTokenDate = new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime());// after
-
-		} catch (Exception e) {
-			log.error(e);
-			log.error(" Exception while validating token {} ", e.getMessage());
-			throw new InsightsCustomException("Exception while varifing token ==== " + e.getMessage());
-		}
-
-		if (!isVerify) {
-			log.debug("Token signuture not match ");
-			throw new AuthorizationServiceException("Token signuture not match");
-		} else if (!isTokenExistsInCache) {
-			log.error("Token Not matched ");
-			throw new AuthenticationCredentialsNotFoundException("Token not found in cache");
-		} else if (!validateTokenDate) {
-			throw new AccountExpiredException("Token Expire");
-		} else {
-			log.debug("Token verified sucessfully ==== ");
-			isVerify = Boolean.TRUE;
-		}
-
-		log.debug(" is Token Verify  ====  {} ", isVerify);
-
-		return isVerify;
 	}
 
 	/**
@@ -262,14 +196,76 @@ public class TokenProviderUtility {
 	 */
 	public JWTClaimsSet verifyAndFetchCliaimsToken(String token) throws InsightsCustomException {
 		boolean isVerify = Boolean.FALSE;
-		boolean validateTokenDate = Boolean.FALSE;
 		JWTClaimsSet claims = null;
 		log.debug(" In verifyAndFetchCliaimsToken method ==== ");
 		try {
 			String authToken = ValidationUtils.cleanXSS(token);
 			if (authToken == null || authToken.isEmpty()) {
-				log.error("authToken is null or empty");
-				throw new InsightsCustomException("authToken is null or empty");
+				throw new InsightsCustomException("Invalid authToken or empty authToken");
+			}
+			// parse the JWS and verify its HMAC
+			SignedJWT signedJWT = SignedJWT.parse(authToken);
+			JWSVerifier verifier = new MACVerifier(signingKey);
+			isVerify = signedJWT.verify(verifier);
+			String id = signedJWT.getJWTClaimsSet().getJWTID();
+			String username = signedJWT.getJWTClaimsSet().getSubject();
+			TokenDataDTO tokenValueFromCache = TokenProviderUtility.tokenCache.get(id);
+			 
+			SignedJWT signedCacheTokenJWT = SignedJWT.parse(tokenValueFromCache.getTokenValue());
+			
+			if(!isVerify) {
+				log.debug("Token signuture not match ");
+				throw new AuthorizationServiceException("Token signuture not match");
+			} else if (tokenValueFromCache.getTokenValue() == null) {
+				log.error("No token found in cache");
+				throw new AuthorizationServiceException("No token found in cache");
+			} else if (!tokenValueFromCache.getTokenValue().equalsIgnoreCase(authToken) && 
+					!signedCacheTokenJWT.getJWTClaimsSet().getSubject().equalsIgnoreCase(username)) {
+				log.error("Token Details not match, system token value not matched with received token ");
+				throw new AuthorizationServiceException("Token Details not match");
+			} else {
+				claims = signedCacheTokenJWT.getJWTClaimsSet();
+
+				signedJWT.getJWTClaimsSet().getClaims().forEach((k,v) -> log.debug(" k ======== {} v ======== {} ",k,v));
+				
+				if(new Date().after(tokenValueFromCache.getSessionTime())) {
+					log.debug(" Token session expire {} ", tokenValueFromCache.getSessionTime());
+					throw new AccountExpiredException("Session Expire");
+				}else {
+					Date expDate = new Date(System.currentTimeMillis() + AuthenticationUtils.SESSION_TIME * 60 * 1000);
+					TokenDataDTO updateobj = new TokenDataDTO(tokenValueFromCache.getTokenValue(),expDate);
+					TokenProviderUtility.tokenCache.replace(id, updateobj);
+					log.debug("Token verified sucessfully ==== Before {} After {} session time check ",tokenValueFromCache.getSessionTime(), TokenProviderUtility.tokenCache.get(id).getSessionTime());
+				}
+			}
+		} catch (Exception e) {
+			log.error(e);
+			log.error(" Exception while validating token {} ", e.getMessage());
+			throw new InsightsCustomException("Exception while varifing token ==== " + e.getMessage());
+		}
+		return claims;
+	}
+	
+	/**
+	 * Used to verify received token without cache
+	 * 
+	 * @param token
+	 * @return
+	 * @throws AuthorizationServiceException
+	 * @throws AuthenticationCredentialsNotFoundException
+	 * @throws AccountExpiredException
+	 * @throws InsightsCustomException
+	 */
+	public JWTClaimsSet verifyExternalTokenAndFetchClaims(String token) throws InsightsCustomException {
+		boolean isVerify = Boolean.FALSE;
+		boolean validateTokenDate = Boolean.FALSE;
+		JWTClaimsSet claims = null;
+		log.debug(" In verifyExternalTokenAndFetchClaims method ==== ");
+		try {
+			String authToken = ValidationUtils.cleanXSS(token);
+			if (authToken == null || authToken.isEmpty()) {
+				log.error("External authToken is not valid or empty");
+				throw new InsightsCustomException("Invalid External authToken or empty authToken");
 			}
 
 			// parse the JWS and verify its HMAC
@@ -278,31 +274,24 @@ public class TokenProviderUtility {
 			isVerify = signedJWT.verify(verifier);
 
 			claims = signedJWT.getJWTClaimsSet();
+			
+			//signedJWT.getJWTClaimsSet().getClaims().forEach((k,v) -> log.debug(" k ======== {} v ======== {} ",k,v));
 
-			//log.debug(" userName in message  {} ", signedJWT.getJWTClaimsSet().getSubject());
-			//log.debug(" domain {} ", signedJWT.getJWTClaimsSet().getIssuer()) cognizant.com
-			//log.debug("Expiration Time after  {}", signedJWT.getJWTClaimsSet().getExpirationTime())
-			//log.debug("Check date of token with current date {} ",
-			//		new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime()))// after
-			validateTokenDate = new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime());// after
+			validateTokenDate = new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime());
 
 			if (!isVerify) {
-				log.debug("Token signuture not match ");
-				throw new AuthorizationServiceException("Token signuture not match");
+				log.error("External Token signuture not match ");
+				throw new AuthorizationServiceException("External Token signuture not match");
 			} else if (!validateTokenDate) {
-				throw new AccountExpiredException("Session Expire");
+				throw new AccountExpiredException("External token validity Expire");
 			} else {
-				log.debug("Token verified sucessfully ==== ");
-				isVerify = Boolean.TRUE;
+				log.debug("External Token verified sucessfully ==== ");
 			}
 		} catch (Exception e) {
 			log.error(e);
-			log.error(" Exception while validating token {} ", e.getMessage());
-			throw new InsightsCustomException("Exception while varifing token ==== " + e.getMessage());
+			log.error(" Exception while validating External token {} ", e.getMessage());
+			throw new InsightsCustomException("Exception while varifing External token ==== " + e.getMessage());
 		}
-
-		//log.debug(" is Token Verify  ====  {} ", isVerify);
-
 		return claims;
 	}
 
@@ -321,8 +310,8 @@ public class TokenProviderUtility {
 			Boolean isVerify = signedJWT.verify(verifier);
 
 			String id = signedJWT.getJWTClaimsSet().getJWTID();
-			String key = TokenProviderUtility.tokenCache.get(id);
-			if (key != null && isVerify) {
+			TokenDataDTO tokenDetail = TokenProviderUtility.tokenCache.get(id);
+			if (tokenDetail.getTokenValue() != null && isVerify) {
 				TokenProviderUtility.tokenCache.remove(id);
 				isTokenRemoved = Boolean.TRUE;
 			}
@@ -332,5 +321,4 @@ public class TokenProviderUtility {
 		}
 		return isTokenRemoved;
 	}
-
 }

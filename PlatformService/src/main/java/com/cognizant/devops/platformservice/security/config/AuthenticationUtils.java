@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -72,14 +73,14 @@ public class AuthenticationUtils {
 	public static final int DEFAULT_PORT = 8080;
 	public static final String HEADER_COOKIES_KEY = "Cookie";
 	public static final String RESPONSE_HEADER_KEY = "responseHeaders";
-	public static final Integer SESSION_TIME = 60;
+	public static final Integer SESSION_TIME = 30;
 	public static final String AUTH_HEADER_KEY = "Authorization";
 	public static final String CUSTOM_AUTH_HEADER_KEY = "PLAFORM_AUTHORIZATION";
 	public static final String SSO_USER_HEADER_KEY = "insights-sso-givenname";
 	public static final String SSO_LOGOUT_URL = "postLogoutURL";
 	public static final String JTOKEN="jtoken";
-	
-	
+	public static final String AUTHORITY = "authority";
+	public static final String GRAFANA_DETAIL = "details";
 	public static final String KERBEROS_AUTH_HEADER_KEY = "authorization";
 
 	public static final String NATIVE_AUTH_PROTOCOL = "NativeGrafana";
@@ -91,6 +92,12 @@ public class AuthenticationUtils {
 			"/user/authenticate/**", "/user/insightsso/**", "/saml/**", "/externalApi/**"));
 	
 	public static final List<String> WEB_IGNORE_URLS = Collections.unmodifiableList(Arrays.asList("/settings/getLogoImage"));
+	
+	public static final String EXTERNALAPI = "/externalApi/";
+	
+	public static final String JWT_LOGIN_URL = "/PlatformService/user/insightsso/authenticateJWT";
+	
+	public static final String JWT_USER_DETAIL_URL = "/PlatformService/user/insightsso/getJWTUserDetail";
 
 	public static final List<String> SET_VALUES = Collections.unmodifiableList(Arrays.asList(GRAFANA_COOKIES_ORG, "grafana_user", GRAFANA_ROLE_KEY,
 			"grafana_remember", "grafana_sess", CSRF_COOKIE_NAME , "JSESSIONID",  GRAFANA_SESSION_KEY, GRAFANA_WEBAUTH_HTTP_REQUEST_HEADER,
@@ -108,7 +115,8 @@ public class AuthenticationUtils {
 	public static final Set<String> AUTHENTICATION_PROTOCOL_LIST = Collections.unmodifiableSet(new HashSet<String>(SUPPORTED_TYPE));
 
 	protected static List<SecurityFilterChain> securityFilterchains = new ArrayList<>();
-
+	
+	private static TokenProviderUtility tokenProviderUtility = new TokenProviderUtility();
 
 	public static void setResponseMessage(HttpServletResponse response, int statusCode, String message) {
 		try {
@@ -139,7 +147,7 @@ public class AuthenticationUtils {
 					urlString = httpRequest.getHeader(HttpHeaders.HOST);
 					hostInfo = urlString;
 					if (urlString.contains(":")) {
-						int index = urlString.indexOf(":");
+						int index = urlString.indexOf(':');
 						hostInfo = urlString.substring(0, index);
 					}
 				} else {
@@ -159,7 +167,7 @@ public class AuthenticationUtils {
 		return httpRequest.getHeader(HttpHeaders.REFERER) + "/#/ssologin";
 	}
 
-	public static String getLogoutURL(HttpServletRequest httpRequest, int logoutCode, String message) {
+	public static String getLogoutURL(int logoutCode, String message) {
 		try {
 			String url = URLEncoder.encode(
 					ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getPostLogoutURL(), "UTF-8");
@@ -171,7 +179,6 @@ public class AuthenticationUtils {
 			log.error("Unable to retrive logout information ");
 			return null;
 		}
-
 	}
 
 	public CsrfTokenRepository csrfTokenRepository() {
@@ -183,7 +190,7 @@ public class AuthenticationUtils {
 	public static List<SecurityFilterChain> getSecurityFilterchains() {
 		return AuthenticationUtils.securityFilterchains;
 	}
-
+	
 	public static void setSecurityFilterchain(SecurityFilterChain securityFilterchains) {
 		AuthenticationUtils.securityFilterchains.add(securityFilterchains);
 	}
@@ -240,9 +247,11 @@ public class AuthenticationUtils {
 	public static JWTClaimsSet validateIncomingToken(Object principal) {
 		JWTClaimsSet jwtClaimsSet = null;
 		try {
-			TokenProviderUtility tokenProviderUtility = new TokenProviderUtility();
-			jwtClaimsSet =tokenProviderUtility.verifyAndFetchCliaimsToken(principal.toString());
-			//log.debug(" isTokenVarified and claims are ==== {} ", jwtClaimsSet);
+			if(ApplicationConfigProvider.getInstance().getAutheticationProtocol().equalsIgnoreCase("JWT")) {
+				jwtClaimsSet =tokenProviderUtility.verifyExternalTokenAndFetchClaims(principal.toString());
+			} else {
+				jwtClaimsSet =tokenProviderUtility.verifyAndFetchCliaimsToken(principal.toString());
+			}
 		} catch (InsightsCustomException e) {
 			log.error(e);
 			log.error(" Exception while varifing token " + e.getMessage(), e);
@@ -257,7 +266,7 @@ public class AuthenticationUtils {
 			throw new InsightsAuthenticationException(e.getMessage(), e);
 		} catch (AccountExpiredException e) {
 			log.error(e);
-			log.error(" Token Expire {}", e.getMessage());
+			log.error(" Token Session Expire {}", e.getMessage());
 			throw new InsightsAuthenticationException(e.getMessage(), e);
 		} catch (Exception e) {
 			log.error(e);
@@ -266,5 +275,20 @@ public class AuthenticationUtils {
 		}
 		return jwtClaimsSet ;
 	}
-
+	
+	public static String getToken(String userid, int tokenTime, Map<String, Object> params)  {
+		String jToken ="";
+		try {
+			jToken= tokenProviderUtility.createToken(userid,tokenTime, params);
+		} catch (Exception e) {
+			log.error(e);
+			throw new AuthorizationServiceException(" Error while creating data ");
+		}
+		return jToken;
+	}
+	
+	public static boolean deleteToken(String authToken) {
+		return tokenProviderUtility.deleteToken(authToken);
+	}
+	
 }

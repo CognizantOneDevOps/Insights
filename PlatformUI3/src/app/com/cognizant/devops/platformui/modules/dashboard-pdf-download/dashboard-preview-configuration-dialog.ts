@@ -44,4 +44,8 @@ export class DashboardPreviewConfigDialog implements OnInit {
         this.dialogRef.close();
         this.grafanaService.onOkSubject.next('OK');
     }
+
+    confirm() {
+        this.dialogRef.close("confirm");
+    }
 }

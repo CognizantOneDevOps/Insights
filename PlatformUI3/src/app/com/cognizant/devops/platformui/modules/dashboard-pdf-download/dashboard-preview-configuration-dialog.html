@@ -23,9 +23,14 @@
     <mat-dialog-content  style="overflow-y: hidden; overflow-x: hidden;">
         <iframe frameborder="0" marginwidth=0 marginheight=0 frameborder=0
         style="height:65vh;width: 100%;" [src]="dashboardUrl" ></iframe> 
-      </mat-dialog-content>
-      <mat-dialog-actions class="mat-dialog-actions-button">
-        <button mat-raised-button class="btnStyle" (click)="closeDialog()">OK</button>
+    </mat-dialog-content>
+    <mat-dialog-actions class="mat-dialog-actions-button">
+        <button mat-raised-button (click)="closeDialog()" class="btnStyle">
+            CANCEL
+        </button>
+        <button mat-raised-button (click)="confirm()" class="btnStyle" style="margin-right: 2%;" >
+            CONFIRM
+        </button>
     </mat-dialog-actions>
 
 

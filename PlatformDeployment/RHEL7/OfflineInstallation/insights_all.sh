@@ -22,6 +22,9 @@ echo "Installing Postgres"
 sudo sh ./insights_postgres.sh
 echo "Installing Grafana"
 sudo sh ./insights_grafana.sh
+sleep 50
+echo "Installing Neo4j"
+sudo sh ./insights_neo4j.sh
 echo "Installing Python 2.7.11 with required libraries needed for Insights"
 sudo sh ./insights_python.sh
 echo "Installing Erlang and RabbitMQ"

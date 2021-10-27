@@ -27,17 +27,13 @@
       </span>
     </div>
   </div>
-  <div class="btnAlign">
 
+  <div class="btnAlign">
     <button mat-icon-button (click)="onPreviewClick()">
-      <mat-icon svgIcon="view" title="View " style="margin-bottom: 25%;" class="mat-icon material-icons">
-        view </mat-icon>
+      <mat-icon title="Preview And Save " style="margin-top: 10%;" class="mat-icon material-icons">
+        save </mat-icon>
     </button>
-    <button mat-icon-button [disabled]="disableSave" (click)="save()">
-      <mat-icon title="Save" style="margin-top: 0%;" class="mat-icon material-icons">
-        save
-      </mat-icon>
-    </button>
+    
     <button mat-icon-button (click)="list()">
       <mat-icon svgIcon="redirect_icon" title="Redirect To Landing Page" style="margin-bottom: 20%;"
         class="mat-icon material-icons">
@@ -49,7 +45,7 @@
       <mat-progress-spinner *ngIf="isDatainProgress" [diameter]="100" color="primary" mode="indeterminate">
       </mat-progress-spinner>
     </div>
-  </div>  
+  </div>
   <table class="mat-elevation-z8 mat-table">
     <thead>
       <tr class="mat-header-row" layout-align="start start">
@@ -68,8 +64,9 @@
           <span style="color:#ff0000;">*</span>
         </td>
         <td class="columnComponent">
-          <mat-select [(ngModel)]="organisation" style="margin:1%" class="form-control" required placeholder="Select Organisation"
-            color="primary" (selectionChange)="getDashboardsByOrg($event)" [disabled]="type === 'edit'">
+          <mat-select [(ngModel)]="organisation" style="margin:1%" class="form-control" required
+            placeholder="Select Organisation" color="primary" (selectionChange)="getDashboardsByOrg($event)"
+            [disabled]="type === 'edit'">
             <mat-option *ngFor="let org of orgArr" value="{{org.orgId}}" style="color:#0033A0">
               {{org.name}} </mat-option>
           </mat-select>
@@ -85,7 +82,8 @@
         </td>
         <td class="columnComponent">
           <mat-select [(ngModel)]="dashboard" class="form-control" required placeholder="Select Dashboard"
-            color="primary" (selectionChange)="getDashboardJson($event.value)" style="margin:1%" [disabled]="type === 'edit'">
+            color="primary" (selectionChange)="getDashboardJson($event.value)" style="margin:1%"
+            [disabled]="type === 'edit'">
             <mat-option *ngFor="let dash of dashOptions" value="{{dash.uid}}" style="color:#0033A0">
               {{dash.title}} </mat-option>
           </mat-select>
@@ -96,11 +94,41 @@
       </tr>
       <tr class="mat-row-webhook">
         <td class="mat-cell" class="columnName">
+          <span class="mainText">Title</span>
+          <span style="color:#ff0000;">*</span>
+        </td>
+        <td class="columnComponent">
+          <input matinput maxlength="100" style="margin:1%;" [ngClass]="['input-disabled', 'form-control']" [(ngModel)]="title" type="text"
+            autocomplete="off" placeholder="Enter Title" disabled>
+        </td>
+        <td class="info">
+          <span class="infoText">Enter Title</span>
+        </td>
+      </tr>
+      <tr class="mat-row-webhook">
+        <td class="mat-cell" class="columnName">
+          <span class="mainText">Theme</span>
+          <span style="color: #ff0000;">*</span>
+        </td>
+        <td class="columnComponent">
+          <mat-select [(ngModel)]="theme" style="margin:1%;" class="form-control" required
+            placeholder="Select Dashboard Theme" color="primary">
+            <mat-option [value]="themes.dark">Dark</mat-option>
+            <mat-option [value]="themes.light">Light</mat-option>
+          </mat-select>
+        </td>
+        <td class="info">
+          <span class="infoText">Select Dashboard Theme</span>
+        </td>
+      </tr>
+      <tr class="mat-row-webhook">
+        <td class="mat-cell" class="columnName">
           <span class="mainText">Pdf Type</span>
           <span style="color:#ff0000;">*</span>
         </td>
         <td class="columnComponent">
-          <mat-select [(ngModel)]="pdfType" class="form-control" required placeholder="Select PdfType" style="margin:1%" color="primary">
+          <mat-select [(ngModel)]="pdfType" class="form-control" required placeholder="Select PdfType" style="margin:1%"
+            color="primary">
             <mat-option style="color:#0033A0" value="Dashboard">Dashboard View</mat-option>
             <mat-option style="color:#0033A0" value="Printable">Printable View</mat-option>
           </mat-select>
@@ -116,7 +144,8 @@
           <span style="color:#ff0000;">*</span>
         </td>
         <td class="columnComponent">
-          <mat-select  [(ngModel)]="loadTime" style="margin:1%;" class="form-control" required placeholder="Select loadTime" color="primary">
+          <mat-select [(ngModel)]="loadTime" style="margin:1%;" class="form-control" required
+            placeholder="Select loadTime" color="primary">
             <mat-option style="color:#0033A0" value="10">10</mat-option>
             <mat-option style="color:#0033A0" value="15">15</mat-option>
             <mat-option style="color:#0033A0" value="30">30</mat-option>
@@ -130,7 +159,8 @@
             <mat-option style="color:#0033A0" value="270">270</mat-option>
             <mat-option style="color:#0033A0" value="300">300</mat-option>
           </mat-select>
-          <mat-select *ngIf="pdfType==='Printable'" [(ngModel)]="loadTime" style="margin:1%;" class="form-control" required placeholder="Select loadTime" color="primary">
+          <mat-select *ngIf="pdfType==='Printable'" [(ngModel)]="loadTime" style="margin:1%;" class="form-control"
+            required placeholder="Select loadTime" color="primary">
             <mat-option style="color:#0033A0" value="3">3</mat-option>
             <mat-option style="color:#0033A0" value="5">5</mat-option>
             <mat-option style="color:#0033A0" value="8">8</mat-option>
@@ -150,7 +180,8 @@
           <span style="color:#ff0000;">*</span>
         </td>
         <td class="columnComponent">
-          <mat-select  [(ngModel)]="loadTime" style="margin:1%;" class="form-control" required placeholder="Select loadTime" color="primary">
+          <mat-select [(ngModel)]="loadTime" style="margin:1%;" class="form-control" required
+            placeholder="Select loadTime" color="primary">
             <mat-option style="color:#0033A0" value="3">3</mat-option>
             <mat-option style="color:#0033A0" value="5">5</mat-option>
             <mat-option style="color:#0033A0" value="8">8</mat-option>
@@ -185,7 +216,7 @@
                       {{option}}</mat-option>
                   </mat-select>
                 </div>
-                <div  class="align-element" *ngIf="list.type ==='query' && !list.multi">
+                <div class="align-element" *ngIf="list.type ==='query' && !list.multi">
                   <label class="block">{{list.label?list.label:list.name}}</label>
                   <mat-select id={{list.name}} class="form-control" style="margin: 1%;" formControlName={{list.name}}
                     (selectionChange)="onChangeVariables($event,list)" required color="primary"
@@ -283,11 +314,12 @@
       </tr>
       <tr class="mat-row-webhook" *ngIf="!showTimePicker">
         <td class="mat-cell" class="columnName">
-          <span class="mainText">Time Range</span>
+          <span class="mainText">Data Time Range</span>
         </td>
         <td class="columnComponent">
           <mat-radio-group aria-label="Select a TimeRange" (change)="onRangeChange($event)" [(ngModel)]="timeRange">
-            <mat-radio-button *ngIf="frequency === 'ONETIME'" class="form-control" style="margin: 1%;" value="absolute">Absolute</mat-radio-button>
+            <mat-radio-button *ngIf="frequency === 'ONETIME'" class="form-control" style="margin: 1%;" value="absolute">
+              Absolute</mat-radio-button>
             <mat-radio-button class="form-control" style="margin: 1%;" value="relative">Relative</mat-radio-button>
             <mat-radio-button class="form-control" style="margin: 1%;" value="other">Other</mat-radio-button>
           </mat-radio-group>
@@ -327,17 +359,19 @@
           <span class="mainText">Mailing Details</span>
         </td>
         <td class="columnComponent">
-          <button mat-icon-button (click)="addEmailConfig()">
-              <mat-icon *ngIf="!emailDetails" title="Add Email" class="mat-icon material-icons">
-                  add_circle
-              </mat-icon>
-              <mat-icon *ngIf="emailDetails" title="Edit email" class="mat-icon material-icons">
-                  edit
-              </mat-icon>
+          <button mat-icon-button [disabled]="!enableEmail" (click)="addEmailConfig()">
+            <mat-icon *ngIf="!emailDetails" title="Add Email" class="mat-icon material-icons">
+              add_circle
+            </mat-icon>
+            <mat-icon *ngIf="emailDetails" title="Edit  Email"
+              class="mat-icon material-icons">
+              edit
+            </mat-icon>
           </button>
-      </td>
+        </td>
         <td>
-          <span class="infoText">Enter the email address details. </span>
+          <span *ngIf="enableEmail" class="infoText">Enter the email address details.</span>
+          <span *ngIf="!enableEmail" class="infoText">Email  Server not configured. Please contact the admin</span>
         </td>
       </tr>
     </tbody>

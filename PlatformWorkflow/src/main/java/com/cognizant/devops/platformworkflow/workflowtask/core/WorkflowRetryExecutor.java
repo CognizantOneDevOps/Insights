@@ -65,13 +65,9 @@ public class WorkflowRetryExecutor implements Job, ApplicationConfigInterface {
 	
 	
 	public void retryWorkflows() {
-		InsightsStatusProvider.getInstance().createInsightStatusNode("Started  WorkflowRetryExecutor: ",
-				PlatformServiceConstants.SUCCESS);
 		retryWorkflowWithFailedTask();
 		retryWorkflowWithCompletedTask();
 		retryWorkflowWithoutHistory();
-		InsightsStatusProvider.getInstance().createInsightStatusNode("Completed  WorkflowRetryExecutor: ",
-				PlatformServiceConstants.SUCCESS);
 	}
 
 	/**

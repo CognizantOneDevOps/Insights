@@ -19,8 +19,8 @@
     color: white;
     width: 100%;
     text-align: center;
-    padding-top: 25px;
     background: #FF8F1C;
+    height: 40px;
 }
 .noHover{
     pointer-events: none;
@@ -41,9 +41,10 @@
     font-size: 18px;
     color: white;
     margin-left: 90px;
+    line-height: 40px;
+    vertical-align: middle;
 }
 .btnStyle{
-    margin-left: 140vh;
     background: #ff8f1c;
     color: white;
 }
@@ -51,6 +52,8 @@
     float: right;
     margin-right: 2%;
     color: white;
+    line-height: 40px;
+    vertical-align: middle;
 }
 .mat-dialog-actions{
     padding: 0px 0;
@@ -60,5 +63,6 @@
     align-items: center;
     box-sizing: content-box;
     margin-bottom: 0px;
+    justify-content: flex-end;
 }
 

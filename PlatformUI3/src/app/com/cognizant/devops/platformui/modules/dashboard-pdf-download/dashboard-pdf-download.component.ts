@@ -26,6 +26,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatOption } from '@angular/material/core';
 import { TimeRange } from './timeRangeJson';
 import { EmailConfigurationDialog } from '../reportmanagement/report-configuration/email-configuration-dialog';
+import { DataSharedService } from '@insights/common/data-shared-service';
 
 export interface queryData {
   index: any;
@@ -40,7 +41,6 @@ export interface queryData {
 })
 export class DashboardPdfDownloadComponent implements OnInit {
   dashboardForm: FormGroup;
-  currentUserWithOrgs: any;
   orgArr = [];
   asyncResult: any;
   dashboardList: any;
@@ -68,6 +68,7 @@ export class DashboardPdfDownloadComponent implements OnInit {
   });
   organisation: any;
   dashboard: any;
+  theme : string;
   frequency: any;
   emailAdd: any;
   mailSubject: any;
@@ -87,16 +88,29 @@ export class DashboardPdfDownloadComponent implements OnInit {
   showTimePicker: boolean = true;
   mailIconDisable: boolean = true;
   loadTime: any;
+  title: string;
+  enableEmail : boolean;
+  themes : any;
+  userName : string;
 
   constructor(public router: Router, private grafanaService: GrafanaAuthenticationService, private landingService: LandingPageService,
     public reportmanagementservice: ReportManagementService, public messageDialog: MessageDialogService, private dialog: MatDialog,
-    private formBuilder: FormBuilder, public relativeTime: TimeRange, public route: ActivatedRoute
+    private formBuilder: FormBuilder, public relativeTime: TimeRange, public route: ActivatedRoute,
+    public dataShare : DataSharedService
   ) { }
 
   ngOnInit() {
     this.type = '';
     this.disableSave = true;
     this.getOrgs();
+    this.themes = {
+      dark : 'dark',
+      light : 'light'
+    };
+    this.route.queryParams.subscribe(params => {
+      this.userName = params.userName;
+    });
+    this.theme = this.themes.dark;
     //this.loadSchedule();
     this.relativeRange = this.relativeTime.relativeJson;
     this.otherRelativeRange = this.relativeTime.otherRelativeJson;
@@ -110,11 +124,16 @@ export class DashboardPdfDownloadComponent implements OnInit {
         this.disableSave = true;
       }
     })
+    this.grafanaService.getEmailConfigurationStatus()
+      .then((response) => {
+        this.enableEmail = response.data;
+      })
   }
   public async getOrgs() {
-    this.currentUserWithOrgs = await this.grafanaService.getCurrentUserWithOrgs();
-    if (this.currentUserWithOrgs.status === "success") {
-      this.orgArr = this.currentUserWithOrgs.data.orgArray.filter(org => org.role === 'Admin');
+    // this.currentUserWithOrgs = await this.grafanaService.getCurrentUserWithOrgs();
+    let currentUserWithOrgs = this.dataShare.getUserOrgArray();
+    if (currentUserWithOrgs  !== undefined) {
+      this.orgArr = currentUserWithOrgs.filter(org => org.role === 'Admin');
     }
   }
   async loadSchedule() {
@@ -158,6 +177,7 @@ export class DashboardPdfDownloadComponent implements OnInit {
   }
 
   public async onChangeVariables(event, data) {
+    console.log(data)
     let eve = event;
     this.isDatainProgress = true;
     if (data.multi) {
@@ -236,7 +256,9 @@ export class DashboardPdfDownloadComponent implements OnInit {
     console.log("Selected Dashboard UUID " + dashboardUUID);
     this.asyncResult = await this.grafanaService.getDashboardByUid(dashboardUUID, this.organisation);
     if (this.asyncResult.status === "success") {
-      this.mailIconDisable = false;
+      if(this.enableEmail) {
+        this.mailIconDisable = false;
+      }
       console.log(typeof this.asyncResult.data)
       if ('message' in this.asyncResult.data) {
         console.log("has property message");
@@ -246,6 +268,7 @@ export class DashboardPdfDownloadComponent implements OnInit {
         this.showTimePicker = this.asyncResult.data.dashboard.timepicker.hidden;
         this.templateVariableArr = [];
         this.templateVariableArr = this.asyncResult.data.dashboard.templating.list;
+        console.log(this.templateVariableArr)
         this.templateVariableArr.forEach((ele, i) => {
           if (!ele.multi) {
             this.templateVariableArr[i]['selectedValue'] = '';
@@ -299,6 +322,7 @@ export class DashboardPdfDownloadComponent implements OnInit {
         asyncOptions.results[0].data.forEach(element => {
           optionData.push(element.row[0]);
         });
+        console.log(this.templateVariableArr)
         this.templateVariableArr[query.index].options = optionData;
         this.globalMap.set('$' + this.templateVariableArr[query.index].name, optionData);
         this.totalMap.set('$' + this.templateVariableArr[query.index].name, optionData)
@@ -339,6 +363,9 @@ export class DashboardPdfDownloadComponent implements OnInit {
     });
   }
   addEmailConfig() {
+    if(!this.enableEmail) {
+      return;
+    }
     var self = this;
     const dialogRef = self.dialog.open(EmailConfigurationDialog, {
       panelClass: "showjson-dialog-container",
@@ -346,7 +373,7 @@ export class DashboardPdfDownloadComponent implements OnInit {
       disableClose: true,
       data: {
         screen: 'dashboard',
-        subject: this.asyncResult.data.meta.slug
+        subject: this.title
       }
     });
     dialogRef.afterClosed().subscribe(result => {
@@ -388,13 +415,13 @@ export class DashboardPdfDownloadComponent implements OnInit {
       dashboard.panels.forEach(x => {
         if (x.type !== 'row' && x.type !== 'text') {
           this.urlArray.push(InsightsInitService.grafanaHost + '/d/' + dashboard.uid + '/' + this.asyncResult.data.meta.slug + '?' +
-            'viewPanel=' + x.id + '&' + variables);
+            'viewPanel=' + x.id + '&' + variables + '&theme=' + this.theme);
         } else if (x.type === 'row' && x.collapsed) {
           if (Array.isArray(x.panels)) {
             if (x.type !== 'text')
               x.panels.forEach(x => {
                 this.urlArray.push(InsightsInitService.grafanaHost + '/d/' + dashboard.uid + '/' + this.asyncResult.data.meta.slug + '?' +
-                  'viewPanel=' + x.id + '&' + variables);
+                  'viewPanel=' + x.id + '&' + variables + '&theme=' + this.theme);
               });
           }
         }
@@ -424,25 +451,22 @@ export class DashboardPdfDownloadComponent implements OnInit {
       });
       if (containsNull === true) {
         valid = false;
-        this.messageDialog.showApplicationsMessage("Please fill mandatory fields", "ERROR");
+        this.messageDialog.showApplicationsMessage("Please select filter details.", "ERROR");
         return;
-      } else {
-        valid = true;
-      }
+      } 
     }
-    if (this.organisation !== undefined && this.pdfType !== undefined && this.dashboard !== undefined &&
-      this.frequency !== undefined) {
-      valid = true;
-    } else {
+    if (this.organisation == undefined || this.pdfType == undefined || this.dashboard == undefined ||
+      this.frequency == undefined || this.title == undefined || this.organisation === "" || this.pdfType === "" || this.dashboard === "" ||
+      this.frequency === "" || this.title === "" ) {
       valid = false;
-      this.messageDialog.showApplicationsMessage("Please fill mandatory fields", "ERROR");
+      this.messageDialog.showApplicationsMessage("Please fill mandatory fields.", "ERROR");
+      return;
     }
     if (!this.asyncResult.data.dashboard.timepicker.hidden) {
-      if ((this.range.controls['start'].value !== null && this.range.controls['end'].value !== null) || this.timeValue !== "") {
-        valid = true;
-      } else {
+      if (!((this.range.controls['start'].value !== null && this.range.controls['end'].value !== null) || this.timeValue !== "")) {
         valid = false;
-        this.messageDialog.showApplicationsMessage("Please fill mandatory fields", "ERROR");
+        this.messageDialog.showApplicationsMessage("Please fill Data Time Range.", "ERROR");
+        return;
       }
     }
     return valid;
@@ -475,8 +499,11 @@ export class DashboardPdfDownloadComponent implements OnInit {
     }
     var self = this;
     var decode = InsightsInitService.grafanaHost + '/dashboard/script/iSight_ui3.js?url=' + InsightsInitService.grafanaHost + '/dashboard/db/' + this.asyncResult.data.meta.slug + '?' + this.urlString;
-    this.dashUrl = InsightsInitService.grafanaHost + '/dashboard/script/iSight_ui3.js?url=' + encodeURIComponent(InsightsInitService.grafanaHost + '/dashboard/db/' + this.asyncResult.data.meta.slug+'?orgId='+ this.organisation+'&'+this.urlString);
-    this.saveUrl = InsightsInitService.grafanaHost + '/dashboard/db/' + this.asyncResult.data.meta.slug +'?orgId='+ this.organisation+'&'+ this.urlString;
+    var dashboardUri = this.asyncResult.data.meta.url;
+    dashboardUri = dashboardUri.substring(dashboardUri.indexOf("/d"));
+    this.dashUrl = InsightsInitService.grafanaHost + '/dashboard/script/iSight_ui3.js?url=' + encodeURIComponent(InsightsInitService.grafanaHost +  dashboardUri+'?orgId='+ this.organisation+'&'+this.urlString + '&theme=' + this.theme);
+    this.saveUrl = InsightsInitService.grafanaHost + '/dashboard/db/' + this.asyncResult.data.meta.slug +'?orgId='+ this.organisation+'&'+ this.urlString + '&theme=' + this.theme;
+
     this.getUrlArray();
     const dialogRef = self.dialog.open(DashboardPreviewConfigDialog, {
       panelClass: "traceablity-show-details-dialog-container",
@@ -487,16 +514,18 @@ export class DashboardPdfDownloadComponent implements OnInit {
         route: this.dashUrl,
       }
     });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if(result == "confirm") {
+        this.save();
+      }
+    });
   }
   onTimeChange(event) {
     this.timeValue = event.value;
   }
   save() {
-    if (this.emailDetails === undefined || this.emailDetails.senderEmailAddress === '' || this.emailDetails.mailSubject === '' ||
-      this.emailDetails.mailBodyTemplate === '') {
-      this.messageDialog.showApplicationsMessage("Please fill mailing details", "ERROR");
-      return;
-    }
+    console.log(this.title)
     this.isDatainProgress = true;
     this.getUrlArray();
     let variables = '';
@@ -525,24 +554,22 @@ export class DashboardPdfDownloadComponent implements OnInit {
       variables = variables + 'from=' + absStartDt + ',to=' + absEndDt;
     }
     saveObj['loadTime'] = this.loadTime;
-    saveObj['title'] = this.emailDetails.mailSubject;
+    saveObj['title'] = this.title;
     saveObj['source'] = 'PLATFORM';
     saveObj['pdfType'] = [this.pdfType];
     saveObj['variables'] = variables;
     saveObj['dashUrl'] = this.saveUrl;
     saveObj['panelUrls'] = this.urlArray
     saveObj['metadata'] = metaObj;
-    saveObj['email'] = this.emailDetails.receiverEmailAddress;
-    saveObj['senderEmailAddress'] = this.emailDetails.senderEmailAddress;
-    saveObj['mailSubject'] = this.emailDetails.mailSubject;
-    saveObj['mailBodyTemplate'] = this.emailDetails.mailBodyTemplate;
-    saveObj['receiverCCEmailAddress'] = this.emailDetails.receiverCCEmailAddress;
-    saveObj['receiverBCCEmailAddress'] = this.emailDetails.receiverBCCEmailAddress;
     saveObj['range'] = this.timeRange;
-    saveObj['emailBody'] = this.mailBody;
     saveObj['scheduleType'] = this.frequency;
     saveObj['organisation'] = this.organisation;
     saveObj['dashboard'] = this.dashboard;
+    saveObj['userName'] = this.userName;
+    saveObj['theme'] = this.theme;
+    if(this.emailDetails != null) {
+      saveObj['emailDetails'] = this.emailDetails;
+    }
     if (this.timeRange === 'relative' || this.timeRange === 'other')
       saveObj['rangeText'] = this.timeValue.text;
     let requestObj = JSON.stringify(saveObj);
@@ -559,6 +586,15 @@ export class DashboardPdfDownloadComponent implements OnInit {
               self.messageDialog.showApplicationsMessage("Saved Successfully", "SUCCESS");
               self.router.navigateByUrl('InSights/Home/dash-pdf-download', { skipLocationChange: true });
             }
+            else if(response.status === 'failure') {
+              self.messageDialog.showApplicationsMessage(response.message, "ERROR");
+            } else {
+              self.messageDialog.showApplicationsMessage("Unable to Save Details", "ERROR");
+            }
+          })
+          .catch(function(error) {
+            console.log(error);
+            self.messageDialog.showApplicationsMessage("Unable to Save Details", "ERROR");
           })
       }
     })

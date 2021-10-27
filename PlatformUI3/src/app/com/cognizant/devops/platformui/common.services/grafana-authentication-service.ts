@@ -101,4 +101,17 @@ export class GrafanaAuthenticationService implements IAuthenticationService {
         return this.restCallHandlerService.postWithData("GET_EXECUTIONID", workflowId, "", { 'Content-Type': 'application/json' }).toPromise();
     }
 
+    setRestartStatus(idStatusMapping: string){
+        console.log(idStatusMapping);
+        return this.restCallHandlerService.postWithData("SET_DASHBOARD_STATUS", idStatusMapping, { 'Content-Type': 'application/json' }).toPromise();
+    }
+
+    getEmailConfigurationStatus() : Promise<any>{
+        return this.restCallHandlerService.get("GET_EMAIL_CONFIGURATION_STATUS");
+    }
+
+    setActiveState(jsonObject : string) : Promise<any> {
+        return this.restCallHandlerService.postWithData("SET_DASHBOARD_ACTIVE_STATE", jsonObject, "", { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
+    }
+
 }

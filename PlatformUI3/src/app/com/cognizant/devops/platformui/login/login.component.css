@@ -315,3 +315,7 @@ md-icon {
     bottom: 0;
     top: 0;
 }
+
+.sigBtnCssDisable{
+	background-color: #9e9a9a !important;
+}

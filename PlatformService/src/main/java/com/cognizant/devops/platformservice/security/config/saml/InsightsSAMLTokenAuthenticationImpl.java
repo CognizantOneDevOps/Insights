@@ -17,18 +17,13 @@ package com.cognizant.devops.platformservice.security.config.saml;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.security.access.AuthorizationServiceException;
-import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.providers.ExpiringUsernameAuthenticationToken;
 
-import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
-import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationException;
 import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationToken;
-import com.cognizant.devops.platformservice.security.config.TokenProviderUtility;
 
 public class InsightsSAMLTokenAuthenticationImpl implements AuthenticationProvider {
 	

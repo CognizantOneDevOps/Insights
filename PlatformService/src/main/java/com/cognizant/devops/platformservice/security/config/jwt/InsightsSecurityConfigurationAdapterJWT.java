@@ -48,8 +48,8 @@ import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationFilter;
 import com.cognizant.devops.platformservice.security.config.InsightsCrossScriptingFilter;
 import com.cognizant.devops.platformservice.security.config.InsightsCustomCsrfFilter;
+import com.cognizant.devops.platformservice.security.config.InsightsExternalAPIAuthenticationFilter;
 import com.cognizant.devops.platformservice.security.config.InsightsResponseHeaderWriterFilter;
-import com.cognizant.devops.platformservice.security.config.jwt.SpringJWTAccessDeniedHandler;
 
 @ComponentScan(basePackages = { "com.cognizant.devops" })
 @Configuration
@@ -91,14 +91,12 @@ public class InsightsSecurityConfigurationAdapterJWT extends WebSecurityConfigur
 			http.cors().and().authorizeRequests().antMatchers("/datasources/**").permitAll().antMatchers("/admin/**")
 					.access("hasAuthority('Admin')").antMatchers("/traceability/**").access("hasAuthority('Admin')")
 					.antMatchers("/configure/loadConfigFromResources").permitAll().antMatchers("/**").authenticated() // .permitAll()
-					.and().exceptionHandling().accessDeniedHandler(springAccessDeniedHandler).and().httpBasic()
-					.disable()
+					.and().exceptionHandling().accessDeniedHandler(springAccessDeniedHandler);
 
-					.csrf().ignoringAntMatchers(AuthenticationUtils.CSRF_IGNORE.toArray(new String[0]))
+			http.csrf().ignoringAntMatchers(AuthenticationUtils.CSRF_IGNORE.toArray(new String[0]))
 					.csrfTokenRepository(authenticationUtils.csrfTokenRepository()).and()
-					.addFilterBefore(insightsFilter(), BasicAuthenticationFilter.class)
-
-					.headers().frameOptions().disable().and().sessionManagement().maximumSessions(1).and() //sameOrigin()
+					.addFilterBefore(insightsFilter(), BasicAuthenticationFilter.class);
+			http.headers().frameOptions().disable().and().sessionManagement().maximumSessions(1).and() // sameOrigin()
 					.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
 		}
 	}
@@ -108,9 +106,7 @@ public class InsightsSecurityConfigurationAdapterJWT extends WebSecurityConfigur
 	 */
 	@Override
 	public void configure(WebSecurity web) throws Exception {
-		web.ignoring().antMatchers("/settings/getLogoImage");
 		web.ignoring().antMatchers("/datasource/**");
-		web.ignoring().antMatchers("/externalApi/**");
 	}
 
 	/**
@@ -127,11 +123,29 @@ public class InsightsSecurityConfigurationAdapterJWT extends WebSecurityConfigur
 		List<Filter> filters = new ArrayList<>();
 		filters.add(0, new InsightsCustomCsrfFilter());
 		filters.add(1, new InsightsCrossScriptingFilter());
-		filters.add(2, insightsJWTProcessingFilter());
+		filters.add(2, insightsInitialJWTProcessingFilter());
 		filters.add(3, new InsightsResponseHeaderWriterFilter());
 
+		AuthenticationUtils.setSecurityFilterchain(
+				new DefaultSecurityFilterChain(new AntPathRequestMatcher("/user/insightsso/**"), filters));// chains.add
+		
+		List<Filter> filtersexternal = new ArrayList<>();
+		filtersexternal.add(0, new InsightsCustomCsrfFilter());
+		filtersexternal.add(1, new InsightsCrossScriptingFilter());
+		filtersexternal.add(2, insightsExternalProcessingFilter());
+		filtersexternal.add(3, new InsightsResponseHeaderWriterFilter());
+		
+		AuthenticationUtils.setSecurityFilterchain(new DefaultSecurityFilterChain(
+				new AntPathRequestMatcher("/externalApi/**"), insightsExternalProcessingFilter()));
+
+		List<Filter> filtersohter = new ArrayList<>();
+		filtersohter.add(0, new InsightsCustomCsrfFilter());
+		filtersohter.add(1, new InsightsCrossScriptingFilter());
+		filtersohter.add(2, insightsJWTProcessingFilter());
+		filtersohter.add(3, new InsightsResponseHeaderWriterFilter());
+
 		AuthenticationUtils
-				.setSecurityFilterchain(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/**"), filters));//chains.add
+				.setSecurityFilterchain(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/**"), filtersohter));// chains.add
 
 		return new FilterChainProxy(AuthenticationUtils.getSecurityFilterchains());
 	}
@@ -142,8 +156,16 @@ public class InsightsSecurityConfigurationAdapterJWT extends WebSecurityConfigur
 	 * @return
 	 * @throws Exception
 	 */
-	public InsightsAuthenticationFilter insightsJWTProcessingFilter() throws Exception {
-		InsightsAuthenticationFilter filter = new InsightsAuthenticationFilter("/**", authenticationManager());
+	public InsightsAuthenticationFilter insightsJWTProcessingFilter() {
+		InsightsAuthenticationFilter filter = new InsightsAuthenticationFilter("/**");
+		return filter;
+	}
+	
+	/** This is use to validate Initial API Request 
+	 * @return
+	 */
+	public InsightsAuthenticationFilter insightsInitialJWTProcessingFilter() throws Exception {
+		InsightsAuthenticationFilter filter = new InsightsAuthenticationFilter("/user/insightsso/**");
 		return filter;
 	}
 
@@ -165,5 +187,14 @@ public class InsightsSecurityConfigurationAdapterJWT extends WebSecurityConfigur
 	public JWTAuthenticationProvider jwtAuthenticationProvider() {
 		JWTAuthenticationProvider provider = new JWTAuthenticationProvider();
 		return provider;
+	}
+	
+	/** This bean use to validate External Request 
+	 * @return
+	 */
+	@Bean
+	@Conditional(InsightsJWTBeanInitializationCondition.class)
+	public InsightsExternalAPIAuthenticationFilter insightsExternalProcessingFilter() {
+		return new InsightsExternalAPIAuthenticationFilter();
 	}
 }

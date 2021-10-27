@@ -15,9 +15,11 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.security.config;
 
+import java.io.IOException;
 import java.net.UnknownHostException;
 
 import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -38,20 +40,19 @@ public class InsightsCrossScriptingFilter extends OncePerRequestFilter {
 	/**
 	 * This filter is used to validate Header,Cookies and Parameter for each and
 	 * every request
+	 * @throws ServletException 
+	 * @throws IOException 
 	 */
 	@Override
 	protected void doFilterInternal(HttpServletRequest httpRequest, HttpServletResponse httpResponce,
-			FilterChain filterChain) {
+			FilterChain filterChain) throws IOException, ServletException {
 		log.info("Inside Filter == InsightsCrossScriptingFilter ............... {} method {}  ",
 				httpRequest.getRequestURL(),
 				httpRequest.getMethod());
-
+		RequestWrapper requestMapper = null;
 		try {
 			validateHeaders(httpRequest, httpResponce);
-			RequestWrapper requestMapper = new RequestWrapper(httpRequest, httpResponce);
-			filterChain.doFilter(requestMapper, httpResponce);
-			log.debug("Completed .. in InsightsCrossScriptingFilter");
-
+			requestMapper = new RequestWrapper(httpRequest, httpResponce);
 		} catch (Exception e) {
 			String msg;
 			if (e.getMessage().contains("InsightsCustomException")) {
@@ -78,14 +79,15 @@ public class InsightsCrossScriptingFilter extends OncePerRequestFilter {
 				AuthenticationUtils.setResponseMessage(httpResponce, AuthenticationUtils.INFORMATION_MISMATCH,
 						e.getMessage());
 			} else {
-				log.error("Invalid request in CrossScriptingFilter {}", e.getMessage());
+				log.error(" Exception while processing request  {}", e.getMessage());
 				msg = PlatformServiceUtil.buildFailureResponse(
-								"Invalid request,Someting is wrong in cookies,Header or Parameter" + e.getMessage())
+								"Exception while processing request .... " + e.getMessage())
 						.toString();
-				AuthenticationUtils.setResponseMessage(httpResponce, HttpServletResponse.SC_BAD_REQUEST, msg);
+				AuthenticationUtils.setResponseMessage(httpResponce, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
 			}
 		}
 		log.info("Out doFilter CrossScriptingFilter ...............");
+		filterChain.doFilter(requestMapper, httpResponce);
 	}
 
 	/**

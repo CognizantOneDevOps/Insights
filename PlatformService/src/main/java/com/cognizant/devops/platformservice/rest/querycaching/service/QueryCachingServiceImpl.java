@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
+import org.ehcache.config.CacheConfiguration;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Service;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformservice.rest.querycaching.service.CustomExpiryPolicy;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -47,21 +49,24 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 	JsonParser parser = new JsonParser();
 	public static final Long GRAFANA_DATASOURCE_CACHE_HEAP_SIZE_BYTES = 1000000l;
 	@SuppressWarnings("rawtypes")
-	Cache<String, EhcacheValue> datasourceCache;
+	Cache<String, EhcacheValue<JsonObject>> datasourceCache;
 	
 	{
-		CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
-				.withCache("grafana",
-						CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
-								ResourcePoolsBuilder.newResourcePoolsBuilder().heap(30, EntryUnit.ENTRIES).offheap(10,
-										MemoryUnit.MB)))
-				.build();
+		CustomExpiryPolicy<String, EhcacheValue<JsonObject>> expiryPolicy = new CustomExpiryPolicy<String, EhcacheValue<JsonObject>>();
+		
+		 Class<EhcacheValue<JsonObject>> myEhcacheValue = (Class<EhcacheValue<JsonObject>>)(Class<?>)EhcacheValue.class;
+
+		CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder().build();
 		cacheManager.init();
-		datasourceCache = cacheManager.createCache("datasource",
-				CacheConfigurationBuilder
-						.newCacheConfigurationBuilder(String.class, EhcacheValue.class,
-								ResourcePoolsBuilder.heap(GRAFANA_DATASOURCE_CACHE_HEAP_SIZE_BYTES)));
-	
+
+		CacheConfiguration<String, EhcacheValue<JsonObject>> cacheConfiguration = CacheConfigurationBuilder
+				.newCacheConfigurationBuilder(String.class, myEhcacheValue,
+						ResourcePoolsBuilder.heap(GRAFANA_DATASOURCE_CACHE_HEAP_SIZE_BYTES))
+				.withExpiry(expiryPolicy)
+				.build();
+
+		datasourceCache = cacheManager.createCache("datasource", cacheConfiguration);
+
 	}
 	
 	/**
@@ -163,14 +168,14 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 				JsonObject ehResponse = null;
 
 				if (datasourceCache.get(cacheKey) != null) {
-					@SuppressWarnings("unchecked")
+					log.debug("Record found in cache");
 					EhcacheValue<JsonObject> ehcacheValue = datasourceCache.get(cacheKey);
 					ehResponse = (ehcacheValue != null ? ehcacheValue.getObject()
 							: getNeo4jDatasourceResults(requestPayload));
 					return ehResponse;
 				} else {
 					Long durationSeconds = endTime - startTime;
-					log.debug("Fetching Results From Neo4j and storing in ehcache");
+					log.debug("Fetching Results From Neo4j and storing in cache");
 					return fetchRecordFromGraphDBAndsaveInEH(requestPayload, cacheKey, durationSeconds,cachingValue,cachingType);
 				}
 

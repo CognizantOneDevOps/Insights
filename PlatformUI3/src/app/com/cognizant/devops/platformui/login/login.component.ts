@@ -57,6 +57,7 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
   loginForm: FormGroup;
   imageAlt: String = "";
   displayLoginPage: boolean = true;
+  loginRequestSent: boolean = false;
   year: any;
   eventData: string;
   version: any;
@@ -68,6 +69,7 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
     private route: ActivatedRoute, public messageDialog: MessageDialogService,
     private grafanaService: GrafanaAuthenticationService, private activatedRoute: ActivatedRoute) {
     var self = this;
+    this.loginRequestSent = false
     console.log(" in login constructer")
   }
 
@@ -177,6 +179,7 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
 
   public userAuthentication(): void {
     this.deleteAllPreviousCookies();
+    this.loginRequestSent = true;
     this.username = this.loginForm.value.username;
     this.password = this.loginForm.value.password;
     this.kerberosToken = this.loginForm.value.kerberosToken;
@@ -219,9 +222,11 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
             self.isLoginError = true;
             self.logMsg = data.message;
             self.isDisabled = false;
+            self.loginRequestSent = false
           }
         })
         .catch(function (data) {
+          
           if (data.status == 500) {
             self.logMsg = "Internal server error"
           } else if (data.status == 404) {
@@ -231,6 +236,7 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
           } else {
             self.logMsg = "Internal server error";
           }
+          self.loginRequestSent = false
           self.showThrobber = false;
           self.isLoginError = true;
           self.isDisabled = false;

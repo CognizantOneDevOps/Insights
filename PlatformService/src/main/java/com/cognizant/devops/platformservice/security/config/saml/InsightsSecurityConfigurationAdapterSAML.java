@@ -15,7 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.security.config.saml;
 
-import java.io.IOException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,6 +31,7 @@ import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.velocity.app.VelocityEngine;
+import org.opensaml.saml2.metadata.provider.FilesystemMetadataProvider;
 import org.opensaml.saml2.metadata.provider.HTTPMetadataProvider;
 import org.opensaml.saml2.metadata.provider.MetadataProvider;
 import org.opensaml.saml2.metadata.provider.MetadataProviderException;
@@ -105,6 +106,7 @@ import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationFilter;
 import com.cognizant.devops.platformservice.security.config.InsightsCrossScriptingFilter;
 import com.cognizant.devops.platformservice.security.config.InsightsCustomCsrfFilter;
+import com.cognizant.devops.platformservice.security.config.InsightsExternalAPIAuthenticationFilter;
 import com.cognizant.devops.platformservice.security.config.InsightsResponseHeaderWriterFilter;
 
 @ComponentScan(basePackages = { "com.cognizant.devops" })
@@ -166,9 +168,7 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 	@Override
 	public void configure(WebSecurity web) throws Exception {
 		if (AUTHTYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
-			web.ignoring().antMatchers("/settings/getLogoImage");
 			web.ignoring().antMatchers("/datasource/**");
-			web.ignoring().antMatchers("/externalApi/**");
 		}
 	}
 
@@ -201,6 +201,9 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 
 		AuthenticationUtils.setSecurityFilterchain(new DefaultSecurityFilterChain(
 				new AntPathRequestMatcher("/user/insightsso/**"), insightsSSOProcessingFilter()));
+		
+		AuthenticationUtils.setSecurityFilterchain(
+				new DefaultSecurityFilterChain(new AntPathRequestMatcher("/externalApi/**"), insightsExternalProcessingFilter()));
 
 		List<Filter> filters = new ArrayList<>();
 		filters.add(0, new InsightsCustomCsrfFilter());
@@ -603,14 +606,25 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 	public ExtendedMetadataDelegate idpMetadata() throws MetadataProviderException {
 
 		Timer backgroundTaskTimer = new Timer(true);
-
-		HTTPMetadataProvider httpMetadataProvider = new HTTPMetadataProvider(backgroundTaskTimer, new HttpClient(),
-				singleSignOnConfig.getMetadataUrl());
-
-		httpMetadataProvider.setParserPool(parserPool());
-
-		ExtendedMetadataDelegate extendedMetadataDelegate = new ExtendedMetadataDelegate(httpMetadataProvider,
-				extendedMetadata());
+		ExtendedMetadataDelegate extendedMetadataDelegate = null;
+		
+		if(singleSignOnConfig.getMetadataUrl() != null && !singleSignOnConfig.getMetadataUrl().trim().isEmpty() ) {
+			LOG.debug("Inside  Metadata : URL metadata provider =====================================  ");
+			
+			HTTPMetadataProvider httpMetadataProvider = new HTTPMetadataProvider(backgroundTaskTimer, new HttpClient(),
+					singleSignOnConfig.getMetadataUrl());
+			httpMetadataProvider.setParserPool(parserPool());
+			extendedMetadataDelegate = new ExtendedMetadataDelegate(httpMetadataProvider,
+					extendedMetadata());
+		}else {
+			LOG.debug("Inside  Metadata : File metadata provider =================================== ");
+			
+			File metadataFile = new File(singleSignOnConfig.getMetdataFilePath());
+			FilesystemMetadataProvider fileSystemProvider = new FilesystemMetadataProvider(backgroundTaskTimer,metadataFile);
+			fileSystemProvider.setParserPool(parserPool());
+			extendedMetadataDelegate = new ExtendedMetadataDelegate(fileSystemProvider,
+					extendedMetadata());
+		}
 		extendedMetadataDelegate.setMetadataTrustCheck(true);
 		extendedMetadataDelegate.setMetadataRequireSignature(true);
 		return extendedMetadataDelegate;
@@ -632,8 +646,8 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 	}
 
 	/**
-	 * used to provide Saml Authentication Provider which is responsible to
-	 * validatate authentication at first time
+	 * used to provide SAML Authentication Provider which is responsible to
+	 * Validated authentication at first time
 	 * This used for first API call to SAML
 	 * 
 	 * @return
@@ -657,5 +671,14 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 	@Conditional(InsightsSAMLBeanInitializationCondition.class)
 	public SAMLUserDetailsService samlUserDetailsService() {
 		return new SamlUserDetailsServiceImpl();
+	}
+	
+	/** This bean use to validate External Request 
+	 * @return
+	 */
+	@Bean
+	@Conditional(InsightsSAMLBeanInitializationCondition.class)
+	public InsightsExternalAPIAuthenticationFilter insightsExternalProcessingFilter() {
+		return new InsightsExternalAPIAuthenticationFilter();
 	}
 }

@@ -18,16 +18,15 @@ package com.cognizant.devops.platformservice.rest.util;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -122,7 +121,6 @@ public class PlatformServiceUtil {
 					log.debug("Cookie Name Not found in master cookies list name as {}", cookie.getName());
 				}
 			}
-			//log.debug(" Request cookies are  {}  ", cookiesValue);
 			cookiesArray = new Cookie[cookiesArrayLength];
 			cookiesArray = cookiesList.toArray(cookiesArray);
 		} else {
@@ -265,19 +263,25 @@ public class PlatformServiceUtil {
 			if (AuthenticationUtils.IS_NATIVE_AUTHENTICATION) {
 				try {
 					requestCookies = getGrafanaCookies(httpRequest);
-				} catch (UnsupportedEncodingException e) {
+				} catch (Exception e) {
 					log.error("Unable to get grafana session. Error is ", e);
 				}
 			}
 		}
-		String grafanaCookies = requestCookies.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
-				.collect(Collectors.joining(";"));
-		log.debug(" grafanaCookies ==== {}", grafanaCookies);
+		String grafanaCookies="";
+		for (Entry<String, String> entry : requestCookies.entrySet()) {
+			if(!AuthenticationUtils.IS_NATIVE_AUTHENTICATION
+					&& entry.getKey().equalsIgnoreCase(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY_NAME)) {
+				continue;
+			} else {
+			 grafanaCookies = grafanaCookies.concat(entry.getKey()).concat("=").concat(entry.getValue()).concat(";") ;
+			}
+		}
 		return grafanaCookies;
 	}
 
 	public static Map<String, String> getGrafanaCookies(HttpServletRequest httpRequest)
-			throws UnsupportedEncodingException, InsightsCustomException {
+			throws InsightsCustomException {
 		GrafanaHandler grafanaHandler = new GrafanaHandler();
 		Map<String, String> requestCookies = new HashMap<>(0);
 		String authHeader = ValidationUtils

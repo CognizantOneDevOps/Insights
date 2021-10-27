@@ -26,6 +26,8 @@ import { ReportManagementService } from '../../reportmanagement/reportmanagement
 import { saveAs as importedSaveAs } from "file-saver";
 import { WorkflowHistoryDetailsDialog } from '../../reportmanagement/workflow-history-details/workflow-history-details-dialog';
 import { DataSharedService } from '@insights/common/data-shared-service';
+import { MatRadioChange } from '@angular/material/radio';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-dash-list',
@@ -56,7 +58,12 @@ export class DashboardListComponent implements OnInit {
   disablebutton=[];
   timeZone: string = '';
   count: number;
-
+  selectedIndex : number;
+  currentPageValue : number;
+  disableDownload : boolean = true;
+  userName : string;
+  changeState: boolean;
+  isActive : boolean;
 
   constructor(public messageDialog: MessageDialogService,private grafanaService: GrafanaAuthenticationService,
     public dataShare: DataSharedService,public router: Router, public dialog: MatDialog,public reportmanagementService: ReportManagementService
@@ -69,7 +76,10 @@ export class DashboardListComponent implements OnInit {
       .split(/\s/)
       .reduce((response, word) => (response += word.slice(0, 1)), '');
     this.getAllConfig();
-    this.displayedColumns = ['radio', 'Title','Organisation', 'PdfType', 'ScheduleType', 'Status', 'More'];
+    this.displayedColumns = ['radio', 'Title','Organisation', 'PdfType', 'ScheduleType', 'Status', 'Active', 'More'];
+    this.currentPageValue = this.paginator.pageIndex * this.MAX_ROWS_PER_TABLE;    
+    this.userName = this.dataShare.getUserName();
+    console.log(this.dashboardDatasource);
   }
   public async getOrgs() {
   }
@@ -80,21 +90,28 @@ export class DashboardListComponent implements OnInit {
 
   add() {
     this.grafanaService.iconClkSubject.next('CLICK');
-    this.router.navigate(['InSights/Home/dash-pdf-config'],{skipLocationChange:true});
+    let navigationExtras : NavigationExtras = {
+      skipLocationChange : true,
+      queryParams : {
+        "userName" : this.userName
+      }
+    }
+    this.router.navigate(['InSights/Home/dash-pdf-config'], navigationExtras);
   }
   edit() {
     this.grafanaService.iconClkSubject.next('CLICK');
     let dashboardJson=JSON.parse(this.selectedDashboard.dashboardJson)
+    let emailDetails = dashboardJson.emailDetails
+    console.log(emailDetails)
+    console.log(this.selectedDashboard)
     let navigationExtras: NavigationExtras = {
       skipLocationChange: true,
       queryParams: {
         "id":this.selectedDashboard.id,
-        "emailBody":dashboardJson.emailBody,
-        "email":this.selectedDashboard.email,
         "pdfType":this.selectedDashboard.pdfType,
         "scheduleType":this.selectedDashboard.scheduleType,
         "status":this.selectedDashboard.status,
-        "title":this.selectedDashboard.title,
+        "title": dashboardJson.title,
         "variables":this.selectedDashboard.variables,
         "orgName":this.selectedDashboard.orgName,
         "type":'edit',
@@ -102,16 +119,14 @@ export class DashboardListComponent implements OnInit {
         "organisation":dashboardJson.organisation,
         "range":dashboardJson.range,
         "from":dashboardJson.from,
-        "to":dashboardJson.to,       
-        "senderEmailAddress": dashboardJson.senderEmailAddress, 
-        "receiverEmailAddress": dashboardJson.email, 
-        "mailSubject": dashboardJson.mailSubject,
-         "mailBodyTemplate": dashboardJson.mailBodyTemplate, 
-         "receiverCCEmailAddress": dashboardJson.receiverCCEmailAddress, 
-         "receiverBCCEmailAddress": dashboardJson.receiverBCCEmailAddress,
-         "rangeText":dashboardJson.rangeText,
-         "workflowId": this.selectedDashboard.workflowId ,
-         "loadTime":  dashboardJson.loadTime   
+        "to":dashboardJson.to,   
+        "email":this.selectedDashboard.email,    
+        "emailDetails": JSON.stringify(emailDetails),
+        "rangeText":dashboardJson.rangeText,
+        "workflowId": this.selectedDashboard.workflowId ,
+        "loadTime":  dashboardJson.loadTime,
+        "userName" : this.userName,
+        "theme" : dashboardJson.theme
       }
     };
     this.router.navigate(['InSights/Home/edit-dashboard'], navigationExtras);
@@ -120,21 +135,28 @@ export class DashboardListComponent implements OnInit {
     this.getAllConfig();
     this.refreshRadio = false;
     this.onRadioBtnSelect = false;
-
+    this.disableDownload = true;
   }
-  enableButtons(i) {
+  enableButtons(event: MatRadioChange, i) {
+    this.selectedIndex = i + this.currentPageValue ;
     this.onRadioBtnSelect = true;
     this.disablebutton[i] = false;
+    if(event.value.status == 'NOT_STARTED') {
+      this.disableDownload = true;
+    } else {
+      this.disableDownload = false;
+    }
   }
     async getAllConfig() {
     this.isDatainProgress=true;
+    this.selectedIndex = -1;
     var self = this;
     self.refreshRadio = false;
-    let currentUserWithOrgs = await this.grafanaService.getCurrentUserWithOrgs();
-    if (currentUserWithOrgs.status === "success") {
-      this.orgArr = currentUserWithOrgs.data.orgArray;
-    }
-
+    // let currentUserWithOrgs = await this.grafanaService.getCurrentUserWithOrgs();
+    // if (currentUserWithOrgs.status === "success") {
+    //   this.orgArr = currentUserWithOrgs.data.orgArray;
+    // }
+    console.log(this.orgArr);
     this.dashConfigList = await this.grafanaService.fetchDashboardConfigs();
     if (this.dashConfigList != null && this.dashConfigList.status == "success") {
     this.dashboardDatasource.data = this.dashConfigList.data.filter(x=>x.source==='PLATFORM');
@@ -144,12 +166,12 @@ export class DashboardListComponent implements OnInit {
     }
     this.isDatainProgress=false;
     this.count = 0;
-    this.dashConfigList.data.forEach(element => {
-      let dashJson=JSON.parse(element.dashboardJson);
-      let organisationObj = this.orgArr.filter(e => e.orgId === Number(dashJson.organisation));
-      this.dashboardDatasource.data[this.count].orgName = organisationObj[0].name;
-      this.count += 1;
-    }); 
+    // this.dashConfigList.data.forEach(element => {
+    //   let dashJson=JSON.parse(element.dashboardJson);
+    //   // let organisationObj = this.orgArr.filter(e => e.orgId === Number(dashJson.organisation));
+    //   // this.dashboardDatasource.data[this.count].orgName = organisationObj[0].name;
+    //   this.count += 1;
+    // }); 
       this.dashboardDatasource.paginator = this.paginator;
     }
   
@@ -235,7 +257,76 @@ export class DashboardListComponent implements OnInit {
       });
 
   }
+
+  changeCurrentPageValue() {
+    this.selectedIndex = -1;
+    this.currentPageValue = this.paginator.pageIndex  * this.MAX_ROWS_PER_TABLE;
+  }
+
+  restart() {
+    var statusRequestJson = {};
+    statusRequestJson['id'] = this.selectedDashboard.id;
+    statusRequestJson['status'] = "RESTART";
+    var message = 'Status has been updated to RESTART.';
+    console.log(statusRequestJson);
+    this.updateReportStatus(statusRequestJson, message);
+  }
+
+  private updateReportStatus(statusRequestJson: {}, message: string) {
+    var self = this;
+    this.grafanaService.setRestartStatus(JSON.stringify(statusRequestJson))
+      .then(function (data) {
+        if (data.status == 'success') {
+          self.messageDialog.showApplicationsMessage(message, 'SUCCESS');
+          self.list();
+        }
+        else {
+          self.messageDialog.showApplicationsMessage('Failed to update the Dashboard report state.Please check logs for more details String.', 'ERROR');
+        }
+      });
+  }
+
+  
+  updateStatus(event: MatSlideToggleChange, id, element) {
+    console.log(id, element);
+    var self = this;
+    var title = 'Update Active/Inactive State';
+    var state = element.isActive ? 'Active' : 'Inactive';
+    var dialogmessage =
+      'Are you sure you want to <b>' +
+      state +
+      '</b> Dashboard report <b>' +
+      self.selectedDashboard.title +
+      '</b> ?';
+    const dialogRef = self.messageDialog.showConfirmationMessage(
+      title,
+      dialogmessage,
+      this.selectedDashboard.title,
+      'ALERT',
+      '45%'
+    );
+    dialogRef.afterClosed().subscribe(result => {
+      if (result == 'yes') {
+        this.changeState = event.checked;
+        var setStatusRequestJson = {};
+        setStatusRequestJson['id'] = id;
+        setStatusRequestJson['isActive'] = event.checked;
+        this.grafanaService
+          .setActiveState(JSON.stringify(setStatusRequestJson))
+          .then(function (data) {
+            if (data.status == 'success') {
+              console.log('active status changed');
+            } else {
+              this.messageDialog.showApplicationsMessage(
+                'Failed to update active state.Please check logs for more details.',
+                'ERROR'
+              );
+            }
+          });
+      } else {
+        element.isActive = !event.checked;
+      }
+    });
+  }
 }
-
-
 

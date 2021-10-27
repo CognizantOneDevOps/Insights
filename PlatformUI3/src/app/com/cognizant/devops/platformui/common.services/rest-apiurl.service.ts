@@ -83,6 +83,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("CURRENT_USER_DETAIL", '/PlatformService/accessGrpMgmt/currentUserDetail');
         this.addEndPoint("SEARCH_DASHBOARD_FOLDERDETAIL", '/PlatformService/accessGrpMgmt/getDashboardsFoldersDetail');
         this.addEndPoint("GET_DASHBOARD_LIST_BY_ORG", '/PlatformService/accessGrpMgmt/getDashboardByOrg');
+
         //Business Mapping module under Admin section
         
         this.addEndPoint("SAVE_TOOL_MAPPING", '/PlatformService/admin/businessmapping/saveToolsMapping');
@@ -96,12 +97,16 @@ export class RestAPIurlService implements IRestAPIUrlService {
         //this.addEndPoint("SAVE_DATAPURGING_SETTING", '/PlatformService/admin/settings/saveSettingsConfiguration');
         this.addEndPoint("GET_DASHBOARD_BY_UID", '/PlatformService/accessGrpMgmt/getDashboardByUid');
         this.addEndPoint("GET_TEMPLATE_BY_QUERY", '/PlatformService/accessGrpMgmt/getTemplateQueryResults');
-        this.addEndPoint("SAVE_GRAFANA_DASHBOARD_CONFIG",'/PlatformService/dashboardReport/exportPDF/getDashboardAsPDF')
+        this.addEndPoint("SAVE_GRAFANA_DASHBOARD_CONFIG",'/PlatformService/dashboardReport/exportPDF/saveDashboardAsPDF')
         this.addEndPoint("FETCH_DASHBOARD_CONFIGS",'/PlatformService/dashboardReport/exportPDF/fetchGrafanaDashboardConfigs')
         this.addEndPoint("UPDATE_DASHBOARD_CONFIGS",'/PlatformService/dashboardReport/exportPDF/updateDashboardConfig')
         this.addEndPoint("DELETE_DASHBOARD_CONFIGS",'/PlatformService/dashboardReport/exportPDF/deleteDashboardConfig')
         this.addEndPoint("DOWNLOAD_DASHBOARD_REPORT_PDF",'/PlatformService/datasource/exportPDF/downloadReportPDF'),
-       this.addEndPoint("GET_EXECUTIONID",'/PlatformService/insights/workflow/getLatestExecutionId')
+        this.addEndPoint("SET_DASHBOARD_STATUS",'/PlatformService/dashboardReport/updateDasboardStatus'),
+        this.addEndPoint("GET_EXECUTIONID",'/PlatformService/insights/workflow/getLatestExecutionId')
+        this.addEndPoint("GET_EMAIL_CONFIGURATION_STATUS", '/PlatformService/dashboardReport/getEmailConfigurationStatus');
+        this.addEndPoint("SET_DASHBOARD_ACTIVE_STATE", '/PlatformService/dashboardReport/setDashboardActiveState');
+
         //Agent Configuration
         this.addEndPoint("AGENT_REGISTER", '/PlatformService/admin/agentConfiguration/registerAgent');
         this.addEndPoint("AGENT_UPDATE", '/PlatformService/admin/agentConfiguration/updateAgent');

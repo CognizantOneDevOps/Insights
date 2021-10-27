@@ -28,7 +28,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
-import com.google.gson.JsonObject;
 
 /**
  * This class is responsible to validate Request Header, Cookies and Paramanter
@@ -81,11 +80,14 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
 		
 		Enumeration<String> headerNames = request.getHeaderNames();
 		log.debug("In validateAllHeaders started ==== ");
+		StringBuilder headerInfo = new StringBuilder();
 		while (headerNames.hasMoreElements()) {
 			String headerName = headerNames.nextElement();
 			String headersValue = request.getHeader(headerName);
+			headerInfo.append(headerName.concat(" = ").concat(headersValue).concat(" , "));
 			ValidationUtils.cleanXSS(headerName,headersValue);
 		}
+		log.debug("In validatedAllHeaders  ==== {} ",headerInfo);
 		log.debug("In validatedAllHeaders  ====  Completed ");
 	}
 

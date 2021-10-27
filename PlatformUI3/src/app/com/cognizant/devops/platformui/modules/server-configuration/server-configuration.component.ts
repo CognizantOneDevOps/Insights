@@ -110,7 +110,6 @@ export class ServerConfigurationComponent implements OnInit {
           }
           serverConfig.setData(number, configDatakey, value, typeof (value), isRequiredField, inputType);
         }
-        console.log(serverConfig);
         this.ServerConfigItems.push(serverConfig);
       }
     }

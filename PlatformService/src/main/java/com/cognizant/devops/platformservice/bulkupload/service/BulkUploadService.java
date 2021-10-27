@@ -355,7 +355,6 @@ public class BulkUploadService implements IBulkUpload {
 			json.addProperty(PlatformServiceConstants.INSIGHTSTIME, timeStringval);
 			dateTimeFromEpoch = InsightsUtils.insightsTimeXFormatFromSeconds(timeStringval);
 			json.addProperty(PlatformServiceConstants.INSIGHTSTIMEX, dateTimeFromEpoch);
-			log.debug("No Time format required here.");
 		} else if (insightsTimeFormat.isEmpty()) {
 			throw new InsightsCustomException("Provide Insight Time Format for this file");
 		} else {

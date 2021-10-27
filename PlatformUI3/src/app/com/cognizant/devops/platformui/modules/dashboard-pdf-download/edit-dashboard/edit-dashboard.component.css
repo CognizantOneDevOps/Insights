@@ -214,6 +214,7 @@ tr.mat-footer-row, tr.mat-row-kpi {
     color: #544646
 }
 
+
 .subText {
     font-size: 14px;
     color: #050505
@@ -266,11 +267,14 @@ tr.mat-footer-row, tr.mat-row-kpi {
     margin-bottom: 2%;
 }
 
+
+
 .mainHeaderText {
     margin-left: 1%;
     font-size: 15px;
     color: white;
 }
+
 
 td.mat-cell:first-of-type {
     padding-left: 10px !important;

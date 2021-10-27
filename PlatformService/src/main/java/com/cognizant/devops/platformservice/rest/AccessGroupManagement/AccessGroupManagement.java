@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.rest.AccessGroupManagement;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -76,7 +75,7 @@ public class AccessGroupManagement {
 
 	@PostMapping(value = "/switchUserOrg", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject switchUserOrg(@RequestParam int orgId) throws InsightsCustomException {
-		log.debug("%n%nInside switchUserOrg method call, and the Org ID is: {}", orgId);
+		log.debug("Inside switchUserOrg method call and the request Org ID is: {}", orgId);
 		JsonObject json = new JsonObject();
 		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 		String response = grafanaHandler.grafanaPost("/api/user/using/" + orgId, json, headers);
@@ -97,9 +96,12 @@ public class AccessGroupManagement {
 		httpRequest.setAttribute("responseHeaders", grafanaResponseCookies);
 
 		InsightsAuthenticationTokenUtils authenticationProviderImpl = new InsightsAuthenticationTokenUtils();
-		authenticationProviderImpl.updateSecurityContextRoleBased(grafanaCurrentOrgRole);
+		String jtoken = authenticationProviderImpl.updateSecurityContextRoleBased(grafanaCurrentOrgRole);
+		
+		JsonObject responseJson = new JsonParser().parse(response).getAsJsonObject();
+		responseJson.addProperty("jtoken", jtoken);
 
-		return PlatformServiceUtil.buildSuccessResponseWithData(new JsonParser().parse(response));
+		return PlatformServiceUtil.buildSuccessResponseWithData(responseJson);
 	}
 
 	@PostMapping(value = "/searchUser", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -171,16 +173,13 @@ public class AccessGroupManagement {
 			if (updateAgentJson.isJsonArray()) {
 				JsonArray arrayOfOrg = updateAgentJson.getAsJsonArray();
 				int size = arrayOfOrg.size();
-				// log.debug(size);
 				for (int i = 0; i < size; i++) {
 					JsonElement aorg = arrayOfOrg.get(i);
-					// log.debug(aorg);
 
 					int orgId = aorg.getAsJsonObject().get(PlatformServiceConstants.ORGID).getAsInt();
 					String userName = aorg.getAsJsonObject().get("userName").getAsString();
 					String orgName = aorg.getAsJsonObject().get("orgName").getAsString();
 					String role = aorg.getAsJsonObject().get("roleName").getAsString();
-					// log.debug(userName);
 					String responsename = grafanaHandler.grafanaGet(PATH + userName, grafanaHeader);
 					JsonObject jsonResponseName = new JsonParser().parse(responsename).getAsJsonObject();
 					if (jsonResponseName.get("id") == null) {
@@ -223,7 +222,7 @@ public class AccessGroupManagement {
 			List<NewCookie> cookieList = grafanaHandler.getGrafanaCookies(PlatformServiceConstants.API_USER, null, headers);
 			for (NewCookie cookie : cookieList) {
 				String value = ValidationUtils.cleanXSS(cookie.getValue());
-				log.debug("getUser cookies =================" + cookie.getName() + "   ====  " + value);
+				log.debug("getUser cookies ================= {} ==== {}  " , cookie.getName(), value);
 			}
 			log.debug("Response in get User {}", cookieList);
 			return PlatformServiceUtil.buildSuccessResponseWithData(new JsonParser().parse(response));
@@ -251,7 +250,6 @@ public class AccessGroupManagement {
 	@PostMapping(value = "/addUserInOrg", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject addUser(@RequestBody String requserPropertyList) {
 		String message = null;
-		// log.debug("getOrgs API is: " + userPropertyList);
 		try {
 			String userPropertyList = ValidationUtils.validateRequestBody(requserPropertyList);
 			JsonParser parser = new JsonParser();
@@ -302,7 +300,6 @@ public class AccessGroupManagement {
 					// role or not
 					if (role.equals(orgCurrentRole)) {
 						message = "{\"message\":\"User exists in currrent org with same role\"}";
-						// message="User exists in currrent org with same role as "+orgCurrentRole;
 						return PlatformServiceUtil.buildSuccessResponseWithData(message);
 					} else {
 						message = "{\"message\":\"User exists in currrent org with different role\"}";
@@ -325,7 +322,6 @@ public class AccessGroupManagement {
 				// if the username is not present in grafana then we are checking for the email
 				String responseEmail = grafanaHandler.grafanaGet(PATH + email, grafanaHeader);
 				JsonObject jsonResponseEmail = new JsonParser().parse(responseEmail).getAsJsonObject();
-				// log.error("jsonResponseEmail--------------------"+jsonResponseEmail);
 				if (jsonResponseEmail.get("id") != null) {
 					// if email id exists returning email exists
 					message = "{\"message\":\"Email already exists\"}";
@@ -342,7 +338,6 @@ public class AccessGroupManagement {
 							grafanaHeader);
 
 					JsonObject jsonResponse = new JsonParser().parse(responseCreate).getAsJsonObject();
-					// log.error(jsonResponseCreate);
 					if (jsonResponse.get("id") != null && orgId != 1) {
 						// if the org is other than main org we are adding the created user to the org
 						String apiUrlorg = "/api/orgs/" + orgId + "/users";
@@ -352,7 +347,6 @@ public class AccessGroupManagement {
 
 						String responseOrg = grafanaHandler.grafanaPost(apiUrlorg, requestOrg, grafanaHeader);
 						message = responseOrg;
-						// log.error(requestOrg+""+headersOrg+" "+responseOrg.getEntity(String.class));
 						return PlatformServiceUtil.buildSuccessResponseWithData(message);
 					} else if (jsonResponse.get("id") != null && orgId == 1 && role.equals("Viewer") != true) {
 						// if the org is main org and the role is other than viewer we are adding the
@@ -365,13 +359,11 @@ public class AccessGroupManagement {
 						requestRole.addProperty("role", role);
 						Map<String, String> headersRole = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 						String responseRole = grafanaHandler.grafanaPatch(apiUrlRole, requestRole, headersRole);
-						// log.error(responseRole);
 						message = responseRole;
 						return PlatformServiceUtil.buildSuccessResponseWithData(message);
 					} else {
 						// if the org is main org and the role is viewer then we are not doing anything
 						message = jsonResponse.toString();
-						// log.debug(PlatformServiceUtil.buildSuccessResponseWithData(message));
 						return PlatformServiceUtil.buildSuccessResponseWithData(message);
 					}
 				}
@@ -397,8 +389,7 @@ public class AccessGroupManagement {
 
 	private String getCurrentOrgRole(Map<String, String> headers, String grafanaCurrentOrg)
 			throws InsightsCustomException {
-		log.debug("\n\nInside getCurrentOrgRole method call");
-		// log.debug("Headers: " + headers);
+		log.debug("Inside getCurrentOrgRole method call");
 		String grafanaCurrentOrgResponse = grafanaHandler.grafanaGet("/api/user/orgs", headers);
 		JsonArray grafanaOrgs = new JsonParser().parse(grafanaCurrentOrgResponse).getAsJsonArray();
 		String grafanaCurrentOrgRole = null;
@@ -408,16 +399,16 @@ public class AccessGroupManagement {
 				break;
 			}
 		}
-		log.debug("Current grafana org role: " + grafanaCurrentOrgRole + "\n\n");
+		log.debug("Current grafana org role: {} ", grafanaCurrentOrgRole );
 		return grafanaCurrentOrgRole;
 	}
 
 	private String getGrafanaCurrentOrg(Map<String, String> headers) throws InsightsCustomException {
-		log.debug("\n\nInside getGrafanaCurrentOrg method call");
+		log.debug("Inside getGrafanaCurrentOrg method call");
 		String grafanaCurrentOrgResponse = grafanaHandler.grafanaGet("/api/user", headers);
 		JsonObject responseJson = new JsonParser().parse(grafanaCurrentOrgResponse).getAsJsonObject();
 		String grafanaCurrentOrg = responseJson.get("orgId").toString();
-		log.debug("The Current Grafana OrgId is: " + grafanaCurrentOrg + "\n\n");
+		log.debug("The Current Grafana OrgId is:  {} ", grafanaCurrentOrg );
 		return grafanaCurrentOrg;
 	}
 
@@ -439,7 +430,7 @@ public class AccessGroupManagement {
 			}*/
 			
 			String grafanaBaseUrl="INSIGHTS_GRAFANA_HOST";
-			String grafanaUrl = grafanaBaseUrl + "/dashboard/";
+			String grafanaUrl = grafanaBaseUrl;
 			String grafanaIframeUrl = grafanaBaseUrl + "/dashboard/script/iSight_ui3.js?url=";
 			String grafanaVersion = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaVersion();
 			if (grafanaVersion == null) {
@@ -455,10 +446,10 @@ public class AccessGroupManagement {
 						dashboardData.get(PlatformServiceConstants.TITLE).getAsString());
 				datamodel.addProperty("id", dashboardData.get("id").getAsInt());
 				if ("dash-db".equals(dashboardData.get("type").getAsString())) {
-
+						String dashboardUrlStr = dashboardData.get("url").getAsString();
+						dashboardUrlStr = dashboardUrlStr.substring(dashboardUrlStr.indexOf("/d"));
 						datamodel.addProperty("url",
-								(grafanaIframeUrl + grafanaUrl + dashboardData.get("uri").getAsString()));
-					
+								(grafanaIframeUrl + grafanaUrl + dashboardUrlStr));
 					if (dashboardData.get("isStarred").getAsBoolean()) {
 						starrreddashboardsArray.add(datamodel);
 					}

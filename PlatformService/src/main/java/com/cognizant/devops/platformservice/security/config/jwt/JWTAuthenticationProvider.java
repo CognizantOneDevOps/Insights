@@ -17,18 +17,15 @@ package com.cognizant.devops.platformservice.security.config.jwt;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
-import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationException;
 import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationToken;
-import com.cognizant.devops.platformservice.security.config.TokenProviderUtility;
 import com.nimbusds.jwt.JWTClaimsSet;
 
 public class JWTAuthenticationProvider implements AuthenticationProvider {
@@ -41,7 +38,8 @@ public class JWTAuthenticationProvider implements AuthenticationProvider {
 	 */
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-		log.debug("Inside JWTAuthenticationProvider === ");
+		log.debug("Inside JWTAuthenticationProvider === ");;
+		Authentication authenticationJWT =	 null ;
 		if (!supports(authentication.getClass())) {
 			throw new IllegalArgumentException(
 					"Only JWTAuthenticationProvider is supported, " + authentication.getClass() + " was attempted");
@@ -56,12 +54,16 @@ public class JWTAuthenticationProvider implements AuthenticationProvider {
 		/*validate request token*/
 		JWTClaimsSet jwtClaimsSet = AuthenticationUtils.validateIncomingToken(authentication.getPrincipal());
 		if (jwtClaimsSet != null) {
-			return new InsightsAuthenticationToken(
+			log.debug("Inside JWTAuthenticationProvider jwtClaimsSet {} === {} ",jwtClaimsSet, authentication);
+			authentication.getAuthorities().forEach(
+					b -> log.debug("In successfulAuthentication JWTAuthenticationProvider GrantedAuthority ==== {} ", b.getAuthority()));
+			authenticationJWT =  new InsightsAuthenticationToken(
 					authentication.getPrincipal(), jwtClaimsSet.getSubject(), null, authentication.getAuthorities());
 		} else {
 			log.error(" Error while validating token and retriving claims ");
 			throw new InsightsAuthenticationException(" Error while validating token and retriving claims {} ");
 		}
+		return authenticationJWT; 
 	}
 
 	/**
