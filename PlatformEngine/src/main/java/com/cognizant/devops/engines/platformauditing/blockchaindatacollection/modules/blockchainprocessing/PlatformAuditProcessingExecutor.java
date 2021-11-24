@@ -77,11 +77,15 @@ public class PlatformAuditProcessingExecutor implements Job, ApplicationConfigIn
 			LOG.error(e);
 			EngineStatusLogger.getInstance().createSchedularTaskStatusNode("PlatformAuditProcessingExecutor execution has some issue  ",
 					PlatformServiceConstants.FAILURE,jobName);
+			EngineStatusLogger.getInstance().createAuditStatusNode("PlatformAuditProcessingExecutor execution has some issue  ",
+					PlatformServiceConstants.FAILURE);
 		}
         
         long processingTime = System.currentTimeMillis() - startTime ;
 		EngineStatusLogger.getInstance().createSchedularTaskStatusNode("PlatformAuditProcessingExecutor execution Completed",
 				PlatformServiceConstants.SUCCESS,jobName,processingTime);
+		EngineStatusLogger.getInstance().createAuditStatusNode("PlatformAuditProcessingExecutor execution Completed",
+				PlatformServiceConstants.SUCCESS);
         
     }
 

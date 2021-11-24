@@ -83,6 +83,9 @@ public class Application implements ApplicationConfigInterface {
 			
 			scheduler.triggerJob(jobInitializer.getKey());
 			
+			EngineStatusLogger.getInstance().createEngineStatusNode(
+					"Platform Engine Service started successfully", PlatformServiceConstants.SUCCESS);
+			
 		} catch (Exception e) {
 			EngineStatusLogger.getInstance().createEngineStatusNode(
 					"Platform Engine Service not running " + e.getMessage(), PlatformServiceConstants.FAILURE);

@@ -113,12 +113,10 @@ public class WorkflowExecutor implements Job , ApplicationConfigInterface{
 				}
 			}
 		} else {
-			log.debug("Worlflow Detail ==== WorkflowExecutor No reports are currently on due to run");
+			log.debug("Worlflow Detail ==== WorkflowExecutor No reports are currently due for run");
 			InsightsStatusProvider.getInstance().createInsightStatusNode(
-					" Error occured while initializing executeWorkflow  ", PlatformServiceConstants.FAILURE);
+					" WorkflowExecutor: No reports are currently due for run ", PlatformServiceConstants.SUCCESS);
 		}
-
-
 	}
 	
 	private void initilizeWorkflowTasks() {

@@ -67,10 +67,14 @@ public class DataArchivalAggregatorModule implements Job, ApplicationConfigInter
 			log.error("Unable to add subscriber ", e);
 			EngineStatusLogger.getInstance().createSchedularTaskStatusNode("Data Archival Aggregator execution has some issue  ",
 					PlatformServiceConstants.FAILURE,jobName);
+			EngineStatusLogger.getInstance().createDataArchivalStatusNode(
+					"Data Archival Aggregator execution has some issue   "+e.getMessage(), PlatformServiceConstants.FAILURE);
 		}
 		long processingTime = System.currentTimeMillis() - startTime ;
 		EngineStatusLogger.getInstance().createSchedularTaskStatusNode("Data Archival Aggregator execution Completed",
 				PlatformServiceConstants.SUCCESS,jobName,processingTime);
+		EngineStatusLogger.getInstance().createDataArchivalStatusNode(
+				"Data Archival Aggregator execution started successfully  ", PlatformServiceConstants.SUCCESS);
 		log.debug("Data Archival Aggregator Module completed");
 	}
 
