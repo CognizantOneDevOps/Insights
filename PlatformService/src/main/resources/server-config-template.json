@@ -88,14 +88,6 @@
 		"correlationFrequency": 3,
 		"batchSize": 2000
 	},
-	"schedulerConfigInMin": {
-		"auditEngineInterval": 60,
-		"webhookEngineInterval": 10,
-		"engineAggregatorModuleInterval": 10,
-		"engineCorrelatorModuleInterval": 60,
-		"offlineDataProcessingExecutorInterval": 10,
-		"dataArchivalEngineInterval": 240
-	},
 	"singleSignOnConfig": {
 		"entityId": "",
 		"appId": "",

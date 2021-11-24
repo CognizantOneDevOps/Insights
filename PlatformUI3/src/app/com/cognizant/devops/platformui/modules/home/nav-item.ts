@@ -22,8 +22,9 @@ export class NavItem {
   children?: NavItem[];
   isToolbarDisplay?: boolean = true;
   showIcon?: boolean = false;
-  isAdminMenu?: boolean = true;
   orgId?: number;
-  showMenu?: boolean = true;
+  showMenu: boolean = true;
   title?: string;
+  activeCount?:number = 0 ; 
+  menuId: string;
 }

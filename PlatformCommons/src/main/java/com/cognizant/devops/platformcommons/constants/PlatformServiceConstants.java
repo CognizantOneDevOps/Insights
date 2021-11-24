@@ -15,12 +15,14 @@
  ******************************************************************************/
 package com.cognizant.devops.platformcommons.constants;
 
+import java.io.File;
 import java.util.Base64;
 
 public interface PlatformServiceConstants {
 	String STATUS = "status";
 	String SUCCESS = "success";
 	String FAILURE = "failure";
+	String ERROR = "ERROR";
 	String MESSAGE = "message";
 	String DATA = "data";
 	String INVALID_REQUEST = "Invalid request.";
@@ -53,5 +55,4 @@ public interface PlatformServiceConstants {
 	String API_ORGS = "/api/orgs/";
 	String API_USER = "/api/user";
 	String API_USER_ORGS = "/api/user/orgs";
-
 }

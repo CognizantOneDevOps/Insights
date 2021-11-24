@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.FilenameUtils;
@@ -31,6 +30,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.plugins.convert.TypeConverters.CronExpressionConverter;
 import org.apache.logging.log4j.core.util.CronExpression;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing.model.DataEnrichmentModel;
@@ -62,26 +64,36 @@ import com.google.gson.JsonSyntaxException;
  * @author 368419
  *
  */
-public class OfflineDataProcessingExecutor extends TimerTask implements ApplicationConfigInterface {
+public class OfflineDataProcessingExecutor implements Job, ApplicationConfigInterface {
+	
 	private static Logger log = LogManager.getLogger(OfflineDataProcessingExecutor.class);
 	private static final String DATE_TIME_FORMAT = "yyyy/MM/dd hh:mm a";
 	private static final String JSON_FILE_EXTENSION = "json";
 	private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT).withZone(InsightsUtils.zoneId);
 	InsightsConfigFilesDAL configFilesDAL = new InsightsConfigFilesDAL();
 	private Map<String,String> loggingInfo = new ConcurrentHashMap<>();
+	String jobName="";
+	
 	@Override
-	public void run() {
+	public void execute(JobExecutionContext context) throws JobExecutionException {
+		long startTime =System.currentTimeMillis();
 		try {
+			jobName=context.getJobDetail().getKey().getName();
+			EngineStatusLogger.getInstance().createSchedularTaskStatusNode("OfflineDataProcessingExecutor execution Start ",
+					PlatformServiceConstants.SUCCESS,jobName);
 			ApplicationConfigInterface.loadConfiguration();
 			loggingInfo.put("execId", String.valueOf(System.currentTimeMillis()));
 			executeOfflineProcessing();
 			log.debug(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} ProcessingTime={} processedRecords={} Offline Data Processing completed",loggingInfo.get("execId"),"-","-",0,0);
-			EngineStatusLogger.getInstance().createEngineStatusNode("Offline Data Processing completed",PlatformServiceConstants.SUCCESS);
 		} catch (Exception e) {
 			log.error("Offline Data Procesing has some issue",e);
-			EngineStatusLogger.getInstance().createEngineStatusNode("Offline Data Procesing has some issue",
-					PlatformServiceConstants.FAILURE);
+			EngineStatusLogger.getInstance().createSchedularTaskStatusNode("Offline Data Procesing has some issue",
+					PlatformServiceConstants.FAILURE,jobName);
 		}
+		
+		long processingTime = System.currentTimeMillis() - startTime ;
+		EngineStatusLogger.getInstance().createSchedularTaskStatusNode("OfflineDataProcessingExecutor execution completed ",
+				PlatformServiceConstants.SUCCESS,jobName,processingTime);
 	}
 
 	public int executeOfflineProcessing() {

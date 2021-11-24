@@ -21,10 +21,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimerTask;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
@@ -49,13 +51,35 @@ import com.google.gson.JsonParser;
  * @author 146414 This module will pull the data from Graph and accordingly
  *         subscribe for the incoming data
  */
-public class EngineAggregatorModule extends TimerTask implements ApplicationConfigInterface {
+public class EngineAggregatorModule implements Job, ApplicationConfigInterface {
 	private static Logger log = LogManager.getLogger(EngineAggregatorModule.class.getName());
 	private static Map<String, EngineSubscriberResponseHandler> registry = new HashMap<>();
-
+	String jobName="";
+	
 	@Override
-	public void run() {
-		log.debug(" EngineAggregatorModule start ====");
+	public void execute(JobExecutionContext context)
+			throws JobExecutionException {
+		log.debug(" Engine Scheduled Job ====  Schedular Inside EngineAggregatorModule ");
+		long startTime = System.currentTimeMillis();
+		jobName=context.getJobDetail().getKey().getName();
+		EngineStatusLogger.getInstance().createSchedularTaskStatusNode("EngineAggregatorModule execution Start ",
+				PlatformServiceConstants.SUCCESS,jobName);
+		try {
+			ApplicationConfigInterface.loadConfiguration();
+			executeJob();
+		} catch (Exception e) {
+			log.error(e);
+			EngineStatusLogger.getInstance().createSchedularTaskStatusNode("EngineAggregatorModule execution has some issue  ",
+					PlatformServiceConstants.ERROR,jobName);			
+		}
+		long processingTime = System.currentTimeMillis() - startTime  ;
+		EngineStatusLogger.getInstance().createSchedularTaskStatusNode("EngineAggregatorModule execution Completed",
+				PlatformServiceConstants.SUCCESS,jobName,processingTime);
+	}
+
+	
+	public void executeJob() {
+		log.debug(" Engine Scheduled Job ==== EngineAggregatorModule start ====");
 		try {
 			ApplicationConfigInterface.loadConfiguration();
 			ApplicationConfigProvider.performSystemCheck();
@@ -77,9 +101,9 @@ public class EngineAggregatorModule extends TimerTask implements ApplicationConf
 			}
 		}catch(InsightsCustomException e ) {
 			log.error("Error while loading Engine Aggregator Module ",e);
-			EngineStatusLogger.getInstance().createEngineStatusNode(
+			EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
 					" Error occured while initializing Engine Aggregator Module  " + e.getMessage(),
-					PlatformServiceConstants.FAILURE);
+					PlatformServiceConstants.FAILURE,jobName);
 		}
 		log.debug(" EngineAggregatorModule Completed ====");
 	}
@@ -114,14 +138,17 @@ public class EngineAggregatorModule extends TimerTask implements ApplicationConf
 					log.debug(" Type=AgentEngine toolName={} category={} agentId={} routingKey={} dataSize={} execId={} ProcessingTime={} Successfully registered data subscriber for routing key: {}  " ,toolName,agentConfig.getToolCategory(),agentConfig.getAgentKey(),dataRoutingKey,0,"-",0,dataRoutingKey);
 				} catch (Exception e) {
 					log.error(" toolName={} category={} agentId={} routingKey={} Unable to add data subscriber for routing key: {} " ,toolName,agentConfig.getToolCategory(),agentConfig.getAgentKey(),dataRoutingKey, dataRoutingKey, e);
-					EngineStatusLogger.getInstance().createEngineStatusNode(
+					EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
 							" Error occured while executing aggragator for data queue subscriber " + e.getMessage(),
-							PlatformServiceConstants.FAILURE);
+							PlatformServiceConstants.FAILURE,jobName);
 				}
-				EngineStatusLogger.getInstance().createEngineStatusNode(
+				EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
 						" Agent data queue " + dataRoutingKey + " subscribed successfully ",
-						PlatformServiceConstants.SUCCESS);
+						PlatformServiceConstants.SUCCESS,jobName);
 			} else if (registry.containsKey(dataRoutingKey)) {
+				EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
+						" Agent data queue already has " + dataRoutingKey + " subscribed successfully ",
+						PlatformServiceConstants.SUCCESS,jobName);
 				AgentDataSubscriber dataSubscriber = (AgentDataSubscriber) registry.get(dataRoutingKey);
 				dataSubscriber.setMappingData(businessMappingList);
 			}
@@ -136,20 +163,20 @@ public class EngineAggregatorModule extends TimerTask implements ApplicationConf
 					log.debug(" Type=AgentEngine toolName={} category={} agentId={} routingKey={} dataSize={} execId={} ProcessingTime={} Successfully registered health subscriber for routing key: {}  " ,toolName,agentConfig.getToolCategory(),agentConfig.getAgentKey(),healthRoutingKey,0,"-",0,healthRoutingKey);
 				} catch (Exception e) {
 					log.error(" toolName={} category={} agentId={} routingKey={} Unable to add health subscriber for routing key: {}",toolName,agentConfig.getToolCategory(),agentConfig.getAgentKey(),healthRoutingKey,healthRoutingKey, e);
-					EngineStatusLogger.getInstance().createEngineStatusNode(
+					EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
 							" Error occured while executing aggragator for health queue subscriber  " + e.getMessage(),
-							PlatformServiceConstants.FAILURE);
+							PlatformServiceConstants.FAILURE,jobName);
 				}
-				EngineStatusLogger.getInstance().createEngineStatusNode(
+				EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
 						" Agent health queue " + healthRoutingKey + " subscribed successfully ",
-						PlatformServiceConstants.SUCCESS);
+						PlatformServiceConstants.SUCCESS,jobName);
 			}
 
 		} catch (Exception e) {
 			log.error("Unable to add subscriber for routing key: {}",agentConfig.getAgentKey(), e);
-			EngineStatusLogger.getInstance().createEngineStatusNode(
+			EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
 					" Error occured while executing aggragator  " + agentConfig.getAgentKey() + e.getMessage(),
-					PlatformServiceConstants.FAILURE);
+					PlatformServiceConstants.ERROR,jobName);
 		}
 	}
 

@@ -23,10 +23,14 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.util.ComponentHealthLogger;
+import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
+import com.cognizant.devops.platformdal.timertasks.InsightsSchedulerTaskDAL;
+import com.cognizant.devops.platformdal.timertasks.InsightsSchedulerTaskStatus;
 
 public class EngineStatusLogger extends ComponentHealthLogger {
 	private static Logger log = LogManager.getLogger(EngineStatusLogger.class);
 	static EngineStatusLogger instance = null;
+	InsightsSchedulerTaskDAL schedularTaskDAL = new InsightsSchedulerTaskDAL();
 
 	private EngineStatusLogger() {
 
@@ -53,50 +57,30 @@ public class EngineStatusLogger extends ComponentHealthLogger {
 		}
 		return Boolean.TRUE;
 	}
-
-	public boolean createDataArchivalStatusNode(String message, String status) {
-		try {
-			String version = "";
-			version = EngineStatusLogger.class.getPackage().getImplementationVersion();
-			log.debug(" Engine version for createDataArchivalStatusNode {} ", version);
-			Map<String, String> extraParameter = new HashMap<>(0);
-			if (isDBUpdateSafe()) {
-				createComponentStatusNode("HEALTH:DATAARCHIVALENGINE", version, message, status, extraParameter);
-			}
-		} catch (Exception e) {
-			log.error(" Unable to create node {}", e.getMessage());
-		}
-		return Boolean.TRUE;
+		
+	public void createSchedularTaskStatusNode(String message, String status, String timerTaskMapping) {
+		createSchedularTaskStatusNode(message,status,timerTaskMapping,0);
 	}
-
-	public boolean createWebhookEngineStatusNode(String message, String status) {
+	
+	public void createSchedularTaskStatusNode(String message, String status, String timerTaskMapping, long processingTime) {
 		try {
-			String version = "";
-			version = EngineStatusLogger.class.getPackage().getImplementationVersion();
-			log.debug(" Engine version createWebhookEngineStatusNode {}", version);
-			Map<String, String> extraParameter = new HashMap<>(0);
-			if (isDBUpdateSafe()) {
-				createComponentStatusNode("HEALTH:WEBHOOKENGINE", version, message, status, extraParameter);
-			}
+			String version = EngineStatusLogger.class.getPackage().getImplementationVersion();
+			
+			InsightsSchedulerTaskStatus schedularTaskSatus = new InsightsSchedulerTaskStatus();
+			schedularTaskSatus.setMessage(message);
+			schedularTaskSatus.setStatus(status);
+			schedularTaskSatus.setVersion(version == null ? "NA" : version);
+			schedularTaskSatus.setTimerTaskMapping(timerTaskMapping);
+			schedularTaskSatus.setRecordtimestamp(System.currentTimeMillis());
+			schedularTaskSatus.setRecordtimestampX(InsightsUtils.insightsTimeXFormat(System.currentTimeMillis()));
+			schedularTaskSatus.setProcessingTime(processingTime);
+			
+			schedularTaskDAL.saveOrUpdateSchedulerTaskStatus(schedularTaskSatus);
+			
 		} catch (Exception e) {
-			log.error(" Unable to create node {}", e.getMessage());
+			log.error(" Unable to create InsightsSchedulerTaskStatus node {} ", e.getMessage());
+			log.error(e);
 		}
-		return Boolean.TRUE;
-	}
-
-	public boolean createAuditStatusNode(String message, String status) {
-		try {
-			String version = "";
-			version = EngineStatusLogger.class.getPackage().getImplementationVersion();
-			log.debug(" Engine version createAuditStatusNode {} ", version);
-			Map<String, String> extraParameter = new HashMap<>(0);
-			if (isDBUpdateSafe()) {
-				createComponentStatusNode("HEALTH:AUDITENGINE", version, message, status, extraParameter);
-			}
-		} catch (Exception e) {
-			log.error(" Unable to create node {} ", e.getMessage());
-		}
-		return Boolean.TRUE;
 	}
 
 	private boolean isDBUpdateSafe() {

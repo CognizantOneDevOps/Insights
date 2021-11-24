@@ -52,9 +52,9 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 	int taskID = 0;
 	int emailTaskID = 0;
 	int assessmentId = 0;
-	int systemHealthTaskId=0;
-	int systemEmailTaskId=0;
-	int workflowTypeId=0;
+	int systemHealthTaskId = 0;
+	int systemEmailTaskId = 0;
+	int workflowTypeId = 0;
 	String workflowId = null;
 	String system_workflowId = "SYSTEM_HealthNotification";
 
@@ -72,7 +72,7 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 		} catch (Exception e) {
 			log.error("Error preparing data at WorkflowServiceTest Report template record ", e);
 		}
-		
+
 		try {
 			InsightsWorkflowType type = new InsightsWorkflowType();
 			type.setWorkflowType(WorkflowTaskEnum.WorkflowType.REPORT.getValue());
@@ -94,7 +94,9 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 			Assert.assertNotNull(emailtask);
 			taskID = task.getTaskId();
 			emailTaskID = emailtask.getTaskId();
-			String dailyAssessmentReportWorkflow = "{\"reportName\":\"Daily_Deployment_Workflow\",\"reportTemplate\":" + reportId + ",\"emailList\":\"fdfsfsdfs\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
+			String dailyAssessmentReportWorkflow = "{\"reportName\":\"Daily_Deployment_Workflow\",\"reportTemplate\":"
+					+ reportId
+					+ ",\"emailList\":\"fdfsfsdfs\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
 					+ taskID
 					+ ",\"sequence\":0}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
 			dailyAssessmentReportWorkflowJson = convertStringIntoJson(dailyAssessmentReportWorkflow);
@@ -166,7 +168,7 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 			Assert.fail("testgetWorkflowExecutionRecords");
 		}
 	}
-	
+
 	@Test(priority = 7)
 	public void testEnableHealthStatus() throws InsightsCustomException {
 		try {
@@ -174,7 +176,8 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 			statusJson.addProperty("status", true);
 			String response = workflowService.updateHealthNotification(statusJson);
 			Assert.assertEquals(response, PlatformServiceConstants.SUCCESS);
-			InsightsWorkflowConfiguration workflowConfig =workflowConfigDAL.getWorkflowConfigByWorkflowId(system_workflowId);
+			InsightsWorkflowConfiguration workflowConfig = workflowConfigDAL
+					.getWorkflowConfigByWorkflowId(system_workflowId);
 			Assert.assertNotNull(workflowConfig);
 			Assert.assertTrue(workflowConfig.isActive());
 			Assert.assertNotNull(workflowConfig.getEmailConfig());
@@ -194,7 +197,7 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 			Assert.fail("testEnableHealthStatus");
 		}
 	}
-	
+
 	@Test(priority = 8)
 	public void testDisableHealthStatus() throws InsightsCustomException {
 		try {
@@ -202,12 +205,164 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 			statusJson.addProperty("status", false);
 			String response = workflowService.updateHealthNotification(statusJson);
 			Assert.assertEquals(response, PlatformServiceConstants.SUCCESS);
-			InsightsWorkflowConfiguration workflowConfig =workflowConfigDAL.getWorkflowConfigByWorkflowId(system_workflowId);
+			InsightsWorkflowConfiguration workflowConfig = workflowConfigDAL
+					.getWorkflowConfigByWorkflowId(system_workflowId);
 			Assert.assertNotNull(workflowConfig);
 			Assert.assertFalse(workflowConfig.isActive());
 		} catch (AssertionError e) {
 			Assert.fail("testEnableHealthStatus");
 		}
+	}
+
+	@Test(priority = 9)
+	public void testgetWorkflowtaskDetails() throws InsightsCustomException {
+		try {
+			JsonArray taskList = workflowService.getTaskDetail();
+			Assert.assertNotNull(taskList);
+			Assert.assertTrue(taskList.size() > 0);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test(priority = 10)
+	public void testgetAllWorkflowType() throws InsightsCustomException {
+		try {
+			List<String> taskList = workflowService.getAllWorkflowTypes();
+			Assert.assertNotNull(taskList);
+			Assert.assertTrue(taskList.size() > 0);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test(priority = 11)
+	public void testdeleteTaskDetails() throws InsightsCustomException {
+		try {
+
+			int response = workflowService.saveWorkflowTask(workflowTaskAsJson);
+			InsightsWorkflowTask task = workflowConfigDAL.getTaskByTaskId(response);
+			taskID = task.getTaskId();
+			boolean status = workflowService.deleteTaskDetail(taskID);
+			Assert.assertTrue(status);
+
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test(priority = 12)
+	public void testUpdateTaskDetails() throws InsightsCustomException {
+		try {
+			int taskId = workflowService.saveWorkflowTask(workflowTaskAsJson);
+
+			String workflowTaskData = "{\"taskId\":" + taskId
+					+ ",\"description\": \"demo\",\"mqChannel\": \"WORKFLOW.WORKFLOWSERVICE_TEST.TASK.KPI.EXCECUTION\",\"componentName\": \"com.cognizant.devops.platformreports.assessment.core.ReportKPISubscriber\",\"dependency\": \"100\",\"workflowType\": \"Report\"}";
+			log.debug(workflowTaskData);
+			JsonObject workflowTaskAsJson = convertStringIntoJson(workflowTaskData);
+			int status = workflowService.updateWorkflowTask(workflowTaskAsJson);
+			Assert.assertEquals(status, 0);
+
+		} catch (AssertionError e) {
+
+			Assert.fail(e.getMessage());
+		}
+	}
+
+
+
+	@Test(priority = 13)
+	public void testgetHealthNotificationStatus() throws InsightsCustomException {
+		try {
+			JsonObject taskList = workflowService.getHealthNotificationStatus();
+			Assert.assertNotNull(taskList);
+			Assert.assertTrue(taskList.size() > 0);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test(priority = 14)
+	public void testgetLatestExecutionId() throws InsightsCustomException {
+		try {
+			JsonObject taskList = workflowService.getLatestExecutionId(workflowId);
+			Assert.assertNotNull(taskList);
+			Assert.assertTrue(taskList.size() > 0);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test(priority = 15)
+	public void testconvertStringIntoJson() throws InsightsCustomException {
+		try {
+			JsonObject taskList = workflowService.convertStringIntoJson(registerkpiWorkflow);
+			Assert.assertNotNull(taskList);
+			Assert.assertTrue(taskList.size() > 0);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test(priority = 16)
+	public void testgetWorkFlowExecutionRecordsByWorkflowId() throws InsightsCustomException {
+		try {
+			String workflowIdData = "{\"workflowId\":" + workflowId + "}";
+			JsonObject workflowTaskAsJson = convertStringIntoJson(workflowIdData);
+			JsonObject taskList = workflowService.getWorkFlowExecutionRecordsByWorkflowId(workflowTaskAsJson);
+			Assert.assertNotNull(taskList);
+			Assert.assertTrue(taskList.size() > 0);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	// , expectedExceptions = InsightsCustomException.class
+	@Test(priority = 17, expectedExceptions = InsightsCustomException.class)
+	public void testsaveWorkflowConfig() throws InsightsCustomException {
+		try {
+			InsightsWorkflowConfiguration taskList = workflowService.saveWorkflowConfig(workflowId, true, true, null,
+					null, null, null, 0, null, false);
+			Assert.assertNotNull(taskList);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test(priority = 18, expectedExceptions = InsightsCustomException.class)
+	public void testEnableHealthStatusForException() throws InsightsCustomException {
+		JsonObject statusJson = new JsonObject();
+		workflowService.updateHealthNotification(statusJson);
+	}
+
+	@Test(priority = 19, expectedExceptions = InsightsCustomException.class)
+	public void testgetWorkFlowExecutionRecordsByWorkflowIdForException() throws InsightsCustomException {
+		JsonObject statusJson = new JsonObject();
+		workflowService.getWorkFlowExecutionRecordsByWorkflowId(statusJson);
+	}
+
+	@Test(priority = 20, expectedExceptions = InsightsCustomException.class)
+	public void testsaveWorkflowTaskForException() throws InsightsCustomException {
+		JsonObject statusJson = new JsonObject();
+		workflowService.saveWorkflowTask(statusJson);
+	}
+
+	@Test(priority = 21, expectedExceptions = InsightsCustomException.class)
+	public void testUpdateTaskDetailsForException() throws InsightsCustomException {
+		JsonObject statusJson = new JsonObject();
+		workflowService.updateWorkflowTask(statusJson);
+	}
+
+	@Test(priority = 22, expectedExceptions = InsightsCustomException.class)
+	public void testgetWorkflowExecutionRecordsForException() throws InsightsCustomException {
+		JsonObject statusJson = new JsonObject();
+		workflowService.getWorkFlowExecutionRecords(statusJson);
+	}
+
+	@Test(priority = 23, expectedExceptions = InsightsCustomException.class)
+	public void testgetMaximumExecutionIDsForException() throws InsightsCustomException {
+		JsonObject statusJson = new JsonObject();
+		workflowService.getMaximumExecutionIDs(statusJson);
 	}
 
 	@AfterClass
@@ -236,26 +391,25 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 				log.error("Error cleaning data up at WorkflowServiceTest Assessment Record ", e);
 			}
 		}
-		
+
 		try {
 			workflowConfigDAL.deleteWorkflowTaskSequence(system_workflowId);
 		} catch (Exception e) {
 			log.error("Error cleaning data up at System Task sequence", e);
 		}
-		
+
 		try {
 			String status = workflowConfigDAL.deleteEmailTemplateByWorkflowId(system_workflowId);
 		} catch (Exception e) {
 			log.error("Error cleaning data up at System Email task ", e);
 		}
-		
+
 		try {
 			workflowConfigDAL.deleteWorkflowConfig(system_workflowId);
 		} catch (Exception e) {
 			log.error("Error cleaning data up at System Task sequence", e);
 		}
-		
-		
+
 		// Delete tasks
 		try {
 			String status = workflowConfigDAL.deleteTask(taskID);
@@ -267,25 +421,25 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 		} catch (Exception e) {
 			log.error("Error cleaning data up at WorkflowServiceTest Email task ", e);
 		}
-		
+
 		try {
 			String status = workflowConfigDAL.deleteTask(systemHealthTaskId);
 		} catch (Exception e) {
 			log.error("Error cleaning data up at System Notification task ", e);
 		}
-		
+
 		try {
 			String status = workflowConfigDAL.deleteTask(systemEmailTaskId);
 		} catch (Exception e) {
 			log.error("Error cleaning data up at System Email task ", e);
-		}	
-		
+		}
+
 		try {
 			String status = workflowConfigDAL.deleteWorkflowType(workflowTypeId);
 		} catch (Exception e) {
 			log.error("Error cleaning data up at WorkflowType", e);
 		}
-		
+
 		// Delete Report Templates
 		try {
 			reportConfigDAL.deleteReportTemplatebyReportID(reportId);

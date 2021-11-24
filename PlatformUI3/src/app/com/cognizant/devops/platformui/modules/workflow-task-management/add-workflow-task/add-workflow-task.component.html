@@ -1,0 +1,121 @@
+<!--/*******************************************************************************
+ * Copyright 2021 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************-->
+<div class="pageCss">
+    <div layout layout-align="left" class="titleStyle">
+        <div>Configuration |
+            <a class="greenTitleTxt">Workflow Task Management</a>
+        </div>
+    </div>
+
+    <div class="orangeStripCss"></div>
+
+    <div layout layout-align="left" class="sectionHeadingStyle">
+        <div layout> &nbsp;Workflow Task
+        </div>
+    </div>
+
+    <div class="btnAlign">
+        <button mat-icon-button (click)="validateTaskDetails()">
+            <mat-icon title="Save" style="margin-bottom: -10%;" class="mat-icon material-icons">
+                save
+            </mat-icon>
+        </button>
+
+        <button mat-icon-button>
+            <mat-icon title="Reset" (click)="reset()" style="margin-bottom: -10%;" class="mat-icon material-icons">
+                cancel
+            </mat-icon>
+        </button>
+
+        <button mat-icon-button>
+            <mat-icon svgIcon="redirect_icon" title="Redirect To Landing Page" (click)="refresh()"
+                style="margin-bottom: 15%;" class="mat-icon material-icons">
+            </mat-icon>
+        </button>
+    </div>
+    <table class="mat-elevation-z8 mat-table" style="margin-top:3% !important">
+        <thead>
+            <tr class="mat-header-row" layout-align="start start">
+                <th colspan="4" class="tableHeaderCss mat-header-cell" style=" border-radius: 10px 10px 0 0;">
+                    <span class="mainHeaderText">{{feature}} workflow task details</span>
+                    <span class="infoHeaderText">(Please provide accurate details.
+                        Fields marked "<span style="color:#ff0000;">*</span>" are mandatory)
+                    </span>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="mat-row-webhook">
+
+                <td class="mat-cell" class="columnName">
+                    <span class="mainText">Workflow Type</span>
+                    <span style="color:#ff0000;">*</span>
+                </td>
+                <td class="columnComponent" style="padding-top:1%;">
+                    <mat-select class="form-control" required placeholder="Select workflow type" color="primary"
+                        [disabled]="disableInputFields" [(ngModel)]="workflowType">
+                        <mat-option *ngFor="let wType of workflowTypeList" value="{{wType}}"
+                            style="color:black">
+                            {{wType}}</mat-option>
+                    </mat-select>
+                </td>
+
+            </tr>
+
+            <tr class="mat-row-webhook">
+                <td class="mat-cell" class="columnName">
+                    <span class="mainText">Description</span>
+                    <span style="color:#ff0000;">*</span>
+                </td>
+                <td class="columnComponent">
+                    <input matinput maxlength="40" [(ngModel)]="description" class='form-control' type="text"
+                        autocomplete="off" placeholder="Enter description">
+                </td>
+            </tr>
+            <tr class="mat-row-webhook">
+                <td class="mat-cell" class="columnName">
+                    <span class="mainText">Component Class Detail</span>
+                    <span style="color:#ff0000;">*</span>
+                </td>
+                <td class="columnComponent">
+                    <textarea matinput [(ngModel)]="componentName" class='form-control' type="text"
+                        autocomplete="off" placeholder="Enter Component Class Detail"></textarea>
+                </td>
+            </tr>
+            <tr class="mat-row-webhook">
+                <td class="mat-cell" class="columnName">
+                    <span class="mainText">Dependency</span>
+                    <span style="color:#ff0000;">*</span>
+                </td>
+                <td class="columnComponent">
+                    <input matinput [(ngModel)]="dependency" class='form-control' type="text"
+                        autocomplete="off" placeholder="Enter dependency">
+                </td>
+            </tr>
+
+            <tr class="mat-row-webhook">
+                <td class="mat-cell" class="columnName">
+                    <span class="mainText">MQ Channel Name</span>
+                    <span style="color:#ff0000;">*</span>
+                </td>
+                <td class="columnComponent">
+                    <input matinput maxlength="40" [disabled]="disableInputFields" [(ngModel)]="mqChannel"
+                        [ngClass]="{'input-disabled' : disableInputFields ,  'form-control': !disableInputFields}"
+                        type="text" autocomplete="off" placeholder="Enter MqChannel">
+                </td>
+            </tr>
+
+        </tbody>

@@ -50,14 +50,8 @@ public class MessageSubscriberFactory {
 			channel.close();
 		} catch (IOException e) {
 			log.error("Unable to create MQ connection", e);
-			EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
-					"Exception while creating Message Queue connection " + e.getMessage(),
-					PlatformServiceConstants.FAILURE);
 		} catch (TimeoutException e) {
 			log.error("Unable to create MQ connection within specified time.", e);
-			EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
-					"Exception while creating Message queue connection " + e.getMessage(),
-					PlatformServiceConstants.FAILURE);
 		}
 	}
 

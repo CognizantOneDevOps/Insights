@@ -39,11 +39,13 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 	private static Logger log = LogManager.getLogger(WebHookDataSubscriber.class);
 	private GraphDBHandler dbHandler = new GraphDBHandler();
 	private WebHookConfig webhookConfig;
+	private String jobName = ""; 
 
 
-	public WebHookDataSubscriber(WebHookConfig webhookConfig, String mqChannelName) throws Exception {
+	public WebHookDataSubscriber(WebHookConfig webhookConfig, String mqChannelName, String jobName) throws Exception {
 		super(mqChannelName);
 		this.webhookConfig = webhookConfig;
+		this.jobName=jobName;
 
 	}
 
@@ -83,9 +85,9 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 					
 				} else {
 					log.error(" Unmatched Response Template found for {} ", this.webhookConfig.getWebHookName());
-					EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
+					EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
 							"No Webhook Nodes are inserted in DB for " + this.webhookConfig.getWebHookName(),
-							PlatformServiceConstants.FAILURE);
+							PlatformServiceConstants.FAILURE,jobName);
 				}
 			} else {
 				log.error(" No valid payload found for webhook  message{} {} ", this.webhookConfig.getWebHookName(),
@@ -96,8 +98,8 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 		} catch (Exception e) {
 			log.error("Error in payload {} ",message);
 			log.error(" toolName={} agentId={} routingKey={} Error while storing Webhook data",this.webhookConfig.getToolName(),this.webhookConfig.getWebHookName(),this.webhookConfig.getMQChannel(),e);
-			EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
-					"Exception while pasring or DB issues " + e.getMessage(), PlatformServiceConstants.FAILURE);
+			EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
+					"Exception while pasring or DB issues " + e.getMessage(), PlatformServiceConstants.FAILURE,jobName);
 			getChannel().basicReject(envelope.getDeliveryTag(), false);
 		}
 	}

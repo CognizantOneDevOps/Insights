@@ -27,6 +27,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ImageHandlerService } from '@insights/common/imageHandler.service';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { ServerConfigurationService } from '@insights/app/modules/server-configuration/server-configuration-service';
+import { MenuItem } from '@insights/app/modules/home/menu-item.ts';
 
 @Component({
   selector: 'app-home',
@@ -53,7 +54,6 @@ export class HomeComponent implements OnInit {
   timeZone: String = '';
   userRole: String = '';
   userCurrentOrg: string = '';
-  showAdminTab: boolean = false;
   isToolbarDisplay: boolean = InsightsInitService.enableInsightsToolbar;
   isValidUser: boolean = false;
   showLogoutButton: boolean = true;
@@ -87,6 +87,7 @@ export class HomeComponent implements OnInit {
   aboutPageURL = "https://onedevops.atlassian.net/wiki/spaces/OI/pages/218936/Release+Notes";
   helpPageURL = "https://onedevops.atlassian.net/wiki/spaces/OI/overview";
   isServerConfigAvailable: boolean = false;
+  menuItem : MenuItem;
 
 
   constructor(private grafanaService: GrafanaAuthenticationService,
@@ -98,7 +99,8 @@ export class HomeComponent implements OnInit {
     if (this.depth === undefined) {
       this.depth = 0;
     }
-
+    
+    this.menuItem = new MenuItem(dataShare);
     this.isValidUser = true;
     this.framesize = window.frames.innerHeight;
     this.leftNavWidthInPer = 20;
@@ -166,16 +168,14 @@ export class HomeComponent implements OnInit {
       )
 
     } catch (error) {
-      console.log(error);
+      console.log(error); 
     }
   }
-
- 
 
   public async getInformationFromGrafana() {
     let currentUserResponce: any;
     let self = this;
-    this.loadBottomMenuItem();
+    this.navItemsBottom = this.menuItem.loadBottomMenuItem();
     this.currentUserWithOrgs = await this.grafanaService.getCurrentUserWithOrgs();
     if (this.currentUserWithOrgs != undefined && this.currentUserWithOrgs.data != undefined) {
       this.userName = this.dataShare.setUserName(self.currentUserWithOrgs.data.userDetail.name);
@@ -194,18 +194,11 @@ export class HomeComponent implements OnInit {
       this.cookieService.set('grafanaRole', self.userRole.toString());
       this.cookieService.set('grafanaOrg', self.userCurrentOrg);
       
-      this.loadorganizations();
+      this.menuItem.loadorganizations();
     } else {
       console.log(" user and user organization data is not valid  ")
     }
-    if (this.userRole === 'Admin') {
-      this.showAdminTab = true;
-    } else {
-      this.showAdminTab = false;
-    }
-
     this.getServerConfigInfo();
-    
   }
 
    getServerConfigInfo() {
@@ -213,7 +206,9 @@ export class HomeComponent implements OnInit {
      this.serverconfigService.getServerConfigStatus().then( function (serverConfigResponse) {
       console.log(serverConfigResponse);
       self.isServerConfigAvailable = serverConfigResponse.data.isServerConfigAvailable;
-      self.loadMenuItem();
+      //self.loadMenuItem();
+      self.navItems = self.menuItem.loadMenuItem();
+      console.log( self.navItems)
       if(self.isServerConfigAvailable){
         self.loadCustomerLogo();
         self.router.navigateByUrl('/InSights/Home/landingPage/' + self.dataShare.getOrgId(), { skipLocationChange: true, replaceUrl: true });
@@ -224,41 +219,7 @@ export class HomeComponent implements OnInit {
   }
 
 
-  public async loadorganizations() {
-    var self = this;
-
-    if (this.currentUserOrgsArray != undefined) {
-      var orgDataArray = this.currentUserOrgsArray;
-      this.orgList = orgDataArray;
-      for (var key in this.orgList) {
-        var orgDtl = this.orgList[key];
-        var navItemobj = new NavItem();
-        navItemobj.displayName = orgDtl.name;
-        navItemobj.iconName = 'grafanaOrg';
-        navItemobj.route = 'InSights/Home/landingPage/' + orgDtl.orgId;
-        navItemobj.isToolbarDisplay = InsightsInitService.enableInsightsToolbar;
-        navItemobj.showIcon = false;
-        navItemobj.isAdminMenu = false;
-        navItemobj.orgId = orgDtl.orgId;
-        navItemobj.title = orgDtl.name;
-        this.navOrgList.push(navItemobj);
-      }
-
-      var navItemobj = new NavItem();
-      navItemobj.displayName = 'Traceability Dashboard';
-      navItemobj.iconName = 'traceability';
-      navItemobj.route = 'InSights/Home/traceability';
-      navItemobj.isToolbarDisplay = InsightsInitService.enableInsightsToolbar;
-      navItemobj.showIcon = true;
-      navItemobj.isAdminMenu = false;
-      navItemobj.title = "traceability";
-
-      this.navOrgList.push(navItemobj);
-    }
-  }
-
-
-  onItemSelected(item: NavItem) {
+ onItemSelected(item: NavItem) {
     this.selectedItem = item;
     this.isToolbarDisplay = item.isToolbarDisplay;
     var isSessionExpired = this.dataShare.validateSession();
@@ -283,277 +244,7 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  public loadMenuItem() {
-    console.log( " this.isServerConfigAvailable "+this.isServerConfigAvailable)
-    if(!this.isServerConfigAvailable){
-      this.navItems =[
-        {
-          displayName: 'Server Configuration',
-          iconName: 'feature',
-          route: 'InSights/Home/server-configuration',
-          isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-          showMenu: true,
-          title: "Server Configuration",
-          isAdminMenu: true
-        }
-      ];
-    }else{
-      this.navItems = [
-        {
-          displayName: 'Dashboard Groups',
-          iconName: 'feature',
-          isAdminMenu: false,
-          showMenu: true,
-          title: "Click on Organization to see various Org's Dashboards",
-          isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-          children: this.navOrgList
-        },
-        {
-          displayName: 'Audit Reporting',
-          iconName: 'feature',
-          isAdminMenu: true,
-          showMenu: InsightsInitService.showAuditReporting,
-          title: "Audit Report and search assets",
-          isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-          children: [
-            {
-              displayName: 'Search Assets',
-              iconName: 'feature',
-              route: 'InSights/Home/blockchain',
-              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-              showMenu: InsightsInitService.showAuditReporting,
-              title: "Search Assets",
-              isAdminMenu: true
-            }
-  
-          ]
-        },
-        {
-          displayName: 'Playlist',
-          iconName: 'feature',
-          route: 'InSights/Home/playlist',
-          isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-          showMenu: true,
-          title: "Playlist",
-          isAdminMenu: false
-        },
-        {
-          displayName: 'Report Management',
-          iconName: 'feature',
-          route: 'InSights/Home/reportmanagement',
-          isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-          showMenu: true,
-          title: "Report Management",
-          isAdminMenu: false
-        },
-        {
-          displayName: 'Data Dictionary',
-          iconName: 'datadictionary',
-          route: 'InSights/Home/datadictionary',
-          isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-          showMenu: true,
-          title: "Data Dictionary",
-          isAdminMenu: false
-        },
-        {
-          displayName: 'Health Check',
-          iconName: 'feature',
-          route: 'InSights/Home/healthcheck',
-          isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-          showMenu: true,
-          title: "Health Check",
-          isAdminMenu: true
-        },
-        {
-          displayName: 'Dashboard Report Download',
-          iconName: 'feature',
-          route: 'InSights/Home/dash-pdf-download',
-          isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-          showMenu: true,
-          title: "Dashboard Report Download",
-          isAdminMenu: true
-        },
-        {
-          displayName: 'Configuration',
-          iconName: 'admin',
-          isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-          isAdminMenu: true,
-          title: "Configuration",
-          showMenu: true,
-          children: [
-            {
-              displayName: 'Agent Management',
-              iconName: 'feature',
-              route: 'InSights/Home/agentmanagement',
-              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-              showMenu: true,
-              title: "Agent Management",
-              isAdminMenu: true
-            },
-            {
-              displayName: 'Webhook Configuration',
-              iconName: 'feature',
-              route: 'InSights/Home/webhook',
-              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-              showMenu: InsightsInitService.showWebhookConfiguration,
-              title: "WebHook",
-              isAdminMenu: true
-            },
-            {
-              displayName: 'Bulk Upload',
-              iconName: 'feature',
-              route: 'InSights/Home/bulkupload',
-              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-              showMenu: true,
-              title: "Bulk Upload",
-              isAdminMenu: true
-            },
-            {
-              displayName: 'Server Configuration',
-              iconName: 'feature',
-              route: 'InSights/Home/server-configuration',
-              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-              showMenu: true,
-              title: "Server Configuration",
-              isAdminMenu: true
-            },
-            {
-              displayName: 'Configuration File Management',
-              iconName: 'feature',
-              route: 'InSights/Home/filesystem',
-              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-              showMenu: true,
-              title: "Configuration File Management",
-              isAdminMenu: true
-            },
-            {
-              displayName: 'Group & Users',
-              iconName: 'feature',
-              route: 'InSights/Home/accessGroupManagement',
-              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-              showMenu: true,
-              title: "Group & Users",
-              isAdminMenu: true
-            },
-            {
-              displayName: 'Co-Relation Builder',
-              iconName: 'feature',
-              route: 'InSights/Home/relationship-builder',
-              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-              showMenu: true,
-              title: "Relationship-Builder",
-              isAdminMenu: true
-            },
-            {
-              displayName: 'Business Mapping',
-              iconName: 'feature',
-              route: 'InSights/Home/businessmapping',
-              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-              showMenu: true,
-              title: "Business Mapping",
-              isAdminMenu: true
-            },
-        {
-              displayName: 'Report Configuration',
-              iconName: 'feature',
-              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-              showMenu: true,
-              title: "Report Configuration",
-              isAdminMenu: true,
-              children:[
-                {
-                  displayName: 'Kpi Configuration',
-                  iconName: 'feature',
-                  route: 'InSights/Home/kpicreation',
-                  isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-                  showMenu: true,
-                  title: "Kpi Creation",
-                  isAdminMenu: true
-                },
-                {
-                  displayName: 'Content Configuration',
-                  iconName: 'feature',
-                  route: 'InSights/Home/contentConfig',
-                  isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-                  showMenu: true,
-                  title: "Content Configuration",
-                  isAdminMenu: true
-                },
-                {
-                  displayName: 'Report Template Configuration',
-                  iconName: 'feature',
-                  route: 'InSights/Home/reportTemplate',
-                  isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-                  showMenu: true,
-                  title: "Report Template Configuration",
-                  isAdminMenu: true
-                }
-              ]
-            },
-            {
-              displayName: 'Logo Setting',
-              iconName: 'feature',
-              route: 'InSights/Home/logoSetting',
-              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-              showMenu: true,
-              title: "Logo Setting",
-              isAdminMenu: true
-            },
-            {
-              displayName: 'Data Archival',
-              iconName: 'feature',
-              route: 'InSights/Home/dataarchiving',
-              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-              showMenu: true,
-              title: "Data Archival",
-              isAdminMenu: true
-            },
-            {
-               displayName: 'Forecasting',
-               iconName: 'feature',
-               route: 'InSights/Home/modelmanagement',
-               isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-               showMenu: true,
-               title: "Forecasting",
-               isAdminMenu: true
-            }       
-          ]
-        }
-      ];
-  }
-    //console.log(this.navItems);
-  }
 
-  loadBottomMenuItem() {
-    this.navItemsBottom = [
-      {
-        displayName: 'About',
-        iconName: 'info',
-        isToolbarDisplay: false,
-        showIcon: false,
-        title: "About",
-        showMenu: true,
-        isAdminMenu: false
-      }, {
-        displayName: 'Help',
-        iconName: 'help',
-        isToolbarDisplay: false,
-        showIcon: false,
-        title: "Help",
-        showMenu: true,
-        isAdminMenu: false
-      }, {
-        displayName: 'Logout',
-        iconName: 'logout',
-        route: 'login',
-        isToolbarDisplay: false,
-        showIcon: this.showLogoutButton,
-        title: "Logout",
-        showMenu: this.showLogoutButton,
-        isAdminMenu: false
-      }
-    ];
-  }
 
   getNavItemsByFilter() {
     return this.navItems.filter(x => x.showMenu == true);
@@ -599,14 +290,11 @@ export class HomeComponent implements OnInit {
           }
         }
         console.log(" grafanaCurrentOrgRole " + grafanaCurrentOrgRole + " orgId " + orgId);
-        if (grafanaCurrentOrgRole === 'Admin') {
-          self.showAdminTab = true;
-        } else {
-          self.showAdminTab = false;
-        }
-        self.dataShare.setOrgAndRole(orgName, orgId, self.userRole);
+        self.dataShare.setOrgAndRole(orgName, orgId, grafanaCurrentOrgRole);
         self.cookieService.set('grafanaRole', grafanaCurrentOrgRole);
         self.cookieService.set('grafanaOrg', orgId);
+        self.navItems = self.menuItem.loadMenuItem();
+        console.log( self.navItems)
         self.router.navigateByUrl(route, { skipLocationChange: true });
       } else {
         this.messageDialog.showApplicationsMessage(" Error while Organizantion change ,Please try again later ", "ERROR");

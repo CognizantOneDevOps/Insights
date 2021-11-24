@@ -45,6 +45,8 @@ import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfig;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaOrgToken;
 import com.cognizant.devops.platformdal.icon.Icon;
 import com.cognizant.devops.platformdal.relationshipconfig.RelationshipConfiguration;
+import com.cognizant.devops.platformdal.timertasks.InsightsSchedulerTaskDefinition;
+import com.cognizant.devops.platformdal.timertasks.InsightsSchedulerTaskStatus;
 import com.cognizant.devops.platformdal.upshiftassessment.UpshiftAssessmentConfig;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformdal.webhookConfig.WebhookDerivedConfig;
@@ -96,6 +98,9 @@ public class PlatformDALSessionFactoryProvider {
 		    configuration.addAnnotatedClass(GrafanaDashboardPdfConfig.class);
 		    configuration.addAnnotatedClass(UpshiftAssessmentConfig.class);
 		    configuration.addAnnotatedClass(GrafanaOrgToken.class);
+		    configuration.addAnnotatedClass(InsightsSchedulerTaskDefinition.class);
+		    configuration.addAnnotatedClass(InsightsSchedulerTaskStatus.class);
+		    
 			PostgreData postgre = ApplicationConfigProvider.getInstance().getPostgre();
 			if(postgre != null){				
 				configuration.setProperty(AvailableSettings.USER, postgre.getUserName());

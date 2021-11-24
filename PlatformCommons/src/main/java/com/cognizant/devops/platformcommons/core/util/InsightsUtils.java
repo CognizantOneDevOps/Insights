@@ -530,7 +530,7 @@ public class InsightsUtils {
 		ZonedDateTime lastRunTimeInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(lastRunTime),
 				InsightsUtils.zoneIdUTC);
 		Duration d = Duration.between(lastRunTimeInput, now);
-		return d.abs().toMillis();
+		return d.abs().toDays();
 	}
 
 	/**

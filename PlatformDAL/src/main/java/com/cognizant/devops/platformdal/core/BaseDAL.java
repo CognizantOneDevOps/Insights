@@ -139,6 +139,26 @@ public class BaseDAL implements IBaseDAL {
 			throw e;
 		}
 	}
+	
+	@Override
+	public int executeUpdate(String query, Map<String, Object> parameters) {
+		long starttime = System.nanoTime();
+		int recordUpdated = -1;
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			Query createQuery = session.createQuery(query);
+			for (Map.Entry<String, Object> parameter : parameters.entrySet()) {
+				createQuery.setParameter(parameter.getKey(), parameter.getValue());
+			}
+			recordUpdated = createQuery.executeUpdate();
+			session.getTransaction().commit();
+			printHibernateStatistics(starttime, query, recordUpdated);
+		} catch (PersistenceException e) {
+			printHibernateException(e, query);
+			throw e;
+		}
+		return recordUpdated;
+	}
 
 	/** Method used to delete Entity object 
 	 * @param It required Hibernate Entity Object

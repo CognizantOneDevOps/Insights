@@ -35,10 +35,12 @@ import com.rabbitmq.client.Envelope;
 
 public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 	private static Logger log = LogManager.getLogger(WebhookHealthSubscriber.class);
+	private String jobName = ""; 
 	
 
-	public WebhookHealthSubscriber(String routingKey) throws Exception {
+	public WebhookHealthSubscriber(String routingKey, String jobName) throws Exception {
 		super(routingKey);
+		this.jobName=jobName;
 	}
 
 	@Override
@@ -70,9 +72,9 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 				}
 			} else {
 				log.error(" Data List is empty for webhook health record ");
-				EngineStatusLogger.getInstance().createEngineStatusNode(
+				EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
 						" Data List is empty for webhook health record: " + routingKey,
-						PlatformServiceConstants.FAILURE);
+						PlatformServiceConstants.FAILURE,jobName);
 			}
 		} catch (InsightsCustomException e) {
 			log.error("Type=WebhookHealth routingKey={} message={}  status={} serverPort={} error={}"
@@ -99,8 +101,8 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 		if (graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0) {
 			isRecordUpdate = Boolean.FALSE;
 			log.error("Unable to insert health nodes for routing key: {} error {}  ", nodeLabels, graphResponse);
-			EngineStatusLogger.getInstance().createEngineStatusNode(
-					"Unable to insert health nodes for routing key: " + nodeLabels, PlatformServiceConstants.FAILURE);
+			EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
+					"Unable to insert health nodes for routing key: " + nodeLabels, PlatformServiceConstants.FAILURE,jobName);
 		}
 		return isRecordUpdate;
 	}

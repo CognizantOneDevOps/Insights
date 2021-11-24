@@ -156,6 +156,10 @@ export class DataSharedService {
     this.storage.set("orgId", orgId);
   }
 
+  public getUserRole(){
+    return this.storage.get("userRole")
+  }
+
   public getTimeZone() {
     return this.storage.get("timeZone");
   }

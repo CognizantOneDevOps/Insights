@@ -28,6 +28,7 @@ import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflo
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.core.BaseDAL;
+import com.cognizant.devops.platformdal.workflow.InsightsWorkflowExecutionHistory;
 
 public class ReportConfigDAL extends BaseDAL {
 	private static Logger log = LogManager.getLogger(ReportConfigDAL.class);
@@ -231,7 +232,33 @@ public class ReportConfigDAL extends BaseDAL {
 			throw e;
 		}
 	}
-
+	/**
+	 * Method to delete Assessment report 100 days old
+	 * 
+	 * @param assessmentConfiguration
+	 * @return void
+	 */
+	public void deleteAssessmentReport(InsightsAssessmentConfiguration assessmentConfiguration) {
+		try {
+			String workflowId = assessmentConfiguration.getWorkflowConfig().getWorkflowId();
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
+			
+			String deleteIRV = "delete from InsightsReportVisualizationContainer IRV WHERE IRV.workflowId = :workflowId ";
+			
+			String deleteWE = "delete from InsightsWorkflowExecutionHistory WE WHERE WE.workflowConfig.workflowId = :workflowId ";
+			
+			int executedRecordWE = executeUpdate(deleteWE,parameters);
+			log.debug("Total rows deleted in Workflow Execution History {} for the query", executedRecordWE);
+			int executedRecordIRV = executeUpdate(deleteIRV,parameters);
+			log.debug("Total rows deleted in Insights Report Visualization Container {} for the query",executedRecordIRV);
+			delete(assessmentConfiguration);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
+	}
+	
 	/**
 	 * Method to get Assessment Configuration using Report Id
 	 * 

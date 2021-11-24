@@ -124,6 +124,13 @@ import { DashboardListComponent } from './dashboard-pdf-download/dashboard-list/
 import { DashboardDetailsDialog } from './dashboard-pdf-download/dashboard-details-dialog/dashboard-details-dialog';
 import { NgxJsonViewerModule } from 'ngx-json-viewer';
 import { EditDashboardComponent } from './dashboard-pdf-download/edit-dashboard/edit-dashboardcomponent';
+import { WorkflowTaskManagementComponent } from './workflow-task-management/workflow-task-management.component';
+import { WorkflowTaskManagementService } from './workflow-task-management/workflow-task-management.service';
+import { AddWorkflowTaskComponent } from './workflow-task-management/add-workflow-task/add-workflow-task.component';
+import { ScheduleTaskManagmentComponent } from '@insights/app/modules/schedule-task-managment/schedule-task-managment.component';
+import { TaskManagementService } from '@insights/app/modules/schedule-task-managment/task-management-service';
+import { TaskHistoryDetailsDialog } from '@insights/app/modules/schedule-task-managment/task-history-details/task-history-details-dialog';
+
 
 @NgModule({
   declarations: [
@@ -140,7 +147,6 @@ import { EditDashboardComponent } from './dashboard-pdf-download/edit-dashboard/
     AgentManagementComponent,
     DatadictionaryComponent,
     BusinessMappingComponent,
-
     DataArchivingComponent,
     DataArchiveDetailsDialog,
     DataArchiveConfigureURLDialog,
@@ -190,7 +196,12 @@ import { EditDashboardComponent } from './dashboard-pdf-download/edit-dashboard/
     DashboardPdfDownloadComponent,
     EditDashboardComponent,
     DashboardListComponent,
-    DashboardDetailsDialog
+    DashboardDetailsDialog,
+    WorkflowTaskManagementComponent,
+    AddWorkflowTaskComponent,
+    DashboardDetailsDialog,
+    ScheduleTaskManagmentComponent,
+    TaskHistoryDetailsDialog
   ],
   imports: [
     HomeRouting,
@@ -230,8 +241,8 @@ import { EditDashboardComponent } from './dashboard-pdf-download/edit-dashboard/
     KpiListDialog,
     KpiReportListDialog,
     DashboardPreviewConfigDialog,
-    DashboardDetailsDialog
-
+    DashboardDetailsDialog,
+    TaskHistoryDetailsDialog
   ],
 
   providers: [
@@ -241,7 +252,7 @@ import { EditDashboardComponent } from './dashboard-pdf-download/edit-dashboard/
     HealthCheckService,
     DataDictionaryService,
     BusinessMappingService,
-
+    WorkflowTaskManagementService,
     DataArchivingService,
     UserOnboardingService,
     MessageDialogService,
@@ -263,7 +274,8 @@ import { EditDashboardComponent } from './dashboard-pdf-download/edit-dashboard/
     ContentService,
     ReportTemplateService,
     ServerConfigurationService,
-    FileSystemService
+    FileSystemService,
+    TaskManagementService
   ]
 })
 export class HomeModules { }

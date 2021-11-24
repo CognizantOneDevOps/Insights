@@ -15,6 +15,9 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.workflow.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformdal.workflow.InsightsWorkflowType;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.workflow.service.WorkflowServiceImpl;
 import com.google.gson.JsonArray;
@@ -64,6 +69,8 @@ public class InsightsWorkflowController {
 			return PlatformServiceUtil.buildFailureResponse("Unable to save workflow task due to exception");
 		}
 	}
+
+	
 
 	@PostMapping(value = "/getTaskList", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getTaskList(@RequestParam String workflowType) {
@@ -121,7 +128,7 @@ public class InsightsWorkflowController {
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(records);
 	}
-	
+
 	@PostMapping(value = "/getLatestExecutionId", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getLatestExecutionId(@RequestBody String workflowId) {
 		JsonObject records = null;
@@ -191,6 +198,72 @@ public class InsightsWorkflowController {
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
+	}
+	
+	@PostMapping(value = "/updateWorkflowTask", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject updateWorkflowTask(@RequestBody String workflowTask) {
+		try {
+			workflowTask = workflowTask.replace("\n", "").replace("\r", "");
+			String validatedResponse = ValidationUtils.validateRequestBody(workflowTask);
+			JsonParser parser = new JsonParser();
+			JsonObject workflowTaskJson = (JsonObject) parser.parse(validatedResponse);
+			workflowService.updateWorkflowTask(workflowTaskJson);
+			return PlatformServiceUtil.buildSuccessResponseWithData(" workflow Task was updated");
+		} catch (InsightsCustomException e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		} catch (Exception e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse("Unable to update workflow task due to exception");
+		}
+	}
+	
+	/**
+	 * get the task lists from the table
+	 * @return JsonArray
+	 */
+	@GetMapping(value = "/getAllWorkflowTask", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject getTaskDetail() {
+		try {
+			return PlatformServiceUtil.buildSuccessResponseWithData(workflowService.getTaskDetail());
+		} catch (InsightsCustomException e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+	}
 
+	/**
+	 * get the workflow type from the table
+	 * @return JsonArray
+	 * @throws InsightsCustomException
+	 */
+	@GetMapping(value = "/getAllWorkflowType", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody List<String> getWorkflowType() throws InsightsCustomException {
+		try {
+			return workflowService.getAllWorkflowTypes();
+		} catch (InsightsCustomException e) {
+			log.error(e);
+			throw new InsightsCustomException(e.toString());
+		}
+	}
+
+	/**
+	 * Deleting a task
+	 * @param taskId
+	 * @return JsonObject
+	 */
+	@PostMapping(value = "/deleteTaskList", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject deleteWorkflowtask(@RequestParam int taskId) {
+		log.debug("TASK ID : {}", taskId);
+		try {
+			boolean status = workflowService.deleteTaskDetail(taskId);
+			if (!status) 
+				return PlatformServiceUtil.buildFailureResponse("The workflow task in use");
+			else
+				return PlatformServiceUtil.buildSuccessResponseWithData(status);
+		} catch (InsightsCustomException e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
 	}
 }

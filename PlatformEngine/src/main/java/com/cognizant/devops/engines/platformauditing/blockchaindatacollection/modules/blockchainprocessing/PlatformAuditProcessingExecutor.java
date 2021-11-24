@@ -29,20 +29,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TimerTask;
 import java.util.TreeMap;
 
 import javax.crypto.Cipher;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
 import com.cognizant.devops.platformauditing.util.LoadFile;
-import com.cognizant.devops.platformcommons.constants.InsightsAuditConstants;
-import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
+import com.cognizant.devops.platformcommons.constants.InsightsAuditConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
@@ -53,24 +54,34 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class PlatformAuditProcessingExecutor extends TimerTask implements ApplicationConfigInterface{
+public class PlatformAuditProcessingExecutor implements Job, ApplicationConfigInterface {
+	
     private static Logger LOG = LogManager.getLogger(PlatformAuditProcessingExecutor.class);
     private final InsightsAuditImpl insightAuditImpl = Util.getAuditObject();
 	private static Util utilObj = new Util();
 	private long lastTimestamp;
+	String jobName="";
 
     @Override
-	public void run() {
+	public void execute(JobExecutionContext context) throws JobExecutionException {
         LOG.info("Blockchain Processing Executer module is getting executed");
+        long startTime =System.currentTimeMillis();
+        
         try {
+        	jobName=context.getJobDetail().getKey().getName();
+        	EngineStatusLogger.getInstance().createSchedularTaskStatusNode("PlatformAuditProcessingExecutor execution Start ",
+				PlatformServiceConstants.SUCCESS,jobName);
 			ApplicationConfigInterface.loadConfiguration();
 			orphanNodeExtraction();
-		} catch (InsightsCustomException e) {
+		} catch (Exception e) {
 			LOG.error(e);
-			EngineStatusLogger.getInstance().createEngineStatusNode(
-					" Error occured while initializing Audit Engine processing  " + e.getMessage(),
-					PlatformServiceConstants.FAILURE);
+			EngineStatusLogger.getInstance().createSchedularTaskStatusNode("PlatformAuditProcessingExecutor execution has some issue  ",
+					PlatformServiceConstants.FAILURE,jobName);
 		}
+        
+        long processingTime = System.currentTimeMillis() - startTime ;
+		EngineStatusLogger.getInstance().createSchedularTaskStatusNode("PlatformAuditProcessingExecutor execution Completed",
+				PlatformServiceConstants.SUCCESS,jobName,processingTime);
         
     }
 

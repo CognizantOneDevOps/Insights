@@ -1,0 +1,34 @@
+[
+	{
+		"queryName": "Add EngineAggregatorModule ",
+		"sqlQuery": " INSERT INTO public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\" ( timertaskid, action, componentclassdetail, componentname, schedule) SELECT nextval('hibernate_sequence'), 'NOT_STARTED', 'com.cognizant.devops.engines.platformengine.modules.aggregator.EngineAggregatorModule','EngineAggregatorModule', '0 */10 * ? * *' WHERE NOT EXISTS(SELECT componentname from public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\" WHERE componentname = 'EngineAggregatorModule');"
+	},
+	{
+		"queryName": "Add EngineCorrelatorModule ",
+		"sqlQuery": " INSERT INTO public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\" ( timertaskid, action, componentclassdetail, componentname, schedule) SELECT nextval('hibernate_sequence'), 'NOT_STARTED', 'com.cognizant.devops.engines.platformengine.modules.correlation.EngineCorrelatorModule', 'EngineCorrelatorModule', '0 0 0/1 ? * * *' WHERE NOT EXISTS(SELECT componentname from public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\"  WHERE componentname = 'EngineCorrelatorModule');"
+	},
+	{
+		"queryName": "Add OfflineDataProcessingExecutor ",
+		"sqlQuery": " INSERT INTO public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\" ( timertaskid, action, componentclassdetail, componentname, schedule) SELECT nextval('hibernate_sequence'), 'NOT_STARTED', 'com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing.OfflineDataProcessingExecutor', 'OfflineDataProcessingExecutor', '0 */10 * ? * *'  WHERE NOT EXISTS(SELECT componentname from public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\" WHERE componentname = 'OfflineDataProcessingExecutor'); "
+	},
+	{
+		"queryName": "Add PlatformAuditProcessingExecutor ",
+		"sqlQuery": " INSERT INTO public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\" ( timertaskid, action, componentclassdetail, componentname, schedule) SELECT nextval('hibernate_sequence'), 'STOP',  'com.cognizant.devops.engines.platformauditing.blockchaindatacollection.modules.blockchainprocessing.PlatformAuditProcessingExecutor', 'PlatformAuditProcessingExecutor', '0 0 0/1 ? * * *' WHERE NOT EXISTS(SELECT componentname from public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\"  WHERE componentname = 'PlatformAuditProcessingExecutor'); "
+	},
+	{
+		"queryName": "Add AuditJiraProcessingExecutor ",
+		"sqlQuery": " INSERT INTO public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\" ( timertaskid, action, componentclassdetail, componentname, schedule) SELECT nextval('hibernate_sequence'), 'STOP',  'com.cognizant.devops.engines.platformauditing.blockchaindatacollection.modules.blockchainprocessing.JiraProcessingExecutor', 'AuditJiraProcessingExecutor', '0 0 0/1 ? * * *' WHERE NOT EXISTS(SELECT componentname from public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\" WHERE componentname = 'AuditJiraProcessingExecutor'); "
+	},
+	{
+		"queryName": "Add WebHookEngineAggregatorModule ",
+		"sqlQuery": " INSERT INTO public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\" ( timertaskid, action, componentclassdetail, componentname, schedule) SELECT nextval('hibernate_sequence'), 'STOP', 'com.cognizant.devops.engines.platformwebhookengine.modules.aggregator.WebHookEngineAggregatorModule', 'WebHookEngineAggregatorModule', '0 */10 * ? * *' WHERE NOT EXISTS(SELECT componentname from public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\" WHERE componentname = 'WebHookEngineAggregatorModule'); "
+	},
+	{
+		"queryName": "Add WebhookOfflineEventProcessing ",
+		"sqlQuery": " INSERT INTO public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\" ( timertaskid, action, componentclassdetail, componentname, schedule) SELECT nextval('hibernate_sequence'), 'STOP',  'com.cognizant.devops.engines.platformwebhookengine.offlineprocessing.WebhookOfflineEventProcessing', 'WebhookOfflineEventProcessing', '0 */15 * ? * *' WHERE NOT EXISTS(SELECT componentname from public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\" WHERE componentname = 'WebhookOfflineEventProcessing'); "
+	},
+	{
+		"queryName": "Add DataArchivalAggregatorModule ",
+		"sqlQuery": " INSERT INTO public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\" ( timertaskid, action, componentclassdetail, componentname, schedule) SELECT nextval('hibernate_sequence'), 'STOP', 'com.cognizant.devops.engines.platformdataarchivalengine.modules.aggregator.DataArchivalAggregatorModule', 'DataArchivalAggregatorModule', '0 0 0/4 ? * * *' WHERE NOT EXISTS(SELECT componentname from public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\"  WHERE componentname = 'DataArchivalAggregatorModule'); "
+	}
+]

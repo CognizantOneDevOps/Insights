@@ -186,7 +186,8 @@ public class InsightsAssessmentReportController {
 	public @ResponseBody JsonObject deleteReport(@RequestParam String configId) {
 		String message = null;
 		try {
-			message = assessmentReportService.deleteAssessmentReport(configId);
+			String validatedResponse = ValidationUtils.validateRequestBody(configId);
+			message = assessmentReportService.deleteAssessmentReport(validatedResponse);
 			return PlatformServiceUtil.buildSuccessResponseWithData(message);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());

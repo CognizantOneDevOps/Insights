@@ -57,11 +57,14 @@ public class CorrelationExecutor {
 	private int dataBatchSize;
 	InsightsConfigFilesDAL configFilesDAL = new InsightsConfigFilesDAL();
 	private Map<String,String> loggingInfo = new ConcurrentHashMap<>();
+	private String jobName = ""; 
+	
 	/**
 	 * Correlation execution starting point.
 	 */
-	public void execute() {
+	public void execute(String jobName) {
 		loggingInfo.put("execId", String.valueOf(System.currentTimeMillis()));
+		this.jobName = jobName;
 		CorrelationConfig correlationConfig = ApplicationConfigProvider.getInstance().getCorrelations();
 		if (correlationConfig != null) {
 			loadCorrelationConfiguration(correlationConfig);
@@ -250,9 +253,9 @@ public class CorrelationExecutor {
 			log.debug(" Type=Correlator execId={} correlationName={} sourceTool={} destinationTool={} ProcessingTime={} processedRecords={} Processed Records for correlation= {}  ",loggingInfo.get("execId"),loggingInfo.get("correlationName"),loggingInfo.get("sourceTool"),loggingInfo.get("destinationTool"),(System.currentTimeMillis() - st),processedRecords,processedRecords);
 		} catch (InsightsCustomException e) {
 			log.error(" execId={} correlationName={} sourceTool={} destinationTool={} Error occured while executing correlations",loggingInfo.get("execId"),loggingInfo.get("correlationName"),loggingInfo.get("sourceTool"),loggingInfo.get("destinationTool"),e);
-			EngineStatusLogger.getInstance().createEngineStatusNode(
+			EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
 					" Error occured while executing correlations for relation " + e.getMessage(),
-					PlatformServiceConstants.FAILURE);
+					PlatformServiceConstants.FAILURE, jobName);
 		}
 		return processedRecords;
 	}
@@ -327,21 +330,21 @@ public class CorrelationExecutor {
 				String configFileData = new String(configFile.get(0).getFileData(), StandardCharsets.UTF_8);
 				Correlation[] correlationArray = new Gson().fromJson(configFileData, Correlation[].class);
 				correlations = Arrays.asList(correlationArray);
-				EngineStatusLogger.getInstance().createEngineStatusNode("Correlation.json is successfully loaded.",
-						PlatformServiceConstants.SUCCESS);
+				EngineStatusLogger.getInstance().createSchedularTaskStatusNode("Correlation.json is successfully loaded.",
+						PlatformServiceConstants.SUCCESS, jobName);
 				log.debug(" Type=Correlator execId={} correlationName={} sourceTool={} destinationTool={} ProcessingTime={} processedRecords={} Correlation.json is successfully loaded.",loggingInfo.get("execId"),"-","-","-",0,0);
 			} else {
 				log.error(" execId={} Correlation.json not found in DB.",loggingInfo.get("execId"));
-				EngineStatusLogger.getInstance().createEngineStatusNode("Correlation.json not found in DB.",
-						PlatformServiceConstants.FAILURE);
+				EngineStatusLogger.getInstance().createSchedularTaskStatusNode("Correlation.json not found in DB.",
+						PlatformServiceConstants.FAILURE, jobName);
 			}
 		} catch (JsonSyntaxException e) {
-			EngineStatusLogger.getInstance().createEngineStatusNode("Correlation.json is not formatted.",
-					PlatformServiceConstants.FAILURE);
+			EngineStatusLogger.getInstance().createSchedularTaskStatusNode("Correlation.json is not formatted.",
+					PlatformServiceConstants.FAILURE, jobName);
 			log.error(" execId={} Correlation.json is not formatted",loggingInfo.get("execId"));
 		} catch (Exception e) {
-			EngineStatusLogger.getInstance().createEngineStatusNode("Error while loading Correlation.json.",
-					PlatformServiceConstants.FAILURE);
+			EngineStatusLogger.getInstance().createSchedularTaskStatusNode("Error while loading Correlation.json.",
+					PlatformServiceConstants.FAILURE, jobName);
 			log.error(" execId={} Exception while loading Correlation.json",loggingInfo.get("execId"));
 		}
 		return correlations;
@@ -381,8 +384,8 @@ public class CorrelationExecutor {
 			correlationList = correlationConfigDAL.getActiveCorrelations();
 		} catch (Exception e) {
 			log.error(" execId={} unable to get correlation from database",loggingInfo.get("execId"));
-			EngineStatusLogger.getInstance().createEngineStatusNode("unable to get correlation from database",
-					PlatformServiceConstants.FAILURE);
+			EngineStatusLogger.getInstance().createSchedularTaskStatusNode("unable to get correlation from database",
+					PlatformServiceConstants.FAILURE, jobName);
 		}
 		return correlationList;
 	}

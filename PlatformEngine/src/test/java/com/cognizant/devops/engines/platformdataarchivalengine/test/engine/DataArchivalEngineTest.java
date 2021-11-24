@@ -90,7 +90,7 @@ public class DataArchivalEngineTest extends DataArchivalEngineData {
 		}
 
 		DataArchivalAggregatorModule dam = new DataArchivalAggregatorModule();
-		dam.run();
+		dam.runDataArchival();
 
 		Thread.sleep(1000);
 

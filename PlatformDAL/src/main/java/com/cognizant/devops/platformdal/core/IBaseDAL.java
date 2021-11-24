@@ -49,6 +49,8 @@ public interface IBaseDAL {
 	
 	<T> List<T> executeGrafanaSQLQueryAndRetunList(String query, Map<String, Type> scalarValues,
 			Map<String, Object> parameters);
+
+	int executeUpdate(String query, Map<String, Object> parameters);
 	
 
 }

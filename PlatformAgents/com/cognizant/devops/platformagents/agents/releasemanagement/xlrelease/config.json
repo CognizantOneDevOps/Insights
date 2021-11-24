@@ -1,0 +1,226 @@
+{
+	"vault": {
+		"getFromVault": false,
+		"secretEngine": "insights-kv",
+		"readToken": "vault_secret_token",
+		"vaultUrl": "http://Vault_Host:port/v1/"
+	},
+	"mqConfig": {
+		"user": "username for RabbitMq",
+		"password": "",
+		"host": "127.0.0.1",
+		"port": 5672,
+		"exchange": "iTest",
+		"agentControlXchg": "iAgent"
+	},
+	"subscribe": {
+		"config": "RELEASEMANAGEMENT.XLRELEASE.config"
+	},
+	"publish": {
+		"data": "RELEASEMANAGEMENT.XLRELEASE.DATA",
+		"health": "RELEASEMANAGEMENT.XLRELEASE.HEALTH"
+	},
+	"communication": {
+		"type": "REST",
+		"sslVerify": false,
+		"responseType": "JSON"
+	},
+	"dynamicTemplate": {
+		"timeFieldMapping": {
+			"releaseStartDate": "%Y-%m-%dT%H:%M:%S",
+			"releaseEndDate": "%Y-%m-%dT%H:%M:%S",
+			"releaseDueDate": "%Y-%m-%dT%H:%M:%S",
+			"releaseScheduledStartDate": "%Y-%m-%dT%H:%M:%S",
+			"phaseStartDate": "%Y-%m-%dT%H:%M:%S",
+			"phaseEndDate": "%Y-%m-%dT%H:%M:%S",
+			"phaseDueDate": "%Y-%m-%dT%H:%M:%S",
+			"phaseScheduledStartDate": "%Y-%m-%dT%H:%M:%S",
+			"taskStartDate": "%Y-%m-%dT%H:%M:%S",
+			"taskEndDate": "%Y-%m-%dT%H:%M:%S",
+			"taskDueDate": "%Y-%m-%dT%H:%M:%S",
+			"taskScheduledStartDate": "%Y-%m-%dT%H:%M:%S",
+			"consumptionTime": "%Y-%m-%dT%H:%M:%S"
+		},
+		"releasesResponseTemplate": {
+			"id": "releaseId",
+			"title": "releaseTitle",
+			"type": "releaseType",
+			"overdueNotified": "releaseOverdueNotified",
+			"status": "releaseStatus",
+			"scheduledStartDate": "releaseScheduledStartDate",
+			"dueDate": "releaseDueDate",
+			"startDate": "releaseStartDate",
+			"endDate": "releaseEndDate",
+			"maxConcurrentReleases": "releaseMaxConcurrentReleases",
+			"allowConcurrentReleasesFromTrigger": "releaseAllowConcurrentReleasesFromTrigger",
+			"members": "releaseMembers",
+			"createdFromTrigger": "releaseCreatedFromTrigger",
+			"riskProfile": "releaseRiskProfile",
+			"description": "releaseDescription",
+			"owner": "releaseOwner"
+		},
+		"phasesResponseTemplate": {
+			"id": "phaseId",
+			"title": "phaseTitle",
+			"type": "phaseType",
+			"status": "phaseStatus",
+			"scheduledStartDate": "phaseScheduledStartDate",
+			"dueDate": "phaseDueDate",
+			"startDate": "phaseStartDate",
+			"endDate": "phaseEndDate",
+			"description": "phaseDescription",
+			"owner": "phaseOwner"
+		},
+		"tasksResponseTemplate": {
+			"id": "taskId",
+			"title": "taskTitle",
+			"type": "taskType",
+			"status": "taskStatus",
+			"overdueNotified": "taskOverdueNotified",
+			"waitForScheduledStartDate": "taskWaitForScheduledStartDate",
+			"delayDuringBlackout": "taskDelayDuringBlackout",
+			"postponedDueToBlackout": "taskPostponedDueToBlackout",
+			"hasBeenFlagged": "taskHasBeenFlagged",
+			"failuresCount": "taskFailuresCount",
+			"dueSoonNotified": "taskDueSoonNotified",
+			"scheduledStartDate": "taskScheduledStartDate",
+			"dueDate": "taskDueDate",
+			"startDate": "taskStartDate",
+			"endDate": "taskEndDate",
+			"description": "taskDescription",
+			"owner": "taskOwner"
+		},
+		"foldersResponseTemplate": {
+			"title": "folderTitle",
+			"level": "folderLabel",
+			"parentFolderId": "parentFolderId",
+			"id": "folderId"
+		},
+		"releasesPayloadTemplate": {
+			"inactive": true,
+			"active": true,
+			"planned" : true
+		},
+		"releases": {
+			"insightsTimeXFieldMapping": {
+				"timefield": "releaseStartDate",
+				"isEpoch": false,
+				"timeformat": "%Y-%m-%dT%H:%M:%S"
+			}
+		},
+		"phases": {
+			"insightsTimeXFieldMapping": {
+				"timefield": "phaseStartDate",
+				"isEpoch": false,
+				"timeformat": "%Y-%m-%dT%H:%M:%S"
+			}
+		},
+		"tasks": {
+			"insightsTimeXFieldMapping": {
+				"timefield": "taskStartDate",
+				"isEpoch": false,
+				"timeformat": "%Y-%m-%dT%H:%M:%S"
+			}
+		},
+		"metaData": {
+			"releases": {
+				"labels": [
+					"XLRELEASE_RELEASES"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"releaseId"
+				]
+			},
+			"phases": {
+				"labels": [
+					"XLRELEASE_PHASES"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"phaseId"
+				]
+			},
+			"tasks": {
+				"labels": [
+					"XLRELEASE_TASKS"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"taskId"
+				]
+			},
+			"folders": {
+				"labels": [
+					"XLRELEASE_FOLDERS"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"folderId"
+				]
+			}
+		},
+		"extensions": {
+			"releaseDetails": {
+				"runSchedule": 60,
+				"relationMetadata": {
+					"relation": {
+						"properties": [
+							"releaseId"
+						],
+						"name": "RELEASES_TO_PHASES",
+						"source": {
+							"labels": [
+								"XLRELEASE_RELEASES"
+							],
+							"constraints": [
+								"releaseId"
+							]
+						},
+						"destination": {
+							"labels": [
+								"XLRELEASE_PHASES"
+							],
+							"constraints": [
+								"phaseId",
+								"releaseId"
+							],
+							"selectedProperties": [
+								"inSightsTimeX",
+								"inSightsTime"
+							]
+						}
+					}
+				}
+			}
+		}
+	},
+	"agentId": "",
+	"auth": "base64",
+	"toolCategory": "RELEASEMANAGEMENT",
+	"enableDataValidation": true,
+	"runSchedule": 30,
+	"toolsTimeZone": "Asia/Kolkata",
+	"isEpochTimeFormat": false,
+	"enableValueArray": false,
+	"agentSecretDetails": [
+		"userid",
+		"passwd"
+	],
+	"timeStampFormat": "%Y-%m-%dT%H:%M:%S",
+	"useResponseTemplate": true,
+	"userID": "",
+	"passwd": "",
+	"baseEndPoint": "",
+	"isDebugAllowed": false,
+	"loggingSetting": {
+		"logLevel": "INFO",
+		"maxBytes": 5000000,
+		"backupCount": 10
+	},
+	"auditing": false,
+	"webhookEnabled": false,
+	"osversion": "linux",
+	"agentVersion": "v6.0",
+	"toolName": "XLRELEASE"
+}

@@ -41,6 +41,8 @@
                 name="com.cognizant.devops.platformservice.test.upshiftassessment.UpshiftAssessmentServiceTest" />
              <class
                 name="com.cognizant.devops.platformservice.test.grafanadashboard.GrafanaDashboardReportTest" />
+             <class
+                name="com.cognizant.devops.platformservice.test.TaskManagement.TaskManagementServiceTest" />
 		</classes>
 	</test>
 </suite>

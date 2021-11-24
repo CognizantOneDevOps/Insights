@@ -16,19 +16,34 @@
 package com.cognizant.devops.engines.platformauditing.blockchaindatacollection.modules.blockchainprocessing;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Base64;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
+import javax.crypto.Cipher;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
 import com.cognizant.devops.platformauditing.util.LoadFile;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
-import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.constants.InsightsAuditConstants;
-import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
@@ -36,18 +51,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import javax.crypto.Cipher;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.*;
 
-
-public class JiraProcessingExecutor extends TimerTask implements ApplicationConfigInterface {
+public class JiraProcessingExecutor implements Job, ApplicationConfigInterface {
+	
 	private static Logger LOG = LogManager.getLogger(JiraProcessingExecutor.class);
 	private String blockchainProcessedFlag = "blockchainProcessedFlag";
 	private long lastTimestamp;
@@ -58,19 +64,27 @@ public class JiraProcessingExecutor extends TimerTask implements ApplicationConf
 	private static Util utilObj = new Util();
     private String decryptionAlgorithm = config.get("decryptionAlgorithm").getAsString();
     private String keyAlgorithm = config.get("keyAlgorithm").getAsString();
+    String jobName="";
 
 	@Override
-	public void run() {
+	public void execute(JobExecutionContext context) throws JobExecutionException {
 		LOG.info("Blockchain Processing Executer jira module is getting executed");
+		long startTime =System.currentTimeMillis();
 		try {
+			jobName=context.getJobDetail().getKey().getName();
+			EngineStatusLogger.getInstance().createSchedularTaskStatusNode("JiraProcessingExecutor execution Start ",
+					PlatformServiceConstants.SUCCESS,jobName);
 			ApplicationConfigInterface.loadConfiguration();
 			JiraNodeExtraction();
 		} catch (InsightsCustomException e) {
 			LOG.error(e);
-			EngineStatusLogger.getInstance().createEngineStatusNode(
-					" Error occured while initializing Audit Engine JIRA processing   " + e.getMessage(),
-					PlatformServiceConstants.FAILURE);
+			EngineStatusLogger.getInstance().createSchedularTaskStatusNode("JiraProcessingExecutor execution has some issue  ",
+					PlatformServiceConstants.FAILURE,jobName);
 		}
+		
+		long processingTime = System.currentTimeMillis() - startTime ;
+		EngineStatusLogger.getInstance().createSchedularTaskStatusNode("JiraProcessingExecutor execution Completed",
+				PlatformServiceConstants.SUCCESS,jobName,processingTime);
 		
 	}
 

@@ -17,23 +17,27 @@ package com.cognizant.devops.engines.platformengine.test.engine;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
+import org.quartz.Scheduler;
+import org.quartz.impl.JobDetailImpl;
+import org.quartz.spi.TriggerFiredBundle;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.engines.platformengine.modules.aggregator.EngineAggregatorModule;
 import com.cognizant.devops.engines.platformengine.modules.correlation.EngineCorrelatorModule;
 import com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing.OfflineDataProcessingExecutor;
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
@@ -53,6 +57,7 @@ public class EngineAggregatorCorelationModuleTest {
 	private FileReader reader = null;
 
 	private Properties p = null;
+	
 
 	@BeforeClass
 	public void onInit() throws InterruptedException, IOException, InsightsCustomException {
@@ -110,12 +115,12 @@ public class EngineAggregatorCorelationModuleTest {
 		 */
 
 		EngineAggregatorModule em = new EngineAggregatorModule();
-		em.run();
+		em.executeJob();
 		Thread.sleep(1000);
 		
 		
 		OfflineDataProcessingExecutor oc = new OfflineDataProcessingExecutor();
-		oc.run();
+		oc.executeOfflineProcessing();
 		
 
 		/* Start Engine for Correlation **/
@@ -126,6 +131,7 @@ public class EngineAggregatorCorelationModuleTest {
 
 		log.debug("Test Data flow has been created successfully");
 	}
+	
 
 	@Test(priority = 1)
 	public void testNeo4JData() {
@@ -164,7 +170,7 @@ public class EngineAggregatorCorelationModuleTest {
 			Thread.sleep(5000);
 
 			EngineCorrelatorModule ecm = new EngineCorrelatorModule();
-			ecm.run();
+			ecm.executeCorrelation();
 		} catch (Exception e) {
 			log.error(e);
 		}

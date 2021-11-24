@@ -46,14 +46,13 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return String
 	 */
 	public String deleteWorkflowTaskSequence(String workflowId) {
-		 
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
+
+		try {
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			List<InsightsWorkflowTaskSequence> asssessmentList = getResultList(
 					"FROM InsightsWorkflowTaskSequence a WHERE a.workflowConfig.workflowId= :workflowId",
-					InsightsWorkflowTaskSequence.class,
-					parameters);
+					InsightsWorkflowTaskSequence.class, parameters);
 			List<Integer> listofPrimaryKey = new ArrayList<>();
 			for (InsightsWorkflowTaskSequence asssessment : asssessmentList) {
 				asssessment.setWorkflowConfig(null);
@@ -78,7 +77,7 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return historyID
 	 */
 	public int saveTaskworkflowExecutionHistory(InsightsWorkflowExecutionHistory historyConfig) {
-		try  {
+		try {
 			return (int) save(historyConfig);
 		} catch (Exception e) {
 			log.error(e);
@@ -126,12 +125,10 @@ public class WorkflowDAL extends BaseDAL {
 	 */
 	public InsightsWorkflowConfiguration getWorkflowByWorkflowId(String workflowId) {
 		try {
-			Map<String,Object> parameters = new HashMap<>();
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-			return getUniqueResult(
-					"FROM InsightsWorkflowConfiguration WC WHERE WC.workflowId = :workflowId ",
-					InsightsWorkflowConfiguration.class,
-					parameters);
+			return getUniqueResult("FROM InsightsWorkflowConfiguration WC WHERE WC.workflowId = :workflowId ",
+					InsightsWorkflowConfiguration.class, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -150,19 +147,19 @@ public class WorkflowDAL extends BaseDAL {
 			Map<String, Object> extraParameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			extraParameters.put("MaxResults", 5);
-			List<Long> executionIds =  executeQueryWithExtraParameter(
+			List<Long> executionIds = executeQueryWithExtraParameter(
 					"select distinct executionId FROM InsightsWorkflowExecutionHistory EH WHERE EH.workflowConfig.workflowId = :workflowId ORDER BY executionId DESC",
 					Long.class, parameters, extraParameters);
-			
+
 			parameters.clear();
 			extraParameters.clear();
-			
+
 			extraParameters.put("executionIDs", executionIds);
-			
+
 			return executeQueryWithExtraParameter(
 					"FROM InsightsWorkflowExecutionHistory EH WHERE EH.executionId IN (:executionIDs) ORDER BY executionId DESC",
 					InsightsWorkflowExecutionHistory.class, parameters, extraParameters);
-			
+
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -177,12 +174,10 @@ public class WorkflowDAL extends BaseDAL {
 	 */
 	public InsightsWorkflowExecutionHistory getWorkflowExecutionHistoryByHistoryId(int historyId) {
 		try {
-			Map<String,Object> parameters = new HashMap<>();
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put("historyId", historyId);
-			return getUniqueResult(
-					"FROM InsightsWorkflowExecutionHistory EH WHERE EH.id = :historyId ",
-					InsightsWorkflowExecutionHistory.class,
-					parameters);
+			return getUniqueResult("FROM InsightsWorkflowExecutionHistory EH WHERE EH.id = :historyId ",
+					InsightsWorkflowExecutionHistory.class, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -196,13 +191,12 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return List<InsightsWorkflowExecutionHistory>
 	 */
 	public List<InsightsWorkflowExecutionHistory> getWorkflowExecutionHistoryByWorkflowId(String workflowId) {
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			return getResultList(
 					"FROM InsightsWorkflowExecutionHistory EH WHERE EH.workflowConfig.workflowId = :workflowId ",
-					InsightsWorkflowExecutionHistory.class,
-					parameters);
+					InsightsWorkflowExecutionHistory.class, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -216,13 +210,11 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return InsightsWorkflowTask object
 	 */
 	public InsightsWorkflowTask getTaskByTaskId(int taskId) {
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.TASK_ID, taskId);
-			return getUniqueResult(
-					"FROM InsightsWorkflowTask TE WHERE TE.taskId = :taskId ",
-					InsightsWorkflowTask.class,
-					parameters);
+			return getUniqueResult("FROM InsightsWorkflowTask TE WHERE TE.taskId = :taskId ",
+					InsightsWorkflowTask.class, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -238,12 +230,10 @@ public class WorkflowDAL extends BaseDAL {
 	@Deprecated
 	public InsightsWorkflowTask getTaskByTaskIdList(Integer taskId) {
 		try {
-			Map<String,Object> parameters = new HashMap<>();
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.TASK_ID, taskId);
-			return getUniqueResult(
-					"FROM InsightsWorkflowTask TE WHERE TE.taskId = :taskId ",
-					InsightsWorkflowTask.class,
-					parameters);
+			return getUniqueResult("FROM InsightsWorkflowTask TE WHERE TE.taskId = :taskId ",
+					InsightsWorkflowTask.class, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -255,13 +245,27 @@ public class WorkflowDAL extends BaseDAL {
 	 * 
 	 * @return List<InsightsWorkflowTask>
 	 */
+
 	public List<InsightsWorkflowTask> getAllWorkflowTask() {
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
-			return getResultList(
-					"FROM InsightsWorkflowTask TE ",
-					InsightsWorkflowTask.class,
+		try {
+			Map<String, Object> parameters = new HashMap<>();
+			return getResultList("FROM InsightsWorkflowTask TE ORDER BY workflowType", InsightsWorkflowTask.class,
 					parameters);
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
+	}
+
+	/**
+	 * Method to get all Workflow Type
+	 * 
+	 * @return List<InsightsWorkflowType>
+	 */
+	public List<InsightsWorkflowType> getAllWorkflowType() {
+		try {
+			Map<String, Object> parameters = new HashMap<>();
+			return getResultList("FROM InsightsWorkflowType TE ", InsightsWorkflowType.class, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -275,11 +279,10 @@ public class WorkflowDAL extends BaseDAL {
 	 */
 	public List<InsightsWorkflowConfiguration> getAllActiveWorkflowConfiguration() {
 		try {
-			Map<String,Object> parameters = new HashMap<>();
+			Map<String, Object> parameters = new HashMap<>();
 			return getResultList(
 					"FROM InsightsWorkflowConfiguration WC WHERE WC.isActive = true and WC.reoccurence = true",
-					InsightsWorkflowConfiguration.class,
-					parameters);
+					InsightsWorkflowConfiguration.class, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -294,11 +297,10 @@ public class WorkflowDAL extends BaseDAL {
 	 */
 	public List<InsightsWorkflowConfiguration> getAllScheduledAndActiveWorkflowConfiguration() {
 		try {
-			Map<String,Object> parameters = new HashMap<>();
+			Map<String, Object> parameters = new HashMap<>();
 			return getResultList(
 					"FROM InsightsWorkflowConfiguration WC WHERE WC.isActive = true and WC.runImmediate = false  ",
-					InsightsWorkflowConfiguration.class,
-					parameters);
+					InsightsWorkflowConfiguration.class, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -312,11 +314,10 @@ public class WorkflowDAL extends BaseDAL {
 	 */
 	public List<InsightsWorkflowConfiguration> getImmediateWorkflowConfiguration() {
 		try {
-			Map<String,Object> parameters = new HashMap<>();
+			Map<String, Object> parameters = new HashMap<>();
 			return getResultList(
 					"FROM InsightsWorkflowConfiguration WC WHERE WC.isActive = true and WC.runImmediate = true ",
-					InsightsWorkflowConfiguration.class,
-					parameters);
+					InsightsWorkflowConfiguration.class, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -330,13 +331,12 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return InsightsWorkflowTaskSequence object
 	 */
 	public InsightsWorkflowTaskSequence getWorkflowTaskSequenceByWorkflowId(String workflowId) {
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			return getUniqueResult(
 					"FROM InsightsWorkflowTaskSequence WTS WHERE WTS.workflowConfig.workflowId = :workflowId and WTS.sequence=1 ",
-					InsightsWorkflowTaskSequence.class,
-					parameters);
+					InsightsWorkflowTaskSequence.class, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -350,13 +350,12 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return List<InsightsWorkflowTaskSequence>
 	 */
 	public List<InsightsWorkflowTaskSequence> getAllWorkflowTaskSequenceByWorkflowId(String workflowId) {
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			return getResultList(
 					"FROM InsightsWorkflowTaskSequence WTS WHERE WTS.workflowConfig.workflowId = :workflowId ORDER BY sequence ASC ",
-					InsightsWorkflowTaskSequence.class,
-					parameters);
+					InsightsWorkflowTaskSequence.class, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -372,13 +371,30 @@ public class WorkflowDAL extends BaseDAL {
 	 */
 	public InsightsWorkflowTaskSequence getWorkflowTaskSequenceByWorkflowAndTaskId(String workflowId, int taskId) {
 		try {
-			Map<String,Object> parameters = new HashMap<>();
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			parameters.put(AssessmentReportAndWorkflowConstants.TASK_ID, taskId);
 			return getUniqueResult(
 					"FROM InsightsWorkflowTaskSequence WTS WHERE WTS.workflowConfig.workflowId = :workflowId and WTS.workflowTaskEntity.taskId=:taskId ",
-					InsightsWorkflowTaskSequence.class,
-					parameters);
+					InsightsWorkflowTaskSequence.class, parameters);
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
+	}
+
+	/**
+	 * Method to get Workflow Task Sequence using TaskId
+	 * 
+	 * @param taskId
+	 * @return InsightsWorkflowTaskSequence object
+	 */
+	public List<InsightsWorkflowTaskSequence> getWorkflowTaskSequenceByTaskId(int taskId) {
+		try {
+			Map<String, Object> parameters = new HashMap<>();
+			parameters.put(AssessmentReportAndWorkflowConstants.TASK_ID, taskId);
+			return getResultList("FROM InsightsWorkflowTaskSequence WTS WHERE  WTS.sequence > 0 and WTS.workflowTaskEntity.taskId=:taskId",
+					InsightsWorkflowTaskSequence.class, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -392,8 +408,19 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return taskId
 	 */
 	public int saveInsightsWorkflowTaskConfig(InsightsWorkflowTask config) {
-		try  {
-			return(int) save(config);
+		try {
+			return (int) save(config);
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
+
+	}
+
+	public int updateInsightsWorkflowTaskConfig(InsightsWorkflowTask config) {
+		try {
+			update(config);
+			return 0;
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -407,8 +434,8 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return List<InsightsWorkflowTask>
 	 */
 	public List<InsightsWorkflowTask> getTaskLists(String workflowType) {
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put("workflowType", workflowType);
 			return getResultList(
 					"FROM InsightsWorkflowTask RE WHERE RE.workflowType.workflowType = :workflowType ORDER BY RE.dependency ASC",
@@ -427,13 +454,11 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return InsightsWorkflowConfiguration object
 	 */
 	public InsightsWorkflowConfiguration getWorkflowConfigByWorkflowId(String workflowId) {
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-			return getUniqueResult(
-					"FROM InsightsWorkflowConfiguration WC WHERE WC.workflowId = :workflowId",
-					InsightsWorkflowConfiguration.class,
-					parameters);
+			return getUniqueResult("FROM InsightsWorkflowConfiguration WC WHERE WC.workflowId = :workflowId",
+					InsightsWorkflowConfiguration.class, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -449,8 +474,8 @@ public class WorkflowDAL extends BaseDAL {
 	 */
 	public List<Object[]> getWorkflowExecutionRecordsbyAssessmentConfigID(int assessmentConfigId) {
 		try {
-			Map<String,Type> scalarList = new LinkedHashMap<>();
-			Map<String,Object> parameters = new HashMap<>();
+			Map<String, Type> scalarList = new LinkedHashMap<>();
+			Map<String, Object> parameters = new HashMap<>();
 			String query = "SELECT IWHU.executionid as executionid,IWHU.starttime as startTime,IWHU.endtime as endTime,IWHU.retrycount as retryCount,IWHU.statuslog as statusLog,"
 					+ "IWHU.taskstatus as taskStatus,IWT.description as currentTask FROM \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\" IWHU inner join \"INSIGHTS_WORKFLOW_TASK\" IWT ON IWHU.currenttask=IWT.taskid WHERE executionid IN "
 					+ "(SELECT DISTINCT(executionid) FROM \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\" IWH where IWH.workflowid IN"
@@ -466,7 +491,7 @@ public class WorkflowDAL extends BaseDAL {
 			scalarList.put("taskStatus", StandardBasicTypes.STRING);
 			scalarList.put("currentTask", StandardBasicTypes.STRING);
 			parameters.put("configId", assessmentConfigId);
-			return executeSQLQueryAndRetunList(query,scalarList,parameters);
+			return executeSQLQueryAndRetunList(query, scalarList, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -481,9 +506,9 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return List<Object[]>
 	 */
 	public List<Object[]> getWorkflowExecutionRecordsByworkflowID(String workflowId) {
-		try  {
-			Map<String,Type> scalarList = new LinkedHashMap<>();
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Type> scalarList = new LinkedHashMap<>();
+			Map<String, Object> parameters = new HashMap<>();
 			String query = "SELECT IWHU.executionid as executionid,IWHU.starttime as startTime,IWHU.endtime as endTime,IWHU.retrycount as retryCount,IWHU.statuslog as statusLog,"
 					+ "IWHU.taskstatus as taskStatus,IWT.description as currentTask "
 					+ "FROM \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\" IWHU "
@@ -499,7 +524,7 @@ public class WorkflowDAL extends BaseDAL {
 			scalarList.put("taskStatus", StandardBasicTypes.STRING);
 			scalarList.put("currentTask", StandardBasicTypes.STRING);
 			parameters.put("workflowID", workflowId);
-			return executeSQLQueryAndRetunList(query,scalarList,parameters);
+			return executeSQLQueryAndRetunList(query, scalarList, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -513,11 +538,10 @@ public class WorkflowDAL extends BaseDAL {
 	 */
 	public List<InsightsWorkflowExecutionHistory> getErrorExecutionHistoryBasedOnWorflow() {
 		try {
-			Map<String,Object> parameters = new HashMap<>();
+			Map<String, Object> parameters = new HashMap<>();
 			return getResultList(
 					"FROM InsightsWorkflowExecutionHistory EH WHERE EH.taskStatus='ERROR' and EH.workflowConfig.isActive = true order by EH.executionId desc",
-					InsightsWorkflowExecutionHistory.class,
-					parameters);
+					InsightsWorkflowExecutionHistory.class, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -530,12 +554,11 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return List<InsightsWorkflowConfiguration> @
 	 */
 	public List<InsightsWorkflowConfiguration> getCompletedTaskRetryWorkflows() {
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Object> parameters = new HashMap<>();
 			return getResultList(
 					"FROM InsightsWorkflowConfiguration WC WHERE WC.status='TASK_INITIALIZE_ERROR' and WC.isActive = true",
-					InsightsWorkflowConfiguration.class,
-					parameters);
+					InsightsWorkflowConfiguration.class, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -550,14 +573,13 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return InsightsWorkflowExecutionHistory object
 	 */
 	public InsightsWorkflowExecutionHistory getLastestTaskByEndTime(String workflowId, long latestExecutionId) {
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			parameters.put("latestExecutionId", latestExecutionId);
-			List<InsightsWorkflowExecutionHistory> nextTasks =  getResultList(
+			List<InsightsWorkflowExecutionHistory> nextTasks = getResultList(
 					"FROM InsightsWorkflowExecutionHistory EH WHERE EH.workflowConfig.isActive = true and EH.workflowConfig.workflowId=:workflowId and EH.executionId=:latestExecutionId order by EH.endTime desc",
-					InsightsWorkflowExecutionHistory.class,
-					parameters);
+					InsightsWorkflowExecutionHistory.class, parameters);
 			List<String> errorStatusList = Arrays.asList("ERROR", "ABORTED", "RETRY_EXCEEDED", "IN_PROGRESS");
 			if (nextTasks.stream()
 					.noneMatch(anyFailedTask -> errorStatusList.contains(anyFailedTask.getTaskStatus()))) {
@@ -579,7 +601,7 @@ public class WorkflowDAL extends BaseDAL {
 	 */
 	public long getLastestExecutionIdForFailedWorkflow(String workflowId) {
 		try {
-			
+
 			Map<String, Object> parameters = new HashMap<>();
 			Map<String, Object> extraParameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
@@ -603,12 +625,11 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return List<InsightsWorkflowConfiguration>
 	 */
 	public List<InsightsWorkflowConfiguration> getAllRestartWorkflows() {
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Object> parameters = new HashMap<>();
 			return getResultList(
 					"FROM InsightsWorkflowConfiguration WC WHERE WC.isActive = true and WC.status='TASK_INITIALIZE_ERROR' ",
-					InsightsWorkflowConfiguration.class,
-					parameters);
+					InsightsWorkflowConfiguration.class, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -622,12 +643,11 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return int
 	 */
 	public int getTaskId(String mqChannel) {
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put("mqChannel", mqChannel);
-			InsightsWorkflowTask workflowTask =  getUniqueResult(
-					"FROM InsightsWorkflowTask IWT WHERE IWT.mqChannel = :mqChannel",
-					InsightsWorkflowTask.class,
+			InsightsWorkflowTask workflowTask = getUniqueResult(
+					"FROM InsightsWorkflowTask IWT WHERE IWT.mqChannel = :mqChannel", InsightsWorkflowTask.class,
 					parameters);
 			return workflowTask.getTaskId();
 		} catch (Exception e) {
@@ -643,13 +663,11 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return InsightsWorkflowTask
 	 */
 	public InsightsWorkflowTask getTaskByChannel(String mqChannel) {
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put("mqChannel", mqChannel);
-			return getUniqueResult(
-					"FROM InsightsWorkflowTask IWT WHERE IWT.mqChannel = :mqChannel",
-					InsightsWorkflowTask.class,
-					parameters);
+			return getUniqueResult("FROM InsightsWorkflowTask IWT WHERE IWT.mqChannel = :mqChannel",
+					InsightsWorkflowTask.class, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -679,12 +697,11 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return String
 	 */
 	public String deleteExecutionHistory(int id) {
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put("id", id);
 			InsightsWorkflowExecutionHistory executionRecord = getSingleResult(
-					"FROM InsightsWorkflowExecutionHistory a WHERE a.id= :id",
-					InsightsWorkflowExecutionHistory.class,
+					"FROM InsightsWorkflowExecutionHistory a WHERE a.id= :id", InsightsWorkflowExecutionHistory.class,
 					parameters);
 			executionRecord.setWorkflowConfig(null);
 			delete(executionRecord);
@@ -703,13 +720,11 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return InsightsWorkflowTask object
 	 */
 	public InsightsWorkflowTask getTaskbyTaskDescription(String description) {
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put("description", description);
-			return getUniqueResult(
-					"FROM InsightsWorkflowTask RE WHERE RE.description = :description",
-					InsightsWorkflowTask.class,
-					parameters);
+			return getUniqueResult("FROM InsightsWorkflowTask RE WHERE RE.description = :description",
+					InsightsWorkflowTask.class, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -723,13 +738,11 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return String
 	 */
 	public String deleteTask(int taskId) {
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put("id", taskId);
-			InsightsWorkflowTask deleteTask = getSingleResult(
-					"FROM InsightsWorkflowTask a WHERE a.taskId= :id",
-					InsightsWorkflowTask.class,
-					parameters);
+			InsightsWorkflowTask deleteTask = getSingleResult("FROM InsightsWorkflowTask a WHERE a.taskId= :id",
+					InsightsWorkflowTask.class, parameters);
 			deleteTask.setWorkflowType(null);
 			delete(deleteTask);
 			return PlatformServiceConstants.SUCCESS;
@@ -745,8 +758,8 @@ public class WorkflowDAL extends BaseDAL {
 	 * @param emailHistoryConfig
 	 */
 	public void saveEmailExecutionHistory(InsightsReportVisualizationContainer emailHistoryConfig) {
-		try  {
-			 save(emailHistoryConfig);
+		try {
+			save(emailHistoryConfig);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -761,12 +774,10 @@ public class WorkflowDAL extends BaseDAL {
 	 */
 	public InsightsEmailTemplates getEmailTemplateByWorkflowId(String workflowId) {
 		try {
-			Map<String,Object> parameters = new HashMap<>();
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-			return getUniqueResult(
-					"FROM InsightsEmailTemplates EH WHERE EH.workflowConfig.workflowId = :workflowId ",
-					InsightsEmailTemplates.class,
-					parameters);
+			return getUniqueResult("FROM InsightsEmailTemplates EH WHERE EH.workflowConfig.workflowId = :workflowId ",
+					InsightsEmailTemplates.class, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -782,8 +793,6 @@ public class WorkflowDAL extends BaseDAL {
 		update(emailHistoryConfig);
 	}
 
-	
-
 	/**
 	 * Method to fetch Email Execution History using ExecutionId
 	 * 
@@ -792,12 +801,10 @@ public class WorkflowDAL extends BaseDAL {
 	 */
 	public InsightsReportVisualizationContainer getEmailExecutionHistoryByExecutionId(long executionId) {
 		try {
-			Map<String,Object> parameters = new HashMap<>();
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put("executionId", executionId);
-			return getUniqueResult(
-					"FROM InsightsReportVisualizationContainer EH WHERE EH.executionId = :executionId ",
-					InsightsReportVisualizationContainer.class,
-					parameters);
+			return getUniqueResult("FROM InsightsReportVisualizationContainer EH WHERE EH.executionId = :executionId ",
+					InsightsReportVisualizationContainer.class, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -811,8 +818,8 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return InsightsReportVisualizationContainer
 	 */
 	public InsightsReportVisualizationContainer getEmailExecutionHistoryByWorkflowId(String workflowId) {
-		try  {
-			
+		try {
+
 			Map<String, Object> parameters = new HashMap<>();
 			Map<String, Object> extraParameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
@@ -861,13 +868,12 @@ public class WorkflowDAL extends BaseDAL {
 	 */
 	public String deleteEmailExecutionHistoryByWorkflowId(String workflowId) {
 		try {
-			Map<String,Object> parameters = new HashMap<>();
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			List<InsightsReportVisualizationContainer> executionRecords = getResultList(
 					"FROM InsightsReportVisualizationContainer a WHERE a.workflowId= :workflowId",
-					InsightsReportVisualizationContainer.class,
-					parameters);
-			
+					InsightsReportVisualizationContainer.class, parameters);
+
 			for (InsightsReportVisualizationContainer insightsReportVisualizationContainer : executionRecords) {
 				delete(insightsReportVisualizationContainer);
 			}
@@ -886,14 +892,13 @@ public class WorkflowDAL extends BaseDAL {
 	 * @throws InsightsCustomException
 	 */
 	public String deleteEmailTemplateByWorkflowId(String workflowId) throws InsightsCustomException {
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			List<InsightsEmailTemplates> executionRecords = getResultList(
 					"FROM InsightsEmailTemplates a WHERE a.workflowConfig.workflowId= :workflowId",
-					InsightsEmailTemplates.class,
-					parameters);
-			
+					InsightsEmailTemplates.class, parameters);
+
 			for (InsightsEmailTemplates insightsEmailTemplates : executionRecords) {
 				insightsEmailTemplates.setWorkflowConfig(null);
 				save(insightsEmailTemplates);
@@ -916,15 +921,15 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return List<Object[]>
 	 */
 	public List<Object[]> getMaxExecutionIDsFromWorkflowExecutionAndReportVisualization(String workflowId) {
-		try  {
-			Map<String,Type> scalarList = new LinkedHashMap<>();
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Type> scalarList = new LinkedHashMap<>();
+			Map<String, Object> parameters = new HashMap<>();
 			scalarList.put("emailexecutionid", StandardBasicTypes.LONG);
 			scalarList.put("workflowexecutionid", StandardBasicTypes.LONG);
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			String query = "SELECT max(IRCV.executionid) as emailexecutionid,max(IWEH.executionid) as workflowexecutionid"
 					+ "  FROM \"INSIGHTS_REPORT_VISUALIZATION_CONTAINER\" IRCV inner join \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\" IWEH on IRCV.workflowid=IWEH.workflowid where IWEH.workflowid=:workflowId";
-			return executeSQLQueryAndRetunList(query,scalarList,parameters);
+			return executeSQLQueryAndRetunList(query, scalarList, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -938,7 +943,7 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return String
 	 */
 	public String saveInsightsWorkflowConfig(InsightsWorkflowConfiguration config) {
-		try  {
+		try {
 			return (String) save(config);
 		} catch (Exception e) {
 			log.error(e);
@@ -953,8 +958,8 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return int
 	 */
 	public int saveWorkflowType(InsightsWorkflowType type) {
-		try  {
-			return(int) save(type);
+		try {
+			return (int) save(type);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -968,13 +973,11 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return InsightsWorkflowType
 	 */
 	public InsightsWorkflowType getWorkflowType(String workflowType) {
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put("workflowType", workflowType);
-			return getUniqueResult(
-					"FROM InsightsWorkflowType IWT WHERE IWT.workflowType = :workflowType",
-					InsightsWorkflowType.class,
-					parameters);
+			return getUniqueResult("FROM InsightsWorkflowType IWT WHERE IWT.workflowType = :workflowType",
+					InsightsWorkflowType.class, parameters);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -989,13 +992,12 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return Boolean
 	 */
 	public Boolean updateWorkflowConfigActive(String workflowId, Boolean status) {
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-			InsightsWorkflowConfiguration updateStatus =  getUniqueResult(
+			InsightsWorkflowConfiguration updateStatus = getUniqueResult(
 					"FROM InsightsWorkflowConfiguration WC WHERE WC.workflowId = :workflowId ",
-					InsightsWorkflowConfiguration.class,
-					parameters);
+					InsightsWorkflowConfiguration.class, parameters);
 			updateStatus.setActive(status);
 			update(updateStatus);
 			return Boolean.TRUE;
@@ -1013,12 +1015,10 @@ public class WorkflowDAL extends BaseDAL {
 	 */
 	public String deleteWorkflowType(int typeId) {
 		try {
-			Map<String,Object> parameters = new HashMap<>();
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put("id", typeId);
-			InsightsWorkflowType executionRecord = getSingleResult(
-					"FROM InsightsWorkflowType a WHERE a.id= :id",
-					InsightsWorkflowType.class,
-					parameters);
+			InsightsWorkflowType executionRecord = getSingleResult("FROM InsightsWorkflowType a WHERE a.id= :id",
+					InsightsWorkflowType.class, parameters);
 			delete(executionRecord);
 			return PlatformServiceConstants.SUCCESS;
 		} catch (Exception e) {
@@ -1034,13 +1034,12 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return String
 	 */
 	public String deleteWorkflowConfig(String workflowId) {
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put("workflowId", workflowId);
 			InsightsWorkflowConfiguration executionRecord = getSingleResult(
 					"FROM InsightsWorkflowConfiguration a WHERE a.workflowId= :workflowId",
-					InsightsWorkflowConfiguration.class,
-					parameters);
+					InsightsWorkflowConfiguration.class, parameters);
 
 			executionRecord.setEmailConfig(null);
 			executionRecord.setTaskSequenceEntity(null);
@@ -1052,15 +1051,14 @@ public class WorkflowDAL extends BaseDAL {
 			throw e;
 		}
 	}
-	
+
 	/**
 	 * Method to fetch Email Execution History using WorkflowId
 	 * 
 	 * @param workflowId
 	 * @return InsightsReportVisualizationContainer
 	 */
-	public InsightsReportVisualizationContainer getReportVisualizationContainerByWorkflowId(
-			String workflowId) {
+	public InsightsReportVisualizationContainer getReportVisualizationContainerByWorkflowId(String workflowId) {
 		try {
 			Map<String, Object> parameters = new HashMap<>();
 			Map<String, Object> extraParameters = new HashMap<>();

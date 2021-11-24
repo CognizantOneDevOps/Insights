@@ -15,14 +15,14 @@
  ******************************************************************************/
 package com.cognizant.devops.engines.platformengine.modules.correlation;
 
-import java.util.TimerTask;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
-import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 
 /**
@@ -32,30 +32,40 @@ import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
  *         Entry point for correlation executor.
  *
  */
-public class EngineCorrelatorModule extends TimerTask implements ApplicationConfigInterface{
+public class EngineCorrelatorModule implements Job, ApplicationConfigInterface {
 	private boolean isCorrelationExecutionInProgress = false;
 	private static Logger log = LogManager.getLogger(EngineCorrelatorModule.class.getName());
-
+	String jobName="";
+	
 	@Override
-	public void run() {
-		log.debug(" EngineCorrelatorModule start  ====");
+	public void execute(JobExecutionContext context) throws JobExecutionException {
+		log.debug(" Engine Scheduled Job ====  EngineCorrelatorModule start ");
+		long startTime =System.currentTimeMillis();
+		jobName=context.getJobDetail().getKey().getName();
+		EngineStatusLogger.getInstance().createSchedularTaskStatusNode("Correlation execution Start ",
+				PlatformServiceConstants.SUCCESS,jobName);
 		try {
 			ApplicationConfigInterface.loadConfiguration();
 			if (!isCorrelationExecutionInProgress) {
 				isCorrelationExecutionInProgress = true;
-				CorrelationExecutor correlationsExecutor = new CorrelationExecutor();
-				correlationsExecutor.execute();
+				executeCorrelation();
 				isCorrelationExecutionInProgress = false;
 			}
-			log.debug("Correlation Execution Completed");
-			EngineStatusLogger.getInstance().createEngineStatusNode("Correlation Execution Completed",
-					PlatformServiceConstants.SUCCESS);
+			log.debug("Engine Scheduled Job ==== Correlation Execution Completed");
+			
 		} catch (Exception e) {
 			log.error("Error in correlation module ", e);
-			EngineStatusLogger.getInstance().createEngineStatusNode("Correlation Execution has some issue  ",
-					PlatformServiceConstants.FAILURE);
+			EngineStatusLogger.getInstance().createSchedularTaskStatusNode("Correlation execution has some issue  ",
+					PlatformServiceConstants.FAILURE,jobName);	
 		}
+		
+		long processingTime = System.currentTimeMillis() - startTime ;
+		EngineStatusLogger.getInstance().createSchedularTaskStatusNode("Correlation execution Completed",
+				PlatformServiceConstants.SUCCESS,jobName,processingTime);
+	}
 
-		log.debug(" EngineCorrelatorModule Completed ====");
+	public void executeCorrelation() {
+		CorrelationExecutor correlationsExecutor = new CorrelationExecutor();
+		correlationsExecutor.execute(jobName);
 	}
 }

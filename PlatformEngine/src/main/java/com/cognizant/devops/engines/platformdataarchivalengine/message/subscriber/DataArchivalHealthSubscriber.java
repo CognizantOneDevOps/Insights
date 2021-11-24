@@ -140,8 +140,6 @@ public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandle
 		}
 		if (graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0) {
 			log.error(" toolName={} category={} agentId={} execId={} Unable to insert health nodes for routing key: {} error {}  ",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),loggingInfo.get("execId"), nodeLabels, graphResponse);
-			EngineStatusLogger.getInstance().createDataArchivalStatusNode(
-					"Unable to insert health nodes for routing key: " + nodeLabels, PlatformServiceConstants.FAILURE);
 		}
 	}
 

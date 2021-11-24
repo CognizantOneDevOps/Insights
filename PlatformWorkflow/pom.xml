@@ -13,7 +13,7 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>8.7</version>
+		<version>8.8</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -21,7 +21,7 @@
 	<artifactId>PlatformWorkflow</artifactId>
 	<packaging>jar</packaging>
 	<name>PlatformWorkflow</name>
-	<version>8.7</version>
+	<version>8.8</version>
 	<description>PlatformWorkflow to implement workflow in Insights enviroment </description>
 	<url>http://maven.apache.org</url>
 
@@ -51,11 +51,6 @@
 			<version>1.26</version>
 		</dependency>
 		<dependency>
-			<groupId>org.quartz-scheduler</groupId>
-			<artifactId>quartz</artifactId>
-			<version>2.3.2</version>
-		</dependency>
-		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 			<version>3.1.0</version>
@@ -64,12 +59,12 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>8.7</version>
+			<version>8.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>8.7</version>
+			<version>8.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.rabbitmq</groupId>

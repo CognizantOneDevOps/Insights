@@ -26,13 +26,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.engines.platformwebhookengine.modules.aggregator.WebHookEngineAggregatorModule;
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
@@ -98,7 +95,7 @@ public class WebhookEngineTest {
 	@Test(priority = 3)
 	public void testEngineData() {
 		WebHookEngineAggregatorModule em = new WebHookEngineAggregatorModule();
-		em.run();
+		em.runWebhookDataCollector();
 	}
 
 	@Test(priority = 4)
@@ -121,7 +118,7 @@ public class WebhookEngineTest {
 				webhookEngineTestData.toolData);
 		Thread.sleep(1000);
 		WebHookEngineAggregatorModule em = new WebHookEngineAggregatorModule();
-		em.run();
+		em.runWebhookDataCollector();
 		Thread.sleep(1000);
 	}
 
@@ -145,7 +142,7 @@ public class WebhookEngineTest {
 				webhookEngineTestData.toolData);
 		Thread.sleep(1000);
 		WebHookEngineAggregatorModule em = new WebHookEngineAggregatorModule();
-		em.run();
+		em.runWebhookDataCollector();
 		Thread.sleep(1000);
 	}
 
@@ -166,7 +163,7 @@ public class WebhookEngineTest {
 	@Test(priority = 7)
 	public void testEngineReRunAfterSpecifcTime() throws InterruptedException {
 		WebHookEngineAggregatorModule em = new WebHookEngineAggregatorModule();
-		em.run();
+		em.runWebhookDataCollector();
 		Thread.sleep(1000);
 	}
 

@@ -89,7 +89,7 @@ public class WorkflowServiceImpl {
 		}
 		return id;
 	}
-	
+
 	/**
 	 * Adding tasks to the workflow task table *
 	 * 
@@ -97,7 +97,8 @@ public class WorkflowServiceImpl {
 	 * @return
 	 * @throws InsightsCustomException
 	 */
-	public int populateAndSaveWorkflowTask(String description,String mqChannel,String componentName,int dependency,String workflowType) throws InsightsCustomException {
+	public int populateAndSaveWorkflowTask(String description, String mqChannel, String componentName, int dependency,
+			String workflowType) throws InsightsCustomException {
 		int id = -1;
 		try {
 			InsightsWorkflowTask taskConfig = new InsightsWorkflowTask();
@@ -215,7 +216,8 @@ public class WorkflowServiceImpl {
 				workflowConfigDAL.deleteWorkflowTaskSequence(workflowConfig.getWorkflowId());
 			}
 			ArrayList<Integer> sortedTask = new ArrayList<>();
-			taskList.forEach(taskObj -> sortedTask.add(taskObj.getAsJsonObject().get(AssessmentReportAndWorkflowConstants.TASK_ID).getAsInt()));
+			taskList.forEach(taskObj -> sortedTask
+					.add(taskObj.getAsJsonObject().get(AssessmentReportAndWorkflowConstants.TASK_ID).getAsInt()));
 			@SuppressWarnings("unchecked")
 
 			/*
@@ -346,17 +348,20 @@ public class WorkflowServiceImpl {
 		mailBody = mailBody.replace("#", "<").replace("~", ">");
 		emailTemplateConfig.setMailFrom(emailDetails.get("senderEmailAddress").getAsString());
 		if (!emailDetails.get(AssessmentReportAndWorkflowConstants.RECEIVEREMAILADDRESS).getAsString().isEmpty()) {
-			emailTemplateConfig.setMailTo(emailDetails.get(AssessmentReportAndWorkflowConstants.RECEIVEREMAILADDRESS).getAsString());
+			emailTemplateConfig.setMailTo(
+					emailDetails.get(AssessmentReportAndWorkflowConstants.RECEIVEREMAILADDRESS).getAsString());
 		} else {
 			emailTemplateConfig.setMailTo(null);
 		}
 		if (!emailDetails.get(AssessmentReportAndWorkflowConstants.RECEIVERCCEMAILADDRESS).getAsString().isEmpty()) {
-			emailTemplateConfig.setMailCC(emailDetails.get(AssessmentReportAndWorkflowConstants.RECEIVERCCEMAILADDRESS).getAsString());
+			emailTemplateConfig.setMailCC(
+					emailDetails.get(AssessmentReportAndWorkflowConstants.RECEIVERCCEMAILADDRESS).getAsString());
 		} else {
 			emailTemplateConfig.setMailCC(null);
 		}
 		if (!emailDetails.get(AssessmentReportAndWorkflowConstants.RECEIVERBCCEMAILADDRESS).getAsString().isEmpty()) {
-			emailTemplateConfig.setMailBCC(emailDetails.get(AssessmentReportAndWorkflowConstants.RECEIVERBCCEMAILADDRESS).getAsString());
+			emailTemplateConfig.setMailBCC(
+					emailDetails.get(AssessmentReportAndWorkflowConstants.RECEIVERBCCEMAILADDRESS).getAsString());
 		} else {
 			emailTemplateConfig.setMailBCC(null);
 		}
@@ -471,22 +476,24 @@ public class WorkflowServiceImpl {
 				InsightsWorkflowTask systemNotificationTask = workflowConfigDAL
 						.getTaskByChannel("WORKFLOW.SYSTEM_TASK.SYSTEMNOTIFICATION.EXECUTION");
 				if (systemNotificationTask == null) {
-					String description= "SystemNotification_Execute";
-					String mqChannel="WORKFLOW.SYSTEM_TASK.SYSTEMNOTIFICATION.EXECUTION";
-					String componentName="com.cognizant.devops.platformreports.assessment.core.SystemNotificationDetailSubscriber";
-					int dependency=100;
-					systemTask = populateAndSaveWorkflowTask(description,mqChannel,componentName,dependency,workflowType);
+					String description = "SystemNotification_Execute";
+					String mqChannel = "WORKFLOW.SYSTEM_TASK.SYSTEMNOTIFICATION.EXECUTION";
+					String componentName = "com.cognizant.devops.platformreports.assessment.core.SystemNotificationDetailSubscriber";
+					int dependency = 100;
+					systemTask = populateAndSaveWorkflowTask(description, mqChannel, componentName, dependency,
+							workflowType);
 				} else {
 					systemTask = systemNotificationTask.getTaskId();
 				}
 				InsightsWorkflowTask emailNotificationTask = workflowConfigDAL
 						.getTaskByChannel("WORKFLOW.SYSTEM_TASK.EMAIL.EXCECUTION");
 				if (emailNotificationTask == null) {
-					String description= "Email_Execute";
-					String mqChannel="WORKFLOW.SYSTEM_TASK.EMAIL.EXCECUTION";
-					String componentName="com.cognizant.devops.platformreports.assessment.core.ReportEmailSubscriber";
-					int dependency=101;
-					emailTask = populateAndSaveWorkflowTask(description,mqChannel,componentName,dependency,workflowType);
+					String description = "Email_Execute";
+					String mqChannel = "WORKFLOW.SYSTEM_TASK.EMAIL.EXCECUTION";
+					String componentName = "com.cognizant.devops.platformreports.assessment.core.ReportEmailSubscriber";
+					int dependency = 101;
+					emailTask = populateAndSaveWorkflowTask(description, mqChannel, componentName, dependency,
+							workflowType);
 				} else {
 					emailTask = emailNotificationTask.getTaskId();
 				}
@@ -573,7 +580,7 @@ public class WorkflowServiceImpl {
 		return emailDetailsJson;
 	}
 
-	public JsonObject getLatestExecutionId(String workflowId) throws InsightsCustomException{
+	public JsonObject getLatestExecutionId(String workflowId) throws InsightsCustomException {
 		try {
 			long workflowExecutionId = -1;
 			long reportVisualizerExecutionId = -1;
@@ -607,6 +614,107 @@ public class WorkflowServiceImpl {
 		} catch (Exception e) {
 			log.error("Error while fetching execution ids", e);
 			throw new InsightsCustomException("Error while fetching execution ids");
+		}
+	}
+
+	/**
+	 * get the task lists from the table
+	 * @return JsonArray
+	 * @throws InsightsCustomException
+	 */
+	public JsonArray getTaskDetail() throws InsightsCustomException {
+		try {
+			List<InsightsWorkflowTask> listofTasks = workflowConfigDAL.getAllWorkflowTask();
+			JsonArray jsonarray = new JsonArray();
+			for (InsightsWorkflowTask taskDetail : listofTasks) {
+				JsonObject jsonobject = new JsonObject();
+				jsonobject.addProperty(AssessmentReportAndWorkflowConstants.TASK_ID, taskDetail.getTaskId());
+				jsonobject.addProperty("description", taskDetail.getDescription());
+				jsonobject.addProperty("componentname", taskDetail.getCompnentName());
+				jsonobject.addProperty("mqchannel", taskDetail.getMqChannel());
+				jsonobject.addProperty("workflowtype", taskDetail.getWorkflowType().getWorkflowType());
+				jsonobject.addProperty("dependency", taskDetail.getDependency());
+				jsonarray.add(jsonobject);
+			}
+			return jsonarray;
+		} 
+		catch (Exception e) {
+			log.error("Error while getting task detail {}", e.getMessage());
+			throw new InsightsCustomException(e.toString());
+		}
+	}
+
+	/**
+	 * get all workflow type from the table
+	 * 
+	 * @return JsonArray
+	 * @throws InsightsCustomException
+	 */
+	public List<String> getAllWorkflowTypes() throws InsightsCustomException {
+		try {
+			List<InsightsWorkflowType> listofTasks = workflowConfigDAL.getAllWorkflowType();
+			List<String> workFlowType = new ArrayList<String>();
+			for (InsightsWorkflowType taskDetail : listofTasks) {
+				workFlowType.add(taskDetail.getWorkflowType());
+			}
+			return workFlowType;
+		}
+		catch (Exception e) {
+			log.error("Error while getting the workflow type {}", e.getMessage());
+			throw new InsightsCustomException(e.toString());
+		}
+	}
+
+	/**
+	 * Deleting a task
+	 * @param taskId
+	 * @return String
+	 * @throws InsightsCustomException
+	 */
+	public boolean deleteTaskDetail(int taskId) throws InsightsCustomException {
+		try {
+			List<InsightsWorkflowTaskSequence> listofTasks = workflowConfigDAL.getWorkflowTaskSequenceByTaskId(taskId);
+			if (listofTasks.isEmpty()) {
+				workflowConfigDAL.deleteTask(taskId);
+				return true;
+			}
+			else
+				return false;
+			} catch (Exception e) {
+			log.error("Error while deleting workflow task {}", e.getMessage());
+			throw new InsightsCustomException(e.toString());
+			}
+		}
+	
+	/**
+	 * Updating tasks to the workflow task table *
+	 * @param workflowTaskJson
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	public int updateWorkflowTask(JsonObject workflowTaskJson) throws InsightsCustomException {
+		try {
+			int taskId = workflowTaskJson.get("taskId").getAsInt();
+			String description = workflowTaskJson.get("description").getAsString();
+			String mqChannel = workflowTaskJson.get("mqChannel").getAsString();
+			String componentName = workflowTaskJson.get("componentName").getAsString();
+			int dependency = workflowTaskJson.get("dependency").getAsInt();
+			String workflowType = workflowTaskJson.get("workflowType").getAsString();
+			InsightsWorkflowTask taskConfig = new InsightsWorkflowTask();
+			taskConfig.setTaskId(taskId);
+			taskConfig.setDescription(description);
+			taskConfig.setMqChannel(mqChannel);
+			taskConfig.setCompnentName(componentName);
+			taskConfig.setDependency(dependency);
+			InsightsWorkflowType workflowTypeEntity = new InsightsWorkflowType();
+			workflowTypeEntity.setWorkflowType(workflowType);
+			taskConfig.setWorkflowType(workflowTypeEntity);
+			int status = workflowConfigDAL.updateInsightsWorkflowTaskConfig(taskConfig);
+			return status;
+		} 
+		catch (Exception e) {
+			log.error("Error while updating tasks to the workflow task  {}", e.getMessage());
+			throw new InsightsCustomException(e.getMessage());
 		}
 	}
 

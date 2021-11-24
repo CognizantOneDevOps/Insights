@@ -55,6 +55,10 @@ import { FileSystemConfigComponent } from './filesystem/file-system-configuratio
 import { DashboardPdfDownloadComponent } from './dashboard-pdf-download/dashboard-pdf-download.component';
 import { DashboardListComponent } from './dashboard-pdf-download/dashboard-list/dash-list.component';
 import { EditDashboardComponent } from './dashboard-pdf-download/edit-dashboard/edit-dashboardcomponent';
+import { WorkflowTaskManagementComponent } from './workflow-task-management/workflow-task-management.component';
+import { AddWorkflowTaskComponent } from './workflow-task-management/add-workflow-task/add-workflow-task.component';
+import { ScheduleTaskManagmentComponent } from '@insights/app/modules/schedule-task-managment/schedule-task-managment.component';
+
 
 const homeRoutes: Routes = [
   {
@@ -97,7 +101,11 @@ const homeRoutes: Routes = [
       { path: 'file-system-configuration', component: FileSystemConfigComponent },
       { path:'dash-pdf-download',component:DashboardListComponent},
       { path:'dash-pdf-config',component:DashboardPdfDownloadComponent},
-      { path:'edit-dashboard',component:EditDashboardComponent}
+      { path:'edit-dashboard',component:EditDashboardComponent},
+      {path:'workflow-task-management',component:WorkflowTaskManagementComponent},
+      {path:'workflow-configuration' , component:AddWorkflowTaskComponent},
+      { path:'edit-dashboard',component:EditDashboardComponent},
+      { path:'taskManagement',component:ScheduleTaskManagmentComponent}
 
     ],
     canActivate: [AuthGuard]

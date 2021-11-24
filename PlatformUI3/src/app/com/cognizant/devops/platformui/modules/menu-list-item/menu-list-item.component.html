@@ -15,7 +15,7 @@
  * the License.
  ****************************************************************************** -->
 
-<a routerLinkActive=active *ngIf=" item.isAdminMenu ? showAdminTab : true" mat-list-item [ngStyle]="{'padding-left': (depth * 10) + 'px '}"
+<a routerLinkActive=active id = "{{item.menuId}}" *ngIf= "item.activeCount > 0" mat-list-item [ngStyle]="{'padding-left': (depth * 10) + 'px '}"
   (click)="onItemSelected(item)" [attr.title]="item.title" [ngClass]="{'active': (item.route && isExpanded) ? router.isActive(item.route, true): false, 'expanded': expanded}">
   <mat-icon *ngIf="item.showIcon && !isExpanded">{{item.iconName}}</mat-icon>
   <p matLine class="mat-line-child" *ngIf="isExpanded">{{item.displayName}}
@@ -30,6 +30,6 @@
   </a>
   <div *ngIf="expanded && isExpanded">
     <app-menu-list-item [style.width.px]="leftNavWidthpx" *ngFor="let child of getNavItemsChildernByFilter(item.children)" [item]="child" [depth]="depth+1"
-      [isExpanded]="isExpanded" [selectedOrg]="selectedOrg" [showAdminTab]="showAdminTab" [leftNavWidthpx]="leftNavWidthpx">
+      [isExpanded]="isExpanded" [selectedOrg]="selectedOrg" [leftNavWidthpx]="leftNavWidthpx">
       </app-menu-list-item>
   </div>

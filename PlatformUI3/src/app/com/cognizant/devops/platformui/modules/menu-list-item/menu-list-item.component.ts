@@ -41,7 +41,6 @@ export class MenuListItemComponent implements OnInit {
   @Input() depth: number;
   @Input() isExpanded: boolean = false;
   @Input() selectedOrg: String;
-  @Input() showAdminTab: boolean = true;
   @Input() leftNavWidthpx: number;
 
 

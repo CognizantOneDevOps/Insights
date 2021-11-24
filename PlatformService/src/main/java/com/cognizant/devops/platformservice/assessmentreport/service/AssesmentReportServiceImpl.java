@@ -558,7 +558,7 @@ public class AssesmentReportServiceImpl {
 
 	/**
 	 * Method to create AssessmentReport JsonObject
-	 * 
+	 *
 	 * @param assessmentReport
 	 * @return JsonObject
 	 */
@@ -682,13 +682,17 @@ public class AssesmentReportServiceImpl {
 		try {
 			int id = Integer.parseInt(configId);
 			InsightsAssessmentConfiguration result = reportConfigDAL.getAssessmentConfigListByReportId(id);
-			String workflowid = result.getWorkflowConfig().getWorkflowId();
-			List<InsightsWorkflowExecutionHistory> historyConfig = workflowConfigDAL
-					.getWorkflowExecutionHistoryByWorkflowId(workflowid);
-			if (historyConfig.isEmpty()) {
-				reportConfigDAL.deleteAssessmentReport(id);
+			if (result == null) {
+				throw new InsightsCustomException("Report not found.");
+			}
+			long lastRun = result.getWorkflowConfig().getLastRun();
+			long diff = InsightsUtils.getDifferenceFromLastRunTime(lastRun);
+			if (lastRun==0) {
+				reportConfigDAL.deleteAssessmentReport(result);
+			} else if (diff >= 100) {
+				reportConfigDAL.deleteAssessmentReport(result);
 			} else {
-				throw new InsightsCustomException("Executions found in history");
+				throw new InsightsCustomException("This report is not 100 days old");
 			}
 			return PlatformServiceConstants.SUCCESS;
 		} catch (Exception e) {
@@ -696,7 +700,6 @@ public class AssesmentReportServiceImpl {
 			throw new InsightsCustomException(e.getMessage());
 		}
 	}
-
 	/**
 	 * Method to save workflow configuration and create assessment report object
 	 * 

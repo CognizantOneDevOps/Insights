@@ -170,10 +170,7 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 		JsonArray errorMessage = graphResponse.getAsJsonArray("errors");
 		if (errorMessage != null && errorMessage.size() >= 0) {
 			String errorMessageText = errorMessage.get(0).getAsJsonObject().get("message").getAsString();
-			log.error("Unable to insert health nodes for routing key: {} , error occured: {}  {}  " , routingKey
-					,errorMessageText, graphResponse);
-			EngineStatusLogger.getInstance().createEngineStatusNode(
-					"Unable to insert health nodes for routing key: " + routingKey, PlatformServiceConstants.FAILURE);
+			log.error(errorMessageText);
 		}
 	}
 }

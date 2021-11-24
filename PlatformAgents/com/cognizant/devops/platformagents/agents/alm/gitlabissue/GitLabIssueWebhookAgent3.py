@@ -61,9 +61,12 @@ class GitLabIssueWebhookAgent(BaseAgent):
             parsedIssueResponse[0].update(self.updateMandatoryFields("assignees", responseTemplate))
         
         if "labels" not in dataReceived :
-            parsedIssueResponse[0].update(self.updateMandatoryFields("assignees", responseTemplate))
+            parsedIssueResponse[0].update(self.updateMandatoryFields("labels", responseTemplate))
         closed_at = dataReceived.get("object_attributes",{}).get("closed_at")
         if closed_at is None: parsedIssueResponse[0]["issueClosedDate"] = ""
+        
+        due_date = dataReceived.get("object_attributes",{}).get("due_date")
+        if due_date is None: parsedIssueResponse[0]["issueDueDate"] = ""
         
         self.baseLogger.info(" before publish issue data ======") 
         self.publishToolsData(parsedIssueResponse, issueMetadata,timeStampField,timeStampFormat,isEpoch,True)

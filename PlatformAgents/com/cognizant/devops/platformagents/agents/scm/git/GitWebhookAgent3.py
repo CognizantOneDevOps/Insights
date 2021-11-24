@@ -239,7 +239,7 @@ class GitWebhookAgent(BaseAgent):
             pullReqDetails['originbranchAlmKeys']= branchAlmKeys
             
         originRepo = pullReqDetails.get('head', dict()).get('repo', dict())
-        isForked = originRepo.get('fork', False)
+        #isForked = originRepo.get('fork', False)
         commits = pullReqDetails.get("commits",None)
         changed_files = pullReqDetails.get("changed_files",None)
         author = dataReceived.get("sender",dict()).get("login", None)

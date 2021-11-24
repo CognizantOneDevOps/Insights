@@ -56,6 +56,11 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("UPDATE_REPORT", '/PlatformService/insights/report/updateAssessmentReport');
         this.addEndPoint("GET_KPI_LIST", '/PlatformService/insights/report/getKPIlistOfReportTemplate');
         this.addEndPoint("GET_TASK_LIST", '/PlatformService/insights/workflow/getTaskList');
+        this.addEndPoint("GET_TASK_DETAIL", '/PlatformService/insights/workflow/getAllWorkflowTask');
+        this.addEndPoint("SAVE_TASK_DETAIL", '/PlatformService/insights/workflow/saveWorkflowTask');
+        this.addEndPoint("UPDATE_TASK_DETAIL", '/PlatformService/insights/workflow/updateWorkflowTask');
+        this.addEndPoint("GET_ALL_WORKFLOW_TYPE", '/PlatformService/insights/workflow/getAllWorkflowType');
+        this.addEndPoint("DELETE_TASK_DETAIL", '/PlatformService/insights/workflow/deleteTaskList');       
         //this.addEndPoint("GET_WORKFLOW_EXECUTION_RECORDS", '/PlatformService/insights/workflow/workFlowExecutionRecords');
         this.addEndPoint("GET_WORKFLOW_EXECUTION_RECORDS", '/PlatformService/insights/workflow/workFlowExecutionRecordsByWorkflowId');
         this.addEndPoint("SET_REPORT_STATUS", '/PlatformService/insights/report/setReportStatus');
@@ -236,6 +241,14 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("GET_CONFIG_FILES", '/PlatformService/filemanagement/getConfigurationFiles');
         this.addEndPoint("DELETE_CONFIG_FILE", '/PlatformService/filemanagement/deleteConfigFile');
         this.addEndPoint("DOWNLOAD_CONFIG_FILE", '/PlatformService/filemanagement/downloadConfigFile');
+
+        //Task Management 
+        this.addEndPoint("GET_SCHEDULE_TASK_LIST", '/PlatformService/admin/scheduletaskmanagement/getAllTaskDetail');
+        this.addEndPoint("GET_SCHEDULE_TASK_HISTORY_LIST", '/PlatformService/admin/scheduletaskmanagement/getTaskHistoryDetail');
+        this.addEndPoint("SCHEDULE_TASK_SAVE_EDIT", '/PlatformService/admin/scheduletaskmanagement/saveOrEditTaskDefinition');
+        this.addEndPoint("SCHEDULE_TASK_STATUS_UPDATE", '/PlatformService/admin/scheduletaskmanagement/statusUpdateForTaskDefinition');
+        this.addEndPoint("DELETE_SCHEDULE_TASK_STATUS", '/PlatformService/admin/scheduletaskmanagement/deleteTaskDefinition');
+
     }
 
     public addEndPoint(name: String, url: String) {

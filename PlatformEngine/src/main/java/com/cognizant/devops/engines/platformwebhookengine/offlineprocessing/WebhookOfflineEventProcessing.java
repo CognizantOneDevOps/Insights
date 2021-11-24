@@ -18,11 +18,13 @@ package com.cognizant.devops.engines.platformwebhookengine.offlineprocessing;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.util.WebhookEventProcessing;
@@ -43,15 +45,20 @@ import com.google.gson.JsonObject;
  * Responsible for processing failed webhook events.
  *
  */
-public class WebhookOfflineEventProcessing extends TimerTask implements ApplicationConfigInterface{
+public class WebhookOfflineEventProcessing implements Job, ApplicationConfigInterface {
 	WebHookConfigDAL dal = new WebHookConfigDAL();
 	private GraphDBHandler dbHandler = new GraphDBHandler();
 	private static Logger log = LogManager.getLogger(WebhookOfflineEventProcessing.class);
+	String jobName="";
 	
 
 	@Override
-	public void run() {
+	public void execute(JobExecutionContext context) throws JobExecutionException {
 		log.debug("Webhook Offline Event Processing Started ======");
+		long startTime =System.currentTimeMillis();
+		jobName=context.getJobDetail().getKey().getName();
+		EngineStatusLogger.getInstance().createSchedularTaskStatusNode("WebhookOfflineEventProcessing execution Start ",
+				PlatformServiceConstants.SUCCESS,jobName);
 		try {
 			ApplicationConfigInterface.loadConfiguration();
 			List<WebHookConfig> webhookEventConfigs = dal.getAllEventWebHookConfigurations();
@@ -59,10 +66,13 @@ public class WebhookOfflineEventProcessing extends TimerTask implements Applicat
 			execute(webhookEventConfigs);
 		} catch (Exception e) {
 			log.error(e);
-			EngineStatusLogger.getInstance().createEngineStatusNode(
-					" Error occured while initializing WebhookOfflineEventProcessing  " + e.getMessage(),
-					PlatformServiceConstants.FAILURE);
+			EngineStatusLogger.getInstance().createSchedularTaskStatusNode("WebhookOfflineEventProcessing execution has some issue  ",
+					PlatformServiceConstants.FAILURE,jobName);	
 		}
+		
+		long processingTime = System.currentTimeMillis() - startTime ;
+		EngineStatusLogger.getInstance().createSchedularTaskStatusNode("WebhookOfflineEventProcessing execution Completed",
+				PlatformServiceConstants.SUCCESS,jobName,processingTime);
 	}
 
 	public void execute(List<WebHookConfig> webhookEventConfigs) {
