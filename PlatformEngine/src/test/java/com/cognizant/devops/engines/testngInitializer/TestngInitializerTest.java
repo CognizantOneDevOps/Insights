@@ -24,6 +24,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformdal.core.CommonDALUtils;
 
 @Test
 public class TestngInitializerTest {
@@ -34,6 +35,7 @@ public class TestngInitializerTest {
 	public void testOnStartup() throws Exception {
 		try {
 			ApplicationConfigCache.loadConfigCache();
+			CommonDALUtils.changeAnnotationValue();
 			loadDBDetails();
 		} catch (InsightsCustomException e) {
 			log.error(e);

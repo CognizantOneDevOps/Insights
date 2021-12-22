@@ -271,7 +271,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			String frontPagePath = assessmentReportDTO.getPdfReportDirPath() + File.separator + MODIFIED_FRONT_PAGE_TEMPLATE;
 			modifyFrontPageTemplate(frontPagePath, grafanaDashboardPdfConfig);
 			page = context.newPage();
-			page.navigate(new File(frontPagePath).getAbsolutePath());
+			page.navigate("file:" +new File(frontPagePath).getAbsolutePath());
 			pdfOptions.setHeaderTemplate(updateLogoImgInHeaderTemplate(grafanaDashboardPdfConfig, true));
 			pdfOptions.setFooterTemplate(fetchTemplate("frontPagefooter.html"));
 			pdfOptions.setHeight("1600px");
@@ -297,6 +297,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),
 					"-","-","-",0," Grafana Dashboard export as PDF Completed with error " + e.getMessage());
 			log.error("Dashboard page content ========== {} ",pageContent);
+			log.error(e);
 			throw new InsightsJobFailedException(e.getMessage());
 		}finally {
 			try {
@@ -409,7 +410,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			String frontPagePath = assessmentReportDTO.getPdfReportDirPath() + File.separator + MODIFIED_FRONT_PAGE_TEMPLATE;
 			modifyFrontPageTemplate(frontPagePath, grafanaDashboardPdfConfig);
 			page = context.newPage();
-			page.navigate(new File(frontPagePath).getAbsolutePath());
+			page.navigate("file:" +new File(frontPagePath).getAbsolutePath());
 			pdfOptions.setHeaderTemplate(updateLogoImgInHeaderTemplate(grafanaDashboardPdfConfig, true));
 			pdfOptions.setFooterTemplate(fetchTemplate("frontPagefooter.html"));
 			byte[] frontPagePdf = page.pdf(pdfOptions);
@@ -433,6 +434,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			log.error(LOG_MESSAGE,
 					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),
 					"-","-","-",0," Grafana Dashboard export as Printable PDF Completed with error " + e.getMessage());
+			log.error(e);
 			throw new InsightsJobFailedException(e.getMessage());
 		}finally {
 			try {
