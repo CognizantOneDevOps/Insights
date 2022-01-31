@@ -63,7 +63,7 @@ public class TraceabilityDashboardObjectRepository extends LoginAndSelectModule{
 	@FindBy(xpath = "//div[contains(text(), ' Error')]")
 	WebElement errorMessage;
 	
-	@FindBy(xpath = "//span[text()= 'OK']")
+	@FindBy(xpath = "//span[text()= 'OKAY']")
 	WebElement okButton;
 	
 	@FindBy(xpath = "//span[contains(@class, 'mat-option-text')]")

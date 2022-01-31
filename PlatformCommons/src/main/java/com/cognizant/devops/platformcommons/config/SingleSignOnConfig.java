@@ -45,6 +45,7 @@ public class SingleSignOnConfig implements Serializable {
 	private String tokenSigningKey;
 	private String servicePrincipalKerberos;
 	private String keyTabLocationKerberos;
+	private String jwtTokenOriginServerURL;
 	
 	public String getEntityId() {
 		return entityId;
@@ -148,6 +149,12 @@ public class SingleSignOnConfig implements Serializable {
 
 	public void setKeyTabLocationKerberos(String keyTabLocationKerberos) {
 		this.keyTabLocationKerberos = keyTabLocationKerberos;
+	}
+	public String getJwtTokenOriginServerURL() {
+		return jwtTokenOriginServerURL;
+	}
+	public void setJwtTokenOriginServerURL(String jwtTokenOriginServerURL) {
+		this.jwtTokenOriginServerURL = jwtTokenOriginServerURL;
 	}
 
 }

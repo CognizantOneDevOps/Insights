@@ -34,10 +34,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformservice.neo4jpluginlogs.service.Neo4jPluginLogsService;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/externalApi")
@@ -130,7 +130,7 @@ public class Neo4jPluginLogsController {
 			cacheDashboardId = dashboardEventCache.get(cacheUserId);
 		}
 		if(!cacheDashboardId.equals(String.valueOf(dashboardId))) {
-			JsonObject jsonObject = new JsonParser().parse(dashboardDetails.toString()).getAsJsonObject();
+			JsonObject jsonObject = JsonUtils.parseStringAsJsonObject(dashboardDetails.toString());
 			jsonObject.addProperty(EVENT_NAME, "dashboard-view");
 			jsonObject.addProperty(PANEL_NAME, "");
 			jsonObject.addProperty(CHART_TYPE, "");
@@ -142,7 +142,7 @@ public class Neo4jPluginLogsController {
 
 	private void processDashboardJsonForLog(JsonObject dashboardDetails, String panelId, String dashboardJson) {
 		String eventType = dashboardDetails.get(EVENT_NAME).getAsString();
-		JsonObject dashboardJsonObject = new JsonParser().parse(dashboardJson).getAsJsonObject();
+		JsonObject dashboardJsonObject = JsonUtils.parseStringAsJsonObject(dashboardJson);
 		if(dashboardJsonObject.get(PANELS).getAsJsonArray().size() > 0) {
 			dashboardDetails.addProperty("uid", dashboardJsonObject.get("uid").getAsString());
 			dashboardDetails.addProperty("dashboardName", dashboardJsonObject.get("title").getAsString());

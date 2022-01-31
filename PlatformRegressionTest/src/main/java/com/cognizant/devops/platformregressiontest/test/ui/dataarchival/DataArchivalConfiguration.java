@@ -61,9 +61,8 @@ public class DataArchivalConfiguration extends DataArchivalObjectRepository{
 			log.debug("archive name already exists");
 			throw new SkipException("Skipping test case as archive already exists");
 		} else {
-			driver.manage().timeouts().implicitlyWait(1200, TimeUnit.SECONDS);
+			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 			addDetails.click();
-			driver.manage().timeouts().implicitlyWait(1200, TimeUnit.SECONDS);
 			archivalName.sendKeys(LoginAndSelectModule.testData.get("archiveName"));
 			startDate.click();
 			calenderArrow.click();
@@ -111,7 +110,7 @@ public class DataArchivalConfiguration extends DataArchivalObjectRepository{
 				return true;
 			}
 		}
-		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 		log.info("{} archive name is not present.", archive);
 		return false;
 	}
@@ -123,7 +122,7 @@ public class DataArchivalConfiguration extends DataArchivalObjectRepository{
 	 * @throws InterruptedException
 	 */
 	public void selectDate(String dateValue) throws InterruptedException {
-		Thread.sleep(1000);
+		Thread.sleep(5);
 		for (WebElement d : listOfDate) {
 			if (d.getText().equals(dateValue)) {
 				d.click();
@@ -144,9 +143,9 @@ public class DataArchivalConfiguration extends DataArchivalObjectRepository{
 			log.debug("archive name does not exist to check error");
 			throw new SkipException("Skipping test case as archive does not exist");
 		} else {
-			driver.manage().timeouts().implicitlyWait(1200, TimeUnit.SECONDS);
+			driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 			addDetails.click();
-			driver.manage().timeouts().implicitlyWait(1200, TimeUnit.SECONDS);
+			driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 			archivalName.sendKeys(LoginAndSelectModule.testData.get("archiveName"));
 			startDate.click();
 			calenderArrow.click();
@@ -212,7 +211,7 @@ public class DataArchivalConfiguration extends DataArchivalObjectRepository{
 		addDetails.click();
 		archivalName.sendKeys(LoginAndSelectModule.testData.get("archiveName"));
 		resetButton.click();
-		driver.manage().timeouts().implicitlyWait(1000, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 		if (archivalName.getText().length() == 0) {
 			log.info("reset functionality successful");
 			return true;

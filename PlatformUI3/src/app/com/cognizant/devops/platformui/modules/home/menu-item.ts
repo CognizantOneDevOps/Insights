@@ -166,24 +166,6 @@ export class MenuItem {
           title: "Dashboard Report Download",
           menuId : "DashboardReportDownload"
         },
-      /*  {
-          displayName: 'OutCome Config',
-          iconName: 'feature',
-          route: 'InSights/Home/fetchOutcome',
-          isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-          showMenu: this.getMenuShowAdmin(['Admin', 'Editor']),
-          title: "OutCome Config",
-          menuId : "OutComeConfig"
-        },
-        {
-          displayName: 'MileStone Config',
-          iconName: 'feature',
-          route: 'InSights/Home/fetchMileStone',
-          isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-          showMenu: this.getMenuShowAdmin(['Admin', 'Editor']),
-          title: "MileStone Config",
-          menuId : "MileStoneConfig"
-        }, */
         {
           displayName: 'Configuration',
           iconName: 'admin',
@@ -292,6 +274,34 @@ export class MenuItem {
               title: "Business Mapping",
               menuId : "BusinessMapping"
             },
+           /* {
+              displayName: 'ROI',
+              iconName: 'feature',
+              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+              showMenu: this.getMenuShowAdmin(['Admin', 'Editor']),
+              menuId : "ROI",
+              title: "ROI",
+              children: [
+                {
+                  displayName: 'OutCome Config',
+                  iconName: 'feature',
+                  route: 'InSights/Home/fetchOutcome',
+                  isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+                  showMenu: this.getMenuShowAdmin(['Admin', 'Editor']),
+                  title: "OutCome Config",
+                  menuId : "OutComeConfig"
+                },
+                {
+                  displayName: 'MileStone Config',
+                  iconName: 'feature',
+                  route: 'InSights/Home/fetchMileStone',
+                  isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+                  showMenu: this.getMenuShowAdmin(['Admin']),
+                  title: "MileStone Config",
+                  menuId : "MileStoneConfig"
+                }
+              ]
+            }, */
             {
               displayName: 'Report Configuration',
               iconName: 'feature',

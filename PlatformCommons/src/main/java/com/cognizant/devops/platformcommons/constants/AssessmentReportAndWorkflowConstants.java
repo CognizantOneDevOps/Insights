@@ -83,6 +83,20 @@ public interface AssessmentReportAndWorkflowConstants {
 	String ENDTIME = "endTime";
 	String USECASE= "usecase";
 	
+	String GRAFANAPDF = "GRAFANAPDF";
+	String USERNAME = "userName";
+	String ORGNAME = "orgName";
+	String DASHBOARD = "dashboard";
+	String TITLE = "title";
+	String VISUALIZATIONCONFIGS = "visualizationConfigs";
+	String QUERYTEXT = "queryText";
+	String TARGETS = "targets";
+	String VTYPE = "vType";
+	String VQUERY = "vQuery";
+	String DASHBOARDTEMPLATEJSON = "dashboardTemplate.json";
+	
+	String GRAFANA_PDF_TOKEN_SIGNING_KEY = "insights_Grafana_PDF_Token_string";
+	
 	Set<String> validReportTemplateFileExtention = Collections
 			.unmodifiableSet(new HashSet<String>(Arrays.asList("html", "json", "css", "webp")));
 }

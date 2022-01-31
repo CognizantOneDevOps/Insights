@@ -21,6 +21,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.EmailConfiguration;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsEmailTemplates;
@@ -34,7 +35,6 @@ import com.cognizant.devops.platformworkflow.workflowtask.message.factory.Workfl
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -118,7 +118,7 @@ public class UpshiftAssessmentTestData {
     }
 
     public int saveWorkflowTask(String task) {
-        JsonObject taskJson = new JsonParser().parse(task).getAsJsonObject();
+        JsonObject taskJson = JsonUtils.parseStringAsJsonObject(task);
         InsightsWorkflowTask taskConfig = new InsightsWorkflowTask();
         int taskId = -1;
         try {

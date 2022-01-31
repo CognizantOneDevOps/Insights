@@ -457,7 +457,7 @@ public class ReportConfigDAL extends BaseDAL {
 		try {
 			Map<String,Object> parameters = new HashMap<>();
 			return getResultList(
-					"FROM InsightsAssessmentConfiguration CE ORDER by CE.asseementreportname ASC",
+					"FROM InsightsAssessmentConfiguration CE ORDER by CE.id DESC",
 					InsightsAssessmentConfiguration.class,
 					parameters);
 		} catch (Exception e) {
@@ -612,6 +612,7 @@ public class ReportConfigDAL extends BaseDAL {
 						executionRecord.getReportId());
 				if (resultList.isEmpty()) {
 					delete(executionRecord);
+					deleteTemplateDesignFilesByReportTemplateID(reportID);
 				} else {
 					throw new InsightsCustomException(
 							"Report Template should not be deleted as it is attached to Assessment Report.");

@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.common;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,7 +41,7 @@ public class XLUtils {
 
 	public static int getRowCount(String xlFile, String xlSheet) throws IOException {
 
-		fi = new FileInputStream(xlFile);
+		fi = new FileInputStream(new File(xlFile).getCanonicalPath());
 		wb = new XSSFWorkbook(fi);
 		ws = wb.getSheet(xlSheet);
 		int rowCount = ws.getLastRowNum();
@@ -52,7 +53,7 @@ public class XLUtils {
 
 	public static int getCellCount(String xlFile, String xlSheet, int rowNum) throws IOException {
 
-		fi = new FileInputStream(xlFile);
+		fi = new FileInputStream(new File(xlFile).getCanonicalPath());
 		wb = new XSSFWorkbook(fi);
 		ws = wb.getSheet(xlSheet);
 		row = ws.getRow(rowNum);
@@ -65,7 +66,7 @@ public class XLUtils {
 
 	public static String getCellData(String xlFile, String xlSheet, int rowNum, int colNum) throws IOException {
 
-		fi = new FileInputStream(xlFile);
+		fi = new FileInputStream(new File(xlFile).getCanonicalPath());
 		wb = new XSSFWorkbook(fi);
 		ws = wb.getSheet(xlSheet);
 		row = ws.getRow(rowNum);

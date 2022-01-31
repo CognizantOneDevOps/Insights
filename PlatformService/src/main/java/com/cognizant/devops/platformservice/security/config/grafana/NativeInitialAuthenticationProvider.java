@@ -56,8 +56,7 @@ public class NativeInitialAuthenticationProvider implements AuthenticationProvid
 			authenticationGrafana = new InsightsAuthenticationToken(userDetail,
 					GrafanaUserDetailsUtil.getGrafanaResponseCookies(),
 					userDetail.getPassword(), userDetail.getAuthorities());
-			log.debug("In InsightsAuthenticationToken in grafana validation GrantedAuthority ==== {} ",
-					authenticationGrafana.getAuthorities());
+			log.debug("In InsightsAuthenticationToken validation complete ==== ");
 		}
 		return authenticationGrafana;
 	}

@@ -25,12 +25,15 @@
         style="height:65vh;width: 100%;" [src]="dashboardUrl" ></iframe> 
     </mat-dialog-content>
     <mat-dialog-actions class="mat-dialog-actions-button">
-        <button mat-raised-button (click)="closeDialog()" class="btnStyle">
+        <span style="margin-right: 30%;" *ngIf="isAssessmentReport">
+            <b>Please note:</b> To save changes in current dashboard, click the Save icon on top.</span>
+        <button mat-raised-button (click)="closeDialog()" class="btnStyle" *ngIf="!isAssessmentReport">
             CANCEL
         </button>
-        <button mat-raised-button (click)="confirm()" class="btnStyle" style="margin-right: 2%;" >
+        <button mat-raised-button (click)="confirm()" class="btnStyle" style="margin-right: 2%;" *ngIf="!isAssessmentReport" >
             CONFIRM
         </button>
+        <button mat-raised-button class="btnStyle" (click)="closeDialog()" style="margin-right: 2%;"  *ngIf="isAssessmentReport">OK</button>
     </mat-dialog-actions>
 
 

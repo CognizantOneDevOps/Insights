@@ -43,6 +43,7 @@ import org.apache.logging.log4j.core.config.LoggerConfig;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.vault.VaultHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
@@ -50,7 +51,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonWriter;
 
 public class ApplicationConfigCache {
@@ -175,7 +175,7 @@ public class ApplicationConfigCache {
 				}
 				String payload = json.toString().replaceAll("\\t", "");
 
-				serverConfig = new JsonParser().parse(payload).getAsJsonObject();
+				serverConfig = JsonUtils.parseStringAsJsonObject(payload);
 			} catch (FileNotFoundException e) {
 				log.error("Config file not found", e);
 			} catch (Exception e) {
@@ -213,8 +213,7 @@ public class ApplicationConfigCache {
 	public static boolean initialize(String json) {
 		try {
 			Gson gson = new Gson();
-			JsonParser parser = new JsonParser();
-			JsonElement jsonElement = parser.parse(json);
+			JsonElement jsonElement = JsonUtils.parseString(json);
 			if (jsonElement != null && jsonElement.isJsonObject()) {
 				ApplicationConfigProvider config = gson.fromJson(jsonElement.getAsJsonObject(),
 						ApplicationConfigProvider.class);

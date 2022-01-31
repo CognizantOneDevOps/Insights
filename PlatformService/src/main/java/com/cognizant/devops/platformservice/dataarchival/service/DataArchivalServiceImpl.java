@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import com.cognizant.devops.platformcommons.constants.DataArchivalConstants;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -36,7 +37,6 @@ import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.cognizant.devops.platformdal.dataArchivalConfig.DataArchivalConfigDal;
 import com.cognizant.devops.platformdal.dataArchivalConfig.InsightsDataArchivalConfig;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 
@@ -79,7 +79,7 @@ public class DataArchivalServiceImpl implements DataArchivalService {
 			List<AgentConfig> agentDetails = agentConfigDAL.getAgentConfigurations(DataArchivalConstants.TOOLNAME,
 					DataArchivalConstants.TOOLCATEGORY);
 			if (!agentDetails.isEmpty()) {
-				JsonObject agentJson = new JsonParser().parse(agentDetails.get(0).getAgentJson()).getAsJsonObject();
+				JsonObject agentJson = JsonUtils.parseStringAsJsonObject(agentDetails.get(0).getAgentJson());
 				String routingKey = agentJson.get("subscribe").getAsJsonObject().get("dataArchivalQueue").getAsString();
 				InsightsDataArchivalConfig dataArchivalRecord = dataArchivalConfigdal
 						.getSpecificArchivalRecord(archivalName);

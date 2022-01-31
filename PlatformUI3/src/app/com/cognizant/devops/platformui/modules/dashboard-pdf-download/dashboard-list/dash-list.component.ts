@@ -132,6 +132,7 @@ export class DashboardListComponent implements OnInit {
     this.router.navigate(['InSights/Home/edit-dashboard'], navigationExtras);
   }
   refresh() {
+    this.selectedIndex = -1;
     this.getAllConfig();
     this.refreshRadio = false;
     this.onRadioBtnSelect = false;
@@ -194,7 +195,6 @@ export class DashboardListComponent implements OnInit {
   delete() {
     var self = this;
     let data = self.selectedDashboard;
-
     var title = "Delete Dashboard";
     var dialogmessage =
       "Do you want to delete a Dashboard <b>" +
@@ -215,6 +215,7 @@ export class DashboardListComponent implements OnInit {
            .then(function (data) {
              if (data.status === "success") {
                self.messageDialog.showApplicationsMessage("<b>" + "Deleted Successfully" + "</b>", "SUCCESS");
+               self.onRadioBtnSelect = false;
                self.list();
              }
            })
@@ -251,7 +252,9 @@ export class DashboardListComponent implements OnInit {
     PDFRequestJson['pdfName'] = this.selectedDashboard.title +'.pdf';
     PDFRequestJson['workflowId'] = this.selectedDashboard.workflowId;
     PDFRequestJson['executionId'] = executionRecords.data.executionId;
-    this.grafanaService.downloadPDF(JSON.stringify(PDFRequestJson))
+    var request = btoa(JSON.stringify(PDFRequestJson));
+    //console.log(request)
+    this.grafanaService.downloadPDF(request)
       .then(function (data) {
         importedSaveAs(data, pdfFileName);
       });

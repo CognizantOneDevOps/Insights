@@ -1,0 +1,77 @@
+{
+	"vault": {
+		"getFromVault": false,
+		"secretEngine": "insights-kv",
+		"readToken": "vault_secret_token",
+		"vaultUrl": "http://Vault_Host:port/v1/"
+	},
+	"mqConfig": {
+		"user": "username for RabbitMq",
+		"password": "",
+		"host": "localhost",
+		"exchange": "iSight",
+		"agentControlXchg": "iAgent"
+	},
+	"subscribe": {
+		"config": "ROI.APPDYNAMICS.config"
+	},
+	"publish": {
+		"data": "ROI.APPDYNAMICS.DATA",
+		"health": "ROI.APPDYNAMICS.HEALTH"
+	},
+	"communication": {
+		"type": "REST",
+		"sslVerify": false,
+		"responseType": "JSON"
+	},
+	"dynamicTemplate": {
+		"responseTemplate": {
+			"milestoneDetails": {
+				"milestoneId": "milestoneId",
+                "milestoneName" : "milestoneName",
+                "outcomeId": "outcomeId",
+                "outcomeName": "outcomeName",
+                "statusQueue": "statusQueue",
+                "metricUrl": "metricUrl"
+			},
+		   "metadata": {
+		        "labels": [
+					"MILESTONE"
+				],
+				"dataUpdateSupported": false,
+				"uniqueKey": [
+					"milestoneId",
+					"outcomeId"
+				]
+			}
+		}
+	},
+	
+	"agentId": "",
+	"toolCategory": "ROI",
+	"enableDataValidation": true,
+	"toolsTimeZone": "GMT",
+	"insightsTimeZone": "Asia/Kolkata",
+	"useResponseTemplate": true,
+	"auth": "base64",
+	"runSchedule": 30,
+	"timeStampField": "",
+	"timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
+	"isEpochTimeFormat": true,
+	"baseUrl": "",
+	"username": "",
+	"password": "",
+	"account": "",
+	"agentSecretDetails": [
+		"password","account"
+	],
+	"isDebugAllowed": false,
+	"enableValueArray": false,
+	"loggingSetting": {
+		"logLevel": "ERROR",
+		"maxBytes": 5000000,
+		"backupCount": 10
+	},
+	"auditing": false,
+	"toolName": "AppDynamics"
+}

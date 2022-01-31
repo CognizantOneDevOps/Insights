@@ -79,7 +79,7 @@ public class FileManagementTest extends FileManagementTestData {
 	
 	@Test(priority = 5)
 	public void testGetFileData() throws InsightsCustomException {
-		byte[] fileContent = fileManagementService.getFileData(fileDetailsJson);
+		byte[] fileContent = fileManagementService.getFileData(fileDetailsJson.get("fileName").getAsString());
 		Assert.assertNotNull(fileContent);
 		
 	}
@@ -104,7 +104,7 @@ public class FileManagementTest extends FileManagementTestData {
 	
 	@Test(priority = 8, expectedExceptions = InsightsCustomException.class)
 	public void testGetFileDataException() throws InsightsCustomException {
-		byte[] fileContent = fileManagementService.getFileData(fileDetailsJson);
+		byte[] fileContent = fileManagementService.getFileData(fileDetailsJson.get("fileName").getAsString());
 		Assert.assertNull(fileContent);
 		
 	}

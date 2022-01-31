@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.engineautomation;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -47,7 +48,7 @@ public class GraphdbCorrelationConfiguration extends LoginAndSelectModule {
 	public GraphdbCorrelationConfiguration() {
 		String timer;
 		try {
-			timer = new String(Files.readAllBytes(Paths.get(LoginAndSelectModule.testData.get("dataenrichmentmodule"))),
+			timer = new String(Files.readAllBytes(Paths.get(new File(LoginAndSelectModule.testData.get("dataenrichmentmodule")).getCanonicalPath())),
 					StandardCharsets.UTF_8);
 			Binding binding = new Binding();
 			GroovyShell shell = new GroovyShell(binding);

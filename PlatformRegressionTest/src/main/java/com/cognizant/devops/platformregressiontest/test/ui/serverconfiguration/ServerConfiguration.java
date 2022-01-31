@@ -33,7 +33,7 @@ import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectMod
  */
 public class ServerConfiguration extends ServerConfigurationObjectRepository {
 
-	WebDriverWait wait = new WebDriverWait(driver, 20);
+	WebDriverWait wait = new WebDriverWait(driver, 10);
 
 	private static final Logger log = LogManager.getLogger(ServerConfiguration.class);
 

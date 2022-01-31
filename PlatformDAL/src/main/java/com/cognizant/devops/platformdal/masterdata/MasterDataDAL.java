@@ -15,19 +15,35 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.masterdata;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class MasterDataDAL extends BaseDAL {
 
 	private static final Logger log = LogManager.getLogger(MasterDataDAL.class);
+	
+	public static final List<String> MASTER_TABLE_LIST = Collections.unmodifiableList(Arrays.asList("agent_configuration","INSIGHTS_SCHEDULER_TASK_DEFINITION"
+												,"INSIGHTS_WORKFLOW_TYPE","INSIGHTS_WORKFLOW_TASK","INSIGHTS_ROI_TOOLS"));
 
-	public void processMasterDataQuery(String query) {
+	public void processMasterDataQuery(String query) throws InsightsCustomException {
 		try {
-			int executedRecord = executeUpdateWithSQLQuery(query);
-			log.debug("processMasterDataQuery data updated {} for query  {} ",executedRecord, query);
+			String escapedSQL = ValidationUtils.cleanXSS(query);
+			boolean validData = MASTER_TABLE_LIST.stream().anyMatch(tableName -> query.contains(tableName));
+			if(validData) {
+				int executedRecord = executeUpdateWithSQLQuery(escapedSQL);
+				log.debug("processMasterDataQuery data updated {} for query  {} ",executedRecord, query);
+			}else {
+				log.error(query);
+				throw new InsightsCustomException("Unable to process query ");
+			}
 		} catch (Exception e) {
 			log.error(e);
 			throw e;

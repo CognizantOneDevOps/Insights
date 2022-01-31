@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
@@ -49,7 +50,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/accessGrpMgmt")
@@ -70,7 +70,7 @@ public class AccessGroupManagement {
 		log.debug("%n%nInside getOrgs method call");
 		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 		String response = grafanaHandler.grafanaGet("/api/orgs", headers);
-		return PlatformServiceUtil.buildSuccessResponseWithData(new JsonParser().parse(response));
+		return PlatformServiceUtil.buildSuccessResponseWithData(JsonUtils.parseString(response));
 	}
 
 	@PostMapping(value = "/switchUserOrg", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -93,12 +93,11 @@ public class AccessGroupManagement {
 
 		grafanaResponseCookies.put(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY,
 				httpRequest.getHeader(AuthenticationUtils.GRAFANA_WEBAUTH_HEADER_KEY));
-		httpRequest.setAttribute("responseHeaders", grafanaResponseCookies);
 
 		InsightsAuthenticationTokenUtils authenticationProviderImpl = new InsightsAuthenticationTokenUtils();
 		String jtoken = authenticationProviderImpl.updateSecurityContextRoleBased(grafanaCurrentOrgRole);
 		
-		JsonObject responseJson = new JsonParser().parse(response).getAsJsonObject();
+		JsonObject responseJson = JsonUtils.parseStringAsJsonObject(response);
 		responseJson.addProperty("jtoken", jtoken);
 
 		return PlatformServiceUtil.buildSuccessResponseWithData(responseJson);
@@ -113,12 +112,12 @@ public class AccessGroupManagement {
 
 			String message = null;
 			String responsename = grafanaHandler.grafanaGet(PATH + name, grafanaHeader);
-			JsonObject jsonResponseName = new JsonParser().parse(responsename).getAsJsonObject();
+			JsonObject jsonResponseName = JsonUtils.parseStringAsJsonObject(responsename);
 			if (jsonResponseName.has("id")) {
 				int userId = jsonResponseName.get("id").getAsInt();
 				String apiUrl = "/api/users/" + userId + "/orgs";
 				String response = grafanaHandler.grafanaGet(apiUrl, grafanaHeader);
-				return PlatformServiceUtil.buildSuccessResponseWithData(new JsonParser().parse(response));
+				return PlatformServiceUtil.buildSuccessResponseWithData(JsonUtils.parseString(response));
 			} else {
 				message = "User Not Found";
 				return PlatformServiceUtil.buildSuccessResponseWithData(message);
@@ -142,7 +141,7 @@ public class AccessGroupManagement {
 			if (response.isEmpty()) {
 				lastSeen = "-";
 			} else {
-				JsonObject responseJson = new JsonParser().parse(response).getAsJsonObject();
+				JsonObject responseJson = JsonUtils.parseStringAsJsonObject(response);
 				JsonArray userArray = responseJson.get("users").getAsJsonArray();
 				for (JsonElement userArrayElement : userArray) {
 					if (userArrayElement.getAsJsonObject().get("login").getAsString().equals(name)) {
@@ -167,8 +166,7 @@ public class AccessGroupManagement {
 		try {
 
 			String assignUserdata = ValidationUtils.validateRequestBody(reqassignUserdata);
-			JsonParser parser = new JsonParser();
-			JsonElement updateAgentJson = parser.parse(assignUserdata);
+			JsonElement updateAgentJson = JsonUtils.parseString(assignUserdata);
 			Map<String, String> grafanaHeader = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 			if (updateAgentJson.isJsonArray()) {
 				JsonArray arrayOfOrg = updateAgentJson.getAsJsonArray();
@@ -181,7 +179,7 @@ public class AccessGroupManagement {
 					String orgName = aorg.getAsJsonObject().get("orgName").getAsString();
 					String role = aorg.getAsJsonObject().get("roleName").getAsString();
 					String responsename = grafanaHandler.grafanaGet(PATH + userName, grafanaHeader);
-					JsonObject jsonResponseName = new JsonParser().parse(responsename).getAsJsonObject();
+					JsonObject jsonResponseName = JsonUtils.parseStringAsJsonObject(responsename);
 					if (jsonResponseName.get("id") == null) {
 						message = "User does not exsist.";
 						return PlatformServiceUtil.buildFailureResponse(message);
@@ -195,10 +193,12 @@ public class AccessGroupManagement {
 						message = message + "Org" + ": " + orgName + " " + responseorg;
 					}
 				}
+			} else {
+				throw new InsightsCustomException("Request parameter is not valid.");
 			}
 			return PlatformServiceUtil.buildSuccessResponseWithData(message);
 		} catch (InsightsCustomException e) {
-			return PlatformServiceUtil.buildFailureResponse("User already exsists in the Org.");
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		} catch (Exception e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
@@ -209,7 +209,7 @@ public class AccessGroupManagement {
 		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 		String response = grafanaHandler.grafanaGet(PlatformServiceConstants.API_USER_ORGS, headers);
 		log.debug("getCurrentUserOrgs response {} ",  response);
-		return PlatformServiceUtil.buildSuccessResponseWithData(new JsonParser().parse(response));
+		return PlatformServiceUtil.buildSuccessResponseWithData(JsonUtils.parseString(response));
 	}
 
 	@GetMapping(value = "/getUser", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -225,7 +225,7 @@ public class AccessGroupManagement {
 				log.debug("getUser cookies ================= {} ==== {}  " , cookie.getName(), value);
 			}
 			log.debug("Response in get User {}", cookieList);
-			return PlatformServiceUtil.buildSuccessResponseWithData(new JsonParser().parse(response));
+			return PlatformServiceUtil.buildSuccessResponseWithData(JsonUtils.parseString(response));
 		} catch (Exception e) {
 			log.error(" Error in getUser API ");
 			throw new InsightsCustomException(
@@ -236,14 +236,13 @@ public class AccessGroupManagement {
 	@GetMapping(value = "/getCurrentUserWithOrgs", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject getCurrentUserWithOrgs() throws InsightsCustomException {
 		JsonObject responseJson = new JsonObject();
-		JsonParser parser = new JsonParser();
 		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 		log.debug("Headers in get User {}", headers);
 		String responseUser = grafanaHandler.grafanaGet(PlatformServiceConstants.API_USER, headers);
-		JsonObject jsonObject = parser.parse(responseUser).getAsJsonObject();
+		JsonObject jsonObject = JsonUtils.parseStringAsJsonObject(responseUser);
 		responseJson.add("userDetail", (jsonObject));
 		String responseUserOrg = grafanaHandler.grafanaGet(PlatformServiceConstants.API_USER_ORGS, headers);
-		responseJson.add("orgArray", parser.parse(responseUserOrg));
+		responseJson.add("orgArray", JsonUtils.parseString(responseUserOrg));
 		return PlatformServiceUtil.buildSuccessResponseWithData(responseJson);
 	}
 
@@ -252,8 +251,7 @@ public class AccessGroupManagement {
 		String message = null;
 		try {
 			String userPropertyList = ValidationUtils.validateRequestBody(requserPropertyList);
-			JsonParser parser = new JsonParser();
-			JsonObject updateAgentJson = (JsonObject) parser.parse(userPropertyList);
+			JsonObject updateAgentJson = JsonUtils.parseStringAsJsonObject(userPropertyList);
 			int orgId = updateAgentJson.get(PlatformServiceConstants.ORGID).getAsInt();
 			String name = updateAgentJson.get("name").getAsString();
 			String email = updateAgentJson.get(PlatformServiceConstants.EMAIL).getAsString();
@@ -266,7 +264,7 @@ public class AccessGroupManagement {
 			log.debug(" orgName {}", orgName);
 
 			String responsename = grafanaHandler.grafanaGet(PATH + userName, grafanaHeader);
-			JsonObject jsonResponseName = new JsonParser().parse(responsename).getAsJsonObject();
+			JsonObject jsonResponseName = JsonUtils.parseStringAsJsonObject(responsename);
 
 			String jsonResponseNameEmail = "";
 			if (jsonResponseName.get("id") != null) {
@@ -282,7 +280,7 @@ public class AccessGroupManagement {
 				String apiUrlUserOrgs = "/api/users/"+ jsonResponseName.get("id").getAsInt() + "/orgs";
 				Map<String, String> headersUserOrgs = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 				String responseUserOrgs = grafanaHandler.grafanaGet(apiUrlUserOrgs, headersUserOrgs);
-				JsonArray userOrgs = new JsonParser().parse(responseUserOrgs).getAsJsonArray();
+				JsonArray userOrgs = JsonUtils.parseStringAsJsonArray(responseUserOrgs);
 				boolean orgFlag = false;
 				String orgCurrentRole = "";
 				for (JsonElement totalOrgs : userOrgs) {
@@ -321,7 +319,7 @@ public class AccessGroupManagement {
 			} else {
 				// if the username is not present in grafana then we are checking for the email
 				String responseEmail = grafanaHandler.grafanaGet(PATH + email, grafanaHeader);
-				JsonObject jsonResponseEmail = new JsonParser().parse(responseEmail).getAsJsonObject();
+				JsonObject jsonResponseEmail = JsonUtils.parseStringAsJsonObject(responseEmail);
 				if (jsonResponseEmail.get("id") != null) {
 					// if email id exists returning email exists
 					message = "{\"message\":\"Email already exists\"}";
@@ -337,7 +335,7 @@ public class AccessGroupManagement {
 					String responseCreate = grafanaHandler.grafanaPost("/api/admin/users", requestCreate,
 							grafanaHeader);
 
-					JsonObject jsonResponse = new JsonParser().parse(responseCreate).getAsJsonObject();
+					JsonObject jsonResponse =JsonUtils.parseStringAsJsonObject(responseCreate);
 					if (jsonResponse.get("id") != null && orgId != 1) {
 						// if the org is other than main org we are adding the created user to the org
 						String apiUrlorg = "/api/orgs/" + orgId + "/users";
@@ -391,7 +389,7 @@ public class AccessGroupManagement {
 			throws InsightsCustomException {
 		log.debug("Inside getCurrentOrgRole method call");
 		String grafanaCurrentOrgResponse = grafanaHandler.grafanaGet("/api/user/orgs", headers);
-		JsonArray grafanaOrgs = new JsonParser().parse(grafanaCurrentOrgResponse).getAsJsonArray();
+		JsonArray grafanaOrgs = JsonUtils.parseStringAsJsonArray(grafanaCurrentOrgResponse);
 		String grafanaCurrentOrgRole = null;
 		for (JsonElement org : grafanaOrgs) {
 			if (grafanaCurrentOrg.equals(org.getAsJsonObject().get("orgId").toString())) {
@@ -406,9 +404,9 @@ public class AccessGroupManagement {
 	private String getGrafanaCurrentOrg(Map<String, String> headers) throws InsightsCustomException {
 		log.debug("Inside getGrafanaCurrentOrg method call");
 		String grafanaCurrentOrgResponse = grafanaHandler.grafanaGet("/api/user", headers);
-		JsonObject responseJson = new JsonParser().parse(grafanaCurrentOrgResponse).getAsJsonObject();
+		JsonObject responseJson = JsonUtils.parseString(ValidationUtils.validateResponseBody(grafanaCurrentOrgResponse))
+				.getAsJsonObject();
 		String grafanaCurrentOrg = responseJson.get("orgId").toString();
-		log.debug("The Current Grafana OrgId is:  {} ", grafanaCurrentOrg );
 		return grafanaCurrentOrg;
 	}
 
@@ -419,7 +417,7 @@ public class AccessGroupManagement {
 		try {
 			Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 			String grafanaResponse = grafanaHandler.grafanaGet("/api/search", headers);
-			JsonElement response = new JsonParser().parse(grafanaResponse);
+			JsonElement response =JsonUtils.parseString(grafanaResponse);
 			JsonArray dashboardsJsonArray = response.getAsJsonArray();
 			if (dashboardsJsonArray.size() == 0) {
 				return PlatformServiceUtil.buildSuccessResponseWithData(finalJson);
@@ -432,6 +430,7 @@ public class AccessGroupManagement {
 			String grafanaBaseUrl="INSIGHTS_GRAFANA_HOST";
 			String grafanaUrl = grafanaBaseUrl;
 			String grafanaIframeUrl = grafanaBaseUrl + "/dashboard/script/iSight_ui3.js?url=";
+			//String grafanaDomainUrl = accessGrpMgmtServiceImpl.grafanaUrl(grafanaBaseUrl);
 			String grafanaVersion = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaVersion();
 			if (grafanaVersion == null) {
 				grafanaVersion = "7.0.3";
@@ -491,7 +490,7 @@ public class AccessGroupManagement {
 	@PostMapping(value = "/getTemplateQueryResults", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject getTemplateQueryResults(@RequestBody String queryJson) throws InsightsCustomException {
 		log.debug("%n%nInside getTemplateQueryResults method call  ==== ");
-		JsonObject query = new JsonParser().parse(queryJson).getAsJsonObject();
+		JsonObject query =JsonUtils.parseStringAsJsonObject(queryJson);
 		GraphDBHandler dbHandler = new GraphDBHandler();
 		JsonObject neo4jResponse = dbHandler.executeCypherQueryForJsonResponse(query.get("query").getAsString());
 		return neo4jResponse;
@@ -503,7 +502,7 @@ public class AccessGroupManagement {
 		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 		headers.put("x-grafana-org-id", String.valueOf(orgId));
         String response = grafanaHandler.grafanaGet("/api/dashboards/uid/"+uuid, headers);
-        return PlatformServiceUtil.buildSuccessResponseWithHtmlData(new JsonParser().parse(response));
+        return PlatformServiceUtil.buildSuccessResponseWithHtmlData(JsonUtils.parseString(response));
     }
 	@GetMapping(value = "/getDashboardByDBUid", produces = MediaType.APPLICATION_JSON_VALUE)
     public JsonObject getDashboardByDBUid(@RequestParam String uuid,@RequestParam int orgId)  {

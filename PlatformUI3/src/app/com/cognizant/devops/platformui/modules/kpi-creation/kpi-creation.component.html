@@ -38,7 +38,7 @@
                     add_circle
                 </mat-icon>
             </button>
-            <button mat-icon-button *ngIf="onRadioBtnSelect" (click)="edit()">
+            <button mat-icon-button [disabled]="!onRadioBtnSelect" (click)="edit()">
                 <mat-icon title="Edit" class="mat-icon material-icons">
                     edit
                 </mat-icon>
@@ -49,7 +49,7 @@
                 </mat-icon>
             </button>
 
-            <button mat-icon-button *ngIf="onRadioBtnSelect" (click)="uninstallKpi()">
+            <button mat-icon-button [disabled]="!onRadioBtnSelect" (click)="uninstallKpi()">
                 <mat-icon title="Delete" style="margin-bottom: -10%;" class="mat-icon material-icons">
                     delete
                 </mat-icon>

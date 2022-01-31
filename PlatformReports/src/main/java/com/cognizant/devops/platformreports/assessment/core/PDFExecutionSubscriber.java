@@ -32,6 +32,7 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportsKPIConfig;
@@ -49,7 +50,6 @@ import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadP
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 	
@@ -71,7 +71,7 @@ public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 					"Worlflow Detail ==== PDFExecutionSubscriber started ... routing key  message handleDelivery ===== {} ",
 					incomingTaskMessage);
 			assessmentReportDTO = new InsightsAssessmentConfigurationDTO();
-			JsonObject incomingTaskMessageJson = new JsonParser().parse(incomingTaskMessage).getAsJsonObject();
+			JsonObject incomingTaskMessageJson = JsonUtils.parseStringAsJsonObject(incomingTaskMessage);
 			prepareVisualizationJsonBasedOnKPIResult(incomingTaskMessageJson);
 			processVisualizationJson();
 			setPDFDetailsInEmailHistory(incomingTaskMessageJson);

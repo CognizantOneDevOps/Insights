@@ -20,12 +20,13 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
+
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfigDAL;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @Service("correlationBuilderService")
 public class CorrelationBuilderServiceImpl implements CorrelationBuilderService {
@@ -81,8 +82,7 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 	@Override
 	public boolean updateCorrelationStatus(String flagDeatils) throws InsightsCustomException {
 
-		JsonParser parser = new JsonParser();
-		JsonObject json = (JsonObject) parser.parse(flagDeatils);
+		JsonObject json = JsonUtils.parseStringAsJsonObject(flagDeatils);
 		String relationName = json.get("relationName").getAsString();
 		Boolean flag = json.get("correlationFlag").getAsBoolean();
 		CorrelationConfigDAL correlationConfigDAL = new CorrelationConfigDAL();
@@ -93,8 +93,7 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 	@Override
 	public boolean deleteCorrelation(String relationName) throws InsightsCustomException {
 
-		JsonParser parser = new JsonParser();
-		JsonObject json = (JsonObject) parser.parse(relationName);
+		JsonObject json = JsonUtils.parseStringAsJsonObject(relationName);
 		String relationNameValue = json.get("relationName").getAsString();
 		CorrelationConfigDAL correlationConfigDAL = new CorrelationConfigDAL();
 		return correlationConfigDAL.deleteCorrelationConfig(relationNameValue);
@@ -102,8 +101,7 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 	}
 
 	private CorrelationJson loadCorrelation(String config) {
-		JsonParser parser = new JsonParser();
-		JsonObject json = (JsonObject) parser.parse(config);
+		JsonObject json = JsonUtils.parseStringAsJsonObject(config);
 		CorrelationJson correlation = new Gson().fromJson(json, CorrelationJson.class);
 		return correlation;
 	}

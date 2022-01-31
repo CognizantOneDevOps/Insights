@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfigDAL;
@@ -72,18 +73,28 @@ public class WebHookServiceImpl implements IWebHook {
 	 */
 	private Boolean checkResponseTemplate(String responseTemplate) throws InsightsCustomException {
 		try {
-			StringTokenizer st = new StringTokenizer(responseTemplate, ",");
-			while (st.hasMoreTokens()) {
-				String keyValuePairs = st.nextToken();
-				int count = StringUtils.countOccurrencesOf(keyValuePairs, "=");
-				if (count != 1) {
-					throw new InsightsCustomException(PlatformServiceConstants.INCORRECT_RESPONSE_TEMPLATE);
-				} else {
-					String[] dataKeyMapper = keyValuePairs.split("=");
-					log.debug(" {}  , {} ", dataKeyMapper[0].trim(), dataKeyMapper[1].trim());
+			String responseTemplateValidated = ValidationUtils.cleanXSS(responseTemplate);
+			StringTokenizer st = new StringTokenizer(responseTemplateValidated, ",");
+			int tokenCount = st.countTokens();
+			int maxTokenCount = 70;
+			
+			if(tokenCount > maxTokenCount) {
+				log.debug("In checkResponseTemplate ==== parameter count exceeds max limit {}",tokenCount);
+				throw new InsightsCustomException("Response template parameter count exceeds max limit."); 
+			} else {
+				for(int i=0; i < tokenCount; i++){
+					String keyValuePairs = st.nextToken();
+					String validatedString = ValidationUtils.cleanXSS(keyValuePairs);
+					int count = StringUtils.countOccurrencesOf(validatedString, "=");
+					if (count != 1) {
+						throw new InsightsCustomException(PlatformServiceConstants.INCORRECT_RESPONSE_TEMPLATE);
+					} else {
+						String[] dataKeyMapper = validatedString.split("=");
+						log.debug(" {}  , {} ", dataKeyMapper[0].trim(), dataKeyMapper[1].trim());
+					}
 				}
+				return true;
 			}
-			return true;
 		} catch (InsightsCustomException e) {
 			log.error("Error in Response Template.. {}", e.getMessage());
 			throw new InsightsCustomException(PlatformServiceConstants.INCORRECT_RESPONSE_TEMPLATE);

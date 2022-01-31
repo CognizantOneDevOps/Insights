@@ -56,7 +56,7 @@ public class JWTAuthenticationProvider implements AuthenticationProvider {
 		if (jwtClaimsSet != null) {
 			log.debug("Inside JWTAuthenticationProvider jwtClaimsSet {} === {} ",jwtClaimsSet, authentication);
 			authentication.getAuthorities().forEach(
-					b -> log.debug("In successfulAuthentication JWTAuthenticationProvider GrantedAuthority ==== {} ", b.getAuthority()));
+					b -> log.debug("In successfulAuthentication JWTAuthenticationProvider assigned "));
 			authenticationJWT =  new InsightsAuthenticationToken(
 					authentication.getPrincipal(), jwtClaimsSet.getSubject(), null, authentication.getAuthorities());
 		} else {

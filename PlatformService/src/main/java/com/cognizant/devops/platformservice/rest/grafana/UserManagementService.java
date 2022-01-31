@@ -18,6 +18,7 @@ package com.cognizant.devops.platformservice.rest.grafana;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -31,9 +32,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.core.util.AES256Cryptor;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
@@ -47,15 +53,56 @@ public class UserManagementService {
 	private HttpServletRequest httpRequest;
 	
 	GrafanaHandler grafanaHandler = new GrafanaHandler();
-	private static final String PATH = "/api/orgs/";  
-
+	private static final String PATH = "/api/orgs/"; 
+	private static final String USERS = "/users"; 
+	private static final String FORWARD_SLASH = "/";
+	private static final String ORG_ID = "orgId";
+	private static final String NAME = "name";
+	private static final String LOGIN = "login";
+	private static final String ROLE = "role";
+	private static final String USER_ID = "userId";
+	private static final String EMAIL = "email";
+	private static final String COLON = ":";
+	private static final String AUTHORIZATION = "Authorization";
+	private static final String BASIC = "Basic ";
+	
 	@PostMapping(value = "/getOrgUsers", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject getOrgUsers(@RequestParam int orgId) throws InsightsCustomException {
 		try {
 			Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
-			String response = grafanaHandler.grafanaGet(PATH + orgId + "/users", headers);
+			String response = grafanaHandler.grafanaGet(PATH + orgId + USERS, headers);
 			return PlatformServiceUtil
-					.buildSuccessResponseWithData(new JsonParser().parse(response));
+					.buildSuccessResponseWithData(JsonUtils.parseString(response));
+		} catch (JsonSyntaxException e) {
+			return PlatformServiceUtil.buildFailureResponse("Unable to get current org users");
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse("Unable to get current org users,Permission denide ");
+		}
+	}
+	
+	@PostMapping(value = "/v2/getOrgUsers", produces = MediaType.APPLICATION_JSON_VALUE)
+	public JsonObject getOrgUsersV2(@RequestParam int orgId) throws InsightsCustomException {
+		try {
+			Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
+			String response = grafanaHandler.grafanaGet(PATH + orgId + USERS, headers);
+			JsonArray respJson = new Gson().fromJson(response, JsonArray.class);
+			JsonArray restrictedArray = new JsonArray();
+			for (JsonElement jsonElement : respJson) {
+				JsonObject restrictedObject = new JsonObject();
+				JsonObject inpJson = jsonElement.getAsJsonObject();
+				restrictedObject.add(ORG_ID, inpJson.get(ORG_ID));
+				restrictedObject.add(NAME, inpJson.get(NAME));
+				restrictedObject.add(LOGIN, inpJson.get(LOGIN));
+				restrictedObject.add(ROLE, inpJson.get(ROLE));
+				restrictedObject.add(USER_ID, inpJson.get(USER_ID));
+				restrictedObject.add(EMAIL, inpJson.get(EMAIL));
+				restrictedArray.add(restrictedObject);
+			}
+			String passKey = UUID.randomUUID().toString().substring(0, 15);
+		    String encodedData = passKey+AES256Cryptor.encrypt(restrictedArray.toString(), passKey);
+			return PlatformServiceUtil
+					.buildSuccessResponseWithData(encodedData);
+			
 		} catch (JsonSyntaxException e) {
 			return PlatformServiceUtil.buildFailureResponse("Unable to get current org users");
 		} catch (InsightsCustomException e) {
@@ -66,7 +113,7 @@ public class UserManagementService {
 	@PostMapping(value = "/createOrg", produces = MediaType.APPLICATION_JSON_VALUE)
 	public String createOrg(@RequestParam String orgName) throws InsightsCustomException {
 		JsonObject request = new JsonObject();
-		request.addProperty("name", orgName);
+		request.addProperty(NAME, orgName);
 		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 		return grafanaHandler.grafanaPost(PATH, request, headers);
 	}
@@ -75,24 +122,24 @@ public class UserManagementService {
 	public String editOrganizationUser(@RequestParam int orgId, @RequestParam int userId, @RequestParam String role) throws InsightsCustomException {
 		log.debug("%n%nInside editOrganizationUser method call");
 		JsonObject request = new JsonObject();
-		request.addProperty("role", role);
+		request.addProperty(ROLE, role);
 		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
-		String authString = ApplicationConfigProvider.getInstance().getGrafana().getAdminUserName() + ":"
+		String authString = ApplicationConfigProvider.getInstance().getGrafana().getAdminUserName() + COLON
 				+ ApplicationConfigProvider.getInstance().getGrafana().getAdminUserPassword();
 		String encodedString = Base64.getEncoder().encodeToString(authString.getBytes());
-		headers.put("Authorization", "Basic " + encodedString);
-		return grafanaHandler.grafanaPatch(PATH + orgId + "/users/" + userId, request, headers);
+		headers.put(AUTHORIZATION, BASIC + encodedString);
+		return grafanaHandler.grafanaPatch(PATH + orgId + USERS + FORWARD_SLASH + userId, request, headers);
 	}
 
 	@PostMapping(value = "/deleteOrganizationUser", produces = MediaType.APPLICATION_JSON_VALUE)
 	public String deleteOrganizationUser(@RequestParam int orgId, @RequestParam int userId, @RequestParam String role) throws InsightsCustomException {
 		log.debug("%n%nInside deleteOrganizationUser method call");
 		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
-		String authString = ApplicationConfigProvider.getInstance().getGrafana().getAdminUserName() + ":"
+		String authString = ApplicationConfigProvider.getInstance().getGrafana().getAdminUserName() + COLON
 				+ ApplicationConfigProvider.getInstance().getGrafana().getAdminUserPassword();
 		String encodedString = Base64.getEncoder().encodeToString(authString.getBytes());
-		headers.put("Authorization", "Basic " + encodedString);
-		return grafanaHandler.grafanaDelete(PATH + orgId + "/users/" + userId, headers);
+		headers.put(AUTHORIZATION, BASIC + encodedString);
+		return grafanaHandler.grafanaDelete(PATH + orgId + USERS + FORWARD_SLASH + userId, headers);
 		
 	}
 }

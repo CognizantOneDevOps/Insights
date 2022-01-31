@@ -26,6 +26,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum.WorkflowSchedule;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformreports.assessment.datamodel.ContentConfigDefinition;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsContentDetail;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsKPIResultDetails;
@@ -184,8 +185,7 @@ public class ThresholdRangeCategoryImpl extends BaseContentCategoryImpl {
 		ReportEngineEnum.KPISentiment sentiment = ReportEngineEnum.KPISentiment.NEUTRAL;
 		HashMap<String,Integer> zonesMap = new HashMap<>();
 		String comparisonField = getResultFieldFromContentDefination();
-		JsonObject thresholdObjs = jsonParser.parse(String.valueOf(contentConfigDefinition.getThresholds()))
-				.getAsJsonObject();
+		JsonObject thresholdObjs = JsonUtils.parseStringAsJsonObject(String.valueOf(contentConfigDefinition.getThresholds()));
 		double amberThreshold = thresholdObjs.get(AssessmentReportAndWorkflowConstants.AMBER).getAsDouble();
 		double greenThreshold = thresholdObjs.get(AssessmentReportAndWorkflowConstants.GREEN).getAsDouble();
 

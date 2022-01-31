@@ -18,9 +18,9 @@ package com.cognizant.devops.platformauditing.api;
 import com.cognizant.devops.platformauditing.hyperledger.accesslayer.BCNetworkGatewayClient;
 import com.cognizant.devops.platformauditing.util.LoadFile;
 import com.cognizant.devops.platformauditing.util.RestructureDataUtil;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -110,9 +110,7 @@ public class InsightsAuditImpl implements InsightsAudit {
         try {
             JsonObject changelogData = utilMethods.massageChangeLog(input);
 			if (changelogData != null) {
-                JsonParser parser = new JsonParser();
-				JsonObject ledgerCopy = parser.parse(getAssetInfo(changelogData.get("almAssetID").getAsString()))
-						.getAsJsonObject();
+				JsonObject ledgerCopy = JsonUtils.parseStringAsJsonObject(getAssetInfo(changelogData.get("almAssetID").getAsString()));
 				if (ledgerCopy.getAsJsonPrimitive(STATUS_CODE).getAsString().equals("200")) {
                     if (utilMethods.validateChangelog(ledgerCopy.getAsJsonObject("msg"), changelogData)) {
 						changelogData = utilMethods.constructJiraFromChangelog(ledgerCopy.getAsJsonObject("msg"),

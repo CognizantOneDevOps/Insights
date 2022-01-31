@@ -32,6 +32,7 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsContentConfig;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsKPIConfig;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportsKPIConfig;
@@ -53,7 +54,6 @@ import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadP
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
@@ -81,7 +81,7 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 			log.debug("Worlflow Detail ==== ReportKPISubscriber routing key  message handleDelivery ===== {} ",
 					message);
 
-			JsonObject incomingTaskMessage = new JsonParser().parse(message).getAsJsonObject();
+			JsonObject incomingTaskMessage = JsonUtils.parseStringAsJsonObject(message);
 			String workflowId = incomingTaskMessage.get("workflowId").getAsString();
 			executionId = incomingTaskMessage.get("executionId").getAsLong();
 			workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
@@ -165,6 +165,7 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 			throws InterruptedException, ExecutionException {
 		log.debug("Worlflow Detail ==== ReportKPISubscriber  inside executeKPI start ");
 		int assessmentId = workflowConfig.getAssessmentConfig().getId();
+		String assessmentReportName = workflowConfig.getAssessmentConfig().getAsseementreportname();
 		String assessmentInputDataSource = workflowConfig.getAssessmentConfig().getInputDatasource();
 		int reportTemplateId = workflowConfig.getAssessmentConfig().getReportTemplateEntity().getReportId();
 		List<Callable<JsonObject>> kpiListToExecute = new ArrayList<>();
@@ -182,6 +183,7 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 				kpiConfigDTO.setExecutionId(executionId);
 				kpiConfigDTO.setReportId(reportTemplateId);
 				kpiConfigDTO.setAssessmentId(assessmentId);
+				kpiConfigDTO.setAssessmentReportName(assessmentReportName);
 				kpiConfigDTO.setWorkflowId(workflowConfig.getWorkflowId());
 				kpiConfigDTO.setSchedule(WorkflowTaskEnum.WorkflowSchedule.valueOf(workflowConfig.getScheduleType()));
 				kpiConfigDTO.setLastRunTime(workflowConfig.getLastRun());
@@ -232,6 +234,7 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 		List<Callable<Integer>> contentListToExecute = new ArrayList<>();
 		ReportPostgresDataHandler contentProcessing = new ReportPostgresDataHandler();
 		int assessmentId = workflowConfig.getAssessmentConfig().getId();
+		String assessmentReportName = workflowConfig.getAssessmentConfig().getAsseementreportname();
 		int reportTemplateId = workflowConfig.getAssessmentConfig().getReportTemplateEntity().getReportId();
 		for (int contentId : contentList) {
 			InsightsContentConfig contentConfig = contentProcessing.getContentConfig(contentId);
@@ -250,6 +253,7 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 				contentConfigDefinition.setWorkflowId(workflowConfig.getWorkflowId());
 				contentConfigDefinition.setReportId(reportTemplateId);
 				contentConfigDefinition.setAssessmentId(assessmentId);
+				contentConfigDefinition.setAssessmentReportName(assessmentReportName);
 				contentListToExecute.add(new ContentExecutor(contentConfigDefinition));
 
 			} else

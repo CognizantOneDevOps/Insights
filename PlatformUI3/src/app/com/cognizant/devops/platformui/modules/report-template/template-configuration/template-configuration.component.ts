@@ -52,6 +52,8 @@ export class ReportTemplateConfig implements OnInit {
     disableInputFields: boolean = false;
     deletedKpiList = [];
     status: boolean = true;
+    chartTypes: any;
+    grafanaVtypes = [];
     kpiListDatasource = new MatTableDataSource<any>();
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -66,7 +68,10 @@ export class ReportTemplateConfig implements OnInit {
             console.log(params);
             this.receivedParam = JSON.parse(params.templateParam);
             this.visualizationUtilList = JSON.parse(params.visualizaionUtil);
-            this.vTypeList = JSON.parse(params.vType);
+            this.chartTypes = JSON.parse(params.vType);
+            this.vTypeList = this.chartTypes['vTypes'];
+            this.grafanaVtypes = this.chartTypes['grafanaCharts']
+            console.log(this.vTypeList, this.grafanaVtypes);
         });
         this.initializeTemplateDetails();
     }
@@ -134,7 +139,8 @@ export class ReportTemplateConfig implements OnInit {
         this.buttonName = 'UPDATE';
         var listData = this.kpiDetailItems.find(({ kpiId }) => kpiId === id);
         this.kpiId = listData.kpiId;
-        this.vType = listData.vType.split('_')[0].toString();
+        //this.vType = listData.vType.split('_')[0].toString();
+        this.vType = listData.vType.substring(0, listData.vType.lastIndexOf('_'));
         this.vQuery = listData.vQuery;
         this.isEdit = true;
     }

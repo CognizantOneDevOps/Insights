@@ -23,7 +23,9 @@ import java.util.List;
 public class ReportChartCollection {
 	
 	private ReportChartCollection() {}
-
+	
+	public static final List<String> GRAFANA_CHARTS = Collections.unmodifiableList(
+		     Arrays.asList("piechart","barchart","table"));
 	
 	public static final List<String> SINGLE_SERIES_CHARTS = Collections.unmodifiableList(
 			     Arrays.asList("pie2d","pie3d","doughnut2d","doughnut3d","pareto2d","pareto3d"));
@@ -46,6 +48,10 @@ public class ReportChartCollection {
 
 	public static List<String> getSingleValueCharts() {
 		return SINGLE_VALUE_CHARTS;
+	}
+
+	public static List<String> getGrafanaCharts() {
+		return GRAFANA_CHARTS;
 	}
 	
 	

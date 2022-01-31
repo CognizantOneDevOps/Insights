@@ -17,7 +17,11 @@ package com.cognizant.devops.automl.service;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -38,6 +42,7 @@ import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.core.enums.AutoMLEnum;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.ai.H2oApiCommunicator;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
@@ -48,7 +53,6 @@ import com.cognizant.devops.platformservice.workflow.service.WorkflowServiceImpl
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @Service("trainModelsService")
 public class TrainModelsServiceImpl implements ITrainModelsService {
@@ -212,7 +216,13 @@ public class TrainModelsServiceImpl implements ITrainModelsService {
 				return response;
 			}
 			response.addProperty(STATUSCODE, 0);
-			File directory = new File(ConfigOptions.ML_DATA_STORAGE_RESOLVED_PATH + FILE_SEPERATOR + usecase);
+			File directory = null;
+			try {
+				String directoryPath = new File(ConfigOptions.ML_DATA_STORAGE_RESOLVED_PATH + FILE_SEPERATOR + usecase).getCanonicalPath();
+				directory = new File(directoryPath);
+			} catch (IOException e) {
+				log.error(e);
+			}
 			if (!FileSystemUtils.deleteRecursively(directory)) {
 				log.error("Unable to delete usecase {} directory ", usecase);
 			}
@@ -276,26 +286,23 @@ public class TrainModelsServiceImpl implements ITrainModelsService {
 			
 			/* Save file to Insights_Home */
 			
-			String folderPath = ConfigOptions.ML_DATA_STORAGE_RESOLVED_PATH + ConfigOptions.FILE_SEPERATOR + usecase
-					+ ConfigOptions.FILE_SEPERATOR;
-			File destfolder = new File(folderPath);
-			if (destfolder.mkdirs()) {
-				log.debug("AutoML========== Usecasefolder is created {}", destfolder.getAbsolutePath());
-			}
-			String filePath = folderPath + file.getOriginalFilename();
-			destfolder = new File(filePath);
 			try {
-				file.transferTo(destfolder);
-				fileBytes= FileUtils.readFileToByteArray(destfolder);
+				String folderPath = new File(ConfigOptions.ML_DATA_STORAGE_RESOLVED_PATH + ConfigOptions.FILE_SEPERATOR + usecase).getCanonicalPath();
+				File destfolder = new File(folderPath);
+				if (destfolder.mkdirs()) {
+					log.debug("AutoML========== Usecasefolder is created {}", destfolder.getCanonicalPath());
+				}
+				String filename = file.getOriginalFilename();
+				String filePath = folderPath + ConfigOptions.FILE_SEPERATOR + filename;
+				file.transferTo(new File(filePath));
+				fileBytes= FileUtils.readFileToByteArray(new File(filePath));
 			} catch (Exception e) {
 				log.debug("AutoML========== Exception while creating folder {}", e.getMessage());
 				throw new InsightsCustomException("Unable to create folder");
 			}		
 			
 			/* Save record in DB and create workflow */
-			
-			JsonParser parser = new JsonParser();
-			JsonArray taskList = parser.parse(taskDetails).getAsJsonArray();
+			JsonArray taskList = JsonUtils.parseStringAsJsonArray(taskDetails);
 			boolean runImmediate = true;
 			boolean reoccurence = false;
 			String schedule = WorkflowTaskEnum.WorkflowSchedule.ONETIME.name();

@@ -16,7 +16,9 @@
 package com.cognizant.devops.engines.platformengine.message.factory;
 
 import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Envelope;
@@ -37,5 +39,9 @@ public abstract class EngineSubscriberResponseHandler {
 	}
 	public void setChannel(Channel channel) {
 		this.channel = channel;
+	}
+	
+	public void unregisterSubscriber(String routingKey) throws IOException, TimeoutException, InsightsCustomException {
+		MessageSubscriberFactory.getInstance().unregisterSubscriber(routingKey, engineSubscriberResponseHandler);
 	}
 }

@@ -28,7 +28,7 @@
 			<class
 				name="com.cognizant.devops.platformservice.test.assessmentReports.ReportTemplateKPIContentServiceTest" />
 			<class
-				name="com.cognizant.devops.platformservice.test.workflow.WorkflowServiceTest" /> 
+				name="com.cognizant.devops.platformservice.test.workflow.WorkflowServiceTest" />
 			<class
 				name="com.cognizant.devops.platformservice.test.dataArchival.DataArchivalServiceTest" />
 			<class
@@ -37,12 +37,16 @@
 				name="com.cognizant.devops.platformservice.test.serverConfig.ServerConfigServiceTest" />
 			<class
 				name="com.cognizant.devops.platformservice.test.fileManagement.FileManagementTest" />
-            <class
-                name="com.cognizant.devops.platformservice.test.upshiftassessment.UpshiftAssessmentServiceTest" />
-             <class
-                name="com.cognizant.devops.platformservice.test.grafanadashboard.GrafanaDashboardReportTest" />
-             <class
-                name="com.cognizant.devops.platformservice.test.TaskManagement.TaskManagementServiceTest" />
+			<class
+				name="com.cognizant.devops.platformservice.test.upshiftassessment.UpshiftAssessmentServiceTest" />
+			<class
+				name="com.cognizant.devops.platformservice.test.grafanadashboard.GrafanaDashboardReportTest" /> 
+			<class
+				name="com.cognizant.devops.platformservice.test.TaskManagement.TaskManagementServiceTest" />
+			<!-- <class
+				name="com.cognizant.devops.platformservice.test.milestone.OutcomeServiceTest" />
+			<class
+				name="com.cognizant.devops.platformservice.test.milestone.MilestoneServiceTest" /> -->
 		</classes>
 	</test>
 </suite>

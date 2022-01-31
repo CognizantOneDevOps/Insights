@@ -31,12 +31,12 @@ import com.cognizant.devops.platformcommons.constants.DataArchivalConstants;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.dataArchivalConfig.DataArchivalConfigDal;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Envelope;
 
@@ -61,7 +61,7 @@ public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandle
 			List<JsonObject> failedDataList = new ArrayList<>();
 			Boolean isFailure = false;
 			String healthStatus = "";
-			JsonElement json = new JsonParser().parse(message);
+			JsonElement json = JsonUtils.parseString(message);
 			JsonObject messageJson = json.getAsJsonArray().get(0).getAsJsonObject();
 			String agentId = messageJson.get("agentId").getAsString();
 			String toolName = messageJson.get("toolName").getAsString();

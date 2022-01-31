@@ -24,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.constants.ErrorMessage;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
@@ -32,7 +33,6 @@ import com.cognizant.devops.platformservice.rest.datatagging.constants.Datataggi
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @Service("businessMappingService")
 public class BusinessMappingServiceImpl implements BusinessMappingService {
@@ -51,8 +51,7 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 			dbHandler.executeCypherQuery("CREATE CONSTRAINT ON (n:METADATA) ASSERT n.metadata_id  IS UNIQUE");
 			String query = "UNWIND {props} AS properties " + "CREATE (n:METADATA:BUSINESSMAPPING) "
 					+ "SET n = properties"; // DATATAGGING
-			JsonParser parser = new JsonParser();
-			JsonObject json = (JsonObject) parser.parse(validatedResponse);
+			JsonObject json = JsonUtils.parseStringAsJsonObject(validatedResponse);
 			log.debug("arg0 {} ", json);
 			nodeProperties.add(json);
 			JsonObject graphResponse = dbHandler.bulkCreateNodes(nodeProperties, null, query);
@@ -93,8 +92,7 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 		try {
 			String validatedResponse = ValidationUtils.validateRequestBody(agentMappingJson);
 			GraphDBHandler dbHandler = new GraphDBHandler();
-			JsonParser parser = new JsonParser();
-			JsonObject json = (JsonObject) parser.parse(validatedResponse);
+			JsonObject json = JsonUtils.parseStringAsJsonObject(validatedResponse);
 			String uuid = json.get("uuid").getAsString();
 			log.debug("arg0 {} uuid  ", uuid);
 			JsonArray asJsonArray = getCurrentRecords(uuid, dbHandler);

@@ -1,0 +1,70 @@
+{
+      "datasource": "Neo4j Data Source",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "blue",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 18
+      },
+      "id": null,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.1.3",
+      "targets": [
+        {
+          "cache": false,
+          "cacheType": false,
+          "cacheValue": false,
+          "constant": 6.5,
+          "fixTime": false,
+          "graph": false,
+          "hide": false,
+          "queryText": "",
+          "raw": false,
+          "refId": "A",
+          "stats": false,
+          "table": true,
+          "timeseries": false,
+          "varTime": false
+        }
+      ],
+      "title": "",
+	  "transparent": true,
+      "type": "stat"
+    }

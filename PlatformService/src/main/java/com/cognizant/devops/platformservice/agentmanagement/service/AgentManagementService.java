@@ -25,7 +25,7 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 public interface AgentManagementService {
 
 	public String registerAgent(String toolName, String agentVersion, String osversion, String configDetails,
-			String trackingDetails, boolean vault,boolean isWebhook) throws InsightsCustomException;
+			String trackingDetails, boolean vault,boolean isWebhook, String type) throws InsightsCustomException;
 
 	public String uninstallAgent(String agentId, String toolName, String osversion) throws InsightsCustomException;
 
@@ -55,4 +55,8 @@ public interface AgentManagementService {
 
 	// Returns config.json for request AgentId from Db
 	public AgentConfigTO getAgentDetails(String agentId) throws InsightsCustomException;
+
+	public boolean isROIAgentCheck(String tool) throws InsightsCustomException;
+	// Provides currently registered Agents in DB and their health
+	public List<AgentConfigTO> getRegisteredAgentsAndHealth() throws InsightsCustomException;
 }

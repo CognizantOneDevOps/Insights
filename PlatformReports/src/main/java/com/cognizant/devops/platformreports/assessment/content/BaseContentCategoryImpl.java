@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -43,7 +44,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public abstract class BaseContentCategoryImpl {
 
@@ -51,7 +51,6 @@ public abstract class BaseContentCategoryImpl {
 
 	protected ContentConfigDefinition contentConfigDefinition;
 	GraphDBHandler dbHandler = new GraphDBHandler();
-	JsonParser jsonParser = new JsonParser();
 	String datasource = ApplicationConfigProvider.getInstance().getAssessmentReport().getOutputDatasource();
 	ReportDataHandler datasourceDataHandler = ReportDataHandlerFactory.getDataSource(datasource);
 	Gson gson = new Gson();
@@ -99,10 +98,9 @@ public abstract class BaseContentCategoryImpl {
 		try {
 			long startTime = System.nanoTime();
 			String json = oMapper.writeValueAsString(contentResult);
-			JsonObject contentDataJson = jsonParser.parse(json).getAsJsonObject();
+			JsonObject contentDataJson = JsonUtils.parseStringAsJsonObject(json);
 			if (!contentResult.getResultValuesMap().isEmpty() && contentDataJson != null) {
-				JsonObject resultValueJson = jsonParser
-						.parse(oMapper.writeValueAsString(contentResult.getResultValuesMap())).getAsJsonObject();
+				JsonObject resultValueJson = JsonUtils.parseStringAsJsonObject(oMapper.writeValueAsString(contentResult.getResultValuesMap()));
 				contentDataJson = ReportEngineUtils.mergeTwoJson(contentDataJson, resultValueJson);
 			} else {
 				log.debug("Worlflow Detail {}==== In Content, no result foundg and data json is null {} ",
@@ -174,6 +172,7 @@ public abstract class BaseContentCategoryImpl {
 		detail.setExecutionId(contentConfigDefinition.getExecutionId());
 		detail.setReportId(contentConfigDefinition.getReportId());
 		detail.setAssessmentId(contentConfigDefinition.getAssessmentId());
+		detail.setAssessmentReportName(contentConfigDefinition.getAssessmentReportName());
 		return detail;
 	}
 
@@ -210,6 +209,7 @@ public abstract class BaseContentCategoryImpl {
 			detail.setExecutionId(contentConfigDefinition.getExecutionId());
 			detail.setReportId(contentConfigDefinition.getReportId());
 			detail.setAssessmentId(contentConfigDefinition.getAssessmentId());
+			detail.setAssessmentReportName(contentConfigDefinition.getAssessmentReportName());
 			detail.setKpiName(kpiConfig.getKpiName());
 			detail.setToolName(kpiConfig.getToolname());
 			detail.setGroup(kpiConfig.getGroupName());			
@@ -243,8 +243,7 @@ public abstract class BaseContentCategoryImpl {
 			resultValuesMap = resultValuesMap.entrySet().stream()
 					.collect(Collectors.toMap(Map.Entry::getKey, e -> getResultValueForDisplay(e.getValue())));
 			StringSubstitutor sub = new StringSubstitutor(resultValuesMap, "{", "}");
-			JsonObject valueMessageObject = jsonParser.parse(String.valueOf(contentConfigDefinition.getMessage()))
-					.getAsJsonObject();
+			JsonObject valueMessageObject = JsonUtils.parseStringAsJsonObject(String.valueOf(contentConfigDefinition.getMessage()));
 			JsonElement messageInference = valueMessageObject.get(key);
 			if (messageInference != null) {
 				messageConfigText = messageInference.getAsString();

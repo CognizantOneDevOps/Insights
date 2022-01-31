@@ -23,12 +23,12 @@ import java.util.Map;
 import javax.ws.rs.core.NewCookie;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.RestApiHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformcommons.exception.RestAPI404Exception;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 
 
@@ -143,7 +143,7 @@ public class GrafanaHandler {
 	 * @return
 	 */
 	private String getResponseMessage(String messageJson) {
-		return new JsonParser().parse(messageJson).getAsJsonObject().get("data").getAsString();
+		return JsonUtils.parseStringAsJsonObject(messageJson).get("data").getAsString();
 	}
 
 

@@ -32,6 +32,7 @@ import org.ehcache.config.units.EntryUnit;
 import org.ehcache.config.units.MemoryUnit;
 import org.springframework.stereotype.Service;
 
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -39,14 +40,12 @@ import com.cognizant.devops.platformservice.rest.querycaching.service.CustomExpi
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import java.util.stream.Stream;
 
 @Service("queryCachingService")
 public class QueryCachingServiceImpl implements QueryCachingService {
 
 	private static Logger log = LogManager.getLogger(QueryCachingServiceImpl.class);
-	JsonParser parser = new JsonParser();
 	public static final Long GRAFANA_DATASOURCE_CACHE_HEAP_SIZE_BYTES = 1000000l;
 	@SuppressWarnings("rawtypes")
 	Cache<String, EhcacheValue<JsonObject>> datasourceCache;
@@ -80,7 +79,7 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 	public JsonObject getCacheResults(String requestPayload) {
 
 		JsonObject resultJson = null;
-		JsonObject requestJson = parser.parse(requestPayload).getAsJsonObject();
+		JsonObject requestJson = JsonUtils.parseStringAsJsonObject(requestPayload);
 		JsonObject dataJson = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray()
 				.get(QueryCachingConstants.ZEROTH_INDEX).getAsJsonObject();
 
@@ -112,7 +111,7 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 
 		GraphDBHandler graphDBHandler = new GraphDBHandler();
 		GraphResponse response = null;
-		JsonObject json = parser.parse(queryjson).getAsJsonObject();
+		JsonObject json = JsonUtils.parseStringAsJsonObject(queryjson);
 
 		try {
 			StringBuilder stringBuilder = new StringBuilder();
@@ -142,7 +141,7 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 	private JsonObject getEhCachedResults(String requestPayload) {
 
 		try {
-			JsonObject requestJson = parser.parse(requestPayload).getAsJsonObject();
+			JsonObject requestJson = JsonUtils.parseStringAsJsonObject(requestPayload);
 			
 			JsonObject dataJson = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray()
 					.get(QueryCachingConstants.ZEROTH_INDEX).getAsJsonObject();

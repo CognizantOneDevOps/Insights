@@ -79,50 +79,86 @@
 
   <div>
     <mat-radio-group [(ngModel)]="selectedAgent">
-      <table mat-table [dataSource]="agentListDatasource" class="mat-elevation-z8" style="margin-top:2% !important">
+      <table mat-table [dataSource]="agentListDatasource" class="mat-elevation-z8" style="margin-top:2% !important;">
         <!-- Radio Button Column -->
 
         <ng-container matColumnDef="radio">
-          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="width:10% !important"></th>
-          <td mat-cell *matCellDef="let element " style="width:5% !important">
-            <mat-radio-button [value]="element" color="primary" (click)="statusEdit(element)"></mat-radio-button>
+          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="width:2% !important"></th>
+          <td mat-cell *matCellDef="let element; let i =index; " style="width:2% !important">
+            <mat-radio-button [value]="element" color="primary" (click)="statusEdit(element, i)"></mat-radio-button>
           </td>
         </ng-container>
 
-        <ng-container matColumnDef="Type">
-          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Type</th>
-          <td mat-cell *matCellDef="let element" style="width:10% !important"> {{element.iswebhook?'Webhook':'Agent'}} </td>
-        </ng-container>
 
         <ng-container matColumnDef="ToolName">
           <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Tool Name</th>
-          <td mat-cell *matCellDef="let element" style="width:15% !important"> {{element.toolName}} </td>
+          <td mat-cell *matCellDef="let element" style="width:15% !important; word-break: break-all !important;"> {{element.toolName}} </td>
         </ng-container>
 
         <ng-container matColumnDef="ToolCategory">
           <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Tool Category</th>
-          <td mat-cell *matCellDef="let element" style="width:15% !important"> {{element.toolCategory}} </td>
+          <td mat-cell *matCellDef="let element"  style="width:20% !important; word-break: break-all !important;"> {{element.toolCategory}} </td>
         </ng-container>
 
         <ng-container matColumnDef="AgentKey">
           <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Instance ID</th>
-          <td mat-cell *matCellDef="let element" style="width:20% !important"> {{element.agentKey}} </td>
+          <td mat-cell *matCellDef="let element"  style="width:20% !important; word-break: break-all !important;"> {{element.agentKey}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Type">
+          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Type</th>
+          <td mat-cell *matCellDef="let element"  style="width:8% !important"> {{element.iswebhook?'Webhook':'Agent'}} </td>
         </ng-container>
 
         <ng-container matColumnDef="OS">
-          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Operating System</th>
-          <td mat-cell *matCellDef="let element" style="width:15% !important"> {{element.osVersion}} </td>
+          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">OS</th>
+          <td mat-cell *matCellDef="let element"  style="width:7% !important"> {{element.osVersion}} </td>
         </ng-container>
 
          <ng-container matColumnDef="Version">
           <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Version</th>
-          <td mat-cell *matCellDef="let element" style="width:10% !important"> {{element.agentVersion}} </td>
+          <td mat-cell *matCellDef="let element"  style="width:5% !important; text-align: left!important;"> {{element.agentVersion}} </td>
         </ng-container>
 
         <ng-container matColumnDef="Status">
           <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Status</th>
-          <td mat-cell *matCellDef="let element" style="width:10% !important"> {{element.agentStatus}} </td>
+          <td mat-cell *matCellDef="let element"  style="width:10% !important"> 
+            <mat-grid-list cols="2">
+              <mat-grid-tile style="font-size: 14px !important;">{{element.agentStatus}} </mat-grid-tile>
+              <mat-grid-tile>
+                <mat-icon svgIcon="healthcheck_success_status" *ngIf="element.healthStatus =='success'"
+                  style="margin-bottom: 10px;"
+                  title="Success"
+                  [ngStyle]="{color: '#00B140', height: '20px', width: '20px'}">
+                </mat-icon>
+                <mat-icon svgIcon="healthcheck_failure_status" *ngIf="element.healthStatus =='failure'"
+                  style="margin-bottom: 10px;"
+                  title="Failure"
+                  [ngStyle]="{color: '#FF8F1C', height: '20px', width: '20px'}">
+                </mat-icon> 
+            </mat-grid-tile>
+            </mat-grid-list>
+            
+            
+          </td>
         </ng-container>
+
+        <ng-container matColumnDef="Time">
+          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Last run time({{timeZone}})</th>
+          <td mat-cell *matCellDef="let element"  style="width:10% !important"> {{element.lastRunTime | date:'yyyy-MM-dd HH:mm:ss'}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Details">
+          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Details</th>
+          <td mat-cell *matCellDef="let element;let i=index; "  style="width:10% !important;">
+            <button mat-icon-button (click)="showDetailsDialog(element.toolName,element.toolCategory,element.agentKey)" [disabled]="(selectedIndex != i + currentPageValue)">
+              <mat-icon svgIcon="healthcheck_show_details" style="margin-bottom:7px!important;"
+                [ngStyle]="{height: '20px', width: '20px'}">
+              </mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"> </tr>
@@ -130,7 +166,7 @@
     </mat-radio-group>
   </div>
   <div [hidden]="!showDetail">
-    <mat-paginator #paginator [pageSize]="MAX_ROWS_PER_TABLE" showFirstLastButtons class="paginationStyle">
+    <mat-paginator (page)="changeCurrentPageValue()" #paginator [pageSize]="MAX_ROWS_PER_TABLE" showFirstLastButtons class="paginationStyle">
     </mat-paginator>
   </div>
 </div>

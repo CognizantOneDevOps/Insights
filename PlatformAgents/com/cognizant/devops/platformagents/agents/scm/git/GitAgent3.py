@@ -66,6 +66,7 @@ class GitAgent(BaseAgent):
         }
         pullReqResponseTemplate = dynamicTemplate.get('pullReqResponseTemplate', defPullReqResTemplate)
         orphanCommitResTemplate= dynamicTemplate.get('orphanCommitResponseTemplate',defPullReqResTemplate)
+        repoList = dynamicTemplate.get("repositories",{}).get("names",[])
         repoPageNum = 1
         fetchNextPage = True
         while fetchNextPage:
@@ -74,6 +75,8 @@ class GitAgent(BaseAgent):
                 break
             for repo in repos:
                 repoName = repo.get('name', None)
+                if len(repoList) > 0 and repoName not in repoList:
+                    continue
                 if not os.path.isfile(self.trackingCachePath + repoName + '.json'):
                     self.UpdateTrackingCache(repoName, dict())
                 repoTrackingCache = self.TrackingCacheFileLoad(repoName)

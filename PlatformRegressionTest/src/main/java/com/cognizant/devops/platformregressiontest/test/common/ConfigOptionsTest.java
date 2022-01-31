@@ -29,6 +29,8 @@ public interface ConfigOptionsTest {
 	String CORRELATION_JSON_FILE = "correlationTestData.json";
 	String EVENTCONFIG_JSON_FILE = "eventConfigWebhook.json";
 	String HEALTHCHECK_JSON_FILE = "healthCheckTestData.json";
+	String DASHBOARDREPORTDOWNLOAD_JSON_FILE = "dashboardReportDownload.json";
+	String REPORT_WITHOUT_MAILING_DETAILS = "reportWithoutMailingDetails.json";
 	String SERVERCONFIGURATION_JSON_FILE = "serverConfiguration.json";
 	String DATADICTIONARY_JSON_FILE = "dataDictionary.json";
 	String GROUP_JSON_FILE = "groupTestData.json";
@@ -47,6 +49,7 @@ public interface ConfigOptionsTest {
 	String LOGIN_DIR = "login";
 	String TRACEABILITY_DASHBOARD_DIR = "trceability_dashboard";
 	String HEALTH_CHECK_DIR = "health_check";
+	String DASHBOARD_REPORT_DOWNLOAD_DIR = "dashboard_report_download";
 	String SERVERCONFIGURATION_DIR = "server_configuration";
 	String DATADICTIONARY_DIR = "data_dictionary";
 	String LOGOSETTING_DIR = "logo_setting";

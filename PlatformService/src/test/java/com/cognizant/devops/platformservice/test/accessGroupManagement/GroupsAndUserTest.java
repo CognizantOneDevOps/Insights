@@ -53,13 +53,13 @@ import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.AccessGroupManagement.AccessGroupManagement;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 @Test
@@ -92,8 +92,8 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 				+ "grafanaAuth.json";
 		JsonElement jsonData;
 		try {
-			jsonData = new JsonParser().parse(new FileReader(path));
-		} catch (JsonIOException | JsonSyntaxException | FileNotFoundException e) {
+			jsonData = JsonUtils.parseReader(new FileReader(new File(path).getCanonicalPath()));
+		} catch (JsonIOException | JsonSyntaxException | IOException e) {
 			throw new SkipException("skipped this test case as grafana auth file not found.");
 		}
 		testAuthData = new Gson().fromJson(jsonData, Map.class);

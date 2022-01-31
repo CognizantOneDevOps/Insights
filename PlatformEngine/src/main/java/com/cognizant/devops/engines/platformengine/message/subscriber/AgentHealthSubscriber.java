@@ -29,12 +29,12 @@ import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscri
 import com.cognizant.devops.platformcommons.constants.AgentCommonConstant;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Envelope;
 
@@ -56,7 +56,7 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 			List<String> labels = Arrays.asList(routingKey.split(MQMessageConstants.ROUTING_KEY_SEPERATOR));
 			List<JsonObject> dataList = new ArrayList<>();
 			List<JsonObject> failedDataList = new ArrayList<>();
-			JsonElement json = new JsonParser().parse(message);
+			JsonElement json = JsonUtils.parseString(message);
 			String agentId = "";
 			String toolName = "";
 			String categoryName = "";

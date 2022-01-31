@@ -17,8 +17,8 @@ package com.cognizant.devops.platformservice.test.fileManagement;
 
 import java.io.File;
 
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class FileManagementTestData {
 	
@@ -29,5 +29,5 @@ public class FileManagementTestData {
 	String module = "DATAENRICHMENT";
 	File file = new File(classLoader.getResource("FileManagement_test.json").getFile());
 	String fileDetails = "{\"fileName\":\"Test_Data\",\"fileType\":\"JSON\"}";
-	JsonObject fileDetailsJson = new JsonParser().parse(fileDetails).getAsJsonObject();
+	JsonObject fileDetailsJson = JsonUtils.parseStringAsJsonObject(fileDetails);
 }	

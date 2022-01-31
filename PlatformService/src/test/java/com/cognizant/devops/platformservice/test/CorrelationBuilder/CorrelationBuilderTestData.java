@@ -40,7 +40,7 @@ public class CorrelationBuilderTestData {
 		Path dir = Paths.get(configFilePath);
 		Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE,
 				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(ConfigOptions.CORRELATION_TEMPLATE));
-		configFile = paths.limit(1).findFirst().get().toFile();
+		configFile = new File(paths.limit(1).findFirst().get().toFile().getCanonicalPath());
 		FileWriter file = new FileWriter(configFile);
 		file.write(configDetails);
 		file.flush();

@@ -32,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentReportTemplate;
@@ -40,7 +41,6 @@ import com.cognizant.devops.platformservice.assessmentreport.service.AssesmentRe
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/insights/report")
@@ -57,8 +57,7 @@ public class InsightsAssessmentReportController {
 			JsonObject kpiResponse = new JsonObject();
 			registerkpiJson = registerkpiJson.replace("\n", "").replace("\r", "");
 			String validatedResponse = ValidationUtils.validateRequestBody(registerkpiJson);
-			JsonParser parser = new JsonParser();
-			JsonObject registerKpijson = (JsonObject) parser.parse(validatedResponse);
+			JsonObject registerKpijson =  JsonUtils.parseStringAsJsonObject(validatedResponse);
 			int resultKpiId = assessmentReportService.saveKpiDefinition(registerKpijson);
 			kpiResponse.addProperty(PlatformServiceConstants.MESSAGE, "Kpi created with Id " + resultKpiId);
 			return PlatformServiceUtil.buildSuccessResponseWithData(kpiResponse);
@@ -77,8 +76,7 @@ public class InsightsAssessmentReportController {
 			JsonObject contentResponse = new JsonObject();
 			registerContentJson = registerContentJson.replace("\n", "").replace("\r", "");
 			String validatedResponse = ValidationUtils.validateRequestBody(registerContentJson);
-			JsonParser parser = new JsonParser();
-			JsonObject registerContentKPIJson = (JsonObject) parser.parse(validatedResponse);
+			JsonObject registerContentKPIJson =  JsonUtils.parseStringAsJsonObject(validatedResponse);
 			int contentId = assessmentReportService.saveContentDefinition(registerContentKPIJson);
 			contentResponse.addProperty(PlatformServiceConstants.MESSAGE, " Content Id created " + contentId);
 			return PlatformServiceUtil.buildSuccessResponseWithData(contentResponse);
@@ -137,11 +135,10 @@ public class InsightsAssessmentReportController {
 		try {
 			assessmentReport = assessmentReport.replace("\n", "").replace("\r", "");
 			String validatedResponse = ValidationUtils.validateRequestBody(assessmentReport);
-			JsonParser parser = new JsonParser();
-			JsonObject assessmentReportJson = (JsonObject) parser.parse(validatedResponse);
-			int assessmentReportId = assessmentReportService.saveAssessmentReport(assessmentReportJson);
+			JsonObject assessmentReportJson =  JsonUtils.parseStringAsJsonObject(validatedResponse);
+			JsonObject responseJson = assessmentReportService.saveAssessmentReport(assessmentReportJson);
 			return PlatformServiceUtil
-					.buildSuccessResponseWithData(" Assessment Report Id created " + assessmentReportId);
+					.buildSuccessResponseWithData(responseJson);
 		} catch (InsightsCustomException e) {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
@@ -156,8 +153,7 @@ public class InsightsAssessmentReportController {
 		try {
 			assessmentReport = assessmentReport.replace("\n", "").replace("\r", "");
 			String validatedResponse = ValidationUtils.validateRequestBody(assessmentReport);
-			JsonParser parser = new JsonParser();
-			JsonObject assessmentReportJson = (JsonObject) parser.parse(validatedResponse);
+			JsonObject assessmentReportJson =  JsonUtils.parseStringAsJsonObject(validatedResponse);
 			int assessmentReportId = assessmentReportService.updateAssessmentReport(assessmentReportJson);
 			return PlatformServiceUtil
 					.buildSuccessResponseWithData(" Assessment Report Id updated " + assessmentReportId);
@@ -170,11 +166,14 @@ public class InsightsAssessmentReportController {
 		}
 	}
 
-	@GetMapping(value = "/loadAssessmentReport", produces = MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody JsonObject getAssessmentReport() {
+	@PostMapping(value = "/loadAssessmentReport", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject getAssessmentReport(@RequestBody String UserDetail) {
 		JsonArray jsonarray = new JsonArray();
 		try {
-			jsonarray = assessmentReportService.getAssessmentReportList();
+			UserDetail = UserDetail.replace("\n", "").replace("\r", "");
+			String validatedResponse = ValidationUtils.validateRequestBody(UserDetail);
+			JsonObject userDetail = JsonUtils.parseStringAsJsonObject(validatedResponse);
+			jsonarray = assessmentReportService.getAssessmentReportList(userDetail);
 			return PlatformServiceUtil.buildSuccessResponseWithData(jsonarray);
 		} catch (Exception e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
@@ -200,8 +199,7 @@ public class InsightsAssessmentReportController {
 		String message = null;
 		try {
 			String validatedResponse = ValidationUtils.validateRequestBody(updateReportStateJson);
-			JsonParser parser = new JsonParser();
-			JsonObject updateReportStateJsonValidated = (JsonObject) parser.parse(validatedResponse);
+			JsonObject updateReportStateJsonValidated =  JsonUtils.parseStringAsJsonObject(validatedResponse);
 			message = assessmentReportService.updateAssessmentReportState(updateReportStateJsonValidated);
 			if (message.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
 				return PlatformServiceUtil.buildSuccessResponse();
@@ -219,8 +217,7 @@ public class InsightsAssessmentReportController {
 	public @ResponseBody JsonObject saveReportTemplate(@RequestBody String reportTemplate) {
 		try {
 			String validatedResponse = ValidationUtils.validateRequestBody(reportTemplate);
-			JsonParser parser = new JsonParser();
-			JsonObject reportTemplateJson = (JsonObject) parser.parse(validatedResponse);
+			JsonObject reportTemplateJson = JsonUtils.parseStringAsJsonObject(validatedResponse);
 			int templateReportId = assessmentReportService.saveTemplateReport(reportTemplateJson);
 			return PlatformServiceUtil.buildSuccessResponseWithData(" Template Report Id created " + templateReportId);
 		} catch (InsightsCustomException e) {
@@ -236,8 +233,7 @@ public class InsightsAssessmentReportController {
 	public @ResponseBody JsonObject setReportTemplateStatus(@RequestBody String reportTemplate) {
 		try {
 			String validatedResponse = ValidationUtils.validateRequestBody(reportTemplate);
-			JsonParser parser = new JsonParser();
-			JsonObject reportTemplateJson = (JsonObject) parser.parse(validatedResponse);
+			JsonObject reportTemplateJson =  JsonUtils.parseStringAsJsonObject(validatedResponse);
 			String message= assessmentReportService.setReportTemplateStatus(reportTemplateJson);
 			return PlatformServiceUtil.buildSuccessResponseWithData(message);
 		} catch (InsightsCustomException e) {
@@ -255,8 +251,7 @@ public class InsightsAssessmentReportController {
 		String message = null;
 		try {
 			String validatedResponse = ValidationUtils.validateRequestBody(deleteReportTemplateJson);
-			JsonParser parser = new JsonParser();
-			JsonObject deleteReportTemplateJsonParsed = (JsonObject) parser.parse(validatedResponse);
+			JsonObject deleteReportTemplateJsonParsed =  JsonUtils.parseStringAsJsonObject(validatedResponse);
 			message = assessmentReportService.deleteReportTemplate(deleteReportTemplateJsonParsed);
 			return PlatformServiceUtil.buildSuccessResponseWithData(message);
 		} catch (InsightsCustomException e) {
@@ -300,8 +295,7 @@ public class InsightsAssessmentReportController {
 		try {
 			reportTemplate = reportTemplate.replace("\n", "").replace("\r", "");
 			String validatedResponse = ValidationUtils.validateRequestBody(reportTemplate);
-			JsonParser parser = new JsonParser();
-			JsonObject reportTemplateJson = (JsonObject) parser.parse(validatedResponse);
+			JsonObject reportTemplateJson =  JsonUtils.parseStringAsJsonObject(validatedResponse);
 			int templateReportId = assessmentReportService.editReportTemplate(reportTemplateJson);
 			return PlatformServiceUtil
 					.buildSuccessResponseWithData("Report Template Id updated successfully  " + templateReportId);
@@ -350,8 +344,7 @@ public class InsightsAssessmentReportController {
 		String message = null;
 		try {
 			String validatedResponse = ValidationUtils.validateRequestBody(reportConfigJsonString);
-			JsonParser parser = new JsonParser();
-			JsonObject reportConfigJson = (JsonObject) parser.parse(validatedResponse);
+			JsonObject reportConfigJson =  JsonUtils.parseStringAsJsonObject(validatedResponse);
 			message = assessmentReportService.setReportStatus(reportConfigJson);
 			return PlatformServiceUtil.buildSuccessResponseWithData(message);
 		} catch (InsightsCustomException e) {
@@ -398,8 +391,7 @@ public class InsightsAssessmentReportController {
 			JsonObject kpiResponse = new JsonObject();
 			updatekpiRequest = updatekpiRequest.replace("\n", "").replace("\r", "");
 			String validatedEditResponse = ValidationUtils.validateRequestBody(updatekpiRequest);
-			JsonParser parser = new JsonParser();
-			JsonObject updateKpijson = (JsonObject) parser.parse(validatedEditResponse);
+			JsonObject updateKpijson =  JsonUtils.parseStringAsJsonObject(validatedEditResponse);
 			int resultKpiId = assessmentReportService.updateKpiDefinition(updateKpijson);
 			kpiResponse.addProperty(PlatformServiceConstants.MESSAGE,
 					"Kpi definition updated for KpiId " + resultKpiId);
@@ -419,8 +411,7 @@ public class InsightsAssessmentReportController {
 			JsonObject kpiResponse = new JsonObject();
 			deletekpiRequest = deletekpiRequest.replace("\n", "").replace("\r", "");
 			String validatedEditResponse = ValidationUtils.validateRequestBody(deletekpiRequest);
-			JsonParser parser = new JsonParser();
-			JsonObject updateKpijson = (JsonObject) parser.parse(validatedEditResponse);
+			JsonObject updateKpijson =  JsonUtils.parseStringAsJsonObject(validatedEditResponse);
 			boolean isRecordDeleted = assessmentReportService.deleteKpiDefinition(updateKpijson);
 			if (isRecordDeleted) {
 				kpiResponse.addProperty(PlatformServiceConstants.MESSAGE,
@@ -448,8 +439,7 @@ public class InsightsAssessmentReportController {
 			JsonObject kpiResponse = new JsonObject();
 			updateContentRequest = updateContentRequest.replace("\n", "").replace("\r", "");
 			String validatedEditResponse = ValidationUtils.validateRequestBody(updateContentRequest);
-			JsonParser parser = new JsonParser();
-			JsonObject updateKpijson = (JsonObject) parser.parse(validatedEditResponse);
+			JsonObject updateKpijson =  JsonUtils.parseStringAsJsonObject(validatedEditResponse);
 			int resultContentId = assessmentReportService.updateContentDefinition(updateKpijson);
 			kpiResponse.addProperty(PlatformServiceConstants.MESSAGE,
 					"Content definition updated for ContentId " + resultContentId);
@@ -490,8 +480,7 @@ public class InsightsAssessmentReportController {
 			JsonObject kpiResponse = new JsonObject();
 			deleteContentRequest = deleteContentRequest.replace("\n", "").replace("\r", "");
 			String validatedEditResponse = ValidationUtils.validateRequestBody(deleteContentRequest);
-			JsonParser parser = new JsonParser();
-			JsonObject updateKpijson = (JsonObject) parser.parse(validatedEditResponse);
+			JsonObject updateKpijson =  JsonUtils.parseStringAsJsonObject(validatedEditResponse);
 			boolean isRecordDeleted = assessmentReportService.deleteContentDefinition(updateKpijson);
 			if (isRecordDeleted) {
 				kpiResponse.addProperty(PlatformServiceConstants.MESSAGE,
@@ -550,7 +539,7 @@ public class InsightsAssessmentReportController {
 
 	@GetMapping(value = "/getChartType", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getChartType() {
-		List<String> vTypeList;
+		JsonObject vTypeList;
 		try {
 			vTypeList = assessmentReportService.getAllChartType();
 			return PlatformServiceUtil.buildSuccessResponseWithData(vTypeList);

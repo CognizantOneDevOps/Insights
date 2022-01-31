@@ -19,10 +19,8 @@ import java.util.UUID;
 
 import com.cognizant.devops.platformcommons.core.util.AES256Cryptor;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class ServerConfigTestData {
-	JsonParser parser = new JsonParser();
 	
 	public String extractServerConfig(JsonObject serverConfigStatus) {
 		String serverConfigStr = serverConfigStatus.get("data").getAsString();

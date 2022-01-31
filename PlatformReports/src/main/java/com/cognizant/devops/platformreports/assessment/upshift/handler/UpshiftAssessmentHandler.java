@@ -17,6 +17,7 @@
 package com.cognizant.devops.platformreports.assessment.upshift.handler;
 
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
@@ -43,7 +44,6 @@ public class UpshiftAssessmentHandler implements BaseDataProcessor {
 
     private static Logger log = LogManager.getLogger(UpshiftAssessmentHandler.class);
     private static Gson gson = new Gson();
-    private static JsonParser jsonParser = new JsonParser();
     private static GraphDBHandler dbHandler = new GraphDBHandler();
     private UpshiftAssessmentConfigDAL upshiftAssessmentConfigDAL = new UpshiftAssessmentConfigDAL();
     private boolean flag = true;
@@ -79,7 +79,7 @@ public class UpshiftAssessmentHandler implements BaseDataProcessor {
 
             for (Map.Entry<?, ?> entry : map.entrySet()) {
 
-                 element = jsonParser.parse(gson.toJson(entry.getValue()));
+                 element = JsonUtils.parseString(gson.toJson(entry.getValue()));
                 if (element.isJsonPrimitive() && updateNode(primKey, entry.getKey().toString(), element.getAsString())) {
                     flag = Boolean.FALSE;
                 } else if (element.isJsonObject()) {
@@ -150,7 +150,7 @@ public class UpshiftAssessmentHandler implements BaseDataProcessor {
     			flag = Boolean.FALSE;
     		}
     		for (Map.Entry<?,?> entry : input.entrySet()) {
-    			JsonElement element = jsonParser.parse(gson.toJson(entry.getValue()));
+    			JsonElement element = JsonUtils.parseString(gson.toJson(entry.getValue()));
     			if (element.isJsonPrimitive() && updateNode(primKey, entry.getKey().toString(), element.getAsString())) {
     				flag = Boolean.FALSE;
     			} else if (element.isJsonObject()) {

@@ -64,6 +64,12 @@ public class InsightsAssessmentConfiguration implements Serializable {
 
 	@Column(name = "isActive")
 	private Boolean isActive = false;
+	
+	@Column(name="orgName")
+	private String orgName;
+
+	@Column(name="userName")
+	private String userName;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "reportId", referencedColumnName = "reportId")
@@ -72,6 +78,9 @@ public class InsightsAssessmentConfiguration implements Serializable {
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "workflowId", referencedColumnName = "workflowId")
 	private InsightsWorkflowConfiguration workflowConfig;
+	
+	@Column(name = "additionalDetail", length = 10000)
+	private String additionalDetail;
 
 	public int getId() {
 		return id;
@@ -152,4 +161,29 @@ public class InsightsAssessmentConfiguration implements Serializable {
 	public void setEmails(String emails) {
 		this.emails = emails;
 	}
+
+	public String getAdditionalDetail() {
+		return additionalDetail;
+	}
+
+	public void setAdditionalDetail(String additionalDetail) {
+		this.additionalDetail = additionalDetail;
+	}
+
+	public String getOrgName() {
+		return orgName;
+	}
+
+	public void setOrgName(String orgName) {
+		this.orgName = orgName;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+	
 }

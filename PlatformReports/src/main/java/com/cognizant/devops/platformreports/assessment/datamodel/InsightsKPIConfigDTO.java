@@ -52,7 +52,8 @@ public class InsightsKPIConfigDTO implements Serializable {
 	private long lastRunTime;
 	private long nextRunTime;
 	private long oneTimeReportStartTime;
-	private long oneTimeReportEndDate;	
+	private long oneTimeReportEndDate;
+	private String assessmentReportName;
 
 	private Set<InsightsContentConfig> contentConfig = new HashSet<>(0);
 	
@@ -237,6 +238,14 @@ public class InsightsKPIConfigDTO implements Serializable {
 
 	public void setMojoPath(String mojoPath) {
 		this.mojoPath = mojoPath;
+	}
+
+	public String getAssessmentReportName() {
+		return assessmentReportName;
+	}
+
+	public void setAssessmentReportName(String assessmentReportName) {
+		this.assessmentReportName = assessmentReportName;
 	}
 	
 	

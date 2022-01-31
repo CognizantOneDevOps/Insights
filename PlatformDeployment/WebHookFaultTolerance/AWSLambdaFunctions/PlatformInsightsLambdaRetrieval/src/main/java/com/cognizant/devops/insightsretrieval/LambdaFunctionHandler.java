@@ -132,12 +132,12 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 				try {
 					JsonElement element = parser.next();
 					String data = gson.toJson(element);
-					JsonElement parsedElement = new JsonParser().parse(data);
+					JsonElement parsedElement = parseString(data);
 					JsonObject encodedJson = parsedElement.getAsJsonObject();
 					if (prefix == FUNCTION_FAILED) {
 						String jsonString= encodedJson.get("rawData").toString();
 						String decodedString = new String(Base64.decodeBase64(jsonString.getBytes()));
-						JsonElement rawData = new JsonParser().parse(decodedString);
+						JsonElement rawData = parseString(decodedString);
 						finalJson = rawData.getAsJsonObject();
 					}else {
 						finalJson = encodedJson;
@@ -228,5 +228,15 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 		} catch (Exception e) {
 			log.error("Error while updating the object to S3" + e.toString());
 		}
+	}
+	public static JsonElement parseString(String requestText) {
+		JsonElement response = null;
+		try {			
+			response = JsonParser.parseString(requestText);
+		} catch (Exception e) {
+			log.error(" Error in parseString {}",requestText);
+			log.error(e);
+		}
+		return response; 
 	}
 }

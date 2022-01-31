@@ -64,7 +64,8 @@ public class AgentManagementTestData {
 	
 	
 	public void prepareOfflineAgent(String version, String tool) throws IOException {
-		File offlineAgentFolder = new File(offlineAgentPath+ File.separator + version + File.separator + tool);
+		String folderPath = new File(offlineAgentPath+ File.separator + version + File.separator + tool).getCanonicalPath();
+		File offlineAgentFolder = new File(folderPath);
 		offlineAgentFolder.mkdirs();
 		String srcToolPath = ApplicationConfigProvider.getInstance().getAgentDetails().getDownloadRepoUrl() + "/"
 				+ version + AgentCommonConstant.AGENTS + tool;
@@ -85,15 +86,16 @@ public class AgentManagementTestData {
 	}
 	
 	public void unzip(String zipFilePath, String destDirectory) throws IOException {
-        File destDir = new File(destDirectory);
+		String destDirPath = new File(destDirectory).getCanonicalPath();
+        File destDir = new File(destDirPath);
         if (!destDir.exists()) {
             destDir.mkdir();
         }
-        ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath));
+        ZipInputStream zipIn = new ZipInputStream(new FileInputStream(new File(zipFilePath).getCanonicalPath()));
         ZipEntry entry = zipIn.getNextEntry();
         // iterates over entries in the zip file
         while (entry != null) {
-            String filePath = destDirectory + File.separator + entry.getName();
+            String filePath = new File(destDirectory + File.separator + entry.getName()).getCanonicalPath();
             if (!entry.isDirectory()) {
                 // if the entry is a file, extracts it
                 extractFile(zipIn, filePath);
@@ -109,7 +111,7 @@ public class AgentManagementTestData {
     }
 	
 	private void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(filePath).getCanonicalPath()));
         byte[] bytesIn = new byte[4096];
         int read = 0;
         while ((read = zipIn.read(bytesIn)) != -1) {

@@ -18,6 +18,7 @@ package com.cognizant.devops.platformworkflow.test;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentConfiguration;
@@ -55,7 +57,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class WorkflowTestData {
 	private static final Logger log = LogManager.getLogger(WorkflowTestData.class);
@@ -68,17 +69,17 @@ public class WorkflowTestData {
 	boolean deleteWorkflowType = false;
 	
 	String kpiDefinition = "{\"kpiId\":1111265,\"name\":\"Avg all employee productivity for threshold \",\"toolName\":\"PRODUCTIVITY\",\"category\":\"THRESHOLD_RANGE\",\"group\":\"PRODUCTIVITY\",\"isActive\":true,\"DBQuery\":\"MATCH (n:PRODUCTIVITY) where n.completionDateEpochTime {startTime} AND n.completionDateEpochTime {endTime} WITH  avg(n.storyPoints*8) as StoryPoint, avg(n.authorTimeSpent) as authorTimeSpent  return   StoryPoint, authorTimeSpent, round((toFloat(StoryPoint)authorTimeSpent)*100) as Productivity\",\"resultField\":\"Productivity\",\"datasource\":\"NEO4J\",\"outputDatasource\":\"NEO4J\",\"usecase\":\"\"}";
-	JsonObject kpiDefinitionJson = new JsonParser().parse(kpiDefinition).getAsJsonObject();
+	JsonObject kpiDefinitionJson = JsonUtils.parseStringAsJsonObject(kpiDefinition);
 
 	String contentDefinition = "{\"contentId\":1111204,\"isActive\":\"TRUE\",\"expectedTrend\":\"UPWARDS\",\"contentName\":\"Avg Employee Productivity in percentage w.r.t different zones \",\"kpiId\":1111265,\"noOfResult\":15,\"thresholds\":{\"red\":44,\"amber\":50,\"green\":55},\"action\":\"PERCENTAGE\",\"directionOfThreshold\":\"ABOVE\",\"message\":{\"contentMessage\":\"Employees as per productivity percentage w.r.t zones are red {red}%, amber {amber}% , green {green}%\"}}";
-	JsonObject contentDefinitionJson = new JsonParser().parse(contentDefinition).getAsJsonObject();
+	JsonObject contentDefinitionJson = JsonUtils.parseStringAsJsonObject(contentDefinition);
 
 	String workflowTask = "{\"description\":\"TEST_TASK_Execute\",\"mqChannel\":\"WORKFLOW.TEST.TASK.EXCECUTION\",\"componentName\":\"com.cognizant.devops.platformworkflow.test.WorkflowTestTask1Subscriber\",\"dependency\":1,\"workflowType\":\"Report\"}";
 	String failWorkflowTask = "{\"description\":\"TEST_FAIL_TASK_Execute\",\"mqChannel\":\"WORKFLOW.TEST.FAIL.TASK.EXCECUTION\",\"componentName\":\"com.cognizant.devops.platformworkflow.test.WorkflowTestFailTaskSubscriber\",\"dependency\":2,\"workflowType\":\"Report\"}";
 	String wrongWorkflowTask = "{\"description\":\"WRONG_TEST_TASK\",\"mqChannel\":\"WORKFLOW.TEST.WRONG.TASK\",\"componentName\":\"com.cognizant.devops.platformworkflow.test\",\"dependency\":3,\"workflowType\":\"Report\"}";
 
 	String reportTemplate = "{\"reportName\":\"Productivity\",\"description\":\"Backend Team\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":1111265,\"visualizationConfigs\":[{\"vType\":\"1111265_line\",\"vQuery\":\"\"}]}]}";
-	JsonObject reportTemplateJson = new JsonParser().parse(reportTemplate).getAsJsonObject();
+	JsonObject reportTemplateJson = JsonUtils.parseStringAsJsonObject(reportTemplate);
 
 	String assessmentReport = "{\"reportName\":\"workflow_test\",\"reportTemplate\":" + reportId + ",\"emailList\":\"xyz@xyz.com\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
 	String assessmentReportFail = "{\"reportName\":\"workflow_fail_test\",\"reportTemplate\":" + reportId + ",\"emailList\":\"xyz@xyz.com\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":false,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
@@ -105,7 +106,7 @@ public class WorkflowTestData {
 	public int saveKpiDefinition(String kpiDefinition) {
 		int kpiId = -1;
 		try {
-			JsonObject kpiJson = new JsonParser().parse(kpiDefinition).getAsJsonObject();
+			JsonObject kpiJson = JsonUtils.parseStringAsJsonObject(kpiDefinition);
 			InsightsKPIConfig kpiConfig = new InsightsKPIConfig();
 			kpiId = kpiJson.get("kpiId").getAsInt();
 			InsightsKPIConfig existingConfig = reportConfigDAL.getKPIConfig(kpiId);
@@ -143,7 +144,7 @@ public class WorkflowTestData {
 		int contentId = -1;
 		try {
 			InsightsContentConfig contentConfig = new InsightsContentConfig();
-			JsonObject contentJson = new JsonParser().parse(contentDefinition).getAsJsonObject();
+			JsonObject contentJson = JsonUtils.parseStringAsJsonObject(contentDefinition);
 			Gson gson = new Gson();
 			int kpiId = contentJson.get("kpiId").getAsInt();
 			contentId = contentJson.get("contentId").getAsInt();
@@ -171,7 +172,7 @@ public class WorkflowTestData {
 	public int saveWorkflowTask(String task) {
 		int taskId = -1;
 		try {
-			JsonObject taskJson = new JsonParser().parse(task).getAsJsonObject();
+			JsonObject taskJson = JsonUtils.parseStringAsJsonObject(task);
 			InsightsWorkflowTask taskConfig = new InsightsWorkflowTask();
 			InsightsWorkflowTask existingTask = workflowDAL
 					.getTaskbyTaskDescription(taskJson.get("description").getAsString());
@@ -213,9 +214,9 @@ public class WorkflowTestData {
 	public int saveReportTemplate(String reportTemplate) {
 		int reportId = -1;
 		try {
-			JsonObject reportJson = new JsonParser().parse(reportTemplate).getAsJsonObject();
+			JsonObject reportJson = JsonUtils.parseStringAsJsonObject(reportTemplate);
 			Gson gson = new Gson();
-			Set<InsightsReportsKPIConfig> reportsKPIConfigSet = new HashSet<>();
+			Set<InsightsReportsKPIConfig> reportsKPIConfigSet = new LinkedHashSet<>();
 			reportId = reportJson.get("reportId").getAsInt();
 			InsightsAssessmentReportTemplate reportEntity = (InsightsAssessmentReportTemplate) reportConfigDAL
 					.getActiveReportTemplateByReportId(reportId);
@@ -412,7 +413,7 @@ public class WorkflowTestData {
 	}
 
 	public JsonObject addTask(int taskId, String assessmentReport, int task2Id) {
-		JsonObject assessmentReportJson = new JsonParser().parse(assessmentReport).getAsJsonObject();
+		JsonObject assessmentReportJson = JsonUtils.parseStringAsJsonObject(assessmentReport);
 		JsonObject task = new JsonObject();
 		JsonObject task2 = new JsonObject();
 		task.addProperty("taskId", taskId);

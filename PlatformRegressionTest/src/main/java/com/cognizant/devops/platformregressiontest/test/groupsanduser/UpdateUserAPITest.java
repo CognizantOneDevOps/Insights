@@ -25,13 +25,13 @@ import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import io.restassured.RestAssured;
 import io.restassured.http.Header;
 import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 
 public class UpdateUserAPITest extends GroupsAndUserTestData {
 
@@ -71,7 +71,7 @@ public class UpdateUserAPITest extends GroupsAndUserTestData {
 
 		String searchUserId = "-1";
 
-		JsonArray getOrgUsersResponse = new JsonParser().parse(getOrgUsers).getAsJsonObject().get("data")
+		JsonArray getOrgUsersResponse = JsonUtils.parseStringAsJsonObject(getOrgUsers).get("data")
 				.getAsJsonArray();
 
 		for (JsonElement jsonElement : getOrgUsersResponse) {
@@ -114,10 +114,9 @@ public class UpdateUserAPITest extends GroupsAndUserTestData {
 		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, CommonUtils.jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
 				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
 				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken);
-
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.jtoken);
 		// Request payload sending along with post request
 		JsonObject requestParam = new JsonObject();
-
 		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 		httpRequest.body(requestParam);
 
@@ -129,8 +128,7 @@ public class UpdateUserAPITest extends GroupsAndUserTestData {
 
 		int statusCode = response.getStatusCode();
 		Assert.assertEquals(statusCode, 400);
-		Assert.assertEquals(userResponseFail.contains("failure"), true);
-		Assert.assertTrue(userResponseFail.contains("message"), "Invalid Request");
+		Assert.assertTrue(userResponseFail.contains("invalid request"));
 
 	}
 

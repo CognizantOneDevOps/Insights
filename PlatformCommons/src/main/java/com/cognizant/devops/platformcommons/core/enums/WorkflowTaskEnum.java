@@ -29,7 +29,8 @@ public class WorkflowTaskEnum {
 		AUTOML("AUTOML"),
 		SYSTEM("SYSTEM"),
 		GRAFANADASHBOARDPDFREPORT("GRAFANADASHBOARDPDFREPORT"),
-		UPSHIFTASSESSMENT("UPSHIFTASSESSMENT");
+		UPSHIFTASSESSMENT("UPSHIFTASSESSMENT"),
+		MILESTONE("MILESTONE");
 
 		private String value;
 
@@ -90,5 +91,31 @@ public class WorkflowTaskEnum {
 
 	public enum UpshiftAssessmentStatus {
 		NOT_STARTED, COMPLETED, NODE_CREATED, ERROR
+	}
+	
+	
+	public enum GrafanaPDFScheduleMapping {
+
+		ONETIME(""), DAILY("now-2d"), WEEKLY("now-7d"), BI_WEEKLY_SPRINT("now-14d"), TRI_WEEKLY_SPRINT("now-21d"), MONTHLY("now-30d"), QUARTERLY("now-90d"),
+		YEARLY("now-1y");
+
+		private String value;
+
+		GrafanaPDFScheduleMapping(final String value) {
+			this.value = value;
+		}
+
+		public String getValue() {
+			return value;
+		}
+
+		@Override
+		public String toString() {
+			return super.toString();
+		}
+
+		void setValue(String value) {
+			this.value = value;
+		}
 	}
 }

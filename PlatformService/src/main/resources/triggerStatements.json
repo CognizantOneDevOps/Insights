@@ -1,0 +1,10 @@
+{
+    "statements": [
+        {
+            "statement": "call apoc.trigger.add('restCallNode', 'UNWIND $createdNodes AS n SET n.uuid = apoc.create.uuid()', {phase:'before'})"
+        },
+        {
+            "statement": "call apoc.trigger.add('restCallREL', 'UNWIND $createdRelationships AS r SET r.uuid = apoc.create.uuid()', {phase:'before'})"
+        }
+    ]
+}

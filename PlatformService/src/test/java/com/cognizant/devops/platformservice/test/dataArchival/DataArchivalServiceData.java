@@ -19,12 +19,11 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class DataArchivalServiceData {
-	JsonParser parser = new JsonParser();
 	
 	String configDetails = "{\"mqConfig\":{\"user\":\"iSight\",\"password\":\"iSight\",\"host\":\"127.0.0.1\",\"exchange\":\"iSight\",\"agentControlXchg\":\"iAgent\"},\"subscribe\":{\"config\":\"SYSTEM.ELASTICTRANSFER.CONFIG\",\"agentCtrlQueue\":\"Archival_agent_test\",\"dataArchivalQueue\":\"SYSTEM.ELASTICTRANSFER.DATAARCHIVAL\"},\"publish\":{\"data\":\"SYSTEM.ELASTICTRANSFER.DATA\",\"health\":\"SYSTEM.ELASTICTRANSFER.HEALTH\"},\"agentId\":\"Archival_agent_test\",\"toolCategory\":\"SYSTEM\",\"toolsTimeZone\":\"GMT\",\"insightsTimeZone\":\"Asia/Kolkata\",\"startFrom\":\"2017-10-01 00:00:01\",\"isDebugAllowed\":false,\"loggingSetting\":{\"logLevel\":\"WARN\",\"maxBytes\":5000000,\"backupCount\":1000},\"osversion\":\"windows\",\"agentVersion\":\"v6.8\",\"toolName\":\"elastictransfer\",\"labelName\":\"ELASTICTRANSFER\"}";
 	JsonObject agentJson = convertStringIntoJson(configDetails);
@@ -65,7 +64,7 @@ public class DataArchivalServiceData {
 	
 	public JsonObject convertStringIntoJson(String convertregisterkpi) {
 		JsonObject objectJson = new JsonObject();
-		objectJson = parser.parse(convertregisterkpi).getAsJsonObject();
+		objectJson = JsonUtils.parseStringAsJsonObject(convertregisterkpi);
 		return objectJson;
 	}
 	

@@ -81,6 +81,7 @@ export class AgentConfigurationComponent implements OnInit {
   color = 'accent';
   vault = false;
   agentType=[];
+  isROIAgent:boolean= false;
   validSecretDetails = true;
   secretProperties = ["accessToken", "password","passwd","apiToken","secret_access_key","awsSecretkey","awsAccesskey","authtoken","access_key_id","neo4j_password","elasticsearch_passwd","docker_repo_passwd"];
   constructor(public config: InsightsInitService, public agentService: AgentService,
@@ -105,7 +106,7 @@ export class AgentConfigurationComponent implements OnInit {
   }
 
   initializeVariable() {
-    this.agentType=['Agent','Webhook'];
+    this.agentType=['Agent','Webhook', 'ROIAgent'];
     if (this.receivedParam.type == "update") {
       this.btnValue = "Update";
       this.subTitleName = "Update an Agent"
@@ -198,7 +199,7 @@ export class AgentConfigurationComponent implements OnInit {
       self.showConfig = false;
       self.showMessage = "";
       self.configData = JSON.stringify(self.agentConfigItems);
-      self.agentService.getDocrootAgentConfig(key, self.selectedTool, self.isWebhook)
+      self.agentService.getDocrootAgentConfig(key, self.selectedTool, self.isWebhook, self.selectedType)
         .then(function (vdata) {
           self.showConfig = true;
           self.versionChangeddata = JSON.parse(vdata.data);
@@ -227,7 +228,8 @@ export class AgentConfigurationComponent implements OnInit {
       self.showConfig = false;
       self.showMessage = "";
 
-      var agentConfigResponse = await self.agentService.getDocrootAgentConfig(version, toolName,this.isWebhook)
+      console.log(self.selectedType);
+      var agentConfigResponse = await self.agentService.getDocrootAgentConfig(version, toolName,this.isWebhook, self.selectedType)
       //console.log(agentConfigResponse);
       //console.log(agentConfigResponse.data);
 
@@ -246,6 +248,8 @@ export class AgentConfigurationComponent implements OnInit {
         var message="-";
         if ("message" in agentConfigResponse && agentConfigResponse.message.indexOf("Not_Webhook_Agent") !== -1) {
           message = "This is not a webhook Agent";
+        }else if ("message" in agentConfigResponse && agentConfigResponse.message.indexOf("This is not a ROI agent.") !== -1) {
+          message = "This is not a ROI Agent";
         } else {
           message = "Something wrong with service, Please try again";
         }
@@ -418,6 +422,7 @@ export class AgentConfigurationComponent implements OnInit {
         agentAPIRequestJson['osversion'] = self.selectedOS
         agentAPIRequestJson['vault'] = this.vault
         agentAPIRequestJson['isWebhook'] = this.isWebhook
+        agentAPIRequestJson['type'] = this.selectedType
         try {
           var updateAgentRes = await self.agentService.updateAgentV2(JSON.stringify(agentAPIRequestJson));
 
@@ -446,6 +451,7 @@ export class AgentConfigurationComponent implements OnInit {
         agentAPIRequestJson['trackingDetails'] = self.trackingUploadedFileContentStr
         agentAPIRequestJson['vault'] = this.vault
         agentAPIRequestJson['isWebhook'] = this.isWebhook
+        agentAPIRequestJson['type'] = this.selectedType
         try {
           registerAgentRes = await self.agentService.registerAgentV2(JSON.stringify(agentAPIRequestJson));
           self.agentConfigstatus = registerAgentRes.status;

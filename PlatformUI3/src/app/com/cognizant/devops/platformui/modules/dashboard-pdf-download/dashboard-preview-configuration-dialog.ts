@@ -32,12 +32,17 @@ import { InsightsInitService } from '@insights/common/insights-initservice';
 export class DashboardPreviewConfigDialog implements OnInit {
 
     dashboardUrl: SafeResourceUrl;
+    isAssessmentReport: boolean = false;
 
     constructor(public dialogRef: MatDialogRef<DashboardPreviewConfigDialog>,public router: Router,private sanitizer: DomSanitizer,
          @Inject(MAT_DIALOG_DATA) public data: any, private grafanaService: GrafanaAuthenticationService){}
 
     ngOnInit(){
      this.dashboardUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.data.route);
+     if(this.data.isAssessmentReport != null) {
+        this.isAssessmentReport = this.data.isAssessmentReport;
+     }
+     
     }
     
     closeDialog() {

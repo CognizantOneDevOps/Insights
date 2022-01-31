@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -337,19 +339,20 @@ public class PlatformServiceUtil {
 			return false;
 		}
 	}
-
-	/**
-	 * convert multipart to file
-	 * 
-	 * @param multipartFile
-	 * @return
-	 * @throws IOException
-	 */
-	public static File convertToFile(MultipartFile multipartFile) throws IOException {
-		File file = new File(multipartFile.getOriginalFilename());
-		try (FileOutputStream fos = new FileOutputStream(file)) {
-			fos.write(multipartFile.getBytes());
+	
+	public static String sanitizePathTraversal(String filename) {
+		 Path p = Paths.get(filename).normalize();
+		 String fileName = null;
+		 try {
+			 fileName = p.toFile().getCanonicalPath();
+			 String absoluteFileName = p.toFile().getAbsolutePath();
+			 if (! fileName.equalsIgnoreCase(absoluteFileName))
+			    {
+			        throw new InsightsCustomException("Directory traversal attempt");
+			    }
+		} catch (IOException | InsightsCustomException e) {
+			log.error(e);
 		}
-		return file;
+		return fileName;
 	}
 }

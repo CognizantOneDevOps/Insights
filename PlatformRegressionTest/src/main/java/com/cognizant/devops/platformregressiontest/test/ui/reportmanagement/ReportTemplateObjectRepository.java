@@ -84,7 +84,7 @@ public class ReportTemplateObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//span[text()='YES']")
 	WebElement yesBtnEl;
 
-	@FindBy(xpath = "//span[text()='OK']")
+	@FindBy(xpath = "//span[text()= 'OKAY']")
 	WebElement btnOKEl;
 
 	@FindBy(xpath = "//mat-icon[@title='Upload Report Template JSON']")

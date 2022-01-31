@@ -35,6 +35,7 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsEmailTemplates;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
@@ -50,7 +51,6 @@ import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadP
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 	private static Logger log = LogManager.getLogger(ReportEmailSubscriber.class.getName());
@@ -69,7 +69,7 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 	public void handleTaskExecution(byte[] body) throws IOException {
 		String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
 		JsonObject statusObject = null;
-		JsonObject incomingTaskMessage = new JsonParser().parse(message).getAsJsonObject();
+		JsonObject incomingTaskMessage = JsonUtils.parseStringAsJsonObject(message);
 		try {
 			long startTime = System.nanoTime();
 			log.debug("Workflow Detail ==== ReportEmailSubscriber routing key message handleDelivery {} ===== ",

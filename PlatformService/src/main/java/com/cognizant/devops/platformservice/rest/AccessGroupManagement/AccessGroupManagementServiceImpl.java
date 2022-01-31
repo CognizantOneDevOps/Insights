@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.dal.vault.VaultHandler;
 import com.cognizant.devops.platformdal.grafanadatabase.GrafanaDatabaseDAL;
@@ -38,7 +39,6 @@ import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 
 @Service("accessGrpMgmtServiceImpl")
@@ -59,7 +59,7 @@ public class AccessGroupManagementServiceImpl {
 			Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 
 			String grafanaResponse = grafanaHandler.grafanaGet("/api/search", headers);
-			JsonElement response = new JsonParser().parse(grafanaResponse);
+			JsonElement response = JsonUtils.parseString(grafanaResponse);
 			JsonArray dashboardsJsonArray = response.getAsJsonArray();
 			String grafanaBaseUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaExternalEndPoint();
 			if (grafanaBaseUrl == null) {
@@ -124,7 +124,7 @@ public class AccessGroupManagementServiceImpl {
 		JsonObject dashboardJson= new JsonObject();
 		List<Object[]> records =  grafanaDBDAL.fetchDashboardDetailsByUUId(uuid,orgid);
 		for (Object[] objects : records) {
-			dashboardJson= new JsonParser().parse(String.valueOf(objects[1])).getAsJsonObject();
+			dashboardJson= JsonUtils.parseStringAsJsonObject(String.valueOf(objects[1]));
 		}
 		returnResponse.add("dashboard", dashboardJson);
 		return returnResponse;

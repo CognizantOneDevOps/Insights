@@ -16,6 +16,8 @@
 package com.cognizant.devops.platforminsightswebhook.application;
 
 
+import java.io.File;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.boot.SpringApplication;
@@ -31,11 +33,12 @@ import com.cognizant.devops.platforminsightswebhook.message.core.SubscriberStatu
 @ServletComponentScan
 @EnableConfigurationProperties(AppProperties.class)
 public class WebHookAppStarter {
-	private static Logger LOG = LogManager.getLogger(WebHookAppStarter.class);
+	private static Logger log = LogManager.getLogger(WebHookAppStarter.class);
 	public static final String PROPERTIES_BASEDIR="properties.basedir";
     public static void main(String[] args) {
-		LOG.debug(" Inside Webhook Message Publisher ... ");
-		System.setProperty(PROPERTIES_BASEDIR, ".");
+		log.debug(" Inside Webhook Message Publisher ... ");
+		String configFile = System.getenv().get("INSIGHTS_HOME") + File.separator + ".InSights" + File.separator ;
+		/*System.setProperty(PROPERTIES_BASEDIR, ".");
 		for (String argCommandLine : args) {
 			LOG.debug(argCommandLine);
 			if (argCommandLine.contains("config.file.location")) {
@@ -43,10 +46,12 @@ public class WebHookAppStarter {
 				System.setProperty(PROPERTIES_BASEDIR, argArray[1]);
 			}
 		}
-		LOG.debug(" Spring properties location  " + System.getProperty(PROPERTIES_BASEDIR));
+		*/
+		System.setProperty(PROPERTIES_BASEDIR, configFile);
+		log.debug(" Spring properties location  {} " , System.getProperty(PROPERTIES_BASEDIR));
 		ApplicationContext applicationContext = SpringApplication.run(WebHookAppStarter.class, args);
-		LOG.debug(" message Application Name " + applicationContext.getApplicationName() + " instance name "
-				+ AppProperties.instanceName);
+		log.debug(" message Application Name {} instance name {} " , applicationContext.getApplicationName() ,
+				 AppProperties.instanceName);
 		SubscriberStatusLogger.getInstance()
 				.createSubsriberStatusNode(
 						" Service Started with instance name " + AppProperties.instanceName

@@ -52,6 +52,9 @@ public class AgentConfigTO implements Serializable {
 	
 	private Boolean iswebhook = Boolean.FALSE;
 	
+	private String lastRunTime = "";
+
+	private String healthStatus = "";
 	
 	public int getId() {
 		return id;
@@ -168,4 +171,21 @@ public class AgentConfigTO implements Serializable {
 	public void setIswebhook(Boolean iswebhook) {
 		this.iswebhook = iswebhook;
 	}
+	
+	public String getLastRunTime() {
+		return lastRunTime;
+	}
+
+	public void setLastRunTime(String lastRunTime) {
+		this.lastRunTime = lastRunTime;
+	}
+
+	public String getHealthStatus() {
+		return healthStatus;
+	}
+
+	public void setHealthStatus(String healthStatus) {
+		this.healthStatus = healthStatus;
+	}
+	
 }

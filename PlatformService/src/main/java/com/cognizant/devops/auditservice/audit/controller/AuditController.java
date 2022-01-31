@@ -16,13 +16,9 @@
 
 package com.cognizant.devops.auditservice.audit.controller;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,10 +33,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cognizant.devops.auditservice.audit.service.AuditService;
 import com.cognizant.devops.auditservice.audit.service.AuditServiceImpl;
-import com.cognizant.devops.auditservice.audit.service.InsightsAuditInitializationCondition;
 import com.cognizant.devops.auditservice.audit.service.PdfWriter;
 import com.cognizant.devops.auditservice.audit.service.PdfWriterImpl;
 import com.cognizant.devops.platformcommons.constants.InsightsAuditConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -117,8 +114,11 @@ public class AuditController {
 		ResponseEntity<byte[]>  response = null;
 		try {
 			Log.debug(" Inside getAuditReport  ====== ");
+			String validatedResponse = ValidationUtils.validateRequestBody(assetsResults.toString());
+			String validatedPdfName = StringEscapeUtils.escapeHtml(ValidationUtils.cleanXSS(pdfName));
 			boolean validInput = false;
-			JsonArray jsonarray = assetsResults.get("data").getAsJsonArray();
+			JsonObject assetResults = JsonUtils.parseStringAsJsonObject(validatedResponse);
+			JsonArray jsonarray = assetResults.get("data").getAsJsonArray();
 			for(JsonElement jsonelement: jsonarray) {
 				JsonObject element = jsonelement.getAsJsonObject();
 				if(element.has(InsightsAuditConstants.TIMESTAMP) && element.get(InsightsAuditConstants.TIMESTAMP)!=null &&
@@ -127,12 +127,12 @@ public class AuditController {
 				}
 			}
 			if(validInput) {
-				byte[] fileContent = pdfWriterImpl.generatePdf(jsonarray, pdfName);
+				byte[] fileContent = pdfWriterImpl.generatePdf(jsonarray, validatedPdfName);
 				HttpHeaders headers = new HttpHeaders();
 				headers.setContentType(MediaType.parseMediaType("application/pdf"));
 				headers.add("Access-Control-Allow-Methods", "POST");
 				headers.add("Access-Control-Allow-Headers", "Content-Type");
-				headers.add("Content-Disposition", "attachment; filename="+pdfName);
+				headers.add("Content-Disposition", "attachment; filename="+ validatedPdfName);
 				headers.add("Cache-Control", "no-cache, no-store, must-revalidate,post-check=0, pre-check=0");
 				headers.add("Pragma", "no-cache");
 				headers.add("Expires", "0");
@@ -165,25 +165,30 @@ public class AuditController {
      * @param logFileName
      * @return
      */
-	@GetMapping(value = "/getReportLog")
+	/*@GetMapping(value = "/getReportLog")
 	@ResponseBody
-	public ResponseEntity<byte[]> getReportLog(@RequestParam("logFileName") String logFileName) {
-		ResponseEntity<byte[]>  response = null;
+	public ResponseEntity<String> getReportLog(@RequestParam("logFileName") String logFileName) {
+		ResponseEntity<String>  response = null;
 		try {
 			String path = System.getenv().get("INSIGHTS_HOME") + File.separator + "logs" + File.separator + "PlatformAuditService" + File.separator + "Reports"+ File.separator + logFileName;
-			boolean checkValidFile = PlatformServiceUtil.validateFile(logFileName);
+			String validatedResponse = ValidationUtils.validateRequestBody(logFileName);
+			JsonObject fileDetailsJson = JsonUtils.parseStringAsJsonObject(validatedResponse);
+			boolean checkValidFile = PlatformServiceUtil.validateFile(validatedResponse);
 			if(checkValidFile) {
 				byte[] fileContent = Files.readAllBytes(Paths.get(new File(path).getAbsolutePath()));
+				String fileData = ValidationUtils.cleanXSS(new String(fileContent, StandardCharsets.UTF_8).replace("\n", "").replace("\r", "").replace("\t", ""));
 				boolean isValid = PlatformServiceUtil.checkFileForHTML(new String(fileContent));
 				if(isValid) {
+					String mediaType = "application/" + fileDetailsJson.get("fileType").getAsString().toLowerCase();
 					HttpHeaders headers = new HttpHeaders();
-					headers.setContentType(MediaType.TEXT_PLAIN);
+					headers.setContentType(MediaType.parseMediaType(mediaType));
 					headers.add("Access-Control-Allow-Methods", "POST");
 					headers.add("Content-Disposition", "attachment; filename="+logFileName);
 					headers.add("Cache-Control", "no-cache, no-store, must-revalidate,post-check=0, pre-check=0");
 					headers.add("Pragma", "no-cache");
 					headers.add("Expires", "0");
-					response = new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+					headers.add("Accept-Encoding", "UTF-8");
+					response = new ResponseEntity<>(fileData, headers, HttpStatus.OK);
 				}else {
 					throw new Exception("Invalid file content -- "+new String(fileContent));
 				}
@@ -193,4 +198,5 @@ public class AuditController {
 		}
 		return response;
 	}
+	*/
 }

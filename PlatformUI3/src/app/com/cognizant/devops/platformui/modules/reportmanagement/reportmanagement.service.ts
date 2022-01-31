@@ -50,8 +50,8 @@ export class ReportManagementService {
         return this.restCallHandlerService.postWithData("STATE_CHANGE", reportJson, "", { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
     }
 
-    getAssesmentReport() {
-        return this.restCallHandlerService.get("GET_ASSESSMENT_REPORT");
+    getAssesmentReport(UserDetail: string) {
+        return this.restCallHandlerService.postWithData("GET_ASSESSMENT_REPORT", UserDetail, "", { 'Content-Type': 'application/json' }).toPromise();
     }
 
     getKPISList(reportId: string) {

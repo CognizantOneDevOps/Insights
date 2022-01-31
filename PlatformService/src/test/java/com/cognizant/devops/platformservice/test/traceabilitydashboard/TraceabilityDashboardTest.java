@@ -34,6 +34,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.core.enums.FileDetailsEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
@@ -42,7 +43,6 @@ import com.cognizant.devops.platformservice.rest.filemanagement.service.FileMana
 import com.cognizant.devops.platformservice.traceabilitydashboard.service.TraceabilityDashboardService;
 import com.cognizant.devops.platformservice.traceabilitydashboard.service.TraceabilityDashboardServiceImpl;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @Test
 public class TraceabilityDashboardTest extends TreceabilityTestData {
@@ -83,7 +83,7 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 			List<InsightsConfigFiles> configFile = configFilesDAL
 					.getAllConfigurationFilesForModule(FileDetailsEnum.FileModule.TRACEABILITY.name());
 			String configFileData = new String(configFile.get(0).getFileData(), StandardCharsets.UTF_8);
-			dataModel = (JsonObject) new JsonParser().parse(configFileData);
+			dataModel = JsonUtils.parseStringAsJsonObject(configFileData);
 		} catch (Exception e) {
 
 			log.debug("There is problem while processing Traceability.json file :" + e.getMessage());

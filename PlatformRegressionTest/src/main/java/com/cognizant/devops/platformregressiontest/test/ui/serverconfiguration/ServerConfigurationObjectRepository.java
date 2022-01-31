@@ -46,7 +46,7 @@ public class ServerConfigurationObjectRepository extends LoginAndSelectModule{
 	@FindBy(xpath = "//div[contains(text(), ' Success')]")
 	WebElement successMessage;
 	
-	@FindBy(xpath = "//span[text()= 'OK']")
+	@FindBy(xpath = "//span[text()= 'OKAY']")
 	WebElement okButton;
 	
 	@FindBy(xpath = "//mat-icon[@title='Redirect To Landing Page']")

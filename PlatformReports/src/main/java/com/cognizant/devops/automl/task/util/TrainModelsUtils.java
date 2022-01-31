@@ -38,6 +38,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.ai.H2oApiCommunicator;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.autoML.AutoMLConfigDAL;
@@ -45,7 +46,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -244,7 +244,7 @@ public class TrainModelsUtils {
 		String httpResponse = h2oApiCommunicator.runAutoML(usecase + "AutoML", trainingFrame, trainingFrame,
 				predictionColumn, numOfModels);
 		log.info(httpResponse);
-		JsonObject response = new JsonParser().parse(httpResponse).getAsJsonObject();
+		JsonObject response = JsonUtils.parseStringAsJsonObject(httpResponse);
 		String pollingURL = response.get("job").getAsJsonObject().get("key").getAsJsonObject().get("URL").getAsString();
 		String autoMLName = response.get("job").getAsJsonObject().get("dest").getAsJsonObject().get("name")
 				.getAsString();

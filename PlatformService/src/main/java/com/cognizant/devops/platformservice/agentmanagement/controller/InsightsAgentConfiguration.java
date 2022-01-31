@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,14 +32,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.AgentCommonConstant;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.agentmanagement.service.AgentConfigTO;
 import com.cognizant.devops.platformservice.agentmanagement.service.AgentManagementService;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/admin/agentConfiguration")
@@ -53,8 +55,7 @@ public class InsightsAgentConfiguration {
 
 		try {
 			String validatedResponse = ValidationUtils.validateRequestBody(registerAgentJson);
-			JsonParser parser = new JsonParser();
-			JsonObject registerAgentjson = (JsonObject) parser.parse(validatedResponse);
+			JsonObject registerAgentjson = JsonUtils.parseStringAsJsonObject(validatedResponse);
 			String toolName = registerAgentjson.get("toolName").getAsString();
 			String agentVersion = registerAgentjson.get("agentVersion").getAsString();
 			String osversion = registerAgentjson.get("osversion").getAsString();
@@ -62,8 +63,10 @@ public class InsightsAgentConfiguration {
 			String trackingDetails = registerAgentjson.get("trackingDetails").getAsString();
 			boolean vault = registerAgentjson.get("vault").getAsBoolean();
 			boolean isWebhook = registerAgentjson.get("isWebhook").getAsBoolean();
-			message = agentManagementService.registerAgent(toolName, agentVersion, osversion, configDetails,
-					trackingDetails, vault, isWebhook);
+			String type = registerAgentjson.get("type").getAsString();
+			String validatedtoolName = StringEscapeUtils.escapeHtml(ValidationUtils.cleanXSS(toolName));
+			message = agentManagementService.registerAgent(validatedtoolName, agentVersion, osversion, configDetails,
+					trackingDetails, vault, isWebhook, type);
 			return PlatformServiceUtil.buildSuccessResponseWithData(message);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
@@ -88,8 +91,7 @@ public class InsightsAgentConfiguration {
 		String message = null;
 		try {
 			String validatedResponse = ValidationUtils.validateRequestBody(updateAgentJsonRequest);
-			JsonParser parser = new JsonParser();
-			JsonObject updateAgentJson = (JsonObject) parser.parse(validatedResponse);
+			JsonObject updateAgentJson =JsonUtils.parseStringAsJsonObject(validatedResponse);
 			String agentId = updateAgentJson.get("agentId").getAsString();
 			String toolName = updateAgentJson.get("toolName").getAsString();
 			String agentVersion = updateAgentJson.get("agentVersion").getAsString();
@@ -97,7 +99,9 @@ public class InsightsAgentConfiguration {
 			String configDetails = updateAgentJson.get("configJson").getAsString();
 			boolean vault = updateAgentJson.get("vault").getAsBoolean();
 			boolean isWebhook = updateAgentJson.get("isWebhook").getAsBoolean();
-			message = agentManagementService.updateAgent(agentId, configDetails, toolName, agentVersion, osversion,
+			String validatedtoolName = StringEscapeUtils.escapeHtml(ValidationUtils.cleanXSS(toolName));
+			String validatedAgentId = StringEscapeUtils.escapeHtml(ValidationUtils.cleanXSS(agentId));
+			message = agentManagementService.updateAgent(validatedAgentId, configDetails, validatedtoolName, agentVersion, osversion,
 					vault, isWebhook);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
@@ -137,10 +141,15 @@ public class InsightsAgentConfiguration {
 
 	@GetMapping(value = "/getToolRawConfigFile", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getToolRawConfigFile(@RequestParam String version, @RequestParam String tool,
-			@RequestParam boolean isWebhook) {
+			@RequestParam boolean isWebhook, @RequestParam String type) {
 		String details = null;
 		try {
-			details = agentManagementService.getToolRawConfigFile(version, tool, isWebhook);
+			if(type.equalsIgnoreCase(AgentCommonConstant.ROI_AGENT)) {
+				agentManagementService.isROIAgentCheck(tool);
+			}
+			String validatedversion = StringEscapeUtils.escapeHtml(ValidationUtils.validateRequestBody(version));
+			String validatedtool = StringEscapeUtils.escapeHtml(ValidationUtils.validateRequestBody(tool));
+			details = agentManagementService.getToolRawConfigFile(validatedversion, validatedtool, isWebhook);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
@@ -167,6 +176,17 @@ public class InsightsAgentConfiguration {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(agentDetails);
+	}
+	
+	@GetMapping(value = "/2.0/getRegisteredAgents", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject getRegisteredAgentsNew() {
+		List<AgentConfigTO> agentList;
+		try {
+			agentList = agentManagementService.getRegisteredAgentsAndHealth();
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse(e.toString());
+		}
+		return PlatformServiceUtil.buildSuccessResponseWithData(agentList);
 	}
 
 }

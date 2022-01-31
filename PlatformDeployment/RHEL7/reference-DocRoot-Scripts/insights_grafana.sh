@@ -13,30 +13,41 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 #-------------------------------------------------------------------------------
-# Install customized Grafana V7.1.0
+
 echo "#################### Installing Grafana (running as BG process) ####################"
 source /etc/environment
 source /etc/profile
-cd $INSIGHTS_APP_ROOT_DIRECTORY
-sudo mkdir grafana
-cd grafana
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/latest/grafana.tar.gz
-sudo tar -zxvf grafana.tar.gz
+cd /opt
+#sudo mkdir grafana
+#cd grafana
+read -p "Please enter Grafana version number you want to install(ex. 7.5.10 or 8.1.3): " version_number
+version_number=`echo $version_number | sed -e 's/^[[:space:]]*//'`
+sudo wget https://dl.grafana.com/oss/release/grafana-${version_number}.linux-amd64.tar.gz
+sudo tar -zxvf grafana-${version_number}.linux-amd64.tar.gz
+sudo mv /opt/grafana-${version_number} /opt/grafana
+cd /opt/grafana
+sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/customGrafanaSettings/${version_number}/plugins.tar.gz
+sudo tar -zxvf grafana-plugins.tar.gz
+sudo mkdir /opt/grafana/data
+sudo mkdir /opt/grafana/data/plugins
+sudo chmod -R 777 data
+sudo cp -r plugins/* ./data/plugins/
+sudo rm -rf grafana-plugins.tar.gz
 export GRAFANA_HOME=`pwd`
 sudo echo GRAFANA_HOME=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" GRAFANA_HOME=`pwd` | sudo tee -a /etc/profile
 source /etc/environment
 source /etc/profile
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/latest/ldap.toml
+sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/customGrafanaSettings/ldap.toml
 sudo cp ldap.toml $GRAFANA_HOME/conf/ldap.toml
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/latest/defaults.ini
+sudo wget  https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/customGrafanaSettings/${version_number}/defaults.ini
 sudo cp defaults.ini $GRAFANA_HOME/conf/defaults.ini
 sudo nohup ./bin/grafana-server &
 sudo echo $! > grafana-pid.txt
 sleep 10
 sudo chmod -R 777 $INSIGHTS_APP_ROOT_DIRECTORY/grafana
 cd /etc/init.d/
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/Grafana.sh
+sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/initscripts/Grafana.sh
 sudo yum install dos2unix -y
 sudo dos2unix Grafana.sh
 sudo mv Grafana.sh Grafana

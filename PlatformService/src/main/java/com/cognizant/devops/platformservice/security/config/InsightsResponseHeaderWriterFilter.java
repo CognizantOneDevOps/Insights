@@ -16,11 +16,9 @@
 package com.cognizant.devops.platformservice.security.config;
 
 import java.io.IOException;
-import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -65,18 +63,6 @@ public class InsightsResponseHeaderWriterFilter extends OncePerRequestFilter {
 					request.getHeader(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD));
 			response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
 			response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-			//Set the response headers for grafana details.
-			Map<String, String> grafanaHeaders = (Map<String, String>) request
-					.getAttribute(AuthenticationUtils.RESPONSE_HEADER_KEY);
-			if (grafanaHeaders != null && !grafanaHeaders.isEmpty()) {
-				for (Map.Entry<String, String> entry : grafanaHeaders.entrySet()) {
-					Cookie cookie = new Cookie(entry.getKey(), entry.getValue());
-					cookie.setHttpOnly(true);
-					cookie.setMaxAge(60 * 30);
-					cookie.setPath("/");
-					response.addCookie(cookie);
-				}
-			}
 		} catch (Exception e) {
 			log.error("Invalid detail in  InsightsResponseHeaderWriter {}", e.getMessage());
 			String msg = PlatformServiceUtil

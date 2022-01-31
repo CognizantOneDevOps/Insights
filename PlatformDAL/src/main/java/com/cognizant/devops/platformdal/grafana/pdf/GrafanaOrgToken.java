@@ -31,7 +31,7 @@ public class GrafanaOrgToken {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 
-	@Column(name = "ORG_ID")
+	@Column(name = "ORG_ID", unique = true, nullable = false)
 	private int orgId;
 
 	@Column(name = "API_KEY")

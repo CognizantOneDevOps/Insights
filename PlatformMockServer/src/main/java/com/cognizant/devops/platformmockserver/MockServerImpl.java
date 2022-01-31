@@ -115,7 +115,6 @@ public class MockServerImpl {
 		String folderPath = System.getenv("INSIGHTS_HOME") + FILE_SEPERATOR + "mock_json";   
 		final File requestsFolder = new File(folderPath);
 		Gson gson = new Gson();
-		JsonParser parser = new JsonParser();
 		Type type = new TypeToken<List<MockRequest>>() {}.getType();
 		
 		for (final File currFile : requestsFolder.listFiles()) {
@@ -132,7 +131,7 @@ public class MockServerImpl {
 			
 			try {
 				log.info("Reading {} file for mock requests",mockFileName);
-				File mockFile = new File(currFile.getPath());
+				File mockFile = new File(currFile.getCanonicalPath());
 				Reader jsonFileReader = new FileReader(mockFile);
 				objObject = parser.parse(jsonFileReader);
 				requests = gson.fromJson(objObject, type);

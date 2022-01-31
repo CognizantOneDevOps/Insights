@@ -15,7 +15,9 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.workflow.controller;
 
-import java.util.ArrayList;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -25,7 +27,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,14 +36,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformdal.workflow.InsightsWorkflowType;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.workflow.service.WorkflowServiceImpl;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/insights/workflow")
@@ -57,8 +57,7 @@ public class InsightsWorkflowController {
 		try {
 			assessmentTask = assessmentTask.replace("\n", "").replace("\r", "");
 			String validatedResponse = ValidationUtils.validateRequestBody(assessmentTask);
-			JsonParser parser = new JsonParser();
-			JsonObject workflowTaskJson = (JsonObject) parser.parse(validatedResponse);
+			JsonObject workflowTaskJson = JsonUtils.parseStringAsJsonObject(validatedResponse);
 			int taskId = workflowService.saveWorkflowTask(workflowTaskJson);
 			return PlatformServiceUtil.buildSuccessResponseWithData(" workflow Task created with Id " + taskId);
 		} catch (InsightsCustomException e) {
@@ -90,8 +89,7 @@ public class InsightsWorkflowController {
 		try {
 			configIdJson = configIdJson.replace("\n", "").replace("\r", "");
 			String validatedRequestJson = ValidationUtils.validateRequestBody(configIdJson);
-			JsonParser parser = new JsonParser();
-			JsonObject validatedConfigIdJson = parser.parse(validatedRequestJson).getAsJsonObject();
+			JsonObject validatedConfigIdJson = JsonUtils.parseStringAsJsonObject(validatedRequestJson);
 			records = workflowService.getWorkFlowExecutionRecords(validatedConfigIdJson);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
@@ -105,8 +103,7 @@ public class InsightsWorkflowController {
 		try {
 			workflowIdJson = workflowIdJson.replace("\n", "").replace("\r", "");
 			String validatedRequestJson = ValidationUtils.validateRequestBody(workflowIdJson);
-			JsonParser parser = new JsonParser();
-			JsonObject validatedConfigIdJson = parser.parse(validatedRequestJson).getAsJsonObject();
+			JsonObject validatedConfigIdJson = JsonUtils.parseStringAsJsonObject(validatedRequestJson);
 			records = workflowService.getWorkFlowExecutionRecordsByWorkflowId(validatedConfigIdJson);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
@@ -120,8 +117,7 @@ public class InsightsWorkflowController {
 		try {
 			configIdJson = configIdJson.replace("\n", "").replace("\r", "");
 			String validatedRequestJson = ValidationUtils.validateRequestBody(configIdJson);
-			JsonParser parser = new JsonParser();
-			JsonObject validatedConfigIdJson = parser.parse(validatedRequestJson).getAsJsonObject();
+			JsonObject validatedConfigIdJson = JsonUtils.parseStringAsJsonObject(validatedRequestJson);
 			records = workflowService.getMaximumExecutionIDs(validatedConfigIdJson);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
@@ -139,41 +135,50 @@ public class InsightsWorkflowController {
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(records);
 	}
-
+	
 	@PostMapping(value = "/downloadReportPDF")
 	@ResponseBody
 	public ResponseEntity<byte[]> getReportPDF(@RequestBody String pdfDetailsJsonString) {
 		ResponseEntity<byte[]> response = null;
 		try {
-			String validatedResponse = ValidationUtils.validateRequestBody(pdfDetailsJsonString);
-			JsonParser parser = new JsonParser();
-			JsonObject pdfDetailsJson = (JsonObject) parser.parse(validatedResponse);
+			String decodedString = new String(Base64.getDecoder().decode(pdfDetailsJsonString),
+					StandardCharsets.UTF_8);
+			String validatedResponse =  ValidationUtils.validateRequestBody(decodedString);
+			JsonObject pdfDetailsJson = JsonUtils.parseStringAsJsonObject(validatedResponse);
 			byte[] fileContent = workflowService.getReportPDF(pdfDetailsJson);
-			String pdfName = pdfDetailsJson.get("pdfName").getAsString() + ".pdf";
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.parseMediaType("application/pdf"));
-			headers.add("Access-Control-Allow-Methods", "POST");
-			headers.add("Access-Control-Allow-Headers", "Content-Type");
-			headers.add("Content-Disposition", "attachment; filename=" + pdfName);
-			headers.add("Cache-Control", "no-cache, no-store, must-revalidate,post-check=0, pre-check=0");
-			headers.add("Pragma", "no-cache");
-			headers.add("Expires", "0");
-			response = new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
-		} catch (InsightsCustomException e) {
+			
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+			byteArrayOutputStream.write(fileContent);
+			org.apache.pdfbox.pdmodel.PDDocument document = org.apache.pdfbox.pdmodel.PDDocument.load(fileContent, "12345");
+			
+			if (document == null) {
+				throw new InsightsCustomException("Invalid file ");
+			}else {
+				String pdfName = pdfDetailsJson.get("pdfName").getAsString() + ".pdf";
+				HttpHeaders headers = new HttpHeaders();
+				headers.setContentType(MediaType.parseMediaType("application/pdf"));
+				headers.add("Access-Control-Allow-Methods", "POST");
+				headers.add("Access-Control-Allow-Headers", "Content-Type");
+				headers.add("Content-Disposition", "attachment; filename=" + pdfName);
+				headers.add("Cache-Control", "no-cache, no-store, must-revalidate,post-check=0, pre-check=0");
+				headers.add("Pragma", "no-cache");
+				headers.add("Expires", "0");
+				response = new ResponseEntity<>(byteArrayOutputStream.toByteArray(), headers, HttpStatus.OK);
+			}
+		} catch (Exception e) {
 			log.error("Error, Failed to download pdf -- {} ", e.getMessage());
 		}
 		return response;
 
 	}
-
+	
 	@PostMapping(value = "/updateHealthNotification", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject enableHealthNotification(@RequestBody String status) {
 
 		try {
 			status = status.replace("\n", "").replace("\r", "");
 			String validatedResponse = ValidationUtils.validateRequestBody(status);
-			JsonParser parser = new JsonParser();
-			JsonObject statusJson = (JsonObject) parser.parse(validatedResponse);
+			JsonObject statusJson = JsonUtils.parseStringAsJsonObject(validatedResponse);
 			String message = workflowService.updateHealthNotification(statusJson);
 			if (message.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
 				return PlatformServiceUtil.buildSuccessResponse();
@@ -205,8 +210,7 @@ public class InsightsWorkflowController {
 		try {
 			workflowTask = workflowTask.replace("\n", "").replace("\r", "");
 			String validatedResponse = ValidationUtils.validateRequestBody(workflowTask);
-			JsonParser parser = new JsonParser();
-			JsonObject workflowTaskJson = (JsonObject) parser.parse(validatedResponse);
+			JsonObject workflowTaskJson = JsonUtils.parseStringAsJsonObject(validatedResponse);
 			workflowService.updateWorkflowTask(workflowTaskJson);
 			return PlatformServiceUtil.buildSuccessResponseWithData(" workflow Task was updated");
 		} catch (InsightsCustomException e) {

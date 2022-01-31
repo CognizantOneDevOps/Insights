@@ -1,0 +1,80 @@
+{
+	"vault": {
+		"getFromVault": false,
+		"secretEngine": "insights-kv",
+		"readToken": "vault_secret_token",
+		"vaultUrl": "http://Vault_Host:port/v1/"
+	},
+	"mqConfig": {
+		"user": "User",
+		"password": "-",
+		"host": "localhost",
+		"exchange": "iSight",
+		"agentControlXchg": "iAgent"
+	},
+	"subscribe": {
+		"config": "ROI.NEWRELIC.config"
+	},
+	"publish": {
+		"data": "ROI.NEWRELIC.DATA",
+		"health": "ROI.NEWRELIC.HEALTH"
+	},
+	"communication": {
+		"type": "REST",
+		"sslVerify": false,
+		"responseType": "JSON"
+	},
+	"dynamicTemplate": {
+		"responseTemplate": {
+			"milestoneDetails": {
+				"milestoneId": "milestoneId",
+                "milestoneName" : "milestoneName",
+                "outcomeId": "outcomeId",
+                "outcomeName": "outcomeName",
+                "statusQueue": "statusQueue",
+                "metricUrl": "metricUrl"
+			}
+		},
+		"metadata": {
+			"labels": [
+				"MILESTONE"
+			],
+			"dataUpdateSupported": true,
+			"uniqueKey": [
+				"milestoneId",
+				"outcomeId",
+				"from",
+				"to"
+			]
+		}
+	},
+	"agentId": "",
+	"webhookEnabled": false,
+	"isROIAgent": true,
+	"toolCategory": "ROI",
+	"enableDataValidation": true,
+	"toolsTimeZone": "GMT",
+	"insightsTimeZone": "Asia/Kolkata",
+	"useResponseTemplate": true,
+	"auth": "base64",
+	"runSchedule": 30,
+	"period": 3600,
+	"summarize": true,
+	"timeStampField": "",
+	"timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
+	"isEpochTimeFormat": true,
+	"baseUrl": "",
+	"apiKey": "",
+	"agentSecretDetails": [
+		"apiKey"
+	],
+	"isDebugAllowed": false,
+	"enableValueArray": false,
+	"loggingSetting": {
+		"logLevel": "ERROR",
+		"maxBytes": 5000000,
+		"backupCount": 10
+	},
+	"auditing": false,
+	"toolName": "NewRelic"
+}

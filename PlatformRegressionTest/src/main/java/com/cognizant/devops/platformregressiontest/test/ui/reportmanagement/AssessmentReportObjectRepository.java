@@ -180,7 +180,7 @@ public class AssessmentReportObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//mat-icon[@title='Delete ']")
 	WebElement clickDelete;
 
-	@FindBy(xpath = "//span[text()='OK']")
+	@FindBy(xpath = "//span[text()= 'OKAY']")
 	WebElement clickOk;
 
 }

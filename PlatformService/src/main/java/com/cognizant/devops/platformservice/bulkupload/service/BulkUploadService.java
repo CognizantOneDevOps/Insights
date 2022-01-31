@@ -16,10 +16,9 @@
 
 package com.cognizant.devops.platformservice.bulkupload.service;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -40,6 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.FileDetailsEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -48,7 +48,6 @@ import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFilesDAL;
 import com.cognizant.devops.platformservice.config.PlatformServiceStatusProvider;
 import com.cognizant.devops.platformservice.rest.datatagging.constants.DatataggingConstants;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 @Service("bulkUploadService")
@@ -71,7 +70,6 @@ public class BulkUploadService implements IBulkUpload {
 	@Override
 	public boolean uploadDataInDatabase(MultipartFile file, String toolName, String label, String insightsTimeField,
 			String insightsTimeFormat) throws InsightsCustomException {
-		File csvfile = null;
 		long filesizeMaxValue = 2097152;
 		boolean status = false;
 		CSVParser csvParser = null;
@@ -81,10 +79,10 @@ public class BulkUploadService implements IBulkUpload {
 		try {
 			if (fileExt.equalsIgnoreCase("csv")) {
 				if (file.getSize() < filesizeMaxValue) {
-					csvfile = convertToFile(file);
+					InputStream is = file.getInputStream();
 					CSVFormat format = CSVFormat.newFormat(',').withHeader();
 					try {
-						reader = new FileReader(csvfile);
+						reader = new InputStreamReader(is);
 						csvParser = new CSVParser(reader, format);
 					} catch (IOException e) {
 						log.debug("Not able to read file");
@@ -290,21 +288,6 @@ public class BulkUploadService implements IBulkUpload {
 	}
 
 	/**
-	 * convert multipart file to file
-	 *
-	 * @param multipartFile
-	 * @return File
-	 * @throws IOException
-	 */
-	private File convertToFile(MultipartFile multipartFile) throws IOException {
-		File file = new File(multipartFile.getOriginalFilename());
-		try (FileOutputStream fos = new FileOutputStream(file)) {
-			fos.write(multipartFile.getBytes());
-		}
-		return file;
-	}
-
-	/**
 	 * get Tool details in json format
 	 *
 	 * @return Object
@@ -317,8 +300,7 @@ public class BulkUploadService implements IBulkUpload {
 			List<InsightsConfigFiles> configFile = configFilesDAL
 					.getAllConfigurationFilesForModule(FileDetailsEnum.FileModule.TOOLDETAIL.name());
 			String configFileData = new String(configFile.get(0).getFileData(), StandardCharsets.UTF_8);
-			JsonParser parser = new JsonParser();
-			Object obj = parser.parse(configFileData);
+			Object obj = JsonUtils.parseString(configFileData);
 			config = obj;
 			PlatformServiceStatusProvider.getInstance().createPlatformServiceStatusNode(
 					"ToolDetail.json is successfully loaded.", PlatformServiceConstants.SUCCESS);

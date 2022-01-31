@@ -32,6 +32,7 @@ import com.cognizant.devops.platformauditing.util.AuditServiceUtil;
 import com.cognizant.devops.platformauditing.util.RestructureDataUtil;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
@@ -50,7 +51,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 public class HyperLedgerExecutionSubscriber extends WorkflowTaskSubscriberHandler{
@@ -76,7 +76,7 @@ public class HyperLedgerExecutionSubscriber extends WorkflowTaskSubscriberHandle
 					+ "routing key  message handleDelivery ===== {} ",incomingTaskMessage);
 			assessmentReportDTO = new InsightsAssessmentConfigurationDTO();
 			assessmentReportDTO.setIncomingTaskMessageJson(incomingTaskMessage);
-			JsonObject incomingTaskMessageJson = new JsonParser().parse(incomingTaskMessage).getAsJsonObject();
+			JsonObject incomingTaskMessageJson =JsonUtils.parseStringAsJsonObject(incomingTaskMessage);
 			String workflowId = incomingTaskMessageJson.get("workflowId").getAsString();
 			workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
 			log.debug("Worlflow Detail ==== scheduleType {} ", workflowConfig.getScheduleType());
@@ -136,8 +136,7 @@ public class HyperLedgerExecutionSubscriber extends WorkflowTaskSubscriberHandle
 			if(dbQuery.isEmpty()) {
 				assets = insightsAuditImpl.getAllAssets(ledgerStartDate,ledgerEndDate, toolName);
 				log.debug("Worlflow Detail ==== result {} ", assets);
-				JsonParser jsonParser = new JsonParser();
-				JsonElement msgData = jsonParser.parse(assets);
+				JsonElement msgData = JsonUtils.parseString(assets);
 				JsonArray msgArray = msgData.getAsJsonObject().get("msg").getAsJsonArray();
 				fetchAssetHistory(msgArray, ledgerList, false);
 				
@@ -176,8 +175,7 @@ public class HyperLedgerExecutionSubscriber extends WorkflowTaskSubscriberHandle
 						log.debug("AssetID === {} ",assetId);
 						String ledgerresponse = insightsAuditImpl.getAssetHistory(assetId);
 						log.debug("Ledgerresponse from couch === {} ",ledgerresponse);
-						JsonParser jsonParser = new JsonParser();
-						JsonElement data = jsonParser.parse(ledgerresponse);
+						JsonElement data = JsonUtils.parseString(ledgerresponse);
 						JsonArray msgArray = data.getAsJsonObject().get("msg").getAsJsonArray();
 						fetchAssetHistory(msgArray, ledgerList, true);
 					}
@@ -264,8 +262,7 @@ public class HyperLedgerExecutionSubscriber extends WorkflowTaskSubscriberHandle
 	 * @return ledgerresponse
 	 */
 	private JsonObject formatAssetId(String ledgerresponse, String parentAsset) {
-		JsonParser jsonParser = new JsonParser(); 
-		JsonElement jsonElements = jsonParser.parse(ledgerresponse);
+		JsonElement jsonElements = JsonUtils.parseString(ledgerresponse);
 		JsonObject jsonObject = jsonElements.getAsJsonObject();
 		if(!jsonObject.get("data").isJsonNull() && "success".equalsIgnoreCase(jsonObject.get("status").getAsString())){
 			String assetId = "NA";

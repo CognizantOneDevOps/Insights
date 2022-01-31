@@ -44,6 +44,7 @@ import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.FileDetailsEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -58,7 +59,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 /**
@@ -125,7 +125,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 			List<InsightsConfigFiles> configFile = configFilesDAL
 					.getAllConfigurationFilesForModule(FileDetailsEnum.FileModule.TRACEABILITY.name());
 			String configFileData = new String(configFile.get(0).getFileData(), StandardCharsets.UTF_8);
-			dataModel = (JsonObject) new JsonParser().parse(configFileData);
+			dataModel = JsonUtils.parseStringAsJsonObject(configFileData);
 			LOG.debug("Traceability ===== Traceability.json is present and loaded properly");
 			PlatformServiceStatusProvider.getInstance().createPlatformServiceStatusNode(
 					"Traceability.json is successfully loaded.", PlatformServiceConstants.SUCCESS);
@@ -623,7 +623,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 		if (pipelineCache.get(cacheKey) != null) {
 			LOG.debug("Pipeline response loaded from cache for key {} "
 					,cacheKey);
-			return new JsonParser().parse(pipelineCache.get(cacheKey)).getAsJsonObject();
+			return JsonUtils.parseStringAsJsonObject(pipelineCache.get(cacheKey));
 		} else {
 			try {
 				/* Load JsonObject from DataModel.json for processing */

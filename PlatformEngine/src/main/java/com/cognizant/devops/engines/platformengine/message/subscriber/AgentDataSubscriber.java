@@ -38,13 +38,13 @@ import com.cognizant.devops.engines.platformengine.modules.aggregator.BusinessMa
 import com.cognizant.devops.engines.util.DataEnrichUtils;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Envelope;
 
@@ -111,7 +111,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 			}
 
 			List<JsonObject> dataList = new ArrayList<>();
-			JsonElement json = new JsonParser().parse(message);
+			JsonElement json = JsonUtils.parseString(message);
 			boolean dataUpdateSupported = false;
 			String uniqueKey = "";
 			JsonObject relationMetadata = null;
@@ -262,11 +262,10 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 					}
 				}
 			}
-			JsonParser jsonParser = new JsonParser();
 			Gson gson = new Gson();
 			for (Entry<String, String> entry : labelMappingMap.entrySet()) {
 				List<String> items = Arrays.asList(entry.getValue().split("\\s*,\\s*"));
-				JsonArray jsonArray = (JsonArray) jsonParser.parse(items.toString());
+				JsonArray jsonArray = JsonUtils.parseStringAsJsonArray(items.toString());
 				asJsonObject.add(entry.getKey(), jsonArray);
 			}
 

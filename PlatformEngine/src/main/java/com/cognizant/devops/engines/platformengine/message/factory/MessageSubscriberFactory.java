@@ -16,7 +16,6 @@
 package com.cognizant.devops.engines.platformengine.message.factory;
 
 import java.io.IOException;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -70,8 +69,13 @@ public class MessageSubscriberFactory {
 	}
 
 	public void unregisterSubscriber(String routingKey, final EngineSubscriberResponseHandler responseHandler)
-			throws IOException, TimeoutException {
-		responseHandler.getChannel().basicCancel(routingKey);
-		responseHandler.getChannel().close();
+			throws IOException, InsightsCustomException {
+		try {
+			responseHandler.getChannel().basicCancel(routingKey);
+			responseHandler.getChannel().close();
+		} catch (Exception e) {
+			log.error(e);
+			throw new InsightsCustomException(" Error while unregistering subscriber "+e.getMessage());
+		} 
 	}
 }

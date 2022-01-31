@@ -50,6 +50,7 @@ import org.jsoup.select.Elements;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.ReportChartCollection;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.multipart.MultipartDataHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportTemplateConfigFiles;
@@ -63,7 +64,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class FusionChartHandler implements BasePDFProcessor {
 	 
@@ -148,8 +148,8 @@ public class FusionChartHandler implements BasePDFProcessor {
 		String templateJsonPath = assessmentReportDTO.getPdfReportDirPath() + File.separator
 				+ assessmentReportDTO.getReportFilePath() + ".json";
 		try {
-			String json = new String(Files.readAllBytes(Paths.get(templateJsonPath)));
-			JsonArray pdfTemplateJsonArray = new JsonParser().parse(json).getAsJsonArray();
+			String json = new String(Files.readAllBytes(Paths.get(new File(templateJsonPath).getCanonicalPath()).toAbsolutePath()));
+			JsonArray pdfTemplateJsonArray =JsonUtils.parseStringAsJsonArray(json);
 			Map<String, JsonObject> templateJsonObjMap = loadTemplateJson(pdfTemplateJsonArray);
 			Map<String, String> contentMap = new HashMap<>();
 			Map<String, List<String>> kpiContentMap = new HashMap<>();

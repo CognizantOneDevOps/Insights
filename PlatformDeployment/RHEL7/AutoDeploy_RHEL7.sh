@@ -38,12 +38,13 @@ echo "1)insights_first
 2)insights_java
 3)insights_postgres
 4)insights_grafana
-5)insights_python
-6)insights_rabbitmq
-7)insights_tomcat
-8)insights_enginejar
-9)insights_agents
-10)insights_all"
+5)insights_neo4j
+6)insights_python
+7)insights_rabbitmq
+8)insights_tomcat
+9)insights_enginejar
+10)insights_agents
+11)insights_all"
 read input
 for package in ${input[@]}
 do
@@ -55,6 +56,8 @@ case $package in
    "insights_postgres") sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_postgres.sh -O insights_postgres.sh && dos2unix insights_postgres.sh && sh insights_postgres.sh
    ;;
    "insights_grafana") sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_grafana.sh -O insights_grafana.sh && dos2unix insights_grafana.sh && sh insights_grafana.sh
+   ;;
+   "insights_neo4j") sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_neo4j.sh -O insights_neo4j.sh && dos2unix insights_neo4j.sh && sh insights_neo4j.sh
    ;;
    "insights_python") sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_python.sh -O insights_python.sh && dos2unix insights_python.sh && sh insights_python.sh
    ;;

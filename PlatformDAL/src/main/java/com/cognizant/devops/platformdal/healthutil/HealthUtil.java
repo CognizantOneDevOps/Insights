@@ -16,6 +16,7 @@
 package com.cognizant.devops.platformdal.healthutil;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,25 +25,28 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.AgentCommonConstant;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.constants.ServiceStatusConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.SystemStatus;
 import com.cognizant.devops.platformcommons.dal.elasticsearch.ElasticSearchDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.cognizant.devops.platformdal.dal.PostgresMetadataHandler;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class HealthUtil {
 	static Logger log = LogManager.getLogger(HealthUtil.class);
 	private static final String VERSION = "version";
 	private static final String HOST_ENDPOINT = "endPoint";
+	private static final String AGENT_NODES = "agentNodes";
+	private static final String HEALTH_STATUS = "healthStatus";
+	private static final String LAST_RUN_TIME = "lastRunTime";
 
-	
 	/**
 	 * Method to fetch Client Response for Services and components
 	 * 
@@ -63,7 +67,6 @@ public class HealthUtil {
 		JsonObject json = null;
 		String version = "";
 		String serviceResponse;
-		JsonParser jsonParser = new JsonParser();
 		ElasticSearchDBHandler apiCallElasticsearch = new ElasticSearchDBHandler();
 		try {
 			if (isRequiredAuthentication) {
@@ -76,18 +79,18 @@ public class HealthUtil {
 				strResponse = "Response successfully recieved from " + apiUrl;
 				log.info("response: {} ",serviceResponse);
 				if (serviceType.equalsIgnoreCase(ServiceStatusConstants.Neo4j)) {
-					json = (JsonObject) jsonParser.parse(serviceResponse);
+					json = JsonUtils.parseStringAsJsonObject(serviceResponse);
 					version = json.get("neo4j_version").getAsString();
 					String totalDBSize = getNeo4jDBSize(hostEndPoint, username, password, authToken);
 					returnResponse = buildSuccessResponse(strResponse, hostEndPoint, displayType, version);
 					returnResponse.addProperty("totalDBSize", totalDBSize);
 				} else if (serviceType.equalsIgnoreCase(ServiceStatusConstants.RabbitMq)) {
-					json = (JsonObject) jsonParser.parse(serviceResponse);
+					json = JsonUtils.parseStringAsJsonObject(serviceResponse);
 					version = "RabbitMq version " + json.get("rabbitmq_version").getAsString() + "\n Erlang version "
 							+ json.get("erlang_version").getAsString();
 					returnResponse = buildSuccessResponse(strResponse, hostEndPoint, displayType, version);
 				} else if (serviceType.equalsIgnoreCase(ServiceStatusConstants.ES)) {
-					json = (JsonObject) jsonParser.parse(serviceResponse);
+					json = JsonUtils.parseStringAsJsonObject(serviceResponse);
 					JsonObject versionElasticsearch = (JsonObject) json.get(VERSION);
 					if (versionElasticsearch != null) {
 						version = versionElasticsearch.get("number").getAsString();
@@ -243,8 +246,6 @@ public class HealthUtil {
 			Iterator<NodeData> agentnodeIterator = graphResponse.getNodes().iterator();
 			while (agentnodeIterator.hasNext()) {
 				NodeData node = agentnodeIterator.next();
-				insightTimeX = node.getPropertyMap().get(PlatformServiceConstants.INSIGHTSTIMEX);
-				message = node.getPropertyMap().get("message");
 				toolcategory = node.getPropertyMap().get(AgentCommonConstant.CATEGORY);
 				toolName = node.getPropertyMap().get(AgentCommonConstant.TOOLNAME);
 				if (node.getPropertyMap().containsKey(AgentCommonConstant.AGENTID)) {
@@ -252,7 +253,7 @@ public class HealthUtil {
 				} else {
 					agentId = "";
 				}
-				agentstatus = node.getPropertyMap().get("status");
+				agentstatus = node.getPropertyMap().get(PlatformServiceConstants.STATUS);
 				insightTimeX = node.getPropertyMap().get(PlatformServiceConstants.INSIGHTSTIMEX);
 				JsonObject jsonResponse2 = new JsonObject();
 				jsonResponse2.addProperty(PlatformServiceConstants.INSIGHTSTIMEX, insightTimeX);
@@ -263,7 +264,7 @@ public class HealthUtil {
 				jsonResponse2.addProperty(AgentCommonConstant.CATEGORY, toolcategory);
 				agentNode.add(jsonResponse2);
 			}
-			jsonResponse.add("agentNodes", agentNode);
+			jsonResponse.add(AGENT_NODES, agentNode);
 		} else {
 			jsonResponse.addProperty(PlatformServiceConstants.STATUS, PlatformServiceConstants.FAILURE);
 			jsonResponse.addProperty(PlatformServiceConstants.MESSAGE, message);
@@ -272,7 +273,7 @@ public class HealthUtil {
 			jsonResponse.addProperty(AgentCommonConstant.TOOLNAME, toolName);
 			jsonResponse.addProperty(PlatformServiceConstants.INSIGHTSTIMEX, insightTimeX);
 			jsonResponse.addProperty(VERSION, "");
-			jsonResponse.add("agentNodes", agentNode);
+			jsonResponse.add(AGENT_NODES, agentNode);
 		}
 
 		return jsonResponse;
@@ -297,7 +298,7 @@ public class HealthUtil {
 					password, authToken);
 			log.debug("serviceNeo4jResponse ====== {} ",serviceNeo4jResponse);
 
-			JsonElement object = new JsonParser().parse(serviceNeo4jResponse);
+			JsonElement object = JsonUtils.parseString(serviceNeo4jResponse);
 			if (object.isJsonArray()) {
 				if (object.getAsJsonArray().get(0).getAsJsonObject().get("attributes").isJsonArray()) {
 					JsonArray beans = object.getAsJsonArray().get(0).getAsJsonObject().get("attributes")
@@ -348,7 +349,7 @@ public class HealthUtil {
 		try {
 			AgentConfigDAL agentConfigDal = new AgentConfigDAL();
 			AgentConfig agentConfig = agentConfigDal.getAgentConfigurations(agentId);
-			JsonObject config = (JsonObject) new JsonParser().parse(agentConfig.getAgentJson());
+			JsonObject config = JsonUtils.parseStringAsJsonObject(agentConfig.getAgentJson());
 			JsonObject json = config.get("publish").getAsJsonObject();
 			healthRoutingKey = json.get("health").getAsString().replace(".", ":");
 		} catch (Exception e) {
@@ -481,24 +482,6 @@ public class HealthUtil {
 			serviceStatus.add(ServiceStatusConstants.PlatformEngine, jsonPlatformEngineStatus);
 			JsonObject jsonPlatformWorkflowStatus = getComponentStatus("PlatformWorkflow");
 			serviceStatus.add(ServiceStatusConstants.PlatformWorkflow, jsonPlatformWorkflowStatus);
-
-			if (ApplicationConfigProvider.getInstance().isEnableWebHookEngine()) {
-				JsonObject jsonPlatformWebhookEngineStatus = getComponentStatus("PlatformWebhookEngine");
-				serviceStatus.add(ServiceStatusConstants.PlatformWebhookEngine, jsonPlatformWebhookEngineStatus);
-				JsonObject jsonPlatformWebhookSubscriberStatus = getComponentStatus("PlatformWebhookSubscriber");
-				serviceStatus.add(ServiceStatusConstants.PlatformWebhookSubscriber,
-						jsonPlatformWebhookSubscriberStatus);
-			}
-
-			if (ApplicationConfigProvider.getInstance().isEnableAuditEngine()) {
-				JsonObject jsonPlatformAuditEngineStatus = getComponentStatus("PlatformAuditEngine");
-				serviceStatus.add(ServiceStatusConstants.PlatformAuditEngine, jsonPlatformAuditEngineStatus);
-			}
-			if (ApplicationConfigProvider.getInstance().isEnableDataArchivalEngine()) {
-				JsonObject jsonPlatformDataArchivalEngineStatus = getComponentStatus("PlatformDataArchivalEngine");
-				serviceStatus.add(ServiceStatusConstants.PlatformDataArchivalEngine,
-						jsonPlatformDataArchivalEngineStatus);
-			}
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== Error creating HTML body for services");
 		}
@@ -514,6 +497,55 @@ public class HealthUtil {
 	 */
 	public JsonObject getAgentsStatus() {
 		return getComponentStatus("Agents");
+	}
+	
+	public JsonObject getRegisteredAgentsAndHealth() throws InsightsCustomException {
+		AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
+		JsonObject agentDetails = new  JsonObject();
+		JsonArray agentNodes = new JsonArray();
+		try {
+			List<AgentConfig> agentConfigList = agentConfigDAL.getAllDataAgentConfigurations();
+			for (AgentConfig agentConfig : agentConfigList) {
+				JsonObject node = new JsonObject();
+				node.addProperty("toolName", agentConfig.getToolName());
+				node.addProperty("agentId", agentConfig.getAgentKey());
+				JsonObject agentHealthNode = getAgentHealth(node, agentConfig.getAgentKey());
+				if(agentHealthNode.has(LAST_RUN_TIME)) {
+					node.addProperty(LAST_RUN_TIME,agentHealthNode.get(LAST_RUN_TIME).getAsString());
+				} else {
+					node.addProperty(LAST_RUN_TIME, "");
+				}
+				if(agentHealthNode.has(HEALTH_STATUS)) {
+					node.addProperty(HEALTH_STATUS,agentHealthNode.get(HEALTH_STATUS).getAsString());
+				} else {
+					node.addProperty(HEALTH_STATUS,"");
+				}
+				agentNodes.add(node);
+			}
+			agentDetails.add(AGENT_NODES, agentNodes);
+		} catch (Exception e) {
+			log.error("Error getting all agent config ", e);
+			throw new InsightsCustomException(e.toString());
+		}
+		return agentDetails;
+	}
+	
+	public JsonObject getAgentHealth(JsonObject agentJson, String agentId) {
+		GraphDBHandler graphDBHandler = new GraphDBHandler();
+		JsonObject response;
+		try {
+			response = graphDBHandler.executeCypherQueryForJsonResponse("MATCH (n:HEALTH:LATEST) where n.agentId='"+agentId+"' return n order by n.inSightsTime desc limit 1");		
+			JsonArray responseArray = response.get("results").getAsJsonArray();
+			JsonArray responseData = responseArray.get(0).getAsJsonObject().get("data").getAsJsonArray();
+			if(responseData.size() > 0) {
+				agentJson.addProperty(LAST_RUN_TIME, responseData.get(0).getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().get(PlatformServiceConstants.INSIGHTSTIMEX).getAsString());
+				agentJson.addProperty(HEALTH_STATUS, responseData.get(0).getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().get(PlatformServiceConstants.STATUS).getAsString());
+			}
+		} catch (Exception e) {
+			log.error("Error getting agent health ", e);
+		}
+		
+		return agentJson;
 	}
 
 }

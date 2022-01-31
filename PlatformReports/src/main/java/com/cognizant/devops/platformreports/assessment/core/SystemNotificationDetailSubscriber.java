@@ -16,10 +16,12 @@
 package com.cognizant.devops.platformreports.assessment.core;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -36,6 +38,8 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.constants.ServiceStatusConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
 import com.cognizant.devops.platformdal.healthutil.HealthUtil;
@@ -47,7 +51,6 @@ import com.cognizant.devops.platformworkflow.workflowtask.message.factory.Workfl
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class SystemNotificationDetailSubscriber extends WorkflowTaskSubscriberHandler {
 	private static Logger log = LogManager.getLogger(SystemNotificationDetailSubscriber.class.getName());
@@ -65,7 +68,7 @@ private InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfi
 		try {
 			long startTime = System.nanoTime();
 			String incomingTaskMessage = new String(body, StandardCharsets.UTF_8);
-			JsonObject incomingTaskMessageJson = new JsonParser().parse(incomingTaskMessage).getAsJsonObject();
+			JsonObject incomingTaskMessageJson = JsonUtils.parseStringAsJsonObject(incomingTaskMessage);
 			String workflowId = incomingTaskMessageJson.get("workflowId").getAsString();
 			executionId = incomingTaskMessageJson.get("executionId").getAsLong();
 			workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
@@ -118,15 +121,10 @@ private InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfi
 	private String createEmailHTML(Map<String,String> idDataMap) {
 		try {
 			
-			InputStream templateStream = getClass().getClassLoader().getResourceAsStream("mailTemplate.html");
-			BufferedReader r = new BufferedReader(new InputStreamReader(templateStream));
-			String line;
-			StringBuffer render =new StringBuffer();
-			while ((line = r.readLine()) != null) {
-				render.append(line);
-			}
-			r.close();
-			Document document = Jsoup.parse(render.toString(), StandardCharsets.UTF_8.name());
+			File mailTemplate = new File(getClass().getClassLoader().getResource("mailTemplate.html").getFile());
+			String template = new String(Files.readAllBytes(mailTemplate.toPath()));
+			String validTemplate = ValidationUtils.cleanXSS(template);
+			Document document = Jsoup.parse(validTemplate, StandardCharsets.UTF_8.name());
 			return createComponentTable(idDataMap,document);
 			
 		} catch (Exception e) {
@@ -164,7 +162,7 @@ private InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfi
 	 */
 	private String getAgentHTML() {
 		try {
-			JsonObject jsonAgentResponse = healthUtil.getAgentsStatus();
+			JsonObject jsonAgentResponse = healthUtil.getRegisteredAgentsAndHealth();
 			return agentHTML(jsonAgentResponse);
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== Error creating HTML body for agents");
@@ -236,9 +234,9 @@ private InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfi
 			tableList.append("<tr>");
 			tableList.append("<td>").append(agentJson.getAsJsonObject().get("toolName").getAsString()).append("</td>");
 			tableList.append("<td>").append(agentJson.getAsJsonObject().get("agentId").getAsString()).append("</td>");
-			long time = InsightsUtils.getEpochTime(agentJson.getAsJsonObject().get("inSightsTimeX").getAsString());
+			long time = InsightsUtils.getEpochTime(agentJson.getAsJsonObject().get("lastRunTime").getAsString());
 			tableList.append("<td>").append(InsightsUtils.specficTimeFormat(time, "yyyy-MM-dd HH:mm:ss")).append("</td>");
-			tableList.append("<td>").append(formatStatus(agentJson.getAsJsonObject().get("status").getAsString())).append("</td>");
+			tableList.append("<td>").append(formatStatus(agentJson.getAsJsonObject().get("healthStatus").getAsString())).append("</td>");
 			tableList.append("</tr>");
 		}
 		tableList.append("</tbody>");
@@ -281,4 +279,5 @@ private InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfi
 			return "Failure";
 	}
 
+	
 }

@@ -31,13 +31,13 @@ import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscri
 import com.cognizant.devops.platformcommons.constants.DataArchivalConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.dataArchivalConfig.DataArchivalConfigDal;
 import com.cognizant.devops.platformdal.dataArchivalConfig.InsightsDataArchivalConfig;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Envelope;
 
@@ -45,7 +45,6 @@ public class DataArchivalDataSubscriber extends EngineSubscriberResponseHandler 
 
 	private static Logger log = LogManager.getLogger(DataArchivalDataSubscriber.class);
 	DataArchivalConfigDal dataArchivalConfigDAL = new DataArchivalConfigDal();
-	JsonParser parser = new JsonParser();
 	private Map<String,String> loggingInfo = new ConcurrentHashMap<>();
 	private String agentId;
 
@@ -60,7 +59,7 @@ public class DataArchivalDataSubscriber extends EngineSubscriberResponseHandler 
 		String message=null;
 		try {
 			message = new String(body, StandardCharsets.UTF_8);
-			JsonArray messageJson = parser.parse(message).getAsJsonObject().get("data").getAsJsonArray();
+			JsonArray messageJson = JsonUtils.parseStringAsJsonObject(message).get("data").getAsJsonArray();
 			JsonObject updateURLJson = messageJson.get(0).getAsJsonObject();
 			loggingInfo.put("toolName",String.valueOf(updateURLJson.get("toolName")));
 			loggingInfo.put("category",String.valueOf(updateURLJson.get("categoryName")));

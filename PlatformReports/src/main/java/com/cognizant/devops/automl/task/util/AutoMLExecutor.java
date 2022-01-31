@@ -24,12 +24,12 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.core.enums.AutoMLEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.autoML.AutoMLConfig;
 import com.cognizant.devops.platformdal.autoML.AutoMLConfigDAL;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class AutoMLExecutor implements Callable<JsonObject> {
 
@@ -63,18 +63,18 @@ public class AutoMLExecutor implements Callable<JsonObject> {
 				response.addProperty("Status", "Success");
 				long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
 				log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}"
-						,"-",autoMlConfig.getWorkflowConfig().getWorkflowId(),autoMlConfig.getWorkflowConfig().getAssessmentConfig().getId(),autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",
-						processingTime,"modelId :" + autoMlConfig.getModelId() +"predictionType :" +autoMlConfig.getPredictionType() +
-						"predictionColumn :"+ autoMlConfig.getPredictionColumn()  + "status :" +autoMlConfig.getStatus());
+						,"-",autoMlConfig.getWorkflowConfig().getWorkflowId(),"-",autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",
+						processingTime," modelId :" + autoMlConfig.getModelId() +" predictionType :" +autoMlConfig.getPredictionType() +
+						" predictionColumn :"+ autoMlConfig.getPredictionColumn()  + " status :" +autoMlConfig.getStatus());
 			}
 		} catch (InsightsCustomException e) {
 			log.error("AutoML Executor === Error while executing AutoML on usecase {}", autoMlConfig.getUseCaseName());
 			response.addProperty("Status", "Failure");
 			response.addProperty("errorLog", e.getMessage());
 			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}"
-					,"-",autoMlConfig.getWorkflowConfig().getWorkflowId(),autoMlConfig.getWorkflowConfig().getAssessmentConfig().getId(),autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",
-					0,"modelId :" + autoMlConfig.getModelId() +"predictionType :" +autoMlConfig.getPredictionType() +
-					"predictionColumn :"+ autoMlConfig.getPredictionColumn()  + "status :" +autoMlConfig.getStatus() + e.getMessage());
+					,"-",autoMlConfig.getWorkflowConfig().getWorkflowId(),"-",autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",
+					0," modelId :" + autoMlConfig.getModelId() +" predictionType :" +autoMlConfig.getPredictionType() +
+					" predictionColumn :"+ autoMlConfig.getPredictionColumn()  + " status :" +autoMlConfig.getStatus() + e.getMessage());
 		}
 		return response;
 	}
@@ -94,19 +94,19 @@ public class AutoMLExecutor implements Callable<JsonObject> {
 			log.error("AutoML Executor === CSV data extracted succssfully for usecase {}", usecase);
 			if (extractedDataFromCSV.has("Header") && extractedDataFromCSV.has("Contents")) {
 				log.debug("AutoML Executor === CSV data extracted  {}", extractedDataFromCSV);
+				long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+				log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}"
+						,"-",autoMlConfig.getWorkflowConfig().getWorkflowId(),"-",autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",
+						processingTime," modelId :" + autoMlConfig.getModelId() + " predictionType :" +autoMlConfig.getPredictionType() +
+						" predictionColumn :"+ autoMlConfig.getPredictionColumn()  + " status :" +autoMlConfig.getStatus());
 				return extractedDataFromCSV;
 			}
-			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}"
-					,"-",autoMlConfig.getWorkflowConfig().getWorkflowId(),autoMlConfig.getWorkflowConfig().getAssessmentConfig().getId(),autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",
-					processingTime,"modelId :" + autoMlConfig.getModelId() + "predictionType :" +autoMlConfig.getPredictionType() +
-					"predictionColumn :"+ autoMlConfig.getPredictionColumn()  + "status :" +autoMlConfig.getStatus());
 		} catch (InsightsCustomException e) {
 			log.error("AutoML Executor === Error while extracting data from CSV for usecase {}", usecase);
 			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}"
-					,"-",autoMlConfig.getWorkflowConfig().getWorkflowId(),autoMlConfig.getWorkflowConfig().getAssessmentConfig().getId(),autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",
-					0,"modelId :" + autoMlConfig.getModelId() + "predictionType :" +autoMlConfig.getPredictionType() +
-					"predictionColumn :"+ autoMlConfig.getPredictionColumn()  + "status :" +autoMlConfig.getStatus() + e.getMessage());
+					,"-",autoMlConfig.getWorkflowConfig().getWorkflowId(),"-",autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",
+					0," modelId :" + autoMlConfig.getModelId() + " predictionType :" +autoMlConfig.getPredictionType() +
+					" predictionColumn :"+ autoMlConfig.getPredictionColumn()  + " status :" +autoMlConfig.getStatus() + e.getMessage());
 		}
 		return response;
 	}
@@ -144,7 +144,7 @@ public class AutoMLExecutor implements Callable<JsonObject> {
 		log.info("AutoML Executor === AutoML is running on usecase {} wait for a while to finish",
 				autoMlConfig.getUseCaseName());
 		long startTime = System.nanoTime();
-		JsonObject responseJson = new JsonParser().parse(dataFrameResponse).getAsJsonObject();
+		JsonObject responseJson = JsonUtils.parseStringAsJsonObject(dataFrameResponse);
 		JsonArray destinationFrames = responseJson.get("destination_frames").getAsJsonArray();
 		String trainingFrame = destinationFrames.get(0).getAsJsonObject().get("name").getAsString();
 		JsonObject mlResponse = trainUtils.runAutoML(autoMlConfig.getUseCaseName(), trainingFrame,
@@ -160,7 +160,7 @@ public class AutoMLExecutor implements Callable<JsonObject> {
 					"AutoML Executor === AutoML on usecase {} is completed successfully and usecase is ready for leaderboard and prediction for modelId {}",
 					autoMlConfig.getUseCaseName(), modelId);
 			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}"
-					,"-",autoMlConfig.getWorkflowConfig().getWorkflowId(),autoMlConfig.getWorkflowConfig().getAssessmentConfig().getId(),autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",
+					,"-",autoMlConfig.getWorkflowConfig().getWorkflowId(),"-",autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",
 					processingTime,"modelId :" + autoMlConfig.getModelId() + "predictionType :" +autoMlConfig.getPredictionType() +
 					"predictionColumn :"+ autoMlConfig.getPredictionColumn()  + "status :" +autoMlConfig.getStatus());
 			

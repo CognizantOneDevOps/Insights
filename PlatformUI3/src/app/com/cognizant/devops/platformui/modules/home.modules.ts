@@ -127,6 +127,17 @@ import { EditDashboardComponent } from './dashboard-pdf-download/edit-dashboard/
 import { WorkflowTaskManagementComponent } from './workflow-task-management/workflow-task-management.component';
 import { WorkflowTaskManagementService } from './workflow-task-management/workflow-task-management.service';
 import { AddWorkflowTaskComponent } from './workflow-task-management/add-workflow-task/add-workflow-task.component';
+import { OutcomeComponent } from './outcome/outcome-config/outcome.component';
+import { OutcomeService } from './outcome/outcome.service';
+import { OutcomeProvider } from './outcome/outcome.provider';
+import { OutcomeListComponent } from './outcome/outcome-list/outcome-list.component';
+import { OutcomeEditComponent } from './outcome/outcome-edit/outcome-edit.component';
+import { OutComeDialogComponent } from './outcome/outcome-dialog/outcome-dialog.component';
+import { MileStoneComponent } from './mile-stone/mile-stone-config/mile-stone.component';
+import { MileStoneService } from './mile-stone/mile-stone.service';
+import { MileStoneListComponent } from './mile-stone/mile-stone-list/mile-stone-list.component'
+import { MileStoneEditComponent } from './mile-stone/mile-stone-edit/mile-stone-edit.component';
+import { MileStoneDialog } from './mile-stone/mile-stone-dialog/milestone-dialog';
 import { ScheduleTaskManagmentComponent } from '@insights/app/modules/schedule-task-managment/schedule-task-managment.component';
 import { TaskManagementService } from '@insights/app/modules/schedule-task-managment/task-management-service';
 import { TaskHistoryDetailsDialog } from '@insights/app/modules/schedule-task-managment/task-history-details/task-history-details-dialog';
@@ -200,6 +211,16 @@ import { TaskHistoryDetailsDialog } from '@insights/app/modules/schedule-task-ma
     WorkflowTaskManagementComponent,
     AddWorkflowTaskComponent,
     DashboardDetailsDialog,
+    OutcomeComponent,
+    OutcomeListComponent,
+    OutcomeEditComponent,
+    OutComeDialogComponent,
+    MileStoneComponent,
+    MileStoneListComponent,
+    MileStoneEditComponent,
+    MileStoneDialog,
+    AddWorkflowTaskComponent,
+    DashboardDetailsDialog,
     ScheduleTaskManagmentComponent,
     TaskHistoryDetailsDialog
   ],
@@ -242,7 +263,11 @@ import { TaskHistoryDetailsDialog } from '@insights/app/modules/schedule-task-ma
     KpiReportListDialog,
     DashboardPreviewConfigDialog,
     DashboardDetailsDialog,
+    MileStoneDialog,
+
+    DashboardDetailsDialog,
     TaskHistoryDetailsDialog
+
   ],
 
   providers: [
@@ -274,6 +299,10 @@ import { TaskHistoryDetailsDialog } from '@insights/app/modules/schedule-task-ma
     ContentService,
     ReportTemplateService,
     ServerConfigurationService,
+    FileSystemService,
+    OutcomeService,
+    MileStoneService,
+    OutcomeProvider,
     FileSystemService,
     TaskManagementService
   ]

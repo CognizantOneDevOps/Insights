@@ -92,17 +92,11 @@ public class HealthStatusServiceImpl  {
 				label.append(":").append("INSIGHTS_PLATFORMSERVICE");
 			} else if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformEngine)) {
 				label.append(":").append("ENGINE");
-			} else if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformWebhookEngine)) {
-				label.append(":").append("WEBHOOKENGINE");
-			} else if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformAuditEngine)) {
-				label.append(":").append("AUDITENGINE");
-			} else if (category.equalsIgnoreCase("Platform WebhookSubscriber")) {
-				label.append(":").append("WEBHOOKSUBSCRIBER");
-			} else if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformWorkflow)) {
-				label.append(":").append("INSIGHTS_WORKFLOW");
-			} else if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformDataArchivalEngine)) {
-				label.append(":").append("DATAARCHIVALENGINE");
-			} else {
+			} 
+			else if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformWorkflow)) {
+					label.append(":").append("INSIGHTS_WORKFLOW");
+			} 
+			else {
 				label.append(":").append(category);
 				label.append(":").append(tool);
 			}

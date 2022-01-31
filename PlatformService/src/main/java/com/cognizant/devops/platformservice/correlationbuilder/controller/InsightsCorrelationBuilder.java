@@ -42,7 +42,7 @@ public class InsightsCorrelationBuilder {
 	@Autowired
 	CorrelationBuilderService correlationBuilderService;
 
-	@GetMapping(value = "/getCorrelationJson",produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/getCorrelationJson", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getCorrelationJson() {
 		List<CorrelationConfiguration> details = new ArrayList<>();
 		try {
@@ -54,8 +54,7 @@ public class InsightsCorrelationBuilder {
 		return PlatformServiceUtil.buildSuccessResponseWithData(details);
 	}
 
-	
-	@PostMapping(value = "/saveConfig",produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/saveConfig", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject saveConfig(@RequestBody String configDetails) {
 
 		try {
@@ -65,13 +64,13 @@ public class InsightsCorrelationBuilder {
 			} else {
 				return PlatformServiceUtil.buildFailureResponse("Unable to update Correlation");
 			}
-		} catch (InsightsCustomException e) {
+		} catch (Exception e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
 
 	}
 
-@PostMapping(value = "/updateCorrelation",produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/updateCorrelation", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject updateCorrelation(@RequestBody String flagDeatils) {
 
 		try {
@@ -87,13 +86,13 @@ public class InsightsCorrelationBuilder {
 
 	}
 
-	@PostMapping(value = "/deleteCorrelation",produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/deleteCorrelation", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject deleteCorrelation(@RequestBody String relationName) {
 
 		try {
 			String relationNameValidate = ValidationUtils.validateRequestBody(relationName);
 			if (correlationBuilderService.deleteCorrelation(relationNameValidate)) {
-				//no code
+				// no code
 			} else {
 				return PlatformServiceUtil.buildFailureResponse("Unable to delete Correlation");
 			}

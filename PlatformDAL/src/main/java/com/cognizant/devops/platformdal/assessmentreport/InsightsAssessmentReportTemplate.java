@@ -17,8 +17,9 @@
 package com.cognizant.devops.platformdal.assessmentreport;
 
 import java.io.Serializable;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -60,7 +61,7 @@ public class InsightsAssessmentReportTemplate implements Serializable {
 	private String visualizationutil;
 	
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "reportTemplateEntity", fetch = FetchType.EAGER, orphanRemoval = true)
-	private Set<InsightsReportsKPIConfig> reportsKPIConfig = new HashSet<>();
+	private Set<InsightsReportsKPIConfig> reportsKPIConfig = new LinkedHashSet<>();
 	
 
 	public int getId() {
@@ -103,7 +104,6 @@ public class InsightsAssessmentReportTemplate implements Serializable {
 		this.isActive = isActive;
 	}
 	
-	
 	public String getFile() {
 		return file;
 	}
@@ -127,9 +127,4 @@ public class InsightsAssessmentReportTemplate implements Serializable {
 	public void setReportsKPIConfig(Set<InsightsReportsKPIConfig> reportsKPIConfig) {
 		this.reportsKPIConfig = reportsKPIConfig;
 	}
-
-
-	
-
-
 }

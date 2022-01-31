@@ -44,6 +44,10 @@ import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfig;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaOrgToken;
 import com.cognizant.devops.platformdal.icon.Icon;
+import com.cognizant.devops.platformdal.milestone.InsightsMileStoneOutcomeConfig;
+import com.cognizant.devops.platformdal.milestone.MileStoneConfig;
+import com.cognizant.devops.platformdal.outcome.InsightsOutcomeTools;
+import com.cognizant.devops.platformdal.outcome.InsightsTools;
 import com.cognizant.devops.platformdal.relationshipconfig.RelationshipConfiguration;
 import com.cognizant.devops.platformdal.timertasks.InsightsSchedulerTaskDefinition;
 import com.cognizant.devops.platformdal.timertasks.InsightsSchedulerTaskStatus;
@@ -98,6 +102,10 @@ public class PlatformDALSessionFactoryProvider {
 		    configuration.addAnnotatedClass(GrafanaDashboardPdfConfig.class);
 		    configuration.addAnnotatedClass(UpshiftAssessmentConfig.class);
 		    configuration.addAnnotatedClass(GrafanaOrgToken.class);
+		    configuration.addAnnotatedClass(InsightsTools.class);
+		    configuration.addAnnotatedClass(InsightsOutcomeTools.class);
+		    configuration.addAnnotatedClass(MileStoneConfig.class);
+		    configuration.addAnnotatedClass(InsightsMileStoneOutcomeConfig.class);
 		    configuration.addAnnotatedClass(InsightsSchedulerTaskDefinition.class);
 		    configuration.addAnnotatedClass(InsightsSchedulerTaskStatus.class);
 		    

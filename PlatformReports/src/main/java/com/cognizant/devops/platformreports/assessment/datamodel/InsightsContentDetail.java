@@ -51,6 +51,7 @@ public class InsightsContentDetail implements Serializable{
 	private long executionId;
 	private int reportId;
 	private int assessmentId;
+	private String assessmentReportName;
 
 	@JsonIgnore
 	private transient Map<String, Object> resultValuesMap;
@@ -231,6 +232,14 @@ public class InsightsContentDetail implements Serializable{
 		return resultValuesMap;
 	}
 
+	public String getAssessmentReportName() {
+		return assessmentReportName;
+	}
+
+	public void setAssessmentReportName(String assessmentReportName) {
+		this.assessmentReportName = assessmentReportName;
+	}
+
 	public void setResultValuesMap(Map<String, Object> resultValuesMap) {
 		this.resultValuesMap = resultValuesMap;
 	}
@@ -247,7 +256,7 @@ public class InsightsContentDetail implements Serializable{
 				+ noOfResult + ", inferenceText=" + inferenceText + ", ranking=" + ranking + ", expectedTrend="
 				+ expectedTrend + ", actualTrend=" + actualTrend + ", resultField=" + resultField + ", resultTime="
 				+ resultTime + ", resultTimeX=" + resultTimeX + ", executionId=" + executionId + ", reportId="
-				+ reportId + ", assessmentId=" + assessmentId + ", resultValuesMap=" + resultValuesMap + "]";
+				+ reportId + ", assessmentId=" + assessmentId +", assessmentReportName=" + assessmentReportName + ", resultValuesMap=" + resultValuesMap + "]";
 	}
 
 }

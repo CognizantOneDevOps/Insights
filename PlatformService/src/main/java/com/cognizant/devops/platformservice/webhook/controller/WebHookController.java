@@ -28,13 +28,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.webhook.service.WebHookServiceImpl;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/admin/webhook")
@@ -49,8 +49,7 @@ public class WebHookController {
 
 		try {
 			String validatedResponse = ValidationUtils.validateRequestBody(registerWebhookJson);
-			JsonParser parser = new JsonParser();
-			JsonObject registerWebhookjson = (JsonObject) parser.parse(validatedResponse);
+			JsonObject registerWebhookjson = JsonUtils.parseStringAsJsonObject(validatedResponse);
 			Boolean result = webhookConfigurationService.saveWebHookConfiguration(registerWebhookjson);
 			if (result) {
 				return PlatformServiceUtil.buildSuccessResponse();
@@ -104,8 +103,7 @@ public class WebHookController {
 	public @ResponseBody JsonObject updateWebhook(@RequestBody String registerWebhookJson) {
 		try {
 			String validatedResponse = ValidationUtils.validateRequestBody(registerWebhookJson);
-			JsonParser parser = new JsonParser();
-			JsonObject registerWebhookjson = (JsonObject) parser.parse(validatedResponse);
+			JsonObject registerWebhookjson = JsonUtils.parseStringAsJsonObject(validatedResponse);
 			Boolean result = webhookConfigurationService.updateWebHook(registerWebhookjson);
 			if (result.booleanValue()) {
 				return PlatformServiceUtil.buildSuccessResponse();
@@ -124,8 +122,7 @@ public class WebHookController {
 		String message = null;
 		try {
 			String validatedResponse = ValidationUtils.validateRequestBody(updateWebhookJson);
-			JsonParser parser = new JsonParser();
-			JsonObject updateWebhookJsonValidated = (JsonObject) parser.parse(validatedResponse);
+			JsonObject updateWebhookJsonValidated = JsonUtils.parseStringAsJsonObject(validatedResponse);
 			message = webhookConfigurationService.updateWebhookStatus(updateWebhookJsonValidated);
 			log.debug(" Response in updateWebhookStatus {} ", message);
 			return PlatformServiceUtil.buildSuccessResponse();

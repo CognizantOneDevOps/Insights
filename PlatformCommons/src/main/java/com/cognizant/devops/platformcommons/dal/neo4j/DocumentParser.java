@@ -22,11 +22,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 
 /**
@@ -92,7 +92,7 @@ public class DocumentParser {
 		try {
 			GraphResponse response = new GraphResponse();
 			List<NodeData> nodeDataList = response.getNodes();
-			JsonElement parsedJson = new JsonParser().parse(jsonData);
+			JsonElement parsedJson = JsonUtils.parseString(jsonData);
 			response.setJson(parsedJson.getAsJsonObject());
 			processGraphDBJson(parsedJson, nodeDataList, null, "");
 			return response;

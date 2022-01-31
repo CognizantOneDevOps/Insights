@@ -16,21 +16,21 @@
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { HealthcheckComponent } from './healthcheck.component';
+import { HealthCheckComponent } from './healthcheck.component';
 
 describe('HealthcheckComponent', () => {
-  let component: HealthcheckComponent;
-  let fixture: ComponentFixture<HealthcheckComponent>;
+  let component: HealthCheckComponent;
+  let fixture: ComponentFixture<HealthCheckComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ HealthcheckComponent ]
+      declarations: [ HealthCheckComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(HealthcheckComponent);
+    fixture = TestBed.createComponent(HealthCheckComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

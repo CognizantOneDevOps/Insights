@@ -37,7 +37,7 @@ public class UpdateAgentAPITest extends AgentTestData {
 
 	@Test(priority = 1, dataProvider = "agentupdateprovider")
 	public void updateAgent(String agentId, String toolName, String agentVersion, String osversion, String configJson,
-			String vault) {
+			String vault, String type) {
 
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("updateAgentBaseURI");
 		RequestSpecification httpRequest = RestAssured.given();
@@ -59,6 +59,7 @@ public class UpdateAgentAPITest extends AgentTestData {
 		requestParam.addProperty("trackingDetails", "");
 		requestParam.addProperty("vault", vault);
 		requestParam.addProperty("isWebhook", false);
+		requestParam.addProperty("type", type);
 
 		httpRequest.header("Content-Type", "application/json");
 		httpRequest.body(requestParam);
@@ -76,17 +77,16 @@ public class UpdateAgentAPITest extends AgentTestData {
 
 	@Test(priority = 2, dataProvider = "agentupdateprovider")
 	public void updateAgentFail(String agentId, String toolName, String agentVersion, String osversion,
-			String configJson, String vault) {
+			String configJson, String vault, String type) {
 
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("updateAgentBaseURI");
 		RequestSpecification httpRequest = RestAssured.given();
-
-		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken));
+		
 		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, CommonUtils.jSessionID,
 				ConfigOptionsTest.GRAFANA_COOKIES_ORG, CommonUtils.getProperty("grafanaOrg"),
 				ConfigOptionsTest.GRAFANA_COOKIES_ROLE, CommonUtils.getProperty("grafanaRole"),
 				ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken);
-
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.jtoken);
 		// Request payload sending along with post request
 		JsonObject requestParam = new JsonObject();
 		requestParam.addProperty("agentId", agentId);
@@ -97,8 +97,9 @@ public class UpdateAgentAPITest extends AgentTestData {
 		requestParam.addProperty("trackingDetails", "");
 		requestParam.addProperty("vault", vault);
 		requestParam.addProperty("isWebhook", false);
+		requestParam.addProperty("type", type);
 
-		httpRequest.header("Content-Type", "application/json");
+		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 		httpRequest.body(requestParam);
 
 		Response responseAgent = httpRequest.request(Method.POST, "/");
@@ -107,7 +108,7 @@ public class UpdateAgentAPITest extends AgentTestData {
 		log.debug("FailureResponse {}", responseUpdateAgent);
 
 		int failureStatusCode = responseAgent.getStatusCode();
-		Assert.assertEquals(failureStatusCode, 400);
+		Assert.assertEquals(failureStatusCode, 200);
 		Assert.assertTrue(responseUpdateAgent.contains("status"), "failure");
 
 	}

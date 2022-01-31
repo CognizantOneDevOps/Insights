@@ -15,17 +15,23 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.rest.filemanagement.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cognizant.devops.platformcommons.core.enums.FileDetailsEnum;
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFilesDAL;
@@ -107,7 +113,14 @@ public class FileManagementServiceImpl {
 			throws InsightsCustomException {
 		try {
 			InsightsConfigFiles configFileRecord = configFilesDAL.getConfigurationFile(fileName);
-			File file = PlatformServiceUtil.convertToFile(multipartfile);
+			InputStream is = multipartfile.getInputStream();
+			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		    int nRead;
+		    byte[] data = new byte[4];
+		    while ((nRead = is.read(data, 0, data.length)) != -1) {
+		        buffer.write(data, 0, nRead);
+		    }
+		    buffer.flush();
 			if (configFileRecord == null) {
 				List<InsightsConfigFiles> configFiles = configFilesDAL.getAllConfigurationFilesForModule(module);
 				FileDetailsEnum.FileModule[] modules = FileDetailsEnum.FileModule.values();
@@ -123,7 +136,7 @@ public class FileManagementServiceImpl {
 					configFile.setFileName(fileName);
 					configFile.setFileType(fileType);
 					configFile.setFileModule(module);
-					configFile.setFileData(FileUtils.readFileToByteArray(file));
+					configFile.setFileData(buffer.toByteArray());
 					configFilesDAL.saveConfigurationFile(configFile);
 				} else {
 					throw new InsightsCustomException("One file upload allowed for " + module+". Please delete the existing file to upload a new file.");
@@ -132,7 +145,7 @@ public class FileManagementServiceImpl {
 				configFileRecord.setFileName(fileName);
 				configFileRecord.setFileType(fileType);
 				configFileRecord.setFileModule(module);
-				configFileRecord.setFileData(FileUtils.readFileToByteArray(file));
+				configFileRecord.setFileData(buffer.toByteArray());
 				configFilesDAL.updateConfigurationFile(configFileRecord);
 			} else {
 				throw new InsightsCustomException("File already exists in database.");
@@ -144,7 +157,6 @@ public class FileManagementServiceImpl {
 				traceabilityObj.clearAllCacheValue();
 			}
 			return "File uploaded";
-
 		} catch (Exception e) {
 			log.error("Error saving configuration file", e);
 			throw new InsightsCustomException(e.getMessage());
@@ -176,11 +188,11 @@ public class FileManagementServiceImpl {
 	 * @return byte[]
 	 * @throws InsightsCustomException
 	 */
-	public byte[] getFileData(JsonObject fileDetailsJson) throws InsightsCustomException {
+	public byte[] getFileData(String fileName) throws InsightsCustomException {
 		byte[] fileContent = null;
 		try {
 			InsightsConfigFiles configFile = configFilesDAL
-					.getConfigurationFile(fileDetailsJson.get("fileName").getAsString());
+					.getConfigurationFile(fileName);
 			if (configFile != null) {
 				fileContent = configFile.getFileData();
 			} else {

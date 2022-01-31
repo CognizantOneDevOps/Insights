@@ -255,6 +255,7 @@ export class DashboardPdfDownloadComponent implements OnInit {
     this.queryArr = [];
     console.log("Selected Dashboard UUID " + dashboardUUID);
     this.asyncResult = await this.grafanaService.getDashboardByUid(dashboardUUID, this.organisation);
+    console.log(this.asyncResult)
     if (this.asyncResult.status === "success") {
       if(this.enableEmail) {
         this.mailIconDisable = false;
@@ -502,7 +503,9 @@ export class DashboardPdfDownloadComponent implements OnInit {
     var dashboardUri = this.asyncResult.data.meta.url;
     dashboardUri = dashboardUri.substring(dashboardUri.indexOf("/d"));
     this.dashUrl = InsightsInitService.grafanaHost + '/dashboard/script/iSight_ui3.js?url=' + encodeURIComponent(InsightsInitService.grafanaHost +  dashboardUri+'?orgId='+ this.organisation+'&'+this.urlString + '&theme=' + this.theme);
-    this.saveUrl = InsightsInitService.grafanaHost + '/dashboard/db/' + this.asyncResult.data.meta.slug +'?orgId='+ this.organisation+'&'+ this.urlString + '&theme=' + this.theme;
+    this.saveUrl = InsightsInitService.grafanaHost + dashboardUri +'?orgId='+ this.organisation+'&'+ this.urlString + '&theme=' + this.theme;
+    console.log(dashboardUri)
+    console.log(this.dashUrl, this.saveUrl)
 
     this.getUrlArray();
     const dialogRef = self.dialog.open(DashboardPreviewConfigDialog, {

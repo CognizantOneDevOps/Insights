@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformservice.insights.service.InsightsInference;
 import com.cognizant.devops.platformservice.insights.service.InsightsInferenceService;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
@@ -37,7 +38,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/externalApi")
@@ -69,7 +69,7 @@ public class InferenceDataProviderController {
 		List<InsightsInference> inferences = new ArrayList<>();
 		try {
 			input = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-			JsonArray inferenceInputFromPanel = new JsonParser().parse(input).getAsJsonArray();
+			JsonArray inferenceInputFromPanel = JsonUtils.parseStringAsJsonArray(input);
 			JsonObject jsonInputFromPanel = inferenceInputFromPanel.get(0).getAsJsonObject();
 			String schedule = jsonInputFromPanel.get(VECTORSCHEDULE).getAsString();
 			String vectorType = jsonInputFromPanel.get(VECTORTYPE).getAsString();

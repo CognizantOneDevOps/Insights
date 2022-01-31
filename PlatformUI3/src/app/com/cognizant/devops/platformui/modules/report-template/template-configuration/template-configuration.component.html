@@ -129,8 +129,8 @@
                     </td>
                     <td class="columnComponent">
                         <mat-select  class="form-control" [(ngModel)]="vType" required placeholder="Select VType"
-                        color="primary">
-                        <mat-option *ngFor="let vType of vTypeList" value="{{vType}}" style="color:#0033A0"> 
+                        color="primary" [disabled]="visualizationUtil?false:true">
+                        <mat-option *ngFor="let vType of (visualizationUtil == 'GRAFANAPDF'?grafanaVtypes:vTypeList)" value="{{vType}}" style="color:#0033A0"> 
                         {{vType}}</mat-option> </mat-select>
                     </td>
                     <td class="extraColCss"></td>

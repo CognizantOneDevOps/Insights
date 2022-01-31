@@ -15,22 +15,20 @@
  ******************************************************************************/
 package com.cognizant.devops.engines.platformengine.modules.correlation;
 
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class RelationshipPropertiesUtil {
 	
 	public static String calSUM(String operationJson) {
-		JsonParser operationParser = new JsonParser();
-		JsonObject operationObject = (JsonObject) operationParser.parse(operationJson);
+		JsonObject operationObject = JsonUtils.parseStringAsJsonObject(operationJson);
 		String operandOne = operationObject.get("OperandOne").getAsString();
 		String operandTwo = operationObject.get("OperandTwo").getAsString();
 		return "abs((" + "source." + operandOne + "+" + "destination." + operandTwo + "))";
 	}
 
 	public static String calDiff(String operationJson) {
-		JsonParser operationParser = new JsonParser();
-		JsonObject operationObject = (JsonObject) operationParser.parse(operationJson);
+		JsonObject operationObject = JsonUtils.parseStringAsJsonObject(operationJson);
 		String operandOne = operationObject.get("OperandOne").getAsString();
 		String operandTwo = operationObject.get("OperandTwo").getAsString();
 		return "abs((" + "source." + operandOne + "-" + "destination." + operandTwo + "))";

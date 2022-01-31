@@ -25,6 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
@@ -35,7 +36,6 @@ import com.cognizant.devops.platformreports.exception.InsightsJobFailedException
 import com.cognizant.devops.platformworkflow.workflowtask.core.InsightsStatusProvider;
 import com.cognizant.devops.platformworkflow.workflowtask.message.factory.WorkflowTaskSubscriberHandler;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class GrafanaPDFExecutionSubscriber extends WorkflowTaskSubscriberHandler{
 
@@ -57,7 +57,7 @@ public class GrafanaPDFExecutionSubscriber extends WorkflowTaskSubscriberHandler
 			log.debug("Worlflow Detail ==== GrafanaPDFExecutionSubscriber started ... "
 					+ "routing key  message handleDelivery ===== {} ",incomingTaskMessage);
 			
-			JsonObject incomingTaskMessageJson = new JsonParser().parse(incomingTaskMessage).getAsJsonObject();
+			JsonObject incomingTaskMessageJson = JsonUtils.parseStringAsJsonObject(incomingTaskMessage);
 			String workflowId = incomingTaskMessageJson.get("workflowId").getAsString();
 			long executionId = incomingTaskMessageJson.get("executionId").getAsLong();
 			workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);

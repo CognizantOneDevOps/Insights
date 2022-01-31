@@ -17,8 +17,9 @@ package com.cognizant.devops.platformauditing.util;
 
 import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -36,11 +37,10 @@ public class LoadFile {
 
     private LoadFile(){
         try {
-            JsonParser parser = new JsonParser();
             //Reading the blockchain network network config
-            Config = (JsonObject) parser.parse(new FileReader(ConfigOptions.BLOCKCHAIN_CONFIG_FILE_RESOLVED_PATH));
-            dataModel = (JsonObject) parser.parse(new FileReader(Config.get("DATAMODEL_JSON_PATH").getAsString()));
-            processModel = (JsonObject) parser.parse (new FileReader(Config.get("PROCESS_JSON_PATH").getAsString()));
+            Config = JsonUtils.parseReaderAsJsonObject(new FileReader(ConfigOptions.BLOCKCHAIN_CONFIG_FILE_RESOLVED_PATH));
+            dataModel = JsonUtils.parseReaderAsJsonObject(new FileReader(Config.get("DATAMODEL_JSON_PATH").getAsString()));
+            processModel = JsonUtils.parseReaderAsJsonObject(new FileReader(Config.get("PROCESS_JSON_PATH").getAsString()));
         }catch (FileNotFoundException fnf){
             LOG.error(fnf);
         }catch (Exception e){

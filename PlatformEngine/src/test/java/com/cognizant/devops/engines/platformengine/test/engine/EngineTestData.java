@@ -26,6 +26,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -36,7 +37,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.rabbitmq.client.AMQP.Exchange.DeclareOk;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -137,8 +137,7 @@ public class EngineTestData {
 	}
 
 	public static CorrelationConfiguration loadCorrelation(String config) {
-		JsonParser parser = new JsonParser();
-		JsonObject json = (JsonObject) parser.parse(config);
+		JsonObject json = JsonUtils.parseStringAsJsonObject(config);
 		CorrelationConfiguration correlationConfig = new CorrelationConfiguration();
 		CorrelationJson correlation = new Gson().fromJson(json, CorrelationJson.class);
 

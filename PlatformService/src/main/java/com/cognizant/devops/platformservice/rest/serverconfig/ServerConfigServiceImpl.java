@@ -27,14 +27,13 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.AES256Cryptor;
-import com.cognizant.devops.platformcommons.core.util.CommonUtils;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.vault.VaultHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.config.PlatformServiceStatusProvider;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 
 @Service("serverConfigServiceImpl")
@@ -72,7 +71,7 @@ public class ServerConfigServiceImpl {
 			String auth= serverConfigJson.substring( 15, serverConfigJson.length());
 			String serverConfigJsonDecrypt = AES256Cryptor.decrypt(auth, passkey);
 			config = gson.fromJson(serverConfigJsonDecrypt, ApplicationConfigProvider.class);
-			JsonObject serverConfigReceivedJson = new JsonParser().parse(serverConfigJsonDecrypt).getAsJsonObject();
+			JsonObject serverConfigReceivedJson = JsonUtils.parseStringAsJsonObject(serverConfigJsonDecrypt);
 			if (config.getVault().isVaultEnable()) {
 				String vaultURLDetail =  "/sys/raw/"+ config.getVault().getSecretEngine() + "/" + clientId + "/serverConfig";
 				vaultHandler.storeToVaultJsonInDB(serverConfigReceivedJson, 
@@ -113,7 +112,7 @@ public class ServerConfigServiceImpl {
 		      }
 		     log.debug("server config template {} ",sb);
 		     serverConfigJsonfromStorage = ApplicationConfigCache.loadServerConfigFromFile();
-		     JsonObject serverConfigTempate = new JsonParser().parse(sb.toString()).getAsJsonObject();
+		     JsonObject serverConfigTempate = JsonUtils.parseStringAsJsonObject(sb.toString());
 		     ApplicationConfigProvider config = gson.fromJson(serverConfigJsonfromStorage, ApplicationConfigProvider.class);
 		     if(config.getVault().isVaultEnable()) {
 		    	 try {
@@ -133,10 +132,10 @@ public class ServerConfigServiceImpl {
 		      * 	with server config file (from file system)
 		      */
 		    if(!serverConfigJsonfromVault.entrySet().isEmpty()) {
-		    	serverConfigJsonMerged= CommonUtils.mergeTwoJson(serverConfigTempate,serverConfigJsonfromVault);
+		    	serverConfigJsonMerged= JsonUtils.mergeTwoJson(serverConfigTempate,serverConfigJsonfromVault);
 		    	serverConfigTempate.add("trustedHosts", serverConfigJsonfromVault.get("trustedHosts"));
 		    }else {
-		    	serverConfigJsonMerged= CommonUtils.mergeTwoJson(serverConfigTempate,serverConfigJsonfromStorage);
+		    	serverConfigJsonMerged= JsonUtils.mergeTwoJson(serverConfigTempate,serverConfigJsonfromStorage);
 		    	serverConfigTempate.add("trustedHosts", serverConfigJsonfromStorage.get("trustedHosts"));
 		    }
 		    String passKey = UUID.randomUUID().toString().substring(0, 15);

@@ -140,4 +140,19 @@ public class GrafanaDashboardPdfConfigDAL extends BaseDAL {
 		
     }
 	
+	public Boolean deleteGrafanaOrgToken(int orgId) {
+		try  {
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("orgId", orgId);
+			GrafanaOrgToken grafanaOrgToken = getUniqueResult( "FROM GrafanaOrgToken a WHERE a.orgId = :orgId",
+					GrafanaOrgToken.class,
+					parameters);
+			delete(grafanaOrgToken);
+			return Boolean.TRUE;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
+	}
+	
 }

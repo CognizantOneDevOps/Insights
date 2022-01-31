@@ -16,17 +16,16 @@
 package com.cognizant.devops.platformservice.test.workflow;
 
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowExecutionHistory;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class WorkflowServiceTestData {
 
 	WorkflowDAL workflowConfigDAL = new WorkflowDAL();
 
-	JsonParser parser = new JsonParser();
 	String workflowType = "Report";
 
 	int historyid = 0;
@@ -51,7 +50,7 @@ public class WorkflowServiceTestData {
 
 	public JsonObject convertStringIntoJson(String convertregisterkpi) {
 		JsonObject objectJson = new JsonObject();
-		objectJson = parser.parse(convertregisterkpi).getAsJsonObject();
+		objectJson = JsonUtils.parseStringAsJsonObject(convertregisterkpi);
 		return objectJson;
 	}
 

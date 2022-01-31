@@ -80,7 +80,7 @@ public class ConfigurationFileManagementObjectRepository extends LoginAndSelectM
 	@FindBy(xpath = "//span[text()= 'YES']")
 	WebElement yesButton;
 
-	@FindBy(xpath = "//span[text()= 'OK']")
+	@FindBy(xpath = "//span[text()= 'OKAY']")
 	WebElement okButton;
 
 	@FindBy(xpath = "//mat-icon[@title='Save']")

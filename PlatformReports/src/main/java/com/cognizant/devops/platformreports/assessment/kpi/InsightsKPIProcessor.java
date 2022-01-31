@@ -40,7 +40,6 @@ import com.cognizant.devops.platformreports.assessment.util.ReportEngineUtils;
 import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class InsightsKPIProcessor {
 
@@ -50,7 +49,6 @@ public class InsightsKPIProcessor {
 
 	protected ReportGraphDataHandler reportGraphDBHandler = new ReportGraphDataHandler();
 	Gson gson = new Gson();
-	JsonParser jsonParser = new JsonParser();
 
 	public InsightsKPIProcessor(InsightsKPIConfigDTO kpiConfigDTO) {
 		this.kpiConfigDTO = kpiConfigDTO;

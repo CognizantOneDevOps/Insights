@@ -15,8 +15,12 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.rest.filemanagement.controller;
 
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,13 +37,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.filemanagement.service.FileManagementServiceImpl;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/filemanagement")
@@ -113,23 +119,39 @@ public class FileManagementController {
 	public ResponseEntity<byte[]> downloadConfigFile(@RequestBody String fileDetailsJsonString) {
 		ResponseEntity<byte[]> response = null;
 		try {
-			String validatedResponse = ValidationUtils.validateRequestBody(fileDetailsJsonString);
-			JsonParser parser = new JsonParser();
-			JsonObject fileDetailsJson = (JsonObject) parser.parse(validatedResponse);
-			byte[] fileContent = fileManagementService.getFileData(fileDetailsJson);
-			String fileName = fileDetailsJson.get("fileName").getAsString() + "."
+			String decodedString = new String(Base64.getDecoder().decode(fileDetailsJsonString),
+					StandardCharsets.UTF_8);
+			String validatedRequest = ValidationUtils.validateRequestBody(decodedString);
+			JsonObject fileDetailsJson = JsonUtils.parseStringAsJsonObject(validatedRequest);
+			String fileName = StringEscapeUtils.escapeHtml4(ValidationUtils.cleanXSS(fileDetailsJson.get("fileName").getAsString()));
+			byte[] fileContent = fileManagementService.getFileData(fileName);
+			String fileData = new String(fileContent, StandardCharsets.UTF_8).replace(PlatformServiceConstants.LF, PlatformServiceConstants.EMPTY).replace(PlatformServiceConstants.CR, PlatformServiceConstants.EMPTY).replace(PlatformServiceConstants.TAB, PlatformServiceConstants.EMPTY);
+			String validatedResponse = ValidationUtils.validateResponseBody(fileData);
+			String fileDetailName = fileDetailsJson.get("fileName").getAsString() + "."
 					+ fileDetailsJson.get("fileType").getAsString().toLowerCase();
 			String mediaType = "application/" + fileDetailsJson.get("fileType").getAsString().toLowerCase();
+			
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.parseMediaType(mediaType));
-			headers.add("Access-Control-Allow-Methods", "POST");
-			headers.add("Access-Control-Allow-Headers", "Content-Type");
-			headers.add("Content-Disposition", "attachment; filename=" + fileName);
-			headers.add("Cache-Control", "no-cache, no-store, must-revalidate,post-check=0, pre-check=0");
-			headers.add("Pragma", "no-cache");
-			headers.add("Expires", "0");
-			response = new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
-		} catch (InsightsCustomException e) {
+			if(mediaType.contains("json")) {
+				JsonElement fileValidation = JsonUtils.parseStringAsJsonElement(validatedResponse);
+				if(fileValidation == null) {
+					throw new InsightsCustomException("Invalid file ");
+				}
+				
+				byteArrayOutputStream.write(fileValidation.toString().getBytes());
+			
+				headers.setContentType(MediaType.parseMediaType(mediaType));
+				headers.add("Access-Control-Allow-Methods", "POST");
+				headers.add("Access-Control-Allow-Headers", "Content-Type");
+				headers.add("Content-Disposition", "attachment; filename=" + fileDetailName);
+				headers.add("Cache-Control", "no-cache, no-store, must-revalidate,post-check=0, pre-check=0");
+				headers.add("Pragma", "no-cache");
+				headers.add("Expires", "0");
+				headers.add("Accept-Encoding", "UTF-8");
+				response = new ResponseEntity<>(byteArrayOutputStream.toByteArray(), headers, HttpStatus.OK);
+			}
+		} catch (Exception e) {
 			log.error("Error, Failed to download file -- {} ", e.getMessage());
 		}
 		return response;

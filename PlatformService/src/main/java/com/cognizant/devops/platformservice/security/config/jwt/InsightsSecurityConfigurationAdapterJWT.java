@@ -41,6 +41,7 @@ import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
@@ -96,7 +97,9 @@ public class InsightsSecurityConfigurationAdapterJWT extends WebSecurityConfigur
 			http.csrf().ignoringAntMatchers(AuthenticationUtils.CSRF_IGNORE.toArray(new String[0]))
 					.csrfTokenRepository(authenticationUtils.csrfTokenRepository()).and()
 					.addFilterBefore(insightsFilter(), BasicAuthenticationFilter.class);
-			http.headers().frameOptions().disable().and().sessionManagement().maximumSessions(1).and() // sameOrigin()
+			http.headers().addHeaderWriter(new StaticHeadersWriter("X-FRAME-OPTIONS", "ALLOW-FROM "
+					+ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getJwtTokenOriginServerURL()));
+			http.sessionManagement().maximumSessions(1).and() // sameOrigin()
 					.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
 		}
 	}

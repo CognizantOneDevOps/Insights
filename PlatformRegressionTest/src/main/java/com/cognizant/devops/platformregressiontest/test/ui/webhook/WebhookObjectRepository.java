@@ -93,7 +93,7 @@ public class WebhookObjectRepository extends LoginAndSelectModule{
 	@FindBy(xpath = "//span[text()= 'NO']")
 	WebElement noButton;
 
-	@FindBy(xpath = "//span[text()= 'OK']")
+	@FindBy(xpath = "//span[text()= 'OKAY']")
 	WebElement okButton;
 
 	@FindBy(xpath = "//div[contains(text(), ' Success')]")

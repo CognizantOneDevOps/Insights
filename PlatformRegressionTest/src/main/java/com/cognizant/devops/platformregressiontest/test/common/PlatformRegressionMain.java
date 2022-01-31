@@ -16,6 +16,7 @@
 package com.cognizant.devops.platformregressiontest.test.common;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +41,11 @@ public class PlatformRegressionMain {
 
 		file.add(path);
 		File testngFile = new File(path);
-		log.debug(" Testng file path for PlatformRegressionTest {} ", testngFile.getAbsolutePath());
+		try {
+			log.debug(" Testng file path for PlatformRegressionTest {} ", testngFile.getCanonicalPath());
+		} catch (IOException e) {
+			log.error(e);
+		}
 		TestNG testNG = new TestNG();
 		testNG.setTestSuites(file);
 		testNG.run();

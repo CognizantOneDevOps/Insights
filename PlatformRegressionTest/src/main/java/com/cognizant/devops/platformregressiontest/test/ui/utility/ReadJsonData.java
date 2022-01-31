@@ -15,18 +15,28 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.ui.utility;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.AgentManagementDataModel;
 import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.ConfigurationFileManagementDataModel;
+import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.DashboardReportDataModel;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonIOException;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 public class ReadJsonData {
+	private static final Logger log = LogManager.getLogger(ReadJsonData.class);
 
 	private ReadJsonData() {
 	}
@@ -36,10 +46,11 @@ public class ReadJsonData {
 	}
 
 	public static Object[][] readAgentJsonData(String jsonFile) throws IOException {
-		JsonElement jsonData = new JsonParser().parse(new FileReader(jsonFile));
+		JsonElement jsonData = JsonUtils.parseReader(new FileReader(new File(jsonFile).getCanonicalPath()));
 		JsonElement dataSet = jsonData.getAsJsonObject().get("dataset");
-		List<AgentManagementDataModel> testData = new Gson().fromJson(dataSet, new TypeToken<List<AgentManagementDataModel>>() {
-		}.getType());
+		List<AgentManagementDataModel> testData = new Gson().fromJson(dataSet,
+				new TypeToken<List<AgentManagementDataModel>>() {
+				}.getType());
 		Object[][] returnValue = new Object[testData.size()][1];
 		int index = 0;
 		for (Object[] each : returnValue) {
@@ -49,10 +60,30 @@ public class ReadJsonData {
 	}
 
 	public static Object[][] readConfigurationFileJsonData(String jsonFile) throws IOException {
-		JsonElement jsonData = new JsonParser().parse(new FileReader(jsonFile));
+		JsonElement jsonData = JsonUtils.parseReader(new FileReader(new File(jsonFile).getCanonicalPath()));
 		JsonElement dataSet = jsonData.getAsJsonObject().get("dataset");
 		List<ConfigurationFileManagementDataModel> testData = new Gson().fromJson(dataSet,
 				new TypeToken<List<ConfigurationFileManagementDataModel>>() {
+				}.getType());
+		Object[][] returnValue = new Object[testData.size()][1];
+		int index = 0;
+		for (Object[] each : returnValue) {
+			each[0] = testData.get(index++);
+		}
+		return returnValue;
+	}
+
+	public static Object[][] readReportData(String jsonFile)
+			throws JsonIOException, JsonSyntaxException, FileNotFoundException {
+		JsonElement jsonData = null;
+		try {
+			jsonData = new JsonParser().parse(new FileReader(new File(jsonFile).getCanonicalPath()));
+		} catch (JsonIOException | JsonSyntaxException | IOException e) {
+			log.error(e);
+		}
+		JsonElement dataSet = jsonData.getAsJsonObject().get("dataset");
+		List<DashboardReportDataModel> testData = new Gson().fromJson(dataSet,
+				new TypeToken<List<DashboardReportDataModel>>() {
 				}.getType());
 		Object[][] returnValue = new Object[testData.size()][1];
 		int index = 0;

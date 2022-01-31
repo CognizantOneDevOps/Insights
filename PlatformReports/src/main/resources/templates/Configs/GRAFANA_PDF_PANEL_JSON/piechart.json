@@ -1,0 +1,69 @@
+{
+      "datasource": "Neo4j Data Source",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 18
+      },
+      "id": null,
+      "options": {
+        "displayLabels": [
+          "value"
+        ],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "values": []
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "pluginVersion": "8.1.3",
+      "targets": [
+        {
+          "cache": false,
+          "cacheType": false,
+          "cacheValue": false,
+          "constant": 6.5,
+          "fixTime": false,
+          "graph": false,
+          "hide": false,
+          "queryText": "",
+          "raw": false,
+          "refId": "A",
+          "stats": false,
+          "table": true,
+          "timeseries": false,
+          "varTime": false
+        }
+      ],
+      "title": "",
+	  "transparent": true,
+      "type": "piechart"
+    }

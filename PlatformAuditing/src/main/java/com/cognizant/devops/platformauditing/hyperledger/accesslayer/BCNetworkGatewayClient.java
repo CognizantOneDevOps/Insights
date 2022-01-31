@@ -39,9 +39,9 @@ import java.security.cert.CertificateException;
 import com.cognizant.devops.platformauditing.commons.ChainCodeMethods;
 import com.cognizant.devops.platformauditing.util.LoadFile;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class BCNetworkGatewayClient {
 
@@ -155,8 +155,7 @@ public class BCNetworkGatewayClient {
 		BCNetworkGatewayClient gatewayObject = new BCNetworkGatewayClient();
 		byte[] createChainCodeResult = gatewayObject.gatewayContract().createTransaction(ChainCodeMethods.INSTANTIATE)
 				.submit(functionArgs);
-		JsonObject response = new JsonParser().parse(new String(createChainCodeResult, StandardCharsets.UTF_8))
-				.getAsJsonObject();
+		JsonObject response = JsonUtils.parseStringAsJsonObject(new String(createChainCodeResult, StandardCharsets.UTF_8));
 		return response;
 	}
 }

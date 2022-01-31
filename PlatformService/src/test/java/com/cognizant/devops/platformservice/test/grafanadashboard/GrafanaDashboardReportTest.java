@@ -16,7 +16,6 @@
 package com.cognizant.devops.platformservice.test.grafanadashboard;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertThrows;
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
@@ -32,11 +31,11 @@ import javax.servlet.http.Cookie;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.rules.ExpectedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -55,15 +54,11 @@ import org.testng.annotations.Test;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
-import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfig;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfigDAL;
-import com.cognizant.devops.platformdal.grafana.pdf.GrafanaOrgToken;
-import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
-import com.cognizant.devops.platformdal.workflow.InsightsWorkflowType;
-import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformservice.grafanadashboard.service.GrafanaPdfServiceImpl;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.Gson;
@@ -71,18 +66,19 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 @Test
 @WebAppConfiguration
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
-public class GrafanaDashboardReportTest extends GrafanaDashboardReportData {
+public class GrafanaDashboardReportTest extends AbstractTestNGSpringContextTests  {
 
 	private static final Logger log = LogManager.getLogger(GrafanaDashboardReportTest.class);
 	private static final String AUTHORIZATION = "authorization";
 
 	Map<String, String> testAuthData = new HashMap<>();
+	
+	GrafanaDashboardReportData grafanaDashboard = new GrafanaDashboardReportData();
 
 	MockHttpServletRequest httpRequest = new MockHttpServletRequest();
 	ResultMatcher ok = MockMvcResultMatchers.status().isOk();
@@ -101,8 +97,8 @@ public class GrafanaDashboardReportTest extends GrafanaDashboardReportData {
 				+ UnitTestConstant.TESTNG_TESTDATA + File.separator + "grafanaAuth.json";
 		JsonElement jsonData;
 		try {
-			jsonData = new JsonParser().parse(new FileReader(path));
-		} catch (JsonIOException | JsonSyntaxException | FileNotFoundException e) {
+			jsonData = JsonUtils.parseReader(new FileReader(new File(path).getCanonicalPath()));
+		} catch (JsonIOException | JsonSyntaxException | IOException e) {
 			throw new SkipException("skipped this test case as grafana auth file not found.");
 		}
 		testAuthData = new Gson().fromJson(jsonData, Map.class);
@@ -152,7 +148,7 @@ public class GrafanaDashboardReportTest extends GrafanaDashboardReportData {
 
 			Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 			String responseAuthKey = grafanaHandler.grafanaGet("/api/auth/keys", headers);
-			JsonArray detailsOfAPIJsonArray = new JsonParser().parse(responseAuthKey).getAsJsonArray();
+			JsonArray detailsOfAPIJsonArray = JsonUtils.parseStringAsJsonArray(responseAuthKey);
 
 			for (JsonElement jsonElement : detailsOfAPIJsonArray) {
 				if (jsonElement.getAsJsonObject().has("id")
@@ -178,9 +174,8 @@ public class GrafanaDashboardReportTest extends GrafanaDashboardReportData {
 			deleteApiKeys();
 			this.mockMvc = getMacMvc();
 			log.debug(" cookies " + httpRequest.getCookies());
-			//String saveRequest = "{\"loadTime\":\"20\",\"title\":\"verify-maturity\",\"source\":\"PLATFORM\",\"pdfType\":[\"Dashboard\"],\"variables\":\"Product=Central,Product=Astro,Product=Mars,Product=Force,from=undefined,to=undefined\",\"dashUrl\":\"http://localhost:3000/dashboard/db/3-digital-transformation-application-view?orgId=1&var-Product=Central&var-Product=Astro&var-Product=Mars&var-Product=Force&from=now-5y&to=now\",\"panelUrls\":[\"http://localhost:3000/d/QFd2ks6Wk/3-digital-transformation-application-view?viewPanel=76&var-Product=Central&var-Product=Astro&var-Product=Mars&var-Product=Force&from=now-5y&to=now\",\"http://localhost:3000/d/QFd2ks6Wk/3-digital-transformation-application-view?viewPanel=77&var-Product=Central&var-Product=Astro&var-Product=Mars&var-Product=Force&from=now-5y&to=now\",\"http://localhost:3000/d/QFd2ks6Wk/3-digital-transformation-application-view?viewPanel=42&var-Product=Central&var-Product=Astro&var-Product=Mars&var-Product=Force&from=now-5y&to=now\",\"http://localhost:3000/d/QFd2ks6Wk/3-digital-transformation-application-view?viewPanel=72&var-Product=Central&var-Product=Astro&var-Product=Mars&var-Product=Force&from=now-5y&to=now\",\"http://localhost:3000/d/QFd2ks6Wk/3-digital-transformation-application-view?viewPanel=61&var-Product=Central&var-Product=Astro&var-Product=Mars&var-Product=Force&from=now-5y&to=now\",\"http://localhost:3000/d/QFd2ks6Wk/3-digital-transformation-application-view?viewPanel=62&var-Product=Central&var-Product=Astro&var-Product=Mars&var-Product=Force&from=now-5y&to=now\",\"http://localhost:3000/d/QFd2ks6Wk/3-digital-transformation-application-view?viewPanel=43&var-Product=Central&var-Product=Astro&var-Product=Mars&var-Product=Force&from=now-5y&to=now\",\"http://localhost:3000/d/QFd2ks6Wk/3-digital-transformation-application-view?viewPanel=65&var-Product=Central&var-Product=Astro&var-Product=Mars&var-Product=Force&from=now-5y&to=now\",\"http://localhost:3000/d/QFd2ks6Wk/3-digital-transformation-application-view?viewPanel=66&var-Product=Central&var-Product=Astro&var-Product=Mars&var-Product=Force&from=now-5y&to=now\",\"http://localhost:3000/d/QFd2ks6Wk/3-digital-transformation-application-view?viewPanel=44&var-Product=Central&var-Product=Astro&var-Product=Mars&var-Product=Force&from=now-5y&to=now\",\"http://localhost:3000/d/QFd2ks6Wk/3-digital-transformation-application-view?viewPanel=63&var-Product=Central&var-Product=Astro&var-Product=Mars&var-Product=Force&from=now-5y&to=now\",\"http://localhost:3000/d/QFd2ks6Wk/3-digital-transformation-application-view?viewPanel=47&var-Product=Central&var-Product=Astro&var-Product=Mars&var-Product=Force&from=now-5y&to=now\",\"http://localhost:3000/d/QFd2ks6Wk/3-digital-transformation-application-view?viewPanel=64&var-Product=Central&var-Product=Astro&var-Product=Mars&var-Product=Force&from=now-5y&to=now\",\"http://localhost:3000/d/QFd2ks6Wk/3-digital-transformation-application-view?viewPanel=57&var-Product=Central&var-Product=Astro&var-Product=Mars&var-Product=Force&from=now-5y&to=now\",\"http://localhost:3000/d/QFd2ks6Wk/3-digital-transformation-application-view?viewPanel=46&var-Product=Central&var-Product=Astro&var-Product=Mars&var-Product=Force&from=now-5y&to=now\",\"http://localhost:3000/d/QFd2ks6Wk/3-digital-transformation-application-view?viewPanel=67&var-Product=Central&var-Product=Astro&var-Product=Mars&var-Product=Force&from=now-5y&to=now\",\"http://localhost:3000/d/QFd2ks6Wk/3-digital-transformation-application-view?viewPanel=68&var-Product=Central&var-Product=Astro&var-Product=Mars&var-Product=Force&from=now-5y&to=now\",\"http://localhost:3000/d/QFd2ks6Wk/3-digital-transformation-application-view?viewPanel=59&var-Product=Central&var-Product=Astro&var-Product=Mars&var-Product=Force&from=now-5y&to=now\",\"http://localhost:3000/d/QFd2ks6Wk/3-digital-transformation-application-view?viewPanel=48&var-Product=Central&var-Product=Astro&var-Product=Mars&var-Product=Force&from=now-5y&to=now\"],\"metadata\":[{\"testDB\":\"false\"}],\"email\":\"KanchiSai.Hemanth@cognizant.com\",\"senderEmailAddress\":\"KanchiSai.Hemanth@cognizant.com\",\"mailSubject\":\"3-digital-transformation-application-view\",\"mailBodyTemplate\":\"Very Good\",\"receiverCCEmailAddress\":\"\",\"receiverBCCEmailAddress\":\"\",\"range\":\"\",\"emailBody\":\"\",\"scheduleType\":\"ONETIME\",\"organisation\":\"1\",\"dashboard\":\"QFd2ks6Wk\"}";
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost(
-					"/dashboardReport/exportPDF/saveDashboardAsPDF", dashboardJson);
+					"/dashboardReport/exportPDF/saveDashboardAsPDF", grafanaDashboard.dashboardJson);
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing Save Dashboard " + e);
@@ -214,17 +209,17 @@ public class GrafanaDashboardReportTest extends GrafanaDashboardReportData {
 			int id = 0;
 			List<GrafanaDashboardPdfConfig> list = grafanaPdfServiceImpl.getAllGrafanaDashboardConfigs();
 			for (GrafanaDashboardPdfConfig g : list) {
-				if (g.getTitle().equalsIgnoreCase("5-sprint-score-card")) {
+				if (g.getTitle().equalsIgnoreCase("5-sprint-score-card-updated")) {
 					id = g.getId();
 				}
 			}
-			JsonObject detailsJson = new JsonParser().parse(updateJson).getAsJsonObject();
+			JsonObject detailsJson = JsonUtils.parseStringAsJsonObject(grafanaDashboard.updateJson);
 			detailsJson.toString();
 			detailsJson.addProperty("id", id);
 			this.mockMvc = getMacMvc();
 			log.debug(" cookies " + httpRequest.getCookies());
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost(
-					"/dashboardReport/exportPDF/updateDashboardConfig", updateJson);
+					"/dashboardReport/exportPDF/updateDashboardConfig", grafanaDashboard.updateJson);
 			grafanaPdfServiceImpl.updateGrafanaDashboardDetails(detailsJson);
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
@@ -252,16 +247,16 @@ public class GrafanaDashboardReportTest extends GrafanaDashboardReportData {
 			int id = 0;
 			List<GrafanaDashboardPdfConfig> list = grafanaPdfServiceImpl.getAllGrafanaDashboardConfigs();
 			for (GrafanaDashboardPdfConfig g : list) {
-				if (g.getTitle().equalsIgnoreCase("verify-maturity")) {
+				if (g.getTitle().equalsIgnoreCase("5-sprint-score-card-updated")) {
 					id = g.getId();
 				}
 			}
 			String dashboardString = "{\"id\":" + id + ",\"status\":\"RESTART\"}";
-			JsonObject detailsJson = new JsonParser().parse(dashboardString).getAsJsonObject();
+			JsonObject detailsJson =JsonUtils.parseStringAsJsonObject(dashboardString);
 			this.mockMvc = getMacMvc();
 			log.debug(" cookies " + httpRequest.getCookies());
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost(
-					"/dashboardReport/exportPDF/updateDasboardStatus", detailsJson.toString());
+					"/dashboardReport/updateDasboardStatus", detailsJson.toString());
 			String status = grafanaPdfServiceImpl.updateDashboardPdfConfigStatus(detailsJson);
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
@@ -274,34 +269,13 @@ public class GrafanaDashboardReportTest extends GrafanaDashboardReportData {
 		try {
 			deleteApiKeys();
 			MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
-					.get("/dashboardReport/exportPDF/getEmailConfigurationStatus");
+					.get("/dashboardReport/getEmailConfigurationStatus");
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing  Get Email Configuration status " + e);
 		}
 	}
 
-
-	@Test(priority = 7)
-	public void saveGrafanaDashboardConfigTest() throws Exception {
-		JsonObject dashboardJsonObject = convertStringIntoJson(dashboardJson);
-		
-		
-		grafanaPdfServiceImpl.saveGrafanaDashboardConfig(dashboardJsonObject);
-
-		List<GrafanaDashboardPdfConfig> allGrafanaDashboardConfigs = grafanaPdfServiceImpl
-				.getAllGrafanaDashboardConfigs();
-		int id = 0;
-		for (GrafanaDashboardPdfConfig grafanaDashboardPdfConfig : allGrafanaDashboardConfigs) {
-			if (grafanaDashboardPdfConfig.getTitle().equalsIgnoreCase("5-sprint-score-card")) {
-				id = grafanaDashboardPdfConfig.getId();
-			}
-		}
-		GrafanaDashboardPdfConfigDAL grafanaDashboardConfigDAL = new GrafanaDashboardPdfConfigDAL();
-		GrafanaDashboardPdfConfig outputConfig = grafanaDashboardConfigDAL .getWorkflowById(id);
-
-		assertEquals(outputConfig.getTitle(), allGrafanaDashboardConfigs.get(0).getTitle());
-	}
 	
 	@Test(priority = 7, expectedExceptions = InsightsCustomException.class)
 	public void saveGrafanaDashboardConfigExceptionTest() throws Exception {
@@ -322,12 +296,12 @@ public class GrafanaDashboardReportTest extends GrafanaDashboardReportData {
 				.getAllGrafanaDashboardConfigs();
 		int id = 0;
 		for (GrafanaDashboardPdfConfig grafanaDashboardPdfConfig : allGrafanaDashboardConfigs) {
-			if (grafanaDashboardPdfConfig.getTitle().equalsIgnoreCase("5-sprint-score-card")) {
+			if (grafanaDashboardPdfConfig.getTitle().equalsIgnoreCase("5-sprint-score-card-updated")) {
 				id = grafanaDashboardPdfConfig.getId();
 			}
 		}
 		
-		JsonObject dashObject = (JsonObject) new JsonParser().parse(updateJson);
+		JsonObject dashObject = JsonUtils.parseStringAsJsonObject(grafanaDashboard.updateJson);
 		dashObject.addProperty("id", id);
 		grafanaPdfServiceImpl.updateGrafanaDashboardDetails(dashObject);
 		List<GrafanaDashboardPdfConfig> updateDashboardPdfConfigs = grafanaPdfServiceImpl
@@ -340,7 +314,7 @@ public class GrafanaDashboardReportTest extends GrafanaDashboardReportData {
 	public void updateGrafanaDashboardDetailsExceptionTest() throws InsightsCustomException {
 		
 		int id = 0;
-		JsonObject dashObject = (JsonObject) new JsonParser().parse(updateJson);
+		JsonObject dashObject = JsonUtils.parseStringAsJsonObject(grafanaDashboard.updateJson);
 		dashObject.addProperty("id", id);
 		grafanaPdfServiceImpl.updateGrafanaDashboardDetails(dashObject);
 	}
@@ -356,7 +330,7 @@ public class GrafanaDashboardReportTest extends GrafanaDashboardReportData {
 			}
 		}
 		String dashboardString = "{\"id\":" + id + ",\"status\":\"RESTART\"}";
-		JsonObject detailsJson = new JsonParser().parse(dashboardString).getAsJsonObject();
+		JsonObject detailsJson = JsonUtils.parseStringAsJsonObject(dashboardString);
 		
 		String status = grafanaPdfServiceImpl.updateDashboardPdfConfigStatus(detailsJson);
 		
@@ -368,7 +342,7 @@ public class GrafanaDashboardReportTest extends GrafanaDashboardReportData {
 	public void updateDashboardPdfConfigStatusExceptionTest() throws InsightsCustomException {
 		int id = 0;
 		String dashboardString = "{\"id\":" + id + ",\"status\":\"RESTART\"}";
-		JsonObject detailsJson = new JsonParser().parse(dashboardString).getAsJsonObject();
+		JsonObject detailsJson =JsonUtils.parseStringAsJsonObject(dashboardString);
 		grafanaPdfServiceImpl.updateDashboardPdfConfigStatus(detailsJson);
 	}
 	
@@ -382,7 +356,7 @@ public class GrafanaDashboardReportTest extends GrafanaDashboardReportData {
 			}
 		}
 		String dashboardJsonString = "{\"id\":" + id  + ", \"isActive\": \"false\"}";
-		JsonObject dashboardJson = new JsonParser().parse(dashboardJsonString).getAsJsonObject();
+		JsonObject dashboardJson =JsonUtils.parseStringAsJsonObject(dashboardJsonString);
 		String status = grafanaPdfServiceImpl.setDashboardActiveState(dashboardJson);
 		assertEquals(status, PlatformServiceConstants.SUCCESS);
 	}
@@ -391,7 +365,7 @@ public class GrafanaDashboardReportTest extends GrafanaDashboardReportData {
 	public void setDashboardActiveStatusExceptionTest() throws InsightsCustomException {
 		int id = 0;
 		String dashboardJsonString = "{\"id\":" + id  + ", \"isActive\": \"false\"}";
-		JsonObject dashboardJson = new JsonParser().parse(dashboardJsonString).getAsJsonObject();
+		JsonObject dashboardJson = JsonUtils.parseStringAsJsonObject(dashboardJsonString);
 		String status = grafanaPdfServiceImpl.setDashboardActiveState(dashboardJson);
 	}
 	
@@ -438,6 +412,4 @@ public class GrafanaDashboardReportTest extends GrafanaDashboardReportData {
 		log.debug("Test case Deleted Dashboard successfully ");
 
 	}
-	
-	
 }

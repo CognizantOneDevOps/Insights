@@ -37,28 +37,16 @@ import { saveAs as importedSaveAs } from "file-saver";
 })
 export class HealthCheckComponent implements OnInit {
 
-  agentsStatusResposne: any;
-  agentNodes = [];
-  agentToolsIcon = {};
   showContent: boolean = false;
   showThrobber: boolean = false;
-  showContentAgent: boolean = false;
-  showThrobberAgent: boolean = false;
-  serverStatus = [];
-  displayedAgentColumns: string[];
   dataComponentColumns: string[];
-  servicesColumns: string[];
-  agentDataSource = [];
-  agentListDatasource = [];
+  servicesColumns: string[];  
   dataComponentDataSource = [];
   dataListDatasource = [];
   servicesDataSource = [];
   servicesListDatasource = [];
   timeZone: string = "";
   healthResponse: any;
-  agentResponse: any;
-  agentNameList: any = [];
-  selectAgentTool: any;
   showMessage: string;
   reportLogsColumns: string[];
   reportLogsDataSource = new MatTableDataSource<any>();
@@ -68,7 +56,7 @@ export class HealthCheckComponent implements OnInit {
   constructor(private healthCheckService: HealthCheckService, private dialog: MatDialog,
     public dataShare: DataSharedService, private queryBuilderService: QueryBuilderService,
     private messageDialog: MessageDialogService, private config: InsightsInitService, ) {
-    this.loadAgentCheckInfo();
+    //this.loadAgentCheckInfo();
     this.loadOtherHealthCheckInfo();
     this.loadHealthNotificationStatus();
     if (InsightsInitService.showAuditReporting) {
@@ -93,54 +81,6 @@ export class HealthCheckComponent implements OnInit {
     }
   }
   
-  async loadAgentCheckInfo() {
-    try {
-      this.showThrobberAgent = true;
-      this.showContentAgent = !this.showThrobberAgent;
-      this.agentResponse = await this.healthCheckService.loadServerAgentConfiguration();
-      if (this.agentResponse != null) {
-        this.showThrobberAgent = false;
-        this.showContentAgent = !this.showThrobberAgent;
-        for (var key in this.agentResponse.data) {
-          var element = this.agentResponse.data[key];
-          element.serverName = key;
-          if (element.type == 'Agents') {
-            this.agentNodes = element.agentNodes;
-            this.agentDataSource = this.agentNodes;
-          }
-        }
-        this.agentNameList.push("All");
-        for (var data of this.agentDataSource) {
-          if (this.agentNameList.indexOf(data.toolName) == -1) {
-            this.agentNameList.push(data.toolName);
-
-          }
-        }
-        this.selectToolAgent("All");
-        this.displayedAgentColumns = ['toolName', 'agentKey', 'category', 'inSightsTimeX', 'status', 'details'];
-      }
-    } catch (error) {
-      this.showContentAgent = false;
-      console.log(error);
-    }
-
-  }
-
-  selectToolAgent(ToolSelect) {
-    var agentListDatasourceSelected = [];
-    if (ToolSelect != "All") {
-      this.agentDataSource.filter(x => {
-        if (x.toolName == ToolSelect) {
-          agentListDatasourceSelected.push(x)
-        }
-      }
-      )
-    } else {
-      agentListDatasourceSelected = this.agentDataSource;
-    }
-    this.agentListDatasource = agentListDatasourceSelected;
-  }
-
   async loadOtherHealthCheckInfo() {
     try {
       // Loads Data Component and Services

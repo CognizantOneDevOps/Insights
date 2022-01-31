@@ -49,7 +49,7 @@
             </mat-icon>
         </button>
 
-        <button mat-icon-button [disabled]="!enableAttachFile" (click)="attachFiles()">
+        <button mat-icon-button [disabled]="!enableAttachFile || this.selectedTemplate.visualizationutil !=='FUSION'"(click)="attachFiles()">
             <mat-icon title="Attach Files" class="mat-icon material-icons">
                 attach_file
             </mat-icon>
@@ -108,7 +108,7 @@
                     <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Active</th>
                     <td mat-cell *matCellDef="let element;let i = index" style="width:10% !important">
                         <mat-slide-toggle (change)="updateTemplateStatus($event,element.reportId,element)"
-                        [checked]="element.isActive" [(ngModel)]="element.isActive" >
+                        [checked]="element.isActive" [(ngModel)]="element.isActive" [disabled]="(selectedIndex != i + currentPageValue)">
                         </mat-slide-toggle>
                     </td>
                 </ng-container>
@@ -116,12 +116,12 @@
                     <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> Kpi Details
                     </th>
 
-                    <td mat-cell *matCellDef="let element" style="width:15%;">
-                        <a (click)="showKpiDetailsDialog(element.reportId, element.templateName)">
+                    <td mat-cell *matCellDef="let element;let i = index" style="width:15%;">
+                        <button mat-icon-button [disabled]="(selectedIndex != i + currentPageValue)" (click)="showKpiDetailsDialog(element.reportId, element.templateName)">
                             <mat-icon svgIcon="healthcheck_show_details"
-                                [ngStyle]="{color:'#5C068C', height: '20px', width: '20px'}">
+                            [ngStyle]="{height: '20px', width: '20px', 'margin-bottom' : '10px', 'padding-left' : '0.8% !important'}">
                             </mat-icon>
-                        </a>
+                        </button>
                     </td>
                 </ng-container>
 
@@ -130,7 +130,7 @@
             </table>
         </mat-radio-group>
         <div>
-            <mat-paginator #paginator [pageSize]="MAX_ROWS_PER_TABLE" showFirstLastButtons class="paginationStyle">
+            <mat-paginator (page)="changeCurrentPageValue()" #paginator [pageSize]="MAX_ROWS_PER_TABLE" showFirstLastButtons class="paginationStyle">
             </mat-paginator>
         </div>
     </div>

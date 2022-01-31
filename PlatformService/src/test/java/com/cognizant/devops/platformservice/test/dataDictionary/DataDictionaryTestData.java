@@ -15,10 +15,10 @@
  *******************************************************************************/
 package com.cognizant.devops.platformservice.test.dataDictionary;
 
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class DataDictionaryTestData {
 	GraphDBHandler graphDBHandler;
@@ -29,7 +29,6 @@ public class DataDictionaryTestData {
 	String destCat = "SCM_TEST";
 	String emptylabel = "EMPTY_LABEL";
 	String webhookJson = "{\"toolName\":\"GIT\",\"labelDisplay\":\"SCM:GIT:DATA\",\"webhookName\":\"git_new\",\"dataformat\":\"json\",\"mqchannel\":\"IPW_git_new\",\"responseTemplate\":\"head_commit.message=message,head_commit.timestamp=commitTime,repository.updated_at=updated_at,repository.created_at=created_at,repository.pushed_at=pushed_at\",\"statussubscribe\":false,\"derivedOperations\":[{\"wid\":-1,\"operationName\":\"insightsTimex\",\"operationFields\":{\"timeField\":\"pushed_at\",\"epochTime\":true,\"timeFormat\":\"\"},\"webhookName\":\"\"}],\"dynamicTemplate\":\"{\\n  \\\"commits\\\":[\\n    {\\n      \\\"id\\\":\\\"commitIdDY\\\",\\n      \\\"url\\\":\\\"commitURLDY\\\",\\n      \\\"timestamp\\\":\\\"commitTimeDY\\\"\\n    }\\n  ]\\n}\",\"isUpdateRequired\":true,\"fieldUsedForUpdate\":\"id\",\"eventConfig\":\"\",\"isEventProcessing\":false}";
-	JsonParser parser = new JsonParser();
 	String toolName = "git";
 	String agentVersion = "v5.2";
 	String osversion = "Windows";
@@ -45,12 +44,12 @@ public class DataDictionaryTestData {
 			"RETURN a,b ";
 	
 	private JsonObject getregisteredWebhookJson() {
-		JsonObject json = (JsonObject) parser.parse(webhookJson);
+		JsonObject json = JsonUtils.parseStringAsJsonObject(webhookJson);
 		return json;
 	}
 	
 	public void insertAgentDataInNeo4j(String category, String label, String data) throws InsightsCustomException {
-		JsonObject agentDataJson = new JsonParser().parse(data).getAsJsonObject();
+		JsonObject agentDataJson = JsonUtils.parseStringAsJsonObject(data);
 		String query = "CREATE (n:" + category + ":" + label + ":DATA {props})";
 		try {
 			JsonObject graphResponse = graphDBHandler.createNodesWithSingleData(agentDataJson, query);

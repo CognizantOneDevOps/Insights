@@ -68,7 +68,7 @@
   "insightsTimeZone": "Asia/Kolkata",
   "useResponseTemplate": true,
   "auth": "base64",
-  "runSchedule": 20,
+  "runSchedule": 30,
   "timeStampField": "launchTime",
   "timeStampFormat": "epoch",
   "isEpochTimeFormat" : true,

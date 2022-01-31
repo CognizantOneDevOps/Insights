@@ -29,6 +29,7 @@ import { ImageHandlerService } from '@insights/common/imageHandler.service';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { GrafanaAuthenticationService } from '@insights/common/grafana-authentication-service';
 import { AutheticationProtocol } from '@insights/common/insights-enum';
+import { DomSanitizer } from '@angular/platform-browser'
 
 export interface ILoginComponent {
   createAndValidateForm(): void;
@@ -67,7 +68,7 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
     private router: Router, private logger: LogService, private dataShare: DataSharedService,
     private datePipe: DatePipe, private imageHandeler: ImageHandlerService,
     private route: ActivatedRoute, public messageDialog: MessageDialogService,
-    private grafanaService: GrafanaAuthenticationService, private activatedRoute: ActivatedRoute) {
+    private grafanaService: GrafanaAuthenticationService, private activatedRoute: ActivatedRoute, private sanitizer:DomSanitizer) {
     var self = this;
     this.loginRequestSent = false
     console.log(" in login constructer")
@@ -164,11 +165,13 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
       this.resourceImage = await this.grafanaService.getLogoImage();
       this.dataShare.removeCustomerLogoFromSesssion()
       if (this.resourceImage.data.encodedString.length > 0) {
-        this.imageSrc = 'data:image/jpg;base64,' + this.resourceImage.data.encodedString;
+        this.imageSrc =  this.sanitizer.sanitize(0,'data:image/jpg;base64,' + this.resourceImage.data.encodedString);
         this.imageHandeler.addImage("customer_logo_uploded", this.imageSrc);
         this.dataShare.uploadOrFetchLogo(this.imageSrc);
+        var dt = (<HTMLInputElement>document.getElementById("logoimg"))
+        dt.src =this.imageSrc;
       } else {
-        this.imageSrc = 'icons/svg/landingPage/Insights_Logo.png';
+        this.imageSrc = this.sanitizer.sanitize(0,'icons/svg/landingPage/Insights_Logo.png');
         this.imageAlt = 'Cognizant log';
         this.dataShare.uploadOrFetchLogo("DefaultLogo");
       }
@@ -211,8 +214,6 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
                 this.dataShare.setAuthorizationToken(grafcookies["jtoken"]);
               }
             }
-
-            this.loginGrafana();
             setTimeout(() => {
               //self.showThrobber = false;
               self.router.navigate(['/InSights/Home']);
@@ -254,52 +255,18 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
     }
   }
 
-  private async loginGrafana() {
-    console.log("here in grafana..")
-    var uniqueString = "grfanaLoginIframe";
-    var iframe = document.createElement("iframe");
-    iframe.id = uniqueString;
-    document.body.appendChild(iframe);
-    iframe.style.display = "none";
-    iframe.contentWindow.name = uniqueString;
-    // construct a form with hidden inputs, targeting the iframe
-    var form = document.createElement("form");
-    form.target = uniqueString;
-    form.action = InsightsInitService.grafanaHost + "/login";
-    form.method = "POST";
-    // repeat for each parameter
-    var input = document.createElement("input");
-    input.type = "hidden";
-    input.name = "user";
-    input.value = this.username;
-    form.appendChild(input);
-    var input1 = document.createElement("input");
-    input1.type = "hidden";
-    input1.name = "password";
-    input1.value = this.password;
-    form.appendChild(input1);
-    var input2 = document.createElement("input");
-    input2.type = "hidden";
-    input2.name = "email";
-    input2.value = '';
-    form.appendChild(input2);
-    document.body.appendChild(form);
-    form.submit();
-  }
-
   deleteAllPreviousCookies(): void {
     console.log("in delete all cookies ");
     let allCookies = this.cookieService.getAll();
     let grafana_session_cookie = this.cookieService.get('grafana_session');
-    console.log("grafana_session_cookie " + grafana_session_cookie);
     if (grafana_session_cookie != undefined || grafana_session_cookie != '') {
       this.cookieService.set('grafana_session', undefined);
     }
     this.dataShare.deleteAllPreviousCookies();
     this.cookieService.deleteAll('/');
     for (let key of Object.keys(allCookies)) {
-      console.log("in delete cookies " + key);
       this.cookieService.delete(key, '/');
     }
+    console.log(" deleted all cookies ");
   }
 }

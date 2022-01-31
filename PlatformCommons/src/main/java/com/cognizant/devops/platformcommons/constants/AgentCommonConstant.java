@@ -32,5 +32,7 @@ public interface AgentCommonConstant {
 	String WEBHOOK_FILE_NAME_KEY="webhookPythonFileName";
 	String WEBHOOK_CONFIG_TEMPLATE ="webhookConfigTemplate.json";
 	String WEBHOOK_ENABLED= "webhookEnabled";
+	String IS_ROI_AGENT= "isROIAgent";
+	String ROI_AGENT = "ROIAgent";
 	String MQCONFIG = "mqConfig";
 }

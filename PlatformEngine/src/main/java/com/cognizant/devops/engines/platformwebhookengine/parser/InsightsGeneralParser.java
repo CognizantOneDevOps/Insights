@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.engines.util.DataEnrichUtils;
 import com.cognizant.devops.engines.util.EngineUtils;
 import com.cognizant.devops.platformcommons.core.enums.DerivedOperations;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
@@ -38,7 +39,6 @@ import com.github.wnameless.json.flattener.JsonFlattener;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 	private static Logger LOG = LogManager.getLogger(InsightsGeneralParser.class);
@@ -98,9 +98,8 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 	private JsonObject processResponseTemplate(WebHookConfig webhookConfig, String message) {
 		String keyMqInitial;
 		JsonObject responseTemplateJson;
-		JsonParser parser = new JsonParser();
 		Gson gson = new Gson();
-		JsonElement json = parser.parse(message);
+		JsonElement json = JsonUtils.parseString(message);
 		Map<String, Object> rabbitMqflattenedJsonMap = JsonFlattener.flattenAsMap(json.toString());
 		Map<String, String> responseTemplateMap = getResponseTemplateMap(webhookConfig.getResponseTemplate());
 		Map<String, Object> extractedMap = new HashMap<>(0);
@@ -112,7 +111,7 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 			}
 		}
 		String prettyJson = gson.toJson(extractedMap);
-		responseTemplateJson = parser.parse(prettyJson).getAsJsonObject();
+		responseTemplateJson = JsonUtils.parseStringAsJsonObject(prettyJson);
 		return responseTemplateJson;
 	}
 
@@ -126,7 +125,6 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 	 */
 	private void applyWebhookDerivedConfigs(Set<WebhookDerivedConfig> webhookDerivedConfigs,
 			JsonObject responseTemplateJson) throws InsightsCustomException {
-		JsonParser parser = new JsonParser();
 		Iterator<WebhookDerivedConfig> iterator = webhookDerivedConfigs.iterator();
 		while (iterator.hasNext()) {
 			WebhookDerivedConfig webhookDerivedConfig = iterator.next();
@@ -137,8 +135,7 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 				long epochTime = 0;
 				String dateTimeFromEpoch = "";
 				String operationName = webhookDerivedConfig.getOperationName();
-				JsonObject operationFieldsList = parser.parse(webhookDerivedConfig.getOperationFields())
-						.getAsJsonObject();
+				JsonObject operationFieldsList = JsonUtils.parseStringAsJsonObject(webhookDerivedConfig.getOperationFields());
 				if (operationName.equalsIgnoreCase(DerivedOperations.INSIGHTSTIMEX.getValue())) {
 					isEpochTime = operationFieldsList.get("epochTime").getAsBoolean();
 					String timeFieldKey = operationFieldsList.get("timeField").getAsString();

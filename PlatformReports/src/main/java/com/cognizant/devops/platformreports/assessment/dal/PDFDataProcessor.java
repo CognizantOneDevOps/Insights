@@ -44,10 +44,10 @@ public class PDFDataProcessor {
 
 	}
 
-	public JsonArray fetchAndFormatContentResult(long executionId, int kpiId, int assessmentId) {
+	public JsonArray fetchAndFormatContentResult(long executionId, int kpiId, String assessmentReportName) {
 		JsonArray result = new JsonArray();
 		try {
-			result = kPIAndContentResultDataHandler.fetchVisualizationResults(executionId, kpiId, assessmentId);
+			result = kPIAndContentResultDataHandler.fetchVisualizationResults(executionId, kpiId, assessmentReportName);
 		} catch (Exception e) {
 			log.error(e);
 			throw new InsightsJobFailedException(

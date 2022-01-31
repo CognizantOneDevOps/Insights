@@ -23,13 +23,13 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsKPIConfigDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class ReportEngineUtils {
 
@@ -111,9 +111,8 @@ public class ReportEngineUtils {
 		ObjectMapper oMapper = new ObjectMapper();
 		@SuppressWarnings("unchecked")
 		Map<String, Object> resultMap = oMapper.convertValue(inferenceConfigDefinition, Map.class);
-		JsonParser parser = new JsonParser();
 		String prettyJson = gson.toJson(resultMap);
-		JsonObject dataJson = parser.parse(prettyJson).getAsJsonObject();
+		JsonObject dataJson = JsonUtils.parseStringAsJsonObject(prettyJson);
 		return dataJson;
 	}
 

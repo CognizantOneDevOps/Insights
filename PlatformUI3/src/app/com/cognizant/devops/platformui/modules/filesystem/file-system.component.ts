@@ -128,7 +128,7 @@ export class FileSystemComponent implements OnInit {
     var filename = this.selectedRow.fileName + '.' + String(this.selectedRow.fileType).toLowerCase();
     FileDetailJson['fileName'] = this.selectedRow.fileName;
     FileDetailJson['fileType'] = this.selectedRow.fileType;
-    this.fileSystemService.downloadConfigFile(JSON.stringify(FileDetailJson))
+    this.fileSystemService.downloadConfigFile(btoa(JSON.stringify(FileDetailJson)))
       .then(function (data) {
         importedSaveAs(data, filename);
       });

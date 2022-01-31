@@ -26,13 +26,13 @@ import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.core.enums.SchedularTaskEnum.SchedularTaskAction;
 import com.cognizant.devops.platformcommons.core.enums.SchedularTaskEnum.TaskDefinitionProperty;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.timertasks.InsightsSchedulerTaskDAL;
 import com.cognizant.devops.platformdal.timertasks.InsightsSchedulerTaskDefinition;
 import com.cognizant.devops.platformdal.timertasks.InsightsSchedulerTaskStatus;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 
 @Service("taskManagementServiceI")
@@ -41,7 +41,6 @@ public class TaskManagementServiceImpl implements TaskManagementService  {
 	private static final Logger log = LogManager.getLogger(TaskManagementServiceImpl.class);
 	InsightsSchedulerTaskDAL scheduleTaskDAL = new InsightsSchedulerTaskDAL();
 	Gson gson = new Gson();
-	JsonParser parser = new JsonParser();
 	
 	/** This method fetch all Schedule Task Definition
 	 * @return
@@ -59,7 +58,7 @@ public class TaskManagementServiceImpl implements TaskManagementService  {
 				taskStatus.put(String.valueOf(record[1]),(long) record[0]);
 			});
 			taskListfromDB.forEach(taskDefintion -> {
-				JsonObject taskJsonObj = parser.parse(gson.toJson(taskDefintion)).getAsJsonObject();
+				JsonObject taskJsonObj = JsonUtils.parseStringAsJsonObject(gson.toJson(taskDefintion));
 				taskJsonObj.addProperty("lastrun", taskStatus.get(taskDefintion.getComponentName()));
 				taskList.add(taskJsonObj);
 			});

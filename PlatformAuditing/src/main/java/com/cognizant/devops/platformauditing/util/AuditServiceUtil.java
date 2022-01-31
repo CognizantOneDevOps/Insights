@@ -22,10 +22,10 @@ import java.util.Date;
 import java.util.Map;
 import java.util.TimeZone;
 import com.cognizant.devops.platformcommons.constants.InsightsAuditConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
 
@@ -36,8 +36,7 @@ private AuditServiceUtil() {
     //GetAssetDetails and QueryByDate: Convert the output from ledger into format suitable for UI
     public static JsonObject parseOutput(String message) {
 
-        JsonParser parser = new JsonParser();
-        JsonObject inputMessage = (JsonObject) parser.parse(message);
+        JsonObject inputMessage = JsonUtils.parseStringAsJsonObject(message);
         JsonObject formattedresponse = new JsonObject();
         try {
             formattedresponse.addProperty(InsightsAuditConstants.STATUS_CODE, inputMessage.getAsJsonPrimitive(InsightsAuditConstants.STATUS_CODE).getAsString());
@@ -88,8 +87,7 @@ private AuditServiceUtil() {
 
     //GetAssetHistory: Convert the output from ledger into format suitable for UI
     public static JsonObject parseHistory(String message) {
-        JsonParser parser = new JsonParser();
-        JsonObject inputMessage = (JsonObject) parser.parse(message);
+        JsonObject inputMessage = JsonUtils.parseStringAsJsonObject(message);
         JsonObject formattedresponse = new JsonObject();
         JsonArray array = new JsonArray();
         try {

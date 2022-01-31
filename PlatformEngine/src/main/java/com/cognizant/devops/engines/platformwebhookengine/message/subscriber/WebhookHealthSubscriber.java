@@ -25,11 +25,11 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Envelope;
 
@@ -51,7 +51,7 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 		String routingKey = envelope.getRoutingKey();
 		log.debug(" {}  Received  {} : {}", consumerTag, routingKey, message);
 		List<JsonObject> dataList = new ArrayList<>();
-		JsonElement json = new JsonParser().parse(message);
+		JsonElement json = JsonUtils.parseString(message);
 		if (json.isJsonObject()) {
 			log.debug("This is normal json object for webhook health ");
 			dataList.add(json.getAsJsonObject());

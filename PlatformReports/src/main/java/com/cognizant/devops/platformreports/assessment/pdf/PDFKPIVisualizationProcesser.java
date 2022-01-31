@@ -24,13 +24,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportsKPIConfig;
 import com.cognizant.devops.platformreports.assessment.dal.PDFDataProcessor;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsAssessmentConfigurationDTO;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class PDFKPIVisualizationProcesser implements Callable<JsonObject> {
 	private static final Logger log = LogManager.getLogger(PDFKPIVisualizationProcesser.class);
@@ -68,7 +68,7 @@ public class PDFKPIVisualizationProcesser implements Callable<JsonObject> {
 		JsonArray eachKPIVisualizationResult = new JsonArray();
 		int kpiId = reportKpiConfig.getKpiConfig().getKpiId();
 		eachKPIObject.addProperty(AssessmentReportAndWorkflowConstants.KPIID, kpiId);
-		JsonArray vConfig = new JsonParser().parse(reportKpiConfig.getvConfig()).getAsJsonArray();
+		JsonArray vConfig = JsonUtils.parseStringAsJsonArray(reportKpiConfig.getvConfig());
 		PDFDataProcessor dataProcessor = new PDFDataProcessor();
 		for (JsonElement eachConfig : vConfig) {
 			JsonObject vResultObject = new JsonObject();
@@ -86,7 +86,7 @@ public class PDFKPIVisualizationProcesser implements Callable<JsonObject> {
 		}
 		eachKPIObject.add("visualizationresult", eachKPIVisualizationResult);
 		JsonArray contentResultArray = dataProcessor.fetchAndFormatContentResult(assessmentReportDTO.getExecutionId(),
-				kpiId, assessmentReportDTO.getConfigId());
+				kpiId, assessmentReportDTO.getAsseementreportname());
 		if (contentResultArray.size() > 0) {
 			eachKPIObject.add("contentResult", contentResultArray);
 		}
@@ -98,10 +98,11 @@ public class PDFKPIVisualizationProcesser implements Callable<JsonObject> {
 	}
 
 	private String addFieldInVQuery(String vQuery, int kpiId) {
-		Map<String, Long> dateReplaceMap = new HashMap<>();
-		dateReplaceMap.put("assessmentId", Long.parseLong(String.valueOf(assessmentReportDTO.getConfigId())));
-		dateReplaceMap.put("executionId",assessmentReportDTO.getExecutionId());
-		dateReplaceMap.put(AssessmentReportAndWorkflowConstants.KPIID, Long.parseLong(String.valueOf(kpiId)));
+		Map<String, String> dateReplaceMap = new HashMap<>();
+		dateReplaceMap.put("assessmentId", String.valueOf(assessmentReportDTO.getConfigId()));
+		dateReplaceMap.put("executionId",String.valueOf(assessmentReportDTO.getExecutionId()));
+		dateReplaceMap.put(AssessmentReportAndWorkflowConstants.KPIID, String.valueOf(kpiId));
+		dateReplaceMap.put("assessmentReportName", "'"+assessmentReportDTO.getAsseementreportname()+"'");
 		StringSubstitutor sub = new StringSubstitutor(dateReplaceMap, "{", "}");
 		return sub.replace(vQuery);
 	}

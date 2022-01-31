@@ -40,6 +40,8 @@ public class ContentConfigDefinition {
 	private int reportId;
 	private String workflowId;		
 	private String resultField;	
+	private String assessmentReportName;
+	
 	public String getThresholds() {
 		return thresholds;
 	}
@@ -181,13 +183,21 @@ public class ContentConfigDefinition {
 		this.resultField = resultField;
 	}
 
+	public String getAssessmentReportName() {
+		return assessmentReportName;
+	}
+
+	public void setAssessmentReportName(String assessmentReportName) {
+		this.assessmentReportName = assessmentReportName;
+	}
+
 	@Override
 	public String toString() {
 		return "ContentConfigDefinition [contentId=" + contentId + ", kpiId=" + kpiId + ", action=" + action
 				+ ", directionOfThreshold=" + directionOfThreshold + ", category=" + category + ", schedule=" + schedule
 				+ ", contentName=" + contentName + ", message=" + message + ", expectedTrend=" + expectedTrend
 				+ ", noOfResult=" + noOfResult + ", threshold=" + threshold + ", thresholds=" + thresholds
-				+ ", executionId=" + executionId + ", assessmentId=" + assessmentId + ", reportId=" + reportId
+				+ ", executionId=" + executionId + ", assessmentId=" + assessmentId + ", assessmentReportName=" + assessmentReportName + ", reportId=" + reportId
 				+ ", workflowId=" + workflowId + ", resultField=" + resultField + "]";
 	}
 }

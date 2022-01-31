@@ -1,0 +1,53 @@
+/*
+*******************************************************************************
+ * Copyright 2021 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *******************************************************************************/
+
+.gridheadercenter {
+    font-weight: bold;
+    font-size: 18px;
+    text-decoration: none;
+    color: white;
+    width: 120%;
+    text-align: center;
+    padding-top: 8px;
+    margin-right: -10px;
+}
+
+.showDialogHeadingCss {
+    font-family: inherit;
+    font-size: 18px;
+    color: white;
+    margin-left: 90px;
+}
+.closeIconCss {
+    color: white;
+    margin:2%;
+    padding-left: 77px;
+}
+.dialogtableHeaderCss {
+    background-color: grey;
+    color: white;
+    font-size: 14px;
+    height: 30px;
+    margin: 0px;
+    flex: 0 0 10px;
+    text-align: left;
+}
+.filterGroup{
+    float: left;
+    width: 50%;
+    margin: 2%
+ }

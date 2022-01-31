@@ -49,6 +49,7 @@ import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformcommons.exception.RestAPI404Exception;
 import com.google.gson.JsonElement;
@@ -84,7 +85,15 @@ public class RestApiHandler {
 
 			    @Override
 			    public X509Certificate[] getAcceptedIssuers() {
-			        return new X509Certificate[0] ;
+			    	X509Certificate[] myTrustedAnchors = new X509Certificate[0];
+					for (X509Certificate cert : myTrustedAnchors) {
+						try {
+							cert.checkValidity();
+						} catch (Exception e) {
+							log.error(e);
+						}
+					}
+					return myTrustedAnchors;
 			    }
 
 			    @Override
@@ -95,7 +104,6 @@ public class RestApiHandler {
 							}
 						} catch (Exception e) {
 							log.error(e);
-							//throw new CertificateException("Certificate not valid or trusted.");
 						}
 			    }
 
@@ -107,7 +115,6 @@ public class RestApiHandler {
 							}
 						} catch (Exception e) {
 							log.error(e);
-							//throw new CertificateException("Certificate not valid or trusted.");
 						}
 			    }
 			}};
@@ -189,7 +196,7 @@ public class RestApiHandler {
 	 */
 	private static String getRequestBuilder(String url, JsonObject requestJson, Map<String, String> headers,
 			String action) throws InsightsCustomException {
-		String data = null;
+		String returnStr = null;
 		Builder invocationBuilder = null;
 		Response response = null;
 		WebTarget webTarget = null;
@@ -213,18 +220,18 @@ public class RestApiHandler {
 			}
 
 			if (response != null) {
-				data = response.readEntity(String.class);
+				returnStr = response.readEntity(String.class);
 				if (response.getStatus() == 404) {
-					log.debug("HTTP error code for 404 : {} message {} ", response.getStatus(), data);
+					log.debug("HTTP error code for 404 received");
 					JsonObject errorResponse = new JsonObject();
-					errorResponse.addProperty("status", response.getStatus());
-					errorResponse.addProperty("data", data);
+					errorResponse.addProperty(PlatformServiceConstants.STATUS, response.getStatus());
+					errorResponse.addProperty(PlatformServiceConstants.DATA, returnStr);
 					throw new RestAPI404Exception(errorResponse.toString());
 				} else if (!(response.getStatus() == 200 || response.getStatus() == 204)) {
 					JsonObject errorResponse = new JsonObject();
-					errorResponse.addProperty("status", response.getStatus());
-					errorResponse.addProperty("data", data);
-					log.error(" HTTP response has issue for URL {} response {} ", url, errorResponse);
+					errorResponse.addProperty(PlatformServiceConstants.STATUS, response.getStatus());
+					errorResponse.addProperty(PlatformServiceConstants.DATA, returnStr);
+					log.error(" HTTP response has issue for URL ");
 					throw new InsightsCustomException(errorResponse.toString());
 				}
 			}
@@ -242,7 +249,7 @@ public class RestApiHandler {
 				response.close();
 			}
 		}
-		return data;
+		return returnStr;
 	}
 
 	
@@ -274,10 +281,10 @@ public class RestApiHandler {
 			if (response != null) {
 				data = response.readEntity(String.class);
 				if (response.getStatus() == 404) {
-					log.debug("HTTP error code for 404 : {} message {} ", response.getStatus(), data);
+					log.debug("HTTP error code for 404 received ");
 					JsonObject errorResponse = new JsonObject();
-					errorResponse.addProperty("status", response.getStatus());
-					errorResponse.addProperty("data", data);
+					errorResponse.addProperty(PlatformServiceConstants.STATUS, response.getStatus());
+					errorResponse.addProperty(PlatformServiceConstants.DATA, data);
 					throw new RestAPI404Exception(errorResponse.toString());
 				} else if (!(response.getStatus() == 200 || response.getStatus() == 204)) {
 					throw new InsightsCustomException(
@@ -448,10 +455,7 @@ public class RestApiHandler {
 		} catch (Exception e) {
 			log.error("Error while connecting to server- ", e);
 			throw new InsightsCustomException(e.getMessage());
-		} finally {
-			
-			}
-		
+		} 		
 		return retunInputStream;
 	}
 
@@ -509,7 +513,7 @@ public class RestApiHandler {
 				try {
 					formDataMultiPart.close();
 				} catch (IOException e) {
-					throw new InsightsCustomException(e.getMessage());
+					log.error(e);
 				}
 			}
 		}

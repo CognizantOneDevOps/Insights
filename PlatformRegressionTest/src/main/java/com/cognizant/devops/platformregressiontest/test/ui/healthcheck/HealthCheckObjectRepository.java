@@ -130,7 +130,7 @@ public class HealthCheckObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//span[contains(text(),'YES')]")
 	WebElement yes;
 
-	@FindBy(xpath = "//span[contains(text(),'OK')]")
+	@FindBy(xpath = "//span[text()= 'OKAY']")
 	WebElement ok;
 
 	@FindBy(xpath = "//span[contains(text(),'Email Configuration')]")

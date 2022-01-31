@@ -16,10 +16,7 @@
 package com.cognizant.devops.platformservice.grafanadashboard.service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,7 +28,7 @@ import com.cognizant.devops.platformcommons.config.EmailConfiguration;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
-import com.cognizant.devops.platformcommons.core.util.AES256Cryptor;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -42,12 +39,11 @@ import com.cognizant.devops.platformdal.grafana.pdf.GrafanaOrgToken;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
-import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
+import com.cognizant.devops.platformservice.assessmentreport.service.GrafanaUtilities;
 import com.cognizant.devops.platformservice.workflow.service.WorkflowServiceImpl;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @Service
 public class GrafanaPdfServiceImpl implements GrafanaPdfService{
@@ -67,8 +63,7 @@ public class GrafanaPdfServiceImpl implements GrafanaPdfService{
 	GrafanaHandler grafanaHandler = new GrafanaHandler();
 	
 	@Autowired
-	private HttpServletRequest httpRequest;
-
+	GrafanaUtilities grafanaUtilities;
 
 	/**
 	 * Used to store grafana dashboard configuration
@@ -130,10 +125,7 @@ public class GrafanaPdfServiceImpl implements GrafanaPdfService{
 						WorkflowTaskEnum.WorkflowSchedule.ONETIME.name(): dashboardDetails.get(SCHEDULE_TYPE).getAsString());
 				grafanaDashboardConfig.setCreatedDate(InsightsUtils.getCurrentTimeInEpochMilliSeconds());
 				
-				GrafanaOrgToken token = grafanaDashboardConfigDAL.getTokenByOrgId(dashboardDetails.get(ORGANISATION).getAsInt());
-				if(token == null) {
-					generateGrafanaToken(dashboardDetails);
-				}
+				grafanaUtilities.generateGrafanaToken(dashboardDetails.get(ORGANISATION).getAsInt());
 				
 				id = grafanaDashboardConfigDAL.saveGrafanaDashboardConfig(grafanaDashboardConfig);
 				log.debug(id);
@@ -326,26 +318,6 @@ public class GrafanaPdfServiceImpl implements GrafanaPdfService{
 		} catch (Exception e) {
 			log.error("Error while updating Dashboard Active status.", e);
 			throw new InsightsCustomException(e.getMessage());
-		}
-	}
-	
-	
-	private void generateGrafanaToken(JsonObject dashboardDetails) {
-		try {				
-			GrafanaOrgToken grafanaOrgToken = new GrafanaOrgToken();
-			Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
-			headers.put("x-grafana-org-id", dashboardDetails.get(ORGANISATION).getAsString());
-			headers.put("Content-Type", "application/json");
-			JsonObject json = new JsonObject();
-			json.addProperty("name", "pdftoken");
-			json.addProperty("role", "Viewer");
-			String response = grafanaHandler.grafanaPost("/api/auth/keys",json, headers);
-			JsonObject apiObj = new JsonParser().parse(response).getAsJsonObject();
-			grafanaOrgToken.setOrgId(dashboardDetails.get(ORGANISATION).getAsInt());
-			grafanaOrgToken.setApiKey(AES256Cryptor.encrypt(apiObj.get("key").getAsString(),ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getTokenSigningKey()));
-			grafanaDashboardConfigDAL.saveGrafanaOrgToken(grafanaOrgToken);
-		} catch (Exception e) {
-			log.error("Unable to generate Grafana token  {}", e.getMessage());
 		}
 	}
 

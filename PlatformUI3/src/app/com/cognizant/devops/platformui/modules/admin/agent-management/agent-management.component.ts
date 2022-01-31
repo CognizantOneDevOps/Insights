@@ -24,6 +24,8 @@ import { MessageDialogService } from '@insights/app/modules/application-dialog/m
 import { DataSharedService } from '@insights/common/data-shared-service';
 import { ClipboardService } from "ngx-clipboard";
 import { InsightsInitService } from '@insights/common/insights-initservice';
+import { HealthCheckService } from '@insights/app/modules/healthcheck/healthcheck.service';
+import { ShowDetailsDialog } from '@insights/app/modules/healthcheck/healthcheck-show-details-dialog';
 
 @Component({
   selector: 'app-agent-management',
@@ -56,30 +58,32 @@ export class AgentManagementComponent implements OnInit {
   versionList = [];
   MAX_ROWS_PER_TABLE =8;
   isCopyLinkDisabled =true;
+  timeZone: string = "";
+  selectedIndex : number;
+  currentPageValue : number;
 
   constructor(public agentService: AgentService, public router: Router,
     private route: ActivatedRoute, public dialog: MatDialog,
     public messageDialog: MessageDialogService, private changeDetectorRefs: ChangeDetectorRef,
     private dataShare: DataSharedService,private _clipboardService: ClipboardService,
-    public initConfig: InsightsInitService) {
+    public initConfig: InsightsInitService, private healthCheckService: HealthCheckService) {
     this.getRegisteredAgents();
   }
 
   ngOnInit() {
-    //console.log(this.route.queryParams);
+    this.timeZone = this.dataShare.getTimeZone()
     this.route.queryParams.subscribe(params => {
-      //console.log(params["agentstatus"]);
       if (params["agentstatus"] != undefined) {
         this.receivedParam = params["agentstatus"];
         var agentConfigstatusCode = params["agentConfigstatusCode"];
         var showConfirmMessage = this.receivedParam;
-        //console.log(agentConfigstatusCode + " " + showConfirmMessage);
         if (agentConfigstatusCode == undefined) {
           agentConfigstatusCode = 'WARN';
         }
         setTimeout(() => this.messageDialog.showApplicationsMessage(showConfirmMessage, agentConfigstatusCode));
       }
     });
+    this.currentPageValue = this.paginator.pageIndex * this.MAX_ROWS_PER_TABLE;    
   }
 
   ngAfterViewInit() {
@@ -99,17 +103,14 @@ export class AgentManagementComponent implements OnInit {
     if (this.agentList != null && this.agentList.status == 'success') {
       this.agentListDatasource.data = this.agentList.data.sort((a, b) => a.toolName > b.toolName);
       this.agentListDatasource.paginator = this.paginator;
-      //console.log(this.agentList);
       this.agentNameList.push("All");
       for (var data of this.agentList.data) {
         if (this.agentNameList.indexOf(data.toolName) == -1) {
           this.agentNameList.push(data.toolName);
         }
       }
-      //console.log(this.agentListDatasource);
       self.showDetail = true;
-      //console.log(this.agentNameList);
-      this.displayedColumns = ['radio','Type', 'ToolName','ToolCategory', 'AgentKey', 'OS', 'Version', 'Status'];
+      this.displayedColumns = ['radio', 'ToolName','ToolCategory', 'AgentKey', 'Type', 'OS', 'Version', 'Status', 'Time', 'Details'];
       setTimeout(() => {
         this.showConfirmMessage = "";
       }, 3000);
@@ -127,9 +128,7 @@ export class AgentManagementComponent implements OnInit {
     }
   }
   selectToolAgent(toolSelect) {
-    //console.log(ToolSelect);
     var agentListDatasourceSelected = [];
-    //console.log(agentListDatasourceSelected);
     if (toolSelect != "All") {
       this.agentList.data.filter(av => {
         if (av.toolName == toolSelect) {
@@ -138,15 +137,15 @@ export class AgentManagementComponent implements OnInit {
       }
       )
     } else {
-      agentListDatasourceSelected = this.agentList.data.sort((a, b) => a.toolName > b.toolName);
+      agentListDatasourceSelected = this.agentList.data.agents.sort((a, b) => a.toolName > b.toolName);
     }
     this.agentListDatasource.data = agentListDatasourceSelected;
     this.agentListDatasource.paginator = this.paginator;
     this.changeDetectorRefs.detectChanges();
-    //console.log(this.agentListDatasource);
   }
 
-  statusEdit(element) {
+  statusEdit(element, index) {
+    this.selectedIndex = index + this.currentPageValue;
     this.runDisableStatus = element.agentStatus;
     this.buttonDisableStatus = false;
     if(element.iswebhook){
@@ -197,7 +196,6 @@ export class AgentManagementComponent implements OnInit {
         "agentparameter": this.agentparameter
       }
     };
-    //console.log(navigationExtras);
     this.router.navigate(['InSights/Home/agentconfiguration'], navigationExtras);
   }
 
@@ -217,14 +215,12 @@ export class AgentManagementComponent implements OnInit {
 
   uninstallAgent() {
     var self = this;
-    //console.log("uninstall agent " + JSON.stringify(this.selectedAgent));
     if (self.selectedAgent.agentStatus == 'STOP') {
       var title = "Delete Agent";
       var dialogmessage = "Note: Uninstalling the Agent doesn't delete the data that has been collected. The agent could be re-registered again, and the data collection would be resumed from the last run time. <br> <br> Do you want to uninstall <b> " + self.selectedAgent.toolName + " </b> on <b>" + self.selectedAgent.osVersion + " </b> ? ";
       const dialogRef = self.messageDialog.showConfirmationMessage(title, dialogmessage, this.selectedAgent.toolName, "ALERT", "40%");
 
       dialogRef.afterClosed().subscribe(result => {
-        //console.log('The dialog was closed  ' + result);
         if (result == 'yes') {
           self.agentService.agentUninstall(self.selectedAgent.agentKey, self.selectedAgent.toolName, self.selectedAgent.osVersion).then(function (data) {
             self.getRegisteredAgents();
@@ -247,5 +243,30 @@ export class AgentManagementComponent implements OnInit {
       inputElement.agentKey;
     console.log(value_to_copy);
     this._clipboardService.copyFromContent(value_to_copy);
+  }
+
+  // Displays Show Details dialog box when Details column is clicked
+  showDetailsDialog(toolName: string, categoryName: string, agentId: string) {
+    var isSessionExpired = this.dataShare.validateSession();
+    if (!isSessionExpired) {
+      var rcategoryName = categoryName.replace(/ +/g, "");
+      var rtoolName = toolName.charAt(0).toUpperCase() + toolName.slice(1).toLowerCase();
+      var filePath = "${INSIGHTS_HOME}/logs/PlatformAgent/log_" + agentId + ".log";
+      var detailType = rtoolName;
+      let showDetailsDialog = this.dialog.open(ShowDetailsDialog, {
+        panelClass: 'healthcheck-show-details-dialog-container',
+        height: '80%',
+        width: '90%',
+        disableClose: true,
+        data: { toolName: toolName, categoryName: categoryName, pathName: filePath, detailType: detailType, agentId: agentId, timeZone: this.timeZone },
+      });
+    }
+    else {
+      //console.log("Heathcheck")
+    }
+  }
+  changeCurrentPageValue() {
+    this.selectedIndex = -1;
+    this.currentPageValue = this.paginator.pageIndex  * this.MAX_ROWS_PER_TABLE;
   }
 }

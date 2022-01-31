@@ -17,6 +17,7 @@
 package com.cognizant.devops.platformservice.test.upshiftassessment;
 
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.upshiftassessment.UpshiftAssessmentConfigDAL;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
@@ -24,7 +25,6 @@ import com.cognizant.devops.platformdal.workflow.InsightsWorkflowType;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformservice.workflow.service.WorkflowServiceImpl;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,7 +37,6 @@ import java.io.FileInputStream;
 public class UpshiftAssessmentServiceData {
     private static final Logger log = LogManager.getLogger(UpshiftAssessmentServiceData.class);
     ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-    JsonParser parser = new JsonParser();
     UpshiftAssessmentConfigDAL upshiftAssessmentConfigDAL = new UpshiftAssessmentConfigDAL();
     WorkflowServiceImpl workflowService = new WorkflowServiceImpl();
     WorkflowDAL workflowConfigDAL = new WorkflowDAL();
@@ -100,7 +99,7 @@ public class UpshiftAssessmentServiceData {
 
     public JsonObject convertStringIntoJson(String convertregisterkpi) {
         JsonObject objectJson = new JsonObject();
-        objectJson = parser.parse(convertregisterkpi).getAsJsonObject();
+        objectJson = JsonUtils.parseStringAsJsonObject(convertregisterkpi);
         return objectJson;
     }
 }

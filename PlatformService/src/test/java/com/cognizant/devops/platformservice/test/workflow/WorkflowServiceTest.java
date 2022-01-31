@@ -98,7 +98,7 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 					+ reportId
 					+ ",\"emailList\":\"fdfsfsdfs\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
 					+ taskID
-					+ ",\"sequence\":0}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+					+ ",\"sequence\":0}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null,\"orgName\":\"Test Org\",\"userName\":\"Test_User\"}";
 			dailyAssessmentReportWorkflowJson = convertStringIntoJson(dailyAssessmentReportWorkflow);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
@@ -126,7 +126,8 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 		Thread.sleep(1000);
 		InsightsAssessmentConfiguration assessmentObj = null;
 		try {
-			assessmentId = assessmentService.saveAssessmentReport(dailyAssessmentReportWorkflowJson);
+			JsonObject assessmentResponse = assessmentService.saveAssessmentReport(dailyAssessmentReportWorkflowJson);
+			assessmentId = assessmentResponse.get("assessmentReportId").getAsInt();
 			assessmentObj = reportConfigDAL
 					.getAssessmentByAssessmentName(dailyAssessmentReportWorkflowJson.get("reportName").getAsString());
 			workflowId = assessmentObj.getWorkflowConfig().getWorkflowId();

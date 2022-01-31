@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.TimeoutException;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,6 +49,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.owasp.esapi.ESAPI;
+import org.owasp.esapi.Validator;
+import org.owasp.esapi.errors.IntrusionException;
+import org.owasp.esapi.errors.ValidationException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -58,19 +63,23 @@ import com.cognizant.devops.platformcommons.constants.AgentCommonConstant;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.core.enums.AGENTACTION;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.vault.VaultHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
+import com.cognizant.devops.platformdal.healthutil.HealthUtil;
+import com.cognizant.devops.platformdal.outcome.InsightsTools;
+import com.cognizant.devops.platformdal.outcome.OutComeConfigDAL;
 import com.cognizant.devops.platformservice.agentmanagement.util.AgentManagementUtil;
+import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Channel;
 
@@ -79,9 +88,14 @@ import com.rabbitmq.client.Channel;
 public class AgentManagementServiceImpl implements AgentManagementService {
 
 	private static Logger log = LogManager.getLogger(AgentManagementServiceImpl.class);
+	private static final String LAST_RUN_TIME = "lastRunTime";
+	private static final String HEALTH_STATUS = "healthStatus";
+	private static final String FORWARD_SLASH = "/";
+	
 	boolean isProxyEnabled = ApplicationConfigProvider.getInstance().getProxyConfiguration().isEnableProxy();
 	AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 	VaultHandler vaultHandler = new VaultHandler();
+	OutComeConfigDAL  outComeConfigDAL  = new OutComeConfigDAL ();
 	String fileUnzipPath = ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath();
 
 	String vaultURL = "/sys/raw/" + ApplicationConfigProvider.getInstance().getVault().getSecretEngine()
@@ -89,7 +103,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 
 	@Override
 	public String registerAgent(String toolName, String agentVersion, String osversion, String configDetails,
-			String trackingDetails, boolean vault, boolean isWebhook) throws InsightsCustomException {
+			String trackingDetails, boolean vault, boolean isWebhook, String type) throws InsightsCustomException {
 		try {
 			String agentId = null;
 			Gson gson = new Gson();
@@ -110,6 +124,11 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 				String webhookSubscribeQueue = AgentCommonConstant.WEBHOOK_QUEUE_CONSTANT + agentId;
 				json.get("subscribe").getAsJsonObject().addProperty("webhookPayloadDataQueue", webhookSubscribeQueue);
 				json.addProperty(AgentCommonConstant.WEBHOOK_ENABLED, true);
+			} else if (type.equalsIgnoreCase(AgentCommonConstant.ROI_AGENT)) {
+				InsightsTools configs = outComeConfigDAL.getOutComeByToolName(toolName.toUpperCase());
+				String communicationQueue = configs.getAgentCommunicationQueue();
+				json.get("subscribe").getAsJsonObject().addProperty("roiExecutionQueue", communicationQueue);
+				json.addProperty(AgentCommonConstant.IS_ROI_AGENT, true);
 			}
 
 			/**
@@ -278,7 +297,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		List<AgentConfigTO> agentList = null;
 		try {
 			List<AgentConfig> agentConfigList = agentConfigDAL.getAllDataAgentConfigurations();
-			agentList = new ArrayList<>(agentConfigList.size());
+			agentList = new ArrayList<>();
 			for (AgentConfig agentConfig : agentConfigList) {
 				AgentConfigTO to = new AgentConfigTO();
 				BeanUtils.copyProperties(agentConfig, to, "agentJson", "updatedDate", "vault");
@@ -368,6 +387,9 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		String configJson = null;
 		String toolPath = null;
 		try {
+			if(!version.startsWith("v") ||  ! ValidationUtils.checkAgentVersion(version) ) {
+				throw new InsightsCustomException("Not a valid version ");
+			}
 			if (!ApplicationConfigProvider.getInstance().getAgentDetails().isOnlineRegistration()) {
 				configJson = getOfflineToolRawConfigFile(version, tool, isWebhook);
 			} else {
@@ -375,18 +397,21 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 				if (ApplicationConfigProvider.getInstance().getAgentDetails().getOnlineRegistrationMode()
 						.equalsIgnoreCase(ConfigOptions.ONLINE_REGISTRATION_MODE_DOCROOT)) {
 					toolPath = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl()
-							+ File.separator + version + AgentCommonConstant.AGENTS + tool;
-					toolPath = toolPath.trim() + File.separator + tool.trim() + AgentCommonConstant.ZIPEXTENSION;
+							+ FORWARD_SLASH + version + AgentCommonConstant.AGENTS + tool;
+					toolPath = toolPath.trim() + FORWARD_SLASH + tool.trim() + AgentCommonConstant.ZIPEXTENSION;
 				} else {
 					toolPath = ApplicationConfigProvider.getInstance().getAgentDetails().getDownloadRepoUrl()
-							+ File.separator + version + AgentCommonConstant.AGENTS + tool;
-					toolPath = toolPath.trim() + File.separator + tool.trim() + AgentCommonConstant.ZIPEXTENSION;
+							+ FORWARD_SLASH + version + AgentCommonConstant.AGENTS + tool;
+					toolPath = toolPath.trim() + FORWARD_SLASH + tool.trim() + AgentCommonConstant.ZIPEXTENSION;
 				}
-				String targetDir = fileUnzipPath + File.separator + tool;
+				String targetDir = PlatformServiceUtil.sanitizePathTraversal(fileUnzipPath + File.separator + tool);
 				File targetDirFile = new File(targetDir);
 				if (targetDirFile.exists()) {
 					FileUtils.deleteDirectory(targetDirFile);
 				}
+				ESAPI.initialize("org.owasp.esapi.reference.DefaultSecurityConfiguration");
+				Validator validate = ESAPI.validator();
+				toolPath = validate.getValidInput("URL checking", toolPath, "URLPattern", 300, true);
 				configJson = AgentManagementUtil.getInstance()
 						.getAgentConfigfile(new URL(toolPath), new File(targetDir)).toString();
 				configJson = addDetailToConfigFile(configJson, targetDir, isWebhook);
@@ -461,9 +486,9 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			throws InsightsCustomException {
 		String config = null;
 		try {
-			String offlinePath = ApplicationConfigProvider.getInstance().getAgentDetails().getOfflineAgentPath()
-					+ File.separator + version + File.separator + tool;
-			String agentPath = fileUnzipPath + File.separator + tool;
+			String offlinePath = PlatformServiceUtil.sanitizePathTraversal(ApplicationConfigProvider.getInstance().getAgentDetails().getOfflineAgentPath()
+					+ File.separator + version + File.separator + tool);
+			String agentPath = PlatformServiceUtil.sanitizePathTraversal(fileUnzipPath + File.separator + tool);
 			File agentPathFile = new File(agentPath);
 			if (agentPathFile.exists()) {
 				FileUtils.deleteDirectory(agentPathFile);
@@ -476,8 +501,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			try (Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE,
 					(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(AgentCommonConstant.CONFIG));
 					FileReader reader = new FileReader(paths.limit(1).findFirst().get().toFile())) {
-				JsonParser parser = new JsonParser();
-				Object obj = parser.parse(reader);
+				Object obj = JsonUtils.parseReader(reader);
 				config = ((JsonObject) obj).toString();
 			} catch (IOException e) {
 				log.error("Offline file reading issue", e);
@@ -504,8 +528,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	 */
 	private String addDetailToConfigFile(String configJson, String targetDir, boolean isWebhook)
 			throws IOException, InsightsCustomException {
-		JsonParser parser = new JsonParser();
-		JsonObject configJsonObj = parser.parse(configJson).getAsJsonObject();
+		JsonObject configJsonObj = JsonUtils.parseStringAsJsonObject(configJson);
 		if (isWebhook) {
 			JsonObject webhookJsonFile;
 			JsonObject webhookDynamicTemplateoJson;
@@ -517,7 +540,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 				if (configpath.isPresent()) {
 					File configFileTemplate = configpath.get().toFile();
 					try (FileReader reader = new FileReader(configFileTemplate)) {
-						webhookJsonFile = (JsonObject) parser.parse(reader);
+						webhookJsonFile = JsonUtils.parseReaderAsJsonObject(reader);
 						webhookDynamicTemplateoJson = webhookJsonFile.get("dynamicTemplate").getAsJsonObject();
 						configJsonObj.add("dynamicTemplate", webhookDynamicTemplateoJson);
 					}
@@ -549,7 +572,8 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	 **/
 	private void setupAgentInstanceCreation(String toolName, String osversion, String agentId, boolean isWebhook)
 			throws IOException {
-		File instanceDir = new File(fileUnzipPath + File.separator + agentId);
+		String filename = PlatformServiceUtil.sanitizePathTraversal(fileUnzipPath + File.separator + agentId);
+		File instanceDir = new File(filename);
 		if (!instanceDir.exists()) {
 			instanceDir.mkdir();
 		}
@@ -560,8 +584,8 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 
 	private void copyServiceFileToInstanceFolder(String toolName, String agentId, String osversion, boolean isWebhook)
 			throws IOException {
-		Path sourceFilePath = Paths.get(fileUnzipPath + File.separator + toolName);
-		Path destinationFilePath = Paths.get(fileUnzipPath + File.separator + agentId);
+		Path sourceFilePath = Paths.get(fileUnzipPath + File.separator + toolName).toAbsolutePath();
+		Path destinationFilePath = Paths.get(fileUnzipPath + File.separator + agentId).toAbsolutePath();
 	if ("Windows".equalsIgnoreCase(osversion)) {
 			Path destinationFile = destinationFilePath.resolve(agentId + ".bat");
 			Files.copy(sourceFilePath.resolve(toolName + "agent.bat"), destinationFile, REPLACE_EXISTING);
@@ -639,11 +663,11 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			log.error("Error writing modified json file", e);
 			throw e;
 		}
-		Path sourceFolderPath = Paths.get(fileUnzipPath, agentId);
-		Path zipPath = Paths.get(fileUnzipPath, agentId + AgentCommonConstant.ZIPEXTENSION);
+		Path sourceFolderPath = Paths.get(PlatformServiceUtil.sanitizePathTraversal(Paths.get(fileUnzipPath, agentId).toString()));
+		Path zipPath = Paths.get(PlatformServiceUtil.sanitizePathTraversal(Paths.get(fileUnzipPath, agentId + AgentCommonConstant.ZIPEXTENSION).toString()));
 		Path agentZipPath = null;
 		try {
-			agentZipPath = AgentManagementUtil.getInstance().getAgentZipFolder(sourceFolderPath, zipPath);
+			agentZipPath = new File(AgentManagementUtil.getInstance().getAgentZipFolder(sourceFolderPath, zipPath).toFile().getCanonicalPath()).toPath();
 		} catch (Exception e) {
 			log.error("Error creatig final zip file with modified json file", e);
 			throw new InsightsCustomException(e.getMessage());
@@ -840,7 +864,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		vaultObj.addProperty("vaultUrl",
 				ApplicationConfigProvider.getInstance().getVault().getVaultEndPoint() + vaultURL + agentId);
 		json.add("vault", vaultObj);
-		log.debug("Updated Json {} without creds --", json);
+		log.debug(" without creds Json Updated ");
 		return secretMap;
 	}
 
@@ -865,9 +889,9 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		}
 		log.debug("updateSecrets: vault response {} ", vaultresponse);
 		if (vaultresponse != null) {
-			JsonObject vaultObject = new JsonParser().parse(vaultresponse).getAsJsonObject();
+			JsonObject vaultObject = JsonUtils.parseStringAsJsonObject(vaultresponse);
 			String vaultData = vaultObject.get("data").getAsJsonObject().get("value").getAsString();
-			JsonObject vaultDataJson = new JsonParser().parse(vaultData).getAsJsonObject();
+			JsonObject vaultDataJson = JsonUtils.parseStringAsJsonObject(vaultData);
 			// update secrets based on vault values
 			for (Entry<String, String> field : updatedDataMap.entrySet()) {
 				if (vaultDataJson.has(field.getKey()) && !field.getValue().contains("***")) {
@@ -904,5 +928,41 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		return updatedDataMap;
 
 	}
+	
+	public boolean isROIAgentCheck(String toolName) throws InsightsCustomException {
+		InsightsTools configs = outComeConfigDAL.getOutComeByToolName(toolName.toUpperCase());
+		if(configs == null) {
+			throw new InsightsCustomException("This is not a ROI agent.");
+		}
+		return true;
+		
+	}
 
+	@Override
+	public List<AgentConfigTO> getRegisteredAgentsAndHealth() throws InsightsCustomException {
+		List<AgentConfigTO> agentList = null;
+		HealthUtil healthUtil = new HealthUtil();
+		try {
+			List<AgentConfig> agentConfigList = agentConfigDAL.getAllDataAgentConfigurations();
+			agentList = new ArrayList<>();
+			for (AgentConfig agentConfig : agentConfigList) {
+				AgentConfigTO agentNode = new AgentConfigTO();
+				BeanUtils.copyProperties(agentConfig, agentNode, "agentJson", "updatedDate", "vault");
+				JsonObject node = new JsonObject();
+				JsonObject agentHealthNode = healthUtil.getAgentHealth(node, agentNode.getAgentKey());
+				if(agentHealthNode.has(LAST_RUN_TIME)) {
+					agentNode.setLastRunTime(agentHealthNode.get(LAST_RUN_TIME).getAsString());
+				}
+				if(agentHealthNode.has(HEALTH_STATUS)) {
+					agentNode.setHealthStatus(agentHealthNode.get(HEALTH_STATUS).getAsString());
+				}
+				agentList.add(agentNode);
+			}
+
+		} catch (Exception e) {
+			log.error("Error getting all agent config ", e);
+			throw new InsightsCustomException(e.toString());
+		}
+		return agentList;
+	}
 }

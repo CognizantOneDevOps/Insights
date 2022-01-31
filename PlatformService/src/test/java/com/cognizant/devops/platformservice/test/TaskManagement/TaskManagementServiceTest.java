@@ -55,13 +55,13 @@ import org.testng.annotations.Test;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
@@ -78,7 +78,6 @@ public class TaskManagementServiceTest extends AbstractTestNGSpringContextTests 
 	ResultMatcher ok = MockMvcResultMatchers.status().isOk();
 	String cookiesString;
 	Map<String, String> testAuthData = new HashMap<>();
-	JsonParser jsonParser = new JsonParser();
 
 	@Autowired
 	private WebApplicationContext wac;
@@ -97,8 +96,8 @@ public class TaskManagementServiceTest extends AbstractTestNGSpringContextTests 
 				+ "grafanaAuth.json";
 		JsonElement jsonData;
 		try {
-			jsonData = new JsonParser().parse(new FileReader(path));
-		} catch (JsonIOException | JsonSyntaxException | FileNotFoundException e) {
+			jsonData = JsonUtils.parseReader(new FileReader(new File(path).getCanonicalPath()));
+		} catch (JsonIOException | JsonSyntaxException | IOException e) {
 			throw new SkipException("skipped this test case as grafana auth file not found.");
 		}
 		testAuthData = new Gson().fromJson(jsonData, Map.class);
@@ -153,14 +152,14 @@ public class TaskManagementServiceTest extends AbstractTestNGSpringContextTests 
 			MvcResult result = this.mockMvc.perform(builder).andReturn();
 			String saveresponse = new String(result.getResponse().getContentAsByteArray());
 			log.debug(" webResponse  status  ============= {} ======  saveresponse {}  ",result.getResponse().getStatus(), saveresponse);
-			JsonObject saveTaskConfigjson = jsonParser.parse(saveresponse).getAsJsonObject();
+			JsonObject saveTaskConfigjson = JsonUtils.parseStringAsJsonObject(saveresponse);
 			
 			if (saveresponse.contains("status")) {
 				
 				MockHttpServletRequestBuilder builderAllTaskList  =  mockHttpServletRequestBuilderGet("/admin/scheduletaskmanagement/getAllTaskDetail"); 
 				MvcResult resultAllTask =  this.mockMvc.perform(builderAllTaskList).andReturn();
 				String allTaskResponse = new String(resultAllTask.getResponse().getContentAsByteArray());
-				JsonObject taskConfigjson = jsonParser.parse(allTaskResponse).getAsJsonObject();
+				JsonObject taskConfigjson = JsonUtils.parseStringAsJsonObject(allTaskResponse);
 				log.debug(" webResponse  status  ============= {} ====== {} ",resultAllTask.getResponse().getStatus(),taskConfigjson);
 				
 				
@@ -189,7 +188,7 @@ public class TaskManagementServiceTest extends AbstractTestNGSpringContextTests 
 			MockHttpServletRequestBuilder builderAllTaskList  =  mockHttpServletRequestBuilderGet("/admin/scheduletaskmanagement/getAllTaskDetail"); 
 			MvcResult resultAllTask =  this.mockMvc.perform(builderAllTaskList).andReturn();
 			String allTaskResponse = new String(resultAllTask.getResponse().getContentAsByteArray());
-			JsonObject taskConfigjson = jsonParser.parse(allTaskResponse).getAsJsonObject();
+			JsonObject taskConfigjson = JsonUtils.parseStringAsJsonObject(allTaskResponse);
 			Assert.assertNotNull(taskConfigjson);
 			if (taskConfigjson.has("data")) {
 				List<JsonObject> taskList = gson.fromJson(taskConfigjson.get("data"), new TypeToken<List<JsonObject>>(){}.getType());
@@ -215,13 +214,13 @@ public class TaskManagementServiceTest extends AbstractTestNGSpringContextTests 
 			MvcResult result = this.mockMvc.perform(builder).andReturn();
 			String editresponse = new String(result.getResponse().getContentAsByteArray());
 			log.debug(" webResponse  status  ============= {} ======  editresponse {}  ",result.getResponse().getStatus(), editresponse);
-			JsonObject editTaskConfigjson = jsonParser.parse(editresponse).getAsJsonObject();
+			JsonObject editTaskConfigjson = JsonUtils.parseStringAsJsonObject(editresponse);
 			Assert.assertNotNull(editTaskConfigjson);
 			if (editTaskConfigjson.has("status")) {
 				MockHttpServletRequestBuilder builderAllTaskList  =  mockHttpServletRequestBuilderGet("/admin/scheduletaskmanagement/getAllTaskDetail"); 
 				MvcResult resultAllTask =  this.mockMvc.perform(builderAllTaskList).andReturn();
 				String allTaskResponse = new String(resultAllTask.getResponse().getContentAsByteArray());
-				JsonObject taskConfigjson = jsonParser.parse(allTaskResponse).getAsJsonObject();
+				JsonObject taskConfigjson = JsonUtils.parseStringAsJsonObject(allTaskResponse);
 				log.debug(" webResponse  status  ============= {} ====== {} ",resultAllTask.getResponse().getStatus(),taskConfigjson);
 				
 				List<JsonObject> taskList = gson.fromJson(taskConfigjson.get("data"), new TypeToken<List<JsonObject>>(){}.getType());
@@ -250,13 +249,13 @@ public class TaskManagementServiceTest extends AbstractTestNGSpringContextTests 
 			MvcResult result = this.mockMvc.perform(builder).andReturn();
 			String editresponse = new String(result.getResponse().getContentAsByteArray());
 			log.debug(" webResponse  status  ============= {} ======  editresponse {}  ",result.getResponse().getStatus(), editresponse);
-			JsonObject statusUpdateTaskConfigjson = jsonParser.parse(editresponse).getAsJsonObject();
+			JsonObject statusUpdateTaskConfigjson = JsonUtils.parseStringAsJsonObject(editresponse);
 			Assert.assertNotNull(statusUpdateTaskConfigjson);
 			if (statusUpdateTaskConfigjson.has("status")) {
 				MockHttpServletRequestBuilder builderAllTaskList  =  mockHttpServletRequestBuilderGet("/admin/scheduletaskmanagement/getAllTaskDetail"); 
 				MvcResult resultAllTask =  this.mockMvc.perform(builderAllTaskList).andReturn();
 				String allTaskResponse = new String(resultAllTask.getResponse().getContentAsByteArray());
-				JsonObject taskConfigjson = jsonParser.parse(allTaskResponse).getAsJsonObject();
+				JsonObject taskConfigjson = JsonUtils.parseStringAsJsonObject(allTaskResponse);
 				log.debug(" webResponse  status  ============= {} ====== {} ",resultAllTask.getResponse().getStatus(),taskConfigjson);
 				
 				List<JsonObject> taskList = gson.fromJson(taskConfigjson.get("data"), new TypeToken<List<JsonObject>>(){}.getType());
@@ -286,7 +285,7 @@ public class TaskManagementServiceTest extends AbstractTestNGSpringContextTests 
 			MvcResult result = this.mockMvc.perform(builder).andReturn();
 			String editresponse = new String(result.getResponse().getContentAsByteArray());
 			log.debug(" webResponse  status  ============= {} ======  editresponse {}  ",result.getResponse().getStatus(), editresponse);
-			JsonObject detailTaskHistoryConfigjson = jsonParser.parse(editresponse).getAsJsonObject();
+			JsonObject detailTaskHistoryConfigjson = JsonUtils.parseStringAsJsonObject(editresponse);
 			Assert.assertNotNull(detailTaskHistoryConfigjson);
 			if (detailTaskHistoryConfigjson.has("status")) {
 				List<JsonObject> taskHistoryList = gson.fromJson(detailTaskHistoryConfigjson.get("data"), new TypeToken<List<JsonObject>>(){}.getType());
@@ -310,14 +309,14 @@ public class TaskManagementServiceTest extends AbstractTestNGSpringContextTests 
 			MvcResult result = this.mockMvc.perform(builder).andReturn();
 			String editresponse = new String(result.getResponse().getContentAsByteArray());
 			log.debug(" webResponse  status  ============= {} ======  editresponse {}  ",result.getResponse().getStatus(), editresponse);
-			JsonObject deleteTaskStatus = jsonParser.parse(editresponse).getAsJsonObject();
+			JsonObject deleteTaskStatus = JsonUtils.parseStringAsJsonObject(editresponse);
 			Assert.assertNotNull(deleteTaskStatus);
 			if (deleteTaskStatus.has("status")) {
 				Assert.assertTrue(deleteTaskStatus.get("status").getAsString().equalsIgnoreCase(PlatformServiceConstants.SUCCESS));
 				MockHttpServletRequestBuilder builderAllTaskList  =  mockHttpServletRequestBuilderGet("/admin/scheduletaskmanagement/getAllTaskDetail"); 
 				MvcResult resultAllTask =  this.mockMvc.perform(builderAllTaskList).andReturn();
 				String allTaskResponse = new String(resultAllTask.getResponse().getContentAsByteArray());
-				JsonObject taskConfigjson = jsonParser.parse(allTaskResponse).getAsJsonObject();
+				JsonObject taskConfigjson = JsonUtils.parseStringAsJsonObject(allTaskResponse);
 				log.debug(" webResponse  status  ============= {} ====== {} ",resultAllTask.getResponse().getStatus(),taskConfigjson);
 				
 				List<JsonObject> taskList = gson.fromJson(taskConfigjson.get("data"), new TypeToken<List<JsonObject>>(){}.getType());

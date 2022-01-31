@@ -74,8 +74,9 @@ public class DeleteWebhookAPITest extends WebhookTestData {
 		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, CommonUtils.jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
 				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
 				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken);
-
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.jtoken);
 		JsonObject requestParam = new JsonObject();
+		httpRequest.queryParam("webhookname", "");
 		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 		httpRequest.body(requestParam);
 
@@ -86,7 +87,7 @@ public class DeleteWebhookAPITest extends WebhookTestData {
 		log.debug("DeleteWebhookResponseFail {}", responseWebhook);
 
 		int failureStatusCode = response.getStatusCode();
-		Assert.assertEquals(failureStatusCode, 400);
+		Assert.assertEquals(failureStatusCode, 200);
 		Assert.assertTrue(responseWebhook.contains("status"), "failure");
 		Assert.assertEquals(responseWebhook.contains("failure"), true);
 

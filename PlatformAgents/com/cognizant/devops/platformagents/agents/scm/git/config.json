@@ -36,6 +36,9 @@
 			"until": "%Y-%m-%dT%H:%M:%SZ",
 			"consumptionTime": "%Y-%m-%dT%H:%M:%SZ"
 		},
+    	"repositories": {
+    		"names": []
+    	},
 		"responseTemplate": {
 			"sha": "commitId",
 			"commit": {

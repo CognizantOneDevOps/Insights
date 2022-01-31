@@ -35,6 +35,7 @@ import com.cognizant.devops.engines.platformengine.message.subscriber.AgentHealt
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
@@ -44,7 +45,6 @@ import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 /**
  * 
@@ -115,7 +115,7 @@ public class EngineAggregatorModule implements Job, ApplicationConfigInterface {
 		String keyPattern="";
 		String sourceProperty ="";
 		try {
-			JsonObject config = (JsonObject) new JsonParser().parse(agentConfig.getAgentJson());
+			JsonObject config = JsonUtils.parseStringAsJsonObject(agentConfig.getAgentJson());
 			JsonObject json = config.get("publish").getAsJsonObject();
 			String dataRoutingKey = json.get("data").getAsString();
 			boolean hasenrichTool = config.has("enrichData");

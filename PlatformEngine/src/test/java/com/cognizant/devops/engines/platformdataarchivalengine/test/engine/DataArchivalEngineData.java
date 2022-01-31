@@ -27,6 +27,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
@@ -34,7 +35,6 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 
@@ -80,8 +80,7 @@ public class DataArchivalEngineData {
 
 	public JsonObject convertStringIntoJson(String convertregisterkpi) {
 		JsonObject objectJson = new JsonObject();
-		JsonParser parser = new JsonParser();
-		objectJson = parser.parse(convertregisterkpi).getAsJsonObject();
+		objectJson = JsonUtils.parseStringAsJsonObject(convertregisterkpi);
 		return objectJson;
 	}
 

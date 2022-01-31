@@ -26,7 +26,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
-import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.KPIJobResultAttributes;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
@@ -36,7 +35,6 @@ import com.cognizant.devops.platformreports.assessment.datamodel.ContentConfigDe
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsKPIConfigDTO;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsKPIResultDetails;
 import com.cognizant.devops.platformreports.assessment.datamodel.QueryModel;
-import com.cognizant.devops.platformreports.assessment.kpi.InsightsStatusProvider;
 import com.cognizant.devops.platformreports.assessment.util.ReportEngineUtils;
 import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 import com.google.gson.Gson;
@@ -135,7 +133,7 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 		String graphQuery = QueryEnum.valueOf(query_type).toString();
 		graphQuery = graphQuery.replace(":kpiId", String.valueOf(contentConfigDefinition.getKpiId()))
 				.replace(":executionId", String.valueOf(contentConfigDefinition.getExecutionId()))
-				.replace(":assessmentId", String.valueOf(contentConfigDefinition.getAssessmentId()));
+				.replace(":assessmentReportName", "'"+contentConfigDefinition.getAssessmentReportName()+"'");
 		log.debug("Worlflow Detail ====  for kpi {0} contentId {1} graphQuery   {2} ", contentConfigDefinition.getKpiId(),
 				contentConfigDefinition.getContentId(), graphQuery);
 		List<JsonObject> graphResponse = neo4jExecutor.fetchData(graphQuery);
@@ -289,11 +287,11 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 	}
 
 	@Override
-	public JsonArray fetchVisualizationResults(long executionId, int kpiId, int assessmentId) {
+	public JsonArray fetchVisualizationResults(long executionId, int kpiId, String assessmentReportName) {
 		String vQuery = "";
 		vQuery = QueryEnum.valueOf(QueryEnum.NEO4J_VCONTENTQUERY.name()).toString();
 		vQuery = vQuery.replace(":kpiId", String.valueOf(kpiId)).replace(":executionId", String.valueOf(executionId))
-				.replace(":assessmentId", String.valueOf(assessmentId));
+				.replace(":assessmentReportName", "'"+assessmentReportName+"'");
 		log.debug("Worlflow Detail ==== content Visualization query{}  ", vQuery);
 		return fetchVisualizationResults(vQuery);
 	}

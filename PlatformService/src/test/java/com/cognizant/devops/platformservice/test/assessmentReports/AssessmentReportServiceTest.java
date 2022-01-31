@@ -33,15 +33,18 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentConfiguration;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentReportTemplate;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsContentConfig;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsKPIConfig;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
+import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFilesDAL;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
 import com.cognizant.devops.platformservice.assessmentreport.service.AssesmentReportServiceImpl;
+import com.cognizant.devops.platformservice.rest.filemanagement.service.FileManagementServiceImpl;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -63,6 +66,7 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 
 	public static final AssesmentReportServiceImpl assessmentService = new AssesmentReportServiceImpl();
 	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
+	FileManagementServiceImpl fileManagementService = new FileManagementServiceImpl();
 
 	@Test(priority = 1)
 	public void testsaveKpiDefinition() throws InsightsCustomException, IOException {
@@ -190,7 +194,7 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 			Assert.fail(e.getMessage());
 		}
 	}
-
+	
 	@Test(priority = 15)
 	public void testGetReportTemplate() throws InsightsCustomException {
 		try {
@@ -231,8 +235,8 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 	@Test(priority = 20)
 	public void testSaveDailyAssessmentReport() throws InsightsCustomException {
 		try {
-			int assessmentid = assessmentService.saveAssessmentReport(dailyAssessmentReportJson);
-			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(assessmentid);
+			JsonObject responseJson = assessmentService.saveAssessmentReport(dailyAssessmentReportJson);
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJson.get("assessmentReportId").getAsInt());
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(),
 					dailyAssessmentReportJson.get("reportTemplate").getAsInt(),
@@ -258,8 +262,8 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 	public void testSaveWeeklyAssessmentReport() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
-			int assessmentid = assessmentService.saveAssessmentReport(weeklyAssessmentReportJson);
-			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(assessmentid);
+			JsonObject responseJson = assessmentService.saveAssessmentReport(weeklyAssessmentReportJson);
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJson.get("assessmentReportId").getAsInt());
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(),
 					dailyAssessmentReportJson.get("reportTemplate").getAsInt(),
@@ -285,8 +289,8 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 	public void testSaveMonthlyAssessmentReport() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
-			int assessmentid = assessmentService.saveAssessmentReport(monthlyAssessmentReportJson);
-			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(assessmentid);
+			JsonObject responseJson = assessmentService.saveAssessmentReport(monthlyAssessmentReportJson);
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJson.get("assessmentReportId").getAsInt());
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(),
 					dailyAssessmentReportJson.get("reportTemplate").getAsInt(),
@@ -312,8 +316,8 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 	public void testSaveQuarterlyAssessmentReport() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
-			int assessmentid = assessmentService.saveAssessmentReport(quarterlyAssessmentReportJson);
-			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(assessmentid);
+			JsonObject responseJson = assessmentService.saveAssessmentReport(quarterlyAssessmentReportJson);
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJson.get("assessmentReportId").getAsInt());
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(),
 					dailyAssessmentReportJson.get("reportTemplate").getAsInt(),
@@ -340,8 +344,8 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 	public void testYearlyQuarterlyAssessmentReport() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
-			int assessmentid = assessmentService.saveAssessmentReport(yearlyAssessmentReportJson);
-			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(assessmentid);
+			JsonObject responseJson = assessmentService.saveAssessmentReport(yearlyAssessmentReportJson);
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJson.get("assessmentReportId").getAsInt());
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(),
 					dailyAssessmentReportJson.get("reportTemplate").getAsInt(),
@@ -367,8 +371,8 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 	public void testSaveOneTimeAssessmentReport() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
-			int assessmentid = assessmentService.saveAssessmentReport(oneTimeAssessmentReportJson);
-			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(assessmentid);
+			JsonObject responseJson = assessmentService.saveAssessmentReport(oneTimeAssessmentReportJson);
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJson.get("assessmentReportId").getAsInt());
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(),
 					oneTimeAssessmentReportJson.get("reportTemplate").getAsInt(),
@@ -395,8 +399,8 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 	public void testSaveBiWeeklyAssessmentReport() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
-			int assessmentid = assessmentService.saveAssessmentReport(biWeeklyAssessmentReportJson);
-			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(assessmentid);
+			JsonObject responseJson = assessmentService.saveAssessmentReport(biWeeklyAssessmentReportJson);
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJson.get("assessmentReportId").getAsInt());
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(),
 					biWeeklyAssessmentReportJson.get("reportTemplate").getAsInt(),
@@ -423,8 +427,8 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 			throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
-			int assessmentid = assessmentService.saveAssessmentReport(triWeeklyAssessmentReportJson);
-			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(assessmentid);
+			JsonObject responseJson = assessmentService.saveAssessmentReport(triWeeklyAssessmentReportJson);
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJson.get("assessmentReportId").getAsInt());
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(),
 					triWeeklyAssessmentReportJson.get("reportTemplate").getAsInt(),
@@ -451,8 +455,8 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 	public void testSaveTriWeeklyAssessmentReportWithDataSource() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
-			int assessmentid = assessmentService.saveAssessmentReport(triWeeklyAssessmentWithDataSourceReportJson);
-			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(assessmentid);
+			JsonObject responseJson = assessmentService.saveAssessmentReport(triWeeklyAssessmentWithDataSourceReportJson);
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJson.get("assessmentReportId").getAsInt());
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(),
 					triWeeklyAssessmentReportJson.get("reportTemplate").getAsInt(),
@@ -477,13 +481,15 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 
 	@Test(priority = 29, expectedExceptions = InsightsCustomException.class)
 	public void testSaveAssessmentIncompleteReport() throws InsightsCustomException {
-		int assessmentid = assessmentService.saveAssessmentReport(incorrectAssessmentReportJson);
+		JsonObject assessmentResponse = assessmentService.saveAssessmentReport(incorrectAssessmentReportJson);
 	}
 
 	@Test(priority = 30)
 	public void testLoadAssessmentReportList() throws InsightsCustomException {
 		try {
-			JsonArray reportList = assessmentService.getAssessmentReportList();
+			JsonObject userDetail = new JsonObject();
+			userDetail.addProperty("userName", "Test_User");
+			JsonArray reportList = assessmentService.getAssessmentReportList(userDetail);
 			Assert.assertNotNull(reportList);
 			Assert.assertTrue(reportList.size() > 0);
 		} catch (AssertionError e) {
@@ -546,15 +552,15 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 	public void testSaveOneTimeAssessmentReportWithStartDateGreaterThanEndDate()
 			throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
-		int assessmentid = assessmentService
+		JsonObject assessmentResponse = assessmentService
 				.saveAssessmentReport(oneTimeAssessmentReportWithStartDateGreaterThanEndDateJson);
 	}
 
 	@Test(priority = 38)
 	public void testSaveDailyEmailAssessmentReport() throws InsightsCustomException {
 		try {
-			int assessmentid = assessmentService.saveAssessmentReport(dailyEmailAssessmentReportJson);
-			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(assessmentid);
+			JsonObject responseJson = assessmentService.saveAssessmentReport(dailyEmailAssessmentReportJson);
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJson.get("assessmentReportId").getAsInt());
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(),
 					dailyEmailAssessmentReportJson.get("reportTemplate").getAsInt(),
@@ -586,8 +592,8 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 	public void testSaveDailyWithoutEmailAssessmentReport() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
-			int assessmentid = assessmentService.saveAssessmentReport(dailywithoutEmailAssessmentReportJson);
-			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(assessmentid);
+			JsonObject responseJson = assessmentService.saveAssessmentReport(dailywithoutEmailAssessmentReportJson);
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJson.get("assessmentReportId").getAsInt());
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(),
 					dailywithoutEmailAssessmentReportJson.get("reportTemplate").getAsInt(),
@@ -616,8 +622,8 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 	public void testSaveEmailCCAssessmentReport() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
-			int assessmentid = assessmentService.saveAssessmentReport(dailyEmailCCAssessmentReportJson);
-			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(assessmentid);
+			JsonObject responseJson = assessmentService.saveAssessmentReport(dailyEmailCCAssessmentReportJson);
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJson.get("assessmentReportId").getAsInt());
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(),
 					dailyEmailAssessmentReportJson.get("reportTemplate").getAsInt(),
@@ -650,8 +656,8 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 	public void testSaveEmailBCCAssessmentReport() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
-			int assessmentid = assessmentService.saveAssessmentReport(dailyEmailBCCAssessmentReportJson);
-			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(assessmentid);
+			JsonObject responseJson = assessmentService.saveAssessmentReport(dailyEmailBCCAssessmentReportJson);
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJson.get("assessmentReportId").getAsInt());
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(),
 					dailyEmailAssessmentReportJson.get("reportTemplate").getAsInt(),
@@ -685,7 +691,7 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 			String updateAssessmentReport = "{\"isReoccuring\":true,\"emailList\":\"dasdsd\",\"id\":"
 					+ reportConfigDAL.getAssessmentByAssessmentName(
 							dailyEmailAssessmentReportJson.get("reportName").getAsString()).getId()
-					+ ",\"tasklist\":[{\"taskId\":1,\"description\":\"KPI_Execute_service_test\"},{\"taskId\":2,\"description\":\"PDF_Execute_service_test\"},{\"taskId\":3,\"description\":\"Email_Execute_service_test\"}],\"emailDetails\":{\"senderEmailAddress\":\"onedevops@cogdevops.com\",\"receiverEmailAddress\":\"\",\"receiverCCEmailAddress\":\"dibakor.barua@cognizant.com\",\"receiverBCCEmailAddress\":\"\",\"mailSubject\":\"{ReportDisplayName} - {TimeOfReportGeneration}\",\"mailBodyTemplate\":\"Dear User,\\nPlease find attached Assessment Report  {ReportDisplayName}\\ngenerated on {TimeOfReportGeneration}.\\n\\nRegards,\\nOneDevops Team.\\n** This is an Auto Generated Mail by Insights scheduler. Please Do not reply to this mail**\"}}";
+					+ ",\"tasklist\":[{\"taskId\":1,\"description\":\"KPI_Execute_service_test\"},{\"taskId\":2,\"description\":\"PDF_Execute_service_test\"},{\"taskId\":3,\"description\":\"Email_Execute_service_test\"}],\"emailDetails\":{\"senderEmailAddress\":\"onedevops@cogdevops.com\",\"receiverEmailAddress\":\"\",\"receiverCCEmailAddress\":\"dibakor.barua@cognizant.com\",\"receiverBCCEmailAddress\":\"\",\"mailSubject\":\"{ReportDisplayName} - {TimeOfReportGeneration}\",\"mailBodyTemplate\":\"Dear User,\\nPlease find attached Assessment Report  {ReportDisplayName}\\ngenerated on {TimeOfReportGeneration}.\\n\\nRegards,\\nOneDevops Team.\\n** This is an Auto Generated Mail by Insights scheduler. Please Do not reply to this mail**\"},\"orgName\":\"Test Org\",\"userName\":\"Test_User\"}";
 			final JsonObject updateAssessmentReportJson = convertStringIntoJson(updateAssessmentReport);
 			int assessmentId = assessmentService.updateAssessmentReport(updateAssessmentReportJson);
 			Assert.assertEquals(assessmentId, updateAssessmentReportJson.get("id").getAsInt());
@@ -698,12 +704,12 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 	public void testsetRetryStatus() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
-			int assessmentid = assessmentService.saveAssessmentReport(dailyRestartAssessmentReport);
+			JsonObject assessmentResponse = assessmentService.saveAssessmentReport(dailyRestartAssessmentReport);
 			int configId = reportConfigDAL
 					.getAssessmentByAssessmentName(dailyRestartAssessmentReport.get("reportName").getAsString())
 					.getId();
 			String retryJson = "{\"configId\":" + configId + ",\"status\":\"RESTART\"}";
-			JsonObject reportRestartJson = parser.parse(retryJson).getAsJsonObject();
+			JsonObject reportRestartJson = JsonUtils.parseStringAsJsonObject(retryJson);
 			String status = assessmentService.setReportStatus(reportRestartJson);
 			InsightsAssessmentConfiguration assessment = reportConfigDAL
 					.getAssessmentByConfigId(Integer.valueOf(configId));
@@ -719,12 +725,12 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 	public void testrunImmediateStatus() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
-			int assessmentid = assessmentService.saveAssessmentReport(dailyRunImmediateAssessmentReport);
+			JsonObject assessmentid = assessmentService.saveAssessmentReport(dailyRunImmediateAssessmentReport);
 			int configId = reportConfigDAL
 					.getAssessmentByAssessmentName(dailyRunImmediateAssessmentReport.get("reportName").getAsString())
 					.getId();
 			String retryJson = "{\"configId\":" + configId + ",\"runimmediate\":true}";
-			JsonObject reportRestartJson = parser.parse(retryJson).getAsJsonObject();
+			JsonObject reportRestartJson = JsonUtils.parseStringAsJsonObject(retryJson);
 			String status = assessmentService.setReportStatus(reportRestartJson);
 			InsightsAssessmentConfiguration assessment = reportConfigDAL
 					.getAssessmentByConfigId(Integer.valueOf(configId));
@@ -735,6 +741,43 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		}
 
 	}
+	
+	@Test (priority = 45)
+	public void testGrafanaPDFSaveReportTemplate() throws InsightsCustomException {
+		try {
+			FileInputStream input = new FileInputStream(tableJson);
+			MultipartFile multipartConfigFile = new MockMultipartFile("file", tableJson.getName(), "text/plain",
+					IOUtils.toByteArray(input));
+			String message = fileManagementService.uploadConfigurationFile(multipartConfigFile, "table", "JSON", "GRAFANA_PDF_TEMPLATE", false);
+			assessmentService.saveKpiDefinition(registerGrafanakpiJson);
+			assessmentService.saveContentDefinition(registerGrafanaContentJson);
+			grafanaReportId = assessmentService.saveTemplateReport(grafanaPDFreportTemplateJson);
+			InsightsAssessmentReportTemplate report = (InsightsAssessmentReportTemplate) reportConfigDAL
+					.getReportTemplateByReportId(grafanaReportId);
+			assessmentReportDataInit();
+			Assert.assertNotNull(report);
+			Assert.assertTrue(report.getReportsKPIConfig().size() > 0);
+		} catch (AssertionError | IOException e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test (priority = 46)
+	public void testGrafanaPDFUpdateReportTemplate() throws InsightsCustomException {
+		try {
+			grafanaPDFreportTemplateJson.addProperty("reportId", grafanaReportId);
+			int grafanaReportId = assessmentService.editReportTemplate(grafanaPDFreportTemplateJson);
+			InsightsAssessmentReportTemplate report = (InsightsAssessmentReportTemplate) reportConfigDAL
+					.getReportTemplateByReportId(grafanaReportId);
+			assessmentReportDataInit();
+			Assert.assertNotNull(report);
+			Assert.assertTrue(report.getReportsKPIConfig().size() > 0);
+			Assert.assertNotEquals(grafanaReportId, -1);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
 
 	@AfterClass
 	public void cleanUp() {
@@ -793,12 +836,14 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		// Delete Report Templates
 		try {
 			reportConfigDAL.deleteReportTemplatebyReportID(reportIdForList);
+			reportConfigDAL.deleteReportTemplatebyReportID(grafanaReportId);
 		} catch (Exception e) {
 			log.error("Error cleaning up at AssessmentReportsServiceTest Report template", e);
 		}
 		// Delete Content
 		try {
 			reportConfigDAL.deleteContentbyContentID(registerContentJson.get("contentId").getAsInt());
+			reportConfigDAL.deleteContentbyContentID(registerGrafanaContentJson.get("contentId").getAsInt());
 		} catch (Exception e) {
 			log.error("Error cleaning up at AssessmentReportsServiceTest Content record", e);
 		}
@@ -806,6 +851,7 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		// Delete KPI
 		try {
 			reportConfigDAL.deleteKPIbyKpiID(registerkpiJson.get("kpiId").getAsInt());
+			reportConfigDAL.deleteKPIbyKpiID(registerGrafanakpiJson.get("kpiId").getAsInt());
 		} catch (Exception e) {
 			log.error("Error cleaning up at AssessmentReportsServiceTest KPI record", e);
 		}
@@ -826,6 +872,13 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 			} catch (Exception e) {
 				log.error("Error cleaning up at AssessmentReportsServiceTest Bulk KPI record", e);
 			}
+		}
+		
+		//Delete vType json
+		try {
+			fileManagementService.deleteConfigurationFile("table");
+		} catch (InsightsCustomException e) {
+			log.error("Error cleaning up at AssessmentReportsServiceTest vType Json", e);
 		}
 
 	}

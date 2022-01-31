@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.engines.platformauditing.blockchaindatacollection.modules.blockchainprocessing;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -122,7 +123,7 @@ public class JiraProcessingExecutor implements Job, ApplicationConfigInterface {
 						LOG.debug(hc);
 						//decrypt digitalSign
 						byte[] byteArray = Base64.getDecoder().decode(digitalSign.getBytes());						
-						String keyStr = new String(Files.readAllBytes(Paths.get(config.get("ENGINE_PRIVATE_KEY").getAsString())));
+						String keyStr = new String(Files.readAllBytes(Paths.get(new File(config.get("ENGINE_PRIVATE_KEY").getAsString()).getCanonicalPath())));
 						keyStr = keyStr.replaceAll("\\n", "").replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "");
 						KeyFactory key = KeyFactory.getInstance(keyAlgorithm);
 						PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(keyStr));

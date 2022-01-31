@@ -78,6 +78,22 @@ export class DataSharedService {
     return this.storage.get("orgId");
   }
 
+  public getLoginName() {
+    return this.storage.get("loginName");
+  }
+
+  public setLoginName(loginName: string) {
+    this.storage.set("loginName", loginName);
+  }
+
+  public getOrgName() {
+    return this.storage.get("orgName");
+  }
+
+  public setOrgName(orgName: string) {
+    this.storage.set("orgName", orgName);
+  }
+
   public setSSOUserName(ssouserName: String) {
     this.storage.set("SsoUserName", ssouserName);
   }

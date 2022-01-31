@@ -28,11 +28,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformdal.timertasks.InsightsSchedulerTaskStatus;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/admin/scheduletaskmanagement")
@@ -127,7 +127,6 @@ public class TaskManagementController {
 	private JsonObject validateRequestString(String taskrequestJson) {
 		taskrequestJson = taskrequestJson.replace("\n", "").replace("\r", "");
 		String validatedRequestJson = ValidationUtils.validateRequestBody(taskrequestJson);
-		JsonParser parser = new JsonParser();
-		return parser.parse(validatedRequestJson).getAsJsonObject();
+		return JsonUtils.parseStringAsJsonObject(validatedRequestJson);
 	}
 }

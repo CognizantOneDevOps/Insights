@@ -23,12 +23,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.elasticsearch.ElasticSearchDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class ElasticSearchNativeHandler {
 	private static Logger log = LogManager.getLogger(ElasticSearchNativeHandler.class.getName());
@@ -48,7 +48,7 @@ public class ElasticSearchNativeHandler {
 			} else {
 				JsonArray esResponseArray = esResponse.get("hits").getAsJsonObject().get("hits").getAsJsonArray();
 				for (JsonElement esResponseSource : esResponseArray) {
-					JsonObject parsedJson = new JsonParser().parse(esResponseSource.toString()).getAsJsonObject();
+					JsonObject parsedJson = JsonUtils.parseStringAsJsonObject(esResponseSource.toString());
 					JsonObject recordKPI = parsedJson.get("_source").getAsJsonObject();
 					log.debug(" recordKPI {} ", recordKPI);
 					recordlist.add(recordKPI);
@@ -84,7 +84,7 @@ public class ElasticSearchNativeHandler {
 			} else {
 				JsonArray esResponseArray = esResponse.get("hits").getAsJsonObject().get("hits").getAsJsonArray();
 				for (JsonElement esResponseSource : esResponseArray) {
-					JsonObject parsedJson = new JsonParser().parse(esResponseSource.toString()).getAsJsonObject();
+					JsonObject parsedJson = JsonUtils.parseStringAsJsonObject(esResponseSource.toString());
 					JsonObject recordKPI = parsedJson.get("_source").getAsJsonObject();
 					log.debug(" recordKPI {} ", recordKPI);
 					recordlist.add(recordKPI);

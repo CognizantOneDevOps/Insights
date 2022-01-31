@@ -78,7 +78,7 @@ public class KPIObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//span[text()='YES']")
 	public WebElement yesBtnEl;
 
-	@FindBy(xpath = "//span[text()='OK']")
+	@FindBy(xpath = "//span[text()= 'OKAY']")
 	public WebElement btnOKEl;
 
 	@FindBy(xpath = "//mat-icon[@title='Edit']")

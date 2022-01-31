@@ -122,7 +122,7 @@ public class ContentConfigurationObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//span[text()='YES']/parent::button")
 	WebElement yBtnEl;
 
-	@FindBy(xpath = "//span[text()='OK']")
+	@FindBy(xpath = "//span[text()= 'OKAY']")
 	WebElement btnOKEl;
 
 	@FindBy(xpath = "//mat-icon[@title='Delete']")

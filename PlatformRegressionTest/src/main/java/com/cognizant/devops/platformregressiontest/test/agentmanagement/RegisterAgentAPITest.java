@@ -20,7 +20,6 @@ import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformregressiontest.test.common.CommonUtils;
 import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
 import com.google.gson.JsonObject;
@@ -37,7 +36,7 @@ public class RegisterAgentAPITest extends AgentTestData {
 
 	@Test(priority = 1, dataProvider = "agentdataprovider")
 	public void testGetToolRawConfigFile(String toolName, String agentVersion, String osversion, String configJson,
-			String vault) throws InsightsCustomException {
+			String vault, String type) {
 
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("getAgentConfigBaseURI")
 				+ "?version=" + agentVersion + "&tool=" + toolName + "&isWebhook=false";
@@ -52,7 +51,7 @@ public class RegisterAgentAPITest extends AgentTestData {
 		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.jtoken);
 
 		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
-		httpRequest.queryParams("version", agentVersion, "tool", toolName, "isWebhook", "false");
+		httpRequest.queryParams("version", agentVersion, "tool", toolName, "isWebhook", "false", "type", type);
 
 		// Response Object
 		Response responseAgent = httpRequest.request(Method.GET, "/");
@@ -68,7 +67,7 @@ public class RegisterAgentAPITest extends AgentTestData {
 	}
 
 	@Test(priority = 2, dataProvider = "agentdataprovider")
-	public void registerAgent(String toolName, String agentVersion, String osversion, String configJson, String vault) {
+	public void registerAgent(String toolName, String agentVersion, String osversion, String configJson, String vault, String type) {
 
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("registerAgentBaseURI");
 		RequestSpecification httpRequest = RestAssured.given();
@@ -89,6 +88,7 @@ public class RegisterAgentAPITest extends AgentTestData {
 		requestParam.addProperty("trackingDetails", "");
 		requestParam.addProperty("vault", vault);
 		requestParam.addProperty("isWebhook", false);
+		requestParam.addProperty("type", type);
 
 		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 		httpRequest.body(requestParam);
@@ -109,7 +109,7 @@ public class RegisterAgentAPITest extends AgentTestData {
 
 	@Test(priority = 3, dataProvider = "agentdataprovider")
 	public void registerAgentAuthorizationFail(String toolName, String agentVersion, String osversion,
-			String configJson, String vault) {
+			String configJson, String vault, String type) {
 
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("getRegiterAgent");
 		RequestSpecification httpRequest = RestAssured.given();
@@ -123,13 +123,13 @@ public class RegisterAgentAPITest extends AgentTestData {
 
 		int statusCode = response.getStatusCode();
 		log.info(statusCode);
-		Assert.assertTrue(responseRegisterAgentList.contains("Authentication not successful"), "failure");
+		Assert.assertTrue(responseRegisterAgentList.contains("Forbidden"), "failure");
 
 	}
 
 	@Test(priority = 4, dataProvider = "agentdataprovider")
 	public void registerAgentFail(String toolName, String agentVersion, String osversion, String configJson,
-			String vault) {
+			String vault, String type) {
 
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("registerAgentBaseURI");
 
@@ -139,16 +139,17 @@ public class RegisterAgentAPITest extends AgentTestData {
 				ConfigOptionsTest.GRAFANA_COOKIES_ORG, CommonUtils.getProperty("grafanaOrg"),
 				ConfigOptionsTest.GRAFANA_COOKIES_ROLE, CommonUtils.getProperty("grafanaRole"),
 				ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken);
-
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.jtoken);
 		// Request payload sending along with post request
 		JsonObject requestParam = new JsonObject();
 		requestParam.addProperty("toolName", toolName);
-		requestParam.addProperty("agentVersion", agentVersion);
+		requestParam.addProperty("agentVersion", "99.5");
 		requestParam.addProperty("osversion", osversion);
 		requestParam.addProperty("configJson", configJson);
 		requestParam.addProperty("trackingDetails", "");
+		requestParam.addProperty("vault", vault);
 		requestParam.addProperty("isWebhook", false);
-
+		requestParam.addProperty("type", type);
 		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 		httpRequest.body(requestParam);
 
@@ -158,7 +159,7 @@ public class RegisterAgentAPITest extends AgentTestData {
 		log.debug("FailureResponse {}", responseRegisterAgent);
 
 		int failureStatusCode = responseAgent.getStatusCode();
-		Assert.assertEquals(failureStatusCode, 400);
+		Assert.assertEquals(failureStatusCode, 200);
 		Assert.assertTrue(responseRegisterAgent.contains("status"), "failure");
 
 	}

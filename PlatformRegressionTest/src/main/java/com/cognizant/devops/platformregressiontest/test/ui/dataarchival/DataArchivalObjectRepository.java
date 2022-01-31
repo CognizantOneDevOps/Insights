@@ -59,7 +59,7 @@ public class DataArchivalObjectRepository extends LoginAndSelectModule{
 	@FindBy(xpath = "//table[@role='presentation']//tbody//tr//td")
 	List<WebElement> listOfDate;
 
-	@FindBy(xpath = "//span[text()= 'OK']")
+	@FindBy(xpath = "//span[text()= 'OKAY']")
 	WebElement okButton;
 
 	@FindBy(xpath = "//span[text()= 'YES']")

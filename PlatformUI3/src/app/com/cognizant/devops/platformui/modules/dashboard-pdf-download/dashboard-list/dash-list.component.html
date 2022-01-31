@@ -40,7 +40,7 @@
                     edit
                 </mat-icon>
             </button>
-            <button mat-icon-button *ngIf="onRadioBtnSelect" (click)="delete()">
+            <button mat-icon-button *ngIf="onRadioBtnSelect" [disabled]="this.selectedIndex == -1 || this.selectedDashboard.status == 'IN_PROGRESS'" (click)="delete()">
                 <mat-icon title="Delete" class="mat-icon material-icons">
                     delete
                 </mat-icon>

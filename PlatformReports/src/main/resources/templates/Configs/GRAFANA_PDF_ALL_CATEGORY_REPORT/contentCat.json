@@ -1,0 +1,186 @@
+[
+   {
+      "contentId":22101,
+      "isActive":"TRUE",
+      "expectedTrend":"BELOW",
+      "resultField":"Issues",
+      "contentName":" Defects Count",
+      "kpiId":2101,
+      "noOfResult":2,
+      "threshold":0,
+      "directionOfThreshold":"BELOW",
+      "message":{
+         "contentMessage":"Total number of defects captured in the last sprint were {Count}",
+		 "neutralMessage":"No defects captured in the last sprint"
+      }
+   },
+   {
+      "contentId":22102,
+      "isActive":"TRUE",
+      "expectedTrend":"BELOW",
+      "contentName":"Average hours spent on projects in a Sprint ",
+      "kpiId":2102,
+      "noOfResult":15,
+      "threshold":5,
+      "action":"AVERAGE",
+      "directionOfThreshold":"BELOW",
+      "message":{
+         "contentMessage":"Average hours spent on projects is {actualdirection} the defined threshold in the last sprint.",
+		 "neutralMessage":"No average time spent on projects. "
+      },
+      "resultField":"Duration"
+   },
+   {
+      "contentId":22103,
+      "isActive":"TRUE",
+      "expectedTrend":"UPWARDS",
+      "contentName":"Maximum Employee Productivity",
+      "kpiId":2103,
+      "noOfResult":15,
+      "action":"MAX",
+      "resultField":"Productivity",
+      "message":{
+         "contentMessage":"Employee productivity was maximum on {maxDate} day in last {week} week(s) and was {result}",
+		 "neutralMessage":"No detail found on Employee productivity"
+      }
+   },
+   {
+      "contentId":22104,
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Total Code Smell in Deployment",
+      "kpiId":2104,
+      "noOfResult":2,
+      "threshold":0,
+      "resultField":"CodeSmell",
+      "message":{
+         "positive":"Total Code Smell has decreased to {current:CodeSmell} from {previous:CodeSmell} ",
+         "negative":"Total Code Smell has increased to {current:CodeSmell} from {previous:CodeSmell} ",
+         "neutral":"Total Code Smell has remained constant to {CodeSmell}"
+      },
+      "isActive":"TRUE"
+   },
+   {
+      "contentId":22108,
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Total Code Bugs in Deployment",
+      "kpiId":2104,
+      "noOfResult":2,
+      "threshold":0,
+      "resultField":"Bugs",
+      "message":{
+         "positive":"Total Code Bugs has decreased to {current:Bugs} from {previous:Bugs} ",
+         "negative":"Total Code Bugs has increased to {current:Bugs} from {previous:Bugs} ",
+         "neutral":"Total Code Bugs has remained constant to {Bugs}"
+      },
+      "isActive":"TRUE"
+   },
+   {
+      "contentId":22109,
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Total Code Vulnerablilities in Deployment",
+      "kpiId":2104,
+      "noOfResult":2,
+      "threshold":0,
+      "resultField":"Vulnerablilities",
+      "message":{
+         "positive":"Total Code Vulnerablilities has decreased to {current:Vulnerablilities} from {previous:Vulnerablilities} ",
+         "negative":"Total Code Vulnerablilities has increased to {current:Vulnerablilities} from {previous:Vulnerablilities} ",
+         "neutral":"Total Code Vulnerablilities has remained constant to {Vulnerablilities}"
+      },
+      "isActive":"TRUE"
+   },
+   {
+      "contentId":22105,
+      "isActive":"TRUE",
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Total Failure w.r.t zone ",
+      "kpiId":2105,
+      "noOfResult":15,
+      "resultField":"Failure",
+      "thresholds":{
+         "red":8,
+         "amber":6,
+         "green":4
+      },
+      "action":"COUNT",
+      "directionOfThreshold":"BELOW",
+      "message":{
+         "contentMessage":"Total Failure builds w.r.t zones are red {red}, amber {amber} , green {green}",
+		 "neutralMessage":"No total Failure builds found"
+      }
+   },
+    {
+      "contentId":22110,
+      "isActive":"TRUE",
+      "expectedTrend":"UPWARDS",
+      "contentName":"Total Successful builds w.r.t zone ",
+      "kpiId":2105,
+      "noOfResult":15,
+      "resultField":"Success",
+      "thresholds":{
+         "red":8,
+         "amber":6,
+         "green":4
+      },
+      "action":"COUNT",
+      "directionOfThreshold":"ABOVE",
+      "message":{
+         "contentMessage":"Total Successful builds  w.r.t zones are red {red}, amber {amber} , green {green}",
+		 "neutralMessage":"No Successful builds found"
+      }
+   },
+   {
+      "contentId":22106,
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Maximum Deploy Time in Secs",
+      "kpiId":"2106",
+      "noOfResult":2,
+      "threshold":0,
+	  "resultField":"Deploy",
+      "message":{
+         "contentMessage":"Maximum successful deployment time captured in the last sprint was {Deploy}s .",
+		 "neutralMessage":"No deployment captured in the last sprint"
+      },
+      "isActive":"TRUE"
+   },
+    {
+      "contentId":22107,
+      "expectedTrend":"UPWARDS",
+      "contentName":"Total Number of Builds",
+      "kpiId":"2107",
+	  "resultField":"Builds",
+      "noOfResult":2,
+      "threshold":0,
+      "message":{
+         "contentMessage":"There were total {Builds} build(s) captured in the last sprint.",
+		 "neutralMessage":"No build(s) captured in the last sprint."
+      },
+      "isActive":"TRUE"
+   },{
+      "contentId":22111,
+      "isActive":"TRUE",
+      "expectedTrend":"UPWARDS",
+      "contentName":"Total Successful builds w.r.t zone ",
+      "kpiId":2109,
+      "noOfResult":15,
+      "resultField":"Success",
+      "action":"COUNT",
+      "message":{
+         "contentMessage":"Total Successful builds were {result} in last {day} days",
+		 "neutralMessage":"No Successful builds in last {day} days "
+      }
+   },{
+      "contentId":22112,
+      "isActive":"TRUE",
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Total Failure w.r.t zone ",
+      "kpiId":2109,
+      "noOfResult":15,
+      "resultField":"Failure",
+      "action":"COUNT",
+      "message":{
+         "contentMessage":"Total Failure builds were {result} in last {day} days",
+		 "neutralMessage":"No Failure builds in last {day} days "
+      }
+   }
+]

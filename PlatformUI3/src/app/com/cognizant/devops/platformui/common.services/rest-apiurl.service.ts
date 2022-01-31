@@ -80,7 +80,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_USERS_ORGS", '/PlatformService/accessGrpMgmt/getCurrentOrgRole');
         this.addEndPoint("GET_GRAFANA_VERSION", "/PlatformService/accessGrpMgmt/getGrafanaVersion");
         this.addEndPoint("SEARCH_DASHBOARD", '/PlatformService/accessGrpMgmt/dashboards');
-        this.addEndPoint("ORG_USERS_GET", '/PlatformService/admin/userMgmt/getOrgUsers');
+        this.addEndPoint("ORG_USERS_GET", '/PlatformService/admin/userMgmt/v2/getOrgUsers');
         this.addEndPoint("ORG_CREATE", '/PlatformService/admin/userMgmt/createOrg');
         this.addEndPoint("USER_CREATE", '/PlatformService/accessGrpMgmt/addUserInOrg');
         this.addEndPoint("ASSIGN_USER", '/PlatformService/accessGrpMgmt/assignUser');
@@ -118,7 +118,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("AGENT_START_STOP", '/PlatformService/admin/agentConfiguration/startStopAgent');
         this.addEndPoint("DOCROOT_AGENT_VERSION_TOOLS", '/PlatformService/admin/agentConfiguration/getSystemAvailableAgentList');
         this.addEndPoint("DOCROOT_AGENT_TOOL_CONFIG_DETAILS", '/PlatformService/admin/agentConfiguration/getToolRawConfigFile');
-        this.addEndPoint("DB_AGENTS_LIST", '/PlatformService/admin/agentConfiguration/getRegisteredAgents');
+        this.addEndPoint("DB_AGENTS_LIST", '/PlatformService/admin/agentConfiguration/2.0/getRegisteredAgents');
         this.addEndPoint("DB_AGENT_CONFIG_DETAILS", '/PlatformService/admin/agentConfiguration/getRegisteredAgentDetail');
         this.addEndPoint("AGENT_UNINSTALL", '/PlatformService/admin/agentConfiguration/uninstallAgent');
         this.addEndPoint("AGENT_REGISTERV2", '/PlatformService/admin/agentConfiguration/2.0/registerAgent');
@@ -241,6 +241,22 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("GET_CONFIG_FILES", '/PlatformService/filemanagement/getConfigurationFiles');
         this.addEndPoint("DELETE_CONFIG_FILE", '/PlatformService/filemanagement/deleteConfigFile');
         this.addEndPoint("DOWNLOAD_CONFIG_FILE", '/PlatformService/filemanagement/downloadConfigFile');
+
+        //Outcome
+        this.addEndPoint("SAVE_OUTCOME_CONFIG", '/PlatformService/outcome/saveOutcomeConfig');
+        this.addEndPoint("FETCH_OUTCOME_TOOL_CONFIG", '/PlatformService/outcome/fetchMileStoneTools');
+        this.addEndPoint("UPDATE_OUTCOME_CONFIG", '/PlatformService/outcome/updateOutcomeConfig');
+        this.addEndPoint("DELETE_OUTCOME_CONFIG", '/PlatformService/outcome/deleteOutcomeConfig');
+        this.addEndPoint("LIST_OUTCOME", '/PlatformService/outcome/getAllActiveOutcome');
+        this.addEndPoint("UPDATE_OUTCOME_CONFIG_STATUS", '/PlatformService/outcome/updateOutcomeConfigStatus');
+        
+        //MileStone
+        this.addEndPoint("SAVE_MILESTONE_CONFIG", '/PlatformService/milestone/saveMileStoneConfig');
+        this.addEndPoint("FETCH_MILESTONE_CONFIG", '/PlatformService/milestone/fetchMileStoneConfig');
+        this.addEndPoint("UPDATE_MILESTONE_CONFIG", '/PlatformService/milestone/updateMileStoneConfig');
+        this.addEndPoint("DELETE_MILESTONE_CONFIG", '/PlatformService/milestone/deleteMileStoneConfig');
+        this.addEndPoint("FETCH_OUTCOME_CONFIG", '/PlatformService/milestone/fetchOutcomeConfig');
+        this.addEndPoint("RESTART_MILESTONE_CONFIG", '/PlatformService/milestone/restartMileStoneConfig');
 
         //Task Management 
         this.addEndPoint("GET_SCHEDULE_TASK_LIST", '/PlatformService/admin/scheduletaskmanagement/getAllTaskDetail');

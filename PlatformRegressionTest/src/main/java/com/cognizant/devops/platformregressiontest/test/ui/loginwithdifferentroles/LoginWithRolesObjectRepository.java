@@ -114,7 +114,7 @@ public class LoginWithRolesObjectRepository extends LoginAndSelectModule{
 	@FindBy(xpath = "//span[text()= 'YES']")
 	WebElement yesButton;
 	
-	@FindBy(xpath = "//span[text()= 'OK']")
+	@FindBy(xpath = "//span[text()= 'OKAY']")
 	WebElement okButton;
 	
 	@FindBy(xpath = "//mat-select[@name ='selectedAdminOrg']")

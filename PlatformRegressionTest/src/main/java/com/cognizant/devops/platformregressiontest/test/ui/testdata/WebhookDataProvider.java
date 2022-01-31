@@ -62,6 +62,7 @@ public class WebhookDataProvider {
 	 * @throws Exception
 	 */
 	public static String readFileAsString(String file)throws Exception{
-        return new String(Files.readAllBytes(Paths.get(file)));
+		String filePath = new File(file).getCanonicalPath();
+        return new String(Files.readAllBytes(Paths.get(filePath)));
     }
 }

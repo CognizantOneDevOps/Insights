@@ -29,6 +29,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowExecutionHistory;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
@@ -37,7 +38,6 @@ import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowTask
 import com.cognizant.devops.platformworkflow.workflowtask.utils.WorkflowUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 /**
  * This class mainly used to handle all retry workflow scenario
@@ -75,7 +75,6 @@ public class WorkflowRetryExecutor implements Job, ApplicationConfigInterface {
 	 * state
 	 */
 	public void retryWorkflowWithFailedTask() {
-		JsonParser parser = new JsonParser();
 		log.debug(" Worlflow Detail ====  Inside WorkflowRetryExecutor retryWorkflowWithFailedTask");
 		long startTime = System.nanoTime();
 		List<InsightsWorkflowExecutionHistory> readyToRunWorkflowHistory = workflowProcessing.getFailedTasksForRetry();
@@ -84,7 +83,7 @@ public class WorkflowRetryExecutor implements Job, ApplicationConfigInterface {
 					.equalsIgnoreCase(WorkflowTaskEnum.WorkflowType.SYSTEM.name())) {
 				InsightsWorkflowTask firstworkflowTask = workflowProcessing
 						.getWorkflowTaskByTaskId(workflowHistory.getCurrenttask());
-				JsonObject mqRetryJsonObject = parser.parse(workflowHistory.getRequestMessage()).getAsJsonObject();
+				JsonObject mqRetryJsonObject = JsonUtils.parseStringAsJsonObject(workflowHistory.getRequestMessage());
 				mqRetryJsonObject.addProperty(WorkflowUtils.RETRY_JSON_PROPERTY, true);
 				mqRetryJsonObject.addProperty(WorkflowUtils.EXECUTION_HISTORY_JOSN_PROPERTY, workflowHistory.getId());
 				long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
@@ -137,12 +136,10 @@ public class WorkflowRetryExecutor implements Job, ApplicationConfigInterface {
 	 */
 	private void retryWorkflowWithCompletedTask() {
 		log.debug(" Worlflow Detail ====  Inside WorkflowRetryExecutor retryWorkflowWithCompletedTask ");
-		JsonParser parser = new JsonParser();
 		List<InsightsWorkflowExecutionHistory> readyToRunWorkflowHistory = workflowProcessing.getNextTasksForRetry();
 		for (InsightsWorkflowExecutionHistory lastCompletedTaskExecution : readyToRunWorkflowHistory) {
 			long startTime = System.nanoTime();
-			JsonObject mqRetryJsonObject = parser.parse(lastCompletedTaskExecution.getRequestMessage())
-					.getAsJsonObject();
+			JsonObject mqRetryJsonObject = JsonUtils.parseStringAsJsonObject(lastCompletedTaskExecution.getRequestMessage());
 			mqRetryJsonObject.addProperty("exectionHistoryId", lastCompletedTaskExecution.getId());
 			String message = new Gson().toJson(mqRetryJsonObject);
 			Map<String, Object> requestMessage = WorkflowUtils.convertJsonObjectToMap(message);

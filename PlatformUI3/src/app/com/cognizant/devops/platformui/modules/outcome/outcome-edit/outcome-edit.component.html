@@ -1,0 +1,196 @@
+<!--
+*******************************************************************************
+ * Copyright 2020 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+
+ <div class="pageCss">
+    <div layout layout-align="left" class="titleStyle">
+      <div>Configuration |
+        <a class="greenTitleTxt">OutCome Configuration </a>
+      </div>
+    </div>
+    <div class="orangeStripCss"></div>
+    <div layout layout-align="left" class="sectionHeadingStyle">
+      <div layout>&nbsp; OutCome Configuration
+        <span class="sectionSubHeading"> (Configure a OutCome)
+        </span>
+      </div>
+    </div>
+    <div class="btnAlign">
+  
+      <button type="submit" mat-icon-button [disabled]="!outcomeForm.valid" (click)="onSubmit()">
+        <mat-icon title="Save" style="margin-top: 0%;" class="mat-icon material-icons">
+          save
+        </mat-icon>
+      </button>
+      <button mat-icon-button (click)="redirect()">
+        <mat-icon svgIcon="redirect_icon" title="Redirect To Landing Page" style="margin-bottom: 20%;"
+          class="mat-icon material-icons">
+        </mat-icon>
+      </button>
+    </div>
+    <div style="display: flex; justify-content: center; align-items: center">
+      <div class="loading-indicator">
+        <mat-progress-spinner *ngIf="false" [diameter]="100" color="primary" mode="indeterminate">
+        </mat-progress-spinner>
+      </div>
+    </div>
+    <table class="mat-elevation-z8 mat-table">
+      <thead>
+        <tr class="mat-header-row" layout-align="start start">
+          <th colspan="4" class="tableHeaderCss mat-header-cell" style=" border-radius: 10px 10px 0 0;">
+            <span class="mainHeaderText">Edit Configuration Details </span>
+            <span class="infoHeaderText">(Please provide accurate details.
+              Fields marked "<span style="color:#ff0000;">*</span>" are mandatory)
+            </span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+      <div class="form">
+        <form [formGroup]="outcomeForm" (ngSubmit)="onSubmit()">
+          <tr class="mat-row-webhook">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">Outcome Name</span>
+              <span style="color:#ff0000;">*</span>
+            </td>
+            <td class="columnComponent">
+              <input matinput maxlength="100" class="form-control" formControlName="outcomeName" type="text"
+                autocomplete="off" placeholder="Enter Outcome name" disabled 
+                [ngClass]="['input-disabled', 'form-control']">
+            </td>
+            <td class="info">
+              <span class="infoText"></span>
+            </td>
+          </tr>
+          <tr class="mat-row-webhook">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">Outcome Type</span>
+              <span style="color:#ff0000;">*</span>
+            </td>
+            <td class="columnComponent">
+              <mat-select class="form-control" placeholder="Select OutcomeType" formControlName="outcomeType"
+              required color="primary">
+                <mat-option *ngFor="let type of outcomeArray" value="{{type.type}}" style="color:#0033A0">
+                  {{type.type}} </mat-option>
+              </mat-select>
+          </td>
+          <td class="info">
+            <span class="infoText"></span>
+          </td>
+          </tr>
+          <tr class="mat-row-webhook">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">ToolName</span>
+              <span style="color:#ff0000;">*</span>
+            </td>
+            <td class="columnComponent">
+              <input matinput maxlength="20" class="form-control" formControlName="toolName" type="text" disabled
+                autocomplete="off" placeholder="Enter ToolName type" [ngClass]="['input-disabled', 'form-control']">
+            </td>
+            <td class="info">
+              <span class="infoText"></span>
+            </td>
+          </tr>
+
+            <div *ngFor="let data of toolConfigList?.list">
+           <tr class="mat-row-webhook">
+             <td class="mat-cell" class="columnName">
+               <span class="mainText">{{data.label}}</span>
+               <span style="color:#ff0000;">*</span>
+             </td>
+             <td class="columnComponent">
+               <input matinput maxlength="100" class="form-control" formControlName={{data.name}} type="text"
+                 autocomplete="off" placeholder="{{data.tooltip}}">
+             </td>
+             <td class="info">
+               <span class="infoText"></span>
+             </td>
+           </tr>
+           </div>
+
+           <tr class="mat-row-webhook">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">Metric URL</span>
+              <span style="color:#ff0000;">*</span>
+            </td>
+            <td class="columnComponent">
+              <textarea matinput maxlength="500" class="form-control" rows="2" formControlName="metricUrl" type="text"
+                autocomplete="off" placeholder="Enter metric url"></textarea>
+            </td>
+            <td class="info">
+              <span class="infoText"></span>
+            </td>
+          </tr>
+  
+          <div formArrayName="parameters">
+            <tr class="mat-row-webhook">
+              <td class="mat-cell" class="columnName">
+                <span class="mainText">Request Parameters</span>
+              </td>
+              <td class="columnComponent">
+                <div class="arrange-horizontally" *ngFor="let param of outcomeForm['controls'].parameters['controls']; let i=index"
+                  [formGroupName]="i">
+                  <input matinput class="form-control" style="width: 30%;" formControlName="key" type="text" placeholder="Enter name"
+                    title="{{param.value.key}}" required>
+                  <input matinput class="form-control" style="width: 55%;" formControlName="value" type="text"
+                    placeholder="Enter value" [title]="param.value.value" required>
+                  <button type="button" mat-icon-button (click)="removeParameter(i)">
+                    <mat-icon style="color: #0033a0" title="Remove Parameters" class="mat-icon material-icons">
+                      remove_circle
+                    </mat-icon>
+                  </button>
+                </div>
+                <button type="button" mat-icon-button (click)="addParameter()">
+                  <mat-icon title="Add Parameters" class="mat-icon material-icons">
+                    add_circle
+                  </mat-icon>
+                </button>
+              </td>
+              <td class="info">
+                <span class="infoText"></span>
+              </td>
+            </tr>
+          </div>
+
+          <!-- <tr class="mat-row-webhook">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">Is Active ?</span>
+              <span style="color:#ff0000;">*</span>
+            </td>
+            <td class="columnComponent">
+              <mat-slide-toggle formControlName="isActive" style="height: 3em;"></mat-slide-toggle>
+            </td>
+            <td class="info">
+              <span class="infoText">Status</span>
+            </td>
+          </tr> -->
+         
+
+        </form>
+  
+       <!-- <p>
+          Form Value: {{ outcomeForm.value | json }}
+        </p>
+        
+        
+        <p>
+          Form Status: {{ outcomeForm.status }}
+        </p> -->
+      
+      </div>
+    </tbody>
+    </table>
+  </div>

@@ -16,7 +16,7 @@
 package com.cognizant.devops.platforminsightswebhook.events;
 
 import java.io.IOException;
-import java.util.Enumeration;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
@@ -128,18 +128,23 @@ public class WebHookHandlerServlet extends HttpServlet {
 		try {
 			String bodymessage = request.getReader().lines().collect(Collectors.joining());
 			if (bodymessage.length() > 1) {
-				JsonElement element = new JsonParser().parse(bodymessage);
+				JsonElement element = parseString(bodymessage);
 				responceJson = element.getAsJsonObject();
-				StringBuilder paramDetail = new StringBuilder();
-				Enumeration<String> parameterNames = request.getParameterNames();
-				while (parameterNames.hasMoreElements()) {
-					String paramName = parameterNames.nextElement();
-					String[] paramValues = request.getParameterValues(paramName);
+				Map<String, String[]> parameterMap = request.getParameterMap();
+				int paramSize = parameterMap.size();
+				int maxParamCount = 1;
+				if(paramSize > maxParamCount){
+					parameterMap = parameterMap.entrySet().stream()
+					        .limit(maxParamCount).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+				}
+				for (Map.Entry<String,String[]> entry : parameterMap.entrySet()) {
+					String paramName = entry.getKey();
+					String[] paramValues = entry.getValue();
 					for (int i = 0; i < paramValues.length; i++) {
 						String paramValue = paramValues[i];
-						paramDetail.append(paramName + ":" + paramValue + ",\n");
 						responceJson.addProperty(paramName, paramValue);
 					}
+					
 				}
 				responceJson.addProperty("iswebhookdata", Boolean.TRUE);
 			}
@@ -172,6 +177,16 @@ public class WebHookHandlerServlet extends HttpServlet {
 		} catch (Exception e) {
 			log.error("Error in setUnauthorizedResponse ", e);
 		}
+	}
+	private static JsonElement parseString(String requestText) {
+		JsonElement response = null;
+		try {			
+			response = JsonParser.parseString(requestText);
+		} catch (Exception e) {
+			log.error(" Error in parseString {}",requestText);
+			log.error(e);
+		}
+		return response;
 	}
 
 }

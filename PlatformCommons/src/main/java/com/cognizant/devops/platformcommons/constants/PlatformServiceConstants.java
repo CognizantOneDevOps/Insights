@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.cognizant.devops.platformcommons.constants;
 
-import java.io.File;
 import java.util.Base64;
 
 public interface PlatformServiceConstants {
@@ -55,4 +54,15 @@ public interface PlatformServiceConstants {
 	String API_ORGS = "/api/orgs/";
 	String API_USER = "/api/user";
 	String API_USER_ORGS = "/api/user/orgs";
+	String GET_DATASOURCE_PATH = "/api/datasources/name/";
+	String ADD_DATASOURCE_PATH = "/api/datasources";
+	String API_DASHBOARD_PATH = "/api/dashboards/db";
+	String SEARCH_DASHBOARD_PATH = "/api/search?query=";
+	String API_DASHBOARDS_UID = "/api/dashboards/uid/";
+	String API_AUTH_KEYS = "/api/auth/keys";
+	String LF = "\n";
+	String CR = "\r";
+	String TAB = "\t";
+	String EMPTY = "";
+	
 }

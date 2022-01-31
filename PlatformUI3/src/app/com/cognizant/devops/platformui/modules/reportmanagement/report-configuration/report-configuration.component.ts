@@ -19,11 +19,13 @@ import { MessageDialogService } from "@insights/app/modules/application-dialog/m
 import { Router, NavigationExtras, ActivatedRoute } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
 import { DataSharedService } from "@insights/common/data-shared-service";
+import { InsightsInitService } from '@insights/common/insights-initservice';
 import { ViewKPIDialog } from "@insights/app/modules/reportmanagement/report-configuration/view-kpi-dialog";
 import { AddTasksDialog } from "@insights/app/modules/reportmanagement/report-configuration/add-task";
 import { ReportManagementService } from "@insights/app/modules/reportmanagement/reportmanagement.service";
 import { DataArchivingService } from "@insights/app/modules/settings/dataarchiving/dataarchiving-service";
 import { EmailConfigurationDialog } from "@insights/app/modules/reportmanagement/report-configuration/email-configuration-dialog";
+import { DashboardPreviewConfigDialog } from "@insights/app/modules/dashboard-pdf-download/dashboard-preview-configuration-dialog";
 
 @Component({
   selector: "app-report-configuration",
@@ -348,6 +350,7 @@ export class ReportConfigComponent implements OnInit {
   editSaveData() {
     var reportAPIRequestJson = {};
     var self = this;
+    var message;
     if (this.receivedParam.type == "save") {
       reportAPIRequestJson["reportName"] = self.reportName;
       reportAPIRequestJson["asseementreportdisplayname"] = self.reportdisplayName;
@@ -360,6 +363,8 @@ export class ReportConfigComponent implements OnInit {
       reportAPIRequestJson["tasklist"] = this.taskidInOrder;
       reportAPIRequestJson["emailDetails"] = this.emailDetails;
       reportAPIRequestJson["emailList"] = "abcd@abcd.com";
+      reportAPIRequestJson["orgName"] = this.dataShare.getOrgName();
+      reportAPIRequestJson["userName"] = this.dataShare.getLoginName();
       var dialogmessage =
         " You have created a new Report <b>" +
         self.reportName +
@@ -378,10 +383,16 @@ export class ReportConfigComponent implements OnInit {
             .saveDataforReport(JSON.stringify(reportAPIRequestJson))
             .then(function (response) {
               if (response.status == "success") {
-                self.messageDialog.showApplicationsMessage(
-                  "<b>" + self.reportName + "</b> saved successfully.",
-                  "SUCCESS"
-                );
+                message = "<b>" + self.reportName + "</b> saved successfully.";
+                if(response.data.dashboardResponse != null) {
+                  message = message +"<br>But "+response.data.dashboardResponse;
+                }
+                self.messageDialog.showApplicationsMessage(message,"SUCCESS");
+                if(response.data.dashboardUrl != null) {
+                  console.log(response.data.dashboardUrl)
+                  var dashUrl = InsightsInitService.grafanaHost + '/dashboard/script/iSight_ui3.js?url=' + encodeURIComponent(response.data.dashboardUrl);
+                  self.previewDashboard(dashUrl);
+                }
                 self.list();
               } else {
                 if (response.message == "Email Task not present for sending mail in the provided email details") {
@@ -417,6 +428,8 @@ export class ReportConfigComponent implements OnInit {
       reportAPIRequestJson["id"] = this.receivedParam.data.configId;
       reportAPIRequestJson["tasklist"] = this.taskidInOrder;
       reportAPIRequestJson["emailList"] = "abcd@abcd.com";
+      reportAPIRequestJson["orgName"] = this.dataShare.getOrgName();
+      reportAPIRequestJson["userName"] = this.dataShare.getLoginName();
       var dialogmessage =
         " You have updated Report <b>" +
         self.reportName +
@@ -441,6 +454,7 @@ export class ReportConfigComponent implements OnInit {
                 );
                 self.list();
               } else {
+                console.error(response);
                 self.messageDialog.showApplicationsMessage(
                   "Failed to update the report.Please check logs.",
                   "ERROR"
@@ -450,6 +464,20 @@ export class ReportConfigComponent implements OnInit {
         }
       });
     }
+  }
+
+  previewDashboard(dashUrl) {
+    const dialogRef = this.dialog.open(DashboardPreviewConfigDialog, {
+      panelClass: "traceablity-show-details-dialog-container",
+      width: "100%",
+      height: "80",
+      disableClose: true,
+      data: {
+        route: dashUrl,
+        isAssessmentReport: true
+      }
+    });
+
   }
 
   list() {

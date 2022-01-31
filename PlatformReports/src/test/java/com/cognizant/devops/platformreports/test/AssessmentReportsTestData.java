@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -34,6 +35,7 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.EmailConfiguration;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
@@ -62,7 +64,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class AssessmentReportsTestData {
 	private static Logger log = LogManager.getLogger(AssessmentReportsTestData.class.getName());
@@ -89,8 +90,8 @@ public class AssessmentReportsTestData {
 	String reportTemplatekpi = "{\"reportName\":\"Testing_fail\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":100127,\"visualizationConfigs\":[{\"vType\":\"mscolumn2d_100127\",\"vQuery\":\"MATCH (n:KPI:RESULTS) where n.reportId = 602 and n.kpiId=127 RETURN n.SPKendTime as SPKendTime , n.MaxBuildTime as MaxBuildTime LIMIT 5\"}]}]}";
 	String reportTemplatekpis = "{\"reportName\":\"Testing_fail_queries\",\"description\":\"Testing_queries\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":100161,\"visualizationConfigs\":[{\"vType\":\"100161_line\",\"vQuery\":\"\"}]},{\"kpiId\":100153,\"visualizationConfigs\":[{\"vType\":\"100153_line\",\"vQuery\":\"\"}]}]}";
 
-	JsonObject reportTemplateJson = new JsonParser().parse(reportTemplatekpi).getAsJsonObject();
-	JsonObject reportTemplateKpisJson = new JsonParser().parse(reportTemplatekpis).getAsJsonObject();
+	JsonObject reportTemplateJson = JsonUtils.parseStringAsJsonObject(reportTemplatekpi);
+	JsonObject reportTemplateKpisJson = JsonUtils.parseStringAsJsonObject(reportTemplatekpis);
 
 	String assessmentReportWithEmail = "{\"reportName\":\"report_Email_test10002154\",\"reportTemplate\":" + reportIdProdRT + ",\"emailList\":\"abc@abc.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"startdate\":\"2020-05-12T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"emailDetails\": {\"senderEmailAddress\":\"abc@abc.com\",\"receiverEmailAddress\":\"abcd@abcd.com\",\"receiverCCEmailAddress\":\"sb@sb.com\",\"receiverBCCEmailAddress\":\"sb@sb.com\",\"mailSubject\":\"Sub_mail\",\"mailBodyTemplate\":\"sending a mail for report\"},\"asseementreportdisplayname\":\"Report_test\"}";
 	String assessmentReportWithoutEmail = "{\"reportName\":\"report_test100021548\",\"reportTemplate\":" + reportIdProdRT + ",\"emailList\":\"abc@abc.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"startdate\":\"2020-05-12T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
@@ -131,7 +132,7 @@ public class AssessmentReportsTestData {
 		try {
 			File kpiFile = new File(classLoader.getResource(fileName).getFile());
 			String kpiJson = new String(Files.readAllBytes(kpiFile.toPath()));
-			JsonArray kpiArray = new JsonParser().parse(kpiJson).getAsJsonArray();
+			JsonArray kpiArray = JsonUtils.parseStringAsJsonArray(kpiJson);
 			for (JsonElement element : kpiArray) {
 				int kpiId = saveKpiDefinition(element.getAsJsonObject());
 				kpiIdList.add(kpiId);
@@ -145,7 +146,7 @@ public class AssessmentReportsTestData {
 		try {
 			File contentFile = new File(classLoader.getResource(fileName).getFile());
 			String contentJson = new String(Files.readAllBytes(contentFile.toPath()));
-			JsonArray contentArray = new JsonParser().parse(contentJson).getAsJsonArray();
+			JsonArray contentArray = JsonUtils.parseStringAsJsonArray(contentJson);
 			for (JsonElement element : contentArray) {
 				int contentId = saveContentDefinition(element.getAsJsonObject());
 				contentIdList.add(contentId);
@@ -255,7 +256,7 @@ public class AssessmentReportsTestData {
 	}
 
 	public int saveWorkflowTask(String task) {
-		JsonObject taskJson = new JsonParser().parse(task).getAsJsonObject();
+		JsonObject taskJson = JsonUtils.parseStringAsJsonObject(task);
 		InsightsWorkflowTask taskConfig = new InsightsWorkflowTask();
 		int taskId = -1;
 		try {
@@ -286,8 +287,8 @@ public class AssessmentReportsTestData {
 
 	public int saveReportTemplate(String reportTemplate, int reportID) {
 		int reportId = 0;
-		JsonObject reportJson = new JsonParser().parse(reportTemplate).getAsJsonObject();
-		Set<InsightsReportsKPIConfig> reportsKPIConfigSet = new HashSet<>();
+		JsonObject reportJson = JsonUtils.parseStringAsJsonObject(reportTemplate);
+		Set<InsightsReportsKPIConfig> reportsKPIConfigSet = new LinkedHashSet<>();
 		try {
 			//reportId = (int) (System.currentTimeMillis() / 1000);
 			reportId = reportID;
@@ -502,7 +503,7 @@ public class AssessmentReportsTestData {
 	}
 
 	public JsonObject addTask(String assessmentReport, int noOftask) {
-		JsonObject assessmentReportJson = new JsonParser().parse(assessmentReport).getAsJsonObject();
+		JsonObject assessmentReportJson = JsonUtils.parseStringAsJsonObject(assessmentReport);
 		List<Integer> taskIdList = new ArrayList<Integer>();
 		taskIdList.add(getTaskId(mqChannelKpiExecution));
 		taskIdList.add(getTaskId(mqChannelPDFExecution));

@@ -39,7 +39,7 @@ import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectMod
  */
 public class LoginWithRolesConfiguration extends LoginWithRolesObjectRepository {
 
-	WebDriverWait wait = new WebDriverWait(driver, 20);
+	WebDriverWait wait = new WebDriverWait(driver, 10);
 
 	private static final Logger log = LogManager.getLogger(LoginWithRolesConfiguration.class);
 

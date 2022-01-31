@@ -53,13 +53,13 @@ public class DataDictionaryTest extends DataDictionaryTestData {
 					.saveWebHookConfiguration(dataDictionaryTestData.registeredWebhookJson);
 		}
 
-		List<AgentConfigTO> registeredAgents = agentServiceImpl.getRegisteredAgents();
+		List<AgentConfigTO> registeredAgents = agentServiceImpl.getRegisteredAgentsAndHealth();
 		if (registeredAgents.isEmpty()) {
-			String configJson = agentServiceImpl.getToolRawConfigFile("v5.2", "git",false);
+			String configJson = agentServiceImpl.getToolRawConfigFile("v8.2", "git",false);
 			ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
 			String response = agentServiceImpl.registerAgent(dataDictionaryTestData.toolName,
 					dataDictionaryTestData.agentVersion, dataDictionaryTestData.osversion,
-					dataDictionaryTestData.configDetails, dataDictionaryTestData.trackingDetails, false,false);
+					dataDictionaryTestData.configDetails, dataDictionaryTestData.trackingDetails, false,false,"Agent");
 
 		}
 		

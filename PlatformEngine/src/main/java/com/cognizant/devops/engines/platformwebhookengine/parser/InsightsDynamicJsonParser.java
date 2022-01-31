@@ -26,11 +26,11 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.engines.util.EngineUtils;
 import com.cognizant.devops.platformcommons.core.enums.ResultOutputType;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class InsightsDynamicJsonParser {
 	private static Logger LOG = LogManager.getLogger(InsightsDynamicJsonParser.class);
@@ -276,8 +276,7 @@ public class InsightsDynamicJsonParser {
 				responceData.addProperty(jsonChildResponseNode.asText(), valueNode.asText());
 			} else {
 				if (valueNode.isArray()) {
-					JsonParser parser = new JsonParser();
-					JsonElement tradeElement = parser.parse(valueNode.toString());
+					JsonElement tradeElement = JsonUtils.parseString(valueNode.toString());
 					JsonArray trade = tradeElement.getAsJsonArray();
 					responceData.add(jsonChildResponseNode.asText(), trade);
 				} else {

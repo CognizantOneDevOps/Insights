@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -32,8 +33,8 @@ import org.apache.logging.log4j.Logger;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.path.json.JsonPath;
@@ -60,14 +61,14 @@ public class CommonUtils {
 	}
 
 	public static void loadProperties() {
-
-		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator + ConfigOptionsTest.AUTO_DIR
-				+ File.separator + ConfigOptionsTest.PROP_FILE;
-
-		try (FileReader reader = new FileReader(path)) {
-
+		try {
+			String path = new File(System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator + ConfigOptionsTest.AUTO_DIR
+					+ File.separator + ConfigOptionsTest.PROP_FILE).getCanonicalPath();
+	
+			FileReader reader = new FileReader(path);
+	
 			props = new Properties();
-
+	
 			props.load(reader);
 
 		} catch (FileNotFoundException e) {
@@ -130,10 +131,9 @@ public class CommonUtils {
 	}
 	
 	public static void parseAndgetMap(String json) {
-	    JsonObject object = (JsonObject) new JsonParser().parse(json);
+	    JsonObject object = JsonUtils.parseStringAsJsonObject(json);
 	    for (Map.Entry<String,JsonElement> entry : object.entrySet()) {
 	    	CommonUtils.cookiesMap.put(entry.getKey(), entry.getValue().toString());
 	    }
 	}
-
 }

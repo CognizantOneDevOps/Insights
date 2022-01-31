@@ -136,8 +136,8 @@ public class PdfTableUtil {
 	private void generatePageStaticContent(PDDocument doc, float margin, PDPage page, float yStartNewPage,
 			float tableWidth, boolean drawContent, float ystaticStart, float bottomMargin) throws IOException, JAXBException {
 		try{
-		
-		File staticFile = new File(PDF_PATH+"static/static.xml").getAbsoluteFile();
+		String staticFilePath = new File(PDF_PATH+"static/static.xml").getCanonicalPath();
+		File staticFile = new File(staticFilePath);
 		JAXBContext jaxbContext = JAXBContext.newInstance(PdfStaticContent.class);
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 		PdfStaticContent pdfStaticContent = (PdfStaticContent) jaxbUnmarshaller.unmarshal(staticFile);
@@ -154,7 +154,8 @@ public class PdfTableUtil {
 		BaseTable statictable = new BaseTable(ystaticStart, yStartNewPage, bottomMargin, tableWidth, margin, doc, page, true,
 				drawContent);
 		Row<PDPage> row = statictable.createRow(10f);
-		Cell<PDPage> cell = row.createImageCell(25f, ImageUtils.readImage(new File(PDF_PATH+"sign/Insights.png").getAbsoluteFile()));
+		String imagePath = new File(PDF_PATH+"sign/Insights.png").getCanonicalPath();
+		Cell<PDPage> cell = row.createImageCell(25f, ImageUtils.readImage(new File(imagePath)));
 		cell = row.createCell(10f, "");
 		cell = row.createCell(50f, pdfStaticContent.getTitle());
 		cell.setFont(PDType1Font.HELVETICA);
@@ -450,8 +451,8 @@ public class PdfTableUtil {
 		boolean drawLines = true;
 		float yStart = yStartNewPage;
 		float bottomMargin = 70;
-
-		File staticFile = new File(PDF_PATH+"static/static.xml").getAbsoluteFile();
+		String staticFilePath = new File(PDF_PATH+"static/static.xml").getCanonicalPath();
+		File staticFile = new File(staticFilePath);
 		JAXBContext jaxbContext = JAXBContext.newInstance(PdfStaticContent.class);
 
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();

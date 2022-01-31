@@ -48,12 +48,15 @@ export class ReportTemplateComponent implements OnInit {
   selectedTemplate: any;
   enableEdit: boolean = false;
   enableDelete: boolean = false;
+  visualizationUtil: string;
   configParams: string;
   kpiDetailsResponse: any;
   kpiDetailsList = [];
   templateDatasource = new MatTableDataSource<any>();
   formDataFiles = new FormData();
   enableAttachFile: boolean = false;
+  selectedIndex : -1;
+  currentPageValue : number;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
 
@@ -68,7 +71,8 @@ export class ReportTemplateComponent implements OnInit {
   }
 
   ngOnInit() {
-
+    console.log(this.paginator)
+    this.currentPageValue = this.paginator.pageIndex * this.MAX_ROWS_PER_TABLE; 
   }
 
   ngAfterViewInit() {
@@ -141,6 +145,7 @@ export class ReportTemplateComponent implements OnInit {
     await this.getKpiDetails(this.selectedTemplate.reportId);
     var templateData = this.templateDatasource.data.find(
       ({ templateName }) => templateName === this.selectedTemplate.templateName);
+      console.log(templateData);
     templateData["kpiDetails"] = this.kpiDetailsList;
     this.configParams = JSON.stringify({ type: 'edit', data: templateData });
     this.navigate();
@@ -167,13 +172,20 @@ export class ReportTemplateComponent implements OnInit {
   }
 
   radioChange(event: MatRadioChange, index) {
+    this.selectedIndex = index + this.currentPageValue ;
     this.enableDelete = true;
     this.enableEdit = true;
     this.enableAttachFile = true;
 
   }
 
+  changeCurrentPageValue() {
+    this.selectedIndex = -1;
+    this.currentPageValue = this.paginator.pageIndex  * this.MAX_ROWS_PER_TABLE;
+  }
+
   refresh() {
+    this.selectedIndex = -1;
     this.selectedTemplate = '';
     this.getAllReportTemplate;
     this.enableDelete = false;
@@ -187,7 +199,7 @@ export class ReportTemplateComponent implements OnInit {
       panelClass: 'DialogBox',
       width: '34%',
       height: '25%',
-      disableClose: false,
+      disableClose: true,
       data: {
         type: 'ATTACH_FILES',
         multipleFileAllowed: true,
@@ -238,7 +250,7 @@ export class ReportTemplateComponent implements OnInit {
       panelClass: 'DialogBox',
       width: '34%',
       height: '25%',
-      disableClose: false,
+      disableClose: true,
       data: {
         type: 'REPORT_TEMPLATE',
         multipleFileAllowed: false,

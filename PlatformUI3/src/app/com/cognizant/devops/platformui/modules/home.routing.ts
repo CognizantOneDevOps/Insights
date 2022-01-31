@@ -57,6 +57,12 @@ import { DashboardListComponent } from './dashboard-pdf-download/dashboard-list/
 import { EditDashboardComponent } from './dashboard-pdf-download/edit-dashboard/edit-dashboardcomponent';
 import { WorkflowTaskManagementComponent } from './workflow-task-management/workflow-task-management.component';
 import { AddWorkflowTaskComponent } from './workflow-task-management/add-workflow-task/add-workflow-task.component';
+import { OutcomeComponent } from './outcome/outcome-config/outcome.component';
+import { OutcomeListComponent } from './outcome/outcome-list/outcome-list.component';
+import { OutcomeEditComponent } from './outcome/outcome-edit/outcome-edit.component';
+import { MileStoneComponent } from './mile-stone/mile-stone-config/mile-stone.component';
+import { MileStoneListComponent } from './mile-stone/mile-stone-list/mile-stone-list.component';
+import { MileStoneEditComponent } from './mile-stone/mile-stone-edit/mile-stone-edit.component';
 import { ScheduleTaskManagmentComponent } from '@insights/app/modules/schedule-task-managment/schedule-task-managment.component';
 
 
@@ -103,6 +109,14 @@ const homeRoutes: Routes = [
       { path:'dash-pdf-config',component:DashboardPdfDownloadComponent},
       { path:'edit-dashboard',component:EditDashboardComponent},
       {path:'workflow-task-management',component:WorkflowTaskManagementComponent},
+      {path:'workflow-configuration' , component:AddWorkflowTaskComponent},
+      { path:'edit-dashboard',component:EditDashboardComponent},
+      { path:'outcome', component:OutcomeComponent},
+      { path:'fetchOutcome', component:OutcomeListComponent },
+      { path:'editOutcome', component: OutcomeEditComponent},
+      { path:'milestone', component:MileStoneComponent},
+      { path:'fetchMileStone', component:MileStoneListComponent },
+      { path:'editMileStone', component:MileStoneEditComponent},
       {path:'workflow-configuration' , component:AddWorkflowTaskComponent},
       { path:'edit-dashboard',component:EditDashboardComponent},
       { path:'taskManagement',component:ScheduleTaskManagmentComponent}

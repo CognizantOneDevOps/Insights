@@ -29,6 +29,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -40,7 +41,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.rabbitmq.client.AMQP.Exchange.DeclareOk;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -51,7 +51,6 @@ public class WebhookEngineTestData {
 	 * Webhook test data
 	 */
 	private static Logger LOG = LogManager.getLogger(WebhookEngineTestData.class);
-	JsonParser parser = new JsonParser();
 	public String responseTemplate = "head_commit.message=message,head_commit.timestamp=commitTime,repository.updated_at=updated_at,repository.created_at=created_at,repository.pushed_at=pushed_at,head_commit.id=commitId,head_commit.author.name=authorName";
 	public String dynamicTemplate = "{\"ref\":\"refGIT\",\"repository\":{\"name\":\"repositoryName\"},\"commits\":[{\"id\":\"commitIdDY\",\"url\":\"commitURLDY\",\"timestamp\":\"commitTimeDY\"}]}";
 	public String toolName = "GIT";
@@ -96,7 +95,7 @@ public class WebhookEngineTestData {
 	private Set<WebhookDerivedConfig> getderivedOperationsJSONArray(String derivedOpsJsonLocal) {
 		Set<WebhookDerivedConfig> setWebhookDerivedConfigs = new HashSet<WebhookDerivedConfig>();
 		JsonArray array = new JsonArray();
-		array = parser.parse(derivedOpsJsonLocal).getAsJsonArray();
+		array = JsonUtils.parseStringAsJsonArray(derivedOpsJsonLocal);
 		for (JsonElement webhookDerivedConfigJson : array) {
 			WebhookDerivedConfig webhookDerivedConfig = new WebhookDerivedConfig();
 			JsonObject receivedObject = webhookDerivedConfigJson.getAsJsonObject();

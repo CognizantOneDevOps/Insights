@@ -69,7 +69,8 @@ public class ContentExecutor implements Callable<Integer> {
 					contentConfigDefinition.setSchedule(kpiConfigDTO.getSchedule());
 					contentConfigDefinition.setWorkflowId(kpiConfigDTO.getWorkflowId());
 					contentConfigDefinition.setReportId(kpiConfigDTO.getReportId());
-					contentConfigDefinition.setAssessmentId(kpiConfigDTO.getAssessmentId());									
+					contentConfigDefinition.setAssessmentId(kpiConfigDTO.getAssessmentId());
+					contentConfigDefinition.setAssessmentReportName(kpiConfigDTO.getAssessmentReportName());									
 					contentProcessor.executeContentData(contentConfigDefinition);
 					long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
 					log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",

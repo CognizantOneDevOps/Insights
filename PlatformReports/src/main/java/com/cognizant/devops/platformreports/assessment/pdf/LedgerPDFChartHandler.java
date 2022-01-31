@@ -24,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformauditing.util.PdfTableUtil;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
@@ -31,13 +32,13 @@ import com.cognizant.devops.platformreports.assessment.datamodel.InsightsAssessm
 import com.cognizant.devops.platformreports.assessment.util.ReportEngineUtils;
 import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class LedgerPDFChartHandler implements BasePDFProcessor {
 	
 	private static Logger log = LogManager.getLogger(LedgerPDFChartHandler.class);
 	
 	private WorkflowDAL workflowDAL = new WorkflowDAL();
+	PDFExecutionUtils pdfExecutionUtils = new PDFExecutionUtils();
 	
 	String incomingTaskMessage;
 
@@ -84,7 +85,7 @@ public class LedgerPDFChartHandler implements BasePDFProcessor {
 			byte[] pdfResponse = pdfTableUtil.generateLedgerReport(assessmentReportDTO.getLedgerRecords(), assessmentReportDTO.getAsseementreportname()+".pdf");
 			File extractedPdfFile = new File(exportedFilePath);
 			savePDFFile(extractedPdfFile, pdfResponse);
-			saveToVisualizationContaner(assessmentReportDTO);
+			pdfExecutionUtils.saveToVisualizationContainer(assessmentReportDTO, pdfResponse);
 		} catch (Exception e) {
 			log.error("Workflow Detail ==== error while processing pdf data ", e);
 			throw new InsightsJobFailedException(" unable to prepare pdf data " + e);
@@ -92,27 +93,6 @@ public class LedgerPDFChartHandler implements BasePDFProcessor {
 		
 	}
 	
-	private void saveToVisualizationContaner(InsightsAssessmentConfigurationDTO assessmentReportDTO) {
-		try {
-            InsightsReportVisualizationContainer emailHistoryConfig = new InsightsReportVisualizationContainer();
-            emailHistoryConfig.setExecutionId(assessmentReportDTO.getExecutionId());
-            JsonObject incomingTaskMessageJson = new JsonParser().parse(assessmentReportDTO.getIncomingTaskMessageJson()).getAsJsonObject();
-            if (incomingTaskMessageJson.get("nextTaskId").getAsInt() == -1) {
-                emailHistoryConfig.setStatus(WorkflowTaskEnum.WorkflowStatus.COMPLETED.name());
-                emailHistoryConfig.setExecutionTime(InsightsUtils.getCurrentTimeInEpochMilliSeconds());
-            } else {
-                emailHistoryConfig.setStatus(WorkflowTaskEnum.EmailStatus.NOT_STARTED.name());
-            }
-            emailHistoryConfig.setWorkflowConfig(assessmentReportDTO.getWorkflowId());
-			emailHistoryConfig.setMailAttachmentName(assessmentReportDTO.getAsseementreportname());
-            workflowDAL.saveEmailExecutionHistory(emailHistoryConfig);
-        } catch (Exception e) {
-            log.error("Worlflow Detail ==== Error setting PDF details in Email History table");
-            throw new InsightsJobFailedException(
-                    "Worlflow Detail ==== Error setting PDF details in Email History table");
-        }
-    }
-
 
 	public void savePDFFile(File extractedPdfFile, byte[] pdfResponse) {
 		try(FileOutputStream outStream = new FileOutputStream(extractedPdfFile)) {

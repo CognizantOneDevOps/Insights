@@ -88,6 +88,7 @@ export class HomeComponent implements OnInit {
   helpPageURL = "https://onedevops.atlassian.net/wiki/spaces/OI/overview";
   isServerConfigAvailable: boolean = false;
   menuItem : MenuItem;
+  loginName: any;
 
 
   constructor(private grafanaService: GrafanaAuthenticationService,
@@ -179,6 +180,7 @@ export class HomeComponent implements OnInit {
     this.currentUserWithOrgs = await this.grafanaService.getCurrentUserWithOrgs();
     if (this.currentUserWithOrgs != undefined && this.currentUserWithOrgs.data != undefined) {
       this.userName = this.dataShare.setUserName(self.currentUserWithOrgs.data.userDetail.name);
+      this.loginName = this.dataShare.setLoginName(self.currentUserWithOrgs.data.userDetail.login);
       this.userDisplayName = this.dataShare.getCustomizeName(this.userName);
       this.userCurrentOrg = this.currentUserWithOrgs.data.userDetail.orgId;
       this.currentUserOrgsArray = this.currentUserWithOrgs.data.orgArray

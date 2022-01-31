@@ -104,14 +104,14 @@ public class DataDictionaryConfiguration extends DataDictionaryobjectRepository 
 	 * @throws InterruptedException
 	 */
 	private boolean selectSourceTool(String sourceTool) throws InterruptedException {
-		clickOn(selectSourceTool, 10);
-		visibilityOfAllElements(sourceToolList, 10);
+		clickOn(selectSourceTool, 2);
+		visibilityOfAllElements(sourceToolList, 2);
 		log.info("UniqueToolSize : {}, sourceToolListSize : {}", uniqueToolNames.size(), sourceToolList.size());
 		if (sourceToolList.size() == uniqueToolNames.size()) {
 			for (WebElement sourceToolName : sourceToolList) {
-				visibilityOf(sourceToolName, 10);
+				visibilityOf(sourceToolName, 2);
 				if ((sourceToolName.getText()).equals(sourceTool)) {
-					clickOn(sourceToolName, 10);
+					clickOn(sourceToolName, 2);
 					log.info(
 							"All the tools which are registered by using Agent Management and Webhook Configuration module are displayed and clicked the source tool successfully.");
 					break;
@@ -132,14 +132,14 @@ public class DataDictionaryConfiguration extends DataDictionaryobjectRepository 
 	 * @throws InterruptedException
 	 */
 	private boolean selectDestinationTool(String destinationTool) throws InterruptedException {
-		clickOn(selectDestinationTool, 10);
-		visibilityOfAllElements(destinationToolList, 10);
+		clickOn(selectDestinationTool, 2);
+		visibilityOfAllElements(destinationToolList, 2);
 		if (destinationToolList.size() == uniqueToolNames.size()) {
 			for (WebElement destinationToolName : destinationToolList) {
-				visibilityOf(destinationToolName, 10);
+				visibilityOf(destinationToolName, 2);
 				if ((destinationToolName.getText()).equals(destinationTool)) {
 					Thread.sleep(1000);
-					clickOn(destinationToolName, 10);
+					clickOn(destinationToolName, 2);
 					log.info(
 							"All the tools which are registered by using Agent Management and Webhook Configuration module are displayed and clicked the destination tool successfully.");
 					break;

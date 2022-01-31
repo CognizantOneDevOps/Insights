@@ -43,7 +43,7 @@ export class ReportManagementComponent implements OnInit {
   selectedReport: any;
   CheckboxVar: boolean;
   showPagination: boolean = true;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   MAX_ROWS_PER_TABLE = 5;
   @ViewChild(MatSort) sort: MatSort;
   displayedColumns: string[];
@@ -70,6 +70,8 @@ export class ReportManagementComponent implements OnInit {
   templatesList = [];
   reponseForschedule: any;
   scheduleList = [];
+  selectedIndex : -1;
+  currentPageValue : number;
 
   constructor(
     private dialog: MatDialog,
@@ -124,8 +126,12 @@ export class ReportManagementComponent implements OnInit {
 
 
   async getAssesmentReport() {
+    var UserDetail={};
+    UserDetail["orgName"] = this.dataShare.getOrgName();
+    UserDetail["userName"] = this.dataShare.getLoginName();
     this.detailedRecords = [];
-    this.userDataSourceFromService = await this.reportmanagementService.getAssesmentReport();
+    this.userDataSourceFromService = await this.reportmanagementService.getAssesmentReport(JSON.stringify(UserDetail));
+    console.log(this.userDataSourceFromService);
     this.reportSourceList.data = this.userDataSourceFromService.data;
     this.showThrobber = false;
     this.showPagination = true;
@@ -204,6 +210,7 @@ export class ReportManagementComponent implements OnInit {
   }
 
   Refresh() {
+    this.selectedIndex = -1;
     this.selectedReport = '';
     this.clicked = [];
     this.userDataSource.data.forEach(element => {
@@ -213,6 +220,7 @@ export class ReportManagementComponent implements OnInit {
     this.disableDelete = true;
     this.disableEdit = true;
     this.disableStartImmediate = true;
+    this.disableDownload = true;
     this.list()
   }
 
@@ -225,6 +233,7 @@ export class ReportManagementComponent implements OnInit {
     this.userDataSource.data.forEach(element => {
       this.clicked.push(true);
     });
+    this.currentPageValue = this.paginator.pageIndex * this.MAX_ROWS_PER_TABLE; 
   }
   ngAfterViewInit() {
     this.userDataSource.paginator = this.paginator;
@@ -289,7 +298,7 @@ export class ReportManagementComponent implements OnInit {
               );
             } else {
               self.messageDialog.showApplicationsMessage(
-                'Failed to save the report.Please check logs.',
+                'Unable to delete report.Please check logs.',
                 'ERROR'
               );
             }
@@ -334,6 +343,7 @@ export class ReportManagementComponent implements OnInit {
   }
 
   radioChange(event: MatRadioChange, index) {
+    this.selectedIndex = index + this.currentPageValue ;
     this.disableDelete = false;
     this.disableEdit = false;
     this.disableStartImmediate = false;
@@ -358,11 +368,16 @@ export class ReportManagementComponent implements OnInit {
     } else {
       this.disableStartImmediate = true;
     }
-    if (event.value.status == 'NOT_STARTED') {
+    if (event.value.status == 'NOT_STARTED' || event.value.status == 'IN_PROGRESS') {
       this.disableDownload = true;
     } else {
       this.disableDownload = false;
     }
+  }
+
+  changeCurrentPageValue() {
+    this.selectedIndex = -1;
+    this.currentPageValue = this.paginator.pageIndex  * this.MAX_ROWS_PER_TABLE;
   }
 
   retry() {
@@ -380,7 +395,7 @@ export class ReportManagementComponent implements OnInit {
       statusRequestJson['configId'] = this.selectedReport.configId;
       //statusRequestJson['status'] = this.selectedReport.status;
       statusRequestJson['runimmediate'] = true;
-      var message = 'Report has been scheduled successfully. Execution will be started within 5 min.'; //to
+      var message = 'Report has been scheduled successfully. Execution will start within 5 min.'; //to
       var title = 'Start Report Execution';
       var dialogmessage = 'Do you want to execute <b>' + this.selectedReport.reportName + '</b> immediately ? ';
       const dialogRefStatus = this.messageDialog.showConfirmationMessage(
@@ -465,8 +480,11 @@ export class ReportManagementComponent implements OnInit {
     PDFRequestJson['pdfName'] = this.selectedReport.reportName;
     PDFRequestJson['executionId'] = executionid;
     PDFRequestJson['workflowId'] = workflowid;
-    this.reportmanagementService.downloadPDF(JSON.stringify(PDFRequestJson))
+    var request = btoa(JSON.stringify(PDFRequestJson));
+    console.log(request)
+    this.reportmanagementService.downloadPDF(request)
       .then(function (data) {
+        console.log(data);
         importedSaveAs(data, pdfFileName);
       });
 

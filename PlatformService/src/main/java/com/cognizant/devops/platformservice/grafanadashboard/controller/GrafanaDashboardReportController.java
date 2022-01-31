@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfig;
 import com.cognizant.devops.platformservice.grafanadashboard.service.GrafanaPdfService;
@@ -39,7 +40,6 @@ import com.cognizant.devops.platformservice.rest.AccessGroupManagement.AccessGro
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/dashboardReport")
@@ -59,7 +59,7 @@ public class GrafanaDashboardReportController {
 		log.debug("Dashboard details to generate pdf == {}", dashboardDetails);
 		String message = null;
 		try {
-			JsonObject detailsJson = new JsonParser().parse(dashboardDetails).getAsJsonObject();
+			JsonObject detailsJson = JsonUtils.parseStringAsJsonObject(dashboardDetails);
 			grafanaPdfServiceImpl.saveGrafanaDashboardConfig(detailsJson);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
@@ -83,8 +83,7 @@ public class GrafanaDashboardReportController {
 			}
 			result = grafanaPdfServiceImpl.getAllGrafanaDashboardConfigs();
 			for (GrafanaDashboardPdfConfig dashboardConfig : result) {
-				JsonParser parser = new JsonParser();
-				JsonObject dashJson = (JsonObject) parser.parse(dashboardConfig.getDashboardJson());
+				JsonObject dashJson = JsonUtils.parseStringAsJsonObject(dashboardConfig.getDashboardJson());
 				String orgId = dashJson.get("organisation").getAsString();
 				if(!userOrgsMap.containsKey(orgId)) {
 					continue;
@@ -115,7 +114,7 @@ public class GrafanaDashboardReportController {
 		log.debug("Updating Dashboard details to generate pdf == {}", dashboardDetails);
 		String message = null;
 		try {
-			JsonObject detailsJson = new JsonParser().parse(dashboardDetails).getAsJsonObject();
+			JsonObject detailsJson = JsonUtils.parseStringAsJsonObject(dashboardDetails);
 			grafanaPdfServiceImpl.updateGrafanaDashboardDetails(detailsJson);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
@@ -139,8 +138,7 @@ public class GrafanaDashboardReportController {
 	public @ResponseBody JsonObject updateDashboardStatus(@RequestBody String dashboardIdJsonString) {
 		String message = null;
 		try {
-			JsonParser parser = new JsonParser();
-			JsonObject dashboardIdJson = (JsonObject) parser.parse(dashboardIdJsonString);
+			JsonObject dashboardIdJson = JsonUtils.parseStringAsJsonObject(dashboardIdJsonString);
 			message = grafanaPdfServiceImpl.updateDashboardPdfConfigStatus(dashboardIdJson);		
 			return PlatformServiceUtil.buildSuccessResponseWithData(message);
 		} catch (InsightsCustomException e) {
@@ -158,8 +156,7 @@ public class GrafanaDashboardReportController {
 	public @ResponseBody  JsonObject setDashboardActiveState(@RequestBody String dashboardUpdateJsonString) {
 		String message = null;
 		try {
-			JsonParser parser = new JsonParser();
-			JsonObject dashboardUpdateJson = (JsonObject) parser.parse(dashboardUpdateJsonString);
+			JsonObject dashboardUpdateJson = JsonUtils.parseStringAsJsonObject(dashboardUpdateJsonString);
 			message = grafanaPdfServiceImpl.setDashboardActiveState(dashboardUpdateJson);
 			return PlatformServiceUtil.buildSuccessResponseWithData(message);
 		} catch (InsightsCustomException e) {

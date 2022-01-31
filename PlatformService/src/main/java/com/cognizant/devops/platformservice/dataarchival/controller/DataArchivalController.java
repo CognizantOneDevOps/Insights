@@ -29,13 +29,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.dataArchivalConfig.InsightsDataArchivalConfig;
 import com.cognizant.devops.platformservice.dataarchival.service.DataArchivalServiceImpl;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/admin/dataarchival")
@@ -50,7 +50,7 @@ public class DataArchivalController {
 	public @ResponseBody JsonObject saveDataArchivalDetails(@RequestBody String archivalDetails) {
 		String message = null;
 		try {
-			JsonObject detailsJson = new JsonParser().parse(archivalDetails).getAsJsonObject();
+			JsonObject detailsJson =JsonUtils.parseStringAsJsonObject(archivalDetails);
 			message = dataArchivalService.saveDataArchivalDetails(detailsJson);
 		} catch (InsightsCustomException e) {
 			if (e.getMessage().equals("Archival Name already exists.") ){
@@ -125,8 +125,7 @@ public class DataArchivalController {
 		try {
 			archivalURLDetailsJson = archivalURLDetailsJson.replace("\n", "").replace("\r", "");
 			String validatedRequestJson = ValidationUtils.validateRequestBody(archivalURLDetailsJson);
-			JsonParser parser = new JsonParser();
-			JsonObject validatedArchivalURLDetailsJson = parser.parse(validatedRequestJson).getAsJsonObject();
+			JsonObject validatedArchivalURLDetailsJson = JsonUtils.parseStringAsJsonObject(validatedRequestJson);
 			result = dataArchivalService.updateArchivalSourceUrl(validatedArchivalURLDetailsJson);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());

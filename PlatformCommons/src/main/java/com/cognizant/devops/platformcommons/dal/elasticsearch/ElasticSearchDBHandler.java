@@ -18,12 +18,12 @@ package com.cognizant.devops.platformcommons.dal.elasticsearch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.RestApiHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformcommons.exception.RestAPI404Exception;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 public class ElasticSearchDBHandler {
@@ -50,13 +50,13 @@ public class ElasticSearchDBHandler {
 		JsonObject data = null;
 		String response = "{}";
 		try {
-			JsonObject requestJson = new JsonParser().parse(query).getAsJsonObject();
+			JsonObject requestJson = JsonUtils.parseStringAsJsonObject(query);
 			response = RestApiHandler.doPost(sourceESUrl, requestJson, null);
-			data = new JsonParser().parse(response).getAsJsonObject();
+			data = JsonUtils.parseStringAsJsonObject(response);
 		} catch (InsightsCustomException e) {
 			log.error(e);
 			try {
-				data = new JsonParser().parse(e.getMessage()).getAsJsonObject();
+				data = JsonUtils.parseStringAsJsonObject(e.getMessage());
 			} catch (JsonParseException e1) {
 				data = new JsonObject();
 			}

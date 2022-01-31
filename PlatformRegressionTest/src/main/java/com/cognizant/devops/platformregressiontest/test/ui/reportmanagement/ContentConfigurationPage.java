@@ -127,7 +127,6 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 			log.info("Direction of threshold not applicable for the KPI :{} ", kpiId);
 		}
 		resultFieldEl.sendKeys(resultField);
-		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 		try {
 			if (actionEl.isDisplayed()) {
 				actionEl.sendKeys(action);
@@ -138,7 +137,6 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 		wait.until(ExpectedConditions.elementToBeClickable(isActiveEl));
 		isActiveEl.click();
 		messageEl.sendKeys(message);
-		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 		try {
 			if (thresholdEl.isDisplayed()) {
 				thresholdEl.sendKeys(threshold);
@@ -147,7 +145,6 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 			log.info("threshold not applicable for the KPI :{} ", kpiId);
 		}
 
-		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 		try {
 			if (thresholdsEl.isDisplayed()) {
 				thresholdsEl.sendKeys(threshold);
@@ -160,7 +157,6 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 		saveBtnEl.click();
 		wait.until(ExpectedConditions.elementToBeClickable(yesBtnEl));
 		yesBtnEl.click();
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 		wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
 		try {
 			if (contentIdExistsEl.isDisplayed()) {
@@ -217,7 +213,6 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 			log.info("Direction of threshold not applicable for the KPI :{} ", kpiId);
 		}
 		resultFieldEl.sendKeys(resultField);
-		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 		try {
 			if (actionEl.isDisplayed()) {
 				actionEl.sendKeys(action);
@@ -225,7 +220,6 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 		} catch (NoSuchElementException e) {
 			log.info("Action not applicable for the KPI :{} ", kpiId);
 		}
-		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 		wait.until(ExpectedConditions.elementToBeClickable(isActiveEl));
 		isActiveEl.click();
 		messageEl.sendKeys(message);
@@ -255,13 +249,9 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 		saveBtnEl.click();
 		try {
 
-			driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 			if (contentAddedEl.isDisplayed()) {
-				driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 				wait.until(ExpectedConditions.elementToBeClickable(yesBtnEl));
 				yesBtnEl.click();
-				driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
-				driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 				btnOKEl.click();
 				navigateToContentLandingPage();
 				return false;
@@ -270,11 +260,9 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 		} catch (NoSuchElementException e) {
 			log.info("Validation successful navigating to content landing page {}", e.getMessage());
 		}
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
 		try {
 			if (thresholdActionValidatorEl.isDisplayed()) {
-				driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 				wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
 				btnOKEl.click();
 				navigateToContentLandingPage();
@@ -284,7 +272,6 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 
 		}
 		try {
-			driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 			Integer.parseInt(thresholdEl.getText());
 			wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
 			btnOKEl.click();
@@ -310,7 +297,6 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 		wait.until(ExpectedConditions.elementToBeClickable(saveBtnEl));
 		saveBtnEl.click();
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 		wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
 		try {
 			if (minmaxActionValidatorEl.isDisplayed()) {
@@ -323,9 +309,7 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 
 		}
 		try {
-			driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 			if (contentAddedEl.isDisplayed()) {
-				driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 				wait.until(ExpectedConditions.elementToBeClickable(yBtnEl));
 				yBtnEl.click();
 				btnOKEl.click();
@@ -344,11 +328,9 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 		wait.until(ExpectedConditions.elementToBeClickable(saveBtnEl));
 		saveBtnEl.click();
-		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 		wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
 		try {
 			if (comparisonMsgValidationEl.isDisplayed()) {
-				driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 				btnOKEl.click();
 				navigateToContentLandingPage();
 				return true;
@@ -356,7 +338,6 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 			}
 		} catch (NoSuchElementException e) {
 			log.info("Something went wrong while validating comparision category");
-			driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 			btnOKEl.click();
 			navigateToContentLandingPage();
 			return false;
@@ -371,12 +352,9 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 		thresholdsEl.sendKeys(threshold);
 		wait.until(ExpectedConditions.elementToBeClickable(saveBtnEl));
 		saveBtnEl.click();
-		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 		wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
-		driver.manage().timeouts().implicitlyWait(4, TimeUnit.SECONDS);
 		try {
 			if (thresholdRangeActionValidatorEl.isDisplayed()) {
-				driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 				btnOKEl.click();
 				navigateToContentLandingPage();
 				return true;
@@ -385,10 +363,8 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 		} catch (NoSuchElementException e) {
 
 		}
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 		try {
 			if (thresholdRangeValidatorEl.isDisplayed()) {
-				driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 				btnOKEl.click();
 				navigateToContentLandingPage();
 				return true;
@@ -500,7 +476,7 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 	public boolean uploadJson(String fileName) {
 		String path = uploadFilePath + fileName;
 		uploadBtnE1.click();
-		driver.manage().timeouts().implicitlyWait(1200, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 		chooseFileBtnE1.sendKeys(path);
 		wait.until(ExpectedConditions.elementToBeClickable(uploadJsonBtnE1));
 		uploadJsonBtnE1.click();
@@ -515,7 +491,7 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 		wait.until(ExpectedConditions.elementToBeClickable(uploadBtnE1));
 		uploadBtnE1.click();
-		driver.manage().timeouts().implicitlyWait(12, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 		chooseFileBtnE1.sendKeys(path);
 		wait.until(ExpectedConditions.elementToBeClickable(uploadJsonBtnE1));
 		uploadJsonBtnE1.click();
@@ -525,7 +501,6 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 				driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 				wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
 				btnOKEl.click();
-				driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 				wait.until(ExpectedConditions.elementToBeClickable(uploadJsonCancelBtnE1));
 				uploadJsonCancelBtnE1.click();
 				navigateToContentLandingPage();

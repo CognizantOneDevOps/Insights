@@ -55,8 +55,8 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 	 *         Components tab and Services tab is displayed o/w false
 	 */
 	public boolean navigateToHealthCheckLandingPage() {
-		if (visibilityOf(landingPage, 10) && visibilityOf(notificationLabel, 10) && visibilityOf(servicesTab, 10)
-				&& visibilityOf(dataComponentsTab, 10) && visibilityOf(agentsTab, 10)) {
+		if (visibilityOf(landingPage, 3) && visibilityOf(notificationLabel, 3) && visibilityOf(servicesTab, 3)
+				&& visibilityOf(dataComponentsTab, 3) && visibilityOf(agentsTab, 3)) {
 			log.info(
 					"landingPage, notificationToggle, servicesTab, dataComponentsTab, agentsTab is displayed successfully.");
 			return true;
@@ -75,7 +75,7 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 		try {
 			if (visibilityOfAllElements(toolNameList, 1) > 0) {
-				driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+				driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 				log.info("Agents data has been loaded successfully from database.");
 				return true;
 			}
@@ -155,20 +155,20 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 					driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 					if (visibilityOf(latestStatusDetails, 1) && visibilityOf(latestFailureDetails, 1)) {
 						visibilityOf(additionalDetailsHeading, 1);
-						clickOn(closeDialog, 10);
+						clickOn(closeDialog, 3);
 						i++;
 					}
 				} catch (Exception ex) {
 					agentCount++;
 					visibilityOf(additionalDetailsHeading, 1);
-					clickOn(closeDialog, 10);
+					clickOn(closeDialog, 3);
 					log.info("For {} agent not able to found latest status details or latest failure details",
 							driver.findElement(By.xpath("//*[@id='agentsTable']/table/tbody/tr[" + (++i) + "]/td[2]"))
 									.getText());
 				}
 			}
 		} catch (Exception e) {
-			clickOn(closeDialog, 10);
+			clickOn(closeDialog, 3);
 			log.info(e.getMessage());
 		}
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
@@ -190,26 +190,26 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 	 * @return true if both agents list size is matching else false
 	 */
 	public boolean testSelectToolUnderAgentsTab() {
-		clickOn(agentsTab, 10);
+		clickOn(agentsTab, 5);
 		int agentsCount = 0;
-		visibilityOfAllElements(toolNameList, 10);
+		visibilityOfAllElements(toolNameList, 5);
 		for (WebElement tool : toolNameList) {
 			if (tool.getText().equals(LoginAndSelectModule.testData.get("selectToolName"))) {
 				++agentsCount;
 			}
 		}
 		log.info("Before selecting tool, agents present for selected tool : {}", agentsCount);
-		visibilityOf(selectToolLabel, 10);
-		clickOn(selectTool, 10);
-		visibilityOfAllElements(selectToolOptionsList, 10);
+		visibilityOf(selectToolLabel, 3);
+		clickOn(selectTool, 3);
+		visibilityOfAllElements(selectToolOptionsList, 3);
 		for (WebElement tool : selectToolOptionsList) {
-			visibilityOf(tool, 10);
+			visibilityOf(tool, 3);
 			if (tool.getText().equals(LoginAndSelectModule.testData.get("selectToolName"))) {
-				clickOn(tool, 10);
+				clickOn(tool, 3);
 				break;
 			}
 		}
-		visibilityOfAllElements(toolNameList, 10);
+		visibilityOfAllElements(toolNameList, 3);
 		int agentsListSize = toolNameList.size();
 		log.info("After selecting tool, agents present for selected tool : {}", agentsListSize);
 		if (agentsCount == agentsListSize) {
@@ -232,13 +232,13 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 		boolean verifyElasticSearchData = false;
 		boolean verifyRabbitMQData = false;
 		try {
-			clickOn(dataComponentsTab, 10);
+			clickOn(dataComponentsTab, 5);
 			Thread.sleep(5000);
 			checkServersHeadingComponent();
 			int i = 0;
 			driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 			Thread.sleep(3000);
-			while (i != visibilityOfAllElements(serverNameList, 10)) {
+			while (i != visibilityOfAllElements(serverNameList, 5)) {
 				++i;
 				String serverName = driver.findElement(By.xpath("//tbody[@role='rowgroup']/tr[" + i + "]/td[1]"))
 						.getText();
@@ -329,9 +329,9 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 	 * @return true if all headings present else false
 	 */
 	private boolean checkServersHeadingComponent() {
-		if (visibilityOf(serverNameHeading, 10) && visibilityOf(ipAddressHeading, 10)
-				&& visibilityOf(versionHeading, 10) && visibilityOf(infoHeading, 10)
-				&& visibilityOf(statusHeading, 10)) {
+		if (visibilityOf(serverNameHeading, 5) && visibilityOf(ipAddressHeading, 5)
+				&& visibilityOf(versionHeading, 5) && visibilityOf(infoHeading, 5)
+				&& visibilityOf(statusHeading, 5)) {
 			log.info("Name, IP Address:Port, Version, Additional Information and Staus headings are displayed on UI.");
 			return true;
 		} else {
@@ -348,9 +348,9 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 	public boolean serverHealthCheckStatus() {
 		int failureCount = 0;
 		int i = 0;
-		clickOn(dataComponentsTab, 10);
+		clickOn(dataComponentsTab, 5);
 		log.info("Servers present on UI : {} ", visibilityOfAllElements(serverNameList, 10));
-		while (i != visibilityOfAllElements(dataComponentsTabData, 10)) {
+		while (i != visibilityOfAllElements(dataComponentsTabData, 5)) {
 			++i;
 			String serverName = driver.findElement(By.xpath("//tbody[@role='rowgroup']/tr[" + i + "]/td[1]")).getText();
 			driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
@@ -392,7 +392,7 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 			clickOn(servicesTab, 10);
 			checkServicesHeadingComponent();
 			int i = 0;
-			int servicesCount = visibilityOfAllElements(servicesTabData, 10);
+			int servicesCount = visibilityOfAllElements(servicesTabData, 5);
 			while (i != servicesCount) {
 				++i;
 				driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
@@ -449,9 +449,9 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 	public boolean serviceHealthCheckStatus() {
 		int failureCount = 0;
 		int i = 0;
-		clickOn(servicesTab, 10);
+		clickOn(servicesTab, 5);
 		log.info("Services present on UI : {} ", visibilityOfAllElements(servicesTabData, 10));
-		while (i != visibilityOfAllElements(servicesTabData, 10)) {
+		while (i != visibilityOfAllElements(servicesTabData, 3)) {
 			++i;
 			String serviceName = driver.findElement(By.xpath("//tbody[@role='rowgroup']/tr[" + i + "]/td[1]"))
 					.getText();
@@ -493,14 +493,14 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 				try {
 					driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 					if (visibilityOf(latestStatusDetailsService, 2)) {
-						visibilityOf(additionalDetailsHeading, 10);
-						clickOn(closeDialog, 10);
+						visibilityOf(additionalDetailsHeading, 2);
+						clickOn(closeDialog, 3);
 						i++;
 					}
 				} catch (Exception ex) {
 					failureDetails++;
 					visibilityOf(additionalDetailsHeading, 3);
-					clickOn(closeDialog, 10);
+					clickOn(closeDialog, 3);
 					log.info("For {} service not able to found latest status details or latest failure details",
 							driver.findElement(By.xpath("//*[@id='servicesTable']/table/tbody/tr[" + (++i) + "]/td[1]"))
 									.getText());
@@ -513,7 +513,7 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 						"Skipping test case as not able to found latest status details for all services");
 			}
 		} catch (Exception e) {
-			clickOn(closeDialog, 10);
+			clickOn(closeDialog, 3);
 			log.info(e.getMessage());
 		}
 		log.info("For all services latest status details or latest failure details are present");
@@ -547,7 +547,7 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 					&& visibilityOf(notificationHistoryDetails, 10) && visibilityOf(notificationLabel, 10)) {
 				clickOn(notificationHistoryDetails, 10);
 				visibilityOf(healthNotificationHeading, 10);
-				clickOn(closeDialog, 10);
+				clickOn(closeDialog, 3);
 				return true;
 			}
 		}
@@ -573,7 +573,7 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 				&& visibilityOf(notificationHistoryDetails, 10) && visibilityOf(notificationLabel, 10)) {
 			clickOn(notificationHistoryDetails, 10);
 			visibilityOf(healthNotificationHeading, 10);
-			clickOn(closeDialog, 10);
+			clickOn(closeDialog, 3);
 			if (visibilityOf(notificationToggleTrue, 10)) {
 				log.info("Notification Toggle is in enable mode");
 				clickOn(notificationToggleTrue, 10);
@@ -604,11 +604,11 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 		clickOn(details, 10);
 		visibilityOf(additionalDetailsHeading, 10);
 		if (visibilityOf(latestStatusDetailsService, 10)) {
-			clickOn(closeDialog, 10);
+			clickOn(closeDialog, 3);
 			log.info("{} : Latest Status Details present in details dialog box", serviceName);
 			return true;
 		}
-		clickOn(closeDialog, 10);
+		clickOn(closeDialog, 3);
 		return false;
 	}
 

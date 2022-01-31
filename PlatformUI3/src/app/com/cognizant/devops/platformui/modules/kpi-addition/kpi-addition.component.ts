@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { KpiService } from './kpi-service';
 import { BulkUploadService } from '../bulkupload/bulkupload.service';
 import { MessageDialogService } from '../application-dialog/message-dialog-service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, NavigationExtras } from '@angular/router';
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { ModelManagementService } from '@insights/app/modules/model-management/model-management.service';
 
@@ -59,7 +59,7 @@ export class KpiAdditionComponent implements OnInit {
         this.groupName = params.groupName;
         this.dataSource = params.dataSource;
         this.dbQuery = params.dbQuery;
-        this.isActive = params.isActive;
+        this.isActive =true;
         this.resultField = params.resultField;
         this.dataSourceOutput = params.outputDatasource;
         this.selectedUsecase = params.usecase; 
@@ -279,6 +279,13 @@ export class KpiAdditionComponent implements OnInit {
     this.isForecast = true;
     var usecase = this.usecaseDetails.find(({usecaseName}) => usecaseName === selected);
     this.resultField = usecase.predictionColumn;
+  }
+
+  redirectToLandingPage() {
+    let navigationExtras: NavigationExtras = {
+      skipLocationChange: true
+    };
+    this.router.navigate(["InSights/Home/kpicreation"], navigationExtras);
   }
 
 }

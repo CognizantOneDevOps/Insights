@@ -84,6 +84,9 @@ class BaseAgent(object):
         
         if self.webhookEnabled:
             self.subscriberForWebhookAgent()
+        elif self.isROIAgent:
+            self.subscriberForROIAgent()
+            self.execute()
         else:
             self.scheduleExtensions()
             self.execute()
@@ -154,6 +157,7 @@ class BaseAgent(object):
             self.agentId = self.config.get('agentId')
             self.toolName = self.config.get('toolName')
             self.webhookEnabled = self.config.get('webhookEnabled', False)
+            self.isROIAgent = self.config.get('isROIAgent', False)
             self.executionId = '--';
             self.funcName = '--'
             self.dataSize = 0
@@ -312,6 +316,34 @@ class BaseAgent(object):
         self.messageFactory.subscribe(routingKey, callback)
         self.logIndicator(self.EXECUTION_START, self.config.get('isDebugAllowed', False))
         self.publishHealthData(self.generateHealthData(note="WebHook Agent is in START "))
+        
+    def subscriberForROIAgent(self):
+        
+        self.baseLogger.info('Inside subscriberForROIAgent')
+        self.executionStartTime = datetime.now()
+        routingKey = self.config.get('subscribe').get("roiExecutionQueue")
+
+        def callback(ch, method, properties, data):
+            self.baseLogger.info('Inside subscriberForROIAgent callback')
+            try:
+                self.processROIAgent(data)
+                ch.basic_ack(delivery_tag=method.delivery_tag)
+            except Exception as ex:
+                self.baseLogger.error(" subscriberForROIAgent ")
+                self.baseLogger.error(ex)
+                self.publishROIAgentstatus(json.loads(data), "ERROR", str(ex))
+                self.publishHealthDataForExceptions(ex)
+            finally:
+                '''If agent receive the STOP command, Python program should exit gracefully after current data collection is complete.  '''
+                if self.shouldAgentRun == False:
+                    self.baseLogger.info(' subscriberForWebhookAgent STOP message received, Stopping Agent ')
+                    os._exit(0)
+        
+        self.messageFactory.subscribe(routingKey, callback)
+        self.logIndicator(self.EXECUTION_START, self.config.get('isDebugAllowed', False))
+        self.publishHealthData(self.generateHealthData(note="ROI Agent is in START "))
+    
+    
 
     '''
     Subscribe for Engine Config Changes. Any changes to respective agent will be consumed and processed here.
@@ -681,6 +713,12 @@ class BaseAgent(object):
         '''
         
     def processWebhook(self,data):
+        self.baseLogger.info('Inside processWebhook')
+        '''
+        Override process in Agent class
+        '''
+        
+    def processROIAgent(self,data):
         self.baseLogger.info('Inside processWebhook')
         '''
         Override process in Agent class

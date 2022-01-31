@@ -68,9 +68,9 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 	@Test(priority = 2)
 	public void testAllChartType() throws InsightsCustomException {
 		try {
-			List<String> vTypeList = assessmentService.getAllChartType();
+			JsonObject vTypeList = assessmentService.getAllChartType();
 			Assert.assertNotNull(vTypeList);
-			Assert.assertFalse(vTypeList.isEmpty());
+			Assert.assertFalse(vTypeList.keySet().isEmpty());
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}

@@ -27,6 +27,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.automl.task.util.AutoMLExecutor;
 import com.cognizant.devops.platformcommons.core.enums.AutoMLEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformdal.autoML.AutoMLConfig;
 import com.cognizant.devops.platformdal.autoML.AutoMLConfigDAL;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
@@ -37,7 +38,6 @@ import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadP
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class AutoMLSubscriber extends WorkflowTaskSubscriberHandler {
 
@@ -59,7 +59,7 @@ public class AutoMLSubscriber extends WorkflowTaskSubscriberHandler {
 		long startTime = System.nanoTime();
 		try {
 			String message = new String(body, StandardCharsets.UTF_8);
-			JsonObject incomingTaskMessage = new JsonParser().parse(message).getAsJsonObject();
+			JsonObject incomingTaskMessage = JsonUtils.parseStringAsJsonObject(message);
 			String workflowId = incomingTaskMessage.get("workflowId").getAsString();
 			executionId = incomingTaskMessage.get("executionId").getAsLong();
 			workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);

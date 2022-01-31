@@ -29,11 +29,11 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class Util {
 
@@ -51,11 +51,10 @@ public class Util {
     public JsonObject readTracking() throws IOException, InsightsCustomException {
     	JsonObject tracking = new JsonObject();
     	InputStream is = null;
-        JsonParser parser = new JsonParser();
         if(f.exists()) {
             is = new FileInputStream(f);
             String jsonTxt = IOUtils.toString(is, StandardCharsets.UTF_8.name());
-            tracking = (JsonObject) parser.parse(jsonTxt);
+            tracking = JsonUtils.parseStringAsJsonObject(jsonTxt);
         }
         else{
             if(!f.createNewFile()){

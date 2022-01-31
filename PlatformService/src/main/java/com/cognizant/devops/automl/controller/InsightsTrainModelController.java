@@ -33,12 +33,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import com.cognizant.devops.automl.service.TrainModelsServiceImpl;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+
 
 @RestController
 @RequestMapping("/admin/trainmodels")
@@ -141,7 +142,9 @@ public class InsightsTrainModelController {
 	public @ResponseBody JsonObject getPrediction(@RequestParam String usecase, @RequestParam String modelName) {
 		JsonObject response = null;
 		try {
-			response = trainModelsService.getPrediction(modelName, usecase);
+			String validatedModelName = ValidationUtils.validateRequestBody(modelName);
+			String validatedUsecase = ValidationUtils.validateRequestBody(usecase);
+			response = trainModelsService.getPrediction(validatedModelName, validatedUsecase);
 		} catch (InsightsCustomException e) {
 			log.error(e.getMessage());
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
@@ -240,8 +243,7 @@ public class InsightsTrainModelController {
 	public @ResponseBody JsonObject updateUsecaseState(@RequestBody String usecaseConfig) {
 		try {
 			String validatedResponse = ValidationUtils.validateRequestBody(usecaseConfig);
-			JsonParser parser = new JsonParser();
-			JsonObject usecaseJson = (JsonObject) parser.parse(validatedResponse);
+			JsonObject usecaseJson =JsonUtils.parseStringAsJsonObject(validatedResponse);
 			String message= trainModelsService.updateUsecaseState(usecaseJson);
 			return PlatformServiceUtil.buildSuccessResponseWithData(message);
 		} catch (InsightsCustomException e) {

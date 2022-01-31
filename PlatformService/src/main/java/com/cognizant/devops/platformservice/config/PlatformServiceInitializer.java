@@ -19,6 +19,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -27,6 +28,8 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.SessionCookieConfig;
+import javax.servlet.SessionTrackingMode;
 
 import org.apache.log4j.MDC;
 import org.apache.logging.log4j.LogManager;
@@ -71,10 +74,14 @@ public class PlatformServiceInitializer implements WebApplicationInitializer {
 			disableSslVerification();
 			
 			ProcessMasterData processMasterData = new ProcessMasterData();
+			String triggerResponse = processMasterData.executeTriggerStatement();
+			log.debug(triggerResponse);
 			processMasterData.executeMasterDataProcessing();
 
 			servletContext.addFilter("InsightsResponseHeaderWriter", InsightsResponseHeaderWriterFilter.class)
 					.addMappingForUrlPatterns(null, false, "/*");
+			
+			//sessionCookiesDefine(servletContext);
 			
 			PlatformServiceStatusProvider.getInstance().createPlatformServiceStatusNode(
 					"PlatformService Started Successfully", PlatformServiceConstants.SUCCESS);
@@ -91,6 +98,13 @@ public class PlatformServiceInitializer implements WebApplicationInitializer {
 		}
 
 	}
+
+//	private void sessionCookiesDefine(ServletContext servletContext) {
+//		servletContext.setSessionTrackingModes(Collections.singleton(SessionTrackingMode.COOKIE));
+//        SessionCookieConfig sessionCookieConfig = servletContext.getSessionCookieConfig();
+//        sessionCookieConfig.setHttpOnly(true);
+//        sessionCookieConfig.setSecure(true);
+//	}
 
 	private void loadServerConfig() {
 		try {
@@ -114,30 +128,38 @@ public class PlatformServiceInitializer implements WebApplicationInitializer {
 			TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
 				@Override
 				public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-					return new X509Certificate[0];
+					X509Certificate[] myTrustedAnchors = new X509Certificate[0];
+					for (X509Certificate cert : myTrustedAnchors) {
+						try {
+							cert.checkValidity();
+						} catch (Exception e) {
+							log.error(e);
+						}
+					}
+					return myTrustedAnchors;
 				}
 
-				@Override
-				public void checkClientTrusted(X509Certificate[] certs, String authType) throws CertificateException {
-					try {
-						for (X509Certificate cert : certs) {
-							cert.checkValidity();
+			  @Override
+			    public void checkClientTrusted(X509Certificate[] certs, String authType) throws CertificateException {
+						try {
+							for (X509Certificate cert : certs) {
+								cert.checkValidity();
+							}
+						} catch (Exception e) {
+							log.error(e);
 						}
-					} catch (Exception e) {
-						throw new CertificateException("Certificate not valid or trusted.");
-					}
-				}
+			    }
 
-				@Override
-				public void checkServerTrusted(X509Certificate[] certs, String authType) throws CertificateException {
-					try {
-						for (X509Certificate cert : certs) {
-							cert.checkValidity();
+			    @Override
+			    public void checkServerTrusted(X509Certificate[] certs, String authType) throws CertificateException {
+						try {
+							for (X509Certificate cert : certs) {
+								cert.checkValidity();
+							}
+						} catch (Exception e) {
+							log.error(e);
 						}
-					} catch (Exception e) {
-						throw new CertificateException("Certificate not valid or trusted.");
-					}
-				}
+			    }
 			} };
 
 			// Install the all-trusting trust manager

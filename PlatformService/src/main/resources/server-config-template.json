@@ -103,7 +103,8 @@
 		"postLogoutURL": "logoutURL",
 		"tokenSigningKey": "insights_IDP_CogDevops_SSO_Token_string",
 		"servicePrincipalKerberos": "",
-		"keyTabLocationKerberos": "C:\\InSights_Windows\\Server2\\INSIGHTS_HOME\\.InSights\\kerberos_keytab_file.keytab"
+		"keyTabLocationKerberos": "C:\\InSights_Windows\\Server2\\INSIGHTS_HOME\\.InSights\\kerberos_keytab_file.keytab",
+		"jwtTokenOriginServerURL":""
 	},
 	"mlConfiguration": {
 		"h2oEndpoint": ""

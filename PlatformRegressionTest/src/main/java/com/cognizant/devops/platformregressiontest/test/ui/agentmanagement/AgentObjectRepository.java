@@ -178,7 +178,7 @@ public class AgentObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//mat-icon[@title='Save']")
 	WebElement save;
 
-	@FindBy(xpath = "//span[@class='mat-button-wrapper' and contains(text(), 'OK')]")
+	@FindBy(xpath = "//span[@class='mat-button-wrapper' and contains(text(), 'OKAY')]")
 	WebElement ok;
 
 	@FindBy(xpath = "//span[@class='mat-button-wrapper' and contains(text(), 'YES')]")

@@ -15,7 +15,7 @@
   <div class="alignMain">
     <div class="btnAlign">
       <button mat-icon-button (click)="validateKpiData()">
-        <mat-icon title="Save" style="margin-top: 0%;" class="mat-icon material-icons">
+        <mat-icon title="Save" style="margin-top: 10%;" class="mat-icon material-icons">
           save
         </mat-icon>
       </button>
@@ -24,6 +24,10 @@
           cancel
         </mat-icon>
       </button>
+      <button mat-icon-button (click)="redirectToLandingPage()">
+        <mat-icon svgIcon="redirect_icon" title="Redirect To Landing Page" style="margin-bottom: 13%;" class="mat-icon material-icons">
+        </mat-icon>
+    </button>
     </div>
     <div>
       <table class="mat-elevation-z8 mat-table">
@@ -149,20 +153,7 @@
               <span class="infoText">Please select a Action </span>
             </td>
           </tr>
-          <tr class="mat-row-kpi">
-            <td class="mat-cell" class="columnName">
-              <span class="mainText">Is Active?</span>
-              <span class="asteriskText">*</span>
-            </td>
-            <td class="columnComponent">
-              <mat-slide-toggle [(ngModel)]="isActive">
-              </mat-slide-toggle>
-            </td>
-            <td>
-              <span class="infoText"></span>
-            </td>
-          </tr>
-
+         
           <tr class="mat-row-kpi">
             <td class="mat-cell" class="columnName">
               <span class="mainText">Message</span>

@@ -34,7 +34,7 @@ import  cronstrue  from 'cronstrue';
 export class ScheduleTaskManagmentComponent implements OnInit {
 
   taskuserDataSource = new MatTableDataSource<any>();
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   showPagination: boolean = true;
   displayedColumns: string[];
   displayedToolColumnsEdit: string[];
@@ -44,9 +44,11 @@ export class ScheduleTaskManagmentComponent implements OnInit {
   showListView: boolean = true;
   taskForm: FormGroup;
   disableRadioChangeButton:boolean = true;
-  seletedIndex = -1; 
+  selectedIndex = -1; 
   seletedAction = 'NOT_STARTED';
   nameValidationRegex = new RegExp("^[a-zA-Z0-9_]*$");
+  currentPageValue : number;
+  MAX_ROWS_PER_TABLE = 6;
 
   constructor(public timerTaskService: TaskManagementService,
     private dialog: MatDialog,
@@ -79,12 +81,14 @@ export class ScheduleTaskManagmentComponent implements OnInit {
       componentClassDetail: ['', [Validators.required]],
       schedule: ['', [Validators.required]]
     });
+    this.currentPageValue = this.paginator.pageIndex * this.MAX_ROWS_PER_TABLE;
   }
+
 
   async loadTaskList() {
     var detailedRecords = [];
     this.showListView = true;
-    this.seletedIndex = -1;
+    this.selectedIndex = -1;
     this.disableRadioChangeButton = true;
     let userDataSourceFromService = await this.timerTaskService.getTaskList();
     console.log(userDataSourceFromService);
@@ -132,7 +136,7 @@ export class ScheduleTaskManagmentComponent implements OnInit {
     console.log(this.selectedTask)
     console.log(event.value)
     this.disableRadioChangeButton = false
-    this.seletedIndex = index
+    this.selectedIndex = index + this.currentPageValue;
     this.seletedAction= event.value.action;
     console.log(event.value.action)
   }
@@ -256,10 +260,16 @@ export class ScheduleTaskManagmentComponent implements OnInit {
   }
 
   refresh() {
+    this.selectedIndex = -1;
     this.showListView = false;
     this.taskForm.reset();
     this.loadTaskList();
   }
+
+  changeCurrentPageValue() {
+    this.selectedIndex = -1;
+    this.currentPageValue = this.paginator.pageIndex  * this.MAX_ROWS_PER_TABLE;
+   }
 
   async statusUpdate(action) {
     console.log("Inside statusUpdate " + action)
@@ -296,7 +306,7 @@ export class ScheduleTaskManagmentComponent implements OnInit {
 
   getHistoryCSS(rowno){
     //console.log( " In history css "+this.seletedIndex + "  selected row "+rowno);
-    if(this.seletedIndex == rowno){
+    if(this.selectedIndex == rowno){
       return false;
     } else  {
       return true;

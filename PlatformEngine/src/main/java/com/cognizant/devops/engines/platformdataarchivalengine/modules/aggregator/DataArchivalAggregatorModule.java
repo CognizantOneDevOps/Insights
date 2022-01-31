@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2020 Cognizant Technology Solutions
+ * Copyright 2021 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -35,13 +35,13 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.DataArchivalConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.cognizant.devops.platformdal.dataArchivalConfig.DataArchivalConfigDal;
 import com.cognizant.devops.platformdal.dataArchivalConfig.InsightsDataArchivalConfig;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class DataArchivalAggregatorModule implements Job, ApplicationConfigInterface {
 	private static Logger log = LogManager.getLogger(DataArchivalAggregatorModule.class);
@@ -67,14 +67,10 @@ public class DataArchivalAggregatorModule implements Job, ApplicationConfigInter
 			log.error("Unable to add subscriber ", e);
 			EngineStatusLogger.getInstance().createSchedularTaskStatusNode("Data Archival Aggregator execution has some issue  ",
 					PlatformServiceConstants.FAILURE,jobName);
-			EngineStatusLogger.getInstance().createDataArchivalStatusNode(
-					"Data Archival Aggregator execution has some issue   "+e.getMessage(), PlatformServiceConstants.FAILURE);
 		}
 		long processingTime = System.currentTimeMillis() - startTime ;
 		EngineStatusLogger.getInstance().createSchedularTaskStatusNode("Data Archival Aggregator execution Completed",
 				PlatformServiceConstants.SUCCESS,jobName,processingTime);
-		EngineStatusLogger.getInstance().createDataArchivalStatusNode(
-				"Data Archival Aggregator execution started successfully  ", PlatformServiceConstants.SUCCESS);
 		log.debug("Data Archival Aggregator Module completed");
 	}
 
@@ -82,7 +78,7 @@ public class DataArchivalAggregatorModule implements Job, ApplicationConfigInter
 		List<AgentConfig> agentConfigs = agentConfigDAL.getAgentConfigurations(DataArchivalConstants.TOOLNAME,
 				DataArchivalConstants.TOOLCATEGORY);
 		for(AgentConfig agentConfig: agentConfigs) {
-			JsonObject config = (JsonObject) new JsonParser().parse(agentConfig.getAgentJson());
+			JsonObject config = JsonUtils.parseStringAsJsonObject(agentConfig.getAgentJson());
 			JsonObject publishJson = config.get("publish").getAsJsonObject();
 			String dataRoutingKey = publishJson.get("data").getAsString();
 			loggingInfo.put("toolName", String.valueOf(config.get("toolName")));

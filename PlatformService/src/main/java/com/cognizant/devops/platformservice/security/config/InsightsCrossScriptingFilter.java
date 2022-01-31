@@ -30,9 +30,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class InsightsCrossScriptingFilter extends OncePerRequestFilter {
 	private static Logger log = LogManager.getLogger(InsightsCrossScriptingFilter.class);
@@ -59,8 +59,7 @@ public class InsightsCrossScriptingFilter extends OncePerRequestFilter {
 				log.error(
 						"Invalid request in InsightsCustomException CrossScriptingFilter  InsightsCustomException {} ",
 						e.getMessage());
-				JsonParser parser = new JsonParser();
-				JsonObject element = parser.parse(e.getMessage()).getAsJsonObject();
+				JsonObject element = JsonUtils.parseStringAsJsonObject(e.getMessage());
 				msg = PlatformServiceUtil.buildFailureResponse(
 						"InsightsCustomException Invalid request,Someting is wrong in cookies,Header or Parameter"
 								+ e.getMessage() + " status " + element.get("StatusCode"))

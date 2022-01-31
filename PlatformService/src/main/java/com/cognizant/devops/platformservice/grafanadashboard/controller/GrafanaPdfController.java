@@ -25,13 +25,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.grafanadashboard.service.GrafanaPdfService;
 import com.cognizant.devops.platformservice.rest.querycaching.service.QueryCachingConstants;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/externalApi")
@@ -48,7 +48,7 @@ public class GrafanaPdfController {
 		String message = null;
 		JsonObject result = new JsonObject();
 		try {
-			JsonObject detailsJson = new JsonParser().parse(dashboardDetails).getAsJsonObject();
+			JsonObject detailsJson = JsonUtils.parseStringAsJsonObject(dashboardDetails);
 			String isTestDBConnectivity = detailsJson.get(QueryCachingConstants.METADATA).getAsJsonArray()
 					.get(QueryCachingConstants.ZEROTH_INDEX).getAsJsonObject().get(QueryCachingConstants.TEST_DATABASE)
 					.toString();

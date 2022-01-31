@@ -66,7 +66,7 @@ public class CorrelationObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//div[@class='textPadding']")
 	WebElement afterClickingSaveMsg;
 
-	@FindBy(xpath = "//span[contains(text(),'OK')]")
+	@FindBy(xpath = "//span[text()= 'OKAY']")
 	WebElement ok;
 
 	@FindBy(xpath = "//div[@class='textPadding' and contains(text(), 'Relation Name already exists.')]")

@@ -55,7 +55,7 @@ export class ContentConfigComponent implements OnInit {
       panelClass: 'DialogBox',
       width: '34%',
       height: '27%',
-      disableClose: false,
+      disableClose: true,
       data: {
         type: 'CONTENT',
         multipleFileAllowed: false,

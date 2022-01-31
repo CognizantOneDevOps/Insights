@@ -43,15 +43,16 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.util.FileCopyUtils;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class AgentManagementUtil {
 
@@ -65,10 +66,11 @@ public class AgentManagementUtil {
 		return agentManagementUtil;
 	}
 
-	public  JsonObject getAgentConfigfile(URL filePath, File targetDir) throws IOException  {
+	public  JsonObject getAgentConfigfile(URL filePath, File targetDir) throws IOException, InsightsCustomException  {
 		if (!targetDir.exists()) {
 			targetDir.mkdirs();
 		}
+	
 		File zip = File.createTempFile("agent_", ".zip", targetDir);
 		URLConnection conn;
 		if(ApplicationConfigProvider.getInstance().getProxyConfiguration().isEnableProxy()) {
@@ -78,7 +80,6 @@ public class AgentManagementUtil {
 		}else{
 			conn = filePath.openConnection();
 		}
-
 		try(InputStream in = new BufferedInputStream(conn.getInputStream(), 1024);
 				OutputStream out = new BufferedOutputStream(new FileOutputStream(zip))){
 			copyInputStream(in, out);
@@ -86,7 +87,7 @@ public class AgentManagementUtil {
 		return getAgentConfiguration(zip, targetDir);
 	}
 
-	public   Path getAgentZipFolder(final Path sourceFolderPath, Path zipPath) throws IOException {
+	public Path getAgentZipFolder(final Path sourceFolderPath, Path zipPath) throws IOException {
 		try(final ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipPath.toFile()))){
 			Files.walkFileTree(sourceFolderPath, new SimpleFileVisitor<Path>() {
 				@Override
@@ -140,9 +141,9 @@ public class AgentManagementUtil {
 	}
 
 	private JsonObject readJsonFile(File targetDir, String filePath) throws IOException {
-		JsonParser  parser = new JsonParser();
-		try(FileReader reader = new FileReader(targetDir+File.separator+filePath)){
-			return (JsonObject) parser.parse(reader);
+		File file = new File(targetDir+File.separator+filePath);
+		try(FileReader reader = new FileReader(file)){
+			return JsonUtils.parseReaderAsJsonObject(reader);
 		}
 	}
 
@@ -158,9 +159,8 @@ public class AgentManagementUtil {
 	
 	public JsonObject convertFileToJSON(File configFile) throws IOException {
 		JsonObject jsonObject = new JsonObject();
-		JsonParser parser = new JsonParser();
 		try {
-			JsonElement jsonElement = parser.parse(new FileReader(configFile));
+			JsonElement jsonElement =  JsonUtils.parseReader(new FileReader(configFile));
 			jsonObject = jsonElement.getAsJsonObject();
 		} catch (FileNotFoundException e) {
 			log.error(e);

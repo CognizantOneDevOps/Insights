@@ -1,0 +1,80 @@
+{
+  "reportName": "GRAFANA_PDF_ALL_CAT_REPORT",
+  "description": "Grafana PDF Report template having all categories",
+  "isActive": true,
+  "visualizationutil": "GRAFANAPDF",
+  "kpiConfigs": [
+    {
+      "kpiId": 2101,
+      "visualizationConfigs": [
+        {
+          "vType": "table_2101",
+          "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.Type as Type, sum(n.Count) as Count"
+        }
+      ]
+    },
+    {
+      "kpiId": 2102,
+      "visualizationConfigs": [
+        {
+          "vType": "piechart_2102",
+          "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId}  RETURN distinct n.StoryTypes as StoryTypes ,toInt(ROUND(Avg(n.Duration))) as Duration"
+        }
+      ]
+    },
+    {
+      "kpiId": 2103,
+      "visualizationConfigs": [
+        {
+          "vType": "barchart_horizontal_2103",
+          "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId}  RETURN  apoc.date.format( n.recordDate ,'s','MM/dd','IST') as recordDate, n.Productivity as Productivity ORDER BY recordDate DESC limit 6"
+        }
+      ]
+    },
+    {
+      "kpiId": 2104,
+      "visualizationConfigs": [
+        {
+          "vType": "barchart_vertical_2104",
+          "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  apoc.date.format( n.recordDate ,'s','MM/dd','IST') as recordDate , n.Bugs as Bugs,n.Vulnerablilities as Vulnerablilities,n.CodeSmell as CodeSmell ORDER BY n.executionId ASC limit 2"
+        }
+      ]
+    },
+    {
+      "kpiId": 2105,
+      "visualizationConfigs": [
+        {
+          "vType": "timeseries_2105",
+          "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.recordDateX as Time , n.Failure as Failure, n.Success as Success ORDER BY Time ASC"
+        }
+      ]
+    },
+    {
+      "kpiId": 2109,
+      "visualizationConfigs": [
+        {
+          "vType": "barchart_vertical_2109",
+          "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN   apoc.date.format( n.recordDate ,'s','MM/dd','IST') as recordDate , n.Failure as Failure, n.Success as Success ORDER BY recordDate ASC limit 7"
+        }
+      ]
+    },
+    {
+      "kpiId": 2106,
+      "visualizationConfigs": [
+        {
+          "vType": "gauge_2106",
+          "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.resultField as Deploy , n.Deploy as Value"
+        }
+      ]
+    },
+    {
+      "kpiId": 2107,
+      "visualizationConfigs": [
+        {
+          "vType": "stat_2107",
+          "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.resultField as Builds, n.Builds as Value"
+        }
+      ]
+    }
+  ]
+}

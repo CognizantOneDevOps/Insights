@@ -22,9 +22,9 @@ import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformregressiontest.test.common.CommonUtils;
 import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 
 import io.restassured.RestAssured;
 import io.restassured.http.Header;
@@ -70,7 +70,7 @@ public class DeleteUserAPITest extends GroupsAndUserTestData {
 			 String role, String orgName, String orgId) {
 		String userId="-1";
 		
-		JsonArray getOrgUsersResponse = new JsonParser().parse(getOrgUsers).getAsJsonObject().get("data").getAsJsonArray();
+		JsonArray getOrgUsersResponse = JsonUtils.parseStringAsJsonObject(getOrgUsers).get("data").getAsJsonArray();
 		
 		for (JsonElement jsonElement : getOrgUsersResponse) {
 			if(jsonElement.getAsJsonObject().get("login").getAsString().equalsIgnoreCase(userName)) {

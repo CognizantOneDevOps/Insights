@@ -30,6 +30,7 @@ import com.cognizant.devops.platformcommons.config.EmailConfiguration;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentConfiguration;
@@ -43,14 +44,12 @@ import com.cognizant.devops.platformdal.workflow.InsightsWorkflowType;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @Service("workflowService")
 public class WorkflowServiceImpl {
 	private static final Logger log = LogManager.getLogger(WorkflowServiceImpl.class);
 	WorkflowDAL workflowConfigDAL = new WorkflowDAL();
 	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
-	JsonParser parser = new JsonParser();
 	String healthNotificationWorkflowId = WorkflowTaskEnum.WorkflowType.SYSTEM.getValue() + "_" + "HealthNotification";
 
 	/**
@@ -215,21 +214,21 @@ public class WorkflowServiceImpl {
 			if (!taskSequenceSet.isEmpty()) {
 				workflowConfigDAL.deleteWorkflowTaskSequence(workflowConfig.getWorkflowId());
 			}
-			ArrayList<Integer> sortedTask = new ArrayList<>();
-			taskList.forEach(taskObj -> sortedTask
+			ArrayList<Integer> taskIdList = new ArrayList<>();
+			taskList.forEach(taskObj -> taskIdList
 					.add(taskObj.getAsJsonObject().get(AssessmentReportAndWorkflowConstants.TASK_ID).getAsInt()));
 			@SuppressWarnings("unchecked")
 
 			/*
-			 * make a clone of list as sortedTask list will be iterated so same list can not
+			 * make a clone of list as taskIdList list will be iterated so same list can not
 			 * used to get next element
 			 */
-			ArrayList<Integer> taskListClone = (ArrayList<Integer>) sortedTask.clone();
+			ArrayList<Integer> taskListClone = (ArrayList<Integer>) taskIdList.clone();
 
 			int sequenceNo = 1;
 			int nextTask = -1;
 
-			ListIterator<Integer> listIterator = sortedTask.listIterator();
+			ListIterator<Integer> listIterator = taskIdList.listIterator();
 			while (listIterator.hasNext()) {
 
 				int taskId = listIterator.next();
@@ -545,7 +544,7 @@ public class WorkflowServiceImpl {
 	 */
 	public JsonObject convertStringIntoJson(String convertregisterkpi) {
 		JsonObject objectJson = new JsonObject();
-		objectJson = parser.parse(convertregisterkpi).getAsJsonObject();
+		objectJson = JsonUtils.parseStringAsJsonObject(convertregisterkpi);
 		return objectJson;
 	}
 

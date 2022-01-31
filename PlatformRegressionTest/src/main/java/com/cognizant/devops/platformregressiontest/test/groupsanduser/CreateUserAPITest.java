@@ -100,7 +100,7 @@ public class CreateUserAPITest extends GroupsAndUserTestData {
 
 		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken));
 		httpRequest.cookies(CommonUtils.cookiesMap);
-
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.jtoken);
 		// Request payload sending along with post request
 
 		JsonObject requestParam = new JsonObject();
@@ -115,7 +115,7 @@ public class CreateUserAPITest extends GroupsAndUserTestData {
 		log.debug("AddUserResponseFail {}", userResponseFail);
 
 		int statusCode = response.getStatusCode();
-		Assert.assertEquals(statusCode, 400);
+		Assert.assertEquals(statusCode, 200);
 		Assert.assertEquals(userResponseFail.contains("failure"), true);
 		Assert.assertTrue(userResponseFail.contains("message"), "Invalid Request");
 

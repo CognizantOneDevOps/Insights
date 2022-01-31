@@ -18,6 +18,7 @@ package com.cognizant.devops.platformregressiontest.test.common;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +35,8 @@ import org.testng.annotations.AfterSuite;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 
 public class LoginAndSelectModule {
 
@@ -121,13 +122,13 @@ public class LoginAndSelectModule {
 	}
 
 	public static String getData(String jsonFile) {
-		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator + ConfigOptionsTest.AUTO_DIR
-				+ File.separator + jsonFile;
 		JsonElement jsonData;
 		try {
-			jsonData = new JsonParser().parse(new FileReader(path));
-		} catch (JsonIOException | JsonSyntaxException | FileNotFoundException e) {
-			throw new SkipException("skipped this test case as json file is not found.");
+			String path = new File(System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator + ConfigOptionsTest.AUTO_DIR
+				+ File.separator + jsonFile).getCanonicalPath();
+			jsonData = JsonUtils.parseReader(new FileReader(path));
+		} catch (JsonIOException | JsonSyntaxException | IOException e) {
+			throw new SkipException("skipped this test case as resources not found.");
 		}
 		testData = new Gson().fromJson(jsonData, Map.class);
 		return jsonFile;

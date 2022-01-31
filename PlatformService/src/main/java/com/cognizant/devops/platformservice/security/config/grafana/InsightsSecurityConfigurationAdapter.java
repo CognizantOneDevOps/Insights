@@ -95,6 +95,7 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 					.csrfTokenRepository(authenticationUtils.csrfTokenRepository());
 					
 			http.exceptionHandling().accessDeniedHandler(springAccessDeniedHandler); 
+			http.headers().xssProtection().and().contentSecurityPolicy("script-src 'self'");
 			
 			http
 			//.addFilterAfter(new InsightsCustomCsrfFilter(), CsrfFilter.class)

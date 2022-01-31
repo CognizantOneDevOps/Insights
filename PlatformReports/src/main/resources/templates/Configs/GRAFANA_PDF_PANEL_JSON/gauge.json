@@ -1,0 +1,76 @@
+{
+      "datasource": "Neo4j Data Source",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 5000
+              },
+              {
+                "color": "#EF843C",
+                "value": 10000
+              },
+              {
+                "color": "#E24D42",
+                "value": 15000
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 18
+      },
+      "id": null,
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": true,
+        "showThresholdMarkers": true,
+        "text": {}
+      },
+      "pluginVersion": "8.1.3",
+      "targets": [
+        {
+          "cache": false,
+          "cacheType": false,
+          "cacheValue": false,
+          "constant": 6.5,
+          "fixTime": false,
+          "graph": false,
+          "hide": false,
+          "queryText": "",
+          "raw": false,
+          "refId": "A",
+          "stats": false,
+          "table": true,
+          "timeseries": false,
+          "varTime": false
+        }
+      ],
+      "title": "",
+	  "transparent": true,
+      "type": "gauge"
+    }

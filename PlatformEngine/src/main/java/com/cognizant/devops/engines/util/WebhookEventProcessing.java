@@ -25,6 +25,7 @@ import org.apache.commons.text.StringSubstitutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -33,7 +34,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 /**
@@ -157,7 +157,7 @@ public class WebhookEventProcessing {
 
 	private void getEventConfigMap(String eventConfig, Map<String, JsonObject> config) {
 		try {
-			JsonElement json = new JsonParser().parse(eventConfig);
+			JsonElement json = JsonUtils.parseString(eventConfig);
 			JsonObject eachConfig = json.getAsJsonObject();
 			if (eachConfig.has("config")) {
 				JsonArray array = eachConfig.get("config").getAsJsonArray();

@@ -1,0 +1,118 @@
+{
+  "vault": {
+    "getFromVault": false,
+    "secretEngine": "insights-kv",
+    "readToken": "vault_secret_token",
+    "vaultUrl": "http://Vault_Host:port/v1/"
+  },
+  "mqConfig": {
+    "user": "user",
+    "password": "-",
+    "host": "localhost",
+    "exchange": "iSight",
+    "agentControlXchg": "iAgent"
+  },
+  "subscribe": {
+    "config": "ROI.NEWRELIC.config"
+  },
+  "publish": {
+    "data": "ROI.ELASTICSEARCH.DATA",
+    "health": "ROI.ELASTICSEARCH.HEALTH"
+  },
+  "communication": {
+    "type": "REST",
+    "sslVerify": false,
+    "responseType": "JSON"
+  },
+  "dynamicTemplate": {
+    "responseTemplate": {
+      "metadata": {
+        "dataUpdateSupported": false,
+        "uniqueKey": [
+          "milestoneId",
+          "outcomeId"
+        ]
+      }
+    },
+    "successfulLogin": {
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "match": {
+                "path": "platformService.log"
+              }
+            },
+            {
+              "match": {
+                "message": "successfulAuthentication"
+              }
+            },
+            {
+              "range": {
+                "@timestamp": {
+                  "gte": "",
+                  "lt": ""
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "errorCount": {
+    	"query": {
+        "bool": {
+          "must": [
+            {
+              "match": {
+                "path": "platformService.log"
+              }
+            },
+            {
+              "match": {
+                "message": "ERROR"
+              }
+            },
+            {
+              "range": {
+                "@timestamp": {
+                  "gte": "",
+                  "lt": ""
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "agentId": "",
+  "webhookEnabled": false,
+  "isROIAgent": true,
+  "toolCategory": "ROI",
+  "enableDataValidation": true,
+  "toolsTimeZone": "GMT",
+  "insightsTimeZone": "Asia/Kolkata",
+  "useResponseTemplate": true,
+  "auth": "base64",
+  "runSchedule": 30,
+  "period": 3600,
+  "summarize": true,
+  "timeStampField": "",
+  "timeStampFormat": "",
+  "isEpochTimeFormat": true,
+  "baseUrl": "http://localhost:9200",
+  "agentSecretDetails": [
+    
+  ],
+  "isDebugAllowed": false,
+  "enableValueArray": false,
+  "loggingSetting": {
+    "logLevel": "ERROR",
+    "maxBytes": 5000000,
+    "backupCount": 10
+  },
+  "auditing": false,
+  "toolName": "NewRelic"
+}

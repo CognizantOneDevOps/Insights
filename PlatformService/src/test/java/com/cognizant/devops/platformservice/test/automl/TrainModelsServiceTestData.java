@@ -31,6 +31,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.core.enums.AutoMLEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.ai.H2oApiCommunicator;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.autoML.AutoMLConfig;
@@ -41,7 +42,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class TrainModelsServiceTestData {
 	
@@ -60,7 +60,7 @@ public class TrainModelsServiceTestData {
 	File file = new File(classLoader.getResource("GitAuthorData.csv").getFile());
 	String configuration = "[{\"FieldName\":\"Date\",\"DataType\":\"Time\",\"EnableNLP\":false},{\"FieldName\":\"AuthorName\",\"DataType\":\"Enum\",\"EnableNLP\":false},{\"FieldName\":\"Experience\",\"DataType\":\"Numeric\",\"EnableNLP\":false},{\"FieldName\":\"RepoName\",\"DataType\":\"Numeric\",\"EnableNLP\":false},{\"FieldName\":\"Commits\",\"DataType\":\"Numeric\",\"EnableNLP\":false}]";
 	String workflowTask = "{\"description\":\"H2O_AutoML_Execute\",\"mqChannel\":\"WORKFLOW.TASK.AUTOML.EXCECUTION\",\"componentName\":\"com.cognizant.devops.automl.task.core.AutoMLSubscriber\",\"dependency\":-1,\"workflowType\":\"AUTOML\"}";
-	JsonObject workflowTaskJson = new JsonParser().parse(workflowTask).getAsJsonObject();
+	JsonObject workflowTaskJson = JsonUtils.parseStringAsJsonObject(workflowTask);
 	boolean isTaskExists = false;
 	String mqChannel = "WORKFLOW.TASK.AUTOML.EXCECUTION";
 	String modelName = null;
@@ -90,7 +90,7 @@ public class TrainModelsServiceTestData {
 		JsonObject extractedData = getHeaders(useCasecsvFile, usecase);
 		uploadData(extractedData.getAsJsonArray("Contents"), usecase, autoMlConfig.getConfigJson());
 		String splitFrameResponse = h2oApiCommunicator.splitFrame(usecase, 0.8);
-		JsonObject responseJson = new JsonParser().parse(splitFrameResponse).getAsJsonObject();
+		JsonObject responseJson = JsonUtils.parseStringAsJsonObject(splitFrameResponse);
 		JsonArray destinationFrames = responseJson.get("destination_frames").getAsJsonArray();
 		String trainingFrame = destinationFrames.get(0).getAsJsonObject().get("name").getAsString();
 		JsonObject mlResponse = runAutoML(usecase, trainingFrame,
@@ -111,7 +111,7 @@ public class TrainModelsServiceTestData {
 		String httpResponse = h2oApiCommunicator.runAutoML(usecase + "AutoML", trainingFrame, trainingFrame,
 				predictionColumn, numOfModels);
 		log.info(httpResponse);
-		JsonObject response = new JsonParser().parse(httpResponse).getAsJsonObject();
+		JsonObject response = JsonUtils.parseStringAsJsonObject(httpResponse);
 		String pollingURL = response.get("job").getAsJsonObject().get("key").getAsJsonObject().get("URL").getAsString();
 		String autoMLName = response.get("job").getAsJsonObject().get("dest").getAsJsonObject().get("name")
 				.getAsString();

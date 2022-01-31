@@ -25,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.cos.COSName;
@@ -66,6 +68,8 @@ import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.google.gson.JsonObject;
 
 public class PdfSignUtil extends PdfCreateSignatureBase {
@@ -77,6 +81,14 @@ public class PdfSignUtil extends PdfCreateSignatureBase {
 			+ ConfigOptions.CONFIG_DIR + File.separator + "Pdf" + File.separator;
 	private static final String TARGET_PDF = "target/Traceability_report.pdf";
 	private static final String PDF_NAME_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.pdf)$";
+
+	private static final String KEYSTORE_P12 = "KEYSTORE_P12";
+
+	private static final String PKCS12 = "PKCS12";
+
+	private static final String PIN_PROTECT = "PIN_PROTECT";
+
+	private static final String DIGI_IMG = "DIGI_IMG";
 
 	public PdfSignUtil(KeyStore keystore, char[] pin) throws KeyStoreException, UnrecoverableKeyException,
 			NoSuchAlgorithmException, IOException, CertificateException {
@@ -357,21 +369,24 @@ public class PdfSignUtil extends PdfCreateSignatureBase {
 			String tsaUrl = null;
 			boolean externalSig = false;
 			JsonObject config = LoadFile.getInstance().getConfig();
-			File ksFile = new File(PDF_PATH+config.get("KEYSTORE_P12").getAsString()).getAbsoluteFile();
-			KeyStore keystore = KeyStore.getInstance("PKCS12");
-			char[] pin = config.get("PIN_PROTECT").getAsString().toCharArray();
+			String ksFilePath = new File(PDF_PATH+config.get(KEYSTORE_P12).getAsString()).getCanonicalPath();
+			File ksFile = new File(ksFilePath);
+			KeyStore keystore = KeyStore.getInstance(PKCS12);
+			char[] pin = config.get(PIN_PROTECT).getAsString().toCharArray();
 			keystore.load(new FileInputStream(ksFile), pin);
 			boolean valid = checkValidFile(pdfName);
 			if (valid) {
-				File documentFile = new File(pdfName == null ? TARGET_PDF : pdfName);
-				log.info("documentFile name sign---{}", documentFile.getName());
+				String path = Paths.get(PlatformServiceConstants.EMPTY).toAbsolutePath().normalize().toString();
 				PdfSignUtil signing = new PdfSignUtil(keystore, pin.clone());
-				signing.setImageFile(new File(PDF_PATH + config.get("DIGI_IMG").getAsString()).getAbsoluteFile());
+				String imagePath = new File(PDF_PATH + config.get(DIGI_IMG).getAsString()).getCanonicalPath();
+				signing.setImageFile(new File(imagePath).getAbsoluteFile());
 				File signedDocumentFile;
 				String name = pdfName;
 				String substring = name.substring(0, name.lastIndexOf('.'));
-				signedDocumentFile = new File(documentFile.getParent(), substring + "_signed.pdf");
+				String documentPath = new File(path, substring + "_signed.pdf").getCanonicalPath();
+				signedDocumentFile = new File(documentPath);
 				log.info("signedDocumentFile sign-- {} ", signedDocumentFile.getName());
+				log.info("signedDocumentFile path---{}", path);
 				signing.setExternalSigning(externalSig);
 
 				Rectangle2D humanRect = new Rectangle2D.Float(100, 200, 150, 50);

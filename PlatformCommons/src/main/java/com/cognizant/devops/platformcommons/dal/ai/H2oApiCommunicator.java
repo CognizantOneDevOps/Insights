@@ -25,13 +25,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.RestApiHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class H2oApiCommunicator {
 	public static final String COLUMNS="columns";
@@ -86,7 +87,7 @@ public class H2oApiCommunicator {
 		queryParams.addProperty("delete_on_done","true");
 		queryParams.addProperty("chunk_size","50455");	
 		String httpResponse=RestApiHandler.httpQueryParamRequest(url, queryParams, null,"Post");
-		 JsonObject response=  new JsonParser().parse(httpResponse).getAsJsonObject();
+		 JsonObject response= JsonUtils.parseStringAsJsonObject(httpResponse);
          String pollingURL= response.get("job").getAsJsonObject().get("key")
       		   .getAsJsonObject().get("URL").getAsString();         
 		return pollRequestStatus(pollingURL);	
@@ -121,7 +122,7 @@ public class H2oApiCommunicator {
 			queryParams.addProperty("model_id", modelId);	
 			queryParams.addProperty("training_frame", trainingFrame);	
 			String httpResponse=RestApiHandler.httpQueryParamRequest(url, queryParams, null,"Post");
-			JsonObject response = new JsonParser().parse(httpResponse).getAsJsonObject();
+			JsonObject response = JsonUtils.parseStringAsJsonObject(httpResponse);
 			String pollingURL = response.get("job").getAsJsonObject().get("key").getAsJsonObject().get("URL").getAsString();
 			return pollRequestStatus(pollingURL);			
 			
@@ -249,7 +250,7 @@ public class H2oApiCommunicator {
 			String status = "RUNNING";
 			do {
 				String httpResponse = RestApiHandler.doGet(h20url, null);
-				response = new JsonParser().parse(httpResponse).getAsJsonObject();
+				response = JsonUtils.parseStringAsJsonObject(httpResponse);
 				JsonArray jobs = response.get("jobs").getAsJsonArray();
 				JsonObject job = jobs.get(0).getAsJsonObject();
 				status = job.get("status").getAsString();
@@ -347,16 +348,26 @@ public class H2oApiCommunicator {
 	public JsonArray getDataFrame(String frameName) throws InsightsCustomException {
 		try {
 			log.debug("Getting data frame:{} ", frameName);
-			
-			String url = h2oEndpoint+H2ORestApiUrls.DATA_FRAME+frameName;			
-			String httpResponse = RestApiHandler.doGet(url, null);		
+			String validatedFrameName = ValidationUtils.validateRequestBody(frameName);
+			String url = h2oEndpoint+H2ORestApiUrls.DATA_FRAME+validatedFrameName;			
+			String httpResponse = RestApiHandler.doGet(url, null);	
 			JsonArray data = new JsonArray();
+			int maxParamCount = 200000;
+			int rowprocesscount = 1;
 			JsonObject jsonResponse = new Gson().fromJson(httpResponse, JsonObject.class);
 			JsonObject frame = jsonResponse.getAsJsonArray("frames").get(0).getAsJsonObject();
 			int rowCount = frame.get("row_count").getAsInt();
 			JsonArray columns = frame.getAsJsonArray(COLUMNS);
-			for (int i = 0; i < rowCount; i++) {
+			int modifiedcount = rowCount;
+			if(modifiedcount > maxParamCount ) {
+				modifiedcount = maxParamCount;
+			}
+			for (int i = 0; i < modifiedcount; i++) {
 				JsonObject row = new JsonObject();
+				if(rowprocesscount > maxParamCount){
+					log.debug("In getDataFrame ==== parameter count exceeds max limit {}",rowprocesscount);
+					break;
+				}
 				for (JsonElement c : columns) {
 					JsonObject column = c.getAsJsonObject();
 					String label = column.get("label").getAsString();
@@ -392,6 +403,7 @@ public class H2oApiCommunicator {
 					row.add(label, columnData.get(i));
 				}
 				data.add(row);
+				rowprocesscount++;
 			}
 			return data;
 		} catch (Exception e) {

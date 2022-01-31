@@ -56,13 +56,15 @@ class RestCommunicationFacade(object):
         if None == response:
             raise ValueError('RestFacade: Null response')
         elif 200 != response.status_code and 201 != response.status_code:
-            raise ValueError('RestFacade: Unsupported response code '+str(response.status_code)+', url: '+url+', response received: '+response.content)    
+            raise ValueError('RestFacade: Unsupported response code '+str(response.status_code)+', url: '+url+', response received: '+response.content.decode('utf-8'))    
 
         if responseTupple != None:
             responseTupple['headers'] = response.headers
             responseTupple['cookies'] = response.cookies
         if len(response.content) > 0:
-            if self.responseType == 'JSON':
+            if "Accept" in reqHeaders and reqHeaders["Accept"] == "text/csv":
+                return response.content.decode('utf-8')
+            elif self.responseType == 'JSON':
                 return response.json()
             elif self.responseType == 'XML':
                 return response.content

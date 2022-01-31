@@ -63,7 +63,7 @@ public class InsightsAuthenticationTokenUtils {
 		InsightsAuthenticationToken jwtAuthenticationToken = new InsightsAuthenticationToken(authToken,
 				claimMap.get(AuthenticationUtils.GRAFANA_DETAIL), null, updatedAuthorities);
 		
-		log.debug(" Inside GrafanaJWTAuthenticationData , authorities ==== {} ", updatedAuthorities);
+		log.debug(" Inside GrafanaJWTAuthenticationData authenticateGrafanaJWTData completed..  ");
 		return jwtAuthenticationToken;
 		
 	}
@@ -84,7 +84,7 @@ public class InsightsAuthenticationTokenUtils {
 			SAMLCredential credentials = (SAMLCredential) auth.getCredentials();
 			InsightsAuthenticationToken jwtAuthenticationToken = new InsightsAuthenticationToken(authToken,
 					auth.getDetails(), credentials, auth.getAuthorities());
-			log.debug(" Inside authenticationSAMLData , authorities ==== {} ", auth.getAuthorities());
+			log.debug(" Inside authenticationSAMLData completed ");
 			return jwtAuthenticationToken;
 		} else {
 			AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.SECURITY_CONTEXT_CODE,
@@ -110,7 +110,7 @@ public class InsightsAuthenticationTokenUtils {
 		 */
 		if(AuthenticationUtils.JWT_LOGIN_URL.contains(request.getPathInfo()) || 
 			AuthenticationUtils.JWT_USER_DETAIL_URL.contains(request.getPathInfo()) ) {
-			log.debug("Inside JWTAuthenticationProvider for Authentication === ");
+			log.debug("Inside JWTAuthenticationProvider for Authentication started === ");
 			JWTClaimsSet jwtClaimsSet = AuthenticationUtils.validateIncomingToken(authToken);
 			if (jwtClaimsSet != null) {
 				List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
@@ -118,8 +118,6 @@ public class InsightsAuthenticationTokenUtils {
 				
 				jwtAuthenticationToken =  new InsightsAuthenticationToken(
 						authToken, jwtClaimsSet, null, updatedAuthorities);
-				jwtAuthenticationToken.getAuthorities().forEach(
-						b -> log.debug("In successfulAuthentication JWTAuthenticationProvider GrantedAuthority ==== {} ", b.getAuthority()));
 			} else {
 				log.error(" Error while validating token and retriving claims ");
 				throw new InsightsAuthenticationException(" Error while validating token and retriving claims {} ");
@@ -137,7 +135,7 @@ public class InsightsAuthenticationTokenUtils {
 			jwtAuthenticationToken = new InsightsAuthenticationToken(authToken,
 					claimSet, null, updatedAuthorities);
 			
-			log.debug(" Inside GrafanaJWTAuthenticationData , authorities ==== {} ", jwtAuthenticationToken);
+			log.debug(" Inside GrafanaJWTAuthenticationData , processing completed  ");
 		}
 		
 		return jwtAuthenticationToken;
@@ -160,7 +158,6 @@ public class InsightsAuthenticationTokenUtils {
 		if (AuthenticationUtils.IS_NATIVE_AUTHENTICATION) {
 			Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(),
 					updatedAuthorities);
-			log.debug("In successfulAuthentication Older Native Grafan Auth GrantedAuthority ==== old {} new {} ", auth.getAuthorities(), updatedAuthorities);
 		
 			Map<String, Object> params = new HashMap<>();
 			params.put(AuthenticationUtils.AUTHORITY, grafanaCurrentOrgRole);
@@ -174,7 +171,6 @@ public class InsightsAuthenticationTokenUtils {
 			Date expDate = new Date(System.currentTimeMillis() + 60 * 60 * 1000);
 			ExpiringUsernameAuthenticationToken autharization = new ExpiringUsernameAuthenticationToken(expDate,
 					principal, auth.getCredentials(), updatedAuthorities);
-			log.debug("In successfulAuthentication Older SAML GrantedAuthority ==== old {} new {}  ", auth.getAuthorities(), updatedAuthorities);
 			
 			updateSecurityContext(autharization);
 
@@ -183,7 +179,6 @@ public class InsightsAuthenticationTokenUtils {
 			KerberosServiceRequestToken authKerberos = (KerberosServiceRequestToken) context.getAuthentication();
 			KerberosServiceRequestToken responseAuth = new KerberosServiceRequestToken(authKerberos.getDetails(), authKerberos.getTicketValidation(),
 					updatedAuthorities, authKerberos.getToken());
-			log.debug("In successfulAuthentication Older Kerberos GrantedAuthority ==== old {} new {}  ", auth.getAuthorities(), updatedAuthorities);
 			
 			updateSecurityContext(responseAuth);
 
@@ -195,7 +190,6 @@ public class InsightsAuthenticationTokenUtils {
 
 			InsightsAuthenticationToken responseAuth = new InsightsAuthenticationToken(authJWT.getPrincipal(),
 					authJWT.getDetails(), authJWT.getCredentials(), updatedAuthorities);
-			log.debug("In successfulAuthentication JWT GrantedAuthority ====  old {} new {} ", auth.getAuthorities(), updatedAuthorities);
 			
 			Map<String, Object> params = new HashMap<>();
 			params.put(AuthenticationUtils.AUTHORITY, grafanaCurrentOrgRole);
@@ -204,7 +198,7 @@ public class InsightsAuthenticationTokenUtils {
 			
 			jToken=AuthenticationUtils.getToken(detailData.getSubject(), AuthenticationUtils.SESSION_TIME, params);
 			
-			log.debug("In successfulAuthentication JWT GrantedAuthority jToken ==== {} ", jToken);
+			log.debug("In successfulAuthentication JWT GrantedAuthority completed ==== ");
 			updateSecurityContext(responseAuth);
 		}
 		return jToken;

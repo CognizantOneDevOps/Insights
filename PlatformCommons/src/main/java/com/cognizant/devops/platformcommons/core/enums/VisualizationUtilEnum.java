@@ -18,7 +18,7 @@ package com.cognizant.devops.platformcommons.core.enums;
 public class VisualizationUtilEnum {
 	
 	public enum VisualizationUtil {
-		OPENPDF, FUSION, LEDGERPDF
+		OPENPDF, FUSION, LEDGERPDF, GRAFANAPDF
 	}
 
 }

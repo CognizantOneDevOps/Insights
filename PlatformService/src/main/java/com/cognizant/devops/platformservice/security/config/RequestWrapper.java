@@ -16,7 +16,10 @@
 
 package com.cognizant.devops.platformservice.security.config;
 
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +30,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformservice.rest.datatagging.constants.DatataggingConstants;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 
 /**
@@ -46,8 +51,9 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
 	 * 
 	 * @param servletRequest
 	 * @param servletResponse
+	 * @throws InsightsCustomException 
 	 */
-	public RequestWrapper(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+	public RequestWrapper(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws InsightsCustomException {
 		super(servletRequest);
 		this.request = servletRequest;
 		this.response = servletResponse;
@@ -60,35 +66,53 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
 	 * Validate and Apply the XSS filter to the parameters
 	 * 
 	 * @param parameters
+	 * @throws InsightsCustomException 
 	 */
-	public void validateAllParameter() {
+	public void validateAllParameter() throws InsightsCustomException {
 		log.debug("In getParameterValues .....");
-		Enumeration<String> parameterNames = request.getParameterNames();
-		while (parameterNames.hasMoreElements()) {
-			String paramName = ValidationUtils.cleanXSS(parameterNames.nextElement());
-			ValidationUtils.cleanXSS(request.getParameter(paramName));
+		Map<String, String[]> parameterMap = request.getParameterMap();
+		int maxParamCount = 50;
+		int paramCount = parameterMap.size();
+		if(paramCount > maxParamCount){
+			log.debug("In validateAllParameter ==== parameter count exceeds max limit {}",paramCount);
+			throw new InsightsCustomException("In validateAllParameter ==== parameter count exceeds max limit");
+		} else {
+			for(Map.Entry<String,String[]> entry : parameterMap.entrySet()){
+				
+				String paramName = ValidationUtils.cleanXSS(entry.getKey());
+				ValidationUtils.cleanXSS(request.getParameter(paramName));
+			}
+			log.debug("In validateAllParameter ==== Completed ");
 		}
-		log.debug("In validateAllParameter ==== Completed ");
 	}
 
 	/**
 	 * Validate and Apply the XSS filter to the all Headers
 	 * 
 	 * @param parameters
+	 * @throws InsightsCustomException 
 	 */
-	public void validatAllHeaders() {
+	public void validatAllHeaders() throws InsightsCustomException {
 		
 		Enumeration<String> headerNames = request.getHeaderNames();
+		List<String> headerNameslist = Collections.list(headerNames);
 		log.debug("In validateAllHeaders started ==== ");
 		StringBuilder headerInfo = new StringBuilder();
-		while (headerNames.hasMoreElements()) {
-			String headerName = headerNames.nextElement();
-			String headersValue = request.getHeader(headerName);
-			headerInfo.append(headerName.concat(" = ").concat(headersValue).concat(" , "));
-			ValidationUtils.cleanXSS(headerName,headersValue);
+		int maxParamCount = 50;
+		int headersCount = headerNameslist.size();
+		if(headersCount > maxParamCount ) {
+			log.debug("In validatAllHeaders ==== headers count exceeds max limit {}", headersCount);
+			throw new InsightsCustomException("In validatAllHeaders ==== headers count exceeds max limit ");
+		} else {
+			for (int i =0; i < headersCount; i++ ) {
+				String headerName = headerNameslist.get(i);
+				String headersValue = request.getHeader(headerName);
+				headerInfo.append(headerName.concat(DatataggingConstants.EQUALS).concat(headersValue).concat(DatataggingConstants.COMMA));
+				ValidationUtils.cleanXSS(headerName,headersValue);				
+			}
+			log.debug("In validatedAllHeaders  ==== {} ",headerInfo);
+			log.debug("In validatedAllHeaders  ====  Completed ");
 		}
-		log.debug("In validatedAllHeaders  ==== {} ",headerInfo);
-		log.debug("In validatedAllHeaders  ====  Completed ");
 	}
 
 	/**

@@ -153,7 +153,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		String expectedOutcome = "SUCCESS";
 		String oldVersion = "v7.2";
 		String response = agentServiceImpl.registerAgent(gitTool, oldVersion, osversion, 
-				configDetails, trackingDetails, false,false);
+				configDetails, trackingDetails, false,false, "Agent");
 		
 		Assert.assertEquals(expectedOutcome, response);
 			
@@ -166,7 +166,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		String expectedOutcome = "Agent Id already exsits.";
 		
 		String response = agentServiceImpl.registerAgent(gitTool, 
-							version, osversion, configDetails, trackingDetails, false,false);
+							version, osversion, configDetails, trackingDetails, false,false, "Agent");
 		
 		Assert.assertEquals(expectedOutcome, response);
 			
@@ -179,7 +179,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		String expectedOutcome = "Agent Id and Tool name cannot be the same.";
 		
 		String response = agentServiceImpl.registerAgent(gitTool, 
-							version, osversion, configDetailsWithSameIDs, trackingDetails, false,false);
+							version, osversion, configDetailsWithSameIDs, trackingDetails, false,false, "Agent");
 		
 		Assert.assertEquals(expectedOutcome, response);
 			
@@ -192,7 +192,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		String expectedOutcome = "Invalid data label Name, it should contain only alphanumeric character,underscore & dot";
 		
 		String response = agentServiceImpl.registerAgent(gitTool, 
-							version, osversion, configDetailsWithInvalidDataLabel, trackingDetails, false,false);
+							version, osversion, configDetailsWithInvalidDataLabel, trackingDetails, false,false, "Agent");
 		
 		Assert.assertEquals(expectedOutcome, response);
 			
@@ -206,7 +206,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		
 		String response = agentServiceImpl.registerAgent(gitTool, 
 							version, osversion, 
-							configDetailsWithInvalidHealthLabel, trackingDetails, false, false);
+							configDetailsWithInvalidHealthLabel, trackingDetails, false, false, "Agent");
 		
 		Assert.assertEquals(expectedOutcome, response);
 			
@@ -217,7 +217,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 
 		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		
-		List<AgentConfigTO>  registeredAgents = agentServiceImpl.getRegisteredAgents();
+		List<AgentConfigTO>  registeredAgents = agentServiceImpl.getRegisteredAgentsAndHealth();
 		 /*for (AgentConfigTO agentConfig : registeredAgents) {
 			Assert.assertTrue(agentConfig.getToolName().equals("git"));
 		} */
@@ -227,7 +227,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 	@Test(priority = 11)
 	public void testGetRegisteredAgents() throws InsightsCustomException {
 		
-		Assert.assertFalse(agentManagementServiceImpl.getRegisteredAgents().isEmpty());		
+		Assert.assertFalse(agentManagementServiceImpl.getRegisteredAgentsAndHealth().isEmpty());		
 	}
 	
 	@Test(priority = 12)
@@ -348,7 +348,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		String expectedOutcome = "SUCCESS";
 		String configJson = agentServiceImpl.getToolRawConfigFile(version, gitTool,true);
 		String response = agentServiceImpl.registerAgent(gitTool, version, osversion, 
-				webhookConfigDetails, tracking, false,true);
+				webhookConfigDetails, tracking, false,true,"Webhook");
 		
 		Assert.assertEquals(expectedOutcome, response);
 		
@@ -367,7 +367,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 	public void testRegisterWithInvalidAgentId() throws InsightsCustomException {
 		String expectedOutcome = "Agent Id has to be Alpha numeric with '_' as special character";
 		String response = agentManagementServiceImpl.registerAgent(gitTool, version, osversion, 
-				ConfigDetailsWithInvalidAgentId, trackingDetails, false,true);
+				ConfigDetailsWithInvalidAgentId, trackingDetails, false,true,"Agent");
 		
 		Assert.assertEquals(expectedOutcome, response);
 			

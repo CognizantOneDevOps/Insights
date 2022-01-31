@@ -1,0 +1,25 @@
+{
+	"dataset": [
+		{
+			"moduleName": "Dashboard Report Download",
+			"organization": "",
+			"dashboardName": "",
+			"title": "",
+			"theme": "",
+			"pdfType": "",
+			"loadTime": "",
+			"toolName": "",
+			"agentId": "",
+			"frequency": "",
+			"dataTimeRange": "",
+			"absoluteStartDate": "",
+			"absoluteEndDate": "",
+			"senderEmailAddress": "",
+			"receiverEmailAddress": "",
+			"receiverCCEmailAddress": "",
+			"receiverBCCEmailAddress": "",
+			"mailSubject": "",
+			"mailBodyTemplate": ""
+		}
+	]
+}

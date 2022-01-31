@@ -452,13 +452,13 @@ async queryForRecentDashboards(orgId) {
       dashboard.panels.forEach(x => {
         if (x.type !== 'row' && x.type !== 'text') {
             this.urlArray.push(InsightsInitService.grafanaHost + '/d/' + dashboard.uid + '/' + this.asyncResult.data.meta.slug + '?' +
-              'panelId=' + x.id + '&' + variables + '&theme=' + this.theme);
+              'viewPanel=' + x.id + '&' + variables + '&theme=' + this.theme);
         } else if (x.type === 'row' && x.collapsed) {
           if (Array.isArray(x.panels)) {
             if(x.type!== 'text')
             x.panels.forEach(x => {
               this.urlArray.push(InsightsInitService.grafanaHost + '/d/' + dashboard.uid + '/' + this.asyncResult.data.meta.slug + '?' +
-                'panelId=' + '&' + variables  + '&theme=' + this.theme);
+                'viewPanel=' + '&' + variables  + '&theme=' + this.theme);
             });
           }
         }

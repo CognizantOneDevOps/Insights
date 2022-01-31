@@ -25,6 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
@@ -34,7 +35,6 @@ import com.cognizant.devops.platformreports.assessment.upshift.handler.ReportDat
 import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformworkflow.workflowtask.message.factory.WorkflowTaskSubscriberHandler;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class UpshiftAssessmentExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 
@@ -55,7 +55,7 @@ public class UpshiftAssessmentExecutionSubscriber extends WorkflowTaskSubscriber
             log.debug("Worlflow Detail ==== UpshiftAssessmentExecutionSubscriber started ... "
                     + "routing key  message handleDelivery ===== {} ", incomingTaskMessage);
 
-            JsonObject incomingTaskMessageJson = new JsonParser().parse(incomingTaskMessage).getAsJsonObject();
+            JsonObject incomingTaskMessageJson = JsonUtils.parseStringAsJsonObject(incomingTaskMessage);
             String workflowId = incomingTaskMessageJson.get("workflowId").getAsString();
             long executionId = incomingTaskMessageJson.get("executionId").getAsLong();
             workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);

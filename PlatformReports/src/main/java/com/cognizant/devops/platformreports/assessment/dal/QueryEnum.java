@@ -22,7 +22,7 @@ public enum QueryEnum {
 	
 	NEO4J_STANDARD(
 			"Match (b:"+ ReportEngineUtils.NEO4J_RESULT_LABEL + ") Where b.kpiId= :kpiId "
-					+ " and b.executionId=:executionId and b.assessmentId =:assessmentId RETURN b "),
+					+ " and b.executionId=:executionId and b.assessmentReportName =:assessmentReportName RETURN b "),
 	NEO4J_COMPARISON(
 			"MATCH (n:" + ReportEngineUtils.NEO4J_RESULT_LABEL + ") "
 			+ "with max(n.executionId) as latestexecutionId " + "MATCH (s:"
@@ -33,20 +33,20 @@ public enum QueryEnum {
 			+ " return b order by b.executionId desc"),
 	NEO4J_THRESHOLD(
 			"Match (b:" + ReportEngineUtils.NEO4J_RESULT_LABEL
-					+ ") Where b.kpiId=:kpiId and b.executionId = :executionId and b.assessmentId =:assessmentId RETURN b order by b.executionId desc "),
+					+ ") Where b.kpiId=:kpiId and b.executionId = :executionId and b.assessmentReportName =:assessmentReportName RETURN b order by b.executionId desc "),
 	NEO4J_THRESHOLD_RANGE(
 			"Match (b:" + ReportEngineUtils.NEO4J_RESULT_LABEL
-					+ ") Where b.kpiId= :kpiId and b.executionId = :executionId and b.assessmentId =:assessmentId  RETURN b order by b.executionId desc  "),
+					+ ") Where b.kpiId= :kpiId and b.executionId = :executionId and b.assessmentReportName =:assessmentReportName  RETURN b order by b.executionId desc  "),
 	NEO4J_MINMAX(
 			"Match (b:" + ReportEngineUtils.NEO4J_RESULT_LABEL
-					+ ") Where b.kpiId= :kpiId and b.executionId = :executionId and b.assessmentId =:assessmentId  RETURN b order by b.executionId desc "),
+					+ ") Where b.kpiId= :kpiId and b.executionId = :executionId and b.assessmentReportName =:assessmentReportName  RETURN b order by b.executionId desc "),
 	
 	NEO4J_TREND(
 			"Match (b:" + ReportEngineUtils.NEO4J_RESULT_LABEL
-					+ ") Where b.kpiId=:kpiId and b.executionId = :executionId and b.assessmentId =:assessmentId RETURN b order by b.executionId desc "),
+					+ ") Where b.kpiId=:kpiId and b.executionId = :executionId and b.assessmentReportName =:assessmentReportName RETURN b order by b.executionId desc "),
 
 	NEO4J_VCONTENTQUERY("Match (b:" + ReportEngineUtils.NEO4J_CONTENT_RESULT_LABEL
-					+ ") Where b.kpiId= :kpiId and b.executionId = :executionId and b.assessmentId =:assessmentId RETURN b.inferenceText as Text ,b.contentId as contentId"),
+					+ ") Where b.kpiId= :kpiId and b.executionId = :executionId and b.assessmentReportName =:assessmentReportName RETURN b.inferenceText as Text ,b.contentId as contentId"),
 
 	ES_STANDARD(
 			" {\"size\": 400,\"sort\": [{ \"executionId\": \"desc\" }],\"query\": {\"bool\":{ \"must\":[{ \"match\":{ \"kpiId\":%kpiId% } },{ \"match\":{ \"executionId\":%executionId% } } ]}}}"),

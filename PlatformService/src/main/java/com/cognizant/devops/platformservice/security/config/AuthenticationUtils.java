@@ -122,7 +122,7 @@ public class AuthenticationUtils {
 		try {
 			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 			response.setStatus(statusCode);
-			response.getWriter().write(message);
+			response.getWriter().write("Error while processing request..");
 			response.getWriter().flush();
 			response.getWriter().close();
 

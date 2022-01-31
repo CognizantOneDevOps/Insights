@@ -1,0 +1,61 @@
+{
+      "datasource": "Neo4j Data Sourc",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "color-text",
+            "filterable": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": null,
+      "options": {
+        "showHeader": false
+      },
+      "pluginVersion": "8.1.3",
+      "targets": [
+        {
+          "cache": false,
+          "cacheType": false,
+          "cacheValue": false,
+          "constant": 6.5,
+          "fixTime": false,
+          "graph": false,
+          "queryText": "MATCH (n:CONTENT_RESULT) where n.assessmentReportName= {assessmentReportName} and n.kpiId= {kpiId} with distinct max(n.executionId) as latestexecutionId Match (b:CONTENT_RESULT) where b.executionId =latestexecutionId and b.kpiId= {kpiId} RETURN b.inferenceText as Text order by b.executionId, b.kpiId desc",
+          "raw": false,
+          "refId": "A",
+          "stats": false,
+          "table": true,
+          "timeseries": false,
+          "varTime": false
+        }
+      ],
+      "title": "Panel Title",
+      "transparent": true,
+      "type": "table"
+    }

@@ -47,14 +47,14 @@ public class AgentConfiguration extends AgentObjectRepository {
 		try {
 			JavascriptExecutor js = (JavascriptExecutor) driver;
 			js.executeScript("arguments[0].scrollIntoView();", agentConfigurationHeading);
-			if (visibilityOf(agentConfigurationHeading, 10) && checkIsOnlineRegistration(data.getIsOnlineRegistration())
+			if (visibilityOf(agentConfigurationHeading, 2) && checkIsOnlineRegistration(data.getIsOnlineRegistration())
 					&& checkBrowseRepoUrl(data.getBrowseRepoUrl()) && checkDownloadRepoUrl(data.getDownloadRepoUrl())
 					&& checkOnlineRegistrationMode(data.getOnlineRegistrationMode())
 					&& checkOfflineAgentPath(data.getOfflineAgentPath()) && checkUnzipPath(data.getUnzipPath())
 					&& checkAgentExchange(data.getAgentExchange()) && checkAgentPkgQueue(data.getAgentPkgQueue())) {
-				clickOn(save, 10);
-				clickOn(yes, 10);
-				visibilityOf(successHeading, 10);
+				clickOn(save, 2);
+				clickOn(yes, 2);
+				visibilityOf(successHeading, 2);
 				log.info(successMsg.getText());
 				clickOn(ok, 10);
 				return true;
@@ -82,18 +82,16 @@ public class AgentConfiguration extends AgentObjectRepository {
 			log.info("Agent id already exists.");
 			return false;
 		}
-		visibilityOf(clickAddButton, 10);
 		clickOn(clickAddButton, 10);
-		Thread.sleep(5000);
 		selectOs.sendKeys(data.getOsName());
 		selectAgentType.sendKeys(data.getTypeName());
-		Thread.sleep(2000);
+		Thread.sleep(10000);
 		selectVersion.sendKeys(data.getVersion());
 		selectTools.sendKeys(data.getToolName());
-		visibilityOf(mqUser, 10);
+		visibilityOf(mqUser, 1);
 		mqUser.clear();
 		mqUser.sendKeys(data.getMqUser());
-		visibilityOf(mqPassword, 10);
+		visibilityOf(mqPassword, 1);
 		mqPassword.clear();
 		mqPassword.sendKeys(data.getMqPassword());
 		JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -111,17 +109,15 @@ public class AgentConfiguration extends AgentObjectRepository {
 		wait.until(ExpectedConditions.visibilityOf(ok)).click();
 		return verifyAgentId(data.getAgentId());
 	}
-	
+
 	public boolean registerAgentWithSameAgentId(AgentManagementDataModel data) throws InterruptedException {
 		wait.until(ExpectedConditions.visibilityOf(clickAddButton)).click();
-		Thread.sleep(5000);
 		selectOs.sendKeys(data.getOsName());
 		selectAgentType.sendKeys(data.getTypeName());
-		Thread.sleep(2000);
+		Thread.sleep(10000);
 		selectVersion.sendKeys(data.getVersion());
 		selectTools.sendKeys(data.getToolName());
 		wait.until(ExpectedConditions.visibilityOf(mqUser)).clear();
-		Thread.sleep(2000);
 		wait.until(ExpectedConditions.visibilityOf(mqUser)).clear();
 		mqUser.sendKeys(data.getMqUser());
 		mqPassword.clear();
@@ -163,7 +159,7 @@ public class AgentConfiguration extends AgentObjectRepository {
 		} catch (Exception e) {
 			log.info("Agent List is empty.");
 		}
-		driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 		return isInstanceId;
 	}
 
@@ -171,17 +167,17 @@ public class AgentConfiguration extends AgentObjectRepository {
 		selectAgent(data);
 		try {
 			driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
-			if (visibilityOf(stopAgent, 3)) {
-				driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+			if (visibilityOf(stopAgent, 2)) {
+				driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 				log.info("Agent is in start mode");
-				clickOn(stopAgent, 10);
-				clickOn(ok, 10);
+				clickOn(stopAgent, 2);
+				clickOn(ok, 3);
 				log.info("Agent stopped successfully.");
 				selectAgent(data);
 				if (startAgent.isDisplayed()) {
 					log.info("Agent is in stop mode.");
-					clickOn(startAgent, 10);
-					clickOn(ok, 10);
+					clickOn(startAgent, 3);
+					clickOn(ok, 3);
 					log.info("Agent started successfully.");
 				}
 				selectAgent(data);
@@ -191,14 +187,14 @@ public class AgentConfiguration extends AgentObjectRepository {
 			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 			if (startAgent.isDisplayed()) {
 				log.info("Agent is in stop mode.");
-				clickOn(startAgent, 10);
-				clickOn(ok, 10);
+				clickOn(startAgent, 2);
+				clickOn(ok, 2);
 				log.info("Agent started successfully.");
 				selectAgent(data);
 				if (stopAgent.isDisplayed()) {
 					log.info("Agent is in start mode");
-					clickOn(stopAgent, 10);
-					clickOn(ok, 10);
+					clickOn(stopAgent, 2);
+					clickOn(ok, 2);
 					log.info("Agent stopped successfully.");
 					selectAgent(data);
 					return startAgent.isDisplayed();
@@ -240,14 +236,14 @@ public class AgentConfiguration extends AgentObjectRepository {
 	}
 
 	private String searchToolName(String tools) {
-		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
-		visibilityOf(selectToolName, 10);
-		clickOn(selectToolName, 10);
+		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		visibilityOf(selectToolName, 2);
+		clickOn(selectToolName, 2);
 		visibilityOfAllElements(toolNameList);
 		for (WebElement toolName : toolNameList) {
 			if ((toolName.getText()).equals(tools)) {
-				visibilityOf(toolName, 10);
-				clickOn(toolName, 10);
+				visibilityOf(toolName, 2);
+				clickOn(toolName, 2);
 				break;
 			}
 		}
@@ -261,11 +257,11 @@ public class AgentConfiguration extends AgentObjectRepository {
 			hold.until(ExpectedConditions.visibilityOfAllElements(agentsList));
 			for (int i = 0; i < agentsList.size(); i++) {
 				if (agentsList.get(i).getText().equals(data.getAgentId())) {
-					driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+					driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 					agentPresent = true;
 					List<WebElement> radioButtons = agentsList.get(i)
 							.findElements(By.xpath(".//preceding::span[contains(@class, 'mat-radio-container')]"));
-					driver.manage().timeouts().implicitlyWait(3600, TimeUnit.SECONDS);
+					driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 					radioButtons.get(i).click();
 					break;
 				}
@@ -273,12 +269,12 @@ public class AgentConfiguration extends AgentObjectRepository {
 		} catch (Exception e) {
 			log.info("Agents list is empty!!");
 		}
-		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		return agentPresent;
 	}
 
 	private boolean checkDownloadRepoUrl(String downloadRepoUrlData) {
-		if (visibilityOf(downloadRepoUrl, 10)) {
+		if (visibilityOf(downloadRepoUrl, 2)) {
 			downloadRepoUrlValue.clear();
 			downloadRepoUrlValue.sendKeys(downloadRepoUrlData);
 			log.info("downloadRepoUrl : {}", downloadRepoUrlValue.getAttribute("value"));
@@ -289,7 +285,7 @@ public class AgentConfiguration extends AgentObjectRepository {
 	}
 
 	private boolean checkBrowseRepoUrl(String browseRepoUrlData) {
-		if (visibilityOf(browseRepoUrl, 10)) {
+		if (visibilityOf(browseRepoUrl, 2)) {
 			browseRepoUrlValue.clear();
 			browseRepoUrlValue.sendKeys(browseRepoUrlData);
 			log.info("browseRepoUrl : {}", browseRepoUrlValue.getAttribute("value"));
@@ -300,7 +296,7 @@ public class AgentConfiguration extends AgentObjectRepository {
 	}
 
 	private boolean checkIsOnlineRegistration(String isOnlineRegistrationData) {
-		if (visibilityOf(isOnlineRegistration, 10)) {
+		if (visibilityOf(isOnlineRegistration, 2)) {
 			isOnlineRegistrationValue.clear();
 			isOnlineRegistrationValue.sendKeys(isOnlineRegistrationData);
 			log.info("isOnlineRegistration : {}", isOnlineRegistrationValue.getAttribute("value"));
@@ -311,7 +307,7 @@ public class AgentConfiguration extends AgentObjectRepository {
 	}
 
 	private boolean checkOnlineRegistrationMode(String onlineRegistrationModeData) {
-		if (visibilityOf(onlineRegistrationMode, 10)) {
+		if (visibilityOf(onlineRegistrationMode, 2)) {
 			onlineRegistrationModeValue.clear();
 			onlineRegistrationModeValue.sendKeys(onlineRegistrationModeData);
 			log.info("onlineRegistrationMode : {}", onlineRegistrationModeValue.getAttribute("value"));
@@ -322,7 +318,7 @@ public class AgentConfiguration extends AgentObjectRepository {
 	}
 
 	private boolean checkOfflineAgentPath(String offlineAgentPathData) {
-		if (visibilityOf(offlineAgentPath, 10)) {
+		if (visibilityOf(offlineAgentPath, 2)) {
 			offlineAgentPathValue.clear();
 			offlineAgentPathValue.sendKeys(offlineAgentPathData);
 			log.info("offlineAgentPath : {}", offlineAgentPathValue.getAttribute("value"));
@@ -333,7 +329,7 @@ public class AgentConfiguration extends AgentObjectRepository {
 	}
 
 	private boolean checkUnzipPath(String unzipPathData) {
-		if (visibilityOf(unzipPath, 10)) {
+		if (visibilityOf(unzipPath, 2)) {
 			unzipPathValue.clear();
 			unzipPathValue.sendKeys(unzipPathData);
 			log.info("unzipPath : {}", unzipPathValue.getAttribute("value"));
@@ -344,7 +340,7 @@ public class AgentConfiguration extends AgentObjectRepository {
 	}
 
 	private boolean checkAgentExchange(String agentExchangeData) {
-		if (visibilityOf(agentExchange, 10)) {
+		if (visibilityOf(agentExchange, 2)) {
 			agentExchangeValue.clear();
 			agentExchangeValue.sendKeys(agentExchangeData);
 			log.info("agentExchange : {}", agentExchangeValue.getAttribute("value"));
@@ -355,7 +351,7 @@ public class AgentConfiguration extends AgentObjectRepository {
 	}
 
 	private boolean checkAgentPkgQueue(String agentPkgQueueData) {
-		if (visibilityOf(agentPkgQueue, 10)) {
+		if (visibilityOf(agentPkgQueue, 2)) {
 			agentPkgQueueValue.clear();
 			agentPkgQueueValue.sendKeys(agentPkgQueueData);
 			log.info("agentPkgQueue : {}", agentPkgQueueValue.getAttribute("value"));

@@ -92,8 +92,7 @@ public class InsightsGrafanaAuthenticationFilter extends AbstractAuthenticationP
 			Authentication authResult) throws IOException, ServletException {
 		authResult.getAuthorities()
 				.forEach(b -> log.debug(
-						"In successfulAuthentication InsightsGrafanaAuthenticationFilter GrantedAuthority ==== {} ",
-						b.getAuthority()));
+						"In successfulAuthentication InsightsGrafanaAuthenticationFilter GrantedAuthority for user "));
 		chain.doFilter(request, response);
 	}
 

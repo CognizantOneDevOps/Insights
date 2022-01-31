@@ -26,7 +26,7 @@ public class FileDetailsEnum {
 	}
 
 	public enum FileModule {
-		CORRELATION(1), TRACEABILITY(1), TOOLDETAIL(1), AUDIT(1), DATAENRICHMENT(-1);
+		CORRELATION(1), TRACEABILITY(1), TOOLDETAIL(1), AUDIT(1), DATAENRICHMENT(-1), GRAFANA_PDF_TEMPLATE(-1);
 
 		private int value;
 

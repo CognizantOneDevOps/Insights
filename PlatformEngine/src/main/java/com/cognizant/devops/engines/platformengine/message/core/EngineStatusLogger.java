@@ -58,50 +58,6 @@ public class EngineStatusLogger extends ComponentHealthLogger {
 		return Boolean.TRUE;
 	}
 	
-	public boolean createDataArchivalStatusNode(String message, String status) {
-		try {
-			String version = "";
-			version = EngineStatusLogger.class.getPackage().getImplementationVersion();
-			log.debug(" Engine version for createDataArchivalStatusNode {} ", version);
-			Map<String, String> extraParameter = new HashMap<>(0);
-			if (isDBUpdateSafe()) {
-				createComponentStatusNode("HEALTH:DATAARCHIVALENGINE", version, message, status, extraParameter);
-			}
-		} catch (Exception e) {
-			log.error(" Unable to create node {}", e.getMessage());
-		}
-		return Boolean.TRUE;
-	}
-	
-	public boolean createWebhookEngineStatusNode(String message, String status) {
-		try {
-			String version = "";
-			version = EngineStatusLogger.class.getPackage().getImplementationVersion();
-			log.debug(" Engine version createWebhookEngineStatusNode {}", version);
-			Map<String, String> extraParameter = new HashMap<>(0);
-			if (isDBUpdateSafe()) {
-				createComponentStatusNode("HEALTH:WEBHOOKENGINE", version, message, status, extraParameter);
-			}
-		} catch (Exception e) {
-			log.error(" Unable to create node {}", e.getMessage());
-		}
-		return Boolean.TRUE;
-	}
-	
-	public boolean createAuditStatusNode(String message, String status) {
-		try {
-			String version = "";
-			version = EngineStatusLogger.class.getPackage().getImplementationVersion();
-			log.debug(" Engine version createAuditStatusNode {} ", version);
-			Map<String, String> extraParameter = new HashMap<>(0);
-			if (isDBUpdateSafe()) {
-				createComponentStatusNode("HEALTH:AUDITENGINE", version, message, status, extraParameter);
-			}
-		} catch (Exception e) {
-			log.error(" Unable to create node {} ", e.getMessage());
-		}
-		return Boolean.TRUE;
-	}
 		
 	public void createSchedularTaskStatusNode(String message, String status, String timerTaskMapping) {
 		createSchedularTaskStatusNode(message,status,timerTaskMapping,0);

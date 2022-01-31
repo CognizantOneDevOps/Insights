@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { BulkUploadService } from '../bulkupload/bulkupload.service';
 import { MessageDialogService } from '../application-dialog/message-dialog-service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, NavigationExtras } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { KpiListDialog } from '../kpiList-Dialog/kpiList-Dialog.component';
 import { KpiService } from '../kpi-addition/kpi-service';
@@ -58,7 +58,7 @@ export class ContentConfigAddition implements OnInit {
           this.directionThreshold = params.directionThreshold,
           this.resultField = params.resultField,
           this.action = params.action,
-          this.isActive = params.isActive,
+          this.isActive = true,
           this.message = params.message,
           this.threshold = params.threshold,
           this.thresholds = params.thresholds,
@@ -307,6 +307,14 @@ export class ContentConfigAddition implements OnInit {
 
 
   }
+
+  redirectToLandingPage() {
+    let navigationExtras: NavigationExtras = {
+      skipLocationChange: true
+    };
+    this.router.navigate(["InSights/Home/contentConfig"], navigationExtras);
+  }
+  
   refreshData() {
     this.contentId = '';
     this.kpiId = '';

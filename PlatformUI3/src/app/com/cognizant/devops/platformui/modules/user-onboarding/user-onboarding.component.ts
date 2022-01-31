@@ -51,7 +51,6 @@ export class UserOnboardingComponent implements OnInit {
   orgIdArray = [];
   userRolesArray = [];
   readOnlyOrg: boolean = false;
-  userPropertyList = {};
   assignUserData = {};
   role: any;
   pass: string
@@ -103,6 +102,8 @@ export class UserOnboardingComponent implements OnInit {
     { value: 'Admin', name: 'Admin' },
     { value: 'Viewer', name: 'Viewer' }
   ];
+  emailRegex = /(\w{1})[\w.-]+@([\w.]+\w)/
+  loginRegex = /\S(?=\S{2})/g
 
   constructor(private fb: FormBuilder, public router: Router, private userOnboardingService: UserOnboardingService, private sanitizer: DomSanitizer,
     public dialog: MatDialog, public messageDialog: MessageDialogService, private dataShare: DataSharedService) {
@@ -172,12 +173,16 @@ export class UserOnboardingComponent implements OnInit {
     self.userDataSource = new MatTableDataSource();
     this.userOnboardingService.getOrganizationUsers(selectedAdminOrg.orgId).then(function (usersResponseData) {
       if (usersResponseData.data != undefined && usersResponseData.status == "success") {
+        var auth_uuid = usersResponseData.data.substring(0, 15);
+        var data = usersResponseData.data.substring(15, usersResponseData.data.length);
+        var dataValue = {};
+        dataValue['data'] = self.dataShare.decryptedData(auth_uuid, data);
         //console.log(usersResponseData.data);
         self.showDetail = true;
         self.showThrobber = false;
-        self.displayedColumns = ['radio', 'Login', 'Email', 'Seen', 'Role'];
+        self.displayedColumns = ['radio', 'UserName', 'Login', 'Seen', 'Role'];
         //console.log(usersResponseData.data);
-        self.userDataSource.data = usersResponseData.data; //new MatTableDataSource( )
+        self.userDataSource.data = dataValue['data']; //new MatTableDataSource( )
         self.userDataSource.paginator = self.paginator;
         //console.log(self.userDataSource);
         //console.log(self.userDataSource.data);
@@ -236,7 +241,7 @@ export class UserOnboardingComponent implements OnInit {
   searchUserInAssign(searchOrgForUserAssign) {
     var self = this;
     this.userOnboardingService.getUsersOrganisation(searchOrgForUserAssign).then(function (usersResponseData1) {
-      console.log(usersResponseData1);
+
 
       //this.newresponse = "";
 
@@ -253,7 +258,6 @@ export class UserOnboardingComponent implements OnInit {
         self.newresponse = "User Found and not yet assigned to any Organization.";
       }
 
-      console.log(self.newresponse)
       if (usersResponseData1.data == "User Not Found") {
         self.messageDialog.showApplicationsMessage("User not found", "ERROR");
         self.newresponse = "";
@@ -271,8 +275,6 @@ export class UserOnboardingComponent implements OnInit {
   searchUserInAddUser(searchOrgForUserAssign) {
     var self = this;
     this.userOnboardingService.getUsersOrganisation(searchOrgForUserAssign).then(function (usersResponseData1) {
-      console.log(usersResponseData1);
-
       //this.newresponse = "";
 
       //  this.newrenewresponsesponse = usersResponseData1.data;
@@ -288,7 +290,6 @@ export class UserOnboardingComponent implements OnInit {
         self.newresponse = "User Found.Please use Assign User Functionality for adding the user to different Orgs.";
       }
 
-      console.log(self.newresponse)
       if (usersResponseData1.data == "User Not Found") {
         self.messageDialog.showApplicationsMessage("User not found", "ERROR");
         self.newresponse = "";
@@ -337,7 +338,7 @@ export class UserOnboardingComponent implements OnInit {
     return jsonData;
   }
 
-  saveUser(newName, email, username, pass) {
+  saveUser() {
     this.isEmailIncorrect = false;
     this.isUsernameIncorrect = false;
     this.isPasswordIncorrect = false;
@@ -345,34 +346,33 @@ export class UserOnboardingComponent implements OnInit {
     this.isRoleIncorrect = false;
     // console.log(this.role);
     var userBMparameter;
-    this.userPropertyList = {};
+    var userPropertyList = {};
     //  this.userPropertyList = this.clubProperties(this.userPropertyList, false);
-    this.userPropertyList['name'] = newName;
-    this.userPropertyList['email'] = email;
-    this.userPropertyList['userName'] = username;
-    this.userPropertyList['password'] = pass;
-    this.userPropertyList['role'] = this.role;
-    this.userPropertyList['orgName'] = this.selectedAdminOrg.name
-    this.userPropertyList['orgId'] = this.selectedAdminOrg.orgId
-    //  console.log(this.userPropertyList)
-    //console.log(this.selectedAdminOrg)
-    userBMparameter = JSON.stringify(this.userPropertyList);
-    //console.log(userBMparameter)
-    var checkname = this.regex.test(email);
-    var checkid = this.usernameRegex.test(username);
+    userPropertyList['name'] = this.names;
+    userPropertyList['email'] = this.email;
+    userPropertyList['userName'] = this.username;
+    userPropertyList['password'] = this.pass;
+    userPropertyList['role'] = this.role;
+    userPropertyList['orgName'] = this.selectedAdminOrg.name
+    userPropertyList['orgId'] = this.selectedAdminOrg.orgId
+
+    userBMparameter = JSON.stringify(userPropertyList);
+
+    var checkname = this.regex.test(this.email);
+    var checkid = this.usernameRegex.test(this.username);
     if (!checkid) {
       this.isUsernameIncorrect = true;
     }
     if (!checkname) {
       this.isEmailIncorrect = true;
     }
-    if (username == undefined) {
+    if (this.username == undefined) {
       this.isUsernameIncorrect = true;
     }
-    if (pass == undefined) {
+    if (this.pass == undefined) {
       this.isPasswordIncorrect = true;
     }
-    if (newName == undefined) {
+    if (this.names == undefined) {
       this.isNameIncorrect = true;
     }
     if (this.role == undefined) {
@@ -497,7 +497,6 @@ export class UserOnboardingComponent implements OnInit {
     this.names = null;
     this.role = null;
     this.searchOrgForUser = null;
-    console.log(this.rows.value)
     this.searchUser = null;
     this.showCancel = false;
     this.userForm();
@@ -538,21 +537,17 @@ export class UserOnboardingComponent implements OnInit {
     var count = 0;
     var self = this;
     self.userDataSource = new MatTableDataSource();
-    //console.log(this.assignRadioSelected)
     if (this.assignRadioSelected == true) {
       selectedAdminOrg.orgId = 1;
     }
-    console.log(selectedAdminOrg.orgId)
     this.userOnboardingService.getOrganizationUsers(selectedAdminOrg.orgId).then(function (usersResponseData) {
       if (usersResponseData.data != undefined && usersResponseData.status == "success") {
         self.userDataSource.data = usersResponseData.data; //new MatTableDataSource( )
         self.userDataSource.paginator = self.paginator;
-        //  console.log(self.userDataSource.data)
         for (var element of self.userDataSource.data) {
           var emailcheck = (element.email);
           var usernamecheck = element.login
           self.searchInput = searchUser
-          //  console.log(searchUser)
           if (self.searchInput == emailcheck) {
             count = count + 1;
             break;
@@ -573,11 +568,8 @@ export class UserOnboardingComponent implements OnInit {
         self.messageDialog.showApplicationsMessage("Unable to load data", "WARN");
       }
     });
-    // this.loadUsersInfo(selectedAdminOrg);
-    // console.log(this.userDataSource.data)
   }
   editUserData() {
-    //console.log(this.selectedUser.userId);
     this.isSaveEnable = true;
     this.isSelectedUserId = this.selectedUser.userId;
   }

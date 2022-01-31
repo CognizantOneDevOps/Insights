@@ -190,7 +190,7 @@ public class ReportTemplateConfigurationPage extends ReportTemplateObjectReposit
 			if (reportTemplateListEl.get(i).getText().equals(reportName)) {
 				List<WebElement> radioButtons = reportTemplateListEl.get(i)
 						.findElements(By.xpath(".//preceding::span[contains(@class, 'mat-radio-container')]"));
-				driver.manage().timeouts().implicitlyWait(3600, TimeUnit.SECONDS);
+				driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 				radioButtons.get(i).click();
 				break;
 			}
@@ -232,7 +232,7 @@ public class ReportTemplateConfigurationPage extends ReportTemplateObjectReposit
 			if (kpiListEl.get(i).getText().equals(kpiId)) {
 				List<WebElement> deleteButtons = kpiListEl.get(i)
 						.findElements(By.xpath(".//following::mat-icon[@title='Delete']"));
-				driver.manage().timeouts().implicitlyWait(3600, TimeUnit.SECONDS);
+				driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 				deleteButtons.get(0).click();
 				break;
 			}
@@ -334,7 +334,7 @@ public class ReportTemplateConfigurationPage extends ReportTemplateObjectReposit
 		selectRT(reportTemplateName);
 		wait.until(ExpectedConditions.visibilityOf(attachFilesBtnE1));
 		attachFilesBtnE1.click();
-		driver.manage().timeouts().implicitlyWait(1200, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		chooseFileBtnE1.sendKeys(path);
 		wait.until(ExpectedConditions.elementToBeClickable(uploadJsonBtnE1));
 		uploadJsonBtnE1.click();

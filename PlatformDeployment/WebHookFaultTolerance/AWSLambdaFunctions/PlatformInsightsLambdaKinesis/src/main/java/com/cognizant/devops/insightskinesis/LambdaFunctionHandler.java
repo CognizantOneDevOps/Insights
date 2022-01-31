@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -63,7 +64,7 @@ public class LambdaFunctionHandler implements RequestHandler<KinesisFirehoseEven
 
 			ByteBuffer bufferData = record.getData();
 			InputStream data = new ByteArrayInputStream(bufferData.array());
-			JsonElement element = new JsonParser().parse(new InputStreamReader(data));
+			JsonElement element = parseReader(new InputStreamReader(data));
 			JsonObject json = element.getAsJsonObject();
 			String body = json.get("body").toString();
 			String tool = json.get("tool").getAsString();
@@ -106,5 +107,15 @@ public class LambdaFunctionHandler implements RequestHandler<KinesisFirehoseEven
 		}
 		transformedEvent.setRecords(transRecords);
 		return transformedEvent;
+	}
+	private static JsonElement parseReader(Reader requestReader) {
+		JsonElement response = null;
+		try {			
+			response = JsonParser.parseReader(requestReader);
+		} catch (Exception e) {
+			log.error(" Error in parseReader {}",requestReader);
+			log.error(e);
+		}
+		return response;
 	}
 }

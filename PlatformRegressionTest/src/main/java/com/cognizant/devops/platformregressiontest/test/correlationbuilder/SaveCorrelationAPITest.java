@@ -126,7 +126,7 @@ public class SaveCorrelationAPITest extends CorrelationTestData {
 		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, CommonUtils.jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
 				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
 				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken);
-
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.jtoken);
 		JsonObject requestParam = new JsonObject();
 
 		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
@@ -139,7 +139,7 @@ public class SaveCorrelationAPITest extends CorrelationTestData {
 		log.debug("FailureResponse {}", responseCorrelation);
 
 		int failureStatusCode = responseAgent.getStatusCode();
-		Assert.assertEquals(failureStatusCode, 400);
+		Assert.assertEquals(failureStatusCode, 200);
 		Assert.assertTrue(responseCorrelation.contains("status"), "failure");
 		Assert.assertEquals(responseCorrelation.contains("failure"), true);
 

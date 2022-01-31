@@ -1,0 +1,87 @@
+{
+  "vault": {
+	"getFromVault": false,
+	"secretEngine":"insights-kv",
+    "readToken":"vault_secret_token",
+    "vaultUrl":"http://Vault_Host:port/v1/"
+  },
+  "mqConfig": {
+    "user": "username for RabbitMq",
+    "password": "",
+    "host": "localhost",
+    "exchange": "iSight",
+    "agentControlXchg": "iAgent"
+  },
+  "subscribe": {
+    "config": "ROI.DYNATRACE_ROI.config"
+  },
+  "publish": {
+    "data": "ROI.DYNATRACE_ROI.DATA",
+    "health": "ROI.DYNATRACE_ROI.HEALTH"
+  },
+  "communication": {
+    "type": "REST",
+    "sslVerify": false,
+    "responseType": "JSON"
+  },
+  "dynamicTemplate" : {
+  		"responseTemplate" : {
+  			"milestoneDetails": {
+				"milestoneId": "milestoneId",
+                "milestoneName" : "milestoneName",
+                "outcomeId": "outcomeId",
+                "outcomeName": "outcomeName",
+                "statusQueue": "statusQueue",
+                "metricUrl": "metricUrl"
+			},
+  			"logQueries": {
+   				"errorCount": {
+   					"query": "log.source='c:\\insightsdeployment\\insights_windows\\server2\\insights_home\\logs\\platformengine\\platformengine.log' AND loglevel='ERROR'"   				
+   				},
+   				"successfulLogin": {
+   					"query": "log.source='c:\\insightsdeployment\\insights_windows\\server2\\insights_home\\logs\\platformservice\\platformservice.log' AND content='successfulAuthentication'"
+   				}
+   			},
+   			"metadata": {
+				"labels": [
+					"MILESTONE"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"milestoneId",
+					"outcomeId",
+					"time"
+				]
+			}
+  		}
+   },	
+  "agentId" : "" ,
+  "toolCategory": "ROI",
+  "enableDataValidation": true,
+  "toolsTimeZone": "GMT",
+  "insightsTimeZone": "Asia/Kolkata",
+  "useResponseTemplate": true,
+  "auth": "base64",
+  "runSchedule": 30,
+  "timeStampField": "",
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
+  "isEpochTimeFormat" : true,
+  "agentSecretDetails": ["apiToken"],
+  "baseUrl": "",
+  "apiToken": "",
+  "resolution": "60m",
+  "isDebugAllowed": false,
+  "enableValueArray": false,
+  "loggingSetting": {
+    "logLevel": "INFO",
+	"maxBytes" : 5000000,
+	"backupCount" : 10
+  },
+  "auditing": false,
+  "toolName": "DynatraceRoi",
+  "enableProxy":false,
+  "proxies":{
+    	"http":"",
+    	"https":""
+    }
+}

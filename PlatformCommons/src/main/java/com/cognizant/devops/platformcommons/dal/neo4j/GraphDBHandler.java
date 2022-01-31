@@ -26,12 +26,12 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.RestApiHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 /**
  * 
@@ -163,7 +163,7 @@ public class GraphDBHandler{
 
 		requestJson.add(ConfigOptions.STATEMENTS , statementArray);
 		String response = neo4jCommunication(requestJson);
-		return new JsonParser().parse(response).getAsJsonObject();
+		return JsonUtils.parseStringAsJsonObject(response);
 	}
 
 	/**
@@ -172,7 +172,7 @@ public class GraphDBHandler{
 	 * @throws InsightsCustomException
 	 */
 	public String executeCypherQueryRaw(String queryJson) throws InsightsCustomException {
-		JsonObject requestJson = new JsonParser().parse(queryJson).getAsJsonObject();
+		JsonObject requestJson = JsonUtils.parseStringAsJsonObject(queryJson);
 		return neo4jCommunication(requestJson);
 	}
 
@@ -211,7 +211,7 @@ public class GraphDBHandler{
 	private JsonObject buildResponseJsonFromString(String response) throws InsightsCustomException {
 		try {
 			JsonObject responseJson = new JsonObject();
-			responseJson.add("response", new JsonParser().parse(response));
+			responseJson.add("response", JsonUtils.parseString(response));
 			return responseJson;
 		} catch (Exception e) {
 			throw new InsightsCustomException(e.getMessage());
@@ -254,7 +254,7 @@ public class GraphDBHandler{
 		headers.put("X-Stream", "true");
 		returnResponse = RestApiHandler.doPost(TRANSACTION_COMMIT_URL, requestJson, headers);
 		
-		JsonObject graphJsonObj=new JsonParser().parse(returnResponse).getAsJsonObject();
+		JsonObject graphJsonObj= JsonUtils.parseStringAsJsonObject(returnResponse);
 
 		parseGraphResponseForError(graphJsonObj, requestJson.toString());
 		rowCount = getRecordCount(graphJsonObj); 
@@ -340,7 +340,7 @@ public class GraphDBHandler{
 		Map<String, String> headers = new HashMap<>();
 		headers.put(ConfigOptions.AUTHORIZATION, ApplicationConfigProvider.getInstance().getGraph().getAuthToken());
 		String response = RestApiHandler.doGet(SCHEMA_INDEX_URL, headers);
-		return new JsonParser().parse(response).getAsJsonArray();
+		return JsonUtils.parseStringAsJsonArray(response);
 	}
 
 	/**
@@ -360,7 +360,7 @@ public class GraphDBHandler{
 		headers.put(ConfigOptions.AUTHORIZATION, ApplicationConfigProvider.getInstance().getGraph().getAuthToken());
 		String url = SCHEMA_INDEX_URL + label;
 		String response = RestApiHandler.doPost(url, requestJson, headers);
-		return new JsonParser().parse(response).getAsJsonObject();
+		return JsonUtils.parseStringAsJsonObject(response);
 	}
 
 	/**

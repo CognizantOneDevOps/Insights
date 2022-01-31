@@ -25,13 +25,13 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.RestApiHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformcommons.exception.RestAPI404Exception;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 
 
 
@@ -121,7 +121,6 @@ public class VaultHandler {
 
 	public JsonObject fetchServerConfigFromVault(String clientId,String vaultUrl, String vaultSecretEngine, String vaultToken) throws InsightsCustomException {
 		JsonObject serverConfig = new JsonObject();
-		JsonParser parser = new JsonParser();
 		try {
 			boolean vaultStatus = getVaultStatus(vaultUrl,vaultToken);
 			if(vaultStatus) {
@@ -131,12 +130,11 @@ public class VaultHandler {
 				log.debug(" vaultServerConfigURL {} ", vaultServerConfigURL);
 				String dataFromVault = fetchFromVaultDB(vaultServerConfigURL,vaultToken);
 				if(dataFromVault !=null) {
-					JsonElement parsedJson = parser.parse(dataFromVault);
-					if (parsedJson.getAsJsonObject().has("data")
-							&& parsedJson.getAsJsonObject().get("data").getAsJsonObject().has(PlatformServiceConstants.VAULT_DATA_VALUE)) {
-						JsonElement serverConfigelement = parser
-								.parse(parsedJson.getAsJsonObject().get("data").getAsJsonObject().get(PlatformServiceConstants.VAULT_DATA_VALUE).toString());
-						serverConfig = parser.parse(serverConfigelement.getAsString()).getAsJsonObject(); 
+					JsonObject parsedJson = JsonUtils.parseStringAsJsonObject(dataFromVault);
+					if (parsedJson.has("data")
+							&& parsedJson.get("data").getAsJsonObject().has(PlatformServiceConstants.VAULT_DATA_VALUE)) {
+						JsonElement serverConfigelement = JsonUtils.parseString(parsedJson.get("data").getAsJsonObject().get(PlatformServiceConstants.VAULT_DATA_VALUE).toString());
+						serverConfig = JsonUtils.parseStringAsJsonObject(serverConfigelement.getAsString()); 
 					} else {
 						log.error("Reading server config from Vault is not proper format {} ", parsedJson);
 					}
@@ -181,7 +179,7 @@ public class VaultHandler {
 					+ "/sys/seal-status";
 			headers.put(PlatformServiceConstants.VAULT_TOKEN, vaultToken);
 			String data = RestApiHandler.doGet(vaultStatusURL, headers);
-			JsonObject vaultStatus = new JsonParser().parse(data).getAsJsonObject();
+			JsonObject vaultStatus = JsonUtils.parseStringAsJsonObject(data);
 			if(vaultStatus.has("sealed") && vaultStatus.get("sealed").getAsBoolean()) {
 				throw new InsightsCustomException("Vault_sealed");
 			}

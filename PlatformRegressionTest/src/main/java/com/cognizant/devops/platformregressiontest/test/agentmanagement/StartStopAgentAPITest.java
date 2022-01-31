@@ -36,7 +36,7 @@ public class StartStopAgentAPITest extends AgentTestData {
 
 	@Test(priority = 1, dataProvider = "agentupdateprovider")
 	public void startAgentPost(String agentId, String toolName, String agentVersion, String osversion,
-			String configJson, String vault) {
+			String configJson, String vault, String type) {
 
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("startStopAgentBaseURI");
 
@@ -48,7 +48,7 @@ public class StartStopAgentAPITest extends AgentTestData {
 				ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken);
 		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.jtoken);
 
-		httpRequest.queryParams("agentId", agentId, "toolName", toolName, "osversion", osversion, "action",
+		httpRequest.queryParams("agentId", agentId, "toolName", toolName, "osversion", osversion, "action", "type", type,
 				CommonUtils.getProperty("actionStart"));
 
 		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
@@ -66,7 +66,7 @@ public class StartStopAgentAPITest extends AgentTestData {
 
 	@Test(priority = 2, dataProvider = "agentupdateprovider")
 	public void stopAgent(String agentId, String toolName, String agentVersion, String osversion, String configJson,
-			String vault) {
+			String vault, String type) {
 
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("startStopAgentBaseURI");
 
@@ -78,7 +78,7 @@ public class StartStopAgentAPITest extends AgentTestData {
 				ConfigOptionsTest.CSRF_NAME_KEY, CommonUtils.xsrfToken);
 		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.jtoken);
 
-		httpRequest.queryParams("agentId", agentId, "toolName", toolName, "osversion", osversion, "action",
+		httpRequest.queryParams("agentId", agentId, "toolName", toolName, "osversion", osversion, "action", "type", type,
 				CommonUtils.getProperty("actionStop"));
 
 		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);

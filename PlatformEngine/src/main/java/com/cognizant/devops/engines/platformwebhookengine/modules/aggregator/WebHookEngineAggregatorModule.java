@@ -61,15 +61,11 @@ public class WebHookEngineAggregatorModule implements Job, ApplicationConfigInte
 			log.error(e);
 			EngineStatusLogger.getInstance().createSchedularTaskStatusNode("WebHookEngineAggregatorModule execution has some issue  ",
 					PlatformServiceConstants.FAILURE,jobName);	
-			EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
-					"Webhook Engine Service has some error  "+e.getMessage(), PlatformServiceConstants.FAILURE);
 		}
 		
 		long processingTime = System.currentTimeMillis() - startTime ;
 		EngineStatusLogger.getInstance().createSchedularTaskStatusNode("WebHookEngineAggregatorModule execution Completed",
 				PlatformServiceConstants.SUCCESS,jobName,processingTime);
-		EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
-				"Webhook Engine Service started successfully", PlatformServiceConstants.SUCCESS);
 		log.debug(" Webhook Engine completed ==== ");
 	}
 

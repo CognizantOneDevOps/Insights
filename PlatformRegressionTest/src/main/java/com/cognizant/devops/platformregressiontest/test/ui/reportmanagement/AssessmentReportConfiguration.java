@@ -46,7 +46,6 @@ public class AssessmentReportConfiguration extends AssessmentReportObjectReposit
 
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		addButton.click();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 	}
 
 	public boolean navigateToaddReportConfirmation() {
@@ -70,11 +69,8 @@ public class AssessmentReportConfiguration extends AssessmentReportObjectReposit
 	public boolean addNewReport() {
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		clickAddButton();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		reportName.sendKeys(LoginAndSelectModule.testData.get("reportName"));
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		titleName.sendKeys(LoginAndSelectModule.testData.get("title"));
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		try {
 			selectReportTemplate(reportTemplateName);
 			Thread.sleep(2000);
@@ -83,39 +79,26 @@ public class AssessmentReportConfiguration extends AssessmentReportObjectReposit
 					|| ((frequencyName).equals(LoginAndSelectModule.testData.get("triWeeklyFrequency")))) {
 				selectFrequency(frequencyName);
 				Thread.sleep(2000);
-				driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 				clickCalender();
 				Thread.sleep(2000);
-				driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 				selectYear(year);
 				Thread.sleep(2000);
-				driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 				selectMonth(month);
 				Thread.sleep(2000);
-				driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 				selectDate(date);
 				Thread.sleep(2000);
 			} else {
 				selectFrequency(frequencyName);
 			}
 			Thread.sleep(2000);
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 			dragAndDropTask();
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 			addMaildetails();
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 			Thread.sleep(2000);
 			saveButton.click();
-			Thread.sleep(2000);
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 			navigateToaddReportConfirmation();
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 			clickYesButton();
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 			navigateToaddReportSuccess();
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 			okButton.click();
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
 		} catch (Exception e) {
 
@@ -129,17 +112,11 @@ public class AssessmentReportConfiguration extends AssessmentReportObjectReposit
 
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		selectReport();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		immiediateRunButton.click();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		immediateRunConfirmMessage.isDisplayed();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		immediateRunClickYes.click();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		immediateRunSuccess.isDisplayed();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		immediateRunOk.click();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		return reportsLandingPage.isDisplayed();
 	}
 
@@ -148,14 +125,10 @@ public class AssessmentReportConfiguration extends AssessmentReportObjectReposit
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		selectReport();
 		Thread.sleep(2000);
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		clickToggleButton();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		confirmationMessage.click();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		Thread.sleep(2000);
 		clickYes.click();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		return reportsLandingPage.isDisplayed();
 
 	}
@@ -163,18 +136,14 @@ public class AssessmentReportConfiguration extends AssessmentReportObjectReposit
 	public boolean editReport() throws InterruptedException {
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		selectReport();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		clickEditButton.click();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		addTaskButton.click();
 		Thread.sleep(2000);
 		WebElement emailExecutionTaskSource = driver.findElement(By.xpath("(//div[@id='fromSelectedTaskList'])[3]"));
 		WebElement taskExecutionDestination = driver.findElement(By.xpath("(//div[@class='container'])[1]"));
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		Thread.sleep(2000);
 		Actions act = new Actions(driver);
 		act.dragAndDrop(emailExecutionTaskSource, taskExecutionDestination).build().perform();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		Thread.sleep(2000);
 		for (int i = 0; i <= 2; i++) {
 			try {
@@ -187,28 +156,18 @@ public class AssessmentReportConfiguration extends AssessmentReportObjectReposit
 
 		Thread.sleep(2000);
 		saveButton.click();
-		Thread.sleep(2000);
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		navigateToaddReportConfirmation();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		clickYesButton();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		navigateToaddReportSuccess();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		okButton.click();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		return reportsLandingPage.isDisplayed();
 	}
 
 	public boolean deleteReport() {
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		selectReport();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		clickDelete.click();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		clickYesButton();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		clickOk.click();
 		return reportsLandingPage.isDisplayed();
 
@@ -264,7 +223,6 @@ public class AssessmentReportConfiguration extends AssessmentReportObjectReposit
 	public void selectYear(String year) {
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		selectYearArrowButton.click();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		List<WebElement> requiredYear = yearList;
 		for (WebElement yearSelected : requiredYear) {
 			if (yearSelected.getText().equals(year)) {
@@ -309,11 +267,8 @@ public class AssessmentReportConfiguration extends AssessmentReportObjectReposit
 		Actions act = new Actions(driver);
 
 		act.dragAndDrop(kpiExecutionTaskSource, taskExecutionDestination).build().perform();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		act.dragAndDrop(pdfExecutionTaskSource, taskExecutionDestination).build().perform();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		act.dragAndDrop(emailExecutionTaskSource, taskExecutionDestination).build().perform();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		Thread.sleep(2000);
 		taskaddButton.click();
 
@@ -323,21 +278,14 @@ public class AssessmentReportConfiguration extends AssessmentReportObjectReposit
 
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		clickMailingDetails.click();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		mailFrom.sendKeys(LoginAndSelectModule.testData.get("mailFrom"));
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		mailTo.sendKeys(LoginAndSelectModule.testData.get("mailTo"));
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		ccReceiverMailAddress.sendKeys(LoginAndSelectModule.testData.get("ccMail"));
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		bccReceiverMailAddress.sendKeys(LoginAndSelectModule.testData.get("bccMail"));
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		mailSubject.sendKeys(LoginAndSelectModule.testData.get("subject"));
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		mailBodyTemplate.sendKeys(LoginAndSelectModule.testData.get("bodyTemplate"));
 		Thread.sleep(2000);
 		addMail.click();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 	}
 
 	public boolean verifyReportName(String report) {

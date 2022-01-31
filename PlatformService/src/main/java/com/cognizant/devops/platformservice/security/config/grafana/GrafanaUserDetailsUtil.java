@@ -33,6 +33,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -41,7 +42,6 @@ import com.cognizant.devops.platformservice.security.config.SpringAuthority;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 
 public class GrafanaUserDetailsUtil {
@@ -93,12 +93,8 @@ public class GrafanaUserDetailsUtil {
 			grafanaResponseCookies = currentGrafanacookies.stream()
 					.collect(Collectors.toMap(cookie -> ValidationUtils.cleanXSS(cookie.getName()),
 							cookie -> ValidationUtils.cleanXSS(cookie.getValue())));
-			log.debug("GrafanaUserDetailsUtil ==== grafanaResponseCookies {} ", grafanaResponseCookies);
-
 			String grafanaCookie = grafanaResponseCookies.entrySet().stream()
 					.map(entry -> entry.getKey() + "=" + entry.getValue()).collect(Collectors.joining("; HttpOnly "));
-			log.debug("GrafanaUserDetailsUtil ==== grafanaCookie string {} ", grafanaCookie);
-
 			headers.put("Cookie", grafanaCookie);
 			getCurrentOrgAndRole(headers, grafanaResponseCookies);
 
@@ -112,9 +108,9 @@ public class GrafanaUserDetailsUtil {
 				mappedAuthorities.add(SpringAuthority.valueOf("INVALID"));
 			}
 			
-			if(request!=null) {
+			/*if(request!=null) {
 				request.setAttribute("responseHeaders", grafanaResponseCookies);
-			}
+			}*/
 			return new User(userName, credential, true, true, true, true, mappedAuthorities);
 
 		} catch (Exception e) {
@@ -137,13 +133,13 @@ public class GrafanaUserDetailsUtil {
 		GrafanaHandler grafanaHandler = new GrafanaHandler();
 		log.debug("Inside getCurrentOrgRole function call!");
 		String grafanaCurrentOrgResponse = grafanaHandler.grafanaGet("/api/user", headers);
-		JsonObject responseJson = new JsonParser().parse(grafanaCurrentOrgResponse).getAsJsonObject();
+		JsonObject responseJson =JsonUtils.parseStringAsJsonObject(grafanaCurrentOrgResponse);
 		String grafanaCurrentOrg = responseJson.get("orgId").toString();
 		if (grafanaCurrentOrg != null) {
 			grafanaResponseCookies.put("grafanaOrg", ValidationUtils.cleanXSS(grafanaCurrentOrg));
 			String userOrgsApiUrl = "/api/user/orgs";
 			String grafanaRoleResponse = grafanaHandler.grafanaGet(userOrgsApiUrl, headers);
-			JsonArray grafanaOrgs = new JsonParser().parse(grafanaRoleResponse).getAsJsonArray();
+			JsonArray grafanaOrgs = JsonUtils.parseStringAsJsonArray(grafanaRoleResponse);
 			String grafanaCurrentOrgRole = null;
 			for (JsonElement org : grafanaOrgs) {
 				if (grafanaCurrentOrg.equals(org.getAsJsonObject().get("orgId").toString())) {

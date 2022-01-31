@@ -27,11 +27,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.traceabilitydashboard.service.TraceabilityDashboardServiceImpl;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/traceabilitydashboard")
@@ -107,8 +108,7 @@ public class TraceabilityDashboardController {
 		JsonObject response = new JsonObject();
 		try {
 
-			JsonParser parser = new JsonParser();			
-			JsonObject nodeObject = (JsonObject) parser.parse(issue);			
+			JsonObject nodeObject = JsonUtils.parseStringAsJsonObject(issue);			
 			response = traceabilityDashboardServiceImpl.getPipelineForSelectedNode(nodeObject);
 			return PlatformServiceUtil.buildSuccessResponseWithData(response);
 		} catch (Exception e) {
