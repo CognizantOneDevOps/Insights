@@ -70,7 +70,7 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 	@Override
 	public void saveData(List<JsonObject> resultList) {
 		try {
-			String query = "UNWIND {props} AS properties " + "CREATE (n:" + ReportEngineUtils.NEO4J_RESULT_LABEL + ") "
+			String query = "UNWIND $props AS properties " + "CREATE (n:" + ReportEngineUtils.NEO4J_RESULT_LABEL + ") "
 					+ "SET n = properties";
 			JsonObject graphResponse = graphDBHandler.bulkCreateNodes(resultList, null, query);
 			parseGraphResponseForError(graphResponse);
@@ -144,7 +144,7 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 	@Override
 	public void saveContentResult(JsonObject contentResult) {
 		try {
-			String query = "UNWIND {props} AS properties " + "CREATE (n:" + ReportEngineUtils.NEO4J_CONTENT_RESULT_LABEL
+			String query = "UNWIND $props AS properties " + "CREATE (n:" + ReportEngineUtils.NEO4J_CONTENT_RESULT_LABEL
 					+ ") " + "SET n = properties";
 			JsonObject graphResponse = graphDBHandler.createNodesWithSingleData(contentResult, query);
 			parseGraphResponseForError(graphResponse);

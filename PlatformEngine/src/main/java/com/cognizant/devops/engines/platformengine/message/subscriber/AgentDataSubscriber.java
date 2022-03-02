@@ -190,7 +190,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 				} else if (dataUpdateSupported) {
 					cypherQuery = buildCypherQuery(queryLabel, uniqueKey);
 				} else {
-					cypherQuery = "UNWIND {props} AS properties CREATE (n" + queryLabel
+					cypherQuery = "UNWIND $props AS properties CREATE (n" + queryLabel
 							+ ") set n=properties return count(n)";
 				}
 
@@ -289,7 +289,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 
 	private String buildCypherQuery(String labels, String fieldName) {
 		StringBuffer query = new StringBuffer();
-		query.append("UNWIND {props} AS properties MERGE (node:LATEST").append(labels).append(" { ");
+		query.append("UNWIND $props AS properties MERGE (node:LATEST").append(labels).append(" { ");
 		if (fieldName.contains(",")) {
 			String[] fields = fieldName.split(",");
 			JsonObject searchCriteria = new JsonObject();
@@ -312,7 +312,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		JsonObject destination = relationMetadata.getAsJsonObject("destination");
 		String relationName = relationMetadata.get("name").getAsString();
 		StringBuffer cypherQuery = new StringBuffer();
-		cypherQuery.append("UNWIND {props} AS properties MERGE (source").append(labels);
+		cypherQuery.append("UNWIND $props AS properties MERGE (source").append(labels);
 		if (source.has(AgentDataConstants.LABELS)) {
 			JsonArray sourceLabels = source.getAsJsonArray(AgentDataConstants.LABELS);
 			for (JsonElement sourceLabel : sourceLabels) {

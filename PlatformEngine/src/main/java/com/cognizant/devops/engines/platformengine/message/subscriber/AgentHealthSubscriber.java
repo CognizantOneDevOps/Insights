@@ -136,7 +136,7 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 			healthQuery = healthQuery + " where old.agentId='" + agentId + "' or old.agentId is null";
 			healthQuery = healthQuery + " OPTIONAL MATCH (old) <-[:UPDATED_TO*" + nodeCount
 					+ "]-(purge)  where old.agentId='" + agentId + "'";
-			healthQuery = healthQuery + CREATE + nodeLabels + " {props}) ";
+			healthQuery = healthQuery + CREATE + nodeLabels + " $props) ";
 			healthQuery = healthQuery + " MERGE  (new)<-[r:UPDATED_TO]-(old)";
 			healthQuery = healthQuery + " REMOVE old:" + latestLabel;
 			healthQuery = healthQuery + " detach delete purge ";
@@ -147,7 +147,7 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 		else {
 			healthQuery = "Match (old" + nodeLabels + ")";
 			healthQuery = healthQuery + " OPTIONAL MATCH (old) <-[:UPDATED_TO*" + nodeCount + "]-(purge) ";
-			healthQuery = healthQuery + CREATE + nodeLabels + " {props})";
+			healthQuery = healthQuery + CREATE + nodeLabels + " $props)";
 			healthQuery = healthQuery + " MERGE  (new)<-[r:UPDATED_TO]-(old)";
 			healthQuery = healthQuery + " REMOVE old:" + latestLabel;
 			healthQuery = healthQuery + " detach delete purge ";
@@ -159,7 +159,7 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 				.get("data").getAsJsonArray().size() == 0) {
 			log.debug("Another Health query {} ",healthQuery);
 			healthQuery = "";
-			healthQuery = healthQuery + CREATE + nodeLabels + " {props})";
+			healthQuery = healthQuery + CREATE + nodeLabels + " $props)";
 			JsonObject graphResponse1 = dbHandler.executeQueryWithData(healthQuery, dataList);
 			parseGraphResponseForError(graphResponse1,routingKey);
 		}

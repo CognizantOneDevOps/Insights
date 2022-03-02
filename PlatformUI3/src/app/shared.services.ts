@@ -25,8 +25,8 @@ import { ImageHandlerService } from '@insights/common/imageHandler.service';
 import { LogService } from '@insights/common/log-service';
 import { DataSharedService } from '@insights/common/data-shared-service';
 import { AuthInterceptor } from '@insights/common/rest-api-setting';
-import { AuthService } from '@insights/common/auth-service.ts'
-import { AuthGuardService } from '@insights/common/auth-guard.service.ts'
+import { AuthService } from '@insights/common/auth-service'
+import { AuthGuardService } from '@insights/common/auth-guard.service'
 
 @NgModule({
   declarations: [

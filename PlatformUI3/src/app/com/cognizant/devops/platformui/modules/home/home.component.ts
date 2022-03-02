@@ -27,7 +27,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ImageHandlerService } from '@insights/common/imageHandler.service';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { ServerConfigurationService } from '@insights/app/modules/server-configuration/server-configuration-service';
-import { MenuItem } from '@insights/app/modules/home/menu-item.ts';
+import { MenuItem } from '@insights/app/modules/home/menu-item';
 
 @Component({
   selector: 'app-home',

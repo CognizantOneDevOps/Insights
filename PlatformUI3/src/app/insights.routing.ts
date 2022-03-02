@@ -19,7 +19,7 @@ import { ModuleWithProviders } from '@angular/core';
 import { LoginComponent } from '@insights/app/login/login.component';
 import { SSOLoginComponent } from '@insights/app/com/cognizant/devops/platformui/ssologin/ssologin.component';
 import { PageNotFoundComponent } from '@insights/app/modules/page-not-found/page-not-found.component';
-import { LogoutHandlerComponent } from '@insights/app/com/cognizant/devops/platformui/logout-handler/logout-handler.component.ts';
+import { LogoutHandlerComponent } from '@insights/app/com/cognizant/devops/platformui/logout-handler/logout-handler.component';
 import { AuthGuardService as AuthGuard } from '@insights/common/auth-guard.service';
 
 const appRoutes: Routes = [

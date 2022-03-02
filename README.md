@@ -17,4 +17,5 @@ For information on the latest features and updates please refer to the below men
 
 Latest Major Release Updates :  
 
-Commercial Charting library support through Grafana 7.1.0
+Grafana v8.3.3 support
+Log4j vulnerabilities fixies with v2.17.1

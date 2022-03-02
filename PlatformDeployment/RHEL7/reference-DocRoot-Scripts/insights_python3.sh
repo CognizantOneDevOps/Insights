@@ -17,22 +17,49 @@
 source /etc/environment
 source /etc/profile
 cd $INSIGHTS_APP_ROOT_DIRECTORY
-sudo mkdir python3 && cd python3 && sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/python/Python.tar.gz
-sudo tar -zxf Python.tar.gz
+sudo mkdir python3 && cd python3 && sudo wget https://www.python.org/ftp/python/3.10.2/Python-3.10.2.tgz
+sudo mv Python-3.10.2.tgz Python.tgz
+sudo tar -zxf Python.tgz
+sudo mv Python-3.10.2 Python
 cd Python
 sudo yum install gcc -y
+sudo yum install gcc-c++ -y
+sudo yum install zlib -y  
+sudo yum install zlib-devel -y
 sudo yum install openssl-devel -y 
+sudo yum install openssl11-devel -y 
 sudo yum install bzip2-devel -y  
+sudo yum install sqlite-devel -y
+sudo yum install libffi -y
 sudo yum install libffi-devel -y
-sudo ./configure --enable-optimizations
+export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib64
+openssl_minversion=1.1.1
+if echo -e "$(openssl version|awk '{print $2}')\n${openssl_minversion}" | sort -V | head -1 | grep -q ^${openssl_minversion}$;then
+  openssl version
+else
+  cd /usr/
+  sudo wget https://ftp.openssl.org/source/openssl-1.1.1k.tar.gz
+  sudo tar -xzvf openssl-1.1.1k.tar.gz
+  cd openssl-1.1.1k
+  sudo ./config --prefix=/usr --openssldir=/etc/ssl --libdir=lib no-shared zlib-dynamic
+  sudo make
+  sudo make test
+  sudo make install
+  openssl version
+fi
+cd $INSIGHTS_APP_ROOT_DIRECTORY/python3/Python
+sudo ./configure --with-openssl=/usr --enable-optimizations
+sudo make
 sudo make altinstall
 sudo rm -f /usr/bin/python3
+sudo rm -f /usr/bin/python
 sudo ln -s $INSIGHTS_APP_ROOT_DIRECTORY/python3/Python/python /usr/bin/python3
-cd $INSIGHTS_APP_ROOT_DIRECTORY/python3 && sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/python/get-pip.py
+sudo ln -s $INSIGHTS_APP_ROOT_DIRECTORY/python3/Python/python /usr/bin/python
+cd $INSIGHTS_APP_ROOT_DIRECTORY/python3 && sudo wget https://bootstrap.pypa.io/get-pip.py
 python3 --version
 sudo python3 get-pip.py
 sudo python3 -m pip install setuptools -U
-sudo python3 -m pip install pika==1.1.0
+sudo python3 -m pip install pika
 sudo python3 -m pip install requests apscheduler python-dateutil xmltodict pytz requests_ntlm boto3 urllib3 neotime neo4j neobolt elasticsearch
 python3 --version
 sleep 5

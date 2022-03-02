@@ -12,13 +12,13 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>9.0</version>
+		<version>9.1</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformRegressionTest</artifactId>
 	<packaging>jar</packaging>
-	<version>9.0</version>
+	<version>9.1</version>
 	<name>PlatformRegressionTest</name>
 	<url>http://maven.apache.org</url>
 	<properties>
@@ -40,7 +40,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>9.0</version>
+			<version>9.1</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/io.rest-assured/rest-assured -->
 		<dependency>
@@ -98,7 +98,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>9.0</version>
+			<version>9.1</version>
 		</dependency>
 	</dependencies>
 	<build>

@@ -89,7 +89,6 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
     } else if (InsightsInitService.autheticationProtocol == AutheticationProtocol.NativeGrafana.toString()) {
       console.log("Continue on login page ")
       this.deleteAllPreviousCookies();
-      this.getImageAsyncData();
       this.createAndValidateForm();
       this.dataShare.storeTimeZone();
       this.dataShare.removeAuthorization();
@@ -98,7 +97,6 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
       console.log("JWT SSO is enable ");
       this.dataShare.storeTimeZone();
       this.deleteAllPreviousCookies();
-      this.getImageAsyncData();
       this.createAndValidateForm();
       this.dataShare.storeTimeZone();
       this.dataShare.removeAuthorization();
@@ -112,7 +110,10 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
 
   ngAfterViewInit() {
     console.log(" ngAfterViewInit ");
-    var self = this
+    var self = this;
+    if(InsightsInitService.autheticationProtocol == AutheticationProtocol.NativeGrafana.toString() || InsightsInitService.autheticationProtocol == AutheticationProtocol.JWT.toString() ){
+      this.getImageAsyncData();
+    }
     function receiveMessage(event) {
       console.log(" in receiveMessage ngAfterViewInit event origin " + event.origin)
       //console.log(event.source)
@@ -159,24 +160,23 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
     }
   }
 
-  async getImageAsyncData() {
+   async getImageAsyncData() {
     try {
-
       this.resourceImage = await this.grafanaService.getLogoImage();
       this.dataShare.removeCustomerLogoFromSesssion()
-      if (this.resourceImage.data.encodedString.length > 0) {
+      if (this.resourceImage) {
         this.imageSrc =  this.sanitizer.sanitize(0,'data:image/jpg;base64,' + this.resourceImage.data.encodedString);
         this.imageHandeler.addImage("customer_logo_uploded", this.imageSrc);
         this.dataShare.uploadOrFetchLogo(this.imageSrc);
-        var dt = (<HTMLInputElement>document.getElementById("logoimg"))
-        dt.src =this.imageSrc;
+        (<HTMLInputElement>document.getElementById("logoimg")).src=this.imageSrc;
       } else {
         this.imageSrc = this.sanitizer.sanitize(0,'icons/svg/landingPage/Insights_Logo.png');
+        (<HTMLInputElement>document.getElementById("logoimg")).src=this.imageSrc;
         this.imageAlt = 'Cognizant log';
         this.dataShare.uploadOrFetchLogo("DefaultLogo");
       }
     } catch (error) {
-      console.log(error);
+     console.log(error);
     }
   }
 

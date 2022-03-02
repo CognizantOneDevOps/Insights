@@ -128,11 +128,9 @@ export class LogoutHandlerComponent implements OnInit {
 
     var self = this;
     if (message != "" && message != undefined) {
-      var msg = "There was error in application, Please login again or contact to your Administractor : " + message + "(" + this.id + ")";
-      const dialogRef = this.messageDialog.showConfirmationMessage("Logout Message", msg, "ERROR", "ALERT", "30%")
-      dialogRef.afterClosed().subscribe(result => {
-        //console.log('The dialog was closed  ' + result);
-        if (result == 'yes') {
+      var dialog = self.messageDialog.showApplicationsMessage(
+        'The existing session has expired. You will be redirected to the home page. Request you to Login again to continue using Insights. Thank you.', 'WARN');
+      dialog.afterClosed().subscribe(result => {
           if (InsightsInitService.autheticationProtocol == "SAML") {
             console.error(" logging out from sso " + self.logoutUrl);
             if (this.logoutUrl != undefined) {
@@ -140,16 +138,18 @@ export class LogoutHandlerComponent implements OnInit {
             } else {
               console.error("No logout URL found");
             }
-          } else {
+          } else if (InsightsInitService.autheticationProtocol == "JWT") {
+            window.parent.location.href = InsightsInitService.jwtOriginServerLoginURL + "";
+          } else{
             setTimeout(() => self.router.navigate(['/login']), 1);
           }
           this.deleteAllPreviousCookiesAndSessionValue();
-        }
       });
     } else {
       this.deleteAllPreviousCookiesAndSessionValue();
     }
   }
+
 
   deleteAllPreviousCookiesAndSessionValue(): void {
     //console.log("deleteAllPreviousCookiesAndSessionValue  ==== ");

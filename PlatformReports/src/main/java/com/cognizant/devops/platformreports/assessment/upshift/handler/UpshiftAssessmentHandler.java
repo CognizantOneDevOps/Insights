@@ -210,7 +210,7 @@ public class UpshiftAssessmentHandler implements BaseDataProcessor {
      * @throws InsightsCustomException
      */
     private static boolean createNode(String label, List<JsonObject> dataList) throws InsightsCustomException {
-        StringBuilder cypherQuery = new StringBuilder("UNWIND {props} as properties CREATE (n:INSIGHTSUPSHIFT:UPSHIFT:");
+        StringBuilder cypherQuery = new StringBuilder("UNWIND $props as properties CREATE (n:INSIGHTSUPSHIFT:UPSHIFT:");
         cypherQuery.append(label);
         cypherQuery.append(") SET n=properties RETURN n ");
 

@@ -40,7 +40,7 @@ from base64 import b64encode, b64decode
 from apscheduler.schedulers.blocking import BlockingScheduler
 from pytz import timezone
 from functools import wraps
-
+import tzlocal
 from .LoggingFilter import LoggingFilter
 from .CommunicationFacade3 import CommunicationFacade
 from .MessageQueueProvider3 import MessageFactory
@@ -276,7 +276,7 @@ class BaseAgent(object):
 
     def subscriberForAgentControl(self):
         self.baseLogger.info('Inside subscriberForAgentControl')
-        routingKey = self.config.get('subscribe').get('agentCtrlQueue')
+        routingKey = self.config.get('subscribe').get('agentCtrlQueue', '')
 
         def callback(ch, method, properties, data):
             # Update the config file and cache.
@@ -602,7 +602,7 @@ class BaseAgent(object):
     def scheduleAgent(self):
         self.baseLogger.info('Inside scheduleAgent')
         if not hasattr(self, 'scheduler'):
-            scheduler = BlockingScheduler()
+            scheduler = BlockingScheduler(timezone=str(tzlocal.get_localzone()))
             self.scheduler = scheduler
             self.scheduledJob = scheduler.add_job(self.execute, 'interval', seconds=60 * self.runSchedule)
             try:

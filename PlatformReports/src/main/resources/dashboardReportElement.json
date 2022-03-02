@@ -17,6 +17,6 @@
 			"() => {for (el of document.getElementsByClassName('navbar')) {return el.hidden = true; };  }",
 			"() => {document.querySelector(\"div.submenu-controls\")? document.querySelector(\"div.submenu-controls\").style.display = 'none':'';  }"
 		],
-		"screenshotElement": ".panel-wrapper.panel-wrapper--view"
+		"screenshotElement": ".panel-container"
 	}
 }

@@ -35,6 +35,8 @@ public class GraphData implements Serializable{
 	private Integer connectionExpiryTimeOut;
 	private Integer maxIdleConnections;
 	private Integer logQueryIfProcessingTimeGreaterThanInMS=5;
+	private String version = "3.5.26";
+	private String databaseName = "neo4j";
 	
 	public String getEndpoint() {
 		return endpoint;
@@ -72,4 +74,17 @@ public class GraphData implements Serializable{
 	public void setLogQueryIfProcessingTimeGreaterThanInMS(Integer logQueryIfProcessingTimeGreaterThanInMS) {
 		this.logQueryIfProcessingTimeGreaterThanInMS = logQueryIfProcessingTimeGreaterThanInMS;
 	}
+	public String getVersion() {
+		return version;
+	}
+	public void setVersion(String version) {
+		this.version = version;
+	}
+	public String getDatabaseName() {
+		return databaseName;
+	}
+	public void setDatabaseName(String databaseName) {
+		this.databaseName = databaseName;
+	}
+	
 }

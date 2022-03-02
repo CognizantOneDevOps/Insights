@@ -135,7 +135,7 @@ public class WebhookEventProcessing {
 		long currentTimeStamp = InsightsUtils.getCurrentTimeInSeconds();
 		JsonObject payload = eventPayload.get(0);
 		payload.addProperty("eventTimestamp", currentTimeStamp);
-		String query = "UNWIND {props} AS properties " + "CREATE (n:" + this.webhookConfig.getLabelName().toUpperCase()
+		String query = "UNWIND $props AS properties " + "CREATE (n:" + this.webhookConfig.getLabelName().toUpperCase()
 				+ ") " + "SET n = properties";
 		try {
 			dbHandler.bulkCreateNodes(Arrays.asList(payload), null, query);

@@ -5,14 +5,14 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>9.0</version>
+		<version>9.1</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformUI3</artifactId>
-	<version>9.0</version>
+	<version>9.1</version>
 	<name>PlatformUI3</name>
 
 	<repositories>
@@ -73,11 +73,12 @@
 						<goals>
 							<goal>install-node-and-npm</goal>
 						</goals>
+						
 						<phase>generate-resources</phase>
 
 						<configuration>
 							<arguments>install</arguments>
-							<nodeVersion>v12.18.3</nodeVersion>
+							<nodeVersion>v16.14.0</nodeVersion>
 							<npmVersion>6.14.6</npmVersion>
 							<bowerInheritsProxyConfigFromMaven>false</bowerInheritsProxyConfigFromMaven>
 						</configuration>
@@ -91,7 +92,7 @@
 
 						<configuration>
 							<arguments>install</arguments>
-							<nodeVersion>v12.18.3</nodeVersion>
+							<nodeVersion>v16.14.0</nodeVersion>
 							<npmVersion>6.14.6</npmVersion>
 							<bowerInheritsProxyConfigFromMaven>false</bowerInheritsProxyConfigFromMaven>
 						</configuration>

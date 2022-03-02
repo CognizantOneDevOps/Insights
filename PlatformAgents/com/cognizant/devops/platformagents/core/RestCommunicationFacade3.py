@@ -27,6 +27,7 @@ import sys
 
 class RestCommunicationFacade(object):
     headers = {"Accept":"application/json"}
+    requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
     
     def __init__(self, sslVerify, responseType, enableValueArray):
         self.sslVerify = sslVerify
@@ -56,7 +57,7 @@ class RestCommunicationFacade(object):
         if None == response:
             raise ValueError('RestFacade: Null response')
         elif 200 != response.status_code and 201 != response.status_code:
-            raise ValueError('RestFacade: Unsupported response code '+str(response.status_code)+', url: '+url+', response received: '+response.content.decode('utf-8'))    
+            raise ValueError('RestFacade: Unsupported response code '+str(response.status_code)+', url: '+url+', response received: '+(str(response.content, 'utf8')))        
 
         if responseTupple != None:
             responseTupple['headers'] = response.headers

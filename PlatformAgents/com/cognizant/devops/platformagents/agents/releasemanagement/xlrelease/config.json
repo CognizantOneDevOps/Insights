@@ -198,6 +198,7 @@
 	"agentId": "",
 	"auth": "base64",
 	"toolCategory": "RELEASEMANAGEMENT",
+	"startFrom": "2020-04-01",
 	"enableDataValidation": true,
 	"runSchedule": 30,
 	"toolsTimeZone": "Asia/Kolkata",

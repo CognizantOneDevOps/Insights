@@ -76,7 +76,7 @@ class GitLabAgent(BaseAgent):
                 projectName = project.get('name', '')
                 projectId = project.get('id', '')
                 
-                encodedProjectName = urllib.quote_plus(projectPath)
+                encodedProjectName = urllib.parse.quote_plus(projectPath)
                 if not os.path.isfile(self.trackingCachePath + projectPath + '.json'):
                     self.updateTrackingCacheFile(projectPath, dict())
                 projectTrackingCache = self.loadTrackingCacheFile(projectPath)
@@ -126,7 +126,7 @@ class GitLabAgent(BaseAgent):
                                 
                                 for branch in branchDetails:
                                     branchName = branch['name']                                    
-                                    branchName = urllib.quote_plus(branchName)                                    
+                                    branchName = urllib.parse.quote_plus(branchName)                                    
                                     branchTrackingDetails = trackingDetails.get(branchName, {})
                                     branchTracking = branchTrackingDetails.get('latestCommitId', None)
                                     allBranches.append(branchName)
@@ -182,7 +182,7 @@ class GitLabAgent(BaseAgent):
                             else:
                                 injectData['default'] = False
                             
-                            parsedBranch = urllib.quote_plus(branch)                            
+                            parsedBranch = urllib.parse.quote_plus(branch)                            
                             fetchNextCommitsPage = True
                             getCommitDetailsUrl = commitsBaseEndPoint + encodedProjectName + '/repository/commits?ref_name=' + parsedBranch + '&access_token=' + accessToken + '&per_page=100'
                             branchTrackingDetails = trackingDetails.get(branch, {})
@@ -279,7 +279,7 @@ class GitLabAgent(BaseAgent):
                     injectData['projectId'] = projectId
                     injectData['tagSha'] = tagSha
                     injectData['tagName'] = tagName
-                    parsedTag = urllib.quote_plus(tagSha)
+                    parsedTag = urllib.parse.quote_plus(tagSha)
                     fetchNextCommitsPage = True
                     getCommitDetailsUrl = commitsBaseEndPoint + encodedProjectName + '/repository/commits?ref_name=' + parsedTag + '&private_token=' + accessToken + '&per_page=100'
                     commitsPageNum = 1
@@ -495,7 +495,7 @@ class GitLabAgent(BaseAgent):
                                 isOptimalDataCollect=False, totalCommit=0, hasLatestMergeReq=False):
         updatetimestamp = latestCommit["committed_date"]
         dt = parser.parse(updatetimestamp)
-        fromDateTime = dt + datetime.timedelta(seconds=01)
+        fromDateTime = dt + datetime.timedelta(seconds=1)
         fromDateTime = fromDateTime.strftime(self.config.get('timeStampFormat', '%Y-%m-%dT%H:%M:%SZ'))
         if branchName in trackingDetails:
             trackingDetails[branchName]['latestCommitDate'] = fromDateTime

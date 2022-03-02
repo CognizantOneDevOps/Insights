@@ -14,25 +14,26 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 #-------------------------------------------------------------------------------
-# Python 3.10
+# Python 2.7.11
 
-echo "#################### Installing Python 3.10 with Virtual Env ####################"
-sudo apt update && sudo apt upgrade 
-sudo apt install wget build-essential libreadline-gplv2-dev libncursesw5-dev \
-     libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev
-sudo mkdir /opt/python && cd /opt/python && sudo wget https://www.python.org/ftp/python/3.10.2/Python-3.10.2.tgz
-sudo mv Python-3.10.2.tgz Python.tgz
-sudo tar -zxf Python.tgz
-sudo mv Python-3.10.2 Python
+echo "#################### Installing Python 2.7.11 with Virtual Env ####################"
+#sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/python/dependencies.zip
+#sudo unzip dependencies.zip
+#cd dependencies
+#sudo dpkg -i *.deb
+sudo mkdir /opt/python && cd /opt/python && sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/python/Python.tar.gz 
+sudo tar -zxf Python.tar.gz
 cd Python
 sudo apt-get install gcc -y
+sudo apt-get install libssl-dev -y
 sudo apt-get install bzip2-dev -y
+sudo apt-get install libffi-dev -y
 sudo apt-get install make -y
 sudo ./configure --enable-optimizations
 sudo make altinstall
 sudo rm -f /usr/bin/python
 sudo ln -s /opt/python/Python/python /usr/bin/python
-sudo python -m pip install pika
+sudo python -m pip install pika==1.1.0
 sudo python -m pip install requests apscheduler python-dateutil xmltodict pytz requests_ntlm boto3 urllib3 neotime neo4j neobolt elasticsearch
 python --version
 sleep 5

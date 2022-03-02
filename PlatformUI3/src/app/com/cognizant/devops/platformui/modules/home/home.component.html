@@ -17,7 +17,7 @@
 
 <div class="container-fluid">
   <mat-sidenav-container autosize fullscreen>
-    <mat-sidenav #sidenav class="sidenav" [style.height.%]="100" height="50%" mode="side" opened="true" autosize="true">
+    <mat-sidenav #sidenav class="sidenav" [style.height.%]="100" height="50%" mode="side" opened="true" autosize="true"  disableClose>
       <div class="logoSetting">
         <div class="table-responsive-sm" style="box-sizing: content-box;">
           <table class="table" style="margin-bottom: 0rem;color:#fff;border-top: 0px;">
@@ -79,7 +79,7 @@
             </a>
           </mat-nav-list>
         </div>
-        <div class="customerLogo" *ngIf="isExpanded">
+        <div class="customerLogo" *ngIf="isExpanded && (insightsCustomerLogo!=='' && insightsCustomerLogo!==undefined)">
           <img mat-card-image align="left" height="67px" width="250px" class="customerLogoImage" [src]="insightsCustomerLogo" />
         </div>
         <div class="textCopyright" *ngIf="isExpanded">

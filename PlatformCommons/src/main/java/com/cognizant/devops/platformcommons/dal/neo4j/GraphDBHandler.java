@@ -49,6 +49,10 @@ public class GraphDBHandler{
 	DocumentParser parser;
 
 	public GraphDBHandler() {
+		if(ApplicationConfigProvider.getInstance().getGraph().getVersion() != null && ApplicationConfigProvider.getInstance().getGraph().getVersion().contains("4.")) {
+			String databaseName = ApplicationConfigProvider.getInstance().getGraph().getDatabaseName();
+			COMMIT_URL = "/db/"+databaseName+"/tx/commit";
+		}
 		parser = new DocumentParser();
 		SCHEMA_INDEX_URL = ApplicationConfigProvider.getInstance().getGraph().getEndpoint() + SCHEMAURL;
 		TRANSACTION_COMMIT_URL = ApplicationConfigProvider.getInstance().getGraph().getEndpoint()

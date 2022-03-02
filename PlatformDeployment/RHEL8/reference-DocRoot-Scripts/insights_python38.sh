@@ -1,4 +1,3 @@
-#!/bin/bash
 #-------------------------------------------------------------------------------
 # Copyright 2017 Cognizant Technology Solutions
 #
@@ -14,25 +13,27 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 #-------------------------------------------------------------------------------
-# Python 3.10
-
-echo "#################### Installing Python 3.10 with Virtual Env ####################"
-sudo apt update && sudo apt upgrade 
-sudo apt install wget build-essential libreadline-gplv2-dev libncursesw5-dev \
-     libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev
-sudo mkdir /opt/python && cd /opt/python && sudo wget https://www.python.org/ftp/python/3.10.2/Python-3.10.2.tgz
-sudo mv Python-3.10.2.tgz Python.tgz
-sudo tar -zxf Python.tgz
-sudo mv Python-3.10.2 Python
+# Pythonecho "#################### Installing Python with Virtual Env ####################"
+source /etc/environment
+source /etc/profile
+cd $INSIGHTS_APP_ROOT_DIRECTORY
+sudo mkdir python3 && cd python3 && sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/python/Python.tar.gz
+sudo tar -zxf Python.tar.gz
 cd Python
-sudo apt-get install gcc -y
-sudo apt-get install bzip2-dev -y
-sudo apt-get install make -y
+sudo yum install gcc -y
+sudo yum install openssl-devel -y 
+sudo yum install bzip2-devel -y  
+sudo yum install libffi-devel -y
+sudo yum install make -y
 sudo ./configure --enable-optimizations
 sudo make altinstall
 sudo rm -f /usr/bin/python
-sudo ln -s /opt/python/Python/python /usr/bin/python
-sudo python -m pip install pika
+sudo ln -s $INSIGHTS_APP_ROOT_DIRECTORY/python3/Python/python /usr/bin/python
+cd $INSIGHTS_APP_ROOT_DIRECTORY/python3 && sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/python/get-pip.py
+python --version
+sudo python get-pip.py
+sudo python -m pip install setuptools -U
+sudo python -m pip install pika==1.1.0
 sudo python -m pip install requests apscheduler python-dateutil xmltodict pytz requests_ntlm boto3 urllib3 neotime neo4j neobolt elasticsearch
 python --version
 sleep 5

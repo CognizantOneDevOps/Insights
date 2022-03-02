@@ -3,7 +3,6 @@ import { KpiService } from './kpi-service';
 import { BulkUploadService } from '../bulkupload/bulkupload.service';
 import { MessageDialogService } from '../application-dialog/message-dialog-service';
 import { ActivatedRoute, Router, NavigationExtras } from '@angular/router';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { ModelManagementService } from '@insights/app/modules/model-management/model-management.service';
 
 

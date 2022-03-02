@@ -122,7 +122,7 @@ public class CorrelationExecutor {
 		List<String> destinationFields = Arrays.asList(correlation.getDestinationFields().split("\\s*,\\s*"));
 		StringBuffer cypher = new StringBuffer();
 		cypher.append("MATCH (destination:RAW:DATA:").append(destinationLabelName).append(") ");
-		cypher.append("where not exists(destination.maxCorrelationTime) AND ");
+		cypher.append("where destination.maxCorrelationTime IS NULL AND ");
 		cypher.append(" ");
 		for (String field : destinationFields) {
 			cypher.append("coalesce(size(destination.").append(field).append("), 0) = 0 AND ");
@@ -164,11 +164,11 @@ public class CorrelationExecutor {
 		cypher.append("MATCH (destination:RAW:DATA:").append(destinationLabelName).append(") ");
 		cypher.append("where not ((destination) <-[:").append(correlation.getRelationName()).append("]- (:DATA:")
 				.append(correlation.getSourceLabelName()).append(")) ");
-		cypher.append("AND (not exists(destination.correlationTime) OR ");
+		cypher.append("AND (destination.correlationTime IS NULL OR ");
 		cypher.append("destination.correlationTime < ").append(lastCorrelationTime).append(" ) ");
 		cypher.append("AND (");
 		for (String field : destinationFields) {
-			cypher.append("exists(destination.").append(field).append(") OR ");
+			cypher.append("destination.").append(field).append(" IS NOT NULL OR ");
 		}
 		cypher.delete(cypher.length() - 3, cypher.length());
 		cypher.append(") ");
@@ -176,7 +176,7 @@ public class CorrelationExecutor {
 		cypher.append("WITH destination, []  ");
 		for (String field : destinationFields) {
 			cypher.append(" + CASE ");
-			cypher.append(" WHEN exists(destination.").append(field).append(") THEN destination.").append(field)
+			cypher.append(" WHEN destination.").append(field).append(" IS NOT NULL THEN destination.").append(field)
 					.append(" ");
 			cypher.append(" ELSE [] ");
 			cypher.append(" END ");
@@ -222,7 +222,7 @@ public class CorrelationExecutor {
 	private int executeCorrelations(CorrelationConfiguration correlation, List<JsonObject> dataList) {
 		StringBuffer correlationCypher = new StringBuffer();
 		String sourceField = correlation.getSourceFields(); // currently, we will support only one source field.
-		correlationCypher.append("UNWIND {props} as properties ");
+		correlationCypher.append("UNWIND $props as properties ");
 		correlationCypher.append("MATCH (destination:DATA:RAW:").append(correlation.getDestinationLabelName())
 				.append(" {uuid: properties.uuid}) ");
 		correlationCypher.append("set destination.correlationTime=").append(currentCorrelationTime).append(", ");

@@ -14,7 +14,6 @@
  * the License.
  ******************************************************************************/
 
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { Injectable } from '@angular/core';
 import { InsightsInitService } from '@insights/common/insights-initservice';
 

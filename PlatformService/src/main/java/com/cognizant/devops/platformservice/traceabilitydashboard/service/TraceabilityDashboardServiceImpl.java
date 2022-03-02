@@ -232,7 +232,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 					.append(") -[r]- (b:DATA) WHERE ");
 			if (!toolField.equals("")) {
 				queryBuilder.append("a.").append(toolField).append(" IN ").append(stringify(toolVal)).append(" ")
-						.append("and exists(b.toolName) ");
+						.append("and b.toolName IS NOT NULL ");
 			}
 			if (!excludeLabels.isEmpty()) {
 				queryBuilder.append("AND NOT (");
@@ -244,7 +244,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 				queryBuilder.append(")");
 			}
 			queryBuilder.append(
-					"with case when exists(r.handovertime) then collect(r.handovertime) else [] end as val, a, b");
+					"with case when r.handovertime IS NOT NULL then collect(r.handovertime) else [] end as val, a, b");
 			queryBuilder.append(" unwind(case val when [] then [null] else val end) as list ");
 			queryBuilder.append("return  b.toolName as toolName, collect(distinct b.uuid) as uuids ,b as nodes, abs(avg(list))");
 			return queryBuilder.toString();

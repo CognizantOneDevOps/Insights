@@ -55,6 +55,8 @@
 		"maxBytes": 5000000,
 		"backupCount": 10
 	},
+	"labelName": "XLDEPLOY",
+    "toolName": "XLDEPLOY",
 	"auditing": false,
 	"enableProxy":false,
   	"proxies":{

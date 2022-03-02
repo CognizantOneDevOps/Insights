@@ -27,12 +27,12 @@ sudo tar -zxvf grafana-${version_number}.linux-amd64.tar.gz
 sudo mv /opt/grafana-${version_number} /opt/grafana
 cd /opt/grafana
 sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/customGrafanaSettings/${version_number}/plugins.tar.gz
-sudo tar -zxvf grafana-plugins.tar.gz
+sudo tar -zxvf plugins.tar.gz
 sudo mkdir /opt/grafana/data
 sudo mkdir /opt/grafana/data/plugins
 sudo chmod -R 777 data
 sudo cp -r plugins/* ./data/plugins/
-sudo rm -rf grafana-plugins.tar.gz
+sudo rm -rf plugins.tar.gz
 export GRAFANA_HOME=`pwd`
 sudo echo GRAFANA_HOME=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" GRAFANA_HOME=`pwd` | sudo tee -a /etc/profile
@@ -45,7 +45,7 @@ sudo cp defaults.ini $GRAFANA_HOME/conf/defaults.ini
 sudo nohup ./bin/grafana-server &
 sudo echo $! > grafana-pid.txt
 sleep 10
-sudo chmod -R 777 $INSIGHTS_APP_ROOT_DIRECTORY/grafana
+sudo chmod -R 777 /opt/grafana
 cd /etc/init.d/
 sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/initscripts/Grafana.sh
 sudo yum install dos2unix -y

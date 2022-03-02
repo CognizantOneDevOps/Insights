@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +46,7 @@ import org.apache.pdfbox.multipdf.PDFMergerUtility;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum.WorkflowType;
 import com.cognizant.devops.platformcommons.core.util.AES256Cryptor;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
@@ -90,10 +93,16 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 	private static final String SOURCE = " Source: ";
 		
 	private static final int TRANSITION_TIME = 1000;
-	private static final String FRONT_PAGE_TEMPLATE = System.getenv().get("INSIGHTS_HOME") + File.separator + "dashboardReportTemplate" + File.separator + "frontPageTemplate.html";
-	private static final String LOGO_IMAGE_PATH = System.getenv().get("INSIGHTS_HOME") + File.separator + "dashboardReportTemplate" + File.separator + "image.webp";
+
+	private static final String DASHBOARD_REPORT_DIR = "dashboardReportTemplate";
+	private static final String DASHBOARD_ELEMENT_JSON_FILE = "dashboardReportElement.json";
+	private static final String FRONT_PAGE_TEMPLATE = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + DASHBOARD_REPORT_DIR + File.separator + "frontPageTemplate.html";
+	private static final String LOGO_IMAGE_PATH = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + DASHBOARD_REPORT_DIR + File.separator + "image.webp";
 	private static final String MODIFIED_FRONT_PAGE_TEMPLATE = "frontPage.html";
+	private static final String DASHBOARD_ELEMENT_JSON_PATH = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + DASHBOARD_REPORT_DIR + File.separator + DASHBOARD_ELEMENT_JSON_FILE;
 	private static final String LOG_MESSAGE = "Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}";
+
+	private static final String ORGANISATION = "organisation";
 	private WorkflowDAL workflowDAL = new WorkflowDAL();
 	private GrafanaDashboardPdfConfigDAL grafanaDashboardConfigDAL = new GrafanaDashboardPdfConfigDAL();
 	GrafanaReportConfigurationDTO pdfconfigDto = new GrafanaReportConfigurationDTO();
@@ -151,7 +160,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 				
 				JsonObject dashboardConfigJson = JsonUtils.parseStringAsJsonObject(grafanaDashboardPdfConfig.getDashboardJson());
 				pdfconfigDto.setDashboardJson(grafanaDashboardPdfConfig.getDashboardJson());
-				pdfconfigDto.setOrganisation(dashboardConfigJson.get("organisation").getAsString());
+				pdfconfigDto.setOrganisation(dashboardConfigJson.get(ORGANISATION).getAsString());
 				pdfconfigDto.setPdfType(grafanaDashboardPdfConfig.getPdfType());
 				pdfconfigDto.setScheduleType(grafanaDashboardPdfConfig.getScheduleType());
 				pdfconfigDto.setSource(grafanaDashboardPdfConfig.getSource());
@@ -165,7 +174,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 				if(workflowConfig != null && assessmentConfig != null) {
 					JsonObject dashboardConfigJson = JsonUtils.parseStringAsJsonObject(assessmentConfig.getAdditionalDetail());
 					pdfconfigDto.setDashboardJson(assessmentConfig.getAdditionalDetail());
-					pdfconfigDto.setOrganisation(dashboardConfigJson.get("organisation").getAsString());
+					pdfconfigDto.setOrganisation(dashboardConfigJson.get(ORGANISATION).getAsString());
 					pdfconfigDto.setPdfType(dashboardConfigJson.get("pdfType").getAsString());
 					pdfconfigDto.setScheduleType(workflowConfig.getScheduleType());
 					pdfconfigDto.setSource(dashboardConfigJson.get("source").getAsString());
@@ -274,8 +283,8 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			page.waitForTimeout(loadTime);
 			log.debug("Worlflow Detail ====Waiting exit post configured time to load Dashboard == {} ", Instant.now());
 			
-			String dashboardElement = fetchTemplate("dashboardReportElement.json");
-			log.debug("Worlflow Detail ==== reading dashboardReportElement.json and evaluating element");
+			String dashboardElement = readDashboardElementJson();
+			log.debug("Worlflow Detail ==== reading elements from dashboardReportElement.json");
 			JsonObject dashboardElementJson = JsonUtils.parseStringAsJsonObject(dashboardElement).get("dashboard").getAsJsonObject();
 			JsonArray elementList = dashboardElementJson.get("elements").getAsJsonArray();
 			for(JsonElement ele: elementList) {
@@ -359,7 +368,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 	 * @return map of headers 
 	 */
 	private Map<String, String> getGrafanaHeaders(JsonElement config) {
-		GrafanaOrgToken grafanaOrgToken = grafanaDashboardConfigDAL.getTokenByOrgId(config.getAsJsonObject().get("organisation").getAsInt());
+		GrafanaOrgToken grafanaOrgToken = grafanaDashboardConfigDAL.getTokenByOrgId(config.getAsJsonObject().get(ORGANISATION).getAsInt());
 		String token = "Bearer "+AES256Cryptor.decrypt(grafanaOrgToken.getApiKey(), AssessmentReportAndWorkflowConstants.GRAFANA_PDF_TOKEN_SIGNING_KEY);
 		Map<String, String> headers = new HashMap<>();
 		headers.put("Authorization", token);
@@ -404,7 +413,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			NavigateOptions navigateOptions = new NavigateOptions();
 			navigateOptions.setWaitUntil(WaitUntilState.NETWORKIDLE);
 			
-			String dashboardElement = fetchTemplate("dashboardReportElement.json");
+			String dashboardElement = readDashboardElementJson();
 			log.debug("Worlflow Detail ==== dashboardReportElement.json fetched successfully");
 			JsonObject dashboardElementJson = JsonUtils.parseStringAsJsonObject(dashboardElement).get("Printable").getAsJsonObject();
 			JsonArray elementList = dashboardElementJson.get("elements").getAsJsonArray();
@@ -443,7 +452,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			pdfOptions.setDisplayHeaderFooter(true);
 			pdfOptions.setHeaderTemplate(updateLogoImgInHeaderTemplate(false));
 			pdfOptions.setFooterTemplate(fetchTemplate(FOOTER_HTML));
-			pdfOptions.setMargin(new Margin().setTop("90").setRight("10").setBottom("50").setLeft("10"));
+			pdfOptions.setMargin(new Margin().setTop("85").setRight("10").setBottom("5").setLeft("10"));
 			byte[] dashboardPdf = page.pdf(pdfOptions);
 			
 			String frontPagePath = assessmentReportDTO.getPdfReportDirPath() + File.separator + MODIFIED_FRONT_PAGE_TEMPLATE;
@@ -758,4 +767,21 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			throw new InsightsJobFailedException(e.getMessage());
 		}		
 	}
+	
+	private String readDashboardElementJson() {
+		String dashboardElementContent = null;
+		try {
+			File dashboardElementFile = new File(DASHBOARD_ELEMENT_JSON_PATH);
+			if(dashboardElementFile.exists()) { 
+				dashboardElementContent = new String(Files.readAllBytes(Paths.get(DASHBOARD_ELEMENT_JSON_PATH)));
+			} else {
+				dashboardElementContent = fetchTemplate(DASHBOARD_ELEMENT_JSON_FILE);
+			}
+		} catch (Exception e) {
+			log.error("Workflow Detail ==== Error while reading dashboard report element Json ", e);
+			throw new InsightsJobFailedException(e.getMessage());
+		}
+		return dashboardElementContent;	
+	}
+	
 }

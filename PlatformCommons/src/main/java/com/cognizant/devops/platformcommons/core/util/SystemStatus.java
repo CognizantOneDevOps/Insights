@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformcommons.core.util;
 
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonObject;
 
-import sun.misc.BASE64Encoder;
+
 
 public class SystemStatus {
 	private static Logger log = LogManager.getLogger(SystemStatus.class.getName());
@@ -44,7 +45,7 @@ public class SystemStatus {
 				}
 			}
 
-			String cypherQuery = "CREATE (n" + queryLabel + " {props} ) return count(n)";
+			String cypherQuery = "CREATE (n" + queryLabel + " $props ) return count(n)";
 
 			response = graphDBHandler.executeQueryWithData(cypherQuery, dataList);
 
@@ -61,7 +62,7 @@ public class SystemStatus {
 		String authStringEnc;
 		if (authtoken == null) {
 			String authString = name + ":" + password;
-			authStringEnc = new BASE64Encoder().encode(authString.getBytes());
+			authStringEnc = Base64.getEncoder().encodeToString(authString.getBytes());
 		} else {
 			authStringEnc = authtoken;
 		}

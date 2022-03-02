@@ -26,13 +26,13 @@ cd /opt/grafana
 #sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/customGrafanaSettings/${version_number}/plugins.tar.gz
 sudo cp $DIRECTORY/Offline_Installation/Grafana/ldap.toml ./conf/ldap.toml
 sudo cp $DIRECTORY/Offline_Installation/Grafana/defaults.ini ./conf/defaults.ini
-sudo cp $DIRECTORY/Offline_Installation/Grafana/grafana-plugins.tar.gz .
-sudo tar -zxvf grafana-plugins.tar.gz
+sudo cp $DIRECTORY/Offline_Installation/Grafana/plugins.tar.gz .
+sudo tar -zxvf plugins.tar.gz
 sudo mkdir /opt/grafana/data
 sudo mkdir /opt/grafana/data/plugins
 sudo chmod -R 777 data
 sudo cp -r plugins/* ./data/plugins/
-sudo rm -rf grafana-plugins.tar.gz
+sudo rm -rf plugins.tar.gz
 export GRAFANA_HOME=`pwd`
 sudo echo GRAFANA_HOME=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" GRAFANA_HOME=`pwd` | sudo tee -a /etc/profile
@@ -41,7 +41,7 @@ source /etc/profile
 sudo nohup ./bin/grafana-server 
 sudo echo $! > grafana-pid.txt
 sleep 10
-sudo chmod -R 777 $INSIGHTS_APP_ROOT_DIRECTORY/grafana
+sudo chmod -R 777 /opt/grafana
 cd /etc/init.d/
 #sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/initscripts/Grafana.sh
 cp $DIRECTORY/Offline_Installation/Grafana/Grafana.sh Grafana.sh

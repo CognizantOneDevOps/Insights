@@ -135,7 +135,7 @@ public class BulkUploadService implements IBulkUpload {
 	private boolean parseCsvRecords(CSVParser csvParser, String label, String insightsTimeField,
 			String insightsTimeFormat) throws InsightsCustomException {
 		List<JsonObject> nodeProperties = new ArrayList<>();
-		String query = "UNWIND {props} AS properties " + "CREATE (n:" + label.toUpperCase() + ") "
+		String query = "UNWIND $props AS properties " + "CREATE (n:" + label.toUpperCase() + ") "
 				+ "SET n = properties";
 		Map<String, Integer> headerMap = csvParser.getHeaderMap();
 		try {

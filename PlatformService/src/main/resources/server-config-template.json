@@ -19,7 +19,9 @@
 		"authToken": "",
 		"boltEndPoint": "bolt://localhost:7687",
 		"maxIdleConnections": 25,
-		"logQueryIfProcessingTimeGreaterThanInMS": 5
+		"logQueryIfProcessingTimeGreaterThanInMS": 5,
+		"version": "3.5.26",
+		"databaseName": "neo4j"
 	},
 	"postgre": {
 		"userName": "",

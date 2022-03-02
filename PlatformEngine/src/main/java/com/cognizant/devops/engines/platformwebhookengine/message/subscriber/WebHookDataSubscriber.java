@@ -77,7 +77,7 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 						updateNeo4jNode(toolData, this.webhookConfig);
 						getChannel().basicAck(envelope.getDeliveryTag(), false);
 					} else {
-						String query = "UNWIND {props} AS properties " + "CREATE (n:RAW:"
+						String query = "UNWIND $props AS properties " + "CREATE (n:RAW:"
 								+ this.webhookConfig.getLabelName().toUpperCase() + ") " + "SET n = properties";
 						dbHandler.bulkCreateNodes(toolData, null, query);
 						getChannel().basicAck(envelope.getDeliveryTag(), false);
@@ -111,7 +111,7 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 			String finalQuery = "";
 			for (JsonObject jsonObject : toolData) {
 				StringBuilder query = new StringBuilder();
-				query.append("UNWIND {props} AS properties MERGE (node:RAW:").append(webhookConfig2.getLabelName());
+				query.append("UNWIND $props AS properties MERGE (node:RAW:").append(webhookConfig2.getLabelName());
 				if (webhookConfig2.getFieldUsedForUpdate() != null) {
 					query.append(" { " + webhookConfig2.getFieldUsedForUpdate() + ": ");
 					query.append(jsonObject.get(webhookConfig2.getFieldUsedForUpdate()));

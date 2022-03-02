@@ -155,9 +155,9 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 
 				int cachingValue = dataJson.get(QueryCachingConstants.CACHING_VALUE).getAsInt();
 
-				Long startTime = dataJson.get(QueryCachingConstants.START_TIME).getAsLong();
+				Long startTime = Long.parseLong(dataJson.get(QueryCachingConstants.START_TIME).getAsString().replace(".", ""));
 
-				Long endTime = dataJson.get(QueryCachingConstants.END_TIME).getAsLong();
+				Long endTime = Long.parseLong(dataJson.get(QueryCachingConstants.END_TIME).getAsString().replace(".", ""));
 
 				log.debug("Caching Type {} Caching Value {}  startTimeStr {} endTimeStr {} ", cachingType,
 						cachingValue, startTime, endTime);
@@ -198,6 +198,10 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 	private String getQueryHash(JsonObject requestJson, String cachingType, int cachingValue, Long startTime,
 			Long endTime) {
 		String queryHash;
+		
+		JsonObject dataJson = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray()
+				.get(QueryCachingConstants.ZEROTH_INDEX).getAsJsonObject();
+		
 		StringBuilder tempStatementsCombination = new StringBuilder();
 
         JsonArray jsonArray=requestJson.get(QueryCachingConstants.STATEMENTS).getAsJsonArray();
@@ -208,8 +212,8 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 				
 			String statement=iterator.next().getAsJsonObject().get(QueryCachingConstants.STATEMENT).getAsString();
 			
-			tempStatementsCombination.append(getStatementWithoutTime(statement, String.valueOf(startTime),
-					String.valueOf(endTime)));			
+			tempStatementsCombination.append(getStatementWithoutTime(statement, dataJson.get(QueryCachingConstants.START_TIME).getAsString(),
+					dataJson.get(QueryCachingConstants.END_TIME).getAsString()));			
 		});		
 		String statement = tempStatementsCombination.toString();
 		String cacheDetailsHash = getCacheDetailsHash(cachingType, cachingValue);

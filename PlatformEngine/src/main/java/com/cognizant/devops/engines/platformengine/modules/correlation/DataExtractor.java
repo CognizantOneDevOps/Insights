@@ -95,16 +95,16 @@ public class DataExtractor {
 			String almKeysIndex) {
 		GraphDBHandler dbHandler = new GraphDBHandler();
 		try {
-			String paginationCypher = "MATCH (n:SCM:DATA:RAW) where not exists(n." + almKeyProcessedIndex
-					+ ") and exists(n.commitId) return count(n) as count";
+			String paginationCypher = "MATCH (n:SCM:DATA:RAW) where n." + almKeyProcessedIndex
+					+ "IS NULL and n.commitId IS NOT NULL return count(n) as count";
 			GraphResponse paginationResponse = dbHandler.executeCypherQuery(paginationCypher);
 			int resultCount = paginationResponse.getJson().get(ConfigOptions.RESULTS).getAsJsonArray().get(0).getAsJsonObject()
 					.get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray().get(0)
 					.getAsInt();
 			while (resultCount > 0) {
 				long st = System.currentTimeMillis();
-				String scmDataFetchCypher = "MATCH (source:SCM:DATA:RAW) where not exists(source."
-						+ almKeyProcessedIndex + ") and exists(source.commitId) "
+				String scmDataFetchCypher = "MATCH (source:SCM:DATA:RAW) where source."
+						+ almKeyProcessedIndex + "IS NULL and source.commitId IS NOT NULL "
 						+ "WITH { uuid: source.uuid, commitId: source.commitId, message: source.message} "
 						+ "as data limit " + dataBatchSize + " return collect(data)";
 				GraphResponse response = dbHandler.executeCypherQuery(scmDataFetchCypher);
@@ -116,10 +116,10 @@ public class DataExtractor {
 				}
 				JsonArray dataList = rows.get(0).getAsJsonArray();
 				int processedRecords = dataList.size();
-				String addAlmKeysCypher = "UNWIND {props} as properties MATCH (source:SCM:DATA:RAW {uuid : properties.uuid, commitId: properties.commitId}) "
+				String addAlmKeysCypher = "UNWIND $props as properties MATCH (source:SCM:DATA:RAW {uuid : properties.uuid, commitId: properties.commitId}) "
 						+ "set source." + almKeysIndex + " = properties." + almKeysIndex + ", source."
 						+ almKeyProcessedIndex + " = true return count(source)";
-				String updateRawLabelCypher = "UNWIND {props} as properties MATCH (source:SCM:DATA:RAW {uuid : properties.uuid, commitId: properties.commitId}) "
+				String updateRawLabelCypher = "UNWIND $props as properties MATCH (source:SCM:DATA:RAW {uuid : properties.uuid, commitId: properties.commitId}) "
 						+ "set source." + almKeyProcessedIndex + " = true return count(source)";
 				List<JsonObject> almKeysCypherProps = new ArrayList<JsonObject>();
 				List<JsonObject> updateRawLabelCypherProps = new ArrayList<JsonObject>();
@@ -173,8 +173,8 @@ public class DataExtractor {
 			int processedRecords = 1;
 			while (processedRecords > 0) {
 				long st = System.currentTimeMillis();
-				String scmCleanUpCypher = "MATCH (n:SCM:DATA) where not n:RAW and exists(n." + almKeyProcessedIndex
-						+ ") " + "WITH distinct n limit " + dataBatchSize + " remove n." + almKeyProcessedIndex
+				String scmCleanUpCypher = "MATCH (n:SCM:DATA) where not n:RAW and n." + almKeyProcessedIndex
+						+ "IS NOT NULL " + "WITH distinct n limit " + dataBatchSize + " remove n." + almKeyProcessedIndex
 						+ " return count(n)";
 				GraphResponse response = dbHandler.executeCypherQuery(scmCleanUpCypher);
 				processedRecords = response.getJson().get(ConfigOptions.RESULTS).getAsJsonArray().get(0).getAsJsonObject()
@@ -191,7 +191,7 @@ public class DataExtractor {
 		GraphDBHandler dbHandler = new GraphDBHandler();
 		try {
 			String almProjectCypher = "match (n:" + sourceTool
-					+ ":DATA) where not exists(n._PORTFOLIO_) WITH distinct n.projectKey as projectKey, count(n) as count "
+					+ ":DATA) where n._PORTFOLIO_ IS NULL WITH distinct n.projectKey as projectKey, count(n) as count "
 					+ "OPTIONAL MATCH(m:" + sourceTool + ":METADATA) where m.pkey=projectKey "
 					+ "WITH {projectKey: projectKey , count: count, portfolio: m.PORTFOLIO, product: m.PRODUCT} as data "
 					+ "return collect(data) as data";
@@ -199,8 +199,8 @@ public class DataExtractor {
 			JsonArray data = paginationResponse.getJson().get(ConfigOptions.RESULTS).getAsJsonArray().get(0).getAsJsonObject()
 					.get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray().get(0)
 					.getAsJsonArray();
-			String almDataEnrichmentCypher = "UNWIND {props} as properties MATCH(n:" + sourceTool
-					+ " {projectKey: properties.projectKey}) where not exists(n._PORTFOLIO_) "
+			String almDataEnrichmentCypher = "UNWIND $props as properties MATCH(n:" + sourceTool
+					+ " {projectKey: properties.projectKey}) where n._PORTFOLIO_ IS NULL "
 					+ "set n._PORTFOLIO_ = properties.portfolio, n._PRODUCT_ = properties.product return count(n)";
 			List<JsonObject> projectList = new ArrayList<JsonObject>();
 			List<List<JsonObject>> projectProcessingBatches = new ArrayList<List<JsonObject>>();

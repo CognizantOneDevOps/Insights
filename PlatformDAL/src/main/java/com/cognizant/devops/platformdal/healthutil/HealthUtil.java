@@ -292,25 +292,35 @@ public class HealthUtil {
 		long totalStoreSize = 0L;
 		String returnSize = "";
 		try {
-			String apiUrlForSize = hostEndPoint
-					+ "/db/manage/server/jmx/domain/org.neo4j/instance%3Dkernel%230%2Cname%3DStore+sizes";
-			String serviceNeo4jResponse = SystemStatus.jerseyGetClientWithAuthentication(apiUrlForSize, username,
-					password, authToken);
-			log.debug("serviceNeo4jResponse ====== {} ",serviceNeo4jResponse);
+			if(ApplicationConfigProvider.getInstance().getGraph().getVersion().contains("4.")) {
+				GraphDBHandler dbHandler = new GraphDBHandler();
+				String storeSizeQuery = "CALL apoc.monitor.store() YIELD logSize, totalStoreSize RETURN sum(logSize+totalStoreSize)";
+				JsonObject storeSizeResponse = dbHandler.executeCypherQueryForJsonResponse(storeSizeQuery);
+				log.debug("Neo4j database store size Response ====== {} ",storeSizeResponse);
+				JsonArray dataArray = storeSizeResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
+				totalStoreSize = dataArray.get(0).getAsJsonObject().get("row").getAsJsonArray().get(0).getAsLong();
+			} else {
+				String apiUrlForSize = hostEndPoint
+						+ "/db/manage/server/jmx/domain/org.neo4j/instance%3Dkernel%230%2Cname%3DStore+sizes";
+				String serviceNeo4jResponse = SystemStatus.jerseyGetClientWithAuthentication(apiUrlForSize, username,
+						password, authToken);
+				log.debug("serviceNeo4jResponse ====== {} ",serviceNeo4jResponse);
 
-			JsonElement object = JsonUtils.parseString(serviceNeo4jResponse);
-			if (object.isJsonArray()) {
-				if (object.getAsJsonArray().get(0).getAsJsonObject().get("attributes").isJsonArray()) {
-					JsonArray beans = object.getAsJsonArray().get(0).getAsJsonObject().get("attributes")
-							.getAsJsonArray();
-					for (JsonElement jsonElement : beans) {
-						if (jsonElement.getAsJsonObject().get("name").getAsString()
-								.equalsIgnoreCase("TotalStoreSize")) {
-							totalStoreSize = jsonElement.getAsJsonObject().get("value").getAsLong();
+				JsonElement object = JsonUtils.parseString(serviceNeo4jResponse);
+				if (object.isJsonArray()) {
+					if (object.getAsJsonArray().get(0).getAsJsonObject().get("attributes").isJsonArray()) {
+						JsonArray beans = object.getAsJsonArray().get(0).getAsJsonObject().get("attributes")
+								.getAsJsonArray();
+						for (JsonElement jsonElement : beans) {
+							if (jsonElement.getAsJsonObject().get("name").getAsString()
+									.equalsIgnoreCase("TotalStoreSize")) {
+								totalStoreSize = jsonElement.getAsJsonObject().get("value").getAsLong();
+							}
 						}
 					}
 				}
 			}
+			
 			log.debug(" info totalStoreSize  ==== {}",totalStoreSize);
 			if (totalStoreSize > 0) {
 				returnSize = humanReadableByteCount(totalStoreSize, Boolean.FALSE);
@@ -441,7 +451,10 @@ public class HealthUtil {
 					ServiceStatusConstants.PgSQL, Boolean.FALSE, username, password, authToken);
 			dataComponentStatus.add(ServiceStatusConstants.PgSQL, postgreStatus);
 			hostEndPoint = ServiceStatusConstants.NEO4J_HOST;
-			apiUrl = hostEndPoint + "/db/data/";
+			apiUrl = hostEndPoint; 
+			if(ApplicationConfigProvider.getInstance().getGraph().getVersion().contains("3.5")) {
+				apiUrl += "/db/data/";
+			}
 			authToken = ApplicationConfigProvider.getInstance().getGraph().getAuthToken();
 			JsonObject neo4jStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,
 					ServiceStatusConstants.Neo4j, Boolean.TRUE, username, password, authToken);

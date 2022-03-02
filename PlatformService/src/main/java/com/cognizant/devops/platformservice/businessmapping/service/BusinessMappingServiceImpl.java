@@ -23,6 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ErrorMessage;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
@@ -48,8 +49,12 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 		try {
 			String validatedResponse = ValidationUtils.validateRequestBody(agentMappingJson);
 			GraphDBHandler dbHandler = new GraphDBHandler();
-			dbHandler.executeCypherQuery("CREATE CONSTRAINT ON (n:METADATA) ASSERT n.metadata_id  IS UNIQUE");
-			String query = "UNWIND {props} AS properties " + "CREATE (n:METADATA:BUSINESSMAPPING) "
+			String constraintQuery = "CREATE CONSTRAINT ON (n:METADATA) ASSERT n.metadata_id  IS UNIQUE";
+			if(ApplicationConfigProvider.getInstance().getGraph().getVersion().contains("4.")) {
+				constraintQuery = "CREATE CONSTRAINT IF NOT EXISTS FOR (n:METADATA) REQUIRE n.metadata_id IS UNIQUE";
+			}
+			dbHandler.executeCypherQuery(constraintQuery);
+			String query = "UNWIND $props AS properties " + "CREATE (n:METADATA:BUSINESSMAPPING) "
 					+ "SET n = properties"; // DATATAGGING
 			JsonObject json = JsonUtils.parseStringAsJsonObject(validatedResponse);
 			log.debug("arg0 {} ", json);

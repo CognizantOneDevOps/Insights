@@ -50,7 +50,7 @@ public class DataDictionaryTestData {
 	
 	public void insertAgentDataInNeo4j(String category, String label, String data) throws InsightsCustomException {
 		JsonObject agentDataJson = JsonUtils.parseStringAsJsonObject(data);
-		String query = "CREATE (n:" + category + ":" + label + ":DATA {props})";
+		String query = "CREATE (n:" + category + ":" + label + ":DATA $props)";
 		try {
 			JsonObject graphResponse = graphDBHandler.createNodesWithSingleData(agentDataJson, query);
 		} catch (InsightsCustomException e) {

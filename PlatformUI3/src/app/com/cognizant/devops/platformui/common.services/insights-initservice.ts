@@ -43,6 +43,7 @@ export class InsightsInitService {
     static version;
     static serverConfig = {};
     static jwtTokenOriginServerURL ={};
+    static jwtOriginServerLoginURL : any;
     static configDescResponse : any;
     
 
@@ -97,6 +98,7 @@ export class InsightsInitService {
         InsightsInitService.showAuditReporting = UIConfigResponse.showAuditReporting;
         InsightsInitService.showWebhookConfiguration = UIConfigResponse.showWebhookConfiguration;
         InsightsInitService.jwtTokenOriginServerURL = UIConfigResponse.jwtTokenOriginServerURL;
+        InsightsInitService.jwtOriginServerLoginURL = UIConfigResponse.jwtOriginServerLoginURL;
         console.info("Selected authetication Protocol is "+UIConfigResponse.autheticationProtocol);
         if (this.autheticationProtocolList.indexOf(UIConfigResponse.autheticationProtocol) < 0) {
             console.error("Please provide valid authetication Protocol from list " + String(this.autheticationProtocolList));
@@ -143,5 +145,9 @@ export class InsightsInitService {
 
     public getServerConfig(): any {
         return InsightsInitService.serverConfig;
+    }
+    
+    public getJwtOriginServerLoginURL(): any {
+        return InsightsInitService.jwtOriginServerLoginURL;
     }
 }

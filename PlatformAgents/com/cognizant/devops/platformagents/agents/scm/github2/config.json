@@ -262,6 +262,8 @@
     "maxBytes": 5000000,
     "backupCount": 10
   },
+  "labelName": "GIT",
+  "toolName": "GIT",
   "auditing": false,
   "enableProxy": false,
   "proxies": {

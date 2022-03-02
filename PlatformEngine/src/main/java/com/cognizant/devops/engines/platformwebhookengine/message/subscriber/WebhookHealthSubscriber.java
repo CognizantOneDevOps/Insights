@@ -94,7 +94,7 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 		String cypherhealthQuery;
 		boolean isRecordUpdate = Boolean.TRUE;
 		// For Sequential/successive webhook health publishing
-		cypherhealthQuery = "UNWIND {props} AS properties CREATE (n" + nodeLabels
+		cypherhealthQuery = "UNWIND $props AS properties CREATE (n" + nodeLabels
 				+ ") set n=properties return count(n)";
 
 		JsonObject graphResponse = dbHandler.executeQueryWithData(cypherhealthQuery, dataList);

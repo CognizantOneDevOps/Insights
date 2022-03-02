@@ -125,7 +125,7 @@ public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandle
 		healthQuery = healthQuery + " where old.agentId='" + agentId + "' or old.agentId is null";
 		healthQuery = healthQuery + " OPTIONAL MATCH (old) <-[:UPDATED_TO*" + nodeCount
 				+ "]-(purge)  where old.agentId='" + agentId + "'";
-		healthQuery = healthQuery + " CREATE (new" + nodeLabels + " {props}) ";
+		healthQuery = healthQuery + " CREATE (new" + nodeLabels + " $props) ";
 		healthQuery = healthQuery + " MERGE  (new)<-[r:UPDATED_TO]-(old)";
 		healthQuery = healthQuery + " REMOVE old:" + latestLabel;
 		healthQuery = healthQuery + " detach delete purge ";
@@ -135,7 +135,7 @@ public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandle
 		if (graphResponse.get("response").getAsJsonObject().get("results").getAsJsonArray().get(0).getAsJsonObject()
 				.get("data").getAsJsonArray().size() == 0) {
 			healthQuery = "";
-			healthQuery = healthQuery + " CREATE (new" + nodeLabels + " {props})";
+			healthQuery = healthQuery + " CREATE (new" + nodeLabels + " $props)";
 			dbHandler.executeQueryWithData(healthQuery, dataList);
 		}
 		if (graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0) {

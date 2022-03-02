@@ -17,14 +17,18 @@
 # install erlang
 #echo "#################### Installing Erlang , required for Rabbit MQ ####################"
 cd /opt
-wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/rabbitmq/erlang.zip
+#wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/rabbitmq/erlang.zip
+wget https://github.com/rabbitmq/erlang-rpm/archive/refs/tags/v23.3.4.11.zip
 unzip erlang.zip && cd erlang
 sudo dpkg -i *.deb
 mkdir rabbitmq && cd rabbitmq
 echo "deb http://www.rabbitmq.com/debian/ testing main" | sudo tee -a /etc/apt/sources.list
-wget -O- https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/rabbitmq/rabbitmq-release-signing-key.asc | sudo apt-key add -
-wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/rabbitmq/rabbitmq-server.deb
-sudo dpkg -i rabbitmq-server.deb
+wget -O- https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc | sudo apt-key add -
+#wget -O- https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/rabbitmq/rabbitmq-release-signing-key.asc | sudo apt-key add -
+wget https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.9.13/rabbitmq-server_3.9.13-1_all.deb
+sudo dpkg -i rabbitmq-server_3.9.13-1_all.deb
+#wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/rabbitmq/rabbitmq-server.deb
+#sudo dpkg -i rabbitmq-server.deb
 sleep 15
 wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/rabbitmq/RabbitMQ.zip
 sudo unzip RabbitMQ.zip && cd RabbitMQ && sudo cp rabbitmq.config /etc/rabbitmq/
