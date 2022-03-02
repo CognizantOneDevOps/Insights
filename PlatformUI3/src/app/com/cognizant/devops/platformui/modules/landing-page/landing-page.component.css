@@ -37,11 +37,16 @@
 	cursor: -webkit-grabbing;
 }
 
+::ng-deep .mat-grid-tile-content {
+	justify-content: inherit !important;	
+}
+
 .mat-grid-tile .mat-figure {
 	text-align: center !important;
 	font-size: 12px !important;
 	justify-content: left !important;
 	margin-left: 1% !important;
+	margin-bottom: 0px;
 }
 
 ::ng-deep .listView .mat-figure {

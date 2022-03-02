@@ -51,7 +51,7 @@
               </mat-expansion-panel-header>
               <mat-grid-list cols="8" rowHeight="120px" [gutterSize]="'10px'">
                 <mat-grid-tile *ngFor="let item of getDashboardList('recent')" [colspan]="1" [rowspan]="1"
-                  (click)="onRowClicked(item)">
+                  (click)="onRowClicked(item)" style="justify-content: center !important">
                   <mat-icon class="dashboardIcon" svgIcon="dashboard"></mat-icon>
                   <mat-grid-tile-footer class="short-desc">
                     <h3>{{item.title}}</h3>
@@ -75,7 +75,7 @@
             </mat-expansion-panel-header>
 
             <mat-grid-list cols="8" rowHeight="120px" [gutterSize]="'10px'">
-              <mat-grid-tile *ngFor="let item of getDashboardList('starred')" (click)="onRowClicked(item)">
+              <mat-grid-tile *ngFor="let item of getDashboardList('starred')" (click)="onRowClicked(item)" style="justify-content: center !important">
                 <mat-icon class="dashboardIcon" svgIcon="dashboard"></mat-icon>
                 <mat-grid-tile-footer class="short-desc">
                   <h3>{{item.title}}</h3>
@@ -100,7 +100,7 @@
             </mat-expansion-panel-header>
             <mat-grid-list cols="8" rowHeight="120px" [gutterSize]="'10px'">
               <mat-grid-tile [style.width.px]="gridWidth" *ngFor="let item of folder.value"
-                (click)="onRowClicked(item)">
+                (click)="onRowClicked(item)" style="justify-content: center !important">
                 <mat-icon class="dashboardIcon" svgIcon="dashboard"></mat-icon>
                 <mat-grid-tile-footer class="short-desc">
                   <h3>{{item.title}}</h3>
@@ -129,8 +129,8 @@
               </mat-expansion-panel-header>
               <mat-grid-list cols=8 [rowHeight]="gridHeight" [gutterSize]="'10px'">
                 <mat-grid-tile colspan=8 [style.width.px]="gridWidth" *ngFor="let item of getDashboardList('recent')"
-                  (click)="onRowClicked(item)">
-                  <figure class="mat-figure listView">
+                  (click)="onRowClicked(item)" style="justify-content: left !important">
+                  <figure class="mat-figure listView" >
                     <span class="dashboardLabelText">{{item.title}}</span>
                   </figure>
                 </mat-grid-tile>
@@ -152,7 +152,7 @@
             </mat-expansion-panel-header>
             <mat-grid-list cols=8 [rowHeight]="gridHeight" [gutterSize]="'10px'">
               <mat-grid-tile colspan=8 [style.width.px]="gridWidth" *ngFor="let item of getDashboardList('starred')"
-                (click)="onRowClicked(item)">
+                (click)="onRowClicked(item)" style="justify-content: left !important">
                 <figure class="mat-figure listView">
                   <span class="dashboardLabelText">{{item.title}}</span>
                 </figure>

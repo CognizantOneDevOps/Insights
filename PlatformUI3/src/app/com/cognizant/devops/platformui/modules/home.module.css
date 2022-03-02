@@ -90,7 +90,7 @@ tr.mat-footer-row, tr.mat-row {
 	background-color: #FFFFFF;
 }
 
-.mat-table, mat-row, mat-cell, mat-footer-cell, mat-header-cell, mat-list-item, mat-line, mat-tab-group, mat-tab-label, mat-tab-link, mat-tab-label-content, mat-select, mat-radio-button, iframe, mat-card, mat-tab-link, mat-tab-link, mat-tab, matInput, input, mat-select-value, button, textarea, select, mat-option, mat-raised-button, mat-table, mat-list-item, mat-list, mat-paginator, mat-checkbox, mat-expansion-panel-header, mat-expansion-panel-header, mat-grid-tile, mat-grid-list, mat-button-toggle-group, mat-button-toggle, mat-expansion-panel-header-description {
+.mat-table, mat-row, mat-cell, mat-footer-cell, mat-header-cell, mat-list-item, mat-line, mat-tab-group, mat-tab-label, mat-tab-link, mat-tab-label-content, mat-select, mat-radio-button, iframe, mat-card, mat-tab-link, mat-tab-link, mat-tab, matInput, input, mat-select-value, button, textarea, select, mat-option, mat-raised-button, mat-table, mat-list-item, mat-list, mat-paginator, mat-checkbox, mat-expansion-panel-header, mat-expansion-panel-header, mat-grid-tile, mat-grid-list, mat-button-toggle-group, mat-button-toggle, mat-expansion-panel-header-description, mat-grid-tile-content, mat-figure{
 	font-family: inherit;
 	font-size: 18px;
 }
