@@ -87,7 +87,7 @@ public class AgentManagementUtil {
 		}else{
 			conn = filePath.openConnection();
 		}
-		conn.setRequestProperty (AuthenticationUtils.AUTH_HEADER_KEY, base64login);
+		conn.setRequestProperty (AuthenticationUtils.AUTH_HEADER_KEY, "Basic "+base64login);
 		try(InputStream in = new BufferedInputStream(conn.getInputStream(), 1024);
 				OutputStream out = new BufferedOutputStream(new FileOutputStream(zip))){
 			copyInputStream(in, out);
