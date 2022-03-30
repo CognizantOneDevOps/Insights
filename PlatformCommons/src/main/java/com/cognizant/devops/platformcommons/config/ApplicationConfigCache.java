@@ -319,7 +319,7 @@ public class ApplicationConfigCache {
 					.isUpdateLevelTransitiveDependency();
 			Map<String, Level> removeLoggerString = new HashMap<>();
 
-			LoggerContext context = (org.apache.logging.log4j.core.LoggerContext) LogManager.getContext(false);
+			LoggerContext context = (org.apache.logging.log4j.core.LoggerContext) LogManager.getContext(LogManager.class.getClassLoader(), false);
 
 			if (ApplicationConfigProvider.getInstance().getApplicationLogLevel().getServiceLogLevel()
 					.has(serviceName)) {

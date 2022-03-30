@@ -20,7 +20,11 @@ source /etc/profile
 cd $INSIGHTS_APP_ROOT_DIRECTORY
 sudo mkdir Promtail
 cd Promtail
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/Promtail/promtail-linux-amd64.zip
+echo -n "Nexus(userName):"
+read userName
+echo "Nexus credential:"
+read -s credential
+sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/Promtail/promtail-linux-amd64.zip
 sudo unzip "promtail-linux-amd64.zip"
 sudo rm -r -f promtail-linux-amd64.zip
 sudo chmod a+x "promtail-linux-amd64"
@@ -28,7 +32,7 @@ export PROMTAIL_HOME=`pwd`
 sudo echo PROMTAIL_HOME=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" PROMTAIL_HOME=`pwd` | sudo tee -a /etc/profile
 cd /etc/init.d/
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/InsightsPromtail.sh
+sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/InsightsPromtail.sh
 sudo mv InsightsPromtail.sh InsightsPromtail
 sudo chmod +x InsightsPromtail
 sudo chkconfig InsightsPromtail on

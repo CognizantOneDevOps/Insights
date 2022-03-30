@@ -18,7 +18,11 @@ echo "#################### Installing Postgres with configs , Databases and Role
 source /etc/environment
 source /etc/profile
 cd $INSIGHTS_APP_ROOT_DIRECTORY
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/postgres/postgres12_dependencies.zip
+echo -n "Nexus(userName):"
+read userName
+echo "Nexus credential:"
+read -s credential
+sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/postgres/postgres12_dependencies.zip
 sudo unzip postgres12_dependencies.zip && cd postgres12_dependencies
 sudo yum localinstall pgdg-redhat-repo-latest.noarch.rpm postgresql12-libs-12.5-1PGDG.rhel7.x86_64.rpm postgresql12-12.5-1PGDG.rhel7.x86_64.rpm postgresql12-server-12.5-1PGDG.rhel7.x86_64.rpm -y
 cd $INSIGHTS_APP_ROOT_DIRECTORY/postgres12_dependencies/pgAdmin4

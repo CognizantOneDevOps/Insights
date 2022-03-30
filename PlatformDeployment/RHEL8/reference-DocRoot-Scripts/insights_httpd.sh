@@ -18,11 +18,15 @@ source /etc/profile
 sudo yum install httpd -y
 cd /etc/httpd/conf
 rm -f httpd.conf
-wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/httpd/RHEL/http/httpd.conf
+echo -n "Nexus(userName):"
+read userName
+echo "Nexus credential:"
+read -s credential
+wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/httpd/RHEL/http/httpd.conf
 cd /etc/httpd/conf.d
 rm -f httpd-vhosts.conf
-wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/httpd/RHEL/http/httpd-vhosts.conf
+wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/httpd/RHEL/http/httpd-vhosts.conf
 cd $INSIGHTS_APP_ROOT_DIRECTORY/grafana/conf
-wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/httpd/RHEL/http/custom.ini
+wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/httpd/RHEL/http/custom.ini
 apachectl -k start
 service grafana restart

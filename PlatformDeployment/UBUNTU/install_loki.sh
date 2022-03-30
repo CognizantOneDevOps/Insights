@@ -20,7 +20,11 @@ echo "#################### Installing Loki ####################"
 cd /opt
 sudo mkdir Loki
 cd Loki
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/Loki/loki-linux-amd64.zip
+echo -n "Nexus(userName):"
+read userName
+echo "Nexus credential:"
+read -s credential
+sudo wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/Loki/loki-linux-amd64.zip
 sudo apt-get install unzip
 sudo unzip "loki-linux-amd64.zip"
 sudo rm -r -f loki-linux-amd64.zip
@@ -30,7 +34,7 @@ export LOKI_HOME=`pwd`
 sudo echo LOKI_HOME=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" LOKI_HOME=`pwd` | sudo tee -a /etc/profile
 cd /etc/systemd/system
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/loki/Loki.service
+sudo wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/loki/Loki.service
 sudo systemctl enable Loki.service
 sudo systemctl start Loki
 echo "#################### Loki is up ####################"

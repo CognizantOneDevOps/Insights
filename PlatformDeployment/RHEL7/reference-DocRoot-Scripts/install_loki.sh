@@ -20,7 +20,11 @@ source /etc/profile
 cd $INSIGHTS_APP_ROOT_DIRECTORY
 sudo mkdir Loki
 cd Loki
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/Loki/loki-linux-amd64.zip
+echo -n "Nexus(userName):"
+read userName
+echo "Nexus credential:"
+read -s credential
+sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/Loki/loki-linux-amd64.zip
 sudo unzip "loki-linux-amd64.zip"
 sudo rm -r -f loki-linux-amd64.zip
 sudo chmod a+x "loki-linux-amd64"
@@ -29,7 +33,7 @@ export LOKI_HOME=`pwd`
 sudo echo LOKI_HOME=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" LOKI_HOME=`pwd` | sudo tee -a /etc/profile
 cd /etc/init.d/
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/InsightsLoki.sh
+sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/InsightsLoki.sh
 sudo mv InsightsLoki.sh InsightsLoki
 sudo chmod +x InsightsLoki
 sudo chkconfig InsightsLoki on

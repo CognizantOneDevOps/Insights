@@ -23,7 +23,11 @@ yum remove esl-*
 cd $INSIGHTS_APP_ROOT_DIRECTORY
 read -p "Please enter version number you want to install(3.8 or 3.9): " version_number
 version_number=`echo $version_number | sed -e 's/^[[:space:]]*//'`
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/rabbitmq/epel-release-latest-7.noarch.rpm
+echo -n "Nexus(userName):"
+read userName
+echo "Nexus credential:"
+read -s credential
+sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/rabbitmq/epel-release-latest-7.noarch.rpm
 sudo yum install epel-release-latest-7.noarch.rpm
 sudo yum --disablerepo="*" --enablerepo="epel" list available
 sudo yum search htop
@@ -43,7 +47,7 @@ then
 elif [ $version_number == "3.8"]]
 then
   echo "installing version 3.8"
-  sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/rabbitmq/esl-erlang_23.0-1~centos~7_amd64.rpm
+  sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/rabbitmq/esl-erlang_23.0-1~centos~7_amd64.rpm
   sudo mv esl-erlang_23.0-1~centos~7_amd64.rpm erlang.rpm
 else
   echo "Incorrect version"
@@ -52,7 +56,7 @@ fi
 echo "#################### Installing Rabbit MQ with configs and user creation ####################"
 sudo rm -rf rabbitmq
 sudo mkdir rabbitmq && cd rabbitmq
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/rabbitmq/socat-1.7.3.2-2.el7.x86_64.rpm
+sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/rabbitmq/socat-1.7.3.2-2.el7.x86_64.rpm
 sudo rpm -ivh socat-1.7.3.2-2.el7.x86_64.rpm
 if [ $version_number == "3.9" ]
 then
@@ -63,8 +67,8 @@ then
 elif [ $version_number == "3.8"]
 then
   echo "installing version 3.8"
-  sudo rpm --import https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/rabbitmq/rabbitmq-signing-key-public.asc
-  sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/rabbitmq/rabbitmq-server-3.8.5-1.el7.noarch.rpm
+  sudo rpm --import https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/rabbitmq/rabbitmq-signing-key-public.asc
+  sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/rabbitmq/rabbitmq-server-3.8.5-1.el7.noarch.rpm
   sudo mv rabbitmq-server-3.8.5-1.el7.noarch.rpm rabbitmq-server.noarch.rpm
   sudo rpm -ivh rabbitmq-server.noarch.rpm
 else
@@ -73,7 +77,7 @@ else
 fi
 #sudo mv rabbitmq-server-3.8.5-1.el7.noarch.rpm rabbitmq-server.noarch.rpm
 #sudo rpm -ivh rabbitmq-server.noarch.rpm
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/rabbitmq/RabbitMQ.zip
+sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/rabbitmq/RabbitMQ.zip
 sudo unzip RabbitMQ.zip && cd RabbitMQ && sudo cp rabbitmq.config /etc/rabbitmq/
 sudo chkconfig rabbitmq-server on && sudo service rabbitmq-server start
 sudo rabbitmq-plugins enable rabbitmq_management

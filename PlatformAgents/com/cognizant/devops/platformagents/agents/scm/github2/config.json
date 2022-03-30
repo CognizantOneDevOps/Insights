@@ -171,28 +171,24 @@
             "name": "BRANCH_HAS_COMMITS",
             "source": {
               "labels": [
-                "LATEST"
-              ],
-              "constraints": [
-                "branchName",
-                "repoName",
-                "commitId"
-              ]
-            },
-            "destination": {
-              "labels": [
                 "GIT_BRANCH",
                 "LATEST"
               ],
               "constraints": [
                 "branchName",
                 "repoName"
+               ]
+            },
+            "destination": {
+              "labels": [
+               "LATEST"
+              ],
+              "constraints": [
+                "branchName",
+                "repoName",
+                "commitId"
               ],
               "selectedProperties": [
-                "inSightsTimeX",
-                "inSightsTime",
-                "toolName",
-                "categoryName"
               ]
             }
           }
@@ -207,20 +203,21 @@
             "name": "BRANCH_HAS_PULL_REQUESTS",
             "source": {
               "labels": [
+                "GIT_BRANCH",
                 "LATEST"
+                
               ],
               "constraints": [
-                "originBranch",
-                "repoName"
+               "branchName",
+               "repoName"
               ]
             },
             "destination": {
               "labels": [
-                "GIT_BRANCH",
                 "LATEST"
               ],
               "constraints": [
-                "branchName",
+                "originBranch",
                 "repoName"
               ],
               "selectedProperties": [

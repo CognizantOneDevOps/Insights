@@ -30,6 +30,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -75,6 +76,7 @@ import com.cognizant.devops.platformdal.outcome.InsightsTools;
 import com.cognizant.devops.platformdal.outcome.OutComeConfigDAL;
 import com.cognizant.devops.platformservice.agentmanagement.util.AgentManagementUtil;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
+import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -91,7 +93,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	private static final String LAST_RUN_TIME = "lastRunTime";
 	private static final String HEALTH_STATUS = "healthStatus";
 	private static final String FORWARD_SLASH = "/";
-	
+		
 	boolean isProxyEnabled = ApplicationConfigProvider.getInstance().getProxyConfiguration().isEnableProxy();
 	AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 	VaultHandler vaultHandler = new VaultHandler();
@@ -351,11 +353,16 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	 * @throws IOException
 	 */
 	private Document getDocrootConnection(String url) throws IOException {
+		
+		String login = ApplicationConfigProvider.getInstance().getAgentDetails().getNexusUserName() 
+						+ ":" +ApplicationConfigProvider.getInstance().getAgentDetails().getNexusPassword();
+		String base64login = Base64.getEncoder().encodeToString(login.getBytes());
+		
 		Document doc;
 		if(isProxyEnabled)
-			doc = Jsoup.connect(url).proxy(ApplicationConfigProvider.getInstance().getProxyConfiguration().getProxyHost(), ApplicationConfigProvider.getInstance().getProxyConfiguration().getProxyPort()).get();
+			doc = Jsoup.connect(url).proxy(ApplicationConfigProvider.getInstance().getProxyConfiguration().getProxyHost(), ApplicationConfigProvider.getInstance().getProxyConfiguration().getProxyPort()).header(AuthenticationUtils.AUTH_HEADER_KEY, "Basic " + base64login).get();
 		else
-			doc = Jsoup.connect(url).get();
+			doc = Jsoup.connect(url).header(AuthenticationUtils.AUTH_HEADER_KEY, "Basic " + base64login).get();
 		return doc;
 	}
 

@@ -24,7 +24,11 @@ sudo echo "export" INSIGHTS_WEBHOOK=`pwd` | sudo tee -a /etc/profile
 . /etc/environment
 . /etc/profile
 cd /opt/insightsWebHook
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformInsightsWebHook.jar -O PlatformInsightsWebHook.jar
+echo -n "Nexus(userName):"
+read userName
+echo "Nexus credential:"
+read -s credential
+sudo wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformInsightsWebHook.jar -O PlatformInsightsWebHook.jar
 sleep 2
 sudo nohup java -jar PlatformInsightsWebHook.jar &
 sleep 10

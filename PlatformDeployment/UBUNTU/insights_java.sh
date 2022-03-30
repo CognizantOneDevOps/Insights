@@ -16,22 +16,25 @@
 # Install Java
 echo "#################### Installing Java with Env Variable ####################"
 cd /opt/
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/java/jdklinux.tar.gz
+echo -n "Nexus(userName):"
+read userName
+echo "Nexus credential:"
+read -s credential
+sudo wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/java/jdklinux.tar.gz
 sudo tar xzf jdklinux.tar.gz
-export JAVA_HOME=/opt/jdklinux
-echo JAVA_HOME=/opt/jdklinux  | sudo tee -a /etc/environment
-echo "export" JAVA_HOME=/opt/jdklinux | sudo tee -a /etc/profile
-export JRE_HOME=/opt/jdklinux/jre
-echo JRE_HOME=/opt/jdklinux/jre | sudo tee -a /etc/environment
-echo "export" JRE_HOME=/opt/jdklinux/jre | sudo tee -a /etc/profile
-export PATH=$PATH:/opt/jdklinux/bin:/opt/jdklinux/jre/bin
-echo PATH=$PATH:/opt/jdklinux/bin:/opt/jdklinux/jre/bin | sudo tee -a /etc/environment
-sudo update-alternatives --install /usr/bin/java java /opt/jdklinux/bin/java 20000
-sudo update-alternatives --install "/usr/bin/java" "java" "/opt/jdklinux/bin/java" 1
-sudo update-alternatives --install "/usr/bin/javac" "javac" "/opt/jdklinux/bin/javac" 1
-sudo update-alternatives --install "/usr/bin/javaws" "javaws" "/opt/jdklinux/bin/javaws" 1
-sudo update-alternatives --set java /opt/jdklinux/bin/java
-sudo update-alternatives --set javac /opt/jdklinux/bin/javac
-sudo update-alternatives --set javaws /opt/jdklinux/bin/javaws
+mv jdk-11.0.2 jdklinux
+export JAVA_HOME=$INSIGHTS_APP_ROOT_DIRECTORY/jdklinux/bin
+echo JAVA_HOME=$INSIGHTS_APP_ROOT_DIRECTORY/jdklinux/bin  | sudo tee -a /etc/environment
+echo "export" JAVA_HOME=$INSIGHTS_APP_ROOT_DIRECTORY/jdklinux/bin | sudo tee -a /etc/profile
+
+export PATH=$PATH:$INSIGHTS_APP_ROOT_DIRECTORY/jdklinux/bin
+echo PATH=$PATH:$INSIGHTS_APP_ROOT_DIRECTORY/jdklinux/bin | sudo tee -a /etc/environment
+
+sudo update-alternatives --install /usr/bin/java java $INSIGHTS_APP_ROOT_DIRECTORY/jdklinux/bin/java 20000
+sudo update-alternatives --install "/usr/bin/java" "java" "$INSIGHTS_APP_ROOT_DIRECTORY/jdklinux/bin/java" 1
+sudo update-alternatives --install "/usr/bin/javac" "javac" "$INSIGHTS_APP_ROOT_DIRECTORY/jdklinux/bin/javac" 1
+sudo update-alternatives --set java $INSIGHTS_APP_ROOT_DIRECTORY/jdklinux/bin/java
+sudo update-alternatives --set javac $INSIGHTS_APP_ROOT_DIRECTORY/jdklinux/bin/javac
+
 . /etc/environment
 . /etc/profile

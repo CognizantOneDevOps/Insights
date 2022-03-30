@@ -24,7 +24,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Authenticator;
 import java.net.InetSocketAddress;
+import java.net.PasswordAuthentication;
 import java.net.Proxy;
 import java.net.SocketAddress;
 import java.net.URL;
@@ -36,6 +38,7 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
@@ -51,6 +54,7 @@ import org.springframework.util.FileCopyUtils;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -67,6 +71,9 @@ public class AgentManagementUtil {
 	}
 
 	public  JsonObject getAgentConfigfile(URL filePath, File targetDir) throws IOException, InsightsCustomException  {
+		String login = ApplicationConfigProvider.getInstance().getAgentDetails().getNexusUserName() 
+				+ ":" +ApplicationConfigProvider.getInstance().getAgentDetails().getNexusPassword();
+		String base64login = Base64.getEncoder().encodeToString(login.getBytes());
 		if (!targetDir.exists()) {
 			targetDir.mkdirs();
 		}
@@ -80,6 +87,7 @@ public class AgentManagementUtil {
 		}else{
 			conn = filePath.openConnection();
 		}
+		conn.setRequestProperty (AuthenticationUtils.AUTH_HEADER_KEY, base64login);
 		try(InputStream in = new BufferedInputStream(conn.getInputStream(), 1024);
 				OutputStream out = new BufferedOutputStream(new FileOutputStream(zip))){
 			copyInputStream(in, out);

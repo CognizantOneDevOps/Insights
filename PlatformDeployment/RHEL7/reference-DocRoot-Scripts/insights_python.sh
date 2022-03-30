@@ -18,9 +18,13 @@ echo "#################### Installing Python 2.7.11 with Virtual Env ###########
 source /etc/environment
 source /etc/profile
 cd $INSIGHTS_APP_ROOT_DIRECTORY
-sudo mkdir python && cd python && sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/python/Python-2.7.11.tgz
+echo -n "Nexus(userName):"
+read userName
+echo "Nexus credential:"
+read -s credential
+sudo mkdir python && cd python && sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/python/Python-2.7.11.tgz
 sudo tar -zxf Python-2.7.11.tgz && cd Python-2.7.11 && sudo yum install gcc -y && sudo ./configure --prefix=$INSIGHTS_APP_ROOT_DIRECTORY
-sudo make install && cd .. && sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/python/get-pip.py
+sudo make install && cd .. && sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/python/get-pip.py
 python --version
 sudo python get-pip.py
 sudo pip install setuptools -U

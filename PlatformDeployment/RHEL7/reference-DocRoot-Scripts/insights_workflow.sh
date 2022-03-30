@@ -25,11 +25,15 @@ sudo echo INSIGHTS_WORKFLOW=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" INSIGHTS_WORKFLOW=`pwd` | sudo tee -a /etc/profile
 source /etc/environment
 source /etc/profile
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/release/latest/PlatformWorkflow.jar -O PlatformWorkflow.jar
+echo -n "Nexus(userName):"
+read userName
+echo "Nexus credential:"
+read -s credential
+sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/release/latest/PlatformWorkflow.jar -O PlatformWorkflow.jar
 sleep 5
 sudo chmod -R 777 $INSIGHTS_APP_ROOT_DIRECTORY/insightsworkflow
 cd /etc/init.d/
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/InSightsWorkflow.sh
+sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/InSightsWorkflow.sh
 sudo mv InSightsWorkflow.sh InSightsWorkflow
 sudo chmod +x InSightsWorkflow
 sudo chkconfig InSightsWorkflow on

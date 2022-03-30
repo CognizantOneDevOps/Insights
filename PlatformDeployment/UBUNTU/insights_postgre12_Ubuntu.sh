@@ -17,7 +17,11 @@
 # install postgresql
 echo "#################### Installing Postgres 12 with configs , Databases and Roles ####################"
 cd /opt
-wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/postgres/postgres12_dependencies_Ubuntu.zip
+echo -n "Nexus(userName):"
+read userName
+echo "Nexus credential:"
+read -s credential
+wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/postgres/postgres12_dependencies_Ubuntu.zip
 sleep 5
 unzip postgres12_dependencies_Ubuntu.zip
 cd postgres12_dependencies_Ubuntu

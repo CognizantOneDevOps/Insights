@@ -117,7 +117,11 @@ echo "#################### Setting up Insights Home ####################"
 cd $INSIGHTS_HOME_ROOT_DIRECTORY
 sudo mkdir INSIGHTS_HOME
 cd INSIGHTS_HOME
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/InSightsConfig.zip
+echo -n "Nexus(userName):"
+read userName
+echo "Nexus credential:"
+read -s credential
+sudo wget  https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/InSightsConfig.zip
 sudo unzip InSightsConfig.zip && sudo rm -rf InSightsConfig.zip
 sudo cp -R InSightsConfig/.InSights/ .
 export INSIGHTS_HOME=`pwd`

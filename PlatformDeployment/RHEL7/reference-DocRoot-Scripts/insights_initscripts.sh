@@ -16,9 +16,13 @@
 # This script copies all required scripts to /etc/init.d
 echo "Copying the init.d scripts"
 sudo mkdir initscripts
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/initscripts.zip
+echo -n "Nexus(userName):"
+read userName
+echo "Nexus credential:"
+read -s credential
+sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/initscripts.zip
 sudo unzip initscripts.zip && cd initscripts chmod +x *.sh
 sudo cp -rp * /etc/init.d
 cd /etc/logrotate.d/
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/GrafanaLogRotate.sh
+sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/GrafanaLogRotate.sh
 mv GrafanaLogRotate.sh GrafanaLogRotate

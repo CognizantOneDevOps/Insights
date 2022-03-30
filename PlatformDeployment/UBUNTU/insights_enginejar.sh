@@ -25,6 +25,10 @@ echo "export" INSIGHTS_ENGINE=`pwd` | sudo tee -a /etc/profile
 . /etc/environment
 . /etc/profile
 sudo cd /opt/insightsengine
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformEngine.jar -O PlatformEngine.jar
+echo -n "Nexus(userName):"
+read userName
+echo "Nexus credential:"
+read -s credential
+sudo wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformEngine.jar -O PlatformEngine.jar
 sleep 2
 sudo nohup java -jar PlatformEngine.jar &

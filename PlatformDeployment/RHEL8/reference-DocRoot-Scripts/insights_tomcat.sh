@@ -21,10 +21,14 @@ chmod +x ./jq
 sudo cp jq /usr/bin
 sudo rm -rf jq
 cd $INSIGHTS_APP_ROOT_DIRECTORY
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/release/latest/PlatformUI3.zip -O PlatformUI3.zip
+echo -n "Nexus(userName):"
+read userName
+echo "Nexus credential:"
+read -s credential
+sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/release/latest/PlatformUI3.zip -O PlatformUI3.zip
 sudo unzip PlatformUI3.zip && sudo rm -rf PlatformUI3.zip
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/release/latest/PlatformService.war -O PlatformService.war
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/tomcat/apache-tomcat.tar.gz
+sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/release/latest/PlatformService.war -O PlatformService.war
+sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/tomcat/apache-tomcat.tar.gz
 sudo tar -zxvf apache-tomcat.tar.gz
 sudo cp -R ./app $INSIGHTS_APP_ROOT_DIRECTORY/apache-tomcat/webapps
 sudo rm -rf PlatformUI3
@@ -40,7 +44,7 @@ sudo rm -rf PlatformService.war
 cd apache-tomcat
 sudo chmod -R 777 $INSIGHTS_APP_ROOT_DIRECTORY/apache-tomcat
 cd /etc/init.d/
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/initscripts/Tomcat.sh
+sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/initscripts/Tomcat.sh
 sudo mv Tomcat.sh Tomcat
 sudo chmod +x Tomcat
 sudo chkconfig Tomcat on

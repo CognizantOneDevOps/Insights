@@ -17,8 +17,6 @@ package com.cognizant.devops.platformcommons.config;
 
 import java.io.Serializable;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 public class EndpointData implements Serializable{
 
 	private static final long serialVersionUID = 5450251387447525878L;

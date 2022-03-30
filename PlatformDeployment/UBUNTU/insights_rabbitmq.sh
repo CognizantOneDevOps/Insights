@@ -17,6 +17,10 @@
 # install erlang
 #echo "#################### Installing Erlang , required for Rabbit MQ ####################"
 cd /opt
+echo -n "Nexus(userName):"
+read userName
+echo "Nexus credential:"
+read -s credential
 #wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/rabbitmq/erlang.zip
 wget https://github.com/rabbitmq/erlang-rpm/archive/refs/tags/v23.3.4.11.zip
 unzip erlang.zip && cd erlang
@@ -30,7 +34,7 @@ sudo dpkg -i rabbitmq-server_3.9.13-1_all.deb
 #wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/rabbitmq/rabbitmq-server.deb
 #sudo dpkg -i rabbitmq-server.deb
 sleep 15
-wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/rabbitmq/RabbitMQ.zip
+wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/rabbitmq/RabbitMQ.zip
 sudo unzip RabbitMQ.zip && cd RabbitMQ && sudo cp rabbitmq.config /etc/rabbitmq/
 sudo systemctl enable rabbitmq-server && sudo systemctl start rabbitmq-server
 sudo rabbitmq-plugins enable rabbitmq_management

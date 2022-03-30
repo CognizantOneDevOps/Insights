@@ -26,7 +26,11 @@ sudo wget https://dl.grafana.com/oss/release/grafana-${version_number}.linux-amd
 sudo tar -zxvf grafana-${version_number}.linux-amd64.tar.gz
 sudo mv /opt/grafana-${version_number} /opt/grafana
 cd /opt/grafana
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/customGrafanaSettings/${version_number}/plugins.tar.gz
+echo -n "Nexus(userName):"
+read userName
+echo "Nexus credential:"
+read -s credential
+sudo wget  https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/customGrafanaSettings/${version_number}/plugins.tar.gz
 sudo tar -zxvf plugins.tar.gz
 sudo mkdir /opt/grafana/data
 sudo mkdir /opt/grafana/data/plugins
@@ -38,16 +42,16 @@ sudo echo GRAFANA_HOME=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" GRAFANA_HOME=`pwd` | sudo tee -a /etc/profile
 source /etc/environment
 source /etc/profile
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/customGrafanaSettings/ldap.toml
+sudo wget  https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/customGrafanaSettings/ldap.toml
 sudo cp ldap.toml $GRAFANA_HOME/conf/ldap.toml
-sudo wget  https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/customGrafanaSettings/${version_number}/defaults.ini
+sudo wget  https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/customGrafanaSettings/${version_number}/defaults.ini
 sudo cp defaults.ini $GRAFANA_HOME/conf/defaults.ini
 sudo nohup ./bin/grafana-server &
 sudo echo $! > grafana-pid.txt
 sleep 10
 sudo chmod -R 777 /opt/grafana
 cd /etc/init.d/
-sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/initscripts/Grafana.sh
+sudo wget  https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/initscripts/Grafana.sh
 sudo yum install dos2unix -y
 sudo dos2unix Grafana.sh
 sudo mv Grafana.sh Grafana

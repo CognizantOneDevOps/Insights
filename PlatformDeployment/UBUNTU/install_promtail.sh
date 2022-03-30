@@ -21,7 +21,11 @@ cd /opt
 sudo mkdir Promtail
 cd Promtail
 sudo apt-get install wget
-sudo wget wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/Promtail/promtail-linux-amd64.zip
+echo -n "Nexus(userName):"
+read userName
+echo "Nexus credential:"
+read -s credential
+sudo wget wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/Promtail/promtail-linux-amd64.zip
 sudo apt-get install unzip
 sudo unzip "promtail-linux-amd64.zip"
 sudo rm -rf promtail-linux-amd64.zip
@@ -30,7 +34,7 @@ export PROMTAIL_HOME=`pwd`
 sudo echo PROMTAIL_HOME=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" PROMTAIL_HOME=`pwd` | sudo tee -a /etc/profile
 cd /etc/systemd/system
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/promtail/Promtail.service
+sudo wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/promtail/Promtail.service
 sudo systemctl enable Promtail.service
 sudo systemctl start Promtail
 echo "#################### Promtail is up ####################"

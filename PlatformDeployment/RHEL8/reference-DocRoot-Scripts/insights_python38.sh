@@ -17,7 +17,11 @@
 source /etc/environment
 source /etc/profile
 cd $INSIGHTS_APP_ROOT_DIRECTORY
-sudo mkdir python3 && cd python3 && sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/python/Python.tar.gz
+echo -n "Nexus(userName):"
+read userName
+echo "Nexus credential:"
+read -s credential
+sudo mkdir python3 && cd python3 && sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/python/Python.tar.gz
 sudo tar -zxf Python.tar.gz
 cd Python
 sudo yum install gcc -y
@@ -29,7 +33,7 @@ sudo ./configure --enable-optimizations
 sudo make altinstall
 sudo rm -f /usr/bin/python
 sudo ln -s $INSIGHTS_APP_ROOT_DIRECTORY/python3/Python/python /usr/bin/python
-cd $INSIGHTS_APP_ROOT_DIRECTORY/python3 && sudo wget https://infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/python/get-pip.py
+cd $INSIGHTS_APP_ROOT_DIRECTORY/python3 && sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/python/get-pip.py
 python --version
 sudo python get-pip.py
 sudo python -m pip install setuptools -U

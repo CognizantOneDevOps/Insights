@@ -32,6 +32,9 @@ public class AgentDetails implements Serializable {
 	private String onlineRegistrationMode;
 	private String downloadRepoUrl;
 	private String browseRepoUrl;
+	private String nexusUserName;
+	private String nexusPassword;
+	
 	
 	public String getOnlineRegistrationMode() {
 		return onlineRegistrationMode;
@@ -88,6 +91,18 @@ public class AgentDetails implements Serializable {
 	}
 	public void setOfflineAgentPath(String offlineAgentPath) {
 		this.offlineAgentPath = offlineAgentPath;
+	}
+	public String getNexusUserName() {
+		return nexusUserName;
+	}
+	public void setNexusUserName(String nexusUserName) {
+		this.nexusUserName = nexusUserName;
+	}
+	public String getNexusPassword() {
+		return nexusPassword;
+	}
+	public void setNexusPassword(String nexusPassword) {
+		this.nexusPassword = nexusPassword;
 	}
 
 }

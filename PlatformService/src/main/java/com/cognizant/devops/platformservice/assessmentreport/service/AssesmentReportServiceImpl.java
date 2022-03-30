@@ -1610,8 +1610,13 @@ public class AssesmentReportServiceImpl {
 					JsonObject eachObject = new JsonObject();
 	        		eachObject.addProperty("kpiId", eachRecord.getKpiConfig().getKpiId());
 	        		JsonArray vConfigobj =  JsonUtils.parseStringAsJsonArray(eachRecord.getvConfig());
-	        		eachObject.addProperty("vType", vConfigobj.get(0).getAsJsonObject().get("vType").getAsString());
-	        		eachObject.addProperty("vQuery", vConfigobj.get(0).getAsJsonObject().get("vQuery").getAsString());
+	        		if(vConfigobj.size() == 0) {
+	        			eachObject.addProperty("vType", "");
+		        		eachObject.addProperty("vQuery", "");
+	        		}  else {	        			
+	        			eachObject.addProperty("vQuery", vConfigobj.get(0).getAsJsonObject().get("vQuery").getAsString());
+	        			eachObject.addProperty("vType", vConfigobj.get(0).getAsJsonObject().get("vType").getAsString());
+	        		}
 	        		jsonArray.add(eachObject);
 				}
 			}

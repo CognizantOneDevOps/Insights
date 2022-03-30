@@ -24,7 +24,11 @@ sudo echo "export" INSIGHTS_WORKFLOW=`pwd` | sudo tee -a /etc/profile
 . /etc/environment
 . /etc/profile
 cd /opt/insightsworkflow
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformWorkflow.jar -O PlatformWorkflow.jar
+echo -n "Nexus(userName):"
+read userName
+echo "Nexus credential:"
+read -s credential
+sudo wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformWorkflow.jar -O PlatformWorkflow.jar
 sleep 2
 INSIGHTS_HOME=/usr/INSIGHTS_HOME
 sudo nohup java -cp PlatformWorkflow.jar:$INSIGHTS_HOME/workflowjar/* com.cognizant.devops.platformworkflow.workflowtask.app.PlatformWorkflowApplication &

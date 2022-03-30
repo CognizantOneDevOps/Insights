@@ -18,9 +18,13 @@
 echo "#################### Installing Eleastic Search with configs ####################"
 mkdir elasticsearch
 cd elasticsearch
-wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/elasticsearch/elasticsearch.deb
+echo -n "Nexus(userName):"
+read userName
+echo "Nexus credential:"
+read -s credential
+wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/elasticsearch/elasticsearch.deb
 sudo dpkg -i elasticsearch.deb
-wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/elasticsearch/ElasticSearch.zip
+wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/elasticsearch/ElasticSearch.zip
 unzip ElasticSearch.zip
 sudo cp ElasticSearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
 sudo cp ElasticSearch/log4j2.properties /etc/elasticsearch/log4j2.properties
