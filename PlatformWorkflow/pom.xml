@@ -13,7 +13,7 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>9.2</version>
+		<version>9.3</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -21,14 +21,13 @@
 	<artifactId>PlatformWorkflow</artifactId>
 	<packaging>jar</packaging>
 	<name>PlatformWorkflow</name>
-	<version>9.2</version>
+	<version>9.3</version>
 	<description>PlatformWorkflow to implement workflow in Insights enviroment </description>
 	<url>http://maven.apache.org</url>
 
 	<properties>
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.version>2.3.1.RELEASE</spring.version>
 		<testng.version>7.1.0</testng.version>
 		<project.name>PlatformInsights</project.name>
 	</properties>
@@ -59,12 +58,12 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>9.2</version>
+			<version>9.3</version>
 		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>9.2</version>
+			<version>9.3</version>
 		</dependency>
 		<dependency>
 			<groupId>com.rabbitmq</groupId>
