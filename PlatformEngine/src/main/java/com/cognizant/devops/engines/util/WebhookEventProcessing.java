@@ -93,7 +93,6 @@ public class WebhookEventProcessing {
 			status.add(executeQuery(query));
 		}
 		return !status.contains(Boolean.FALSE);
-
 	}
 
 	private boolean executeQuery(String query) {
@@ -105,9 +104,7 @@ public class WebhookEventProcessing {
 			/* case 4 where neo4j might be down will be caught here */
 			log.error("Webhook event processing ==== has failed due to {} ", e.getMessage());
 			return false;
-
 		}
-
 	}
 
 	private boolean isSuccess(JsonObject resp) {
@@ -125,9 +122,7 @@ public class WebhookEventProcessing {
 			}
 		}
 		/* case 3 we get data means query executed successfully */
-
 		return success;
-
 	}
 
 	private boolean saveEvent() {
@@ -174,10 +169,8 @@ public class WebhookEventProcessing {
 						"Webhook event processing ==== unable to prepare eventConfig map as config property is missing in event config  {}",
 						config);
 			}
-
 		} catch (Exception e) {
 			log.error("Webhook event processing ==== enable to process event config map {}", e.getMessage());
 		}
 	}
-
 }

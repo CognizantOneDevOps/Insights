@@ -21,8 +21,6 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.google.gson.JsonObject;
 
-
-
 public interface InsightsWebhookParserInterface {
 
 	public List<JsonObject> parseToolData(WebHookConfig webhookConfig, String message) throws InsightsCustomException;

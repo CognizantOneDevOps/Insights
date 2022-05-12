@@ -416,6 +416,7 @@ public class ReportConfigDAL extends BaseDAL {
 				reportDBConfigList.setTemplateName(reportTemplateEntity.getTemplateName());
 				reportDBConfigList.setFile(reportTemplateEntity.getFile());
 				reportDBConfigList.setVisualizationutil(reportTemplateEntity.getVisualizationutil());
+				reportDBConfigList.setTemplateType(reportTemplateEntity.getTemplateType());
 				Set<InsightsReportsKPIConfig> kpiDataFromTable = reportDBConfigList.getReportsKPIConfig();
 				kpiDataFromTable.clear();
 				kpiDataFromTable.addAll(kpiDataFromUI);

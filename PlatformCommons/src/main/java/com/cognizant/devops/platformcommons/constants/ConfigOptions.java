@@ -74,7 +74,6 @@ public interface ConfigOptions {
 			+ ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.QUERY_DATA_PROCESSING_FOLDER;
 	String ML_DIRECTORY = "MLData";
 	String ML_DATA_STORAGE_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ML_DIRECTORY;
-
 	String ONLINE_REGISTRATION_MODE_DOCROOT = "docroot";
 	String ONLINE_REGISTRATION_MODE_NEXUS = "nexus";
 	String GRAPH = "graph";
@@ -85,8 +84,11 @@ public interface ConfigOptions {
 	String RESULTS= "results";
 	String NODES="nodes";
 	String RELATIONSHIPS= "relationships";
-
 	String CRLF_PATTERN = "(\r\n|\r|\n|\n\r)";
 	String NBSP = "&nbsp;";
-	String AMP = "&amp;";
+	String AMP = "&amp;";	
+	String CONTENT_NAME = "ContentName :";
+	String CONTENT_RESULT = "ContentResult :";
+	String ACTION = "action :";
+	String CONTENT_ID = "ContentId :";
 }

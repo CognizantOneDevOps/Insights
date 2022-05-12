@@ -1,22 +1,26 @@
 [
 	{
 		"queryName": "Add NewRelic tool",
-		"sqlQuery": "INSERT INTO public.\"INSIGHTS_ROI_TOOLS\"(id, agent_communication_queue, category, isactive, tool_config_json, tool_name) SELECT nextval('hibernate_sequence'), 'NEWRELIC_MILESTONE_EXECUTION', 'APPMONITORING', true, '{}', 'NEWRELIC' WHERE NOT EXISTS (SELECT tool_name FROM public.\"INSIGHTS_ROI_TOOLS\" WHERE tool_name = 'NEWRELIC');"
+		"sqlQuery": "INSERT INTO public.\"INSIGHTS_ROI_TOOLS\"(id, agent_communication_queue, category, isactive, tool_config_json, tool_name) SELECT nextval('hibernate_sequence'), 'NEWRELIC_MILESTONE_EXECUTION', 'ROI', true, '{}', 'NEWRELIC' WHERE NOT EXISTS (SELECT tool_name FROM public.\"INSIGHTS_ROI_TOOLS\" WHERE tool_name = 'NEWRELIC');"
 	},
 	{
 		"queryName": "Add DynatraceROI tool",
-		"sqlQuery": "INSERT INTO public.\"INSIGHTS_ROI_TOOLS\"(id, agent_communication_queue, category, isactive, tool_config_json, tool_name) SELECT nextval('hibernate_sequence'), 'DYNATRACEROI_MILESTONE_EXECUTION', 'APPMONITORING', true, '{\"list\":[{\"label\":\"Metric Key\",\"name\":\"metricKey\",\"type\":\"input\",\"current\":{\"text\":\"\",\"value\":\"\"},\"hide\":0,\"includeAll\":true,\"multi\":false,\"options\":[{\"selected\":false,\"text\":\"\",\"value\":\"\"}],\"query\":\"\",\"tooltip\":\"Enter metric key\"}]}', 'DYNATRACEROI' WHERE NOT EXISTS (SELECT tool_name FROM public.\"INSIGHTS_ROI_TOOLS\" WHERE tool_name = 'DYNATRACEROI');"
+		"sqlQuery": "INSERT INTO public.\"INSIGHTS_ROI_TOOLS\"(id, agent_communication_queue, category, isactive, tool_config_json, tool_name) SELECT nextval('hibernate_sequence'), 'DYNATRACEROI_MILESTONE_EXECUTION', 'ROI', true, '{\"list\":[{\"label\":\"Metric Key\",\"name\":\"metricKey\",\"type\":\"input\",\"current\":{\"text\":\"\",\"value\":\"\"},\"hide\":0,\"includeAll\":true,\"multi\":false,\"options\":[{\"selected\":false,\"text\":\"\",\"value\":\"\"}],\"query\":\"\",\"tooltip\":\"Enter metric key\"}]}', 'DYNATRACEROI' WHERE NOT EXISTS (SELECT tool_name FROM public.\"INSIGHTS_ROI_TOOLS\" WHERE tool_name = 'DYNATRACEROI');"
 	},
 	{
 		"queryName": "Add Appdynamics tool",
-		"sqlQuery": "INSERT INTO public.\"INSIGHTS_ROI_TOOLS\"(id, agent_communication_queue, category, isactive, tool_config_json, tool_name) SELECT nextval('hibernate_sequence'), 'APPDYNAMICS_MILESTONE_EXECUTION', 'APPMONITORING', true, '{}', 'APPDYNAMICS' WHERE NOT EXISTS (SELECT tool_name FROM public.\"INSIGHTS_ROI_TOOLS\" WHERE tool_name = 'APPDYNAMICS');"
+		"sqlQuery": "INSERT INTO public.\"INSIGHTS_ROI_TOOLS\"(id, agent_communication_queue, category, isactive, tool_config_json, tool_name) SELECT nextval('hibernate_sequence'), 'APPDYNAMICS_MILESTONE_EXECUTION', 'ROI', true, '{}', 'APPDYNAMICS' WHERE NOT EXISTS (SELECT tool_name FROM public.\"INSIGHTS_ROI_TOOLS\" WHERE tool_name = 'APPDYNAMICS');"
 	},
 	{
 		"queryName": "Add Splunk tool",
-		"sqlQuery": "INSERT INTO public.\"INSIGHTS_ROI_TOOLS\"(id, agent_communication_queue, category, isactive, tool_config_json, tool_name) SELECT nextval('hibernate_sequence'), 'SPLUNK_MILESTONE_EXECUTION', 'APPMONITORING', true, '{\"list\":[{\"label\":\"Index Name\",\"name\":\"splunkIndex\",\"type\":\"input\",\"current\":{\"text\":\"\",\"value\":\"\"},\"hide\":0,\"includeAll\":true,\"multi\":false,\"options\":[{\"selected\":false,\"text\":\"\",\"value\":\"\"}],\"query\":\"\",\"tooltip\":\"Enter Summary Index\"}]}', 'SPLUNK' WHERE NOT EXISTS (SELECT id FROM public.\"INSIGHTS_ROI_TOOLS\" WHERE tool_name = 'SPLUNK');"
+		"sqlQuery": "INSERT INTO public.\"INSIGHTS_ROI_TOOLS\"(id, agent_communication_queue, category, isactive, tool_config_json, tool_name) SELECT nextval('hibernate_sequence'), 'SPLUNK_MILESTONE_EXECUTION', 'ROI', true, '{\"list\":[{\"label\":\"Index Name\",\"name\":\"splunkIndex\",\"type\":\"input\",\"current\":{\"text\":\"\",\"value\":\"\"},\"hide\":0,\"includeAll\":true,\"multi\":false,\"options\":[{\"selected\":false,\"text\":\"\",\"value\":\"\"}],\"query\":\"\",\"tooltip\":\"Enter Summary Index\"}]}', 'SPLUNK' WHERE NOT EXISTS (SELECT id FROM public.\"INSIGHTS_ROI_TOOLS\" WHERE tool_name = 'SPLUNK');"
 	},
 	{
         "queryName":"Add ELASTICSEARCH tool ",
-        "sqlQuery":"INSERT INTO public.\"INSIGHTS_ROI_TOOLS\"(id, agent_communication_queue, category, isactive, tool_config_json, tool_name)SELECT nextval('hibernate_sequence'), 'ELASTICSEARCH_MILESTONE_EXECUTION',  'APPMONITORING', 'TRUE', '{\"list\":[{\"label\":\"Log Key\",\"name\":\"logKey\",\"type\":\"input\",\"current\":{\"text\":\"\",\"value\":\"\"},\"hide\":0,\"includeAll\":true,\"multi\":false,\"options\":[{\"selected\":false,\"text\":\"\",\"value\":\"\"}],\"query\":\"\",\"tooltip\":\"Enter log key\"}]}','ELASTICSEARCH' WHERE NOT EXISTS(SELECT tool_name from public.\"INSIGHTS_ROI_TOOLS\"  WHERE tool_name = 'ELASTICSEARCH');"
-    }
+        "sqlQuery":"INSERT INTO public.\"INSIGHTS_ROI_TOOLS\"(id, agent_communication_queue, category, isactive, tool_config_json, tool_name)SELECT nextval('hibernate_sequence'), 'ELASTICSEARCH_MILESTONE_EXECUTION',  'ROI', 'TRUE', '{\"list\":[{\"label\":\"Log Key\",\"name\":\"logKey\",\"type\":\"input\",\"current\":{\"text\":\"\",\"value\":\"\"},\"hide\":0,\"includeAll\":true,\"multi\":false,\"options\":[{\"selected\":false,\"text\":\"\",\"value\":\"\"}],\"query\":\"\",\"tooltip\":\"Enter log key\"}]}','ELASTICSEARCH' WHERE NOT EXISTS(SELECT tool_name from public.\"INSIGHTS_ROI_TOOLS\"  WHERE tool_name = 'ELASTICSEARCH');"
+    },
+    {
+		"queryName":"update Template type in report template",
+		"sqlQuery":"Update public.\"INSIGHTS_ASSESSMENT_REPORT_TEMPLATE\" set templatetype = 'Others' where templatetype is null;"
+	}
 ]

@@ -48,9 +48,7 @@ public class ContentExecutor implements Callable<Integer> {
 		}
 		catch (InsightsJobFailedException e) {			
 			return _contentConfigDTO.getContentId();
-		}
-		
-		
+		}		
 		return -1;
 	}
 	
@@ -89,7 +87,5 @@ public class ContentExecutor implements Callable<Integer> {
 			}
 		}
 		return failedContentJobs;
-
 	}
-
 }

@@ -75,6 +75,7 @@ public class MilestoneExecutor {
 					JsonObject jsonObject = new JsonObject();
 					jsonObject.addProperty("milestoneId",outcome.getMileStoneConfig().getId());
 					jsonObject.addProperty("milestoneName",outcome.getMileStoneConfig().getMileStoneName());
+					jsonObject.addProperty("milestoneReleaseId",outcome.getMileStoneConfig().getMilestoneReleaseID());
 					jsonObject.addProperty("startDate", outcome.getMileStoneConfig().getStartDate());
 					jsonObject.addProperty("endDate",outcome.getMileStoneConfig().getEndDate());
 					jsonObject.addProperty("configJson", outcome.getInsightsOutcomeTools().getConfigJson());
@@ -106,5 +107,4 @@ public class MilestoneExecutor {
 			log.debug("Error while publishing message in queue");
 		}
 	}
-
 }

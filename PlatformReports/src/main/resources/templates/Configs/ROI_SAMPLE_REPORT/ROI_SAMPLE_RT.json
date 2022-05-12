@@ -1,0 +1,90 @@
+{
+	"reportName": "ROI_Sample_template",
+	"description": "Sample report template for ROI",
+	"isActive": true,
+	"visualizationutil": "GRAFANAPDF",
+	"templateType": "ROITemplate",
+	"kpiConfigs": [
+		{
+			"kpiId": "60",
+			"visualizationConfigs": [
+				{
+					"vType": "stat_60",
+					"vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.Stories as Value"
+				}
+			]
+		},
+		{
+			"kpiId": "61",
+			"visualizationConfigs": [
+				{
+					"vType": "stat_61",
+					"vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.Developers as Value"
+				}
+			]
+		},
+		{
+			"kpiId": "62",
+			"visualizationConfigs": [
+				{
+					"vType": "stat_62",
+					"vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.HoursSpent as Value"
+				}
+			]
+		},
+		{
+			"kpiId": "63",
+			"visualizationConfigs": [
+				{
+					"vType": "stat_63",
+					"vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.Cost as Value"
+				}
+			]
+		},
+		{
+			"kpiId": "64",
+			"visualizationConfigs": [
+				{
+					"vType": "stat_64",
+					"vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.Rate as Value"
+				}
+			]
+		},
+		{
+			"kpiId": "65",
+			"visualizationConfigs": [
+				{
+					"vType": "stat_65",
+					"vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.Value as Value"
+				}
+			]
+		},
+		{
+			"kpiId": "66",
+			"visualizationConfigs": [
+				{
+					"vType": "stat_66",
+					"vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.Value as Value"
+				}
+			]
+		},
+		{
+			"kpiId": "67",
+			"visualizationConfigs": [
+				{
+					"vType": "barchart_horizontal_67",
+					"vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.value, split(n.fromDate,'T')[0] as recordDate order by recordDate limit 10"
+				}
+			]
+		},
+		{
+			"kpiId": "68",
+			"visualizationConfigs": [
+				{
+					"vType": "barchart_vertical_68",
+					"vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.value, split(n.fromDate,'T')[0] as recordDate order by recordDate limit 10"
+				}
+			]
+		}
+	]
+}

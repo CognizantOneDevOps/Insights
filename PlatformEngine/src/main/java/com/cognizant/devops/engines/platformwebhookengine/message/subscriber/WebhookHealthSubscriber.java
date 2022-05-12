@@ -37,7 +37,6 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 	private static Logger log = LogManager.getLogger(WebhookHealthSubscriber.class);
 	private String jobName = ""; 
 	
-
 	public WebhookHealthSubscriber(String routingKey, String jobName) throws Exception {
 		super(routingKey);
 		this.jobName=jobName;
@@ -56,11 +55,9 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 			log.debug("This is normal json object for webhook health ");
 			dataList.add(json.getAsJsonObject());
 		}
-		
-		
+				
 		JsonObject messageObj = json.getAsJsonObject();
-		try {
-			
+		try {		
 			log.debug("Type=WebhookHealth {} routingKey={} status={} serverPort={}"
 					,messageObj.get("message").getAsString(),routingKey,messageObj.get("status").getAsString(),messageObj.get("serverPort").getAsString());
 			if (!dataList.isEmpty()) {
@@ -81,7 +78,6 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 					,routingKey,messageObj.get("message").getAsString(),messageObj.get("status").getAsString(),messageObj.get("serverPort").getAsString(),e);
 			getChannel().basicReject(envelope.getDeliveryTag(), false);
 		}
-
 	}
 
 	/**
@@ -106,5 +102,4 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 		}
 		return isRecordUpdate;
 	}
-
 }

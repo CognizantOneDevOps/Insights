@@ -31,7 +31,7 @@
   <div class="btnAlign">
 
     <button type="submit" mat-icon-button [disabled]="!mileStoneForm.valid" (click)="onSubmit()">
-      <mat-icon title="Save" style="margin-top: 0%;" class="mat-icon material-icons">
+      <mat-icon title="Save" style="margin-top: 10%;" class="mat-icon material-icons">
         save
       </mat-icon>
     </button>
@@ -79,7 +79,19 @@
             <span class="infoText">Enter MileStone name.</span>
           </td>
         </tr>
-
+        <tr class="mat-row-webhook">
+          <td class="mat-cell" class="columnName">
+            <span class="mainText">MileStone Release ID</span>
+            <span style="color:#ff0000;">*</span>
+          </td>
+          <td class="columnComponent">
+            <input matinput maxlength="20" class="form-control" formControlName="milestoneReleaseID" type="text"
+              autocomplete="off" placeholder="Enter mile stone name">
+          </td>
+          <td class="info">
+            <span class="infoText">Enter Release ID for this milestone</span>
+          </td>
+        </tr>
         <tr class="mat-row-webhook">
           <td class="mat-cell" class="columnName">
             <span class="mainText">Start Date</span>
@@ -165,14 +177,16 @@
             <span style="color:#ff0000;">*</span>
           </td>
           <td class="columnComponent">
-            <mat-select class="form-control" placeholder="Select Outcome" formControlName="outcomeList"
-            required color="primary" multiple>
-              <mat-option *ngFor="let outcome of outcomeArray" value="{{outcome.id}}" style="color:#0033A0">
-                {{outcome.outcomeName}} </mat-option>
-            </mat-select>
+            <textarea matinput rows="2" type="text" class="form-control" formControlName="outcomeList"
+              style="width: 84%;background-color:#e1e3e7;" disabled placeholder="Select Outcome">
+            </textarea>
           </td>
           <td>
-            <span class="infoText">Select Outcomes</span>
+            <a (click)="openOutcomeDialog()" style="margin-left:-63px;">
+              <mat-icon svgIcon="search_icon" [ngStyle]="{color:'#5C068C', height: '20px', width: '20px'}">
+              </mat-icon>
+            </a>
+            <span class="infoText" style="padding-left:45px;">Select Outcomes</span>
           </td>
         </tr>
       </form>

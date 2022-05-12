@@ -29,8 +29,8 @@ import uuid
 from apscheduler.schedulers.blocking import BlockingScheduler
 from pytz import timezone
 
-from CommunicationFacade import CommunicationFacade
-from MessageQueueProvider import MessageFactory
+from .CommunicationFacade import CommunicationFacade
+from .MessageQueueProvider import MessageFactory
 
 
 class BaseAgent(object):
@@ -104,7 +104,7 @@ class BaseAgent(object):
         try:
             logging.debug('==== '+str(message))
             if printOnConsole:
-                print(str(message))
+                print((str(message)))
         except Exception as ex:
             logging.error(ex)
     
@@ -268,7 +268,7 @@ class BaseAgent(object):
                 timeResponse = None
                 if isEpochTime:
                     eventTime = str(eventTime)
-                    eventTime = long(eventTime[:10])
+                    eventTime = int(eventTime[:10])
                     timeResponse = self.getRemoteDateTime(datetime.fromtimestamp(eventTime))
                 else:
                     eventTime = eventTime[:self.dateTimeLength]

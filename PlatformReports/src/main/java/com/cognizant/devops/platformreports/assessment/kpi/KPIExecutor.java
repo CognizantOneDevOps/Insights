@@ -22,6 +22,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.constants.ReportStatusConstants;
+import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsContentConfig;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
 import com.cognizant.devops.platformreports.assessment.content.ContentExecutor;
@@ -32,6 +34,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 public class KPIExecutor implements Callable<JsonObject> {
+
 	private static final Logger log = LogManager.getLogger(KPIExecutor.class);
 	private static final String STATUS= "Status";
 	private static final long serialVersionUID = -4343203101560318074L;
@@ -52,16 +55,16 @@ public class KPIExecutor implements Callable<JsonObject> {
 		long startTime = System.nanoTime();
 		try {
 			kpiId = executeKPIJob(_kpiConfigDTO);
-			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+			log.debug(StringExpressionConstants.STR_EXP_TASK,
 					_kpiConfigDTO.getExecutionId(),_kpiConfigDTO.getWorkflowId(),_kpiConfigDTO.getReportId() ,"-",_kpiConfigDTO.getKpiId(),_kpiConfigDTO.getCategory()
-					,0,"usecasename: " +_kpiConfigDTO.getUsecaseName() + "schedule: " +_kpiConfigDTO.getSchedule());			
+					,0,ReportStatusConstants.USECASENAME +_kpiConfigDTO.getUsecaseName() + ReportStatusConstants.SCHEDULE +_kpiConfigDTO.getSchedule());			
 		} catch (InsightsJobFailedException e) {
 			response.addProperty(STATUS, "Failure");
 			failedjobs.add(_kpiConfigDTO.getKpiId());
 			response.add("kpiArray", failedjobs);
-			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+			log.debug(StringExpressionConstants.STR_EXP_TASK,
 					_kpiConfigDTO.getExecutionId(),_kpiConfigDTO.getWorkflowId(),_kpiConfigDTO.getReportId() ,"-",_kpiConfigDTO.getKpiId(),_kpiConfigDTO.getCategory()
-					,0,"usecasename: " +_kpiConfigDTO.getUsecaseName() + "schedule: " +_kpiConfigDTO.getSchedule());			
+					,0,ReportStatusConstants.USECASENAME +_kpiConfigDTO.getUsecaseName() + ReportStatusConstants.SCHEDULE +_kpiConfigDTO.getSchedule());			
 		}
 		if (kpiId != ReportEngineEnum.StatusCode.ERROR.getValue()) {
 			ReportConfigDAL reportConfigAL = new ReportConfigDAL();
@@ -80,9 +83,9 @@ public class KPIExecutor implements Callable<JsonObject> {
 				response.addProperty(STATUS, "Success");
 			}
 			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+			log.debug(StringExpressionConstants.STR_EXP_TASK,
 					_kpiConfigDTO.getExecutionId(),_kpiConfigDTO.getWorkflowId(),_kpiConfigDTO.getReportId() ,"-",_kpiConfigDTO.getKpiId(),_kpiConfigDTO.getCategory()
-					,processingTime,"usecasename: " +_kpiConfigDTO.getUsecaseName() + " schedule: " +_kpiConfigDTO.getSchedule());
+					,processingTime,ReportStatusConstants.USECASENAME +_kpiConfigDTO.getUsecaseName() + " schedule: " +_kpiConfigDTO.getSchedule());
 			
 		}
 
@@ -101,7 +104,7 @@ public class KPIExecutor implements Callable<JsonObject> {
 			   return ReportEngineEnum.StatusCode.NO_DATA.getValue();
 			}
 			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+			log.debug(StringExpressionConstants.STR_EXP_TASK,
 					_kpiConfigDTO.getExecutionId(),_kpiConfigDTO.getWorkflowId(),_kpiConfigDTO.getReportId() ,"-",_kpiConfigDTO.getKpiId(),_kpiConfigDTO.getCategory()
 					,processingTime," usecasename: " +_kpiConfigDTO.getUsecaseName() + " schedule: " +_kpiConfigDTO.getSchedule());	
 			return kpiDefinition.getKpiId();
@@ -111,9 +114,9 @@ public class KPIExecutor implements Callable<JsonObject> {
 			log.error("Worlflow Detail ====   No neo4j query defined for KPI {} With Id {} ",
 					kpiDefinition.getGroupName(),
 					kpiDefinition.getKpiId());
-			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+			log.error(StringExpressionConstants.STR_EXP_TASK,
 					_kpiConfigDTO.getExecutionId(),_kpiConfigDTO.getWorkflowId(),_kpiConfigDTO.getReportId() ,"-",_kpiConfigDTO.getKpiId(),_kpiConfigDTO.getCategory()
-					,0,"usecasename: " +_kpiConfigDTO.getUsecaseName() + "schedule: " +_kpiConfigDTO.getSchedule()+ "No neo4j query defined for KPI");
+					,0,ReportStatusConstants.USECASENAME +_kpiConfigDTO.getUsecaseName() + ReportStatusConstants.SCHEDULE +_kpiConfigDTO.getSchedule()+ "No neo4j query defined for KPI");
 			
 			throw new InsightsJobFailedException("Worlflow Detail ==== No neo4j query defined for KPI");
 		}

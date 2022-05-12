@@ -37,6 +37,8 @@ import org.quartz.JobExecutionException;
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing.model.DataEnrichmentModel;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
+import com.cognizant.devops.platformcommons.constants.EngineConstants;
+import com.cognizant.devops.platformcommons.constants.MilestoneConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.FileDetailsEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
@@ -82,9 +84,9 @@ public class OfflineDataProcessingExecutor implements Job, ApplicationConfigInte
 			EngineStatusLogger.getInstance().createSchedularTaskStatusNode("OfflineDataProcessingExecutor execution Start ",
 					PlatformServiceConstants.SUCCESS,jobName);
 			ApplicationConfigInterface.loadConfiguration();
-			loggingInfo.put("execId", String.valueOf(System.currentTimeMillis()));
+			loggingInfo.put(MilestoneConstants.EXECID, String.valueOf(System.currentTimeMillis()));
 			executeOfflineProcessing();
-			log.debug(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} ProcessingTime={} processedRecords={} Offline Data Processing completed",loggingInfo.get("execId"),"-","-",0,0);
+			log.debug(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} ProcessingTime={} processedRecords={} Offline Data Processing completed",loggingInfo.get(MilestoneConstants.EXECID),"-","-",0,0);
 		} catch (Exception e) {
 			log.error("Offline Data Procesing has some issue",e);
 			EngineStatusLogger.getInstance().createSchedularTaskStatusNode("Offline Data Procesing has some issue",
@@ -106,7 +108,7 @@ public class OfflineDataProcessingExecutor implements Job, ApplicationConfigInte
 		for (InsightsConfigFiles eachFile : configFile) {
 				if (eachFile.getFileType().equalsIgnoreCase(FileDetailsEnum.ConfigurationFileType.JSON.name())) {
 					jsonFileCount++;
-					loggingInfo.put("fileName",eachFile.getFileName());
+					loggingInfo.put(EngineConstants.FILENAME,eachFile.getFileName());
 					processOfflineConfiguration(eachFile);
 				}
 		}				
@@ -142,11 +144,11 @@ public class OfflineDataProcessingExecutor implements Job, ApplicationConfigInte
 						DataEnrichmentModel[].class));
 				for (DataEnrichmentModel dataEnrichmentModel : dataEnrichmentModels) {
 					String cypherQuery = dataEnrichmentModel.getCypherQuery();
-					loggingInfo.put("queryName", dataEnrichmentModel.getQueryName().trim().replace(" ", "_"));
-					log.debug(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} ProcessingTime={} processedRecords={} Cypher query : {} ",loggingInfo.get("execId"),loggingInfo.get("fileName"),loggingInfo.get("queryName"),0,0,cypherQuery);
+					loggingInfo.put(EngineConstants.QUERYNAME, dataEnrichmentModel.getQueryName().trim().replace(" ", "_"));
+					log.debug(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} ProcessingTime={} processedRecords={} Cypher query : {} ",loggingInfo.get(MilestoneConstants.EXECID),loggingInfo.get(EngineConstants.FILENAME),loggingInfo.get(EngineConstants.QUERYNAME),0,0,cypherQuery);
 					Long runSchedule = dataEnrichmentModel.getRunSchedule();
 					if (cypherQuery == null || cypherQuery.isEmpty() || runSchedule == null )  {
-						log.error(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} {} doesn't have either cypherQuery or runSchedule attribute.",loggingInfo.get("execId"),loggingInfo.get("fileName"),loggingInfo.get("queryName"),dataEnrichmentModel.getQueryName());
+						log.error(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} {} doesn't have either cypherQuery or runSchedule attribute.",loggingInfo.get(MilestoneConstants.EXECID),loggingInfo.get(EngineConstants.FILENAME),loggingInfo.get(EngineConstants.QUERYNAME),dataEnrichmentModel.getQueryName());
 						continue;
 					}
 					if (isQueryScheduledToRun(dataEnrichmentModel.getRunSchedule(),
@@ -161,10 +163,10 @@ public class OfflineDataProcessingExecutor implements Job, ApplicationConfigInte
 				jsonFile.setFileData(new Gson().toJson(dataEnrichmentModels).getBytes());
 				configFilesDAL.updateConfigurationFile(jsonFile);
 		} catch (IllegalStateException | JsonSyntaxException  ex) {
-			log.error(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} {} file is not as per expected format ",loggingInfo.get("execId"),loggingInfo.get("fileName"),loggingInfo.get("queryName"),jsonFile.getFileName(), ex);
+			log.error(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} {} file is not as per expected format ",loggingInfo.get(MilestoneConstants.EXECID),loggingInfo.get(EngineConstants.FILENAME),loggingInfo.get(EngineConstants.QUERYNAME),jsonFile.getFileName(), ex);
 			return false;
 		} catch (Exception e) {
-			log.error(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} {} error while loading file ",loggingInfo.get("execId"),loggingInfo.get("fileName"),loggingInfo.get("queryName"),jsonFile.getFileName(), e);
+			log.error(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} {} error while loading file ",loggingInfo.get(MilestoneConstants.EXECID),loggingInfo.get(EngineConstants.FILENAME),loggingInfo.get(EngineConstants.QUERYNAME),jsonFile.getFileName(), e);
 			return false;
 		}
 		return true;
@@ -201,7 +203,7 @@ public class OfflineDataProcessingExecutor implements Job, ApplicationConfigInte
 				JsonObject sprintResponseJson = sprintResponse.getJson();
 				processedRecords = sprintResponseJson.getAsJsonArray("results").get(0).getAsJsonObject()
 						.getAsJsonArray("data").get(0).getAsJsonObject().getAsJsonArray("row").get(0).getAsInt();
-				log.debug(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} ProcessingTime={} processedRecords={} Processed Records = {}",loggingInfo.get("execId"),loggingInfo.get("fileName"),loggingInfo.get("queryName"),0, processedRecords,processedRecords);
+				log.debug(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} ProcessingTime={} processedRecords={} Processed Records = {}",loggingInfo.get(MilestoneConstants.EXECID),loggingInfo.get(EngineConstants.FILENAME),loggingInfo.get(EngineConstants.QUERYNAME),0, processedRecords,processedRecords);
 				recordCount = recordCount + processedRecords;
 			}
 			long queryExecutionEndTime = System.currentTimeMillis();
@@ -210,9 +212,9 @@ public class OfflineDataProcessingExecutor implements Job, ApplicationConfigInte
 				dataEnrichmentModel.setRecordsProcessed(recordCount);
 				dataEnrichmentModel.setQueryProcessingTime(queryProcessingTime);
 			}
-			log.debug(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} ProcessingTime={} processedRecords={} Offline Query processed records={} ",loggingInfo.get("execId"),loggingInfo.get("fileName"),loggingInfo.get("queryName"), queryProcessingTime,processedRecords,processedRecords);
+			log.debug(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} ProcessingTime={} processedRecords={} Offline Query processed records={} ",loggingInfo.get(MilestoneConstants.EXECID),loggingInfo.get(EngineConstants.FILENAME),loggingInfo.get(EngineConstants.QUERYNAME), queryProcessingTime,processedRecords,processedRecords);
 		} catch (UnsupportedOperationException | IllegalStateException | IndexOutOfBoundsException | InsightsCustomException ex) {
-			log.error(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} {} - query processing failed",loggingInfo.get("execId"),loggingInfo.get("fileName"),loggingInfo.get("queryName"),cypherQuery, ex);
+			log.error(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} {} - query processing failed",loggingInfo.get(MilestoneConstants.EXECID),loggingInfo.get(EngineConstants.FILENAME),loggingInfo.get(EngineConstants.QUERYNAME),cypherQuery, ex);
 			return false;
 		} 
 		return true;
@@ -251,7 +253,7 @@ public class OfflineDataProcessingExecutor implements Job, ApplicationConfigInte
 					return true;
 				}
 			} catch (Exception e) {
-				log.error(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} Unable to parse the CRON expression:{} ",loggingInfo.get("execId"),loggingInfo.get("fileName"),loggingInfo.get("queryName"),cronSchedule, e);
+				log.error(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} Unable to parse the CRON expression:{} ",loggingInfo.get(MilestoneConstants.EXECID),loggingInfo.get(EngineConstants.FILENAME),loggingInfo.get(EngineConstants.QUERYNAME),cronSchedule, e);
 			}
 		}else {
 			if (dateTime != null && now != null) {

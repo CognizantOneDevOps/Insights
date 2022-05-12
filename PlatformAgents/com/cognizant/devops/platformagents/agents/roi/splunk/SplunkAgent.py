@@ -38,6 +38,7 @@ class SplunkAgent(BaseAgent):
         eventDetails = json.loads(data)
         milestoneId = eventDetails.get("milestoneId", None)
         milestoneName = eventDetails.get("milestoneName", None)
+        milestoneReleaseId = eventDetails.get("milestoneReleaseId", None)
         startDate = eventDetails.get("startDate", None)
         endDate = eventDetails.get("endDate", None)
         outcomeName = eventDetails.get("outcomeName", None)
@@ -63,7 +64,8 @@ class SplunkAgent(BaseAgent):
                 "statusQueue": statusQueue,
                 "indexName": indexName,
                 "lastUpdatedDate": self.timeStampNow(),
-                "status": "NOT_STARTED"
+                "status": "NOT_STARTED",
+                "milestoneReleaseId": milestoneReleaseId
                 }
         
         if trackId in milestoneTrackingDetails and milestoneTrackingDetails[trackId]["status"] == "ERROR":
@@ -181,6 +183,7 @@ class SplunkAgent(BaseAgent):
             finalData = []
             outcomeMetadata = {"milestoneId": outcomeDetails["milestoneId"], 
                             "milestoneName": outcomeDetails["milestoneName"],
+                            "milestoneReleaseId": outcomeDetails["milestoneReleaseId"],
                             "outcomeName": outcomeDetails["outcomeName"],
                             "outcomeId": outcomeDetails["outcomeId"]}
             for item in formattedResults:

@@ -25,6 +25,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum.WorkflowSchedule;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformreports.assessment.datamodel.ContentConfigDefinition;
@@ -36,6 +38,7 @@ import com.cognizant.devops.platformreports.exception.InsightsJobFailedException
 import com.google.gson.JsonObject;
 
 public class ThresholdRangeCategoryImpl extends BaseContentCategoryImpl {
+	
 	private static Logger log = LogManager.getLogger(ThresholdRangeCategoryImpl.class);
 	public ThresholdRangeCategoryImpl(ContentConfigDefinition inferenceContentConfigDefinition) {
 		super(inferenceContentConfigDefinition);
@@ -62,12 +65,12 @@ public class ThresholdRangeCategoryImpl extends BaseContentCategoryImpl {
 					contentResult.getInferenceText());
 			saveContentResult(contentResult);
 			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+			log.debug(StringExpressionConstants.STR_EXP_TASK,
 					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
 					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
-					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
-					"action :" + contentConfigDefinition.getAction() 
-					+ "ContentResult :" + contentConfigDefinition.getNoOfResult());
+					ConfigOptions.CONTENT_ID + contentConfigDefinition.getContentId() + ConfigOptions.CONTENT_NAME +contentConfigDefinition.getContentName() +
+					ConfigOptions.ACTION + contentConfigDefinition.getAction() 
+					+ ConfigOptions.CONTENT_RESULT + contentConfigDefinition.getNoOfResult());
 		}
 	}
 
@@ -137,35 +140,35 @@ public class ThresholdRangeCategoryImpl extends BaseContentCategoryImpl {
 							getContentConfig().getKpiId(), getContentConfig().getContentId(), resultDetailObj);
 				}
 				long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-				log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+				log.debug(StringExpressionConstants.STR_EXP_TASK,
 						contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
 						contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
-						"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
-						"action :" + contentConfigDefinition.getAction() 
-						+ "ContentResult :" + contentConfigDefinition.getNoOfResult());
+						ConfigOptions.CONTENT_ID + contentConfigDefinition.getContentId() + ConfigOptions.CONTENT_NAME +contentConfigDefinition.getContentName() +
+						ConfigOptions.ACTION + contentConfigDefinition.getAction() 
+						+ ConfigOptions.CONTENT_RESULT + contentConfigDefinition.getNoOfResult());
 			} catch (Exception e) {
 				log.error(e);
 				log.error(
 						" Error while content processing for threshold-range countAndPercentageInferenceResult KPIId {} contentId {}",
 						getContentConfig().getKpiId(), getContentConfig().getContentId());
-				log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+				log.error(StringExpressionConstants.STR_EXP_TASK,
 						contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
 						contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),0,
-						"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
-						"action :" + contentConfigDefinition.getAction() 
-						+ "ContentResult :" + contentConfigDefinition.getNoOfResult() + " Error while content processing for threshold-range"  + e.getMessage());
+						ConfigOptions.CONTENT_ID + contentConfigDefinition.getContentId() + ConfigOptions.CONTENT_NAME +contentConfigDefinition.getContentName() +
+						ConfigOptions.ACTION + contentConfigDefinition.getAction() 
+						+ ConfigOptions.CONTENT_RESULT + contentConfigDefinition.getNoOfResult() + " Error while content processing for threshold-range"  + e.getMessage());
 				throw new InsightsJobFailedException(" Error while content processing for threshold-range KPIId {} contentId {}");
 			}
 
 		} else {
 			log.error(" Errro while content processing for threshold-range KPIId {} contentId {}",
 					getContentConfig().getKpiId(), getContentConfig().getContentId());
-			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+			log.error(StringExpressionConstants.STR_EXP_TASK,
 					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
 					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),0,
-					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
-					"action :" + contentConfigDefinition.getAction() 
-					+ "ContentResult :" + contentConfigDefinition.getNoOfResult() + " Error while content processing for threshold-range");
+					ConfigOptions.CONTENT_ID + contentConfigDefinition.getContentId() + ConfigOptions.CONTENT_NAME  +contentConfigDefinition.getContentName() +
+					ConfigOptions.ACTION + contentConfigDefinition.getAction() 
+					+ ConfigOptions.CONTENT_RESULT + contentConfigDefinition.getNoOfResult() + " Error while content processing for threshold-range");
 		}
 
 		return inferenceContentResult;

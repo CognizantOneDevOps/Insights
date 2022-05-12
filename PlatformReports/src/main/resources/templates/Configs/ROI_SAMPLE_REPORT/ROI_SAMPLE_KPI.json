@@ -1,0 +1,102 @@
+[
+    {
+      "kpiId":60,
+      "name":"Stories Delivered",
+      "group":"ALM",
+      "category":"STANDARD",
+      "toolName":"JIRA",
+      "DBQuery":"MATCH (n:JIRA:DATA) where n.fixVersion = 'V.1'  and n.issueType='Story' and n.status='Done' RETURN count(DISTINCT n.key) as Stories",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Stories"
+   },
+  {
+      "kpiId":61,
+      "name":"Developers",
+      "group":"ALM",
+      "category":"STANDARD",
+      "toolName":"JIRA",
+      "DBQuery":"MATCH (n:JIRA:DATA) where n.fixVersion = 'V.1' and n.issueType='Story' and n.status='Done' RETURN count(DISTINCT n.assignee) as Developers",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Developers"
+   },
+   {
+      "kpiId":62,
+      "name":"Total Hours Spent",
+      "toolName":"JIRA",
+      "category":"STANDARD",
+      "group":"ALM",
+      "isActive":true,
+      "DBQuery":"MATCH (n:JIRA:DATA) where n.fixVersion = 'V.1' and n.issueType='Story' and n.status='Done' RETURN ((SUM (n.resolutionDateEpoch-timestamp(n.createdDate)/1000))/36000)/4 as HoursSpent",
+      "datasource":"NEO4J",
+      "resultField":"HoursSpent"
+   },
+  {
+      "kpiId":63,
+      "name":"Cost Invested",
+      "group":"ALM",
+      "category":"STANDARD",
+      "toolName":"JIRA",
+      "DBQuery":"MATCH (n:JIRA:DATA) where n.fixVersion = 'V.1' and n.issueType='Story' and n.status='Done' RETURN ((SUM (n.resolutionDateEpoch-timestamp(n.createdDate)/1000))/36000)/4*20 as Cost",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Cost"
+   }
+   ,
+    {
+	  "kpiId":64,
+      "name":"Retention rate",
+      "group":"ROI",
+      "category":"STANDARD",
+      "toolName":"MILESTONE",
+      "DBQuery":"MATCH (n:MILESTONE) where n.milestoneName = {mileStoneName} and n.outcomeName ='Retension_Rate' RETURN DISTINCT AVG(toFloat(n.value)) as Rate",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Rate"
+   },
+   {
+      "kpiId":65,
+      "name":"Stickiness",
+      "group":"ROI",
+      "category":"STANDARD",
+      "toolName":"MILESTONE",
+      "DBQuery":"MATCH (n:MILESTONE) where n.milestoneName = {mileStoneName} and n.outcomeName ='Stickiness' RETURN DISTINCT AVG(toFloat(n.value))  as Value",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Value"
+   }, 
+    {
+      "kpiId":66,
+      "name":"Time on site",
+      "group":"ROI",
+      "category":"STANDARD",
+      "toolName":"MILESTONE",
+      "DBQuery":"MATCH (n:MILESTONE) where n.milestoneName = {mileStoneName} and n.outcomeName ='Time_On_Site_In_Seconds' RETURN DISTINCT AVG(toFloat(n.value))*5 as Value",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Value"
+   }, 
+   {
+      "kpiId":67,
+      "name":"Host Memory Usage %",
+      "group":"ROI",
+      "category":"STANDARD",
+      "toolName":"MILESTONE",
+      "DBQuery":"MATCH (n:MILESTONE) WHERE  n.milestoneName = {mileStoneName} and n.outcomeName='Host_Memory_Usage' RETURN n.from as fromDate ,n.value as value ",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"value"
+   },
+   {
+   "kpiId":68,
+      "name":"Host CPU %",
+      "group":"ROI",
+      "category":"STANDARD",
+      "toolName":"MILESTONE",
+      "DBQuery":"MATCH (n:MILESTONE) WHERE  n.milestoneName = {mileStoneName} and n.outcomeName='Host_Cpu' RETURN n.from as fromDate ,n.value as value ",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"value"
+   }
+]

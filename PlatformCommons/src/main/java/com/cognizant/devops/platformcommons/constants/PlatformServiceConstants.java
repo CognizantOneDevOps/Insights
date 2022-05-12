@@ -64,5 +64,16 @@ public interface PlatformServiceConstants {
 	String CR = "\r";
 	String TAB = "\t";
 	String EMPTY = "";
-	
+	String BUILD="build";
+	String TRUSTED_HOSTS="trustedHosts";
+	String MATCH_N_STRING="match(n:";
+	String DATA_PATTERN_STR=":DATA{";
+	String ISSUE_TYPE ="issueType";
+	String COMPONENT_NAME="componentName";
+	String DEPENDENCY="dependency";
+	String SUBSCRIBE = "subscribe";
+	String VAULT = "vault";
+	String RESULT = "result";
+
 }
+

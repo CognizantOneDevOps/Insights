@@ -27,8 +27,6 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import javax.ws.rs.ProcessingException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,6 +35,7 @@ import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscri
 import com.cognizant.devops.engines.platformengine.modules.aggregator.BusinessMappingData;
 import com.cognizant.devops.engines.util.DataEnrichUtils;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.EngineConstants;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
@@ -47,6 +46,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Envelope;
+
+import jakarta.ws.rs.ProcessingException;
 
 public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 
@@ -153,7 +154,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 				for (JsonElement e : asJsonArray) {
 					if (e.isJsonObject()) {
 						dataWithproperty = e.getAsJsonObject();						
-						loggingInfo.put("execId",String.valueOf(dataWithproperty.get("execId")));
+						loggingInfo.put(EngineConstants.EXECID,String.valueOf(dataWithproperty.get(EngineConstants.EXECID)));
 						// Below Code has the ability to add derived properties as part of Nodes
 						if (Boolean.TRUE.equals(this.isEnrichmentRequired) && e.getAsJsonObject().has(sourceProperty)) {
 							JsonElement sourceElem = e.getAsJsonObject().get(sourceProperty);
@@ -205,22 +206,22 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 				long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
 				log.debug(
 						" Type=AgentEngine toolName={} category={} agentId={} routingKey={} dataSize={} execId={} ProcessingTime={} Data ==== Processingtime={} ms",
-						toolName, category, agentId, "-", 0, loggingInfo.get("execId"), processingTime, processingTime);
+						toolName, category, agentId, "-", 0, loggingInfo.get(EngineConstants.EXECID), processingTime, processingTime);
 				getChannel().basicAck(envelope.getDeliveryTag(), false);
 			}
 		} catch (ProcessingException e) {
 			log.error(" toolName={} category={} agentId={} execId={} ProcessingException occured ", toolName, category,
-					agentId, loggingInfo.get("execId"), e);
+					agentId, loggingInfo.get(EngineConstants.EXECID), e);
 			getChannel().basicNack(envelope.getDeliveryTag(), false, true);
 		} catch (InsightsCustomException e) {
 			log.error("Error in payload {} ",message);
 			log.error(" toolName={} category={} agentId={} execId={} InsightsCustomException occured  ", toolName,
-					category, agentId, loggingInfo.get("execId"), e);
+					category, agentId, loggingInfo.get(EngineConstants.EXECID), e);
 			getChannel().basicReject(envelope.getDeliveryTag(), false);
 		} catch (Exception e) {
 			log.error("Error in payload {} ",message);
 			log.error(" toolName={} category={} agentId={} execId={} Exception occured  ", toolName, category, agentId,
-					loggingInfo.get("execId"), e);
+					loggingInfo.get(EngineConstants.EXECID), e);
 			getChannel().basicReject(envelope.getDeliveryTag(), false);
 		}
 	}
@@ -341,7 +342,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		buildNodePropertiesQueryPart(destination, "destination", cypherQuery);
 		cypherQuery.append(" MERGE (source)-[r:").append(relationName).append("]->(destination) ");
 		if (relationMetadata.has(AgentDataConstants.PROPERTIES)) {
-			cypherQuery.append(" set ");
+			cypherQuery.append(EngineConstants.SET);
 			JsonArray properties = relationMetadata.getAsJsonArray(AgentDataConstants.PROPERTIES);
 			for (JsonElement property : properties) {
 				cypherQuery.append("r.").append(property.getAsString()).append(" = properties.")
@@ -355,7 +356,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 
 	private void buildNodePropertiesQueryPart(JsonObject metaDataNode, String nodeName, StringBuffer cypherQuery) {
         if (metaDataNode.has(AgentDataConstants.PROPERTIES)) {
-            cypherQuery.append(" set ").append(nodeName).append("+=properties ");
+            cypherQuery.append(EngineConstants.SET).append(nodeName).append("+=properties ");
         } else if (metaDataNode.has(AgentDataConstants.SELECTED_PROPERTIES)) {
             cypherQuery.append(appendSelectedAdditionalPropertyQueryPart(metaDataNode, nodeName,
                     AgentDataConstants.SELECTED_PROPERTIES));
@@ -382,7 +383,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
         if (metaDataNodejson.has(memberName)) {
             JsonArray properties = metaDataNodejson.getAsJsonArray(memberName);
             if (properties.size() > 0) {
-                cypherQuery.append(" set ");
+                cypherQuery.append(EngineConstants.SET);
                 for (JsonElement additionalProperty : properties) {
                     String fieldName = additionalProperty.getAsString();
                     cypherQuery.append(nodeName).append(".").append(fieldName).append(" = properties.")

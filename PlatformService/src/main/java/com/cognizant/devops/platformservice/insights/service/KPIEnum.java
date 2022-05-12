@@ -16,17 +16,20 @@
 package com.cognizant.devops.platformservice.insights.service;
 
 public enum KPIEnum {
-  
-	    KPI1("110","Average Build Time","build","daily"),
-	    KPI2("111","Average Build Time","build","weekly"),
-	    KPI3("120","Number of builds","build","daily"),
-	    KPI4("121","Number of builds","build","weekly");
+		
+	
+	
+	    KPI1("110","Average Build Time",InsightsInferenceService.BUILD,"daily"),
+	    KPI2("111","Average Build Time",InsightsInferenceService.BUILD,"weekly"),
+	    KPI3("120","Number of builds",InsightsInferenceService.BUILD,"daily"),
+	    KPI4("121","Number of builds",InsightsInferenceService.BUILD,"weekly");
 
 	    private final String kpiId;
 	    private final String kpiName;
 	    private final String vector;
 	    private final String schedule;
-
+	    
+	    
 	    private KPIEnum(String kpiId,String kpiName, String vector, String schedule) {
 	        this.kpiId = kpiId;
 	        this.kpiName = kpiName;

@@ -41,6 +41,8 @@ export class ReportTemplateComponent implements OnInit {
   reportList: any;
   visualizationUtilResponse: any;
   visualizationUtilList = [];
+  templateTypeResponse: any;
+  templateTypeList = [];
   chartTypeResponse: any;
   chartTypeList = [];
   kpiResponse: any;
@@ -66,6 +68,7 @@ export class ReportTemplateComponent implements OnInit {
     this.showThrobber = true;
     this.displayedColumns = ['radio', 'reportTemplateName', 'reportTemplateDescription', 'visualizationutil', 'active', 'details'];
     this.getVisualizationUtilList();
+    this.getTemplateTypeList();
     this.getChartTypeList();
     this.getAllReportTemplate();
   }
@@ -84,6 +87,15 @@ export class ReportTemplateComponent implements OnInit {
     if (this.visualizationUtilResponse.data != null && this.visualizationUtilResponse.status == 'success') {
       this.visualizationUtilList = this.visualizationUtilResponse.data;
       console.log(this.visualizationUtilList);
+    }
+
+  }
+
+  async getTemplateTypeList() {
+    this.templateTypeResponse = await this.reportTemplateService.loadTemplateType();
+    if (this.templateTypeResponse.data != null && this.templateTypeResponse.status == 'success') {
+      this.templateTypeList = this.templateTypeResponse.data;
+      console.log(this.templateTypeList);
     }
 
   }
@@ -156,6 +168,10 @@ export class ReportTemplateComponent implements OnInit {
       this.messageDialog.showApplicationsMessage(
         "Failed to load visualization util for report templates.Please check logs for more details.", "ERROR");
     }
+    if (this.templateTypeList.length == 0) {
+      this.messageDialog.showApplicationsMessage(
+        "Failed to load template type for report templates.Please check logs for more details.", "ERROR");
+    }
     if (this.chartTypeList.length == 0) {
       this.messageDialog.showApplicationsMessage(
         "Failed to load vtypes for report templates.Please check logs for more details.", "ERROR");
@@ -165,6 +181,7 @@ export class ReportTemplateComponent implements OnInit {
       queryParams: {
         templateParam: this.configParams,
         visualizaionUtil: JSON.stringify(this.visualizationUtilList),
+        templateType: JSON.stringify(this.templateTypeList),
         vType: JSON.stringify(this.chartTypeList)
       }
     };

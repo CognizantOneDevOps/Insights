@@ -49,8 +49,7 @@ public class LedgerPDFChartHandler implements BasePDFProcessor {
 			createPDFDirectory(assessmentReportDTO);
 
 			prepareAndExportPDFFile(assessmentReportDTO);
-			
-			
+						
 		} catch (Exception e) {
 			log.error(e);
 			throw new InsightsJobFailedException(e.getMessage());

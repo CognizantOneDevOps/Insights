@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.engineautomation;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -30,7 +31,7 @@ import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectMod
 
 public class DataCleanup extends DataCleanupObjectrepository {
 
-	WebDriverWait wait = new WebDriverWait(driver, 10);
+	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 	private static final Logger log = LogManager.getLogger(DataCleanup.class);
 
 	public DataCleanup() {

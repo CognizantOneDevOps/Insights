@@ -63,7 +63,6 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 		} catch (Exception e) {
 			throw new InsightsJobFailedException(e.toString());
 		}
-
 		return graphResp;
 	}
 
@@ -98,7 +97,7 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 
 			JsonArray data = graphJsonResult.get(0).getAsJsonObject().getAsJsonArray("data");
 			JsonArray columns = graphJsonResult.get(0).getAsJsonObject().getAsJsonArray(AssessmentReportAndWorkflowConstants.COLUMNS);
-			log.debug(" Worlflow Detail ==== KPI Id {0}  record return by query ==== {1} ", kpiDefinition.getKpiId(),
+			log.debug(" Worlflow Detail ==== KPI Id {}  record return by query ==== {} ", kpiDefinition.getKpiId(),
 					data.size());
 			if (data.size() > 0) {
 				listOfResultJson.addAll(creatingResulJsontFromGraphResponce(data, columns, kpiDefinition, model));
@@ -134,7 +133,7 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 		graphQuery = graphQuery.replace(":kpiId", String.valueOf(contentConfigDefinition.getKpiId()))
 				.replace(":executionId", String.valueOf(contentConfigDefinition.getExecutionId()))
 				.replace(":assessmentReportName", "'"+contentConfigDefinition.getAssessmentReportName()+"'");
-		log.debug("Worlflow Detail ====  for kpi {0} contentId {1} graphQuery   {2} ", contentConfigDefinition.getKpiId(),
+		log.debug("Worlflow Detail ====  for kpi {} contentId {} graphQuery   {} ", contentConfigDefinition.getKpiId(),
 				contentConfigDefinition.getContentId(), graphQuery);
 		List<JsonObject> graphResponse = neo4jExecutor.fetchData(graphQuery);
 		creatingResultDetailFromGraphResponce(kpiDetailList, contentConfigDefinition, graphResponse.get(0));
@@ -166,8 +165,6 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 	 * 
 	 * @param resultMap
 	 */
-
-	
 	void parseGraphResponseForError(JsonObject graphResponse) {
 		JsonArray errorMessage = graphResponse.getAsJsonArray("errors");
 		if (errorMessage != null && errorMessage.size() >= 1) {
@@ -197,7 +194,6 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 				} else {
 					log.error("Either row or column data of graph response is not available for the KPI ID {}",
 							kpiDefinition.getKpiId());
-
 				}
 			}
 			//String resultValue = String.valueOf(dataJson.get(kpiDefinition.getResultField()));
@@ -218,7 +214,6 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 				log.error(
 						" No result calculated  or  ResultField row value field is null or zero for the KPI ID {} ....",
 						kpiDefinition.getKpiId());
-
 			}
 		}
 		return listOfResultJson;

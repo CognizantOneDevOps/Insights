@@ -41,7 +41,6 @@ public class PDFDataProcessor {
 		}
 
 		return result;
-
 	}
 
 	public JsonArray fetchAndFormatContentResult(long executionId, int kpiId, String assessmentReportName) {

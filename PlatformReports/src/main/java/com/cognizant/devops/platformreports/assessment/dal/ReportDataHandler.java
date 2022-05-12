@@ -45,5 +45,4 @@ public interface ReportDataHandler {
 	
 	public JsonArray fetchVisualizationResults(long executionId, int kpiId, String assessmentReportName);
 	
-
 }

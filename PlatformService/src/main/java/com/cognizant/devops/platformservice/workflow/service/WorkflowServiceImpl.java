@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.EmailConfiguration;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
+import com.cognizant.devops.platformcommons.constants.ErrorMessage;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
@@ -51,7 +52,8 @@ public class WorkflowServiceImpl {
 	WorkflowDAL workflowConfigDAL = new WorkflowDAL();
 	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
 	String healthNotificationWorkflowId = WorkflowTaskEnum.WorkflowType.SYSTEM.getValue() + "_" + "HealthNotification";
-
+	
+	
 	/**
 	 * Adding tasks to the workflow task table *
 	 * 
@@ -62,10 +64,10 @@ public class WorkflowServiceImpl {
 	public int saveWorkflowTask(JsonObject workflowTaskJson) throws InsightsCustomException {
 		int id = -1;
 		try {
-			String description = workflowTaskJson.get("description").getAsString();
+			String description = workflowTaskJson.get(AssessmentReportAndWorkflowConstants.TASK_DESCRIPTION).getAsString();
 			String mqChannel = workflowTaskJson.get("mqChannel").getAsString();
-			String componentName = workflowTaskJson.get("componentName").getAsString();
-			int dependency = workflowTaskJson.get("dependency").getAsInt();
+			String componentName = workflowTaskJson.get(PlatformServiceConstants.COMPONENT_NAME).getAsString();
+			int dependency = workflowTaskJson.get(PlatformServiceConstants.DEPENDENCY).getAsInt();
 			String workflowType = workflowTaskJson.get("workflowType").getAsString();
 
 			InsightsWorkflowTask taskConfig = new InsightsWorkflowTask();
@@ -185,9 +187,9 @@ public class WorkflowServiceImpl {
 			for (InsightsWorkflowTask taskDetail : listofTasks) {
 				JsonObject jsonobject = new JsonObject();
 				jsonobject.addProperty(AssessmentReportAndWorkflowConstants.TASK_ID, taskDetail.getTaskId());
-				jsonobject.addProperty("description", taskDetail.getDescription());
-				jsonobject.addProperty("dependency", taskDetail.getDependency());
-				jsonobject.addProperty("componentName", taskDetail.getCompnentName());
+				jsonobject.addProperty(AssessmentReportAndWorkflowConstants.TASK_DESCRIPTION, taskDetail.getDescription());
+				jsonobject.addProperty(PlatformServiceConstants.DEPENDENCY, taskDetail.getDependency());
+				jsonobject.addProperty(PlatformServiceConstants.COMPONENT_NAME, taskDetail.getCompnentName());
 				jsonarray.add(jsonobject);
 			}
 			return jsonarray;
@@ -408,13 +410,13 @@ public class WorkflowServiceImpl {
 				}
 			}
 			JsonObject responseJson = new JsonObject();
-			responseJson.addProperty("status", status);
-			responseJson.addProperty("executionId", executionId);
+			responseJson.addProperty(PlatformServiceConstants.STATUS, status);
+			responseJson.addProperty(AssessmentReportAndWorkflowConstants.EXECUTIONID, executionId);
 			responseJson.addProperty(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			return responseJson;
 		} catch (Exception e) {
-			log.error("Error while fetching execution ids", e);
-			throw new InsightsCustomException("Error while fetching execution ids");
+			log.error(ErrorMessage.FETCH_ERROR_MESSAGE, e);
+			throw new InsightsCustomException(ErrorMessage.FETCH_ERROR_MESSAGE);
 		}
 	}
 
@@ -429,7 +431,7 @@ public class WorkflowServiceImpl {
 		byte[] pdfContent = null;
 		try {
 			String workflowId = pdfDetailsJson.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID).getAsString();
-			long executionId = pdfDetailsJson.get("executionId").getAsLong();
+			long executionId = pdfDetailsJson.get(AssessmentReportAndWorkflowConstants.EXECUTIONID).getAsLong();
 			InsightsReportVisualizationContainer reportVisObject = workflowConfigDAL
 					.getReportVisualizationContainerByWorkflowAndExecutionId(workflowId, executionId);
 			if (reportVisObject != null) {
@@ -461,7 +463,7 @@ public class WorkflowServiceImpl {
 			String reportStatus = WorkflowTaskEnum.WorkflowStatus.NOT_STARTED.toString();
 			String workflowType = WorkflowTaskEnum.WorkflowType.SYSTEM.toString();
 			Long epochStartDate = 0L;
-			boolean isActive = statusJson.get("status").getAsBoolean();
+			boolean isActive = statusJson.get(PlatformServiceConstants.STATUS).getAsBoolean();
 			InsightsWorkflowConfiguration workflowConfig = workflowConfigDAL
 					.getWorkflowConfigByWorkflowId(healthNotificationWorkflowId);
 			if (workflowConfig == null) {
@@ -606,13 +608,13 @@ public class WorkflowServiceImpl {
 				}
 			}
 			JsonObject responseJson = new JsonObject();
-			responseJson.addProperty("status", status);
-			responseJson.addProperty("executionId", executionId);
+			responseJson.addProperty(PlatformServiceConstants.STATUS, status);
+			responseJson.addProperty(AssessmentReportAndWorkflowConstants.EXECUTIONID, executionId);
 			responseJson.addProperty(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			return responseJson;
 		} catch (Exception e) {
-			log.error("Error while fetching execution ids", e);
-			throw new InsightsCustomException("Error while fetching execution ids");
+			log.error(ErrorMessage.FETCH_ERROR_MESSAGE, e);
+			throw new InsightsCustomException(ErrorMessage.FETCH_ERROR_MESSAGE);
 		}
 	}
 
@@ -628,11 +630,11 @@ public class WorkflowServiceImpl {
 			for (InsightsWorkflowTask taskDetail : listofTasks) {
 				JsonObject jsonobject = new JsonObject();
 				jsonobject.addProperty(AssessmentReportAndWorkflowConstants.TASK_ID, taskDetail.getTaskId());
-				jsonobject.addProperty("description", taskDetail.getDescription());
+				jsonobject.addProperty(AssessmentReportAndWorkflowConstants.TASK_DESCRIPTION, taskDetail.getDescription());
 				jsonobject.addProperty("componentname", taskDetail.getCompnentName());
 				jsonobject.addProperty("mqchannel", taskDetail.getMqChannel());
 				jsonobject.addProperty("workflowtype", taskDetail.getWorkflowType().getWorkflowType());
-				jsonobject.addProperty("dependency", taskDetail.getDependency());
+				jsonobject.addProperty(PlatformServiceConstants.DEPENDENCY, taskDetail.getDependency());
 				jsonarray.add(jsonobject);
 			}
 			return jsonarray;
@@ -694,10 +696,10 @@ public class WorkflowServiceImpl {
 	public int updateWorkflowTask(JsonObject workflowTaskJson) throws InsightsCustomException {
 		try {
 			int taskId = workflowTaskJson.get("taskId").getAsInt();
-			String description = workflowTaskJson.get("description").getAsString();
+			String description = workflowTaskJson.get(AssessmentReportAndWorkflowConstants.TASK_DESCRIPTION).getAsString();
 			String mqChannel = workflowTaskJson.get("mqChannel").getAsString();
-			String componentName = workflowTaskJson.get("componentName").getAsString();
-			int dependency = workflowTaskJson.get("dependency").getAsInt();
+			String componentName = workflowTaskJson.get(PlatformServiceConstants.COMPONENT_NAME).getAsString();
+			int dependency = workflowTaskJson.get(PlatformServiceConstants.DEPENDENCY).getAsInt();
 			String workflowType = workflowTaskJson.get("workflowType").getAsString();
 			InsightsWorkflowTask taskConfig = new InsightsWorkflowTask();
 			taskConfig.setTaskId(taskId);

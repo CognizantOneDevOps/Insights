@@ -27,6 +27,7 @@ import org.quartz.JobExecutionException;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
@@ -44,7 +45,8 @@ public class WorkflowExecutor implements Job , ApplicationConfigInterface{
 	final int maxWorkflowsRetries = ApplicationConfigProvider.getInstance().getAssessmentReport()
 			.getMaxWorkflowRetries();
 	private WorkflowDataHandler workflowProcessing = new WorkflowDataHandler();
-
+	
+	
 	@Override
 	public void execute(JobExecutionContext context)
 			throws JobExecutionException {
@@ -85,8 +87,7 @@ public class WorkflowExecutor implements Job , ApplicationConfigInterface{
 					workflowProcessing.publishMessageInMQ(firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),
 							mqRequestJson);
 					processingTime= TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-					log.debug("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetryCount={} isTaskRetry={} processingTime={} message={}"
-							,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),firstworkflowTask.getWorkflowTaskEntity().getDescription(),firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),workflowConfig.getStatus(),workflowConfig.getLastRun()
+					log.debug(StringExpressionConstants.STR_EXP_WORKFLOW_1,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),firstworkflowTask.getWorkflowTaskEntity().getDescription(),firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),workflowConfig.getStatus(),workflowConfig.getLastRun()
 							,workflowConfig.getNextRun(),workflowConfig.getScheduleType(),"-","-",processingTime,"-");			
 				} catch (WorkflowTaskInitializationException e) {
 					log.debug(" Worlflow Detail ====  workflow failed to execute due to MQ exception {}  ",
@@ -95,8 +96,7 @@ public class WorkflowExecutor implements Job , ApplicationConfigInterface{
 							PlatformServiceConstants.FAILURE);
 					workflowProcessing.updateWorkflowDetails(workflowConfig.getWorkflowId(),
 							WorkflowTaskEnum.WorkflowStatus.TASK_INITIALIZE_ERROR.toString(), false);
-					log.error("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetryCount={} isTaskRetry={} processingTime={} message={}"
-							,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),firstworkflowTask.getWorkflowTaskEntity().getDescription(),firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),workflowConfig.getStatus(),workflowConfig.getLastRun()
+					log.error(StringExpressionConstants.STR_EXP_WORKFLOW_1,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),firstworkflowTask.getWorkflowTaskEntity().getDescription(),firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),workflowConfig.getStatus(),workflowConfig.getLastRun()
 							,workflowConfig.getNextRun(),workflowConfig.getScheduleType(),"-","-",processingTime,e.getMessage());
 					
 				}catch (Exception e) {
@@ -107,8 +107,7 @@ public class WorkflowExecutor implements Job , ApplicationConfigInterface{
 							PlatformServiceConstants.FAILURE);
 					workflowProcessing.updateWorkflowDetails(workflowConfig.getWorkflowId(),
 							WorkflowTaskEnum.WorkflowStatus.TASK_INITIALIZE_ERROR.toString(), false);
-					log.error("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetryCount={} isTaskRetry={} processingTime={} message={}"
-							,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),firstworkflowTask.getWorkflowTaskEntity().getDescription(),firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),workflowConfig.getStatus(),workflowConfig.getLastRun()
+					log.error(StringExpressionConstants.STR_EXP_WORKFLOW_1,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),firstworkflowTask.getWorkflowTaskEntity().getDescription(),firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),workflowConfig.getStatus(),workflowConfig.getLastRun()
 							,workflowConfig.getNextRun(),workflowConfig.getScheduleType(),"-","-",processingTime,e.getMessage());
 				}
 			}

@@ -25,11 +25,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
+import com.cognizant.devops.platformcommons.constants.AgentCommonConstant;
 import com.cognizant.devops.platformcommons.constants.DataArchivalConstants;
+import com.cognizant.devops.platformcommons.constants.EngineConstants;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
-import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
@@ -41,6 +41,7 @@ import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Envelope;
 
 public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandler {
+	
 	private static Logger log = LogManager.getLogger(DataArchivalHealthSubscriber.class.getName());
 	GraphDBHandler dbHandler = new GraphDBHandler();
 	DataArchivalConfigDal dataArchivalConfigDal = new DataArchivalConfigDal();
@@ -63,16 +64,16 @@ public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandle
 			String healthStatus = "";
 			JsonElement json = JsonUtils.parseString(message);
 			JsonObject messageJson = json.getAsJsonArray().get(0).getAsJsonObject();
-			String agentId = messageJson.get("agentId").getAsString();
-			String toolName = messageJson.get("toolName").getAsString();
-			messageJson.addProperty("toolName", toolName);
+			String agentId = messageJson.get(AgentCommonConstant.AGENTID).getAsString();
+			String toolName = messageJson.get(AgentCommonConstant.TOOLNAME).getAsString();
+			messageJson.addProperty(AgentCommonConstant.TOOLNAME, toolName);
 			String categoryName = messageJson.get("categoryName").getAsString();
-			messageJson.addProperty("category", categoryName);
-			loggingInfo.put("toolName", toolName);
-			loggingInfo.put("category", categoryName);
-			loggingInfo.put("agentId", agentId);
-			loggingInfo.put("execId",String.valueOf( messageJson.get("execId")));
-			log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Received :{} {} {}",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),"-",loggingInfo.get("execId"), consumerTag, routingKey, message);
+			messageJson.addProperty(AgentCommonConstant.CATEGORY, categoryName);
+			loggingInfo.put(AgentCommonConstant.TOOLNAME, toolName);
+			loggingInfo.put(AgentCommonConstant.CATEGORY, categoryName);
+			loggingInfo.put(AgentCommonConstant.AGENTID, agentId);
+			loggingInfo.put(EngineConstants.EXECID,String.valueOf( messageJson.get(EngineConstants.EXECID)));
+			log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Received :{} {} {}",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),"-",loggingInfo.get(EngineConstants.EXECID), consumerTag, routingKey, message);
 			if (messageJson.has("status")) {
 				healthStatus = messageJson.get("status").getAsString();
 				if (healthStatus.equalsIgnoreCase("failure")) {
@@ -91,12 +92,11 @@ public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandle
 				updateErrorStateInArchivalRecord(messageJson);
 			}
 			getChannel().basicAck(envelope.getDeliveryTag(), false);
-			log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Data Archival Health message processed.",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),"-",loggingInfo.get("execId"));
+			log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Data Archival Health message processed.",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),"-",loggingInfo.get(EngineConstants.EXECID));
 		} catch (InsightsCustomException e) {
-			log.error(" toolName={} category={} agentId={} execId={} Error occured in Data Archival Health Subscriber.Health message: {}",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),loggingInfo.get("execId"),message,e);
+			log.error(" toolName={} category={} agentId={} execId={} Error occured in Data Archival Health Subscriber.Health message: {}",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),loggingInfo.get(EngineConstants.EXECID),message,e);
 			getChannel().basicReject(envelope.getDeliveryTag(), false);
 		}
-
 	}
 	
 	private void updateErrorStateInArchivalRecord(JsonObject messageJson) {
@@ -109,12 +109,12 @@ public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandle
 					dataArchivalConfigDal.updateArchivalStatus(messageJson.get(DataArchivalConstants.ARCHIVALNAME).getAsString(),
 							DataArchivalStatus.ERROR.toString());
 				}
-				log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Updated Error state in Data Archival record.",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),"-",loggingInfo.get("execId"));
+				log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Updated Error state in Data Archival record.",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),"-",loggingInfo.get(EngineConstants.EXECID));
 			} else {
-				log.error(" toolName={} category={} agentId={} execId={} Archival name not provided",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),loggingInfo.get("execId"));
+				log.error(" toolName={} category={} agentId={} execId={} Archival name not provided",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),loggingInfo.get(EngineConstants.EXECID));
 			}
 		} else {
-			log.error(" toolName={} category={} agentId={} execId={} Archival name property not present in message",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),loggingInfo.get("execId"));
+			log.error(" toolName={} category={} agentId={} execId={} Archival name property not present in message",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),loggingInfo.get(EngineConstants.EXECID));
 		}
 	}
 	private void createHealthNodes(List<JsonObject> dataList, String agentId, String nodeLabels, int nodeCount,
@@ -139,8 +139,7 @@ public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandle
 			dbHandler.executeQueryWithData(healthQuery, dataList);
 		}
 		if (graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0) {
-			log.error(" toolName={} category={} agentId={} execId={} Unable to insert health nodes for routing key: {} error {}  ",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),loggingInfo.get("execId"), nodeLabels, graphResponse);
+			log.error(" toolName={} category={} agentId={} execId={} Unable to insert health nodes for routing key: {} error {}  ",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),loggingInfo.get(EngineConstants.EXECID), nodeLabels, graphResponse);
 		}
 	}
-
 }

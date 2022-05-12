@@ -51,6 +51,7 @@ import com.cognizant.devops.platformcommons.constants.ReportChartCollection;
 import com.cognizant.devops.platformcommons.core.enums.ContentConfigEnum;
 import com.cognizant.devops.platformcommons.core.enums.FileDetailsEnum;
 import com.cognizant.devops.platformcommons.core.enums.KpiConfigEnum;
+import com.cognizant.devops.platformcommons.core.enums.ReportTemplateTypeEnum;
 import com.cognizant.devops.platformcommons.core.enums.VisualizationUtilEnum;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
@@ -612,6 +613,7 @@ public class AssesmentReportServiceImpl {
 		reportTemplateJsonObject.addProperty("reportId", reporttemplate.getReportId());
 		reportTemplateJsonObject.addProperty("templateName", reporttemplate.getTemplateName());
 		jsonobject.add("template", reportTemplateJsonObject);
+		jsonobject.addProperty("milestoneId", (assessmentReport.getMilestoneId()!= null ?assessmentReport.getMilestoneId():null));
 
 		InsightsWorkflowConfiguration workflowConfig = assessmentReport.getWorkflowConfig();
 		long lastRun = workflowConfig.getLastRun();
@@ -772,6 +774,7 @@ public class AssesmentReportServiceImpl {
 			}
 			String emailList = assessmentReportJson.get("emailList").getAsString();
 			boolean isActive = false;
+			int milestoneId = assessmentReportJson.has("milestoneId")?assessmentReportJson.get("milestoneId").getAsInt():0;
 			String schedule = assessmentReportJson.get("schedule").getAsString();
 			String datasource = assessmentReportJson.get(AssessmentReportAndWorkflowConstants.DATASOURCE).getAsString();
 			boolean reoccurence = assessmentReportJson.get(AssessmentReportAndWorkflowConstants.ISREOCCURING)
@@ -830,6 +833,7 @@ public class AssesmentReportServiceImpl {
 			assessmentConfig.setAsseementReportDisplayName(asseementreportdisplayname);
 			assessmentConfig.setUserName(username);
 			assessmentConfig.setOrgName(orgname);
+			assessmentConfig.setMilestoneId(milestoneId);
 			workflowConfig.setAssessmentConfig(assessmentConfig);
 			
 			boolean reportHasPDFTask = false;
@@ -1171,12 +1175,14 @@ public class AssesmentReportServiceImpl {
 			boolean isActive = templateReportJson.get(AssessmentReportAndWorkflowConstants.ISACTIVE).getAsBoolean();
 			String description = templateReportJson.get("description").getAsString();
 			String visualizationutil = templateReportJson.get("visualizationutil").getAsString();
+			String templateType = (templateReportJson.has("templateType"))?templateReportJson.get("templateType").getAsString():"Others";
 			reportEntity.setReportId(reportId);
 			reportEntity.setActive(isActive);
 			reportEntity.setDescription(description);
 			reportEntity.setTemplateName(reportName);
 			reportEntity.setFile(reportName);
 			reportEntity.setVisualizationutil(visualizationutil);
+			reportEntity.setTemplateType(templateType);
 			
 			if(visualizationutil.equalsIgnoreCase(AssessmentReportAndWorkflowConstants.GRAFANAPDF)) {
 				JsonObject dashboardTemplateJson = createDashboardJson(templateReportJson);
@@ -1340,12 +1346,15 @@ public class AssesmentReportServiceImpl {
 		boolean isActive = templateReportJson.get(AssessmentReportAndWorkflowConstants.ISACTIVE).getAsBoolean();
 		String description = templateReportJson.get("description").getAsString();
 		String visualizationutil = templateReportJson.get("visualizationutil").getAsString();
+		String templateType = (templateReportJson.has("templateType"))?templateReportJson.get("templateType").getAsString():"Others";
+		
 		reportEntity.setReportId(reportId);
 		reportEntity.setActive(isActive);
 		reportEntity.setDescription(description);
 		reportEntity.setTemplateName(reportName);
 		reportEntity.setFile(reportName);
 		reportEntity.setVisualizationutil(visualizationutil);
+		reportEntity.setTemplateType(templateType);
 		
 		if(visualizationutil.equalsIgnoreCase(AssessmentReportAndWorkflowConstants.GRAFANAPDF)) {
 			JsonObject dashboardTemplateJson = createDashboardJson(templateReportJson);
@@ -1611,11 +1620,11 @@ public class AssesmentReportServiceImpl {
 	        		eachObject.addProperty("kpiId", eachRecord.getKpiConfig().getKpiId());
 	        		JsonArray vConfigobj =  JsonUtils.parseStringAsJsonArray(eachRecord.getvConfig());
 	        		if(vConfigobj.size() == 0) {
-	        			eachObject.addProperty("vType", "");
-		        		eachObject.addProperty("vQuery", "");
+	        			eachObject.addProperty(AssessmentReportAndWorkflowConstants.VTYPE, "");
+		        		eachObject.addProperty(AssessmentReportAndWorkflowConstants.VQUERY, "");
 	        		}  else {	        			
-	        			eachObject.addProperty("vQuery", vConfigobj.get(0).getAsJsonObject().get("vQuery").getAsString());
-	        			eachObject.addProperty("vType", vConfigobj.get(0).getAsJsonObject().get("vType").getAsString());
+	        			eachObject.addProperty(AssessmentReportAndWorkflowConstants.VQUERY, vConfigobj.get(0).getAsJsonObject().get(AssessmentReportAndWorkflowConstants.VQUERY).getAsString());
+	        			eachObject.addProperty(AssessmentReportAndWorkflowConstants.VTYPE, vConfigobj.get(0).getAsJsonObject().get(AssessmentReportAndWorkflowConstants.VTYPE).getAsString());
 	        		}
 	        		jsonArray.add(eachObject);
 				}
@@ -1666,5 +1675,19 @@ public class AssesmentReportServiceImpl {
 			chartHandlerList.add(eachHandler.toString().toUpperCase());
 		}
 		return chartHandlerList;
+	}
+	
+	/**
+	 * Method to get Report template Type
+	 * 
+	 * @return List<String>
+	 */
+	public List<String> getTemplateType() {
+		List<String> templateTypeList = new ArrayList<>();
+		ReportTemplateTypeEnum.ReportTemplateType[] templateType = ReportTemplateTypeEnum.ReportTemplateType.values();
+		for (ReportTemplateTypeEnum.ReportTemplateType eachHandler : templateType) {
+			templateTypeList.add(eachHandler.toString());
+		}
+		return templateTypeList;
 	}
 }

@@ -32,7 +32,8 @@
                 "outcomeId": "outcomeId",
                 "outcomeName": "outcomeName",
                 "statusQueue": "statusQueue",
-                "metricUrl": "metricUrl"
+                "metricUrl": "metricUrl",
+                "milestoneReleaseId": "milestoneReleaseId"
 			},
   			"logQueries": {
    				"errorCount": {

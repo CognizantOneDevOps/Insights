@@ -13,6 +13,15 @@ VALUES (103, 'jenkinsBuildNumber', 'NEXUS', 'ARTIFACTMANAGEMENT', 'NEXUS', TRUE,
 INSERT INTO "INSIGHTS_CORRELATION_CONFIGURATIONS"(id, destination_fields, destination_labelname, destination_toolcategory, destination_toolname, enable_correlation, is_self_tool_relation, relation_name,  source_fields, source_labelname, source_toolcategory, source_toolname) 
 VALUES (104, 'jenkinsBuildNumber', 'RUNDECK', 'DEPLOYMENT', 'RUNDECK', TRUE, FALSE, 'TEST_FROM_JENKINS_TO_RUNDECK', 'buildNumber', 'JENKINS', 'CI', 'JENKINS');
 
+INSERT INTO "INSIGHTS_CORRELATION_CONFIGURATIONS"(id, destination_fields, destination_labelname, destination_toolcategory, destination_toolname, enable_correlation, is_self_tool_relation, relation_name,  source_fields, source_labelname, source_toolcategory, source_toolname) 
+VALUES (105, 'releaseVersion', 'SNOW', 'ITSM', 'SNOW', TRUE, FALSE, 'TEST_FROM_NEXUS_TO_SNOW', 'version', 'NEXUS', 'ARTIFACTMANAGEMENT', 'NEXUS');
+
+INSERT INTO "INSIGHTS_CORRELATION_CONFIGURATIONS"(id, destination_fields, destination_labelname, destination_toolcategory, destination_toolname, enable_correlation, is_self_tool_relation, relation_name,  source_fields, source_labelname, source_toolcategory, source_toolname) 
+VALUES (106, 'snowId', 'XLRELEASE', 'RELEASEMANAGEMENT', 'XLRELEASE', TRUE, FALSE, 'TEST_FROM_SNOW_TO_XLRELEASE', 'changeId', 'SNOW', 'ITSM', 'SNOW');
+
+INSERT INTO "INSIGHTS_CORRELATION_CONFIGURATIONS"(id, destination_fields, destination_labelname, destination_toolcategory, destination_toolname, enable_correlation, is_self_tool_relation, relation_name,  source_fields, source_labelname, source_toolcategory, source_toolname) 
+VALUES (107, 'jiraKey', 'QTEST', 'ALM', 'QTEST', TRUE, FALSE, 'TEST_FROM_JIRA_TO_QTEST', 'key', 'JIRA', 'ALM', 'JIRA');
+
 INSERT INTO public."INSIGHTS_RELATIONSHIP_CONFIGURATIONS"(rid, relationship_field_value, operation, operation_json, relation_name,relationship_id)
     VALUES (201, 'handovertime', 'DIFF', '{"OperandOne":"inSightsTime","OperandTwo":"inSightsTime"}', 'TEST_FROM_GIT_TO_JENKINS',100);
 
@@ -27,3 +36,12 @@ INSERT INTO public."INSIGHTS_RELATIONSHIP_CONFIGURATIONS"(rid, relationship_fiel
 
 INSERT INTO public."INSIGHTS_RELATIONSHIP_CONFIGURATIONS"(rid, relationship_field_value, operation, operation_json, relation_name, relationship_id)
     VALUES (205,  'handovertime', 'DIFF', '{"OperandOne":"inSightsTime","OperandTwo":"inSightsTime"}', 'TEST_FROM_JENKINS_TO_RUNDECK', 104);
+    
+    INSERT INTO public."INSIGHTS_RELATIONSHIP_CONFIGURATIONS"(rid, relationship_field_value, operation, operation_json, relation_name, relationship_id)
+    VALUES (206,  'handovertime', 'DIFF', '{"OperandOne":"inSightsTime","OperandTwo":"inSightsTime"}', 'TEST_FROM_NEXUS_TO_SNOW', 105);
+	
+INSERT INTO public."INSIGHTS_RELATIONSHIP_CONFIGURATIONS"(rid, relationship_field_value, operation, operation_json, relation_name, relationship_id)
+    VALUES (207,  'handovertime', 'DIFF', '{"OperandOne":"inSightsTime","OperandTwo":"inSightsTime"}', 'TEST_FROM_SNOW_TO_XLRELEASE', 106);
+    
+INSERT INTO public."INSIGHTS_RELATIONSHIP_CONFIGURATIONS"(rid, relationship_field_value, operation, operation_json, relation_name, relationship_id)
+    VALUES (208,  'handovertime', 'DIFF', '{"OperandOne":"inSightsTime","OperandTwo":"inSightsTime"}', 'TEST_FROM_JIRA_TO_QTEST', 107);

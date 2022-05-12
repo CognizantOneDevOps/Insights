@@ -30,6 +30,7 @@ import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.Type;
 
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
+import com.cognizant.devops.platformcommons.constants.CommonsAndDALConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsEmailTemplates;
@@ -37,6 +38,7 @@ import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualiza
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class WorkflowDAL extends BaseDAL {
+	
 	private static final Logger log = LogManager.getLogger(WorkflowDAL.class);
 
 	/**
@@ -146,7 +148,7 @@ public class WorkflowDAL extends BaseDAL {
 			Map<String, Object> parameters = new HashMap<>();
 			Map<String, Object> extraParameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-			extraParameters.put("MaxResults", 5);
+			extraParameters.put(CommonsAndDALConstants.MAX_RESULTS, 5);
 			List<Long> executionIds = executeQueryWithExtraParameter(
 					"select distinct executionId FROM InsightsWorkflowExecutionHistory EH WHERE EH.workflowConfig.workflowId = :workflowId ORDER BY executionId DESC",
 					Long.class, parameters, extraParameters);
@@ -605,7 +607,7 @@ public class WorkflowDAL extends BaseDAL {
 			Map<String, Object> parameters = new HashMap<>();
 			Map<String, Object> extraParameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-			extraParameters.put("MaxResults", 1);
+			extraParameters.put(CommonsAndDALConstants.MAX_RESULTS, 1);
 			InsightsWorkflowExecutionHistory nextTasks = (InsightsWorkflowExecutionHistory) executeUniqueResultQueryWithExtraParameter(
 					"FROM InsightsWorkflowExecutionHistory EH WHERE EH.workflowConfig.isActive = true and EH.workflowConfig.workflowId=:workflowId order by EH.executionId desc",
 					InsightsWorkflowExecutionHistory.class, parameters, extraParameters);
@@ -823,7 +825,7 @@ public class WorkflowDAL extends BaseDAL {
 			Map<String, Object> parameters = new HashMap<>();
 			Map<String, Object> extraParameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-			extraParameters.put("MaxResults", 1);
+			extraParameters.put(CommonsAndDALConstants.MAX_RESULTS, 1);
 			return (InsightsReportVisualizationContainer) executeUniqueResultQueryWithExtraParameter(
 					"FROM InsightsReportVisualizationContainer EH WHERE EH.workflowId = :workflowId order by EH.executionId desc",
 					InsightsReportVisualizationContainer.class, parameters, extraParameters);
@@ -848,7 +850,7 @@ public class WorkflowDAL extends BaseDAL {
 			Map<String, Object> extraParameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			parameters.put("executionId", executionId);
-			extraParameters.put("MaxResults", 1);
+			extraParameters.put(CommonsAndDALConstants.MAX_RESULTS, 1);
 
 			return (InsightsReportVisualizationContainer) executeUniqueResultQueryWithExtraParameter(
 					"FROM InsightsReportVisualizationContainer EH WHERE EH.workflowId = :workflowId AND EH.executionId=:executionId",
@@ -1063,7 +1065,7 @@ public class WorkflowDAL extends BaseDAL {
 			Map<String, Object> parameters = new HashMap<>();
 			Map<String, Object> extraParameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-			extraParameters.put("MaxResults", 1);
+			extraParameters.put(CommonsAndDALConstants.MAX_RESULTS, 1);
 
 			return (InsightsReportVisualizationContainer) executeUniqueResultQueryWithExtraParameter(
 					"FROM InsightsReportVisualizationContainer EH WHERE EH.workflowId = :workflowId",

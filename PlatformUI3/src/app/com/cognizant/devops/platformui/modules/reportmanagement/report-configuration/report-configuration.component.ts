@@ -23,6 +23,7 @@ import { InsightsInitService } from '@insights/common/insights-initservice';
 import { ViewKPIDialog } from "@insights/app/modules/reportmanagement/report-configuration/view-kpi-dialog";
 import { AddTasksDialog } from "@insights/app/modules/reportmanagement/report-configuration/add-task";
 import { ReportManagementService } from "@insights/app/modules/reportmanagement/reportmanagement.service";
+import { MileStoneService } from "@insights/app/modules/mile-stone/mile-stone.service";
 import { DataArchivingService } from "@insights/app/modules/settings/dataarchiving/dataarchiving-service";
 import { EmailConfigurationDialog } from "@insights/app/modules/reportmanagement/report-configuration/email-configuration-dialog";
 import { DashboardPreviewConfigDialog } from "@insights/app/modules/dashboard-pdf-download/dashboard-preview-configuration-dialog";
@@ -44,6 +45,8 @@ export class ReportConfigComponent implements OnInit {
   today = new Date();
   reportdisplayName: string = "";
   selectedReport: any = { reportId: 0, description: "" };
+  selectedMilestone: any = {milestoneId:0, id:0};
+  isROITemplate: boolean = false;
   disableInputFields: boolean = false;
   schedule: string;
   configParams: string;
@@ -51,8 +54,10 @@ export class ReportConfigComponent implements OnInit {
   reponseForschdeule: any;
   listOfSchedule = [];
   listOfReports = [];
+  listOfMilestones = [];
   receivedParam: any;
   reponseForReportTemplate: any;
+  responseForMilestone: any;
   customeScheduleSelected: boolean = false;
   isUpdate: boolean;
   templateName: string;
@@ -73,6 +78,7 @@ export class ReportConfigComponent implements OnInit {
   emailReg = "email";
   receivedReportTemplates = [];
   receivedScheduleList = [];
+  mileStoneName: any = null;
 
 
 
@@ -83,6 +89,7 @@ export class ReportConfigComponent implements OnInit {
     public messageDialog: MessageDialogService,
     public router: Router,
     public reportmanagementservice: ReportManagementService,
+    public milestoneservice: MileStoneService,
     private dataArchivingService: DataArchivingService
   ) {
     
@@ -141,6 +148,11 @@ export class ReportConfigComponent implements OnInit {
       this.startDateInput = this.receivedParam.data.startdate;
       this.isReoccuring = this.receivedParam.data.isReoccuring;
       this.viewListDisabled = false;
+      this.loadMilestones();
+      this.selectedMilestone.id = this.receivedParam.data.milestoneId;
+      if(this.selectedMilestone.id != 0 && this.selectedMilestone.id != undefined){
+        this.isROITemplate = true;
+      }
       for (var element of this.taskListTobeSaved) {
         var str = element.description.toLowerCase();
         if (str.search(this.emailReg) !== -1) {
@@ -173,11 +185,12 @@ export class ReportConfigComponent implements OnInit {
       this.disableRefresh = false;
       this.enableEmailDetails = null;
       this.viewListDisabled = true;
+      this.selectedMilestone = {milestoneId: 0};
     }
   }
 
   async addReport() {
-    this.selectedReport = { reportId: 0, templateName: "" };
+    this.selectedReport = { reportId: 0, templateName: "", templateType: "" };
     this.listOfSchedule = this.receivedScheduleList;
     this.activeDataArchivalRecordsResponse = await this.dataArchivingService.listActiveArchivedRecord();
     this.activeDataArchivalRecords = this.activeDataArchivalRecordsResponse.data;
@@ -250,9 +263,51 @@ export class ReportConfigComponent implements OnInit {
     for (var data of this.listOfReports) {
       if (data.reportId == this.selectedReport.reportId) {
         this.templateName = data.templateName;
+        if(data.templateType !== undefined && data.templateType == 'ROITemplate'){
+          this.isROITemplate = true; 
+          this.listOfSchedule = ["ONETIME"];
+          this.loadMilestones();
+        }
+        else{
+          this.isROITemplate = false;
+          this.listOfSchedule = this.receivedScheduleList;
+        }
       }
     }
     this.viewListDisabled = false;
+  }
+
+  async loadMilestones() {
+    this.responseForMilestone = await this.milestoneservice.fetchMileStoneConfig();
+    if (this.responseForMilestone.data != null && this.responseForMilestone.status == 'success') {
+      this.listOfMilestones = [];
+      for (var record of this.responseForMilestone.data){
+        if(record.status == "COMPLETED"){
+          this.listOfMilestones.push(record);
+        }
+      }
+      if(this.listOfMilestones.length<1){
+        this.isROITemplate = false;
+        this.selectedReport = { reportId: 0, description: "" };
+        this.messageDialog.showApplicationsMessage(
+          "No milestone has been completed.Please configure the report once the milestone is completed.",
+          "ERROR"
+        );
+      }
+    } else {
+      this.messageDialog.showApplicationsMessage(
+        "Failed to load the milestones.Please check logs for more details.",
+        "ERROR"
+      );
+    }
+  }
+
+  getMilestoneName() {
+    for (var data of this.listOfMilestones) {
+      if (data.id == this.selectedMilestone.id) {
+        this.mileStoneName = data.mileStoneName;
+      }
+    }
   }
 
   viewListOfKPISofSelectedReport() {
@@ -331,6 +386,10 @@ export class ReportConfigComponent implements OnInit {
       isValidated = false;
       messageDialogText = "Please add Mailing Details";
     }
+    if (this.isROITemplate && this.mileStoneName == null && this.selectedMilestone.id == 0){
+      isValidated = false;
+      messageDialogText = "Please select Milestone";
+    }
     if (isValidated) {
       this.editSaveData();
     } else {
@@ -355,6 +414,7 @@ export class ReportConfigComponent implements OnInit {
       reportAPIRequestJson["reportName"] = self.reportName;
       reportAPIRequestJson["asseementreportdisplayname"] = self.reportdisplayName;
       reportAPIRequestJson["reportTemplate"] = self.selectedReport.reportId;
+      reportAPIRequestJson["milestoneId"] = self.selectedMilestone.id;
       reportAPIRequestJson["schedule"] = self.schedule;
       reportAPIRequestJson["startdate"] = this.startdate;
       reportAPIRequestJson["enddate"] = this.enddate;

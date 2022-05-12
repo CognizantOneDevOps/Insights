@@ -77,7 +77,7 @@ public class MileStoneController {
 		}
 	}
 	
-	/*
+
 	@PostMapping(value = "/updateMileStoneConfig", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject updateMileStoneConfig(@RequestBody String config){
 		String message = null;
@@ -89,7 +89,6 @@ public class MileStoneController {
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
-	*/
 	
 	@PostMapping(value = "/restartMileStoneConfig", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject restartMileStoneConfig(@RequestBody String config){

@@ -54,7 +54,7 @@ public class ReportEngineUtils {
 	public static final String COLUMN_PROPERTY = "columnProperty";
 	public static final String START_TIME_FIELD = "startTime";
 	public static final String END_TIME_FIELD = "endTime";
-
+	public static final String MILESTONE_NAME = "mileStoneName";
 	public static final String ES_KPI_RESULT_INDEX = "kpi-results";
 
 	public static final String ES_CONTENT_RESULT_INDEX = "content-results";
@@ -141,7 +141,6 @@ public class ReportEngineUtils {
 		}
 		return value;
 	}
-
 
 	public static Object getJsonValue(JsonElement jsonElementResult) {
 		Object result = null;

@@ -16,9 +16,11 @@
 
 import { AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DataSharedService } from '@insights/common/data-shared-service';
 import { MessageDialogService } from '../../application-dialog/message-dialog-service';
+import { OutComeDialogComponent } from '../../outcome/outcome-dialog/outcome-dialog.component';
 import { OutcomeService } from '../../outcome/outcome.service';
 import { MileStoneService } from '../mile-stone.service';
 
@@ -42,7 +44,7 @@ export class MileStoneEditComponent implements OnInit {
 
     constructor(private _router: Router, private _route: ActivatedRoute, public messageDialog: MessageDialogService,
         private mileStoneService: MileStoneService, private formBuilder: FormBuilder,private dataShare:DataSharedService,
-        private outcomeService: OutcomeService) {
+        private outcomeService: OutcomeService, private dialog: MatDialog) {
            
     }
   
@@ -60,11 +62,12 @@ export class MileStoneEditComponent implements OnInit {
         this.mileStoneForm = this.formBuilder.group({
             id: [''],
             mileStoneName: ['', [Validators.required]],
+            milestoneReleaseID: ['', [Validators.required]],
             startDate: ['', [Validators.required]],
             endDate: ['', [Validators.required]],
             outcomeList: [[],[Validators.required]]
         });
-        this.fetchOutcomeList();
+        //this.fetchOutcomeList();
         this._route.queryParams.subscribe(params => {
             console.log(params);
             this.existingOutcomeList = params.existingOutcomeList;
@@ -109,6 +112,33 @@ export class MileStoneEditComponent implements OnInit {
             })
             this.isProgress = false;
         }
+        else{
+            this.messageDialog.showApplicationsMessage("Please fill mandatory fields", "ERROR");
+        }
+    }
+
+    openOutcomeDialog() {
+        var dialogRef = this.dialog.open(OutComeDialogComponent, {
+          panelClass: 'showjson-dialog-container',
+          height: "500px",
+          width: "550px",
+          disableClose: true,
+    
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            this.outcomeArray = []
+            this.outcomeService.setOutcomeSubject.subscribe(res => {
+                if(res && res.length > 0) {
+                    for (var ele of res) {
+                        this.outcomeArray.push(ele.outcomeName)
+                    }
+                } 
+                console.log(this.outcomeArray)
+                this.mileStoneForm.controls['outcomeList'].setValue(this.outcomeArray);
+            })
+        });
+
     }
 
     redirect(){

@@ -1,0 +1,101 @@
+INSERT INTO "INSIGHTS_MILESTONE_CONFIG"(milestoneid, createddate, end_date, milestone_name, start_date, status, updateddate, milestone_release_id)
+VALUES (500, 1646293854094, 1624916974, 'Milestone_1646293854094', 1622505660, 'COMPLETED', 1646293854094, 'V.1');
+
+INSERT INTO "INSIGHTS_MILESTONE_CONFIG"(milestoneid, createddate, end_date, milestone_name, start_date, status, updateddate, milestone_release_id)
+VALUES (501, 1646293854095, 1628612167, 'Milestone_1646293854095', 1626134460, 'COMPLETED', 1646293854095, 'V.2');
+
+
+INSERT INTO "INSIGHTS_ROI_TOOLS"(id, agent_communication_queue, category, isactive, tool_config_json, tool_name) SELECT nextval('hibernate_sequence'), 'GOOGLEANALYTICS_MILESTONE_EXECUTION', 'ROI', true, '{}', 'GOOGLEANALYTICS' WHERE NOT EXISTS (SELECT tool_name FROM "INSIGHTS_ROI_TOOLS" WHERE tool_name = 'GOOGLEANALYTICS');
+
+
+INSERT INTO "INSIGHTS_OUTCOME_TOOLS"(id, tool_config_json, created_date, isactive, metric_url, outcome_name, outcome_type, request_parameters, updated_date, tool_name)
+VALUES (600, '', 1646293854094, true, 'https://api.newrelic.com', 'Host_Cpu', 'Tech', '', 1646293854094, 'NEWRELIC');
+
+INSERT INTO "INSIGHTS_OUTCOME_TOOLS"(id, tool_config_json, created_date, isactive, metric_url, outcome_name, outcome_type, request_parameters, updated_date, tool_name)
+VALUES (601, '', 1646293854094, true, 'https://api.newrelic.com', 'Thread_CpuTime', 'Tech', '', 1646293854094, 'NEWRELIC');
+
+INSERT INTO "INSIGHTS_OUTCOME_TOOLS"(id, tool_config_json, created_date, isactive, metric_url, outcome_name, outcome_type, request_parameters, updated_date, tool_name)
+VALUES (602, '', 1646293854094, true, 'https://api.googleanalytics.com', 'Stickiness', 'Tech', '', 1646293854094, 'GOOGLEANALYTICS');
+
+INSERT INTO "INSIGHTS_OUTCOME_TOOLS"(id, tool_config_json, created_date, isactive, metric_url, outcome_name, outcome_type, request_parameters, updated_date, tool_name)
+VALUES (603, '', 1646293854094, true, 'https://api.googleanalytics.com', 'Retension_Rate', 'Tech', '', 1646293854094, 'GOOGLEANALYTICS');
+
+INSERT INTO "INSIGHTS_OUTCOME_TOOLS"(id, tool_config_json, created_date, isactive, metric_url, outcome_name, outcome_type, request_parameters, updated_date, tool_name)
+VALUES (604, '', 1646293854094, true, 'https://api.splunk.com', 'NPS', 'Tech', '', 1646293854094, 'SPLUNK');
+
+INSERT INTO "INSIGHTS_OUTCOME_TOOLS"(id, tool_config_json, created_date, isactive, metric_url, outcome_name, outcome_type, request_parameters, updated_date, tool_name)
+VALUES (605, '', 1646293854094, true, 'https://api.splunk.com', 'Click_Through_Rate', 'Tech', '', 1646293854094, 'SPLUNK');
+
+INSERT INTO "INSIGHTS_OUTCOME_TOOLS"(id, tool_config_json, created_date, isactive, metric_url, outcome_name, outcome_type, request_parameters, updated_date, tool_name)
+VALUES (606, '', 1646293854094, true, 'https://api.splunk.com', 'Conversion_Rate', 'Tech', '', 1646293854094, 'SPLUNK');
+
+INSERT INTO "INSIGHTS_OUTCOME_TOOLS"(id, tool_config_json, created_date, isactive, metric_url, outcome_name, outcome_type, request_parameters, updated_date, tool_name)
+VALUES (607, '', 1646293854094, true, 'https://api.splunk.com', 'Time_On_Site_In_Seconds', 'Tech', '', 1646293854094, 'SPLUNK');
+
+INSERT INTO "INSIGHTS_OUTCOME_TOOLS"(id, tool_config_json, created_date, isactive, metric_url, outcome_name, outcome_type, request_parameters, updated_date, tool_name)
+VALUES (608, '', 1646293854094, true, 'https://api.dynatrace.com', 'Host_Memory_Usage', 'Tech', '', 1646293854094, 'DYNATRACEROI');
+
+INSERT INTO "INSIGHTS_OUTCOME_TOOLS"(id, tool_config_json, created_date, isactive, metric_url, outcome_name, outcome_type, request_parameters, updated_date, tool_name)
+VALUES (609, '', 1646293854094, true, 'https://api.dynatrace.com', 'host_cpu_load', 'Tech', '', 1646293854094, 'DYNATRACEROI');
+
+
+
+INSERT INTO "INSIGHTS_MILESTONE_OUTCOME_CONFIGURATION"(id, lastupdateddate, status, statusmessage, outcomename, milestoneid)
+VALUES (700, 1646293854094, 'SUCCESS', 'outcome data collection completed', 600, 500);
+
+INSERT INTO "INSIGHTS_MILESTONE_OUTCOME_CONFIGURATION"(id, lastupdateddate, status, statusmessage, outcomename, milestoneid)
+VALUES (701, 1646293854094, 'SUCCESS', 'outcome data collection completed', 601, 500);
+
+INSERT INTO "INSIGHTS_MILESTONE_OUTCOME_CONFIGURATION"(id, lastupdateddate, status, statusmessage, outcomename, milestoneid)
+VALUES (702, 1646293854094, 'SUCCESS', 'outcome data collection completed', 602, 500);
+
+INSERT INTO "INSIGHTS_MILESTONE_OUTCOME_CONFIGURATION"(id, lastupdateddate, status, statusmessage, outcomename, milestoneid)
+VALUES (703, 1646293854094, 'SUCCESS', 'outcome data collection completed', 603, 500);
+
+INSERT INTO "INSIGHTS_MILESTONE_OUTCOME_CONFIGURATION"(id, lastupdateddate, status, statusmessage, outcomename, milestoneid)
+VALUES (704, 1646293854094, 'SUCCESS', 'outcome data collection completed', 604, 500);
+
+INSERT INTO "INSIGHTS_MILESTONE_OUTCOME_CONFIGURATION"(id, lastupdateddate, status, statusmessage, outcomename, milestoneid)
+VALUES (705, 1646293854094, 'SUCCESS', 'outcome data collection completed', 605, 500);
+
+INSERT INTO "INSIGHTS_MILESTONE_OUTCOME_CONFIGURATION"(id, lastupdateddate, status, statusmessage, outcomename, milestoneid)
+VALUES (706, 1646293854094, 'SUCCESS', 'outcome data collection completed', 606, 500);
+
+INSERT INTO "INSIGHTS_MILESTONE_OUTCOME_CONFIGURATION"(id, lastupdateddate, status, statusmessage, outcomename, milestoneid)
+VALUES (707, 1646293854094, 'SUCCESS', 'outcome data collection completed', 607, 500);
+
+INSERT INTO "INSIGHTS_MILESTONE_OUTCOME_CONFIGURATION"(id, lastupdateddate, status, statusmessage, outcomename, milestoneid)
+VALUES (708, 1646293854094, 'SUCCESS', 'outcome data collection completed', 608, 500);
+
+INSERT INTO "INSIGHTS_MILESTONE_OUTCOME_CONFIGURATION"(id, lastupdateddate, status, statusmessage, outcomename, milestoneid)
+VALUES (709, 1646293854094, 'SUCCESS', 'outcome data collection completed', 609, 500);
+
+INSERT INTO "INSIGHTS_MILESTONE_OUTCOME_CONFIGURATION"(id, lastupdateddate, status, statusmessage, outcomename, milestoneid)
+VALUES (710, 1646293854094, 'SUCCESS', 'outcome data collection completed', 600, 501);
+
+INSERT INTO "INSIGHTS_MILESTONE_OUTCOME_CONFIGURATION"(id, lastupdateddate, status, statusmessage, outcomename, milestoneid)
+VALUES (711, 1646293854094, 'SUCCESS', 'outcome data collection completed', 601, 501);
+
+INSERT INTO "INSIGHTS_MILESTONE_OUTCOME_CONFIGURATION"(id, lastupdateddate, status, statusmessage, outcomename, milestoneid)
+VALUES (712, 1646293854094, 'SUCCESS', 'outcome data collection completed', 602, 501);
+
+INSERT INTO "INSIGHTS_MILESTONE_OUTCOME_CONFIGURATION"(id, lastupdateddate, status, statusmessage, outcomename, milestoneid)
+VALUES (713, 1646293854094, 'SUCCESS', 'outcome data collection completed', 603, 501);
+
+INSERT INTO "INSIGHTS_MILESTONE_OUTCOME_CONFIGURATION"(id, lastupdateddate, status, statusmessage, outcomename, milestoneid)
+VALUES (714, 1646293854094, 'SUCCESS', 'outcome data collection completed', 604, 501);
+
+INSERT INTO "INSIGHTS_MILESTONE_OUTCOME_CONFIGURATION"(id, lastupdateddate, status, statusmessage, outcomename, milestoneid)
+VALUES (715, 1646293854094, 'SUCCESS', 'outcome data collection completed', 605, 501);
+
+INSERT INTO "INSIGHTS_MILESTONE_OUTCOME_CONFIGURATION"(id, lastupdateddate, status, statusmessage, outcomename, milestoneid)
+VALUES (716, 1646293854094, 'SUCCESS', 'outcome data collection completed', 606, 501);
+
+INSERT INTO "INSIGHTS_MILESTONE_OUTCOME_CONFIGURATION"(id, lastupdateddate, status, statusmessage, outcomename, milestoneid)
+VALUES (717, 1646293854094, 'SUCCESS', 'outcome data collection completed', 607, 501);
+
+INSERT INTO "INSIGHTS_MILESTONE_OUTCOME_CONFIGURATION"(id, lastupdateddate, status, statusmessage, outcomename, milestoneid)
+VALUES (718, 1646293854094, 'SUCCESS', 'outcome data collection completed', 608, 501);
+
+INSERT INTO "INSIGHTS_MILESTONE_OUTCOME_CONFIGURATION"(id, lastupdateddate, status, statusmessage, outcomename, milestoneid)
+VALUES (719, 1646293854094, 'SUCCESS', 'outcome data collection completed', 609, 501);

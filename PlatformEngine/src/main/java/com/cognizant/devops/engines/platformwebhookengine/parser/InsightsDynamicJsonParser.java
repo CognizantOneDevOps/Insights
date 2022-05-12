@@ -403,5 +403,4 @@ public class InsightsDynamicJsonParser {
 			LOG.error(" Error while processing array in extension ", e);
 		}
 	}
-
 }

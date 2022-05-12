@@ -290,5 +290,4 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 		}
 		return responseTemplateMap;
 	}
-
 }

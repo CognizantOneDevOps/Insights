@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.NewCookie;
-
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.RestApiHandler;
@@ -29,6 +27,8 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformcommons.exception.RestAPI404Exception;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import jakarta.ws.rs.core.NewCookie;
 
 
 
@@ -49,6 +49,7 @@ public class GrafanaHandler {
 	 */
 	public String grafanaGet(String path, Map<String, String> headers) throws InsightsCustomException{
 		String response = null;
+		GRAFANA_END_POINT = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint();
 		try {
 			String url = GRAFANA_END_POINT + path;
 			response = RestApiHandler.doGet(url, headers);
@@ -70,6 +71,7 @@ public class GrafanaHandler {
 	public String grafanaPost(String path, JsonElement requestJson, Map<String, String> headers) throws InsightsCustomException{
 		String response = null;
 		try {
+			GRAFANA_END_POINT = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint();
 			String url = GRAFANA_END_POINT + path;
 			JsonObject jsonObject = requestJson.getAsJsonObject();
 			response = RestApiHandler.doPost(url, jsonObject, headers);

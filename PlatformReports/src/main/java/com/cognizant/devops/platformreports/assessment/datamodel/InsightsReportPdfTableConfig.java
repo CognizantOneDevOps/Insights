@@ -98,7 +98,5 @@ public class InsightsReportPdfTableConfig {
 	public void setObservationListFontSize(String observationListFontSize) {
 		this.observationListFontSize = observationListFontSize;
 	}
-	
-	
-	
+
 }

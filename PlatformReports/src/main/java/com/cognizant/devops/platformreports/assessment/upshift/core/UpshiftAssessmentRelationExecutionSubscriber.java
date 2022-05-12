@@ -25,6 +25,8 @@ import java.util.concurrent.TimeoutException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.constants.ReportStatusConstants;
+import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
@@ -38,6 +40,7 @@ import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformworkflow.workflowtask.message.factory.WorkflowTaskSubscriberHandler;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 public class UpshiftAssessmentRelationExecutionSubscriber extends WorkflowTaskSubscriberHandler {
@@ -73,23 +76,23 @@ public class UpshiftAssessmentRelationExecutionSubscriber extends WorkflowTaskSu
 			log.debug("Total nodes related: {}", numOfNodesRelated);
 			updateReportStatus(upshiftAssessmentConfig, WorkflowTaskEnum.UpshiftAssessmentStatus.COMPLETED.name());
 			 long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-	            log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+	            log.debug(StringExpressionConstants.STR_EXP_TASK,
 	            		"-",workflowConfig.getWorkflowId(),upshiftAssessmentConfig.getId(),workflowConfig.getWorkflowType(),"-","-",processingTime
-	            		,"UpshiftUuid :" +upshiftAssessmentConfig.getUpshiftUuid() +
-	            		"CreatedDate :" +upshiftAssessmentConfig.getCreatedDate() +
-	            		"UpdatedDate :"  +upshiftAssessmentConfig.getUpdatedDate() +
-	            		"fileName :" +upshiftAssessmentConfig.getFileName() +
-	            		"status :" +upshiftAssessmentConfig.getStatus()+ " UpshiftAssessmentExecutionSubscriber");			
+	            		, ReportStatusConstants.UPSHIFT_UUID +upshiftAssessmentConfig.getUpshiftUuid() +
+	            		ReportStatusConstants.CREATED_DATE +upshiftAssessmentConfig.getCreatedDate() +
+	            		ReportStatusConstants.UPDATED_DATE  +upshiftAssessmentConfig.getUpdatedDate() +
+	            		ReportStatusConstants.FILENAME +upshiftAssessmentConfig.getFileName() +
+	            		ReportStatusConstants.STATUS +upshiftAssessmentConfig.getStatus()+ " UpshiftAssessmentExecutionSubscriber");			
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== GrafanaPDFExecutionSubscriber Completed with error ", e);
 			updateReportStatus(upshiftAssessmentConfig, WorkflowTaskEnum.UpshiftAssessmentStatus.ERROR.name());
-			 log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+			 log.error(StringExpressionConstants.STR_EXP_TASK,
 	            		"-",workflowConfig.getWorkflowId(),upshiftAssessmentConfig.getId(),workflowConfig.getWorkflowType(),"-","-",0
-	            		,"UpshiftUuid :" +upshiftAssessmentConfig.getUpshiftUuid() +
-	            		"CreatedDate :" +upshiftAssessmentConfig.getCreatedDate() +
-	            		"UpdatedDate :"  +upshiftAssessmentConfig.getUpdatedDate() +
-	            		"fileName :" +upshiftAssessmentConfig.getFileName() +
-	            		"status :" +upshiftAssessmentConfig.getStatus()+ " UpshiftAssessmentExecutionSubscriber" +e.getMessage());
+	            		,ReportStatusConstants.UPSHIFT_UUID +upshiftAssessmentConfig.getUpshiftUuid() +
+	            		ReportStatusConstants.CREATED_DATE +upshiftAssessmentConfig.getCreatedDate() +
+	            		ReportStatusConstants.UPDATED_DATE  +upshiftAssessmentConfig.getUpdatedDate() +
+	            		ReportStatusConstants.FILENAME +upshiftAssessmentConfig.getFileName() +
+	            		ReportStatusConstants.STATUS +upshiftAssessmentConfig.getStatus()+ " UpshiftAssessmentExecutionSubscriber" +e.getMessage());
 			throw new InsightsJobFailedException(e.getMessage());
 		}
 	}
@@ -130,13 +133,13 @@ public class UpshiftAssessmentRelationExecutionSubscriber extends WorkflowTaskSu
 			upshiftAssessmentConfig.setUpdatedDate(InsightsUtils.getCurrentTimeInEpochMilliSeconds());
 			upshiftAssessmentConfigDAL.updateUpshiftAssessmentConfig(upshiftAssessmentConfig);
 			 long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-	            log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+	            log.debug(StringExpressionConstants.STR_EXP_TASK,
 	            		"-",workflowConfig.getWorkflowId(),upshiftAssessmentConfig.getId(),workflowConfig.getWorkflowType(),"-","-",processingTime
-	            		,"UpshiftUuid :" +upshiftAssessmentConfig.getUpshiftUuid() +
-	            		"CreatedDate :" +upshiftAssessmentConfig.getCreatedDate() +
-	            		"UpdatedDate :"  +upshiftAssessmentConfig.getUpdatedDate() +
-	            		"fileName :" +upshiftAssessmentConfig.getFileName() +
-	            		"status :" +upshiftAssessmentConfig.getStatus());
+	            		,ReportStatusConstants.UPSHIFT_UUID +upshiftAssessmentConfig.getUpshiftUuid() +
+	            		ReportStatusConstants.CREATED_DATE +upshiftAssessmentConfig.getCreatedDate() +
+	            		ReportStatusConstants.UPDATED_DATE  +upshiftAssessmentConfig.getUpdatedDate() +
+	            		ReportStatusConstants.FILENAME +upshiftAssessmentConfig.getFileName() +
+	            		ReportStatusConstants.STATUS +upshiftAssessmentConfig.getStatus());
 		}		
 	}
 }

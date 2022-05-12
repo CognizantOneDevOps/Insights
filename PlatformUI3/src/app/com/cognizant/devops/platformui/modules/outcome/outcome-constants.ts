@@ -17,6 +17,6 @@ export const NEW_RELIC_APPLICATION_ID = 'newRelicAppId';
 export const SPLUNK_SUMMARY_INDEX = 'splunkIndex';
 export const APPDYNAMICS_APPLICATION_NAME = 'appDynamicsAppName';
 export const APPDYNAMICS_METRIC_PATH = 'appDynamicsMetricPath';
-export const NEW_RELIC_METRIC_NAME = 'metricName';
-export const DynatraceROI_METRIC_KEY = 'metricKey';
+export const NEW_RELIC_METRIC_NAME = 'NewRelicMetricName';
+export const DynatraceROI_METRIC_KEY = 'DynatraceMetricKey';
 

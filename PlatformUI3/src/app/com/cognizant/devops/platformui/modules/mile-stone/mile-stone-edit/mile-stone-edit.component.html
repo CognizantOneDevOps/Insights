@@ -30,17 +30,17 @@
     </div>
     <div class="btnAlign">
 
-      <button type="submit" mat-icon-button  (click)="onSubmit()">
-        <mat-icon title="Save" style="margin-top: 0%;" class="mat-icon material-icons">
+      <button type="submit" mat-icon-button [disabled]="!mileStoneForm.valid" (click)="onSubmit()">
+        <mat-icon title="Save" style="margin-top: 10%;" class="mat-icon material-icons">
           save
         </mat-icon>
       </button>
-      <button mat-icon-button (click)="redirect()">
+      <button mat-icon-button>
         <mat-icon title="Refresh" style="margin-top: 10%;" class="mat-icon material-icons">
           cancel
         </mat-icon>
       </button>
-      <button mat-icon-button>
+      <button mat-icon-button (click)="redirect()">
         <mat-icon svgIcon="redirect_icon" title="Redirect To Landing Page" style="margin-bottom: 20%;"
           class="mat-icon material-icons">
         </mat-icon>
@@ -73,24 +73,36 @@
             </td>
             <td class="columnComponent">
               <input matinput maxlength="20" class="form-control" formControlName="mileStoneName" type="text"
-                autocomplete="off" placeholder="Enter mile stone name">
+                autocomplete="off" placeholder="Enter mile stone name" disabled  [ngClass]="['input-disabled', 'form-control']">
             </td>
             <td class="info">
               <span class="infoText">Enter MileStone name.</span>
             </td>
           </tr>
-  
+          <tr class="mat-row-webhook">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">MileStone Release ID</span>
+              <span style="color:#ff0000;">*</span>
+            </td>
+            <td class="columnComponent">
+              <input matinput maxlength="20" class="form-control" formControlName="milestoneReleaseID" type="text"
+                autocomplete="off" placeholder="Enter release ID">
+            </td>
+            <td class="info">
+              <span class="infoText">Enter Release ID for this milestone</span>
+            </td>
+          </tr>
           <tr class="mat-row-webhook">
             <td class="mat-cell" class="columnName">
               <span class="mainText">Start Date</span>
               <span style="color:#ff0000;">*</span>
             </td>
             <td class="columnComponent">
-            <mat-form-field appearance="fill" style="width: 85%;">
-              <mat-label>Choose start date</mat-label>
-              <input matInput [matDatepicker]="startpicker" formControlName="startDate" [(ngModel)]="startDate">
+            <mat-form-field  appearance="standard" style="width: 85%;">
+              <mat-label>Choose start date</mat-label> 
+              <input matInput [matDatepicker]="startpicker" formControlName="startDate" [(ngModel)]="startDate" disabled>
               <mat-datepicker-toggle matSuffix [for]="startpicker" class="mat-form-field-wrapper"></mat-datepicker-toggle>
-              <mat-datepicker #startpicker></mat-datepicker>
+              <mat-datepicker #startpicker [disabled]=false></mat-datepicker>
             </mat-form-field>
             </td>
             <td class="info">
@@ -104,11 +116,11 @@
               <span style="color:#ff0000;">*</span>
             </td>
             <td class="columnComponent">
-            <mat-form-field appearance="fill" style="width: 85%;">
+            <mat-form-field appearance="standard" style="width: 85%;">
               <mat-label>Choose End date</mat-label>
-              <input matInput [matDatepicker]="endpicker" formControlName="endDate" [(ngModel)]="endDate">
+              <input matInput [matDatepicker]="endpicker" formControlName="endDate" [(ngModel)]="endDate" disabled>
               <mat-datepicker-toggle matSuffix [for]="endpicker"></mat-datepicker-toggle>
-              <mat-datepicker #endpicker></mat-datepicker>
+              <mat-datepicker #endpicker [disabled]=false></mat-datepicker>
             </mat-form-field>
             <td>
               <span class="infoText">Choose End date.</span>
@@ -157,7 +169,7 @@
             </td>
           </tr> -->
 
-          <tr class="mat-row-webhook">
+          <!-- <tr class="mat-row-webhook">
             <td class="mat-cell" class="columnName">
               <span class="mainText">Choose Outcome</span>
               <span style="color:#ff0000;">*</span>
@@ -171,6 +183,25 @@
             </td>
             <td>
               <span class="infoText">Select Outcomes</span>
+            </td>
+          </tr> -->
+
+          <tr class="mat-row-webhook">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">Choose Outcome</span>
+              <span style="color:#ff0000;">*</span>
+            </td>
+            <td class="columnComponent">
+              <textarea matinput rows="2" type="text" class="form-control" formControlName="outcomeList"
+                style="width: 84%;background-color:#e1e3e7;" disabled placeholder="Select Outcome">
+              </textarea>
+            </td>
+            <td>
+              <a (click)="openOutcomeDialog()" style="margin-left:-63px;">
+                <mat-icon svgIcon="search_icon" [ngStyle]="{color:'#5C068C', height: '20px', width: '20px'}">
+                </mat-icon>
+              </a>
+              <span class="infoText" style="padding-left:45px;">Select Outcomes</span>
             </td>
           </tr>
         </form>

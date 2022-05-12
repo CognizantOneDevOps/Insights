@@ -27,7 +27,9 @@ import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
@@ -50,6 +52,7 @@ public class WorkflowRetryExecutor implements Job, ApplicationConfigInterface {
 			.getMaxWorkflowRetries();
 	private WorkflowDataHandler workflowProcessing = new WorkflowDataHandler();
 	
+
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		log.debug(" Worlflow Detail ====  Schedular Inside WorkflowRetryExecutor ");
@@ -92,9 +95,7 @@ public class WorkflowRetryExecutor implements Job, ApplicationConfigInterface {
 					log.debug(" Worlflow Detail ==== before publish message retryWorkflowWithFailedTask {} ",
 							mqRetryJsonObject);
 					workflowProcessing.publishMessageInMQ(firstworkflowTask.getMqChannel(), mqRetryJsonObject);
-					log.debug("Type=WorkFlow executionId={} workflowId={} LastRunTime={} NextRunTime={} schedule={} isTaskRetry={} "
-							+ "TaskRetryCount={} TaskDescription={} TaskMQChannel={} WorkflowType={} processingTime={} status ={} message={}"
-							,workflowHistory.getExecutionId(),workflowHistory.getWorkflowConfig().getWorkflowId(),
+					log.debug(StringExpressionConstants.STR_EXP_WORKFLOW_4+ StringExpressionConstants.STR_EXP_TASKRETRYCOUNT,workflowHistory.getExecutionId(),workflowHistory.getWorkflowConfig().getWorkflowId(),
 							workflowHistory.getWorkflowConfig().getLastRun()
 							,workflowHistory.getWorkflowConfig().getNextRun(),workflowHistory.getWorkflowConfig().getScheduleType()
 							,mqRetryJsonObject.get(WorkflowUtils.RETRY_JSON_PROPERTY).getAsString(),workflowHistory.getRetryCount(),
@@ -104,9 +105,7 @@ public class WorkflowRetryExecutor implements Job, ApplicationConfigInterface {
 							workflowHistory.getWorkflowConfig().getWorkflowId());
 					InsightsStatusProvider.getInstance().createInsightStatusNode("In WorkflowRetryExecutor,retryWorkflowWithFailedTask failed due to exception. WorkflowId: "+workflowHistory.getWorkflowConfig().getWorkflowId(),
 							PlatformServiceConstants.FAILURE);
-					log.error("Type=WorkFlow executionId={} workflowId={} LastRunTime={} NextRunTime={} schedule={} isTaskRetry={} "
-							+ "TaskRetryCount={} TaskDescription={} TaskMQChannel={} WorkflowType={} processingTime={} status ={} message={}"
-							,workflowHistory.getExecutionId(),workflowHistory.getWorkflowConfig().getWorkflowId(),
+					log.error(StringExpressionConstants.STR_EXP_WORKFLOW_4+ StringExpressionConstants.STR_EXP_TASKRETRYCOUNT,workflowHistory.getExecutionId(),workflowHistory.getWorkflowConfig().getWorkflowId(),
 							workflowHistory.getWorkflowConfig().getLastRun()
 							,workflowHistory.getWorkflowConfig().getNextRun(),workflowHistory.getWorkflowConfig().getScheduleType()
 							,mqRetryJsonObject.get(WorkflowUtils.RETRY_JSON_PROPERTY).getAsString(),workflowHistory.getRetryCount(),
@@ -119,9 +118,7 @@ public class WorkflowRetryExecutor implements Job, ApplicationConfigInterface {
 					workflowProcessing.updateRetryWorkflowExecutionHistory(workflowHistory.getId(),
 							workflowHistory.getWorkflowConfig().getWorkflowId(),
 							WorkflowTaskEnum.WorkflowStatus.ABORTED.toString(), "");
-					log.error("Type=WorkFlow executionId={} workflowId={} LastRunTime={} NextRunTime={} schedule={} isTaskRetry={} "
-							+ "TaskRetryCount={} TaskDescription={} TaskMQChannel={} WorkflowType={} processingTime={} status ={} message={}"
-							,workflowHistory.getExecutionId(),workflowHistory.getWorkflowConfig().getWorkflowId(),
+					log.error(StringExpressionConstants.STR_EXP_WORKFLOW_4+ StringExpressionConstants.STR_EXP_TASKRETRYCOUNT,workflowHistory.getExecutionId(),workflowHistory.getWorkflowConfig().getWorkflowId(),
 							workflowHistory.getWorkflowConfig().getLastRun()
 							,workflowHistory.getWorkflowConfig().getNextRun(),workflowHistory.getWorkflowConfig().getScheduleType()
 							,"-",workflowHistory.getRetryCount(),
@@ -153,9 +150,7 @@ public class WorkflowRetryExecutor implements Job, ApplicationConfigInterface {
 				log.debug("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule ={} TaskRetryCount={} RetryType ={} isTaskRetry={} processingTime={} message={}"
 						,lastCompletedTaskExecution.getExecutionId(),lastCompletedTaskExecution.getWorkflowConfig().getWorkflowId(),lastCompletedTaskExecution.getWorkflowConfig().getWorkflowType(),"-","-",lastCompletedTaskExecution.getTaskStatus(),lastCompletedTaskExecution.getWorkflowConfig().getLastRun(),"-",lastCompletedTaskExecution.getWorkflowConfig().getScheduleType(),lastCompletedTaskExecution.getRetryCount(),"-","WorkflowWithCompletedTask",processingTime,"-");
 				
-				log.debug("Type=WorkFlow executionId={} workflowId={} LastRunTime={} NextRunTime={} schedule={} isTaskRetry={} "
-						+ "TaskRetryCount={} TaskDescription={} TaskMQChannel={} WorkflowType={} processingTime={} status ={} message={}"
-						,lastCompletedTaskExecution.getExecutionId(),lastCompletedTaskExecution.getWorkflowConfig().getWorkflowId(),
+				log.debug(StringExpressionConstants.STR_EXP_WORKFLOW_4+ StringExpressionConstants.STR_EXP_TASKRETRYCOUNT,lastCompletedTaskExecution.getExecutionId(),lastCompletedTaskExecution.getWorkflowConfig().getWorkflowId(),
 						lastCompletedTaskExecution.getWorkflowConfig().getLastRun()
 						,lastCompletedTaskExecution.getWorkflowConfig().getNextRun(),lastCompletedTaskExecution.getWorkflowConfig().getScheduleType()
 						,mqRetryJsonObject.get(WorkflowUtils.RETRY_JSON_PROPERTY).getAsString(),lastCompletedTaskExecution.getRetryCount(),
@@ -165,9 +160,7 @@ public class WorkflowRetryExecutor implements Job, ApplicationConfigInterface {
 				log.error(
 						" Worlflow Detail  ====  workflow failed to retry and will be picked up in next retry schedule  {} ",
 						lastCompletedTaskExecution);
-				log.error("Type=WorkFlow executionId={} workflowId={} LastRunTime={} NextRunTime={} schedule={} isTaskRetry={} "
-						+ "TaskRetryCount={} TaskDescription={} TaskMQChannel={} WorkflowType={} processingTime={} status ={} message={}"
-						,lastCompletedTaskExecution.getExecutionId(),lastCompletedTaskExecution.getWorkflowConfig().getWorkflowId(),
+				log.error(StringExpressionConstants.STR_EXP_WORKFLOW_4+ StringExpressionConstants.STR_EXP_TASKRETRYCOUNT,lastCompletedTaskExecution.getExecutionId(),lastCompletedTaskExecution.getWorkflowConfig().getWorkflowId(),
 						lastCompletedTaskExecution.getWorkflowConfig().getLastRun()
 						,lastCompletedTaskExecution.getWorkflowConfig().getNextRun(),lastCompletedTaskExecution.getWorkflowConfig().getScheduleType()
 						,mqRetryJsonObject.get(WorkflowUtils.RETRY_JSON_PROPERTY).getAsString(),lastCompletedTaskExecution.getRetryCount(),
@@ -212,7 +205,7 @@ public class WorkflowRetryExecutor implements Job, ApplicationConfigInterface {
 					log.debug("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} status ={}"
 							+ " LastRunTime ={} NextRunTime ={} Schedule ={}   TaskDescription={}  TaskMQChannel={} "
 							+ "TaskRetryCount={} RetryType ={}  processingTime={} message={}"
-							,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),"-",workflowConfig.getLastRun(),workflowConfig.getNextRun(),workflowConfig.getScheduleType(),firstworkflowTask.getWorkflowTaskEntity().getDescription(),firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),"-","WorkflowWithoutHistory",processingTime,"-");
+							,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),"-",workflowConfig.getLastRun(),workflowConfig.getNextRun(),workflowConfig.getScheduleType(),firstworkflowTask.getWorkflowTaskEntity().getDescription(),firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),"-",AssessmentReportAndWorkflowConstants.WORK_FLOW_WITHOUT_HISTORY,processingTime,"-");
 				} catch (WorkflowTaskInitializationException | InterruptedException e) {
 					log.debug("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} "
 							+ " status ={} LastRunTime ={} NextRunTime ={} Schedule ={}   TaskDescription={} "
@@ -220,7 +213,7 @@ public class WorkflowRetryExecutor implements Job, ApplicationConfigInterface {
 							,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),"-",
 							workflowConfig.getLastRun(),workflowConfig.getNextRun(),workflowConfig.getScheduleType(),
 							firstworkflowTask.getWorkflowTaskEntity().getDescription(),firstworkflowTask.getWorkflowTaskEntity().getMqChannel()
-							,"-","WorkflowWithoutHistory",0,e.getMessage());
+							,"-",AssessmentReportAndWorkflowConstants.WORK_FLOW_WITHOUT_HISTORY,0,e.getMessage());
 					log.debug(
 							" Worlflow Detail ==== retryWorkflowWithoutHistory workflow failed to execute due to MQ exception {}  ",
 							workflowConfig.getWorkflowId());
@@ -234,7 +227,7 @@ public class WorkflowRetryExecutor implements Job, ApplicationConfigInterface {
 							,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),
 							"Failure",workflowConfig.getLastRun(),workflowConfig.getNextRun(),workflowConfig.getScheduleType()
 							,firstworkflowTask.getWorkflowTaskEntity().getDescription()
-							,firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),"-","WorkflowWithoutHistory",0,e.getMessage());
+							,firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),"-",AssessmentReportAndWorkflowConstants.WORK_FLOW_WITHOUT_HISTORY,0,e.getMessage());
 					
 				}
 			}

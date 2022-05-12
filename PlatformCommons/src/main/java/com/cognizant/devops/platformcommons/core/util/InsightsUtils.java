@@ -44,13 +44,10 @@ public class InsightsUtils {
 	}
 	private static final String DAYS= " Days ";
 	private static String sparkTimezone = ApplicationConfigProvider.getInstance().getInsightsTimeZone();
-	public static ZoneId zoneId = ZoneId.of(sparkTimezone);
+	public static final ZoneId zoneId = ZoneId.of(sparkTimezone);
 	public static final ZoneId zoneIdUTC = ZoneId.of("UTC");
 	public static final String DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
-	
-
-	
 	public static long getDurationBetweenTime(long time) {
 		ZonedDateTime now = ZonedDateTime.now(zoneIdUTC);
 		return now.toInstant().getEpochSecond() - time;
@@ -105,11 +102,8 @@ public class InsightsUtils {
 		ZonedDateTime startDateOfTheWeek = startDateZone.toLocalDate().atStartOfDay(zoneIdUTC);
 		return startDateOfTheWeek.toInstant().getEpochSecond();
 	}
-
-
-
+	
 	public static long getDataToTime(String schedule) {
-
 		Long time = null;
 		ZonedDateTime now = ZonedDateTime.now(zoneIdUTC);
 
@@ -124,10 +118,7 @@ public class InsightsUtils {
 			time = lastWeek.toInstant().toEpochMilli();
 		} else if (JobSchedule.BI_WEEKLY_SPRINT.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime todayStart = now.toLocalDate().atStartOfDay(zoneIdUTC);
-
-			todayStart = todayStart.minusWeeks(2);
 		}
-
 		else if (JobSchedule.MONTHLY.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime firstDayofMonth = now.with(TemporalAdjusters.firstDayOfMonth()).toLocalDate()
 					.atStartOfDay(zoneIdUTC);
@@ -138,8 +129,7 @@ public class InsightsUtils {
 			lastDayOftheMonth = lastDayOftheMonth.minusSeconds(1);
 			time = lastDayOftheMonth.toInstant().toEpochMilli();
 		} else if (JobSchedule.QUARTERLY.name().equalsIgnoreCase(schedule)) {
-			// Will add code later for this usecase
-			// zdt = zdt.plusMonths(3);
+			
 		} else if (JobSchedule.YEARLY.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime firstDayofYear = now.with(TemporalAdjusters.firstDayOfYear()).toLocalDate()
 					.atStartOfDay(zoneIdUTC);
@@ -151,26 +141,20 @@ public class InsightsUtils {
 			time = lastDayofYear.toInstant().toEpochMilli();
 		}
 		return time;
-
 	}
 
 	public static long addTimeInCurrentTime(long currentTimeInSeconds, String frequency, long value) {
 		long time = 0l;
 		ZonedDateTime currentTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(currentTimeInSeconds), zoneIdUTC);
 		if (frequency.equalsIgnoreCase("DAYS")) {
-
 			time = currentTime.plusDays(value).toEpochSecond();
 		} else if (frequency.equalsIgnoreCase("WEEKS")) {
-
 			time = currentTime.plusWeeks(value).toEpochSecond();
 		} else if (frequency.equalsIgnoreCase("MONTHS")) {
-
 			time = currentTime.plusMonths(value).toEpochSecond();
 		} else if (frequency.equalsIgnoreCase("YEARS")) {
-
 			time = currentTime.plusYears(value).toEpochSecond();
 		}
-
 		return time;
 	}
 
@@ -203,16 +187,13 @@ public class InsightsUtils {
 			firstDayofLastMonth = firstDayofLastMonth.plusSeconds(1);
 			time = firstDayofLastMonth.toInstant().toEpochMilli();
 		} else if (JobSchedule.QUARTERLY.name().equalsIgnoreCase(schedule)) {
-			// Will add code later for this usecase
-			// zdt = zdt.plusMonths(3);
+			
 		} else if (JobSchedule.YEARLY.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime firstDayofYear = now.minusYears(since);
 			ZonedDateTime firstDayofLastYear = firstDayofYear.minusMinutes(1).with(TemporalAdjusters.firstDayOfYear())
 					.toLocalDate().atStartOfDay(zoneIdUTC);
-			firstDayofYear = firstDayofLastYear.plusSeconds(1);
 			time = firstDayofLastYear.toInstant().toEpochMilli();
 		}
-
 		return time;
 	}
 
@@ -228,35 +209,38 @@ public class InsightsUtils {
 			ZonedDateTime nextTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(nextRunTime), zoneIdUTC);
 			ZonedDateTime startTime = nextTime.minusDays(1);
 			time = startTime.toInstant().getEpochSecond();
-		} else if (JobSchedule.WEEKLY.name().equalsIgnoreCase(schedule)) {
+		} 
+		else if (JobSchedule.WEEKLY.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime nextTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(nextRunTime), zoneIdUTC);
 			ZonedDateTime startTime = nextTime.minusDays(7);
 			time = startTime.toInstant().getEpochSecond();
-
-		} else if (JobSchedule.BI_WEEKLY_SPRINT.name().equalsIgnoreCase(schedule)) {
-
+		} 
+		else if (JobSchedule.BI_WEEKLY_SPRINT.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime nextTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(nextRunTime), zoneIdUTC);
 			ZonedDateTime startTime = nextTime.minusDays(14);
 			time = startTime.toInstant().getEpochSecond();
-		} else if (JobSchedule.TRI_WEEKLY_SPRINT.name().equalsIgnoreCase(schedule)) {
-
+		} 
+		else if (JobSchedule.TRI_WEEKLY_SPRINT.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime nextTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(nextRunTime), zoneIdUTC);
 			ZonedDateTime startTime = nextTime.minusDays(21);
 			time = startTime.toInstant().getEpochSecond();
-		} else if (JobSchedule.MONTHLY.name().equalsIgnoreCase(schedule)) {
+		} 
+		else if (JobSchedule.MONTHLY.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime nextTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(nextRunTime), zoneIdUTC);
 			ZonedDateTime startTime = nextTime.minusMonths(1);
 			time = startTime.toInstant().getEpochSecond();
-		} else if (JobSchedule.QUARTERLY.name().equalsIgnoreCase(schedule)) {
+		} 
+		else if (JobSchedule.QUARTERLY.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime nextTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(nextRunTime), zoneIdUTC);
 			ZonedDateTime startTime = nextTime.minusMonths(3);
 			time = startTime.toInstant().getEpochSecond();
-
-		} else if (JobSchedule.YEARLY.name().equalsIgnoreCase(schedule)) {
+		} 
+		else if (JobSchedule.YEARLY.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime nextTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(nextRunTime), zoneIdUTC);
 			ZonedDateTime startTime = nextTime.minusYears(1);
 			time = startTime.toInstant().getEpochSecond();
-		} else if (JobSchedule.ONETIME.name().equalsIgnoreCase(schedule)) {
+		} 
+		else if (JobSchedule.ONETIME.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime startTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(nextRunTime), zoneIdUTC);
 			time = startTime.toInstant().getEpochSecond();
 		}
@@ -270,41 +254,40 @@ public class InsightsUtils {
 			long todayStartOfTheDay = getStartDay(currentNextTime, schedule);
 			currentNextTime = todayStartOfTheDay;
 		}
-
 		if (JobSchedule.DAILY.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime currentTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(currentNextTime), zoneIdUTC);
 			ZonedDateTime nextRunTime = currentTime.plusDays(1);
 			time = nextRunTime.toInstant().getEpochSecond();
-		} else if (JobSchedule.WEEKLY.name().equalsIgnoreCase(schedule)) {
+		}
+		else if (JobSchedule.WEEKLY.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime currentTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(currentNextTime), zoneIdUTC);
 			ZonedDateTime nextRunTime = currentTime.plusDays(7);
 			time = nextRunTime.toInstant().getEpochSecond();
-
-		} else if (JobSchedule.BI_WEEKLY_SPRINT.name().equalsIgnoreCase(schedule)) {
-
+		}
+		else if (JobSchedule.BI_WEEKLY_SPRINT.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime currentTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(currentNextTime), zoneIdUTC);
 			ZonedDateTime nextRunTime = currentTime.plusDays(14);
 			time = nextRunTime.toInstant().getEpochSecond();
-		} else if (JobSchedule.TRI_WEEKLY_SPRINT.name().equalsIgnoreCase(schedule)) {
-
+		} 
+		else if (JobSchedule.TRI_WEEKLY_SPRINT.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime currentTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(currentNextTime), zoneIdUTC);
 			ZonedDateTime nextRunTime = currentTime.plusDays(21);
 			time = nextRunTime.toInstant().getEpochSecond();
-		} else if (JobSchedule.MONTHLY.name().equalsIgnoreCase(schedule)) {
+		} 
+		else if (JobSchedule.MONTHLY.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime currentTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(currentNextTime), zoneIdUTC);
 			ZonedDateTime nextRunTime = currentTime.plusMonths(1);
 			time = nextRunTime.toInstant().getEpochSecond();
-		} else if (JobSchedule.QUARTERLY.name().equalsIgnoreCase(schedule)) {
-
+		}
+		else if (JobSchedule.QUARTERLY.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime currentTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(currentNextTime), zoneIdUTC);
 			ZonedDateTime nextRunTime = currentTime.plusMonths(3);
 			time = nextRunTime.toInstant().getEpochSecond();
-
-		} else if (JobSchedule.YEARLY.name().equalsIgnoreCase(schedule)) {
+		} 
+		else if (JobSchedule.YEARLY.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime currentTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(currentNextTime), zoneIdUTC);
 			ZonedDateTime nextRunTime = currentTime.plusYears(1);
 			time = nextRunTime.toInstant().getEpochSecond();
-
 		}
 		return time;
 	}
@@ -312,32 +295,33 @@ public class InsightsUtils {
 	public static long getStartDay(long startDate, String schedule) {
 
 		Long time = null;
-
 		ZonedDateTime now = ZonedDateTime.now(zoneIdUTC);
-
 		if (JobSchedule.DAILY.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime start = now.toLocalDate().atStartOfDay(zoneIdUTC).plusSeconds(1);
 			time = start.toInstant().getEpochSecond();
-		} else if (JobSchedule.WEEKLY.name().equalsIgnoreCase(schedule)) {
-
+		} 
+		else if (JobSchedule.WEEKLY.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime start = now.minusDays(7).with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
 			start = start.toLocalDate().atStartOfDay(zoneIdUTC);
 			start = start.plusSeconds(1);
 			time = start.toInstant().getEpochSecond();
-		} else if (JobSchedule.MONTHLY.name().equalsIgnoreCase(schedule)) {
+		} 
+		else if (JobSchedule.MONTHLY.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime firstDayofMonth = now.with(TemporalAdjusters.firstDayOfMonth()).toLocalDate()
 					.atStartOfDay(zoneIdUTC);
 			ZonedDateTime startOfFirstDayOfLastMonth = firstDayofMonth.minusMinutes(1)
 					.with(TemporalAdjusters.firstDayOfMonth()).toLocalDate().atStartOfDay(zoneIdUTC);
 			startOfFirstDayOfLastMonth = startOfFirstDayOfLastMonth.plusSeconds(1);
 			time = startOfFirstDayOfLastMonth.toInstant().getEpochSecond();
-		} else if (JobSchedule.BI_WEEKLY_SPRINT.name().equalsIgnoreCase(schedule)
+		} 
+		else if (JobSchedule.BI_WEEKLY_SPRINT.name().equalsIgnoreCase(schedule)
 				|| JobSchedule.TRI_WEEKLY_SPRINT.name().equalsIgnoreCase(schedule)) {
-
+			
 			ZonedDateTime givenStartTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(startDate), zoneIdUTC);
 			ZonedDateTime startOfTheGivenDate = givenStartTime.toLocalDate().atStartOfDay(zoneIdUTC).plusSeconds(1);
 			time = startOfTheGivenDate.toInstant().getEpochSecond();
-		} else if (JobSchedule.QUARTERLY.name().equalsIgnoreCase(schedule)) {
+		} 
+		else if (JobSchedule.QUARTERLY.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime firstDayofMonth = now.with(TemporalAdjusters.firstDayOfMonth()).toLocalDate()
 					.atStartOfDay(zoneIdUTC);
 			int crrentQuarterMonth = firstDayofMonth.getMonth().firstMonthOfQuarter().getValue();
@@ -346,13 +330,13 @@ public class InsightsUtils {
 			ZonedDateTime firstDayOfTheLastQuarter = firstDayOfTheCurrentQuarter.minusMonths(3).plusSeconds(1);
 			time = firstDayOfTheLastQuarter.toInstant().getEpochSecond();
 
-		} else if (JobSchedule.YEARLY.name().equalsIgnoreCase(schedule)) {
+		} 
+		else if (JobSchedule.YEARLY.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime firstDayofYear = now.with(TemporalAdjusters.firstDayOfYear()).toLocalDate()
 					.atStartOfDay(zoneIdUTC);
 			firstDayofYear = firstDayofYear.minusYears(1).plusSeconds(1);
 			time = firstDayofYear.toInstant().getEpochSecond();
 		}
-
 		return time;
 	}
 
@@ -368,14 +352,11 @@ public class InsightsUtils {
 	return ZonedDateTime.now(zoneIdUTC);		
 	}
 
-
-
 	public static Long getTimeBeforeDaysInSeconds(Long days) {
 		ZonedDateTime now = ZonedDateTime.now(zoneIdUTC);
 		ZonedDateTime after = now.minusDays(days);
 		return after.toInstant().getEpochSecond();
 	}
-
 
 	public static Long getDurationInDays(Long inputEpocSeconds) {
 		ZonedDateTime now = ZonedDateTime.now(zoneIdUTC);
@@ -407,14 +388,11 @@ public class InsightsUtils {
 		return 0l;
 	}
 
-	
-
 	public static int getMonthDays(long time) {
 		ZonedDateTime fromInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(time), zoneIdUTC);
 		return fromInput.toLocalDate().lengthOfMonth();
 	}
 	
-
 	public static long getDaysInQuarter(long time) {
 		ZonedDateTime fromInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(time), zoneIdUTC)
 				.with(TemporalAdjusters.firstDayOfMonth()).toLocalDate().atStartOfDay(zoneIdUTC);
@@ -440,7 +418,6 @@ public class InsightsUtils {
 		ZonedDateTime fromInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(time), zoneIdUTC);
 		return fromInput.toLocalDate().lengthOfYear();
 	}
-
 
 	public static Long subtractTimeInHours(long inputTime, long hours) {
 		ZonedDateTime fromInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(inputTime), zoneIdUTC);
@@ -487,12 +464,9 @@ public class InsightsUtils {
 			if (days >= getCurrentMonthDays()) {
 				result = Boolean.TRUE;
 			}
-		} else if (JobSchedule.YEARLY.name().equalsIgnoreCase(schedule)) {
-			if (days >= getCurrentYearDays()) {
-				result = Boolean.TRUE;
-			}
+		} else if (JobSchedule.YEARLY.name().equalsIgnoreCase(schedule)&& days >= getCurrentYearDays()) {
+			result = Boolean.TRUE;
 		}
-
 		return result;
 	}
 
@@ -569,7 +543,6 @@ public class InsightsUtils {
 			log.error(e.getMessage());
 			return 0;
 		}
-
 	}
 	
 	private static long convertToEpochSeconds(String datetime, String dateFormat) throws InsightsCustomException{
@@ -581,8 +554,7 @@ public class InsightsUtils {
 		catch(Exception e) {
 			log.error(e.getMessage());
 			throw new InsightsCustomException(e.getMessage());				
-		}
-		
+		}		
 	}
 
 	/** This method use in Traceability 

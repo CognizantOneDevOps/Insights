@@ -38,7 +38,7 @@
       "group":"DEPLOYMENT",
       "category":"STANDARD",
       "toolName":"RUNDECK",
-      "DBQuery":"MATCH (n:RUNDECK)  WHERE n.SPKstartTime > {startTime}  and n.SPKstartTime < {endTime} AND n.SPKstatus='Success' RETURN toInt(ROUND(Avg(toInt(n.SPKduration)))) as Time",
+      "DBQuery":"MATCH (n:RUNDECK)  WHERE n.SPKstartTime > {startTime}  and n.SPKstartTime < {endTime} AND n.SPKstatus='Success' RETURN toInteger(ROUND(Avg(toInteger(n.SPKduration)))) as Time",
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"Time"
@@ -49,7 +49,7 @@
       "group":"DEPLOYMENT",
       "category":"STANDARD",
       "toolName":"RUNDECK",
-      "DBQuery":"MATCH (n:RUNDECK) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKstatus='Success' RETURN ceil(max(toInt(n.SPKduration))) as Time",
+      "DBQuery":"MATCH (n:RUNDECK) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKstatus='Success' RETURN ceil(max(toInteger(n.SPKduration))) as Time",
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"Time"
@@ -94,7 +94,7 @@
       "group":"BUILD",
       "category":"STANDARD",
       "toolName":"JENKINS",
-      "DBQuery":"MATCH (n:JENKINS:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKvector = 'BUILD' and n.SPKstatus='Success' RETURN COALESCE(Max(toInt(n.SPKduration)),0) as Time",
+      "DBQuery":"MATCH (n:JENKINS:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKvector = 'BUILD' and n.SPKstatus='Success' RETURN COALESCE(Max(toInteger(n.SPKduration)),0) as Time",
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"Time"
@@ -139,7 +139,7 @@
       "group":"BUILD",
       "category":"STANDARD",
       "toolName":"JENKINS",
-      "DBQuery":"MATCH (n:JENKINS:DATA)  WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKvector = 'BUILD' and n.SPKstatus='Success'   RETURN toInt(ROUND(Avg(toInt(n.SPKduration)))) as Time",
+      "DBQuery":"MATCH (n:JENKINS:DATA)  WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKvector = 'BUILD' and n.SPKstatus='Success'   RETURN toInteger(ROUND(Avg(toInteger(n.SPKduration)))) as Time",
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"Time"

@@ -18,8 +18,6 @@ package com.cognizant.devops.engines.platformdataarchivalengine.test.engine;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-import javax.persistence.NoResultException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;

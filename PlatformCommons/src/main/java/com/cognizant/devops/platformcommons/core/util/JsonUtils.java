@@ -33,7 +33,6 @@ public class JsonUtils {
 	private JsonUtils() {
 		
 	}
-	
 	/** This method is used to merge two Json object 
 	 * @param json1Obj
 	 * @param json2Obj
@@ -56,7 +55,6 @@ public class JsonUtils {
 					}
 				}
 			}
-
 			Set<Entry<String, JsonElement>> entrySet2 = json2Obj.entrySet();
 			for (Entry<String, JsonElement> entry : entrySet2) {
 				String key2 = entry.getKey();
@@ -66,24 +64,23 @@ public class JsonUtils {
 			}
 		} catch (Exception e) {
 			log.error(" Error while mergeing two json ",e);
-		}
-		
+		}		
 		return json1Obj;
 	}
 	
 	public static JsonElement parseString(String requestText) {
-		JsonElement response = null;
+		JsonElement response = null ;
 		try {			
 			response = JsonParser.parseString(requestText);
 		} catch (Exception e) {
-			log.error(" Error in parseString ");
-			log.error(e);
-		}
+			 log.error(" Error in parseString "); 
+			 log.error(e);		
+		}	
 		return response; 
 	}
 	
 	public static JsonElement parseReader(Reader requestReader) {
-		JsonElement response = null;
+		JsonElement response = null;	
 		try {			
 			response = JsonParser.parseReader(requestReader);
 		} catch (Exception e) {
@@ -99,7 +96,7 @@ public class JsonUtils {
 			response =  parseString(requestText).getAsJsonObject();
 		} catch (Exception e) {
 			log.error(" Error in parseStringAsJsonObject ");
-			log.error(e);
+			log.error(e);			
 		}
 		return response;
 	}
@@ -120,8 +117,8 @@ public class JsonUtils {
 		try {			
 			response =  parseReader(requestReader).getAsJsonObject();
 		} catch (Exception e) {
-			log.error(" Error in parseReaderAsJsonObject ");
-			log.error(e);
+			log.error(" Error in parseReaderAsJsonObject "); 
+			log.error(e);			 
 		}
 		return response;
 	}
@@ -130,10 +127,10 @@ public class JsonUtils {
 		JsonArray response = null;
 		try {
 			response = parseString(requestText).getAsJsonArray();
-		} catch (Exception e) {
-			log.error(" Error in parseStringAsJsonArray ");
-			log.error(e);
-		}
+		} catch (Exception e) {			
+			log.error(" Error in parseStringAsJsonArray "); 
+			log.error(e);			 
+		}	
 		return response;
 	}
 }

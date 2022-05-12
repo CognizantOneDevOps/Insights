@@ -61,6 +61,9 @@ public class MileStoneConfig {
 
 	@Column(name = "updatedDate")
 	private Long updatedDate = 0L;
+	
+	@Column(name = "MILESTONE_RELEASE_ID")
+	private String milestoneReleaseID;
 
 	public int getId() {
 		return id;
@@ -124,6 +127,14 @@ public class MileStoneConfig {
 
 	public void setUpdatedDate(Long updatedDate) {
 		this.updatedDate = updatedDate;
+	}
+
+	public String getMilestoneReleaseID() {
+		return milestoneReleaseID;
+	}
+
+	public void setMilestoneReleaseID(String milestoneReleaseID) {
+		this.milestoneReleaseID = milestoneReleaseID;
 	}
 
 }

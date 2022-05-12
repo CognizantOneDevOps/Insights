@@ -3,8 +3,8 @@
 	"reportName": "Report_Grafana_Inference",
 	"description": "Template to create Inference Panel",
 	"isActive": true,
-	"file": "Report_Grafana_Inference",
-	"visualizationutil": "Fusion",
+	"templateType": "Others",
+	"visualizationutil": "FUSION",
 	"kpiConfigs": [
 		{
 			"kpiId": 1,

@@ -41,12 +41,10 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 	private WebHookConfig webhookConfig;
 	private String jobName = ""; 
 
-
 	public WebHookDataSubscriber(WebHookConfig webhookConfig, String mqChannelName, String jobName) throws Exception {
 		super(mqChannelName);
 		this.webhookConfig = webhookConfig;
 		this.jobName=jobName;
-
 	}
 
 	public void setWebhookConfig(WebHookConfig webhookConfigUpdated) {
@@ -103,7 +101,6 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 			getChannel().basicReject(envelope.getDeliveryTag(), false);
 		}
 	}
-
 	// Execution of the Query in which node updation in Neo4j is required,based on
 	// the unique property.
 	private void updateNeo4jNode(List<JsonObject> toolData, WebHookConfig webhookConfig2) throws Exception {
@@ -131,5 +128,4 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 			throw e;
 		}
 	}
-
 }

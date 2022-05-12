@@ -17,15 +17,10 @@ pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\dummydata
 setlocal ENABLEDELAYEDEXPANSION
 for /f "delims=" %%i in ('python -V ^2^>^&^1') do (
    set PYTHON_VERSION=%%i
-   if "!PYTHON_VERSION:~0,8!" EQU "Python 2" ( 
-      echo Detected python 2 version
+   if "!PYTHON_VERSION:~0,8!" EQU "Python 3" ( 
+      echo Detected python 3 version
 	  python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.dummy.dummydata.DummyDataAgent import DummyDataAgent; DummyDataAgent()"
    ) else (
-      if "!PYTHON_VERSION:~0,8!" EQU "Python 3" ( 
-         echo Detected python 3 version
-		 python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.dummy.dummydata.DummyDataAgent3 import DummyDataAgent; DummyDataAgent()"
-      ) else ( 
-         echo python version not supported 
-      )
+      echo python version not supported 
    )
 )

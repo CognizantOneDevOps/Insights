@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.NewCookie;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,6 +41,8 @@ import com.cognizant.devops.platformservice.security.config.SpringAuthority;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import jakarta.ws.rs.core.NewCookie;
 
 
 public class GrafanaUserDetailsUtil {

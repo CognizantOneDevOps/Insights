@@ -147,6 +147,7 @@ tr.mat-footer-row, tr.mat-row-kpi {
     display: block;
     width: 85%;
     padding: 6px 12px;
+    margin: 1% 1% 1% 0%;
     font-size: 14px;
     font-family: inherit;
     background-color: white;

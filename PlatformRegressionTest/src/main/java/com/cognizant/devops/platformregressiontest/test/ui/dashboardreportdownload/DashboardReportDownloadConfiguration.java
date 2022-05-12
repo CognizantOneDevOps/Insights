@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.ui.dashboardreportdownload;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -31,7 +32,7 @@ import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.Dashboa
 
 public class DashboardReportDownloadConfiguration extends DashboardReportDownloadObjectRepository {
 
-	WebDriverWait wait = new WebDriverWait(driver, 20);
+	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
 	private static final Logger log = LogManager.getLogger(DashboardReportDownloadConfiguration.class);
 
@@ -329,7 +330,7 @@ public class DashboardReportDownloadConfiguration extends DashboardReportDownloa
 	 * @return true if element is displayed else false
 	 */
 	private boolean visibilityOf(WebElement element, int timeout) {
-		new WebDriverWait(driver, timeout).until(ExpectedConditions.visibilityOf(element));
+		new WebDriverWait(driver, Duration.ofSeconds(timeout)).until(ExpectedConditions.visibilityOf(element));
 		return element.isDisplayed();
 	}
 
@@ -340,7 +341,7 @@ public class DashboardReportDownloadConfiguration extends DashboardReportDownloa
 	 * @param timeout
 	 */
 	public static void clickOn(WebElement element, int timeout) {
-		new WebDriverWait(driver, timeout).until(ExpectedConditions.elementToBeClickable(element)).click();
+		new WebDriverWait(driver, Duration.ofSeconds(timeout)).until(ExpectedConditions.elementToBeClickable(element)).click();
 	}
 
 	/**
@@ -350,7 +351,7 @@ public class DashboardReportDownloadConfiguration extends DashboardReportDownloa
 	 * @return size of list of web elements
 	 */
 	public static int visibilityOfAllElements(List<WebElement> element, int timeout) {
-		new WebDriverWait(driver, timeout).until(ExpectedConditions.visibilityOfAllElements(element));
+		new WebDriverWait(driver, Duration.ofSeconds(timeout)).until(ExpectedConditions.visibilityOfAllElements(element));
 		return element.size();
 	}
 

@@ -28,7 +28,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
+import com.cognizant.devops.platformcommons.constants.AgentCommonConstant;
 import com.cognizant.devops.platformcommons.constants.DataArchivalConstants;
+import com.cognizant.devops.platformcommons.constants.EngineConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
@@ -42,12 +44,12 @@ import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Envelope;
 
 public class DataArchivalDataSubscriber extends EngineSubscriberResponseHandler {
-
+	
 	private static Logger log = LogManager.getLogger(DataArchivalDataSubscriber.class);
 	DataArchivalConfigDal dataArchivalConfigDAL = new DataArchivalConfigDal();
 	private Map<String,String> loggingInfo = new ConcurrentHashMap<>();
 	private String agentId;
-
+	private String agent="agentId";
 	public DataArchivalDataSubscriber(String routingKey,String agentId) throws Exception {
 		super(routingKey);
 		this.agentId=agentId;
@@ -61,10 +63,12 @@ public class DataArchivalDataSubscriber extends EngineSubscriberResponseHandler 
 			message = new String(body, StandardCharsets.UTF_8);
 			JsonArray messageJson = JsonUtils.parseStringAsJsonObject(message).get("data").getAsJsonArray();
 			JsonObject updateURLJson = messageJson.get(0).getAsJsonObject();
-			loggingInfo.put("toolName",String.valueOf(updateURLJson.get("toolName")));
-			loggingInfo.put("category",String.valueOf(updateURLJson.get("categoryName")));
-			loggingInfo.put("agentId", agentId);
-			loggingInfo.put("execId",String.valueOf(updateURLJson.get("execId")));
+
+			loggingInfo.put(AgentCommonConstant.TOOLNAME,String.valueOf(updateURLJson.get(AgentCommonConstant.TOOLNAME)));
+			loggingInfo.put(AgentCommonConstant.CATEGORY,String.valueOf(updateURLJson.get("categoryName")));
+			loggingInfo.put(AgentCommonConstant.AGENTID, agentId);
+			loggingInfo.put(EngineConstants.EXECID,String.valueOf(updateURLJson.get(EngineConstants.EXECID)));
+
 			if (PlatformServiceConstants.SUCCESS.equalsIgnoreCase(updateURLJson.get("status").getAsString())) {
 				String containerID = updateURLJson.get(DataArchivalConstants.CONTAINERID).getAsString();
 				if (containerID.isEmpty()) {
@@ -83,21 +87,21 @@ public class DataArchivalDataSubscriber extends EngineSubscriberResponseHandler 
 						throw new InsightsCustomException("Container URL not present in message");
 					}
 					Long expiryDate = getExpiryDate(archivalName);
-					log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Inside Data archival data:- archivalName: {} , sourceUrl: {} ",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),"-",loggingInfo.get("execId"), archivalName, sourceUrl);
+					log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Inside Data archival data:- archivalName: {} , sourceUrl: {} ",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),"-",loggingInfo.get(EngineConstants.EXECID), archivalName, sourceUrl);
 					dataArchivalConfigDAL.updateContainerDetails(archivalName, sourceUrl, containerID, expiryDate,boltPort);
-					log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Update Data Archival record with sourceurl and boltport",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),"-",loggingInfo.get("execId"));
+					log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Update Data Archival record with sourceurl and boltport",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),"-",loggingInfo.get(EngineConstants.EXECID));
 				}
 				getChannel().basicAck(envelope.getDeliveryTag(), false);
 			} else {
 				getChannel().basicAck(envelope.getDeliveryTag(), false);
-				log.error(" toolName={} category={} agentId={} routingKey={} execId={} Failed status in Data archival message received from MQ",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),"-",loggingInfo.get("execId"));
+				log.error(" toolName={} category={} agentId={} routingKey={} execId={} Failed status in Data archival message received from MQ",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),"-",loggingInfo.get(EngineConstants.EXECID));
 				throw new InsightsCustomException("Failed status in Data archival message received from MQ.");
 			}
 		} catch (NoResultException e) {
-			log.error("toolName={} category={} agentId={} execId={} No Record found occured. data message :{} ",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),loggingInfo.get("execId") ,message, e);
+			log.error("toolName={} category={} agentId={} execId={} No Record found occured. data message :{} ",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),loggingInfo.get(EngineConstants.EXECID) ,message, e);
 			getChannel().basicReject(envelope.getDeliveryTag(), false);
 		} catch (Exception e) {
-			log.error("toolName={} category={} agentId={} execId={} Exception occured ",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),loggingInfo.get("execId"),e);
+			log.error("toolName={} category={} agentId={} execId={} Exception occured ",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),loggingInfo.get(EngineConstants.EXECID),e);
 			getChannel().basicReject(envelope.getDeliveryTag(), false);
 		}
 

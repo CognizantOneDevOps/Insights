@@ -27,8 +27,11 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.automl.task.util.AutoMLPrediction;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.ReportStatusConstants;
+import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
+import com.cognizant.devops.platformdal.milestone.MileStoneConfigDAL;
 import com.cognizant.devops.platformreports.assessment.dal.ReportDataHandler;
 import com.cognizant.devops.platformreports.assessment.dal.ReportDataHandlerFactory;
 import com.cognizant.devops.platformreports.assessment.dal.ReportGraphDataHandler;
@@ -49,7 +52,7 @@ public class InsightsKPIProcessor {
 
 	protected ReportGraphDataHandler reportGraphDBHandler = new ReportGraphDataHandler();
 	Gson gson = new Gson();
-
+	
 	public InsightsKPIProcessor(InsightsKPIConfigDTO kpiConfigDTO) {
 		this.kpiConfigDTO = kpiConfigDTO;
 	}
@@ -104,8 +107,7 @@ public class InsightsKPIProcessor {
 				}
 			}
 			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
-					kpiDefinition.getExecutionId(),kpiDefinition.getWorkflowId(),kpiDefinition.getReportId() ,"-",kpiDefinition.getKpiId(),kpiDefinition.getCategory()
+			log.debug(StringExpressionConstants.STR_EXP_TASKEXECUTION,kpiDefinition.getExecutionId(),kpiDefinition.getWorkflowId(),kpiDefinition.getReportId() ,"-",kpiDefinition.getKpiId(),kpiDefinition.getCategory()
 					,processingTime," usecasename: " +kpiDefinition.getUsecaseName() + " schedule: " +kpiDefinition.getSchedule());
 			
 			
@@ -122,9 +124,8 @@ public class InsightsKPIProcessor {
 			}
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== Some calculation job failed for kpiID -{} " , kpiDefinition.getKpiId(), e);
-			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
-					kpiDefinition.getExecutionId(),kpiDefinition.getWorkflowId(),kpiDefinition.getReportId() ,"-",kpiDefinition.getKpiId(),kpiDefinition.getCategory()
-					,0,"usecasename: " +kpiDefinition.getUsecaseName() + "schedule: " +kpiDefinition.getSchedule() + e.getMessage() );
+			log.error(StringExpressionConstants.STR_EXP_TASKEXECUTION,kpiDefinition.getExecutionId(),kpiDefinition.getWorkflowId(),kpiDefinition.getReportId() ,"-",kpiDefinition.getKpiId(),kpiDefinition.getCategory()
+					,0,"usecasename: " +kpiDefinition.getUsecaseName() + ReportStatusConstants.SCHEDULE+kpiDefinition.getSchedule() + e.getMessage() );
 			throw new InsightsJobFailedException("Something went wrong with KPI query execution " + e.getMessage());
 		}
 		return ReportEngineEnum.StatusCode.SUCCESS.getValue();
@@ -146,12 +147,14 @@ public class InsightsKPIProcessor {
 		dateReplaceMap.put(ReportEngineUtils.END_TIME_FIELD, toDate);
 		StringSubstitutor sub = new StringSubstitutor(dateReplaceMap, "{", "}");
 		queryModel.setRecordDate(fromDate);
-		queryModel.setQuery(sub.replace(neo4jQuery));
+		neo4jQuery = sub.replace(neo4jQuery);
+		//Substitute milestoneName in the KPI query
+		neo4jQuery = getMilestone(neo4jQuery);
+		queryModel.setQuery(neo4jQuery);
 		queryModelList.add(queryModel);
 		long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-		log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
-				kpiConfigDTO.getExecutionId(),kpiConfigDTO.getWorkflowId(),kpiConfigDTO.getReportId() ,"-",kpiConfigDTO.getKpiId(),kpiConfigDTO.getCategory()
-				,processingTime,"queryStartTime: " +fromDate+ "queryEndTime: "+toDate +"schedule: " +kpiConfigDTO.getSchedule());
+		log.debug(StringExpressionConstants.STR_EXP_TASKEXECUTION,kpiConfigDTO.getExecutionId(),kpiConfigDTO.getWorkflowId(),kpiConfigDTO.getReportId() ,"-",kpiConfigDTO.getKpiId(),kpiConfigDTO.getCategory()
+				,processingTime,ReportStatusConstants.QUERY_START_TIME +fromDate+ ReportStatusConstants.QUERY_END_TIME+toDate +ReportStatusConstants.SCHEDULE +kpiConfigDTO.getSchedule());
 		
 	}
 
@@ -179,9 +182,8 @@ public class InsightsKPIProcessor {
 				startDate = InsightsUtils.addDaysInGivenTime(startDate, 1);
 				endDate = InsightsUtils.addDaysInGivenTime(endDate, 1);
 				long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-				log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
-						kpiConfigDTO.getExecutionId(),kpiConfigDTO.getWorkflowId(),kpiConfigDTO.getReportId() ,"-",kpiConfigDTO.getKpiId(),kpiConfigDTO.getCategory()
-						,processingTime,"queryStartTime: " +startDate+ "queryEndTime: "+endDate +"schedule: " +kpiConfigDTO.getSchedule());
+				log.debug(StringExpressionConstants.STR_EXP_TASKEXECUTION,kpiConfigDTO.getExecutionId(),kpiConfigDTO.getWorkflowId(),kpiConfigDTO.getReportId() ,"-",kpiConfigDTO.getKpiId(),kpiConfigDTO.getCategory()
+						,processingTime,ReportStatusConstants.QUERY_START_TIME +startDate+ ReportStatusConstants.QUERY_END_TIME+endDate +ReportStatusConstants.SCHEDULE +kpiConfigDTO.getSchedule());
 			}
 		} else {
 
@@ -202,10 +204,22 @@ public class InsightsKPIProcessor {
 				if (endDayOfTheWeek > endTime) {
 					endDayOfTheWeek = endTime;
 				}
-				log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
-						kpiConfigDTO.getExecutionId(),kpiConfigDTO.getWorkflowId(),kpiConfigDTO.getReportId() ,"-",kpiConfigDTO.getKpiId(),kpiConfigDTO.getCategory()
-						,0,"queryStartTime: " +startOfTheDayInWeek+ "queryEndTime: "+endDayOfTheWeek +"schedule: " +kpiConfigDTO.getSchedule());
+				log.debug(StringExpressionConstants.STR_EXP_TASKEXECUTION,kpiConfigDTO.getExecutionId(),kpiConfigDTO.getWorkflowId(),kpiConfigDTO.getReportId() ,"-",kpiConfigDTO.getKpiId(),kpiConfigDTO.getCategory()
+						,0,ReportStatusConstants.QUERY_START_TIME +startOfTheDayInWeek+ ReportStatusConstants.QUERY_END_TIME+endDayOfTheWeek +ReportStatusConstants.SCHEDULE +kpiConfigDTO.getSchedule());
 			}
 		}
+	}
+	
+	protected String getMilestone(String query) {
+		if(kpiConfigDTO.getMilestoneId()!= 0) {
+			Map<String, String> mileStoneReplaceMap = new HashMap<>();
+			int milestoneId = kpiConfigDTO.getMilestoneId();
+			String mileStoneName = new MileStoneConfigDAL().getMileStoneConfigById(milestoneId).getMileStoneName();
+			String replaceString = "\'" + mileStoneName + "\'";
+			mileStoneReplaceMap.put(ReportEngineUtils.MILESTONE_NAME, replaceString);
+			StringSubstitutor sub = new StringSubstitutor(mileStoneReplaceMap, "{", "}");
+			return sub.replace(query);
+		}
+		return query;
 	}
 }

@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.io.IOUtils;
@@ -771,9 +772,10 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 	private String readDashboardElementJson() {
 		String dashboardElementContent = null;
 		try {
-			File dashboardElementFile = new File(DASHBOARD_ELEMENT_JSON_PATH);
+			String dashboardElementFilePath = new File(FilenameUtils.normalize(DASHBOARD_ELEMENT_JSON_PATH)).getCanonicalPath();
+			File dashboardElementFile = new File(dashboardElementFilePath);
 			if(dashboardElementFile.exists()) { 
-				dashboardElementContent = new String(Files.readAllBytes(Paths.get(DASHBOARD_ELEMENT_JSON_PATH)));
+				dashboardElementContent = new String(Files.readAllBytes(Paths.get(dashboardElementFilePath)));
 			} else {
 				dashboardElementContent = fetchTemplate(DASHBOARD_ELEMENT_JSON_FILE);
 			}

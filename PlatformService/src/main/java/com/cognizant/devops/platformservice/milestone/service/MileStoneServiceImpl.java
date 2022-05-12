@@ -63,18 +63,18 @@ public class MileStoneServiceImpl implements MileStoneService{
 		if (epochStartDate > epochEndDate) {
 			throw new InsightsCustomException("Start Date cannot be greater than End Date");
 		}
-        
+        String milestoneReleaseID = configJson.get(MilestoneConstants.MILESTONE_RELEASEID).getAsString();
 		MileStoneConfig mileStoneConfig = new MileStoneConfig();
 		mileStoneConfig.setMileStoneName(milestoneName);
 		mileStoneConfig.setStatus(MilestoneEnum.MilestoneStatus.NOT_STARTED.name());
 		mileStoneConfig.setStartDate(epochStartDate);
 		mileStoneConfig.setEndDate(epochEndDate);
 		mileStoneConfig.setCreatedDate(InsightsUtils.getCurrentTimeInEpochMilliSeconds());
+		mileStoneConfig.setMilestoneReleaseID(milestoneReleaseID);
 		Set<InsightsMileStoneOutcomeConfig> outcomeList = new HashSet<>();
 		JsonArray outcomeListFromUI = configJson.get("outcomeList").getAsJsonArray();
-		for(JsonElement outcome: outcomeListFromUI) {
-			int outcomeId = outcome.getAsInt();
-			InsightsOutcomeTools insightsOutcomeTools = outComeConfigDAL.getOutComeConfigById(outcomeId);
+		for(JsonElement outcomeName: outcomeListFromUI) {
+			InsightsOutcomeTools insightsOutcomeTools = outComeConfigDAL.getOutComeConfigByName(outcomeName.getAsString());
 			InsightsMileStoneOutcomeConfig insightsMileStoneOutcomeConfig = new InsightsMileStoneOutcomeConfig();
 			insightsMileStoneOutcomeConfig.setStatus(MilestoneEnum.OutcomeStatus.NOT_STARTED.name());
 			insightsMileStoneOutcomeConfig.setMileStoneConfig(mileStoneConfig);
@@ -98,6 +98,7 @@ public class MileStoneServiceImpl implements MileStoneService{
 					mileJson.addProperty(MilestoneConstants.MILESTONENAME, mile.getMileStoneName());
 					mileJson.addProperty(MilestoneConstants.STARTDATE, mile.getStartDate());
 					mileJson.addProperty(MilestoneConstants.ENDDATE, mile.getEndDate());
+					mileJson.addProperty(MilestoneConstants.MILESTONE_RELEASEID, mile.getMilestoneReleaseID());
 					mileJson.addProperty("status", mile.getStatus());
 					mileJson.addProperty("workflowId", ""); //mile.getWorkflowConfig().getWorkflowId()
 					List<JsonObject> config = new ArrayList<>();
@@ -126,55 +127,72 @@ public class MileStoneServiceImpl implements MileStoneService{
 
 	@Override
 	public void updateMileStoneConfig(JsonObject configJson) throws InsightsCustomException {
-		MileStoneConfig mileStoneConfig = new MileStoneConfig();
-		mileStoneConfig.setId(configJson.get("id").getAsInt());
-		mileStoneConfig.setMileStoneName(configJson.get(MilestoneConstants.MILESTONENAME).getAsString());
-		mileStoneConfig.setStatus("NOT_STARTED");
-		String startDate = configJson.get(MilestoneConstants.STARTDATE).getAsString();
-		long epochStartDate = InsightsUtils.getEpochTime(startDate) / 1000;
-		String endDate = configJson.get(MilestoneConstants.ENDDATE).getAsString();
-		long epochEndDate = InsightsUtils.getEpochTime(endDate) / 1000;
-		if (epochStartDate > epochEndDate) {
-			throw new InsightsCustomException("Start Date cannot be greater than End Date");
+		try {
+			MileStoneConfig existingConfig = mileStoneConfigDAL.getMileStoneConfigById(configJson.get("id").getAsInt());
+			if(existingConfig.getStatus().equals("NOT_STARTED") && existingConfig.getStartDate()>InsightsUtils.getCurrentTimeInSeconds()) {
+				MileStoneConfig mileStoneConfig = new MileStoneConfig();
+				mileStoneConfig.setId(configJson.get("id").getAsInt());
+				mileStoneConfig.setMileStoneName(configJson.get(MilestoneConstants.MILESTONENAME).getAsString());
+				mileStoneConfig.setStatus("NOT_STARTED");
+				String startDate = configJson.get(MilestoneConstants.STARTDATE).getAsString();
+				long epochStartDate = InsightsUtils.getEpochTime(startDate) / 1000;
+				String endDate = configJson.get(MilestoneConstants.ENDDATE).getAsString();
+				long epochEndDate = InsightsUtils.getEpochTime(endDate) / 1000;
+				if (epochStartDate > epochEndDate) {
+					throw new InsightsCustomException("Start Date cannot be greater than End Date");
+				}
+				String milestoneReleaseID = configJson.get(MilestoneConstants.MILESTONE_RELEASEID).getAsString();
+				mileStoneConfig.setStartDate(epochStartDate);
+				mileStoneConfig.setEndDate(epochEndDate);
+				mileStoneConfig.setMilestoneReleaseID(milestoneReleaseID);
+				mileStoneConfig.setUpdatedDate(InsightsUtils.getCurrentTimeInEpochMilliSeconds());
+				Set<InsightsMileStoneOutcomeConfig> outcomeList = new HashSet<>();
+				JsonArray existingOutcomeList = configJson.get("existingOutcomeList").getAsJsonArray();
+				JsonArray outcomeListFromUI = configJson.get("outcomeList").getAsJsonArray();
+				existingOutcomeList.forEach(x-> mileStoneConfigDAL.deleteOutcome(x.getAsInt()));
+				
+				for(JsonElement outcome: outcomeListFromUI) {
+					InsightsOutcomeTools insightsOutcomeTools = outComeConfigDAL.getOutComeConfigByName(outcome.getAsString());
+					InsightsMileStoneOutcomeConfig insightsMileStoneOutcomeConfig = new InsightsMileStoneOutcomeConfig();
+					insightsMileStoneOutcomeConfig.setLastUpdatedDate(InsightsUtils.getCurrentTimeInEpochMilliSeconds());
+					insightsMileStoneOutcomeConfig.setMileStoneConfig(mileStoneConfig);
+					insightsMileStoneOutcomeConfig.setInsightsOutcomeTools(insightsOutcomeTools);
+					insightsMileStoneOutcomeConfig.setStatus(MilestoneEnum.OutcomeStatus.NOT_STARTED.name());
+					insightsMileStoneOutcomeConfig.setStatusMessage(MilestoneEnum.OutcomeStatus.NOT_STARTED.getValue());
+					outcomeList.add(insightsMileStoneOutcomeConfig);
+				}
+				mileStoneConfig.setListOfOutcomes(outcomeList);
+				mileStoneConfigDAL.updateMileStoneConfig(mileStoneConfig);
+			}
+			else {
+				throw new InsightsCustomException("Only Milestones that have not started can be edited");
+			}
+		} catch(Exception e) {
+			log.error("Error while updating milestone...", e);
+			throw new InsightsCustomException(e.getMessage());
 		}
-		mileStoneConfig.setStartDate(epochStartDate);
-		mileStoneConfig.setEndDate(epochEndDate);
-		mileStoneConfig.setUpdatedDate(InsightsUtils.getCurrentTimeInEpochMilliSeconds());
-		Set<InsightsMileStoneOutcomeConfig> outcomeList = new HashSet<>();
-		JsonArray existingOutcomeList = configJson.get("existingOutcomeList").getAsJsonArray();
-		JsonArray outcomeListFromUI = configJson.get("outcomeList").getAsJsonArray();
-		existingOutcomeList.forEach(x-> mileStoneConfigDAL.deleteOutcome(x.getAsInt()));
-		
-		for(JsonElement outcome: outcomeListFromUI) {
-			int outcomeId = outcome.getAsInt();
-			InsightsOutcomeTools insightsOutcomeTools = outComeConfigDAL.getOutComeConfigById(outcomeId);
-			InsightsMileStoneOutcomeConfig insightsMileStoneOutcomeConfig = new InsightsMileStoneOutcomeConfig();
-			insightsMileStoneOutcomeConfig.setLastUpdatedDate(InsightsUtils.getCurrentTimeInEpochMilliSeconds());
-			insightsMileStoneOutcomeConfig.setMileStoneConfig(mileStoneConfig);
-			insightsMileStoneOutcomeConfig.setInsightsOutcomeTools(insightsOutcomeTools);
-			outcomeList.add(insightsMileStoneOutcomeConfig);
-		}
-		mileStoneConfig.setListOfOutcomes(outcomeList);
-		mileStoneConfigDAL.updateMileStoneConfig(mileStoneConfig);
 		
 	}
 
 	@Override
 	public String deleteMileStoneDetails(int milestoneId) throws InsightsCustomException {
-		
-		MileStoneConfig mileStoneConfig = mileStoneConfigDAL.getMileStoneConfigById(milestoneId);
-		if(mileStoneConfig ==null) {
-			throw new InsightsCustomException("Milestone Detail not found ");
-		}else {
-			boolean updateOutcomeStatusFlag = mileStoneConfig.getListOfOutcomes().stream().allMatch(outcome-> outcome.getStatus().equalsIgnoreCase(MilestoneEnum.OutcomeStatus.NOT_STARTED.name()));
-			if(mileStoneConfig.getStatus().equalsIgnoreCase(MilestoneEnum.MilestoneStatus.NOT_STARTED.name()) && updateOutcomeStatusFlag) {
-				mileStoneConfigDAL.deleteMileStoneConfig(milestoneId);
+		try {
+			MileStoneConfig mileStoneConfig = mileStoneConfigDAL.getMileStoneConfigById(milestoneId);
+			if(mileStoneConfig == null) {
+				throw new InsightsCustomException("Milestone Detail not found ");
 			}else {
-				throw new InsightsCustomException("Milestone already in progress, you cannot delete this Milestone. ");
+				boolean updateOutcomeStatusFlag = mileStoneConfig.getListOfOutcomes().stream().allMatch(outcome-> outcome.getStatus().equalsIgnoreCase(MilestoneEnum.OutcomeStatus.NOT_STARTED.name()));
+				if(mileStoneConfig.getStatus().equalsIgnoreCase(MilestoneEnum.MilestoneStatus.NOT_STARTED.name()) && updateOutcomeStatusFlag) {
+					mileStoneConfigDAL.deleteMileStoneConfig(milestoneId);
+				}else {
+					throw new InsightsCustomException("Milestone already in progress, you cannot delete this Milestone. ");
+				}
 			}
+			return PlatformServiceConstants.SUCCESS;
+		} catch(Exception e) {
+			log.error("Error while deleting milestone...", e);
+			throw new InsightsCustomException(e.getMessage());
 		}
-		return PlatformServiceConstants.SUCCESS;
-		
 	}
 
 	@Override

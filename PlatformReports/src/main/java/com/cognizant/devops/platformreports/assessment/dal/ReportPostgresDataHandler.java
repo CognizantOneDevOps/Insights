@@ -89,5 +89,4 @@ public class ReportPostgresDataHandler {
 		}
 		return contentConfig;
 	}
-
 }

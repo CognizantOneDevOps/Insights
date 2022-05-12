@@ -32,7 +32,6 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.NewCookie;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -49,8 +48,13 @@ import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import jakarta.ws.rs.core.NewCookie;
+
 
 public class PlatformServiceUtil {
+	
+	
+	
 	private static final Logger log = LogManager.getLogger(PlatformServiceUtil.class);
 	
 	GrafanaHandler grafanaHandler = new GrafanaHandler();

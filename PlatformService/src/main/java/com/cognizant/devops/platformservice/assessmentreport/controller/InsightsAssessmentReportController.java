@@ -270,6 +270,7 @@ public class InsightsAssessmentReportController {
 				JsonObject jsonobject = new JsonObject();
 				jsonobject.addProperty("reportId", reportTemplate.getReportId());
 				jsonobject.addProperty("templateName", reportTemplate.getTemplateName());
+				jsonobject.addProperty("templateType", reportTemplate.getTemplateType());
 				jsonarray.add(jsonobject);
 			}
 			return PlatformServiceUtil.buildSuccessResponseWithData(jsonarray);
@@ -515,6 +516,7 @@ public class InsightsAssessmentReportController {
 				jsonobject.addProperty("description", eachTemplate.getDescription());
 				jsonobject.addProperty("isActive", eachTemplate.isActive());
 				jsonobject.addProperty("visualizationutil", eachTemplate.getVisualizationutil());
+				jsonobject.addProperty("templateType", eachTemplate.getTemplateType());
 				jsonarray.add(jsonobject);
 			}
 			return PlatformServiceUtil.buildSuccessResponseWithData(jsonarray);
@@ -555,6 +557,18 @@ public class InsightsAssessmentReportController {
 		try {
 			chartHandlerList = assessmentReportService.getVisualizationUtil();
 			return PlatformServiceUtil.buildSuccessResponseWithData(chartHandlerList);
+		} catch (Exception e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+
+	}
+	
+	@GetMapping(value = "/getTemplateType", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject getTemplateType() {
+		List<String> templateTypeList;
+		try {
+			templateTypeList = assessmentReportService.getTemplateType();
+			return PlatformServiceUtil.buildSuccessResponseWithData(templateTypeList);
 		} catch (Exception e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}

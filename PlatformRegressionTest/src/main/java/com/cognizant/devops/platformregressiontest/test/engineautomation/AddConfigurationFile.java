@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.engineautomation;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -29,7 +30,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectModule;
 
 public class AddConfigurationFile extends AddConfigurationFileObjectRepository {
-	WebDriverWait wait = new WebDriverWait(driver, 20);
+	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 	private static final Logger log = LogManager.getLogger(AddConfigurationFile.class);
 
 	public AddConfigurationFile() {

@@ -25,6 +25,7 @@ import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -41,7 +42,8 @@ public class WorkflowAutoCorrectionExecutor implements Job, ApplicationConfigInt
 	private static final String WEEKS = "WEEKS";
 	private static final String MONTHS = "MONTHS";
 	private static final String YEARS = "YEARS";
-
+	
+	
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		
@@ -153,8 +155,7 @@ public class WorkflowAutoCorrectionExecutor implements Job, ApplicationConfigInt
 						log.debug("WorkflowAutoCorrection executor === correction performed on workflow : {} ",
 								eachWorkflow.getWorkflowId());
 						adjustedNextRunTime = 0;
-						log.debug("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetry={} isTaskRetry={} processingTime={} message={}"
-								,"-",workflowId,workflowType,"-","-",status,lastruntime ,nextRunTime,schedule,"-","-",0,"-");
+						log.debug(StringExpressionConstants.STR_EXP_WORKFLOW,"-",workflowId,workflowType,"-","-",status,lastruntime ,nextRunTime,schedule,"-","-",0,"-");
 					} catch (Exception e) {
 						log.error(
 								"WorkflowAutoCorrection executor === correction failed to update on workflow : {} due to {}",
@@ -163,13 +164,11 @@ public class WorkflowAutoCorrectionExecutor implements Job, ApplicationConfigInt
 								"In WorkflowAutoCorrectionExecutor,correction failed to update on workflow: "
 										+ eachWorkflow.getWorkflowId() + "due to " + e.getMessage(),
 								PlatformServiceConstants.FAILURE);
-						log.error("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetry={} isTaskRetry={} processingTime={} message={}"
-								,"-",workflowId,workflowType,"-","-",status,lastruntime ,nextRunTime,schedule,"-","-",0,"-");
+						log.error(StringExpressionConstants.STR_EXP_WORKFLOW	,"-",workflowId,workflowType,"-","-",status,lastruntime ,nextRunTime,schedule,"-","-",0,"-");
 					}
 				} else {
 					log.debug("WorkflowAutoCorrection executor === no workflows found for correction");
-					log.debug("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetry={} isTaskRetry={} processingTime={} message={}"
-							,"-",workflowId,workflowType,"-","-",status,lastruntime ,nextRunTime,schedule,"-","-",0,"-");
+					log.debug(StringExpressionConstants.STR_EXP_WORKFLOW,"-",workflowId,workflowType,"-","-",status,lastruntime ,nextRunTime,schedule,"-","-",0,"-");
 					}
 
 				}
@@ -177,8 +176,7 @@ public class WorkflowAutoCorrectionExecutor implements Job, ApplicationConfigInt
 			log.error(e1);
 			InsightsStatusProvider.getInstance().createInsightStatusNode(
 					" Error occured while initializing   " + e1.getMessage(), PlatformServiceConstants.FAILURE);
-			log.error("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetry={} isTaskRetry={} processingTime={} message={}"
-					,"-",workflowId,workflowType,"-","-",status,lastruntime ,"-",schedule,"-","-",0,e1.getMessage());
+			log.error(StringExpressionConstants.STR_EXP_WORKFLOW,"-",workflowId,workflowType,"-","-",status,lastruntime ,"-",schedule,"-","-",0,e1.getMessage());
 		}
 	}
 

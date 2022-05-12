@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.ui.bulkupload;
 
+import java.time.Duration;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebElement;
@@ -32,7 +34,7 @@ import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectMod
  */
 public class BulkUploadConfiguration extends BulkUploadObjectRepository {
 
-	WebDriverWait wait = new WebDriverWait(driver, 20);
+	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
 	private static final Logger log = LogManager.getLogger(BulkUploadConfiguration.class);
 

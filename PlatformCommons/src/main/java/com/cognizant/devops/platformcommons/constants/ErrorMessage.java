@@ -22,4 +22,9 @@ public interface ErrorMessage {
 	 String USERNAME_MISSING = "Missing Username";
 	 String ROLES_MISSING = "Missing Roles";
 	 String LAYOUT_SETTINGS_MISSING = "Layout settings are not specified";
+	String ERRORLOG="errorLog";
+	String PDFEXECUTION_ERROR="PDFExecutionSubscriber Completed with error ";
+	String WORKFLOW_ERROR="Worlflow Detail ==== Error setting PDF details in Email History table";
+	String FETCH_ERROR_MESSAGE="Error while fetching execution ids";
+	 						
 }

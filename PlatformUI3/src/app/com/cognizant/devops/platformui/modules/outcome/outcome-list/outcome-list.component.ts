@@ -208,8 +208,8 @@ import { MatSlideToggleChange } from '@angular/material/slide-toggle';
       'ALERT',
       '40%'
     );
-    element.toolConfigJson = JSON.parse(element.configJson);
-    element.toolId = element.insightsTools.id;
+    //element.toolConfigJson = JSON.parse(element.configJson);
+    //element.toolId = element.insightsTools.id;
     dialogRef.afterClosed().subscribe(result => {
       if (result == 'yes') {
         var updateStatusConfig = {};

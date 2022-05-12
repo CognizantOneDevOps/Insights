@@ -16,6 +16,7 @@
 package com.cognizant.devops.platformcommons.constants;
 
 public interface UnitTestConstant {
+	String Report_Test_Data = "reportTestData";
 	String TESTNG_TESTDATA = "TestNG_TestData";
 	String H2_DB_URL = "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS testdb\\;SET SCHEMA testdb";
 	String H2_DRIVER = "org.h2.Driver";

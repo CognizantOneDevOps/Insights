@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.ui.logosetting;
 
+import java.time.Duration;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.support.PageFactory;
@@ -31,7 +33,7 @@ import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectMod
  */
 public class LogoSettingConfiguration extends LogoSettingObjectRepository {
 
-	WebDriverWait wait = new WebDriverWait(driver, 10);
+	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
 	private static final Logger log = LogManager.getLogger(LogoSettingConfiguration.class);
 

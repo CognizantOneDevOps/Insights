@@ -75,6 +75,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 	List<String> fieldValue;
 	String cacheKey;
 	Map<String,List<JsonObject>> mapOfPayload=new HashMap<>();
+	
 
 	static final String PATTERN = "[\\[\\](){}\"\\\"\"]";
 	static final String DATE_PATTERN = "MM/dd/yyyy HH:mm:ss";
@@ -224,7 +225,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 			List<String> excludeLabels, int hopCount) {
 		StringBuilder queryBuilder = new StringBuilder();
 		if (hopCount == 1) {
-			return queryBuilder.append("match(n:").append(toolCategory).append(":" + toolname).append(":DATA{")
+			return queryBuilder.append(PlatformServiceConstants.MATCH_N_STRING).append(toolCategory).append(":" + toolname).append(PlatformServiceConstants.DATA_PATTERN_STR)
 					.append(toolField).append(":").append("'").append(toolVal.get(0)).append("'")
 					.append("}) return n.toolName as toolname ,n.uuid as uuid").toString();
 		} else if (hopCount == 2) {
@@ -252,18 +253,18 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 			return "MATCH (a:DATA) WHERE a.uuid IN " + stringify(toolVal)
 					+ " WITH distinct a.toolName as toolName, collect(distinct a) as nodes Return toolName, nodes";
 		} else if (hopCount == 4) {
-			return queryBuilder.append("match(n:").append(toolCategory).append(":" + toolname).append(":DATA{")
+			return queryBuilder.append(PlatformServiceConstants.MATCH_N_STRING).append(toolCategory).append(":" + toolname).append(PlatformServiceConstants.DATA_PATTERN_STR)
 					.append(toolField).append(":").append("'").append(toolVal.get(0)).append("'").append("})")
 					.append(" return n").toString();
 
 		} else if (hopCount == 5) {
-			return queryBuilder.append("match(n:").append(toolCategory).append(":" + toolname).append(":DATA{")
+			return queryBuilder.append(PlatformServiceConstants.MATCH_N_STRING).append(toolCategory).append(":" + toolname).append(PlatformServiceConstants.DATA_PATTERN_STR)
 					.append("epicKey").append(":").append("'").append(toolVal.get(0)).append("'").append("})")
 					.append(" return n").toString();
 		}
 
 		else if (hopCount == 6) {
-			return queryBuilder.append("match(n:").append(toolCategory).append(":" + toolname).append(":DATA)")
+			return queryBuilder.append(PlatformServiceConstants.MATCH_N_STRING).append(toolCategory).append(":" + toolname).append(":DATA)")
 					.append("where n.").append(toolField).append(" IN ").append(stringify(toolVal))
 					.append(" return n.toolName as toolname ,n.uuid as uuid ,n as nodes").toString();
 		}else {
@@ -723,8 +724,8 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 		// append epic counter
 		for (JsonElement element : pipelineArray) {
 			JsonObject eachObj = element.getAsJsonObject();
-			if (eachObj.get("property").getAsString().equals("ALM") && eachObj.has("issueType")
-					&& eachObj.get("issueType").getAsString().equals("Epic")) {
+			if (eachObj.get("property").getAsString().equals("ALM") && eachObj.has(PlatformServiceConstants.ISSUE_TYPE)
+					&& eachObj.get(PlatformServiceConstants.ISSUE_TYPE).getAsString().equals("Epic")) {
 				eachObj.addProperty("count", epicCounter);
 			}
 		}		 
@@ -778,7 +779,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 	public JsonObject getPipelineForSelectedNode(JsonObject nodeObj) throws InsightsCustomException {
 		JsonObject responsePipeline = new JsonObject();
 		try {
-			if (nodeObj.has("issueType") && nodeObj.get("issueType").getAsString().equals("Epic")) {
+			if (nodeObj.has(PlatformServiceConstants.ISSUE_TYPE) && nodeObj.get(PlatformServiceConstants.ISSUE_TYPE).getAsString().equals("Epic")) {
 				String category = nodeObj.get("property").getAsString();
 				toolName = dataModel.keySet().stream().filter(eachTool -> dataModel.get(eachTool).getAsJsonObject()
 						.get("category").getAsString().equals(category)).findFirst().orElse("None");

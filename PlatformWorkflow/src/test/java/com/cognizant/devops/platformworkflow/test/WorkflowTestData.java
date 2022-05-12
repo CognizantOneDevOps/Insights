@@ -78,7 +78,7 @@ public class WorkflowTestData {
 	String failWorkflowTask = "{\"description\":\"TEST_FAIL_TASK_Execute\",\"mqChannel\":\"WORKFLOW.TEST.FAIL.TASK.EXCECUTION\",\"componentName\":\"com.cognizant.devops.platformworkflow.test.WorkflowTestFailTaskSubscriber\",\"dependency\":2,\"workflowType\":\"Report\"}";
 	String wrongWorkflowTask = "{\"description\":\"WRONG_TEST_TASK\",\"mqChannel\":\"WORKFLOW.TEST.WRONG.TASK\",\"componentName\":\"com.cognizant.devops.platformworkflow.test\",\"dependency\":3,\"workflowType\":\"Report\"}";
 
-	String reportTemplate = "{\"reportName\":\"Productivity\",\"description\":\"Backend Team\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":1111265,\"visualizationConfigs\":[{\"vType\":\"1111265_line\",\"vQuery\":\"\"}]}]}";
+	String reportTemplate = "{\"reportName\":\"Productivity\",\"description\":\"Backend Team\",\"isActive\":true,\"visualizationutil\":\"GRAFANAPDF\",\"kpiConfigs\":[{\"kpiId\":2103,\"visualizationConfigs\":[{\"vType\":\"Table\",\"vQuery\":\"\"}]}]}";	
 	JsonObject reportTemplateJson = JsonUtils.parseStringAsJsonObject(reportTemplate);
 
 	String assessmentReport = "{\"reportName\":\"workflow_test\",\"reportTemplate\":" + reportId + ",\"emailList\":\"xyz@xyz.com\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";

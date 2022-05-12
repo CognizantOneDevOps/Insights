@@ -34,6 +34,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
@@ -60,7 +61,7 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 
 	private long executionId;
 	private String workflowId;
-
+	
 	public ReportEmailSubscriber(String routingKey) throws Exception {
 		super(routingKey);
 	}
@@ -98,7 +99,7 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 					throw new InsightsJobFailedException("Unable to send an email");
 				}
 				long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-				log.debug("Type=EmailExecution  executionId={} workflowId={} ReportName={} mailto={} mailFrom={} ProcessingTime={} message={}",executionId ,workflowId,
+				log.debug(StringExpressionConstants.STR_EXP_EMAIL_EXECUTION,executionId ,workflowId,
 						"-",mailReportDTO.getMailTo(),mailReportDTO.getMailFrom(),processingTime, " AttachmentName: " + mailReportDTO.getEmailAttachmentName());
 			} else {
 				throw new InsightsJobFailedException("Email template not found!");
@@ -114,7 +115,7 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 			} else {
 				setStatusLog(e.getMessage());
 			}
-			log.error("Type=EmailExecution  executionId={} workflowId={} ReportName={} mailto={} mailFrom={} ProcessingTime={} message={}",executionId ,workflowId,
+			log.error(StringExpressionConstants.STR_EXP_EMAIL_EXECUTION,executionId ,workflowId,
 					"-",mailReportDTO.getMailTo(),mailReportDTO.getMailFrom(),0, " AttachmentName :" + mailReportDTO.getEmailAttachmentName() +
 					"Failed to send email in ReportEmailSubscriber" + e.getMessage());			
 			throw new InsightsJobFailedException("Failed to send email in ReportEmailSubscriber");
@@ -122,7 +123,7 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 			log.error("Workflow Detail ==== ReportEmailSubscriberEmail Send failed to execute Exception ===== ", e);
 			InsightsStatusProvider.getInstance().createInsightStatusNode("ReportEmailSubscriberEmail Completed with error "+e.getMessage(),
 					PlatformServiceConstants.FAILURE);
-			log.error("Type=EmailExecution  executionId={} workflowId={} ReportName={} mailto={} mailFrom={} ProcessingTime={} message={}",executionId ,workflowId,
+			log.error(StringExpressionConstants.STR_EXP_EMAIL_EXECUTION,executionId ,workflowId,
 					"-",mailReportDTO.getMailTo(),mailReportDTO.getMailFrom(),0, " AttachmentName :" + mailReportDTO.getEmailAttachmentName() +
 					"  ReportEmailSubscriberEmail Send failed to execute Exception " + e.getMessage());
 		}
@@ -200,7 +201,7 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 		statusObject.add("log", logArray);
 		// statusLog set here which is class variable of WorkflowTaskSubscriberHandler
 		log.error("Workflow Detail ==== unable to send an email statusLog {}  ", statusLog);
-		log.error("Type=EmailExecution  executionId={} workflowId={} ReportName={} mailto={} mailFrom={} ProcessingTime={} message={}",executionId ,workflowId,
+		log.error(StringExpressionConstants.STR_EXP_EMAIL_EXECUTION,executionId ,workflowId,
 				"-",mailReportDTO.getMailTo(),mailReportDTO.getMailFrom(),0, "AttachmentName :" + mailReportDTO.getEmailAttachmentName() +" statuslog :" + statusLog +
 				"Unable to send an email");
 		return statusObject;

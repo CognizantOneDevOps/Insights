@@ -12,12 +12,12 @@
 	<parent>
 		<groupId>com.cognizant.devops</groupId>
 		<artifactId>PlatformParent</artifactId>
-		<version>9.3</version>
+		<version>9.4</version>
 	</parent>
 	<artifactId>PlatformDAL</artifactId>
 	<name>PlatformDAL</name>
 	<groupId>com.cognizant.devops</groupId>
-	<version>9.3</version>
+	<version>9.4</version>
 	<url>http://maven.apache.org</url>
 
 	<properties>
@@ -42,20 +42,20 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>9.3</version>
+			<version>9.4</version>
 		</dependency>
 
 		<!-- Dependency for postgresql -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.3.3</version>
+			<version>42.3.4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
-			<version>5.4.30.Final</version>
+			<version>5.6.1.Final</version>
 		</dependency>
 		<!-- <dependency>
 			<groupId>org.neo4j.driver</groupId>
@@ -72,7 +72,7 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-c3p0</artifactId>
-			<version>5.4.24.Final</version>
+			<version>5.6.1.Final</version>
 		</dependency> 
 
 	</dependencies>

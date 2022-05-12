@@ -28,32 +28,28 @@ import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonObject;
 
-
-
 public class SystemStatus {
 	private static Logger log = LogManager.getLogger(SystemStatus.class.getName());
 
-	public static JsonObject addSystemInformationInNeo4j(String version, List<JsonObject> dataList,
+	public static JsonObject addSystemInformationInNeo4j( List<JsonObject> dataList,
 			List<String> labels) throws Exception {
 		GraphDBHandler graphDBHandler = new GraphDBHandler();
 		JsonObject response = null;
 		try {
-			String queryLabel = "";
+			StringBuilder queryLabel = new StringBuilder();
 			for (String label : labels) {
 				if (label != null && label.trim().length() > 0) {
-					queryLabel += ":" + label;
+					queryLabel.append(":");
+					queryLabel.append(label);
 				}
-			}
-
+			}			
 			String cypherQuery = "CREATE (n" + queryLabel + " $props ) return count(n)";
-
 			response = graphDBHandler.executeQueryWithData(cypherQuery, dataList);
 
 		} catch (Exception e) {
 			log.error(" Neo4j Node not created{} " , e.getMessage());
 			throw e;
 		}
-
 		return response;
 	}
 

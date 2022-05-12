@@ -64,8 +64,6 @@ public class PdfReportTableUtil {
 	private static final Logger log = LogManager.getLogger(PdfReportTableUtil.class);
 
 	private PDFont font;
-
-
 	/**
 	 * Create table based on number of rows with observations.
 	 * @param doc

@@ -54,10 +54,9 @@ public class InsightsKPIConfigDTO implements Serializable {
 	private long oneTimeReportStartTime;
 	private long oneTimeReportEndDate;
 	private String assessmentReportName;
+	private int milestoneId;
 
 	private Set<InsightsContentConfig> contentConfig = new HashSet<>(0);
-	
-	
 
 	public int getKpiId() {
 		return kpiId;
@@ -246,6 +245,14 @@ public class InsightsKPIConfigDTO implements Serializable {
 
 	public void setAssessmentReportName(String assessmentReportName) {
 		this.assessmentReportName = assessmentReportName;
+	}
+
+	public int getMilestoneId() {
+		return milestoneId;
+	}
+
+	public void setMilestoneId(int milestoneId) {
+		this.milestoneId = milestoneId;
 	}
 	
 	

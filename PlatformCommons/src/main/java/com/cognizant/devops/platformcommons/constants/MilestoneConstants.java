@@ -19,6 +19,7 @@ public interface MilestoneConstants  {
 	 String STARTDATE = "startDate";
 	 String ENDDATE = "endDate";
 	 String MILESTONENAME = "mileStoneName";
-	 String ISACTIVE = "isActive";
 	 String STATUS = "status";
+	 String EXECID ="execId";
+	 String MILESTONE_RELEASEID = "milestoneReleaseID";
 }

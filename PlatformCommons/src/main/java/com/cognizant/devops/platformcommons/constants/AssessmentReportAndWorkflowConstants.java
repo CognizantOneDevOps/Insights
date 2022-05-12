@@ -99,4 +99,7 @@ public interface AssessmentReportAndWorkflowConstants {
 	
 	Set<String> validReportTemplateFileExtention = Collections
 			.unmodifiableSet(new HashSet<String>(Arrays.asList("html", "json", "css", "webp")));
+	String ISWOKFLOWTASKRETRY="isWorkflowTaskRetry";
+	String WORKFLOW_IMMEDIATE_JOB_EXECUTOR_EXCEPTION="WorkflowEmmediateJobExecutorfailed to execute due to exception ";
+	String WORK_FLOW_WITHOUT_HISTORY="WorkflowWithoutHistory";
 }

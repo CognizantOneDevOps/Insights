@@ -1,0 +1,203 @@
+{
+	"dynamicTemplate": {
+		"timeFieldMapping": {
+			"startDate": "%Y-%m-%d"
+		},
+		"responseTemplate": {
+			"MilestoneOutcomeMetadata": {
+				"labels": ["ROI", "DATA", "MILESTONE"],
+				"MilestoneDetails": {
+					"Milestone_1646293854094": {
+						"milestoneReleaseId": "V.1",
+						"startFrom": "2021-06-01 00:01",
+						"endDate": "2021-06-29 00:01"
+					},
+					"Milestone_1646293854095": {
+						"milestoneReleaseId": "V.2",
+						"startFrom": "2021-07-13 00:01",
+						"endDate": "2021-08-10 00:01"
+					}
+				},
+				"OutcomeDetails": {
+					"Outcome_1": {
+						"toolName": "NEWRELIC",
+						"outcomeName": "Host_Cpu",
+						"milestoneName": "Milestone_1646293854094",
+						"fieldName": "value",
+						"range": [60,85]
+					},
+					"Outcome_2": {
+						"toolName": "NEWRELIC",
+						"outcomeName": "Thread_CpuTime",
+						"milestoneName": "Milestone_1646293854094",
+						"fieldName": "value",
+						"range": [1.5,4.3]
+					},
+					"Outcome_3": {
+						"toolName": "GoogleAnalytics",
+						"outcomeName": "Stickiness",
+						"milestoneName": "Milestone_1646293854094",
+						"fieldName": "value",
+						"range": [10,20]
+					},
+					"Outcome_4": {
+						"toolName": "GoogleAnalytics",
+						"outcomeName": "Retension_Rate",
+						"milestoneName": "Milestone_1646293854094",
+						"fieldName": "value",
+						"range": [3,7]
+					},
+					"Outcome_5": {
+						"toolName": "Splunk",
+						"outcomeName": "NPS",
+						"milestoneName": "Milestone_1646293854094",
+						"fieldName": "value",
+						"range": [30,45]
+					},
+					"Outcome_6": {
+						"toolName": "Splunk",
+						"outcomeName": "Click_Through_Rate",
+						"milestoneName": "Milestone_1646293854094",
+						"fieldName": "value",
+						"range": [5,10]
+					},
+					"Outcome_7": {
+						"toolName": "Splunk",
+						"outcomeName": "Conversion_Rate",
+						"milestoneName": "Milestone_1646293854094",
+						"fieldName": "value",
+						"range": [10,20]
+					},
+					"Outcome_8": {
+						"toolName": "Splunk",
+						"outcomeName": "Time_On_Site_In_Seconds",
+						"milestoneName": "Milestone_1646293854094",
+						"fieldName": "value",
+						"range": [80,120]
+					},
+					"Outcome_9": {
+						"toolName": "Dynatrace_ROI",
+						"outcomeName": "Host_Memory_Usage",
+						"milestoneName": "Milestone_1646293854094",
+						"fieldName": "value",
+						"range": [45,70]
+					},
+					"Outcome_10": {
+						"toolName": "Dynatrace_ROI",
+						"outcomeName": "host_cpu_load",
+						"milestoneName": "Milestone_1646293854094",
+						"fieldName": "value",
+						"range": [40,65]
+					},
+					"Outcome_11": {
+						"toolName": "NEWRELIC",
+						"outcomeName": "Host_Cpu",
+						"milestoneName": "Milestone_1646293854095",
+						"fieldName": "value",
+						"range": [45,55]
+					},
+					"Outcome_12": {
+						"toolName": "NEWRELIC",
+						"outcomeName": "Thread_CpuTime",
+						"milestoneName": "Milestone_1646293854095",
+						"fieldName": "value",
+						"range": [0.6,1.2]
+					},
+					"Outcome_13": {
+						"toolName": "GoogleAnalytics",
+						"outcomeName": "Retension_Rate",
+						"milestoneName": "Milestone_1646293854095",
+						"fieldName": "value",
+						"range": [35,45]
+					},
+					"Outcome_14": {
+						"toolName": "GoogleAnalytics",
+						"outcomeName": "Stickiness",
+						"milestoneName": "Milestone_1646293854095",
+						"fieldName": "value",
+						"range": [7,9]
+					},
+					"Outcome_15": {
+						"toolName": "Splunk",
+						"outcomeName": "NPS",
+						"milestoneName": "Milestone_1646293854095",
+						"fieldName": "value",
+						"range": [50,65]
+					},
+					"Outcome_16": {
+						"toolName": "Splunk",
+						"outcomeName": "Click_Through_Rate",
+						"milestoneName": "Milestone_1646293854095",
+						"fieldName": "value",
+						"range": [20,35]
+					},
+					"Outcome_17": {
+						"toolName": "Splunk",
+						"outcomeName": "Conversion_Rate",
+						"milestoneName": "Milestone_1646293854095",
+						"fieldName": "value",
+						"range": [55,60]
+					},
+					"Outcome_18": {
+						"toolName": "Splunk",
+						"outcomeName": "Time_On_Site_In_Seconds",
+						"milestoneName": "Milestone_1646293854095",
+						"fieldName": "value",
+						"range": [180,230]
+					},
+					"Outcome_19": {
+						"toolName": "Dynatrace_ROI",
+						"outcomeName": "Host_Memory_Usage",
+						"milestoneName": "Milestone_1646293854095",
+						"fieldName": "value",
+						"range": [50,75]
+					},
+					"Outcome_20": {
+						"toolName": "Dynatrace_ROI",
+						"outcomeName": "host_cpu_load",
+						"milestoneName": "Milestone_1646293854095",
+						"fieldName": "value",
+						"range": [55,70]
+					}
+				}
+			}
+		}
+	},
+	"insightsTimeZone": "Asia/Kolkata",
+	"communication": {
+		"type": "REST",
+		"sslVerify": true,
+		"responseType": "JSON"
+	},
+	"loggingSetting": {
+		"logLevel": "DEBUG",
+		"maxBytes": 5000000,
+		"backupCount": 1000
+	},
+	"mqConfig": {
+		"host": "127.0.0.1",
+		"password": "",
+		"user": "",
+		"exchange": "iSight",
+		"agentControlXchg": "iAgent"
+	},
+	"publish": {
+		"data": "ROIDUMMY.ROIDUMMYDATA.DATA",
+		"health": "ROIDUMMY.ROIDUMMYDATA.HEALTH"
+	},
+	"isDebugAllowed": true,
+	"subscribe": {
+		"config": "ROIDUMMY.ROIDUMMYDATA.config"
+	},
+	"agentId": "",
+	"toolCategory": "ROIDUMMY",
+	"enableDataValidation": true,
+	"enableValueArray": true,
+	"numberOfDaysBetweenOutcomeRecords": 7,
+	"timeStampFormat": "%Y-%m-%dT%H:%M:%S",
+	"toolsTimeZone": "GMT",
+	"isEpochTimeFormat": false,
+	"runSchedule": 3000,
+	"useResponseTemplate": true,
+	"timeStampField": "lastUpdated"
+}

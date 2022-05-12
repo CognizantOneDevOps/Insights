@@ -152,6 +152,8 @@ class RestCommunicationFacade(object):
                         if self.enableValueArray:
                             if prevValue and secData[secKey] not in prevValue:
                                 prevValue.append(secData[secKey])
+                            elif type(secData[secKey]) is list:
+                                data[secKey] = " , ".join(secData[secKey])
                             else:
                                 data[secKey] = [secData[secKey]]
                         else:
@@ -159,7 +161,7 @@ class RestCommunicationFacade(object):
                                 data[secKey] = prevValue + "," + secData[secKey]
                             else:
                                 data[secKey] = secData[secKey]
-        elif keyType is unicode or keyType is str:
+        elif keyType is str or keyType is str:
             responseObjType = type(responseObj)
             if responseObjType is dict:
                 logging.error('Dict object assignment to graph property is not allowed.')

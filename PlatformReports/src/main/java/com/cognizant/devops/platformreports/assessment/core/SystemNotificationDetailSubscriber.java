@@ -35,8 +35,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.constants.ReportStatusConstants;
 import com.cognizant.devops.platformcommons.constants.ServiceStatusConstants;
+import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
@@ -56,9 +59,10 @@ public class SystemNotificationDetailSubscriber extends WorkflowTaskSubscriberHa
 	private static Logger log = LogManager.getLogger(SystemNotificationDetailSubscriber.class.getName());
 	HealthUtil healthUtil = new HealthUtil();
 	private WorkflowDAL workflowDAL = new WorkflowDAL();
-private InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfiguration();	
+	private InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfiguration();	
 	private long executionId;
-
+	
+		
 	public SystemNotificationDetailSubscriber(String routingKey) throws Exception {
 		super(routingKey);
 	}
@@ -70,7 +74,7 @@ private InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfi
 			String incomingTaskMessage = new String(body, StandardCharsets.UTF_8);
 			JsonObject incomingTaskMessageJson = JsonUtils.parseStringAsJsonObject(incomingTaskMessage);
 			String workflowId = incomingTaskMessageJson.get("workflowId").getAsString();
-			executionId = incomingTaskMessageJson.get("executionId").getAsLong();
+			executionId = incomingTaskMessageJson.get(AssessmentReportAndWorkflowConstants.EXECUTIONID).getAsLong();
 			workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
 			String htmlDataComponentResponseBuffer = componentHTML(healthUtil.getDataComponentStatus(), "Data Component");
 			String htmlServiceResponseBuffer = componentHTML(healthUtil.getServiceStatus(), "Services");
@@ -81,22 +85,20 @@ private InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfi
 			idDataMap.put("table_data_components", htmlDataComponentResponseBuffer);
 			String mailHTML = createEmailHTML(idDataMap);
 			Map<String, String> valuesMap = new HashMap<>();
-			valuesMap.put("date", InsightsUtils.specficTimeFormat(incomingTaskMessageJson.get("executionId").getAsLong(), "yyyy-MM-dd"));
+			valuesMap.put("date", InsightsUtils.specficTimeFormat(incomingTaskMessageJson.get(AssessmentReportAndWorkflowConstants.EXECUTIONID).getAsLong(), "yyyy-MM-dd"));
 			StringSubstitutor sub = new StringSubstitutor(valuesMap, "{", "}");
 			mailHTML=sub.replace(mailHTML);
 			setDetailsInEmailHistory(incomingTaskMessageJson, mailHTML);
 			InsightsStatusProvider.getInstance().createInsightStatusNode("SystemNotificationDetailSubscriber completed",
 					PlatformServiceConstants.SUCCESS);
 			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
-					executionId,workflowConfig.getWorkflowId(),"-",workflowConfig.getWorkflowType(),"-","-",processingTime,"-");					
+			log.debug(StringExpressionConstants.STR_EXP_TASKEXECUTION,executionId,workflowConfig.getWorkflowId(),"-",workflowConfig.getWorkflowType(),"-","-",processingTime,"-");					
 		} catch (InsightsJobFailedException ijfe) {
 			log.error("Worlflow Detail ==== SystemNotificationDetail Subscriber Completed with error ", ijfe);
 			InsightsStatusProvider.getInstance().createInsightStatusNode(
 					"SystemNotificationDetail Completed with error " + ijfe.getMessage(),
 					PlatformServiceConstants.FAILURE);
-			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
-					executionId,workflowConfig.getWorkflowId(),"-",workflowConfig.getWorkflowType(),"-","-",0,workflowConfig.getStatus() +"SystemNotificationDetail Subscriber Completed with error" +ijfe.getMessage());
+			log.error(StringExpressionConstants.STR_EXP_TASKEXECUTION,executionId,workflowConfig.getWorkflowId(),"-",workflowConfig.getWorkflowType(),"-","-",0,workflowConfig.getStatus() +"SystemNotificationDetail Subscriber Completed with error" +ijfe.getMessage());
 			statusLog = ijfe.getMessage();
 			throw ijfe;
 		} catch (Exception e) {
@@ -104,8 +106,7 @@ private InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfi
 			InsightsStatusProvider.getInstance().createInsightStatusNode(
 					"SystemNotificationDetail Completed with error " + e.getMessage(),
 					PlatformServiceConstants.FAILURE);
-			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
-					executionId,workflowConfig.getWorkflowId(),"-",workflowConfig.getWorkflowType(),"-","-",0,
+			log.error(StringExpressionConstants.STR_EXP_TASKEXECUTION,executionId,workflowConfig.getWorkflowId(),"-",workflowConfig.getWorkflowType(),"-","-",0,
 					workflowConfig.getStatus() +"SystemNotificationDetail Subscriber Completed with error" +e.getMessage());
 			throw new InsightsJobFailedException(e.getMessage());
 		}
@@ -151,10 +152,6 @@ private InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfi
 		return document.toString();
 		
 	}
-
-
-
-
 	/**
 	 * Method to fetch Agent HTML
 	 * 
@@ -187,23 +184,23 @@ private InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfi
 		for (String column : columns) {
 			tableList.append("<th>" + column + "</th>");
 		}
-		tableList.append("</tr>");
+		tableList.append(ReportStatusConstants.TR_TAG);
 		tableList.append("</thead>");
 		tableList.append("<tbody>");
 		for (String component : componentResponseJson.keySet()) {
 			tableList.append("<tr>");
-			tableList.append("<td>").append(component).append("</td>");
+			tableList.append("<td>").append(component).append(ReportStatusConstants.TD_TAG);
 			tableList.append("<td>");
 			if(!componentResponseJson.get(component).getAsJsonObject().get("version").isJsonNull()) {
 				tableList.append(componentResponseJson.get(component).getAsJsonObject().get("version").getAsString());
 			}else {
 				tableList.append("-");
 			}
-			tableList.append("</td>");
+			tableList.append(ReportStatusConstants.TD_TAG);
 			tableList.append("<td>")
 					.append(formatStatus(componentResponseJson.get(component).getAsJsonObject().get("status").getAsString()))
-					.append("</td>");
-			tableList.append("</tr>");
+					.append(ReportStatusConstants.TD_TAG);
+			tableList.append(ReportStatusConstants.TR_TAG);
 		}
 		tableList.append("</tbody>");
 		tableList.append("</table>");
@@ -226,18 +223,18 @@ private InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfi
 		for (String column : columns) {
 			tableList.append("<th>" + column + "</th>");
 		}
-		tableList.append("</tr>");
+		tableList.append(ReportStatusConstants.TR_TAG);
 		tableList.append("</thead>");
 		tableList.append("<tbody>");
 		JsonArray agentDetails = agentResponseJson.get("agentNodes").getAsJsonArray();
 		for (JsonElement agentJson : agentDetails) {
 			tableList.append("<tr>");
-			tableList.append("<td>").append(agentJson.getAsJsonObject().get("toolName").getAsString()).append("</td>");
-			tableList.append("<td>").append(agentJson.getAsJsonObject().get("agentId").getAsString()).append("</td>");
+			tableList.append("<td>").append(agentJson.getAsJsonObject().get("toolName").getAsString()).append(ReportStatusConstants.TD_TAG);
+			tableList.append("<td>").append(agentJson.getAsJsonObject().get("agentId").getAsString()).append(ReportStatusConstants.TD_TAG);
 			long time = InsightsUtils.getEpochTime(agentJson.getAsJsonObject().get("lastRunTime").getAsString());
-			tableList.append("<td>").append(InsightsUtils.specficTimeFormat(time, "yyyy-MM-dd HH:mm:ss")).append("</td>");
-			tableList.append("<td>").append(formatStatus(agentJson.getAsJsonObject().get("healthStatus").getAsString())).append("</td>");
-			tableList.append("</tr>");
+			tableList.append("<td>").append(InsightsUtils.specficTimeFormat(time, "yyyy-MM-dd HH:mm:ss")).append(ReportStatusConstants.TD_TAG);
+			tableList.append("<td>").append(formatStatus(agentJson.getAsJsonObject().get("healthStatus").getAsString())).append(ReportStatusConstants.TD_TAG);
+			tableList.append(ReportStatusConstants.TR_TAG);
 		}
 		tableList.append("</tbody>");
 		tableList.append("</table>");
@@ -253,7 +250,7 @@ private InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfi
 	private void setDetailsInEmailHistory(JsonObject incomingTaskMessageJson, String mailBody) {
 		try {
 			InsightsReportVisualizationContainer emailHistoryConfig = new InsightsReportVisualizationContainer();
-			emailHistoryConfig.setExecutionId(incomingTaskMessageJson.get("executionId").getAsLong());
+			emailHistoryConfig.setExecutionId(incomingTaskMessageJson.get(AssessmentReportAndWorkflowConstants.EXECUTIONID).getAsLong());
 			emailHistoryConfig.setStatus(WorkflowTaskEnum.EmailStatus.NOT_STARTED.name());
 			emailHistoryConfig.setWorkflowConfig(incomingTaskMessageJson.get("workflowId").getAsString());
 			emailHistoryConfig.setMailBody(mailBody);
@@ -279,5 +276,4 @@ private InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfi
 			return "Failure";
 	}
 
-	
 }

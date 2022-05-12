@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.login;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
@@ -30,7 +31,7 @@ public class LoginConfiguration extends LoginObjectRepository {
 	
 	private static final Logger log = LogManager.getLogger(LoginConfiguration.class);
 
-	WebDriverWait wait = new WebDriverWait(driver, 1);
+	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(1));
 
 	public LoginConfiguration() {
 		PageFactory.initElements(driver, this);

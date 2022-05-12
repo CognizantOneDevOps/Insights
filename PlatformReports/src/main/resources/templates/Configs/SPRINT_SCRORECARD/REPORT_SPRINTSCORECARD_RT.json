@@ -3,15 +3,15 @@
    "reportName":"REPORT_SPRINT_SCORECARD",
    "description":"Testing",
    "isActive":true,
-   "file":"REPORT_SPRINT_SCORECARD",
-   "visualizationutil":"Fusion",
+   "templateType": "Others",
+   "visualizationutil":"GRAFANAPDF",
    "kpiConfigs":[
       {
          "kpiId":1101,
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_1101",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.Date as Date , n.Failure as Failure,n.Success as Success ORDER BY Date ASC"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.Date as Date , n.Failure as Failure,n.Success as Success ORDER BY Date ASC"
             }
          ]
       },
@@ -20,7 +20,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_1115",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.Date as Date , n.Failure as Failure,n.Success as Success ORDER BY Date ASC"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.Date as Date , n.Failure as Failure,n.Success as Success ORDER BY Date ASC"
             }
          ]
       },
@@ -29,7 +29,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_1110",
-               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.Date  as Date , n.Failure as Failure,n.Success as Success ORDER BY Date ASC"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.Date  as Date , n.Failure as Failure,n.Success as Success ORDER BY Date ASC"
             }
          ]
       },
@@ -38,7 +38,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_1116",
-               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.Date  as Date , n.Failure as Failure,n.Success as Success ORDER BY Date ASC"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.Date  as Date , n.Failure as Failure,n.Success as Success ORDER BY Date ASC"
             }
          ]
       },
@@ -47,7 +47,7 @@
          "visualizationConfigs":[
             {
                "vType":"msbar2d_1106",
-               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.Developer as Developer, n.Issues as Issues"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.Developer as Developer, n.Issues as Issues"
             }
          ]
       },
@@ -56,7 +56,7 @@
          "visualizationConfigs":[
             {
                "vType":"table_1107",
-               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.Type as Type, sum(n.Count) as Count"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.Type as Type, sum(n.Count) as Count"
             }
          ]
       },
@@ -65,7 +65,7 @@
          "visualizationConfigs":[
             {
                "vType":"table_1117",
-               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.Type as Type, sum(n.Count) as Count"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.Type as Type, sum(n.Count) as Count"
             }
          ]
       },
@@ -74,7 +74,7 @@
          "visualizationConfigs":[
             {
                "vType":"pie2d_1102",
-               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.resultField as Deployment ,n.Deployment as Value"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.resultField as Deployment ,n.Deployment as Value"
             }
          ]
       },
@@ -84,7 +84,7 @@
          "visualizationConfigs":[
             {
                "vType":"pie2d_1103",
-               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.resultField as Time , n.Time as Value"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN n.resultField as Time , n.Time as Value"
             }
          ]
       },
@@ -93,7 +93,7 @@
          "visualizationConfigs":[
             {
                "vType":"angulargauge_1104",
-               "vQuery":"MATCH (n:KPI:RESULTS)   where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.resultField as Time , n.Time as Value"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.resultField as Time , n.Time as Value"
             }
          ]
       },
@@ -102,7 +102,7 @@
          "visualizationConfigs":[
             {
                "vType":"angulargauge_1108",
-               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.resultField as Time , n.Time as Value"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.resultField as Time , n.Time as Value"
             }
          ]
       },	  
@@ -112,7 +112,7 @@
          "visualizationConfigs":[
             {
                "vType":"pie2d_1111",
-               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.resultField as Builds, n.Builds as Value"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.resultField as Builds, n.Builds as Value"
             }
          ]
       },
@@ -121,7 +121,7 @@
          "visualizationConfigs":[
             {
                "vType":"pie2d_1112",
-               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.resultField as Time, n.Time as Value"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.resultField as Time, n.Time as Value"
             }
          ]
       },{
@@ -129,7 +129,7 @@
          "visualizationConfigs":[
             {
                "vType":"pie2d_1113",
-               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.resultField as Defects,n.Defects as Value"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.resultField as Defects,n.Defects as Value"
             }
          ]
       },
@@ -138,7 +138,7 @@
          "visualizationConfigs":[
             {
                "vType":"pie2d_1114",
-               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.resultField as Stories,n.Stories as Value"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.resultField as Stories,n.Stories as Value"
             }
          ]
       }

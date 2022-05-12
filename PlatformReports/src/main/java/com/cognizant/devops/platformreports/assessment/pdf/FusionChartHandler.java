@@ -50,6 +50,8 @@ import org.jsoup.select.Elements;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.ReportChartCollection;
+import com.cognizant.devops.platformcommons.constants.ReportStatusConstants;
+import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.multipart.MultipartDataHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -88,16 +90,16 @@ public class FusionChartHandler implements BasePDFProcessor {
 			
 			exportPDFFile(finalTemplateJson, assessmentReportDTO, insightsReportPdfTableConfig);
 			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+			log.debug(StringExpressionConstants.STR_EXP_TASK,
 					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-","-","-",processingTime,
-					"reportId: "+assessmentReportDTO.getReportId() + "reportName: " +assessmentReportDTO.getReportName() + "VisualizationUtil" +
+					ReportStatusConstants.REPORT_ID +assessmentReportDTO.getReportId() + ReportStatusConstants.REPORT_NAME +assessmentReportDTO.getReportName() + ReportStatusConstants.VISUALIZATION_UTIL +
 					assessmentReportDTO.getVisualizationutil());
 
 		} catch (Exception e) {
 			log.error(e);
-			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+			log.error(StringExpressionConstants.STR_EXP_TASK,
 					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-","-","-",0,
-					"reportId: "+assessmentReportDTO.getReportId() + "reportName: " +assessmentReportDTO.getReportName() + "VisualizationUtil" +
+					ReportStatusConstants.REPORT_ID +assessmentReportDTO.getReportId() + ReportStatusConstants.REPORT_NAME +assessmentReportDTO.getReportName() + ReportStatusConstants.VISUALIZATION_UTIL +
 					assessmentReportDTO.getVisualizationutil() + e.getMessage());
 			throw new InsightsJobFailedException(e.getMessage());
 		}
@@ -115,15 +117,15 @@ public class FusionChartHandler implements BasePDFProcessor {
 			assessmentReportDTO.setPdfReportDirPath(reportExecutionFile);
 			setReportExecutionFolder(assessmentReportDTO);
 			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+			log.debug(StringExpressionConstants.STR_EXP_TASK,
 					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-","-","-",processingTime,
-					"reportId: "+assessmentReportDTO.getReportId() + "reportName: " +assessmentReportDTO.getReportName() + "Foldername" +folderName
+					ReportStatusConstants.REPORT_ID+assessmentReportDTO.getReportId() + ReportStatusConstants.REPORT_NAME +assessmentReportDTO.getReportName() + "Foldername" +folderName
 					);
 		} catch (Exception e) {
 			log.error(e);
-			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+			log.debug(StringExpressionConstants.STR_EXP_TASK,
 					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-","-","-",0,
-					"reportId: "+assessmentReportDTO.getReportId() + "reportName: " +assessmentReportDTO.getReportName() +"Unable to create pdf execution directory"
+					ReportStatusConstants.REPORT_ID+assessmentReportDTO.getReportId() + ReportStatusConstants.REPORT_NAME +assessmentReportDTO.getReportName() +"Unable to create pdf execution directory"
 					+ e.getMessage());
 			throw new InsightsJobFailedException(
 					"Unable to create pdf execution directory, message == " + e.getMessage());			
@@ -158,7 +160,7 @@ public class FusionChartHandler implements BasePDFProcessor {
 			for (JsonElement element : kpiResultArray) {
 				boolean isTable = false;
 				JsonObject eachKpiResult = element.getAsJsonObject();
-				String kpiId = eachKpiResult.get("kpiId").getAsString();
+				String kpiId = eachKpiResult.get(AssessmentReportAndWorkflowConstants.KPIID).getAsString();
 				JsonArray kpiVisualizationArray = eachKpiResult.get("visualizationresult").getAsJsonArray();
 				log.debug("Worlflow Detail ====  generateChartsConfig for kpi {} kpiVisualizationArray  {} ", kpiId,
 						kpiVisualizationArray);			
@@ -179,8 +181,8 @@ public class FusionChartHandler implements BasePDFProcessor {
 							caption = templateJsonObjMap.get(vType).getAsJsonObject().get(AssessmentReportAndWorkflowConstants.CAPTION).getAsString();
 						}
 						fromkpiResultArray.get(0).getAsJsonObject().addProperty(AssessmentReportAndWorkflowConstants.CAPTION, caption);
-						fromkpiResultArray.get(0).getAsJsonObject().addProperty("kpiId", kpiId);
-						fromkpiResultArray.get(0).getAsJsonObject().addProperty("kpiId", kpiId);
+						fromkpiResultArray.get(0).getAsJsonObject().addProperty(AssessmentReportAndWorkflowConstants.KPIID, kpiId);
+						fromkpiResultArray.get(0).getAsJsonObject().addProperty(AssessmentReportAndWorkflowConstants.KPIID, kpiId);
 						tableJsonObjMap.put(vType, fromkpiResultArray);
 					} else {
 						log.debug(
@@ -262,7 +264,7 @@ public class FusionChartHandler implements BasePDFProcessor {
 				}
 			}
 			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+			log.debug(StringExpressionConstants.STR_EXP_TASK,
 					assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-","-","-",processingTime,
 					"reportId: "+assessmentReportDTO.getReportId() + "reportName: " +assessmentReportDTO.getReportName()
 					);
@@ -386,9 +388,9 @@ public class FusionChartHandler implements BasePDFProcessor {
 			if (fileUploadStatus) {
 				log.debug("Worlflow Detail ==== pdf File Saved {} ", fusionFilePath);
 				long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-				log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+				log.debug(StringExpressionConstants.STR_EXP_TASK,
 						assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-","-","-",processingTime,
-						"reportId: "+assessmentReportDTO.getReportId() + "reportName: " +assessmentReportDTO.getReportName() + "VisualizationUtil" +
+						ReportStatusConstants.REPORT_ID+assessmentReportDTO.getReportId() + ReportStatusConstants.REPORT_NAME +assessmentReportDTO.getReportName() + ReportStatusConstants.VISUALIZATION_UTIL +
 						assessmentReportDTO.getVisualizationutil() + "FusionFilePath :" +fusionFilePath);
 				String fusion = assessmentReportDTO.getPdfReportDirPath() + File.separator
 						+ assessmentReportDTO.getAsseementreportname() + "_Fusion." + ReportEngineUtils.REPORT_TYPE;
@@ -413,9 +415,9 @@ public class FusionChartHandler implements BasePDFProcessor {
 				}
 			} else {
 				log.error("Worlflow Detail ==== Error while created pdf file {}", exportedFilePath);
-				log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+				log.error(StringExpressionConstants.STR_EXP_TASK,
 						assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getConfigId(),"-","-","-",0,
-						"reportId: "+assessmentReportDTO.getReportId() + "reportName: " +assessmentReportDTO.getReportName() + "VisualizationUtil" +
+						ReportStatusConstants.REPORT_ID + assessmentReportDTO.getReportId() + ReportStatusConstants.REPORT_NAME +assessmentReportDTO.getReportName() + ReportStatusConstants.VISUALIZATION_UTIL +
 						assessmentReportDTO.getVisualizationutil() + "FusionFilePath :" +fusionFilePath +"Error while created pdf file");
 				throw new InsightsJobFailedException(
 						"Unable to generate pdf, Please check pdf export server connectivity  ");
@@ -436,7 +438,8 @@ public class FusionChartHandler implements BasePDFProcessor {
 	}
 
 	public Path getPDFZipFolder(Path sourceFolderPath, Path zipPath) throws IOException {
-		try (final ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipPath.toFile()))) {
+		Path normalizedZipPath = zipPath.normalize();
+		try (final ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(normalizedZipPath.toFile()))) {
 			Files.walkFileTree(sourceFolderPath, new SimpleFileVisitor<Path>() {
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
@@ -585,7 +588,7 @@ public class FusionChartHandler implements BasePDFProcessor {
 		JsonArray columnData = fromTableResultArray.get(0).getAsJsonObject().get("columns").getAsJsonArray();
 		JsonArray rowData = fromTableResultArray.get(0).getAsJsonObject().get("data").getAsJsonArray();
 		String caption = fromTableResultArray.get(0).getAsJsonObject().get("caption").getAsString();
-		String kpiId = fromTableResultArray.get(0).getAsJsonObject().get("kpiId").getAsString();
+		String kpiId = fromTableResultArray.get(0).getAsJsonObject().get(AssessmentReportAndWorkflowConstants.KPIID).getAsString();
 		
 		PdfReportTableUtil tableUtil = new PdfReportTableUtil();
 		yStart = tableUtil.createTable(doc, page, tableIndex, kpiId, caption, columnData, rowData, assessmentReportDTO,

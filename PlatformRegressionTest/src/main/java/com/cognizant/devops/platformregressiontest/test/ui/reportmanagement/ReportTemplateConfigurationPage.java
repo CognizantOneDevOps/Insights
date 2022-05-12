@@ -16,6 +16,7 @@
 package com.cognizant.devops.platformregressiontest.test.ui.reportmanagement;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -27,18 +28,16 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.SkipException;
 
 import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
-import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectModule;
 
 public class ReportTemplateConfigurationPage extends ReportTemplateObjectRepository {
 
-	WebDriverWait wait = new WebDriverWait(driver, 20);
+	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
 	private static final Logger log = LogManager.getLogger(ReportTemplateConfigurationPage.class);
 

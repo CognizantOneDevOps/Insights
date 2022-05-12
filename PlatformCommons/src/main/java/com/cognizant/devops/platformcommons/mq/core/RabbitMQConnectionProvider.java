@@ -25,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
+import com.cognizant.devops.platformcommons.constants.CommonsAndDALConstants;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.rabbitmq.client.Connection;
@@ -32,6 +33,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.Channel;
 
 public class RabbitMQConnectionProvider {
+
 	private static final Logger log = LogManager.getLogger(RabbitMQConnectionProvider.class);
 	private static Connection connection = null;
 
@@ -58,8 +60,8 @@ public class RabbitMQConnectionProvider {
 			log.error("Unable to create MQ connection within specified time.", e);
 			throw new InsightsCustomException("Unable to create MQ connection within specified time." + e);
 		} catch (Exception e) {
-			log.error("Exception while initializing RabbitMQ connection.", e);
-			throw new InsightsCustomException("Exception while initializing RabbitMQ connection." + e);
+			log.error(CommonsAndDALConstants.RABBIT_MQ_EXCEPTION, e);
+			throw new InsightsCustomException(CommonsAndDALConstants.RABBIT_MQ_EXCEPTION + e);
 		}
 	}
 
@@ -69,8 +71,8 @@ public class RabbitMQConnectionProvider {
 			channel.queueDeclare(MQMessageConstants.RECOVER_QUEUE, true, false, false, null);
 			channel.queueBind(MQMessageConstants.RECOVER_QUEUE, MQMessageConstants.RECOVER_EXCHANGE_NAME, MQMessageConstants.RECOVER_ROUNTINGKEY_QUEUE);
 		} catch (Exception e) {
-			log.error("Exception while initializing RabbitMQ connection.", e);
-			throw new InsightsCustomException("Exception while initializing RabbitMQ connection." + e);
+			log.error(CommonsAndDALConstants.RABBIT_MQ_EXCEPTION, e);
+			throw new InsightsCustomException(CommonsAndDALConstants.RABBIT_MQ_EXCEPTION + e);
 		}
 	}
 	

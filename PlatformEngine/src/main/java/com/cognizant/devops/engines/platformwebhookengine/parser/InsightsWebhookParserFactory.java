@@ -28,5 +28,4 @@ public class InsightsWebhookParserFactory {
 		
 			return new InsightsGeneralParser();
 	}
-
 }

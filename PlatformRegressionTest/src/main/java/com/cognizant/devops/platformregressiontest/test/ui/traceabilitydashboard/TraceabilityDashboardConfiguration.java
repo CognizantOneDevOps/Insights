@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.ui.traceabilitydashboard;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
@@ -29,7 +30,7 @@ import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectMod
 
 public class TraceabilityDashboardConfiguration extends TraceabilityDashboardObjectRepository {
 
-	WebDriverWait wait = new WebDriverWait(driver, 20);
+	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
 	private static final Logger log = LogManager.getLogger(TraceabilityDashboardConfiguration.class);
 

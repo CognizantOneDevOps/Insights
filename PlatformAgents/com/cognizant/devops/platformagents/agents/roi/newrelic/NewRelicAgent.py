@@ -153,6 +153,7 @@ class NewRelicAgent(BaseAgent):
             timeslicesData = metrics[0]["timeslices"]
             outcomeMetadata = {"milestoneId": outcomeDetails["milestoneId"], 
                 "milestoneName": outcomeDetails["milestoneName"],
+                "milestoneReleaseId": outcomeDetails["milestoneReleaseId"],
                 "outcomeName": outcomeDetails["outcomeName"],
                 "outcomeId": outcomeDetails["outcomeId"]}
             for data in timeslicesData:

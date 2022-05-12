@@ -23,6 +23,8 @@ import { DataSharedService } from '@insights/common/data-shared-service';
 import { MileStoneService } from '@insights/app/modules/mile-stone/mile-stone.service';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { OutcomeService } from '../../outcome/outcome.service';
+import { MatDialog } from '@angular/material/dialog';
+import { OutComeDialogComponent } from '../../outcome/outcome-dialog/outcome-dialog.component';
 
 @Component({
     selector: 'app-mile-stone',
@@ -43,18 +45,20 @@ export class MileStoneComponent implements OnInit{
         private formBuilder: FormBuilder,
         private mileStoneService: MileStoneService,
         private dataShare: DataSharedService,
-        private outcomeService: OutcomeService) {
+        private outcomeService: OutcomeService, private dialog: MatDialog) {
     }
 
     ngOnInit(){
-       this.mileStoneForm = this.formBuilder.group({
+        this.mileStoneForm = this.formBuilder.group({
             mileStoneName: ['', [Validators.required]],
+            milestoneReleaseID: ['', [Validators.required]],
             startDate: ['', [Validators.required]],
             endDate: ['', [Validators.required]],
             outcomeList: [[],[Validators.required]]
         });
 
-        this.fetchOutcomeList();
+
+        //this.fetchOutcomeList();
     }
 
     async fetchOutcomeList(){
@@ -109,6 +113,33 @@ export class MileStoneComponent implements OnInit{
             })
             this.isProgress = false;
         }
+        else{
+            this.messageDialog.showApplicationsMessage("Please fill mandatory fields", "ERROR");
+        }
+    }
+
+    openOutcomeDialog() {
+        var dialogRef = this.dialog.open(OutComeDialogComponent, {
+          panelClass: 'showjson-dialog-container',
+          height: "500px",
+          width: "550px",
+          disableClose: true,
+    
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            this.outcomeArray = []
+            this.outcomeService.setOutcomeSubject.subscribe(res => {
+                if(res && res.length > 0) {
+                    for (var ele of res) {
+                        this.outcomeArray.push(ele.outcomeName)
+                    }
+                } 
+                console.log(this.outcomeArray)
+                this.mileStoneForm.controls['outcomeList'].setValue(this.outcomeArray);
+            })
+        });
+
     }
 
     reset(){

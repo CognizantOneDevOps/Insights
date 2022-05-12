@@ -16,6 +16,8 @@
 
 package com.cognizant.devops.platformreports.assessment.upshift.handler;
 
+import com.cognizant.devops.platformcommons.constants.ReportStatusConstants;
+import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
@@ -92,24 +94,24 @@ public class UpshiftAssessmentHandler implements BaseDataProcessor {
             log.debug("Total nodes created: {}", numOfNodes);
             updateReportStatus(upshiftAssessmentConfig);
             long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-            log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+            log.debug(StringExpressionConstants.STR_EXP_TASK,
             		assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getReportId(),
             		upshiftAssessmentConfig.getWorkflowConfig().getWorkflowType(),"-","-",processingTime
-            		,"UpshiftUuid :" +upshiftAssessmentConfig.getUpshiftUuid() +
-            		"CreatedDate :" +upshiftAssessmentConfig.getCreatedDate() +
-            		"UpdatedDate :"  +upshiftAssessmentConfig.getUpdatedDate() +
-            		"fileName :" +upshiftAssessmentConfig.getFileName() +
-            		"status :" +upshiftAssessmentConfig.getStatus()+ "Completed processing of upshift report");
+            		,ReportStatusConstants.UPSHIFT_UUID +upshiftAssessmentConfig.getUpshiftUuid() +
+            		ReportStatusConstants.CREATED_DATE +upshiftAssessmentConfig.getCreatedDate() +
+            		ReportStatusConstants.UPDATED_DATE  +upshiftAssessmentConfig.getUpdatedDate() +
+            		ReportStatusConstants.FILENAME +upshiftAssessmentConfig.getFileName() +
+            		ReportStatusConstants.STATUS +upshiftAssessmentConfig.getStatus()+ "Completed processing of upshift report");
 
         } catch (Exception e) {
             log.error(e.getStackTrace());
-            log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+            log.error(StringExpressionConstants.STR_EXP_TASK,
             		assessmentReportDTO.getExecutionId(),assessmentReportDTO.getWorkflowId(),assessmentReportDTO.getReportId(),upshiftAssessmentConfig.getWorkflowConfig().getWorkflowType(),"-","-",0
-            		,"UpshiftUuid :" +upshiftAssessmentConfig.getUpshiftUuid() +
-            		"CreatedDate :" +upshiftAssessmentConfig.getCreatedDate() +
-            		"UpdatedDate :"  +upshiftAssessmentConfig.getUpdatedDate() +
-            		"fileName :" +upshiftAssessmentConfig.getFileName() +
-            		"status :" +upshiftAssessmentConfig.getStatus() + element.getAsString() + e.getMessage());
+            		,ReportStatusConstants.UPSHIFT_UUID +upshiftAssessmentConfig.getUpshiftUuid() +
+            		ReportStatusConstants.CREATED_DATE +upshiftAssessmentConfig.getCreatedDate() +
+            		ReportStatusConstants.UPDATED_DATE  +upshiftAssessmentConfig.getUpdatedDate() +
+            		ReportStatusConstants.FILENAME +upshiftAssessmentConfig.getFileName() +
+            		ReportStatusConstants.STATUS +upshiftAssessmentConfig.getStatus() + element.getAsString() + e.getMessage());
             throw new InsightsJobFailedException(e.getMessage());
         }
     }
@@ -277,13 +279,13 @@ public class UpshiftAssessmentHandler implements BaseDataProcessor {
         upshiftAssessmentConfig.setUpdatedDate(InsightsUtils.getCurrentTimeInEpochMilliSeconds());
         upshiftAssessmentConfigDAL.updateUpshiftAssessmentConfig(upshiftAssessmentConfig);
         long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-        log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+        log.debug(StringExpressionConstants.STR_EXP_TASK,
         		"-",upshiftAssessmentConfig.getWorkflowConfig().getWorkflowId(),"-",upshiftAssessmentConfig.getWorkflowConfig().getWorkflowType(),"-","-",processingTime
-        		,"UpshiftUuid :" +upshiftAssessmentConfig.getUpshiftUuid() +
-        		"CreatedDate :" +upshiftAssessmentConfig.getCreatedDate() +
-        		"UpdatedDate :"  +upshiftAssessmentConfig.getUpdatedDate() +
-        		"fileName :" +upshiftAssessmentConfig.getFileName() +
-        		"status :" +upshiftAssessmentConfig.getStatus()+ "Completed processing of upshift report");        
+        		,ReportStatusConstants.UPSHIFT_UUID +upshiftAssessmentConfig.getUpshiftUuid() +
+        		ReportStatusConstants.CREATED_DATE +upshiftAssessmentConfig.getCreatedDate() +
+        		ReportStatusConstants.UPDATED_DATE  +upshiftAssessmentConfig.getUpdatedDate() +
+        		ReportStatusConstants.FILENAME +upshiftAssessmentConfig.getFileName() +
+        		ReportStatusConstants.STATUS +upshiftAssessmentConfig.getStatus()+ "Completed processing of upshift report");        
     }
 
 

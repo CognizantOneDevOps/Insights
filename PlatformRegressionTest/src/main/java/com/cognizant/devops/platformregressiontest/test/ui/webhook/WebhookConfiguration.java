@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.ui.webhook;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -39,7 +40,7 @@ import com.cognizant.devops.platformregressiontest.test.ui.testdata.WebhookDataP
  */
 public class WebhookConfiguration extends WebhookObjectRepository {
 
-	WebDriverWait wait = new WebDriverWait(driver, 10);
+	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
 	private static final Logger log = LogManager.getLogger(WebhookConfiguration.class);
 

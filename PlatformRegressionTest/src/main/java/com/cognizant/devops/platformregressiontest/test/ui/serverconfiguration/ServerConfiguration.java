@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.ui.serverconfiguration;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
@@ -33,7 +34,7 @@ import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectMod
  */
 public class ServerConfiguration extends ServerConfigurationObjectRepository {
 
-	WebDriverWait wait = new WebDriverWait(driver, 10);
+	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
 	private static final Logger log = LogManager.getLogger(ServerConfiguration.class);
 

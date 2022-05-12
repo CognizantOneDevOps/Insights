@@ -27,16 +27,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformworkflow.workflowtask.message.factory.WorkflowTaskSubscriberHandler;
 import com.cognizant.devops.platformworkflow.workflowtask.utils.WorkflowUtils;
 
 public class WorkflowTaskInitializer {
-	
-
 	private static final Logger log = LogManager.getLogger(WorkflowTaskInitializer.class);
-
 	/**
 	 * Subscribe all workflow task using class loader,
 	 * It will fetch all task from workflowjar folder which is located inside
@@ -78,9 +76,7 @@ public class WorkflowTaskInitializer {
 										+ insightsWorkflowTaskEntity.getCompnentName() + " registered successfully",
 								PlatformServiceConstants.SUCCESS);
 						long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-						log.debug(
-								"Type=WorkFlowInitializer TaskDescription={} TaskMQChannel={} componentName{} WorkflowType={} processingTime={} status ={} message={}",
-								insightsWorkflowTaskEntity.getDescription(), insightsWorkflowTaskEntity.getMqChannel(),
+						log.debug(StringExpressionConstants.STR_EXP_WORKFLOWINITIALIZER,insightsWorkflowTaskEntity.getDescription(), insightsWorkflowTaskEntity.getMqChannel(),
 								insightsWorkflowTaskEntity.getCompnentName(),
 								insightsWorkflowTaskEntity.getWorkflowType(), processingTime, "Success",
 								"Task Registered Successfully");
@@ -91,25 +87,21 @@ public class WorkflowTaskInitializer {
 //								" Task is already subscribed " + insightsWorkflowTaskEntity.getMqChannel()
 //										+ " with path " + insightsWorkflowTaskEntity.getCompnentName(),
 //								PlatformServiceConstants.SUCCESS);
-						log.debug(
-								"Type=WorkFlowInitializer TaskDescription={} TaskMQChannel={} componentName{} WorkflowType={} processingTime={} status ={} message={}",
-								insightsWorkflowTaskEntity.getDescription(), insightsWorkflowTaskEntity.getMqChannel(),
+						log.debug(StringExpressionConstants.STR_EXP_WORKFLOWINITIALIZER,insightsWorkflowTaskEntity.getDescription(), insightsWorkflowTaskEntity.getMqChannel(),
 								insightsWorkflowTaskEntity.getCompnentName(),
 								insightsWorkflowTaskEntity.getWorkflowType(), 0, "Success",
 								"Task is already subscribed");
 					}
 				} catch (Exception e) {
 					log.error("Worlflow Detail ==== Error while registering Task", e.getMessage());
-					log.error("Type=WorkFlowInitializer TaskDescription={} TaskMQChannel={} componentName{} WorkflowType={} processingTime={} status ={} message={}"
-							,"-","-","-" ,"-",0,"Failure",e.getMessage());	
+					log.error(StringExpressionConstants.STR_EXP_WORKFLOWINITIALIZER,"-","-","-" ,"-",0,"Failure",e.getMessage());	
 				}
 			}
 		} catch (Exception e) {
 			log.error(" Worlflow Detail ==== Error while registering Task ", e);
 			InsightsStatusProvider.getInstance().createInsightStatusNode(" Error while registering Task "+e.getMessage(),
 					PlatformServiceConstants.FAILURE);
-			log.debug("Type=WorkFlowInitializer TaskDescription={} TaskMQChannel={} componentName{} WorkflowType={} processingTime={} status ={} message={}"
-					,"-","-","-" ,"-",0,"Failure",e.getMessage());			
+			log.debug(StringExpressionConstants.STR_EXP_WORKFLOWINITIALIZER,"-","-","-" ,"-",0,"Failure",e.getMessage());			
 		}finally {
 			if(urlClassLoader!=null) {
 				try {

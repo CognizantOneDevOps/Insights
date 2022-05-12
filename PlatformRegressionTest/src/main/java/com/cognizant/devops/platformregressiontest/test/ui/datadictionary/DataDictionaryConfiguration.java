@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.ui.datadictionary;
 
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,7 +33,7 @@ import org.testng.SkipException;
 import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectModule;
 
 public class DataDictionaryConfiguration extends DataDictionaryobjectRepository {
-	WebDriverWait wait = new WebDriverWait(driver, 20);
+	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
 	private Set<String> uniqueToolNames = new HashSet<>();
 	private static final Logger log = LogManager.getLogger(DataDictionaryConfiguration.class);
@@ -203,7 +204,7 @@ public class DataDictionaryConfiguration extends DataDictionaryobjectRepository 
 	 * @return size of list of web elements
 	 */
 	public static int visibilityOfAllElements(List<WebElement> element, int timeout) {
-		new WebDriverWait(driver, timeout).until(ExpectedConditions.visibilityOfAllElements(element));
+		new WebDriverWait(driver, Duration.ofSeconds(timeout)).until(ExpectedConditions.visibilityOfAllElements(element));
 		return element.size();
 	}
 
@@ -215,7 +216,7 @@ public class DataDictionaryConfiguration extends DataDictionaryobjectRepository 
 	 * @return true if element is displayed else false
 	 */
 	private boolean visibilityOf(WebElement element, int timeout) {
-		new WebDriverWait(driver, timeout).until(ExpectedConditions.visibilityOf(element));
+		new WebDriverWait(driver, Duration.ofSeconds(timeout)).until(ExpectedConditions.visibilityOf(element));
 		return element.isDisplayed();
 	}
 
@@ -226,6 +227,6 @@ public class DataDictionaryConfiguration extends DataDictionaryobjectRepository 
 	 * @param timeout
 	 */
 	public static void clickOn(WebElement element, int timeout) {
-		new WebDriverWait(driver, timeout).until(ExpectedConditions.visibilityOf(element)).click();
+		new WebDriverWait(driver, Duration.ofSeconds(timeout)).until(ExpectedConditions.visibilityOf(element)).click();
 	}
 }

@@ -60,6 +60,9 @@ public class InsightsAssessmentReportTemplate implements Serializable {
 	@Column(name = "visualizationutil")
 	private String visualizationutil;
 	
+	@Column (name = "templateType")
+	private String templateType;
+	
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "reportTemplateEntity", fetch = FetchType.EAGER, orphanRemoval = true)
 	private Set<InsightsReportsKPIConfig> reportsKPIConfig = new LinkedHashSet<>();
 	
@@ -118,6 +121,14 @@ public class InsightsAssessmentReportTemplate implements Serializable {
 
 	public void setVisualizationutil(String visualizationutil) {
 		this.visualizationutil = visualizationutil;
+	}
+
+	public String getTemplateType() {
+		return templateType;
+	}
+
+	public void setTemplateType(String templateType) {
+		this.templateType = templateType;
 	}
 
 	public Set<InsightsReportsKPIConfig> getReportsKPIConfig() {

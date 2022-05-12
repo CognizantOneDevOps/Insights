@@ -63,6 +63,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.AgentCommonConstant;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.AGENTACTION;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
@@ -120,16 +121,16 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			json.addProperty("agentVersion", agentVersion);
 			json.addProperty("toolName", toolName.toUpperCase());
 			json.addProperty("labelName", labelName);
-			json.get("subscribe").getAsJsonObject().addProperty("agentCtrlQueue", agentId);
+			json.get(PlatformServiceConstants.SUBSCRIBE).getAsJsonObject().addProperty("agentCtrlQueue", agentId);
 
 			if (isWebhook) {
 				String webhookSubscribeQueue = AgentCommonConstant.WEBHOOK_QUEUE_CONSTANT + agentId;
-				json.get("subscribe").getAsJsonObject().addProperty("webhookPayloadDataQueue", webhookSubscribeQueue);
+				json.get(PlatformServiceConstants.SUBSCRIBE).getAsJsonObject().addProperty("webhookPayloadDataQueue", webhookSubscribeQueue);
 				json.addProperty(AgentCommonConstant.WEBHOOK_ENABLED, true);
 			} else if (type.equalsIgnoreCase(AgentCommonConstant.ROI_AGENT)) {
 				InsightsTools configs = outComeConfigDAL.getOutComeByToolName(toolName.toUpperCase());
 				String communicationQueue = configs.getAgentCommunicationQueue();
-				json.get("subscribe").getAsJsonObject().addProperty("roiExecutionQueue", communicationQueue);
+				json.get(PlatformServiceConstants.SUBSCRIBE).getAsJsonObject().addProperty("roiExecutionQueue", communicationQueue);
 				json.addProperty(AgentCommonConstant.IS_ROI_AGENT, true);
 			}
 
@@ -302,7 +303,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			agentList = new ArrayList<>();
 			for (AgentConfig agentConfig : agentConfigList) {
 				AgentConfigTO to = new AgentConfigTO();
-				BeanUtils.copyProperties(agentConfig, to, "agentJson", "updatedDate", "vault");
+				BeanUtils.copyProperties(agentConfig, to, "agentJson", "updatedDate", PlatformServiceConstants.VAULT);
 				agentList.add(to);
 			}
 		} catch (Exception e) {
@@ -694,7 +695,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			trackingFile = paths.limit(1).findFirst().get().toFile();
 			trackingFile = trackingFile.getParentFile();
 			dir = Paths.get(trackingFile.toString() + File.separator + "tracking.json");
-			trackingFile = dir.toFile();
+			trackingFile = dir.normalize().toFile();
 		}
 		try (FileWriter file = new FileWriter(trackingFile)) {
 			file.write(trackingDetails.toString());
@@ -870,7 +871,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		vaultObj.addProperty("readToken", ApplicationConfigProvider.getInstance().getVault().getVaultToken());
 		vaultObj.addProperty("vaultUrl",
 				ApplicationConfigProvider.getInstance().getVault().getVaultEndPoint() + vaultURL + agentId);
-		json.add("vault", vaultObj);
+		json.add(PlatformServiceConstants.VAULT, vaultObj);
 		log.debug(" without creds Json Updated ");
 		return secretMap;
 	}
@@ -954,7 +955,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			agentList = new ArrayList<>();
 			for (AgentConfig agentConfig : agentConfigList) {
 				AgentConfigTO agentNode = new AgentConfigTO();
-				BeanUtils.copyProperties(agentConfig, agentNode, "agentJson", "updatedDate", "vault");
+				BeanUtils.copyProperties(agentConfig, agentNode, "agentJson", "updatedDate", PlatformServiceConstants.VAULT);
 				JsonObject node = new JsonObject();
 				JsonObject agentHealthNode = healthUtil.getAgentHealth(node, agentNode.getAgentKey());
 				if(agentHealthNode.has(LAST_RUN_TIME)) {

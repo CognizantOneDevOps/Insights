@@ -18,7 +18,8 @@ package com.cognizant.devops.platformservice.insights.service;
 import java.util.List;
 
 public interface InsightsInferenceService {
-
+	
+	String BUILD="build";
 	public List<InsightsInference> getInferenceDetails(String schedule);
 
 	public List<InsightsInference> getInferenceDetailsVectorWise(String schedule, String vector);

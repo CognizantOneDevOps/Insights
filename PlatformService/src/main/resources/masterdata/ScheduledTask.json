@@ -30,5 +30,13 @@
 	{
 		"queryName": "Add DataArchivalAggregatorModule ",
 		"sqlQuery": " INSERT INTO public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\" ( timertaskid, action, componentclassdetail, componentname, schedule) SELECT nextval('hibernate_sequence'), 'STOP', 'com.cognizant.devops.engines.platformdataarchivalengine.modules.aggregator.DataArchivalAggregatorModule', 'DataArchivalAggregatorModule', '0 0 0/4 ? * * *' WHERE NOT EXISTS(SELECT componentname from public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\"  WHERE componentname = 'DataArchivalAggregatorModule'); "
+	},
+	{
+		"queryName": "Add MileStoneExecutionAggregatorModule ",
+		"sqlQuery": " INSERT INTO public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\" ( timertaskid, action, componentclassdetail, componentname, schedule) SELECT nextval('hibernate_sequence'), 'STOP', 'com.cognizant.devops.engines.platformroi.aggregator.MileStoneExecutionAggregatorModule', 'MileStoneExecutionAggregatorModule', '0 */15 * ? * *' WHERE NOT EXISTS(SELECT componentname from public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\"  WHERE componentname = 'MileStoneExecutionAggregatorModule'); "
+	},
+	{
+		"queryName": "Add MileStoneStatusAggregatorModule ",
+		"sqlQuery": " INSERT INTO public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\" ( timertaskid, action, componentclassdetail, componentname, schedule) SELECT nextval('hibernate_sequence'), 'STOP', 'com.cognizant.devops.engines.platformroi.aggregator.MileStoneStatusAggregatorModule', 'MileStoneStatusAggregatorModule', '0 0 0/4 ? * * *' WHERE NOT EXISTS(SELECT componentname from public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\"  WHERE componentname = 'MileStoneStatusAggregatorModule'); "
 	}
 ]

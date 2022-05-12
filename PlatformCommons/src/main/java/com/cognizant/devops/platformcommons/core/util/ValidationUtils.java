@@ -25,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -34,7 +35,7 @@ public class ValidationUtils {
 	private ValidationUtils() {
 		super();
 	}
-
+	
 	private static final Logger log = LogManager.getLogger(ValidationUtils.class);
 	private static Pattern agentNamePattern = Pattern.compile("[^A-Za-z]", Pattern.CASE_INSENSITIVE);
 	private static Pattern agentIdPattern = Pattern.compile("[^A-Za-z0-9\\_]", Pattern.CASE_INSENSITIVE);
@@ -56,7 +57,6 @@ public class ValidationUtils {
 
 	public static boolean checkString(String toolName) {
 		boolean returnBoolean = false;
-
 		Matcher m = agentNamePattern.matcher(toolName);
 		if (m.find()) {
 			returnBoolean = true;
@@ -76,7 +76,6 @@ public class ValidationUtils {
 
 	public static boolean checkAgentIdString(String agentId) {
 		boolean returnBoolean = false;
-
 		Matcher m = agentIdPattern.matcher(agentId);
 		if (m.find()) {
 			returnBoolean = true;
@@ -86,7 +85,6 @@ public class ValidationUtils {
 	
 	public static boolean checkAgentVersion(String version) {
 		boolean returnBoolean = false;
-
 		Matcher m = agentVersionPattern.matcher(version);
 		if (m.find()) {
 			returnBoolean = true;
@@ -96,7 +94,6 @@ public class ValidationUtils {
 
 	public static boolean checkLabelNameString(String labelData) {
 		boolean returnBoolean = false;
-
 		Matcher m = LabelPattern.matcher(labelData);
 		if (m.find()) {
 			returnBoolean = true;
@@ -113,15 +110,13 @@ public class ValidationUtils {
 	 * @return JsonObject
 	 */
 	public static JsonObject validateJSONForHTMLContent(JsonObject data) {
-		String strRegEx = "<[^>]*>";
 		String jsonString = "";
 		JsonObject json = null;
 
 		if (data instanceof JsonObject) {
 			jsonString = data.toString();
-			// log.debug(" validateStringForHTMLContent after assigment " + jsonString);
 			if (jsonString != null) {
-				jsonString = jsonString.replaceAll(strRegEx, "");
+				jsonString = jsonString.replaceAll(StringExpressionConstants.STR_REGEX, "");
 				// replace &nbsp; with space
 				jsonString = jsonString.replace(ConfigOptions.NBSP, " ");
 				// replace &amp; with &
@@ -138,17 +133,13 @@ public class ValidationUtils {
 	}
 
 	public static Boolean validateStringForHTMLContent(String data) {
-		String strRegEx = "<[^>]*>";
 		String modifiedString = "";
 		Boolean hasHTML = Boolean.FALSE;
 
-		// log.debug(" validateStringForHTMLContent string before " + data);
-
 		if (data instanceof String) {
 			modifiedString = data;
-			// log.debug(" validateStringForHTMLContent after assigment " + jsonString);
 			if (modifiedString != null) {
-				modifiedString = modifiedString.replaceAll(strRegEx, "");
+				modifiedString = modifiedString.replaceAll(StringExpressionConstants.STR_REGEX, "");
 				// replace &nbsp; with space
 				modifiedString = modifiedString.replace(ConfigOptions.NBSP, " ");
 				// replace &amp; with &
@@ -158,7 +149,6 @@ public class ValidationUtils {
 				log.error(" Invilid response data ");
 				log.error("Invalid html pattern found in data value validateStringForHTMLContent ==== ");
 				hasHTML = Boolean.TRUE;
-				//throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
 			}
 		}
 		return hasHTML;
@@ -367,17 +357,13 @@ public class ValidationUtils {
 	 * @return JsonObject
 	 */
 	public static JsonObject replaceHTMLContentFormString(JsonObject data) {
-		String strRegEx = "<[^>]*>";
 		String jsonString = "";
 		JsonObject json = null;
 
-		// log.debug(" validateStringForHTMLContent string before " + data);
-
 		if (data instanceof JsonObject) {
 			jsonString = data.toString();
-			// log.debug(" validateStringForHTMLContent after assigment " + jsonString);
 			if (jsonString != null) {
-				jsonString = jsonString.replaceAll(strRegEx, "");
+				jsonString = jsonString.replaceAll(StringExpressionConstants.STR_REGEX, "");
 				// replace &nbsp; with space
 				jsonString = jsonString.replace("&nbsp;", " ");
 				// replace &amp; with &

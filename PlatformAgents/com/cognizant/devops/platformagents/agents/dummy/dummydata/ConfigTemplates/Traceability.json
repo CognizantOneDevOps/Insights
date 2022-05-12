@@ -1,8 +1,9 @@
 {
 	"JIRA": {
 		"uuid": "uuid",
-		"order": 1,
-		"category": "ALM",	
+		"order": 2,
+		"displayText": "Issues",
+		"category": "ALM",
 		"issueKey": "key",
 		"property": "categoryName",
 		"epicKey": "epicKey",
@@ -10,81 +11,106 @@
 		"toolName": "toolName",
 		"creationDate": "creationDate",
 		"resolutionsdate": "resolutionsdate",
-		"toolstatus": "status",
+		"issueStatus": "status",
 		"author": "reporter",
 		"projectName": "projectName",
+		"timestamp": "inSightsTime",
 		"priority": "priority",
 		"inSightsTimeX": "inSightsTimeX",
-		"eventKey": "epicKey",
+		"eventKey": "eventKey",
 		"uptool": [
 			"EPIC"
 		],
 		"downtool": [
 			"GIT"
 		],
+		"messages": [
+			{
+				"Message": "Total {0} in JIRA",
+				"Operation": "PROPERTY_COUNT",
+				"OperandName": "issueType",
+				"OperandValue": []
+			}
+		],
 		"uifilter": [
-			"key",
-			"projectName",
-			"jiraKey"
+			"key"
 		],
 		"cardDisplayProps": [
 			"issueKey",
-			"epicKey",
-			"toolstatus"
-			
+			"author",
+			"issueStatus",
+			"issueType"
+		],
+		"excludeLabels": [
+			"SPRINT"
 		]
 	},
 	"GIT": {
 		"uuid": "uuid",
 		"category": "SCM",
-		"order": 2,		
+		"order": 3,
+		"displayText": "Commits",
 		"inSightsTimeX": "inSightsTimeX",
 		"commitId": "commitId",
 		"property": "categoryName",
 		"toolName": "toolName",
-		"toolstatus": "status",
+		"commitStatus": "status",
 		"author": "authorName",
 		"repositoryName": "repoName",
 		"timestamp": "inSightsTime",
+		"jiraKey": "jiraKey",
+		"gitCommiTime": "gitCommitTime",
 		"uptool": [
 			"JIRA"
 		],
 		"downtool": [
 			"JENKINS"
 		],
-		"gitCommiTime": "gitCommitTime",
+		"messages": [
+			{
+				"Message": "Total {0} Developers ",
+				"Operation": "DISTINCT_COUNT",
+				"OperandName": "author",
+				"OperandValue": []
+			}
+		],
 		"uifilter": [
-			"commitId",
-			"repoName"
+			"commitId"
 		],
 		"cardDisplayProps": [
 			"commitId",
 			"property",
-			"toolstatus"
+			"jiraKey",
+			"author"
+		],
+		"excludeLabels": [
+			"FILE_CHANGE"
 		]
 	},
 	"JENKINS": {
 		"uuid": "uuid",
-		"category": "CI",	
+		"category": "CI",
 		"inSightsTimeX": "inSightsTimeX",
-		"order": 3,
+		"order": 4,
+		"displayText": "Builds",
 		"buildNumber": "buildNumber",
 		"property": "categoryName",
 		"resourcekey": "resourcekey",
 		"toolName": "toolName",
-		"toolstatus": "status",
+		"buildStatus": "status",
 		"projectName": "projectName",
 		"timestamp": "inSightsTime",
 		"environment": "environment",
 		"buildUrl": "buildUrl",
+		"scmcommitId": "scmcommitId",
 		"jobName": "jobName",
 		"uptool": [
 			"GIT"
 		],
 		"downtool": [
 			"SONAR",
-			"RUNDECK",
-			"NEXUS"
+			"NEXUS",
+			"RUNDECK"
 		],
 		"timelagParam": [
 			"startTime",
@@ -92,7 +118,7 @@
 		],
 		"messages": [
 			{
-				"Message": "Build Information - {0} Passed {1} Failed",
+				"Message": "Build Information - {0} Passed, {1} Failed",
 				"Operation": "SUM",
 				"OperandName": "toolstatus",
 				"OperandValue": [
@@ -102,90 +128,63 @@
 		],
 		"uifilter": [
 			"buildNumber",
-			"projectName"
+			"scmcommitId"
 		],
 		"cardDisplayProps": [
 			"buildNumber",
-			"resourcekey",
-			"toolstatus"
+			"buildUrl",
+			"jobName",
+			"buildStatus"
 		]
 	},
 	"SONAR": {
 		"uuid": "uuid",
 		"category": "CODEQUALITY",
 		"inSightsTimeX": "inSightsTimeX",
-		"order": 4,		
+		"order": 5,
+		"displayText": "Code Quality Executions",
 		"analysisId": "analysisId",
 		"property": "categoryName",
 		"toolName": "toolName",
 		"toolstatus": "sonarQualityGateStatus",
 		"projectName": "projectname",
-		"resourcekey": "resourcekey",
+		"resourceKey": "resourceKey",
 		"complexity": "sonarComplexity",
 		"coverage": "sonarCoverage",
 		"timestamp": "inSightsTime",
+		"code_coverage": "code_coverage",
 		"sonarDuplicateCode": "sonarDuplicateCode",
+		"jenkinsBuildNumber": "jenkinsBuildNumber",
 		"sonarKey": "sonarKey",
-		"uptool": [
-			"JENKIS"
-		],
-		"downtool": [
-			"null"
-		],
-		"timelagParam": [
-			"startTime",
-			"endTime"
-		],
-		"cardDisplayProps": [
-			"resourcekey",
-			"property",
-			"toolstatus"
-		]
-	},
-	"RUNDECK": {
-		"uuid": "uuid",
-		"category": "DEPLOYMENT",
-		"inSightsTimeX": "inSightsTimeX",
-		"order": 5,		
-		"executionId": "run_ExecutionId",
-		"buildNumber": "jenkineBuildNumber",
-		"property": "categoryName",
-		"projectName": "run_ProjectName",
-		"phase": "Deployment",
-		"toolName": "toolName",
-		"toolstatus": "status",
-		"author": "run_User",
-		"timestamp": "inSightsTime",
-		"environment": "environment",
 		"uptool": [
 			"JENKINS"
 		],
 		"downtool": [
 			"null"
 		],
-		"startTime": "startTime",
-		"endTime": "endTime",
+		"uifilter": [
+			"sonarKey",
+			"resourceKey"
+		],
 		"timelagParam": [
 			"startTime",
 			"endTime"
 		],
+		"cardDisplayProps": [
+			"code_coverage",
+			"complexity",
+			"coverage",
+			"jenkinsBuildNumber"
+		],
 		"messages": [
 			{
-				"Message": "Deployment - {0} Successful Deployments  {1} Failed Deployments",
+				"Message": "Sonar Executions - {0} Success, {1} Failed",
 				"Operation": "SUM",
 				"OperandName": "toolstatus",
 				"OperandValue": [
-					"Success"
+					"OK"
 				]
 			}
-		],
-		"uifilter": [
-			"jenkineBuildNumber"
-		],
-		"cardDisplayProps": [
-			"executionId",
-			"buildNumber",
-     		"toolstatus"		
 		]
 	},
 	"NEXUS": {
@@ -193,12 +192,14 @@
 		"category": "ARTIFACTMANAGEMENT",
 		"inSightsTimeX": "inSightsTimeX",
 		"order": 6,
+		"displayText": " Total Artifacts",
 		"repoName": "repoName",
 		"jenkinsBuildNumber": "jenkinsBuildNumber",
 		"property": "categoryName",
 		"toolName": "toolName",
 		"toolstatus": "status",
 		"timestamp": "inSightsTime",
+		"artifactName": "artifactName",
 		"uptool": [
 			"JENKINS"
 		],
@@ -216,8 +217,19 @@
 		],
 		"cardDisplayProps": [
 			"repoName",
-			"jenkineBuildNumber",
-			"toolstatus"
+			"jenkinsBuildNumber",
+			"artifactName",
+			"artifactStatus"
+		],
+		"messages": [
+			{
+				"Message": "Nexus  - {0} Success, {1} Failed",
+				"Operation": "SUM",
+				"OperandName": "toolstatus",
+				"OperandValue": [
+					"succeeded"
+				]
+			}
 		]
 	},
 	"QTEST": {
@@ -225,10 +237,11 @@
 		"category": "ALM",
 		"inSightsTimeX": "inSightsTimeX",
 		"order": 7,
+		"displayText": "Test Executions",
 		"module": "module",
 		"requirement_id": "requirement_id",
 		"projectName": "projectName",
-		"property": "categoryName",
+		"property": "category",
 		"toolName": "toolName",
 		"toolstatus": "status",
 		"timestamp": "inSightsTime",
@@ -250,5 +263,97 @@
 		"cardDisplayProps": [
 			"requirement_id"
 		]
-		}
+	},
+	"SNOW": {
+		"uuid": "uuid",
+		"category": "ITSM",
+		"inSightsTimeX": "inSightsTimeX",
+		"order": 8,
+		"displayText": "Change Request",
+		"releaseVersion": "releaseVersion",
+		"property": "categoryName",
+		"toolName": "toolName",
+		"state": "state",
+		"requestedBy": "requestedBy",
+		"assignedTo": "assignedTo",
+		"timestamp": "inSightsTime",
+		"projectName": "projectName",
+		"environment": "environment",
+		"uptool": [
+			"NEXUS"
+		],
+		"downtool": [
+			"XLRELEASE"
+		],
+		"startTime": "startTime",
+		"endTime": "endTime",
+		"timelagParam": [
+			"startTime",
+			"endTime"
+		],
+		"messages": [
+			{
+				"Message": "Change Request for Prod Deployment ",
+				"Operation": "SUM",
+				"OperandName": "toolstatus",
+				"OperandValue": [
+					"succeeded"
+				]
+			}
+		],
+		"uifilter": [
+			"releaseVersion"
+		],
+		"cardDisplayProps": [
+			"environment",
+			"releaseVersion",
+			"state",
+			"projectName"
+		]
+	},
+	"XLRELEASE": {
+		"uuid": "uuid",
+		"category": "RELEASEMANAGEMENT",
+		"inSightsTimeX": "inSightsTimeX",
+		"order": 9,
+		"displayText": "Release",
+		"snowId": "snowId",
+		"property": "categoryName",
+		"phase": "RELEASE Deployment",
+		"toolName": "toolName",
+		"releaseStatus": "releaseStatus",
+		"timestamp": "inSightsTime",
+		"projectName": "projectName",
+		"releaseOwner": "releaseOwner",
+		"uptool": [
+			"SNOW"
+		],
+		"downtool": [
+			"null"
+		],
+		"startTime": "startTime",
+		"endTime": "endTime",
+		"timelagParam": [
+			"startTime",
+			"endTime"
+		],
+		"messages": [
+			{
+				"Message": "Release management",
+				"Operation": "SUM",
+				"OperandName": "toolstatus",
+				"OperandValue": [
+					"succeeded"
+				]
+			}
+		],
+		"uifilter": [
+			"snowId"
+		],
+		"cardDisplayProps": [
+			"snowId",
+			"releaseStatus",
+			"projectName"
+		]
 	}
+}

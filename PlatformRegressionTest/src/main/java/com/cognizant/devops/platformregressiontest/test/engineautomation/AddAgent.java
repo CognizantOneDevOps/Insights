@@ -16,6 +16,7 @@
 package com.cognizant.devops.platformregressiontest.test.engineautomation;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,8 +38,8 @@ import com.rabbitmq.client.Connection;
 
 public class AddAgent extends AddAgentObjectRepository{
 
-	WebDriverWait wait = new WebDriverWait(driver, 10);
-	WebDriverWait hold = new WebDriverWait(driver, 1);
+	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+	WebDriverWait hold = new WebDriverWait(driver, Duration.ofSeconds(1));
 	Map<String, String> testData = new HashMap<>();
 	private static final Logger log = LogManager.getLogger(AddAgent.class);
 
@@ -282,7 +283,7 @@ public class AddAgent extends AddAgentObjectRepository{
 	 * @return size of list of web elements
 	 */
 	public static int visibilityOfAllElements(List<WebElement> element) {
-		return new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfAllElements(element)).size();
+		return new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.visibilityOfAllElements(element)).size();
 	}
 
 	/**
@@ -293,7 +294,7 @@ public class AddAgent extends AddAgentObjectRepository{
 	 * @return true if element is displayed else false
 	 */
 	public static boolean visibilityOf(WebElement element, int timeout) {
-		return new WebDriverWait(driver, timeout).until(ExpectedConditions.visibilityOf(element)).isDisplayed();
+		return new WebDriverWait(driver, Duration.ofSeconds(timeout)).until(ExpectedConditions.visibilityOf(element)).isDisplayed();
 	}
 
 	/**
@@ -303,6 +304,6 @@ public class AddAgent extends AddAgentObjectRepository{
 	 * @param timeout
 	 */
 	public static void clickOn(WebElement element, int timeout) {
-		new WebDriverWait(driver, timeout).until(ExpectedConditions.elementToBeClickable(element)).click();
+		new WebDriverWait(driver, Duration.ofSeconds(timeout)).until(ExpectedConditions.elementToBeClickable(element)).click();
 	}
 }

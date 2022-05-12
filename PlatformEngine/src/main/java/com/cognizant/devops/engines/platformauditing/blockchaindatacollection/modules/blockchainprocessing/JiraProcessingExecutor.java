@@ -85,8 +85,7 @@ public class JiraProcessingExecutor implements Job, ApplicationConfigInterface {
 		
 		long processingTime = System.currentTimeMillis() - startTime ;
 		EngineStatusLogger.getInstance().createSchedularTaskStatusNode("JiraProcessingExecutor execution Completed",
-				PlatformServiceConstants.SUCCESS,jobName,processingTime);
-		
+				PlatformServiceConstants.SUCCESS,jobName,processingTime);	
 	}
 
 	private void JiraNodeExtraction() {
@@ -144,7 +143,6 @@ public class JiraProcessingExecutor implements Job, ApplicationConfigInterface {
 							dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("uuid")+"\nNode skipped...");
                     //successfulWriteFlag = insertJiraNodes(dataElem, successfulWriteFlag);
 				}
-
 				// check for success for updating tracking
 
 				if (successfulWriteFlag && lastTimestamp != 0) {
@@ -158,16 +156,13 @@ public class JiraProcessingExecutor implements Job, ApplicationConfigInterface {
 				if (processedRecords == 0) {
 					nextBatchSize = 0;
 					nextBatchQuery = false;
-
 				}
-
 			}
 		} catch (InsightsCustomException | IOException e) {
 			LOG.error("Error occured while loading the destination data ", e);
 		} catch (Exception e) {			
 			LOG.error(e);
 		}
-
 	}
 	
     private String getHash(JsonArray row) {

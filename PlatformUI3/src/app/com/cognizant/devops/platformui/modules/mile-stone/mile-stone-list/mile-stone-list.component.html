@@ -35,11 +35,11 @@
                     add_circle
                 </mat-icon>
             </button>
-            <!-- <button mat-icon-button [disabled]="!onRadioBtnSelect" (click)="edit()">
+            <button mat-icon-button [disabled]="!enableEdit" (click)="edit()">
                 <mat-icon title="Edit MileStone config" class="mat-icon material-icons">
                     edit
                 </mat-icon>
-            </button> -->
+            </button>
             <button mat-icon-button [disabled]="disableRestart"  (click)="restartMileStone()">
                 <mat-icon title="Restart" class="mat-icon material-icons ">
                     refresh
@@ -78,17 +78,22 @@
                     </ng-container>
                     <ng-container matColumnDef="mileStoneName">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">MileStone</th>
-                        <td mat-cell *matCellDef="let element" style="width:25% !important">
+                        <td mat-cell *matCellDef="let element" style="width:18% !important">
                             {{element.mileStoneName}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="milestoneReleaseID">
+                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">MileStone Release ID</th>
+                        <td mat-cell *matCellDef="let element" style="width:18% !important">
+                            {{element.milestoneReleaseID}}</td>
                     </ng-container>
                     <ng-container matColumnDef="startDate">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Start Date</th>
-                        <td mat-cell *matCellDef="let element" style="width:20% !important">
+                        <td mat-cell *matCellDef="let element" style="width:12% !important">
                             {{element.startDate}}</td>
                     </ng-container>
                     <ng-container matColumnDef="endDate">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">End Date</th>
-                        <td mat-cell *matCellDef="let element" style="width:15% !important">
+                        <td mat-cell *matCellDef="let element" style="width:12% !important">
                             {{element.endDate}}</td>
                     </ng-container>
                     <ng-container matColumnDef="status">

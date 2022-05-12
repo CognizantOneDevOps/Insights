@@ -35,6 +35,10 @@ export class ReportTemplateService {
         return this.restCallHandlerService.get("GET_VISUALIZATION_UTIL");
     }
 
+    loadTemplateType(): Promise<any> {
+        return this.restCallHandlerService.get("GET_TEMPLATE_TYPE");
+    }
+
     loadChartTypeList(): Promise<any> {
         return this.restCallHandlerService.get("GET_VTYPE_LIST");
     }

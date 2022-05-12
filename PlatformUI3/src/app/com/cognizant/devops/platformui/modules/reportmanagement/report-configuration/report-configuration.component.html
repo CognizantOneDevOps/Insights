@@ -151,6 +151,26 @@
                         <span class="infoText">Select a report template to be configured. </span>
                     </td>
                 </tr>
+                <tr *ngIf="isROITemplate" class="mat-row-webhook">
+                    <td class="mat-cell" class="columnName">
+                        <span class="mainText">Milestone</span>
+                        <span style="color:#ff0000;">*</span>
+                    </td>
+                    <td class="columnComponent">
+                        <mat-select [disabled]="disableInputFields" [(ngModel)]="selectedMilestone.id"
+                            (ngModelChange)="getMilestoneName()" class="form-control" required placeholder="Select milestone"
+                            color="primary">
+                            <mat-option *ngFor="let milestone of listOfMilestones" [value]="milestone.id" style="color:#0033A0">
+                                {{milestone.mileStoneName}} </mat-option>
+                        </mat-select>
+                    </td>
+                    <td class="extraColCss">
+
+                    </td>
+                    <td>
+                        <span class="infoText">Select a milestone for the report. </span>
+                    </td>
+                </tr>
                 <tr class="mat-row-webhook">
                     <td class="mat-cell" class="columnName">
                         <span class="mainText">Frequency</span>

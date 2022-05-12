@@ -81,8 +81,6 @@ public class ReportEngineEnum {
 		public int getValue() {
 			return value;
 		}
-
-	
 	}
 	
 }

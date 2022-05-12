@@ -25,6 +25,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum.WorkflowSchedule;
 import com.cognizant.devops.platformreports.assessment.datamodel.ContentConfigDefinition;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsContentDetail;
@@ -62,12 +64,12 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 					contentResult.getInferenceText());
 			saveContentResult(contentResult);
 			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+			log.debug(StringExpressionConstants.STR_EXP_TASK,
 					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
 					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
-					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
-					"action :" + contentConfigDefinition.getAction() 
-					+ "ContentResult :" + contentConfigDefinition.getNoOfResult());
+					ConfigOptions.CONTENT_ID + contentConfigDefinition.getContentId() + ConfigOptions.CONTENT_NAME +contentConfigDefinition.getContentName() +
+					ConfigOptions.ACTION + contentConfigDefinition.getAction() 
+					+ contentResult + contentConfigDefinition.getNoOfResult());
 		}
 	}
 
@@ -166,22 +168,22 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 						getContentConfig().getKpiId(), getContentConfig().getContentId(), resultFirstData);
 			}
 			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+			log.debug(StringExpressionConstants.STR_EXP_TASK,
 					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
 					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
-					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
-					"action :" + contentConfigDefinition.getAction() 
-					+ "ContentResult :" + contentConfigDefinition.getNoOfResult());
+					ConfigOptions.CONTENT_ID + contentConfigDefinition.getContentId() + ConfigOptions.CONTENT_NAME +contentConfigDefinition.getContentName() +
+					ConfigOptions.ACTION + contentConfigDefinition.getAction() 
+					+ ConfigOptions.CONTENT_RESULT + contentConfigDefinition.getNoOfResult());
 		} catch (Exception e) {
 			log.error(e);
 			log.error(" Errro while content processing for threshold KPIId {} contentId {} ",
 					getContentConfig().getKpiId(), getContentConfig().getContentId());
-			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+			log.error(StringExpressionConstants.STR_EXP_TASK,
 					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
 					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),0,
-					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
-					"action :" + contentConfigDefinition.getAction() 
-					+ "ContentResult :" + contentConfigDefinition.getNoOfResult() + "Exception while running neo4j operation" + e.getMessage());
+					ConfigOptions.CONTENT_ID + contentConfigDefinition.getContentId() + ConfigOptions.CONTENT_NAME +contentConfigDefinition.getContentName() +
+					ConfigOptions.ACTION + contentConfigDefinition.getAction() 
+					+ ConfigOptions.CONTENT_RESULT + contentConfigDefinition.getNoOfResult() + "Exception while running neo4j operation" + e.getMessage());
 			throw new InsightsJobFailedException("Exception while running neo4j operation {} " + e.getMessage());
 		}
 
@@ -241,23 +243,23 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 			}
 
 			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+			log.debug(StringExpressionConstants.STR_EXP_TASK,
 					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
 					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
-					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
-					"action :" + contentConfigDefinition.getAction() 
-					+ "ContentResult :" + contentConfigDefinition.getNoOfResult());
+					ConfigOptions.CONTENT_ID + contentConfigDefinition.getContentId() + ConfigOptions.CONTENT_NAME  +contentConfigDefinition.getContentName() +
+					ConfigOptions.ACTION + contentConfigDefinition.getAction() 
+					+ ConfigOptions.CONTENT_RESULT + contentConfigDefinition.getNoOfResult());
 			
 		} catch (Exception e) {
 			log.error(e);
 			log.error(" Error while content processing for average threshold KPIId {} contentId {} ",
 					getContentConfig().getKpiId(), getContentConfig().getContentId());
-			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+			log.error(StringExpressionConstants.STR_EXP_TASK,
 					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
 					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),0,
-					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
-					"action :" + contentConfigDefinition.getAction() 
-					+ "ContentResult :" + contentConfigDefinition.getNoOfResult() + "Exception while running neo4j operation" + e.getMessage());
+					ConfigOptions.CONTENT_ID + contentConfigDefinition.getContentId() + ConfigOptions.CONTENT_NAME +contentConfigDefinition.getContentName() +
+					ConfigOptions.ACTION + contentConfigDefinition.getAction() 
+					+ ConfigOptions.CONTENT_RESULT + contentConfigDefinition.getNoOfResult() + "Exception while running neo4j operation" + e.getMessage());
 			
 			throw new InsightsJobFailedException("Exception while running neo4j operation {} " + e.getMessage());
 		}

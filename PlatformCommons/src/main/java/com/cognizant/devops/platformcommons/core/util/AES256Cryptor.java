@@ -32,6 +32,8 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.exception.AES256CryptorException;
+
 public class AES256Cryptor {
 	
 	private AES256Cryptor() {
@@ -61,7 +63,7 @@ public class AES256Cryptor {
 			byte[] saltBytes = generateSalt(8);
 
 			// Derive key and iv from passphrase and salt
-			EvpKDF(passphrase.getBytes(StandardCharsets.UTF_8), keySize, ivSize, saltBytes, key, iv);
+			evpKDF(passphrase.getBytes(StandardCharsets.UTF_8), keySize, ivSize, saltBytes, key, iv);
 
 			// Actual encrypt
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -119,7 +121,7 @@ public class AES256Cryptor {
 			// Get key and iv from passphrase and salt
 			byte[] key = new byte[keySize / 8];
 			byte[] iv = new byte[ivSize / 8];
-			EvpKDF(passphrase.getBytes(StandardCharsets.UTF_8), keySize, ivSize, saltBytes, key, iv);
+			evpKDF(passphrase.getBytes(StandardCharsets.UTF_8), keySize, ivSize, saltBytes, key, iv);
 
 			// Actual decrypt
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -157,12 +159,12 @@ public class AES256Cryptor {
 		return salt;
 	}
 
-	private static byte[] EvpKDF(byte[] password, int keySize, int ivSize, byte[] salt, byte[] resultKey,
+	private static byte[] evpKDF(byte[] password, int keySize, int ivSize, byte[] salt, byte[] resultKey,
 			byte[] resultIv) throws NoSuchAlgorithmException {
-		return EvpKDF(password, keySize, ivSize, salt, 1, "MD5", resultKey, resultIv);
+		return evpKDF(password, keySize, ivSize, salt, 1, "MD5", resultKey, resultIv);
 	}
 
-	private static byte[] EvpKDF(byte[] password, int keySize, int ivSize, byte[] salt, int iterations,
+	private static byte[] evpKDF(byte[] password, int keySize, int ivSize, byte[] salt, int iterations,
 			String hashAlgorithm, byte[] resultKey, byte[] resultIv) throws NoSuchAlgorithmException {
 		keySize = keySize / 32;
 		ivSize = ivSize / 32;
@@ -222,7 +224,7 @@ public class AES256Cryptor {
 	 *            the message digest algorithm to use
 	 * @return an two-element array with the generated key and IV
 	 */
-	public static byte[][] GenerateKeyAndIV(int keyLength, int ivLength, int iterations, byte[] salt, byte[] password,
+	public static byte[][] generateKeyAndIV(int keyLength, int ivLength, int iterations, byte[] salt, byte[] password,
 			MessageDigest md) {
 
 		int digestLength = md.getDigestLength();
@@ -262,7 +264,8 @@ public class AES256Cryptor {
 			return result;
 
 		} catch (DigestException e) {
-			throw new RuntimeException(e);
+			//throw new RuntimeException(e);
+			throw new AES256CryptorException(e);
 
 		} finally {
 			// Clean out temporary data

@@ -19,7 +19,7 @@ Created on Jun 15, 2016
 @author: 146414
 '''
 import pika
-import thread
+import _thread
 import json
 import sys
 
@@ -54,10 +54,10 @@ class MessageFactory:
             channel.queue_declare(queue=queueName, passive=False, durable=True, exclusive=False, auto_delete=False, arguments=self.arguments)
             channel.queue_bind(queue=queueName, exchange=self.exchange, routing_key=routingKey, arguments=None)
             channel.basic_qos(prefetch_count=5)
-            channel.basic_consume(routingKey,callback,auto_ack=False)
+            channel.basic_consume(routingKey,callback)
             channel.start_consuming()
         if seperateThread:
-            thread.start_new_thread(subscriberThread, ())
+            _thread.start_new_thread(subscriberThread, ())
         else:
             subscriberThread()
             

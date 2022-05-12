@@ -189,7 +189,7 @@ public class WebhookEngineTest {
 	public void cleanUp() {
 
 		// Cleaning Postgre 
-		webhookConfigDAL.deleteWebhookConfigurations(p.getProperty("webhookName"));
+		webhookConfigDAL.deleteWebhookConfigurations(webhookEngineTestData.webhookName);
 		//webhookConfigDAL.deleteWebhookConfigurations(webhookEngineTestData.webhookNameException);
 		// Cleaning Neo4J 
 		GraphDBHandler dbHandler = new GraphDBHandler();

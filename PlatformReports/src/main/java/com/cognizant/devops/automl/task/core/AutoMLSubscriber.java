@@ -26,6 +26,9 @@ import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.automl.task.util.AutoMLExecutor;
+import com.cognizant.devops.platformcommons.constants.ErrorMessage;
+import com.cognizant.devops.platformcommons.constants.ReportStatusConstants;
+import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
 import com.cognizant.devops.platformcommons.core.enums.AutoMLEnum;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformdal.autoML.AutoMLConfig;
@@ -46,8 +49,8 @@ public class AutoMLSubscriber extends WorkflowTaskSubscriberHandler {
 	private WorkflowDAL workflowDAL = new WorkflowDAL();
 	private AutoMLConfigDAL autoMlDAL = new AutoMLConfigDAL();
 	private AutoMLConfig autoMlConfig=null;
-
 	private long executionId;
+	
 
 	public AutoMLSubscriber(String routingKey) throws Exception {
 		super(routingKey);
@@ -73,8 +76,7 @@ public class AutoMLSubscriber extends WorkflowTaskSubscriberHandler {
 				mlTaskToExecute.add(autoMLExecutor);
 				/* segregate entire automl execution list into defined chunks */
 				List<List<Callable<JsonObject>>> kpiChunkList = WorkflowThreadPool.getChunk(mlTaskToExecute, 1);
-				log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
-						executionId,autoMlConfig.getWorkflowConfig().getWorkflowId(),"-",autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",0,
+				log.debug(StringExpressionConstants.STR_EXP_TASKEXECUTION,executionId,autoMlConfig.getWorkflowConfig().getWorkflowId(),"-",autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",0,
 						" ModelId :" +autoMlConfig.getModelId() + " UsecaseName :" +autoMlConfig.getUseCaseName() + " PredictionColumn : " +autoMlConfig.getPredictionColumn() +
 						" PredictionType :" +autoMlConfig.getPredictionType()  
 	 					+ " TrainingPercentage : " + autoMlConfig.getTrainingPerc() + " status : " + autoMlConfig.getStatus());
@@ -87,31 +89,29 @@ public class AutoMLSubscriber extends WorkflowTaskSubscriberHandler {
 			}
 		} catch (InsightsJobFailedException e) {
 			log.error("Worlflow Detail ==== InsightsJobFailedException ====  ", e);
-			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
-					executionId,autoMlConfig.getWorkflowConfig().getWorkflowId(),"-",autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",0,
-					"ModelId :" +autoMlConfig.getModelId() + " UsecaseName :" +autoMlConfig.getUseCaseName() + " PredictionColumn : " +autoMlConfig.getPredictionColumn() +
-					"predictionType :" +autoMlConfig.getPredictionType()  
- 					+ "trainingPercentage : " + autoMlConfig.getTrainingPerc() + "status : " + autoMlConfig.getStatus() + "Auto ML task failed to execute" +e.getMessage());
+			log.error(StringExpressionConstants.STR_EXP_TASKEXECUTION,executionId,autoMlConfig.getWorkflowConfig().getWorkflowId(),"-",autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",0,
+					ReportStatusConstants.MODELID +autoMlConfig.getModelId() + " UsecaseName :" +autoMlConfig.getUseCaseName() + " PredictionColumn : " +autoMlConfig.getPredictionColumn() +
+					ReportStatusConstants.PREDICTIONTYPE +autoMlConfig.getPredictionType()  
+ 					+ ReportStatusConstants.TRAININGPERCENTAGE + autoMlConfig.getTrainingPerc() + ReportStatusConstants.STATUS+ autoMlConfig.getStatus() + "Auto ML task failed to execute" +e.getMessage());
 			throw new InsightsJobFailedException("Auto ML task failed to execute " + e.getMessage());
 		} catch (Exception e) {
 			JsonObject response = new JsonObject();
 			response.addProperty("Status", "Failure");
-			response.addProperty("errorLog", e.getMessage());
+			response.addProperty(ErrorMessage.ERRORLOG, e.getMessage());
 			failedJobs.add(response);
 			updateFailedTaskStatusLog(failedJobs);
-			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
+			log.error(StringExpressionConstants.STR_EXP_TASKEXECUTION,
 					executionId,autoMlConfig.getWorkflowConfig().getWorkflowId(),"-",autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",0,
-					"ModelId :" +autoMlConfig.getModelId() + "UsecaseName :" +autoMlConfig.getUseCaseName() + "PredictionColumn : " +autoMlConfig.getPredictionColumn() 
-					 +"predictionType :" +autoMlConfig.getPredictionType()
-					+ "trainingPercentage : " + autoMlConfig.getTrainingPerc() + "status : " + autoMlConfig.getStatus() + e.getMessage());
+					ReportStatusConstants.MODELID +autoMlConfig.getModelId() + ReportStatusConstants.USECASENAME +autoMlConfig.getUseCaseName() + ReportStatusConstants.PREDICTIONCOLUMN +autoMlConfig.getPredictionColumn() 
+					 +ReportStatusConstants.PREDICTIONTYPE +autoMlConfig.getPredictionType()
+					+ ReportStatusConstants.TRAININGPERCENTAGE + autoMlConfig.getTrainingPerc() + ReportStatusConstants.STATUS+ autoMlConfig.getStatus() + e.getMessage());
 		}
 		long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
 		log.debug("Worlflow Detail ==== AutoML task completed successfully.");
-		log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
-				executionId,autoMlConfig.getWorkflowConfig().getWorkflowId(),"-",autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",processingTime,
-				"ModelId :" +autoMlConfig.getModelId() + "UsecaseName :" +autoMlConfig.getUseCaseName() + "PredictionColumn : " +autoMlConfig.getPredictionColumn()
-				 +"predictionType :" +autoMlConfig.getPredictionType()
-				+ "trainingPercentage : " + autoMlConfig.getTrainingPerc() + "status : " + autoMlConfig.getStatus() + " AutoML task completed successfully.");
+		log.debug(StringExpressionConstants.STR_EXP_TASKEXECUTION,executionId,autoMlConfig.getWorkflowConfig().getWorkflowId(),"-",autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",processingTime,
+				ReportStatusConstants.MODELID +autoMlConfig.getModelId() + ReportStatusConstants.USECASENAME +autoMlConfig.getUseCaseName() + ReportStatusConstants.PREDICTIONCOLUMN +autoMlConfig.getPredictionColumn()
+				 +ReportStatusConstants.PREDICTIONTYPE +autoMlConfig.getPredictionType()
+				+ ReportStatusConstants.TRAININGPERCENTAGE + autoMlConfig.getTrainingPerc() + ReportStatusConstants.STATUS + autoMlConfig.getStatus() + " AutoML task completed successfully.");
 	}
 
 	private void executeAutoMLChunks(List<List<Callable<JsonObject>>> chunkList, List<JsonObject> failedJobs)
@@ -136,20 +136,19 @@ public class AutoMLSubscriber extends WorkflowTaskSubscriberHandler {
 		long startTime = System.nanoTime();
 		JsonObject statusObject = new JsonObject();
 		JsonArray errorLog = new JsonArray();
-		failedJobs.forEach(failedJob -> errorLog.add(failedJob.get("errorLog").getAsString()));
+		failedJobs.forEach(failedJob -> errorLog.add(failedJob.get(ErrorMessage.ERRORLOG).getAsString()));
 		statusObject.addProperty("executionId", executionId);
 		statusObject.addProperty("workflowId", workflowConfig.getWorkflowId());
-		statusObject.add("errorLog", errorLog);
+		statusObject.add(ErrorMessage.ERRORLOG, errorLog);
 		autoMlConfig.setStatus(AutoMLEnum.Status.ERROR.name());
 		autoMlDAL.updateMLConfig(autoMlConfig);
 		// statusLog set here which is class variable of WorkflowTaskSubscriberHandler
 		statusLog = new Gson().toJson(statusObject);
 		long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-		log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
-				executionId,autoMlConfig.getWorkflowConfig().getWorkflowId(),"-",autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",processingTime,
-				"ModelId :" +autoMlConfig.getModelId() + "UsecaseName :" +autoMlConfig.getUseCaseName() + "PredictionColumn : " +autoMlConfig.getPredictionColumn()
-				 +"predictionType :" +autoMlConfig.getPredictionType()
-				+ "trainingPercentage : " + autoMlConfig.getTrainingPerc() + "status : " + autoMlConfig.getStatus() + "AutoML task failed to execute ");
+		log.error(StringExpressionConstants.STR_EXP_TASKEXECUTION,executionId,autoMlConfig.getWorkflowConfig().getWorkflowId(),"-",autoMlConfig.getWorkflowConfig().getWorkflowType(),"-","-",processingTime,
+				ReportStatusConstants.MODELID +autoMlConfig.getModelId() + ReportStatusConstants.USECASENAME +autoMlConfig.getUseCaseName() + ReportStatusConstants.PREDICTIONCOLUMN +autoMlConfig.getPredictionColumn()
+				 +ReportStatusConstants.PREDICTIONTYPE +autoMlConfig.getPredictionType()
+				+ ReportStatusConstants.TRAININGPERCENTAGE + autoMlConfig.getTrainingPerc() + ReportStatusConstants.STATUS + autoMlConfig.getStatus() + "AutoML task failed to execute ");
 		throw new InsightsJobFailedException("AutoML task failed to execute  " + statusLog);
 		
 	}

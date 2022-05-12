@@ -33,7 +33,9 @@ import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscri
 import com.cognizant.devops.engines.util.EngineUtils;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.AgentCommonConstant;
 import com.cognizant.devops.platformcommons.constants.DataArchivalConstants;
+import com.cognizant.devops.platformcommons.constants.EngineConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -44,6 +46,7 @@ import com.cognizant.devops.platformdal.dataArchivalConfig.InsightsDataArchivalC
 import com.google.gson.JsonObject;
 
 public class DataArchivalAggregatorModule implements Job, ApplicationConfigInterface {
+	
 	private static Logger log = LogManager.getLogger(DataArchivalAggregatorModule.class);
 	private static Map<String, EngineSubscriberResponseHandler> registry = new HashMap<>();
 	AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
@@ -81,10 +84,10 @@ public class DataArchivalAggregatorModule implements Job, ApplicationConfigInter
 			JsonObject config = JsonUtils.parseStringAsJsonObject(agentConfig.getAgentJson());
 			JsonObject publishJson = config.get("publish").getAsJsonObject();
 			String dataRoutingKey = publishJson.get("data").getAsString();
-			loggingInfo.put("toolName", String.valueOf(config.get("toolName")));
-			loggingInfo.put("category", String.valueOf(config.get("toolCategory")));
-			loggingInfo.put("agentId", String.valueOf(config.get("agentId")));
-			loggingInfo.put("routingKey", dataRoutingKey);
+			loggingInfo.put(AgentCommonConstant.TOOLNAME, String.valueOf(config.get(AgentCommonConstant.TOOLNAME)));
+			loggingInfo.put(AgentCommonConstant.CATEGORY, String.valueOf(config.get("toolCategory")));
+			loggingInfo.put(AgentCommonConstant.AGENTID, String.valueOf(config.get(AgentCommonConstant.AGENTID)));
+			loggingInfo.put(EngineConstants.ROUTING_KEY, dataRoutingKey);
 			registerDataAggregator(dataRoutingKey);
 			String healthRoutingKey = publishJson.get("health").getAsString();
 			registerHealthAggregator(healthRoutingKey);
@@ -113,22 +116,20 @@ public class DataArchivalAggregatorModule implements Job, ApplicationConfigInter
 			}
 		} else {
 			log.debug("No archival records are currently on due to expire");
-		}
-
-		
+		}	
 	}
 
 	private void registerDataAggregator(String dataRoutingKey) {
 
 		if (dataRoutingKey != null && !registry.containsKey(dataRoutingKey)) {
 			try {
-				registry.put(dataRoutingKey, new DataArchivalDataSubscriber(dataRoutingKey,loggingInfo.get("agentId")));
-				log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Data archival data queue {} subscribed successfully ",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),loggingInfo.get("routingKey"),"-",dataRoutingKey);
+				registry.put(dataRoutingKey, new DataArchivalDataSubscriber(dataRoutingKey,loggingInfo.get(AgentCommonConstant.AGENTID)));
+				log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Data archival data queue {} subscribed successfully ",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),loggingInfo.get(EngineConstants.ROUTING_KEY),"-",dataRoutingKey);
 				EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
 						" Data archival data queue " + dataRoutingKey + " subscribed successfully ",
 						PlatformServiceConstants.SUCCESS,jobName);
 			} catch (Exception e) {
-				log.error(" toolName={} category={} agentId={} routingKey={} Unable to add subscriber for routing key:{} ",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),loggingInfo.get("routingKey"),dataRoutingKey, e);
+				log.error(" toolName={} category={} agentId={} routingKey={} Unable to add subscriber for routing key:{} ",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),loggingInfo.get(EngineConstants.ROUTING_KEY),dataRoutingKey, e);
 				EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
 						" Error occured while executing aggragator for data queue subscriber " + e.getMessage(),
 						PlatformServiceConstants.FAILURE,jobName);
@@ -141,12 +142,12 @@ public class DataArchivalAggregatorModule implements Job, ApplicationConfigInter
 		if (healthRoutingKey != null && !registry.containsKey(healthRoutingKey)) {
 			try {
 				registry.put(healthRoutingKey, new DataArchivalHealthSubscriber(healthRoutingKey));
-				log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Data archival health queue {} subscribed successfully ",loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),healthRoutingKey,"-",healthRoutingKey);
+				log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Data archival health queue {} subscribed successfully ",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),healthRoutingKey,"-",healthRoutingKey);
 				EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
 						" Data Archival Agent health queue " + healthRoutingKey + " subscribed successfully ",
 						PlatformServiceConstants.SUCCESS,jobName);
 			} catch (Exception e) {
-				log.error(" toolName={} category={} agentId={} routingKey={} Unable to add subscriber for routing key:{}" ,loggingInfo.get("toolName"),loggingInfo.get("category"),loggingInfo.get("agentId"),healthRoutingKey,healthRoutingKey, e);
+				log.error(" toolName={} category={} agentId={} routingKey={} Unable to add subscriber for routing key:{}" ,loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),healthRoutingKey,healthRoutingKey, e);
 				EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
 						" Error occured while executing aggregator for Data archival health queue subscriber  "
 								+ e.getMessage(),
@@ -154,5 +155,4 @@ public class DataArchivalAggregatorModule implements Job, ApplicationConfigInter
 			}
 		}
 	}
-
 }

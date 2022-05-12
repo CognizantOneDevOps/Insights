@@ -32,7 +32,6 @@ public class DataEnrichmentModel  {
 	private long queryProcessingTime;
 	private String cronSchedule;
 	
-	
 	public String getQueryName() {
 		return queryName;
 	}
@@ -75,7 +74,4 @@ public class DataEnrichmentModel  {
 	public void setCronSchedule(String cronSchedule) {
 		this.cronSchedule = cronSchedule;
 	}
-	
-	
-
 }

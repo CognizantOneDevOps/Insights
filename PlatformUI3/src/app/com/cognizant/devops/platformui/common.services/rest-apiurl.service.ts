@@ -220,6 +220,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("LIST_REPORT_TEMPLATE", '/PlatformService/insights/report/getAllReportTemplate');
         this.addEndPoint("LIST_TEMPLATE_KPI", '/PlatformService/insights/report/getReportTemplateKpiDetails');
         this.addEndPoint("GET_VISUALIZATION_UTIL", '/PlatformService/insights/report/getVisualizationUtil');
+        this.addEndPoint("GET_TEMPLATE_TYPE", '/PlatformService/insights/report/getTemplateType');
         this.addEndPoint("GET_VTYPE_LIST", '/PlatformService/insights/report/getChartType');
         this.addEndPoint("SAVE_REPORT_TEMPLATE", '/PlatformService/insights/report/saveReportTemplate');
         this.addEndPoint("DELETE_REPORT_TEMPLATE", '/PlatformService/insights/report/deleteReportTemplate');

@@ -46,7 +46,6 @@ public class Application implements ApplicationConfigInterface {
 	public static final String JOBCORN ="0 */20 * ? * *";
 	public static final String CLEANUP_JOBCORN ="0 0,45 23 ? * * *";
 	
-
 	public static void main(String[] args) {
 
 		try {

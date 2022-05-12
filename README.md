@@ -4,9 +4,9 @@ Why do we need InSights?
 
 Get real-time insights and end-to-end traceability for DevOps across enterprise software delivery pipeline, using customized analytics along with correlation engines.
 
-Cognizant OneDevOpsTM | InSights interacts in real-time with various tools that work in silos, identifies bottlenecks and provides enterprise IT leaders the capability to measure ROI for DevOps implementations. In turn, enterprises can continuously improve DevOps adoption by benchmarking the existing maturity levels and tool chain effectiveness. OneDevOpsTM | InSights is compatible with any DevOps tool which is REST API compliant.
+Cognizant® Cloud Acceleration Platform Insights (Formally OneDevOpsTM | InSights) interacts in real-time with various tools that work in silos, identifies bottlenecks and provides enterprise IT leaders the capability to measure ROI for DevOps implementations. In turn, enterprises can continuously improve DevOps adoption by benchmarking the existing maturity levels and tool chain effectiveness. CCAP InSights is compatible with any DevOps tool which is REST API compliant.
 
-Cognizant OneDevOpsTM | Insights is distributed under the Apache 2.0 license. https://www.apache.org/licenses/LICENSE-2.0
+Cognizant® Cloud Acceleration Platform Insights is distributed under the Apache 2.0 license. https://www.apache.org/licenses/LICENSE-2.0
 
 For installation instruction please refer to the link -> https://onedevops.atlassian.net/wiki/spaces/OI/pages/211638/Installation+of+InSights
 
@@ -16,6 +16,7 @@ For information on the latest features and updates please refer to the below men
 
 
 Latest Major Release Updates :  
-
-Grafana v8.3.3 support
-Log4j vulnerabilities fixies with v2.17.1
+- Java 11
+- Grafana v8.4.3 support
+- Spring Framework versions CVE-2022-22963 vulnerability fix
+- Log4j vulnerabilities fix with v2.17.2

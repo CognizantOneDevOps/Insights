@@ -36,8 +36,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class Util {
-
-    
+ 
     private static File f = new File("tracking.json");
     private static Logger log = LogManager.getLogger(Util.class);
     private static InsightsAuditImpl insightAuditImpl = null;

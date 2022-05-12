@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.ui.healthcheck;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -40,7 +41,7 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 
 	private static final Logger log = LogManager.getLogger(HealthCheckConfiguration.class);
 
-	WebDriverWait wait = new WebDriverWait(driver, 20);
+	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
 	public HealthCheckConfiguration() {
 		PageFactory.initElements(driver, this);
@@ -881,7 +882,7 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 	 * @return size of list of web elements
 	 */
 	public static int visibilityOfAllElements(List<WebElement> element, int timeout) {
-		new WebDriverWait(driver, timeout).until(ExpectedConditions.visibilityOfAllElements(element));
+		new WebDriverWait(driver, Duration.ofSeconds(timeout)).until(ExpectedConditions.visibilityOfAllElements(element));
 		return element.size();
 	}
 
@@ -893,7 +894,7 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 	 * @return true if element is displayed else false
 	 */
 	public static boolean visibilityOf(WebElement element, int timeout) {
-		new WebDriverWait(driver, timeout).until(ExpectedConditions.visibilityOf(element));
+		new WebDriverWait(driver, Duration.ofSeconds(timeout)).until(ExpectedConditions.visibilityOf(element));
 		return element.isDisplayed();
 	}
 
@@ -904,7 +905,7 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 	 * @param timeout
 	 */
 	public static void clickOn(WebElement element, int timeout) {
-		new WebDriverWait(driver, timeout).until(ExpectedConditions.elementToBeClickable(element));
+		new WebDriverWait(driver, Duration.ofSeconds(timeout)).until(ExpectedConditions.elementToBeClickable(element));
 		element.click();
 	}
 

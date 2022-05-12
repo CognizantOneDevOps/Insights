@@ -16,9 +16,11 @@
 package com.cognizant.devops.platformreports.test;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -31,12 +33,20 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.testng.SkipException;
+import org.testng.annotations.DataProvider;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.EmailConfiguration;
+import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
+import com.cognizant.devops.platformcommons.core.util.AES256Cryptor;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
+import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -48,6 +58,10 @@ import com.cognizant.devops.platformdal.assessmentreport.InsightsKPIConfig;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportTemplateConfigFiles;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportsKPIConfig;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
+import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
+import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFilesDAL;
+import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfigDAL;
+import com.cognizant.devops.platformdal.grafana.pdf.GrafanaOrgToken;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowExecutionHistory;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
@@ -63,7 +77,9 @@ import com.cognizant.devops.platformworkflow.workflowtask.message.factory.Workfl
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 
 public class AssessmentReportsTestData {
 	private static Logger log = LogManager.getLogger(AssessmentReportsTestData.class.getName());
@@ -71,50 +87,58 @@ public class AssessmentReportsTestData {
 	ClassLoader classLoader = ClassLoader.getSystemClassLoader();
 	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
 	WorkflowDAL workflowDAL = new WorkflowDAL();
-	
+	GrafanaHandler grafanaHandler = new GrafanaHandler();
+	GrafanaDashboardPdfConfigDAL grafanaDashboardConfigDAL = new GrafanaDashboardPdfConfigDAL();
+	Map<String, String> testAuthData = new HashMap<>();
+	Map<String, String> headers = new HashMap<>();
 	int reportIdProdRT = 300600;
 	int reportIdSonarRT = 300601;
 	int reportIdkpiRT = 300602;
 	int reportIdkpisRT = 300603;
 	int workflowTypeId = 0;
 	boolean deleteWorkflowType = false;
-	String fusionExportUrl = null;
+	String grafanaPDFExportUrl = null;
 	String smtpHostServer = null;
-
+	int id;
 	String taskKpiExecution = "{\"description\":\"TEST.REPORT_KPI_Execute\",\"mqChannel\":\"TEST.WORKFLOW.TASK.KPI.EXCECUTION\",\"componentName\":\"com.cognizant.devops.platformreports.assessment.core.ReportKPISubscriber\",\"dependency\":1,\"workflowType\":\"Report\"}";
 	String taskPDFExecution = "{\"description\":\"TEST.REPORT_PDF_Execute\",\"mqChannel\":\"TEST.WORKFLOW.TASK.PDF.EXCECUTION\",\"componentName\":\"com.cognizant.devops.platformreports.assessment.core.PDFExecutionSubscriber\",\"dependency\":2,\"workflowType\":\"Report\"}";
 	String taskEmailExecution = "{\"description\":\"TEST.REPORT_EMAIL_Execute\",\"mqChannel\":\"TEST.WORKFLOW.TASK.EMAIL.EXCECUTION\",\"componentName\":\"com.cognizant.devops.platformreports.assessment.core.ReportEmailSubscriber\",\"dependency\":3,\"workflowType\":\"Report\"}";
 	String taskSystemHealthNotificationExecution = "{\"description\":\"TEST.SystemNotification_Execute\",\"mqChannel\":\"TEST.WORKFLOW.SYSTEM_TASK.SYSTEMNOTIFICATION.EXECUTION\",\"componentName\":\"com.cognizant.devops.platformreports.assessment.core.SystemNotificationDetailSubscriber\",\"dependency\":100,\"workflowType\":\"SYSTEM\"}";
 	String taskSystemEmailNotificationExecution = "{\"description\":\"TEST.Email_Execute\",\"mqChannel\":\"TEST.WORKFLOW.SYSTEM_TASK.EMAIL.EXECUTION\",\"componentName\":\"com.cognizant.devops.platformreports.assessment.core.ReportEmailSubscriber\",\"dependency\":101,\"workflowType\":\"SYSTEM\"}";
-	
-	String reportTemplatekpi = "{\"reportName\":\"Testing_fail\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":100127,\"visualizationConfigs\":[{\"vType\":\"mscolumn2d_100127\",\"vQuery\":\"MATCH (n:KPI:RESULTS) where n.reportId = 602 and n.kpiId=127 RETURN n.SPKendTime as SPKendTime , n.MaxBuildTime as MaxBuildTime LIMIT 5\"}]}]}";
-	String reportTemplatekpis = "{\"reportName\":\"Testing_fail_queries\",\"description\":\"Testing_queries\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":100161,\"visualizationConfigs\":[{\"vType\":\"100161_line\",\"vQuery\":\"\"}]},{\"kpiId\":100153,\"visualizationConfigs\":[{\"vType\":\"100153_line\",\"vQuery\":\"\"}]}]}";
 
+	String reportTemplatekpi = "{\"reportName\":\"Testing_fail\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"GRAFANAPDF\",\"kpiConfigs\":[{\"kpiId\":100127,\"visualizationConfigs\":[{\"vType\":\"Table_100127\",\"vQuery\":\"\"}]}]}";
+	String reportTemplatekpis = "{\"reportName\":\"Testing_fail_queries\",\"description\":\"Testing_queries\",\"isActive\":true,\"visualizationutil\":\"GRAFANAPDF\",\"kpiConfigs\":[{\"kpiId\":100127,\"visualizationConfigs\":[{\"vType\":\"Table_100127\",\"vQuery\":\"\"}]},{\"kpiId\":100161,\"visualizationConfigs\":[{\"vType\":\"Table_100161\",\"vQuery\":\"\"}]}]}";
+	
 	JsonObject reportTemplateJson = JsonUtils.parseStringAsJsonObject(reportTemplatekpi);
 	JsonObject reportTemplateKpisJson = JsonUtils.parseStringAsJsonObject(reportTemplatekpis);
 
-	String assessmentReportWithEmail = "{\"reportName\":\"report_Email_test10002154\",\"reportTemplate\":" + reportIdProdRT + ",\"emailList\":\"abc@abc.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"startdate\":\"2020-05-12T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"emailDetails\": {\"senderEmailAddress\":\"abc@abc.com\",\"receiverEmailAddress\":\"abcd@abcd.com\",\"receiverCCEmailAddress\":\"sb@sb.com\",\"receiverBCCEmailAddress\":\"sb@sb.com\",\"mailSubject\":\"Sub_mail\",\"mailBodyTemplate\":\"sending a mail for report\"},\"asseementreportdisplayname\":\"Report_test\"}";
-	String assessmentReportWithoutEmail = "{\"reportName\":\"report_test100021548\",\"reportTemplate\":" + reportIdProdRT + ",\"emailList\":\"abc@abc.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"startdate\":\"2020-05-12T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-	String assessmentReportFail = "{\"reportName\":\"report_test_Sonar100064032\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":" + reportIdSonarRT + ",\"emailList\":\"abc@abc.com\",\"schedule\":\"QUARTERLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-	String assessmentReportWrongkpi = "{\"reportName\":\"report_test_10083556935\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":" + reportIdkpiRT + ",\"emailList\":\"abc@abc.com\",\"schedule\":\"MONTHLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-	String assessmentReportWrongkpis = "{\"reportName\":\"report_test_10083563542\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":" + reportIdkpisRT + ",\"emailList\":\"abc@abc.com\",\"schedule\":\"MONTHLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-	String assessmentReport = "{\"reportName\":\"report_test100021547\",\"reportTemplate\":" + reportIdProdRT + ",\"emailList\":\"abc@abc.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"startdate\":\"2020-05-12T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"emailDetails\":null,\"asseementreportdisplayname\":\"Report_test\"}";
+	String assessmentReportWithEmail = "{\"reportName\":\"report_Email_test10002154\",\"reportTemplate\":" + reportIdProdRT + ",\"emailList\":\"abc@abc.com\",\"vUtil\":\"GRAFANAPDF\",\"schedule\":\"ONETIME\",\"startdate\":\"2022-03-04T00:00:00Z\",\"enddate\":\"2022-04-04T00:00:00Z\",\"isReoccuring\":false,\"datasource\":\"\",\"emailDetails\": {\"senderEmailAddress\":\"abc@abc.com\",\"receiverEmailAddress\":\"abcd@abcd.com\",\"receiverCCEmailAddress\":\"sb@sb.com\",\"receiverBCCEmailAddress\":\"sb@sb.com\",\"mailSubject\":\"Sub_mail\",\"mailBodyTemplate\":\"sending a mail for report\"},\"asseementreportdisplayname\":\"Report_test\"}";
+	String assessmentReportWithoutEmail = "{\"reportName\":\"report_test100021548\",\"reportTemplate\":" + reportIdProdRT + ",\"emailList\":\"abc@abc.com\",\"vUtil\":\"GRAFANAPDF\",\"schedule\":\"ONETIME\",\"startdate\":\"2022-03-04T00:00:00Z\",\"enddate\":\"2022-04-04T00:00:00Z\",\"isReoccuring\":false,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+	String assessmentReportFail = "{\"reportName\":\"report_test_Sonar100064032\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":" + reportIdSonarRT + ",\"vUtil\":\"GRAFANAPDF\",\"emailList\":\"abc@abc.com\",\"schedule\":\"QUARTERLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+	String assessmentReportWrongkpi = "{\"reportName\":\"report_test_10083556935\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":" + reportIdkpiRT + ",\"vUtil\":\"GRAFANAPDF\",\"emailList\":\"abc@abc.com\",\"schedule\":\"MONTHLY\",\"startdate\":null,\"enddate\":\"2022-04-04T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+	String assessmentReportWrongkpis = "{\"reportName\":\"report_test_10083563542\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":" + reportIdkpisRT + ",\"vUtil\":\"GRAFANAPDF\",\"emailList\":\"abc@abc.com\",\"schedule\":\"MONTHLY\",\"startdate\":null,\"enddate\":\"2022-04-04T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+	String assessmentReport = "{\"reportName\":\"report_test100021547\",\"reportTemplate\":" + reportIdProdRT + ",\"emailList\":\"abc@abc.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"vUtil\":\"GRAFANAPDF\",\"startdate\":\"2022-03-12T00:00:00Z\",\"enddate\":\"2022-04-04T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"emailDetails\":null,\"asseementreportdisplayname\":\"Report_test\"}";
 
 	String mqChannelKpiExecution = "TEST.WORKFLOW.TASK.KPI.EXCECUTION";
 	String mqChannelPDFExecution = "TEST.WORKFLOW.TASK.PDF.EXCECUTION";
 	String mqChannelEmailExecution = "TEST.WORKFLOW.TASK.EMAIL.EXCECUTION";
 	String mqChannelSystemHealthNotificationExecution = "TEST.WORKFLOW.SYSTEM_TASK.SYSTEMNOTIFICATION.EXECUTION";
 	String mqChannelSystemEmailExecution = "TEST.WORKFLOW.SYSTEM_TASK.EMAIL.EXECUTION";
+	static String tableData = "{\"datasource\":\"Neo4jDataSource\",\"description\":\"\",\"fieldConfig\":{\"defaults\":{\"color\":{\"mode\":\"thresholds\"},\"custom\":{\"align\":\"auto\",\"displayMode\":\"auto\"},\"mappings\":[],\"thresholds\":{\"mode\":\"absolute\",\"steps\":[{\"color\":\"blue\",\"value\":null}]}},\"overrides\":[]},\"gridPos\":{\"h\":9,\"w\":12,\"x\":0,\"y\":18},\"id\":null,\"options\":{\"showHeader\":true},\"pluginVersion\":\"8.1.3\",\"targets\":[{\"cache\":false,\"cacheType\":false,\"cacheValue\":false,\"constant\":6.5,\"fixTime\":false,\"graph\":false,\"queryText\":\"\",\"raw\":false,\"refId\":\"A\",\"stats\":false,\"table\":true,\"timeseries\":false,\"varTime\":false}],\"title\":\"\",\"type\":\"table\"}";
 	
 	public static String workflowIdProd = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "10000567276";
 	public static String workflowIdWithEmail = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "10000567999";
 	public static String workflowIdWithoutEmail = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "10000568296";
 	public static String workflowIdFail = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "10000640327";
-	public static String workflowIdWrongkpi = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "10000835535";
+	public static String workflowIdWrongkpi = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "10083556935";
 	public static String workflowIdWrongkpis = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "1000083563542";
     public static String healthNotificationWorkflowId = WorkflowTaskEnum.WorkflowType.SYSTEM.getValue() + "_" + "HealthNotificationTest";
 	public static long nextRunDaily;
 	public static long nextRunBiWeekly;
+	private static final String NAME = "name";
+	private static final String PDFTOKEN = "Testpdftoken";
+	private static final String ADMIN = "Admin";
+	private static final String ROLE = "role";
 
 	String querySonar = "MATCH (n:SONAR:DATA) where n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKstatus='Success' RETURN  COALESCE(Avg(toInt(n.SPKcomplexity)),0) as AvgComplexityCoverage";
 	String queryJira = "MATCH (n:JIRA:DATA) WHERE n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKissueType='Bug' and n.SPKstatus='Closed'  RETURN count(n) as ClosedDefect";
@@ -125,6 +149,8 @@ public class AssessmentReportsTestData {
 	public static List<Integer> taskidList = new ArrayList<>();
 	public static List<Integer> contentIdList = new ArrayList<>();
 	public static List<Integer> kpiIdList = new ArrayList<>();
+	String username;
+	String credential;
 	
 	String[] templateDesignFilesArray = {"REPORT_SONAR_JENKINS_PROD.json", "REPORT_SONAR_JENKINS_PROD.html", "style.css", "image.webp"};
 
@@ -284,7 +310,129 @@ public class AssessmentReportsTestData {
 		}
 		return taskId;
 	}
+	
+	public void uploadReportTemplateFile(int reportId, InsightsAssessmentReportTemplate reportEntity, String fileType,
+			String filename, byte[] file) {
+		InsightsReportTemplateConfigFiles templateFile = reportConfigDAL
+				.getReportTemplateConfigFileByFileNameAndReportId(filename,
+						reportEntity.getReportId());
+		if (templateFile == null) {
+			InsightsReportTemplateConfigFiles record = new InsightsReportTemplateConfigFiles();
+			record.setFileName(filename);
+			record.setFileData(file);
+			record.setFileType(fileType);
+			record.setReportId(reportId);
+			reportConfigDAL.saveReportTemplateConfigFiles(record);
+		} else {
+			templateFile.setFileData(file);
+			reportConfigDAL.updateReportTemplateConfigFiles(templateFile);
+		}
+	}
+	public JsonObject fetchTemplateJson(String filename) throws InsightsCustomException {
+		JsonObject templateJson = null;
+		try {
+			File templateFile = new File(getClass().getClassLoader().getResource(filename).getFile());
+			String template = new String(Files.readAllBytes(templateFile.toPath()));
+			templateJson = JsonUtils.parseStringAsJsonObject(template);
+		} catch (Exception e) {
+			log.error("Error while fetching template JSON ====", e);
+			throw new InsightsCustomException(e.getMessage());
+		}
+		return templateJson;
+	}
+	public static InsightsConfigFiles createConfigFileData() {
+		InsightsConfigFiles configFile = new InsightsConfigFiles();
+		configFile.setFileName("Table");
+		configFile.setFileType("JSON");
+		configFile.setFileModule("GRAFANA_PDF_TEMPLATE");
+		configFile.setFileData(tableData.getBytes());
+		return configFile;
+	}
 
+	public JsonObject preparePanelJson(String vType, String vQuery, String title, int id) throws InsightsCustomException {
+			JsonObject panelTemplateJson = null;
+			try {
+				InsightsConfigFilesDAL configFilesDAL = new InsightsConfigFilesDAL();
+				byte[] panelTemplateByte = configFilesDAL.getConfigurationFile(vType).getFileData();
+				String template = new String(panelTemplateByte);
+				panelTemplateJson = JsonUtils.parseStringAsJsonObject(template);
+				panelTemplateJson.addProperty("title",title);
+				panelTemplateJson.addProperty("id",id);
+				panelTemplateJson.addProperty("datasource", "Neo4j Data Source");
+				panelTemplateJson.getAsJsonArray(AssessmentReportAndWorkflowConstants.TARGETS).get(0).getAsJsonObject()
+				.addProperty(AssessmentReportAndWorkflowConstants.QUERYTEXT, vQuery);
+				
+			} catch (Exception e) {
+				log.error("Error while preparing panel JSON ====", e);
+				throw new InsightsCustomException(e.getMessage());
+			}
+			return panelTemplateJson;
+		}
+	
+	public JsonObject prepareContentPanelJson(String vType, String title, boolean isContentEmpty, int kpiId, int id ) throws InsightsCustomException {
+			JsonObject panelTemplateJson = null;
+			String vQuery = "";
+			try {
+				panelTemplateJson = fetchTemplateJson(vType+".json");
+				panelTemplateJson.addProperty("title",title);
+				panelTemplateJson.addProperty("id",id);
+				panelTemplateJson.addProperty("datasource", "Neo4j Data Source");
+				if(!isContentEmpty) {
+					vQuery = panelTemplateJson.getAsJsonArray("targets").get(0).getAsJsonObject().get("queryText").getAsString(); 
+					vQuery = vQuery.replace("{kpiId}", String.valueOf(kpiId));
+				}
+				panelTemplateJson.getAsJsonArray("targets").get(0).getAsJsonObject().addProperty("queryText", vQuery);
+				
+			} catch (Exception e) {
+				log.error("Error while preparing panel JSON ====", e);
+				throw new InsightsCustomException(e.getMessage());
+			}
+			return panelTemplateJson;
+		}
+	public JsonObject createDashboardJson(JsonObject templateReportJson) throws InsightsCustomException {
+		JsonObject dashboardTemplateJson = null;
+		try {
+			dashboardTemplateJson = fetchTemplateJson("Dashboard.json");
+			JsonArray kpiConfigArray = templateReportJson.get(AssessmentReportAndWorkflowConstants.KPICONFIGS)
+					.getAsJsonArray();
+			JsonArray panelsArray = new JsonArray();
+			int panelId = 0 ;
+			for (JsonElement eachKpiConfig : kpiConfigArray) {
+				JsonObject kpiObject = eachKpiConfig.getAsJsonObject();
+				int kpiId = kpiObject.get(AssessmentReportAndWorkflowConstants.KPIID).getAsInt();
+				List<InsightsContentConfig> contentList = reportConfigDAL.getActiveContentConfigByKPIId(kpiId);
+				
+				// Add panel for KPI 
+				panelId = panelId + 1; 
+				JsonArray vConfigs = kpiObject.get("visualizationConfigs").getAsJsonArray();
+				String vtype = vConfigs.get(0).getAsJsonObject().get(AssessmentReportAndWorkflowConstants.VTYPE).getAsString();
+				vtype = vtype.substring(0, vtype.lastIndexOf('_')); 
+				String vQuery = vConfigs.get(0).getAsJsonObject().get(AssessmentReportAndWorkflowConstants.VQUERY).getAsString();
+				vQuery = vQuery.replace("{kpiId}", String.valueOf(kpiId));
+				InsightsKPIConfig kpiConfig = reportConfigDAL.getKPIConfig(kpiId);
+				JsonObject panelTemplateJson = preparePanelJson(vtype, vQuery, kpiConfig.getKpiName(), panelId);
+				panelsArray.add(panelTemplateJson);
+				
+				// Add panel for content 
+				panelId = panelId + 1; 
+				vtype = "content";
+				String panelName = "Observation of ".concat(kpiConfig.getKpiName());
+				boolean isContentEmpty = contentList.isEmpty();
+				
+				JsonObject panelContentTemplateJson = prepareContentPanelJson(vtype, panelName, isContentEmpty ,kpiId, panelId);
+				panelsArray.add(panelContentTemplateJson);
+			}
+			
+			dashboardTemplateJson.get("dashboard").getAsJsonObject().add("panels", panelsArray);
+			log.debug("dashboard json ==={}", dashboardTemplateJson);
+			
+		} catch (Exception e) {
+			log.error("Error while preparing dashboard JSON ====", e);
+			throw new InsightsCustomException(e.getMessage());
+		}
+		return dashboardTemplateJson;
+	}
+	
 	public int saveReportTemplate(String reportTemplate, int reportID) {
 		int reportId = 0;
 		JsonObject reportJson = JsonUtils.parseStringAsJsonObject(reportTemplate);
@@ -306,6 +454,11 @@ public class AssessmentReportsTestData {
 				reportEntity.setTemplateName(reportName);
 				reportEntity.setFile(reportName);
 				reportEntity.setVisualizationutil(visualizationutil);
+				if(visualizationutil.equalsIgnoreCase(AssessmentReportAndWorkflowConstants.GRAFANAPDF)) {
+					JsonObject dashboardTemplateJson = createDashboardJson(reportJson);
+					byte[] dashboardTemplatebytes = dashboardTemplateJson.toString().getBytes();
+					uploadReportTemplateFile(reportId, reportEntity, "JSON", "dashboardTemplate.json",dashboardTemplatebytes);
+				}
 				JsonArray kpiConfigArray = reportJson.get("kpiConfigs").getAsJsonArray();
 				for (JsonElement eachKpiConfig : kpiConfigArray) {
 					JsonObject KpiObject = eachKpiConfig.getAsJsonObject();
@@ -330,57 +483,235 @@ public class AssessmentReportsTestData {
 		return reportId;
 
 	}
+	public void getData() {
+		String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + UnitTestConstant.Report_Test_Data+ File.separator
+				+ "grafanaAuthReport.json";
+		JsonElement jsonData;
+		try {
+			jsonData = JsonUtils.parseReader(new FileReader(new File(path).getCanonicalPath()));
+		} catch (JsonIOException | JsonSyntaxException | IOException e) {
+			throw new SkipException("skipped this test case as grafana auth file not found.");
+		}
+		testAuthData = new Gson().fromJson(jsonData, Map.class);
+		log.debug(testAuthData);
+	}
+	public Map<String, String> getGrafanaHeaders(int orgId) {
+		GrafanaOrgToken grafanaOrgToken = grafanaDashboardConfigDAL.getTokenByOrgId(orgId);
+		String token = "Bearer "+AES256Cryptor.decrypt(grafanaOrgToken.getApiKey(), AssessmentReportAndWorkflowConstants.GRAFANA_PDF_TOKEN_SIGNING_KEY);
+		Map<String, String> headers = new HashMap<>();
+		headers.put("Authorization", token);
+		return headers;
+	}
+	public String saveDashbaordInGrafana(InsightsAssessmentReportTemplate reportTemplate,String reportName) throws InsightsCustomException {
+		String responseorg = null ;
+		try {
+			List<InsightsReportTemplateConfigFiles> records = reportConfigDAL.getReportTemplateConfigFileByReportId(reportTemplate.getReportId());
+
+			JsonObject requestOrg = new JsonObject();
+
+			for (InsightsReportTemplateConfigFiles insightsReportTemplateConfigFiles : records) {
+				if (insightsReportTemplateConfigFiles.getFileName().equalsIgnoreCase(AssessmentReportAndWorkflowConstants.DASHBOARDTEMPLATEJSON)) {
+					String dashboardJson = new String(insightsReportTemplateConfigFiles.getFileData());
+					requestOrg = JsonUtils.parseStringAsJsonObject(dashboardJson);
+				}
+			}
+
+			requestOrg.get(AssessmentReportAndWorkflowConstants.DASHBOARD).getAsJsonObject().addProperty(AssessmentReportAndWorkflowConstants.TITLE, reportName);
+			JsonArray panelArray = requestOrg.get("dashboard").getAsJsonObject().get("panels").getAsJsonArray();
+			for (JsonElement jsonElement : panelArray) {
+				String vQuery = jsonElement.getAsJsonObject().getAsJsonArray(AssessmentReportAndWorkflowConstants.TARGETS).get(0).getAsJsonObject()
+						.get(AssessmentReportAndWorkflowConstants.QUERYTEXT).getAsString();
+				vQuery = vQuery.replace("{assessmentReportName}", "'"+reportName+"'");
+				jsonElement.getAsJsonObject().getAsJsonArray(AssessmentReportAndWorkflowConstants.TARGETS).get(0).getAsJsonObject()
+						.addProperty(AssessmentReportAndWorkflowConstants.QUERYTEXT, vQuery);
+			}
+			responseorg = createDashboardInGrafana(requestOrg);
+			log.debug(" responseorg {} ", responseorg);
+			
+		} catch (Exception e) {
+			log.error("Error while saving dashboard in Grafana.", e);
+			throw new InsightsCustomException(e.getMessage());
+		}
+
+		return responseorg;
+	}
+	public String createDashboardInGrafana(JsonObject requestDashboardObj) throws InsightsCustomException, Exception {
+		int orgId =Integer.parseInt(testAuthData.get("org_id"));
+		JsonObject dashboardApiResponseObj = null;
+		try {
+			String title = requestDashboardObj.get("dashboard").getAsJsonObject().get("title").getAsString();
+			String dashboardApiResponse = grafanaHandler.grafanaGet(PlatformServiceConstants.SEARCH_DASHBOARD_PATH + title , getGrafanaHeaders(orgId));
+			if(dashboardApiResponse.equalsIgnoreCase("[]")) {
+				dashboardApiResponse = grafanaHandler.grafanaPost(PlatformServiceConstants.API_DASHBOARD_PATH, requestDashboardObj, getGrafanaHeaders(orgId));
+				log.debug(" dashboardApiResponse {} ", dashboardApiResponse);
+				dashboardApiResponseObj = JsonUtils.parseStringAsJsonObject(dashboardApiResponse);
+			} else {
+				dashboardApiResponseObj = JsonUtils.parseStringAsJsonArray(dashboardApiResponse).get(0).getAsJsonObject();
+			}
+			dashboardApiResponseObj.addProperty("orgId", orgId);
+		} catch (Exception e) {
+			log.error("Error while creating dashboard.", e);
+			throw new InsightsCustomException(e.getMessage());
+		}
+		return dashboardApiResponseObj.toString();
+	}
+	public void generateGrafanaToken() throws InsightsCustomException {
+		try {				
+			int orgId = Integer.parseInt(testAuthData.get("org_id"));
+			GrafanaOrgToken grafanaOrgToken = new GrafanaOrgToken();
+			//httpRequest.addHeader("Authorization", testAuthData.get(AUTHORIZATION));
+			headers.put("Content-Type", "application/json");
+			log.debug(testAuthData);
+			username=testAuthData.get("user_name");
+			credential=testAuthData.get("credential");
+			String basicAuth = username+":"+credential;
+			String basicAuthHeader =  "Basic " + new String(Base64.getEncoder().encode(basicAuth.getBytes()));
+			headers.put("Authorization",basicAuthHeader);
+			headers.put("x-grafana-org-id", String.valueOf(orgId));
+			boolean keyExists = false;
+			String getApiKeyResponse = grafanaHandler.grafanaGet(PlatformServiceConstants.API_AUTH_KEYS, headers);
+			JsonArray getApiKeyResponseObj = JsonUtils.parseStringAsJsonArray(getApiKeyResponse);
+			for(JsonElement item: getApiKeyResponseObj) {
+				if(item.getAsJsonObject().get(NAME).getAsString().equalsIgnoreCase(PDFTOKEN)) {
+					keyExists = true;
+					id=item.getAsJsonObject().get("id").getAsInt();
+				}
+			}
+			if(keyExists) {
+				grafanaHandler.grafanaDelete("/api/auth/keys/" + id ,
+						headers);
+			}
+			JsonObject json = new JsonObject();
+			json.addProperty(NAME, PDFTOKEN);
+			json.addProperty(ROLE, ADMIN);
+			String response = grafanaHandler.grafanaPost(PlatformServiceConstants.API_AUTH_KEYS,json, headers);
+			JsonObject apiObj = JsonUtils.parseStringAsJsonObject(response);
+			grafanaOrgToken.setOrgId(orgId);
+			grafanaOrgToken.setApiKey(AES256Cryptor.encrypt(apiObj.get("key").getAsString(), AssessmentReportAndWorkflowConstants.GRAFANA_PDF_TOKEN_SIGNING_KEY));		
+			grafanaDashboardConfigDAL.saveGrafanaOrgToken(grafanaOrgToken);
+					 
+		}catch (Exception e) {
+			log.error("Unable to generate Grafana token  {}", e.getMessage());
+			log.error(e);
+			throw new InsightsCustomException(e.getMessage());
+		}
+	}
 
 	public String saveAssessmentReport(String workflowid, String assessmentReport, int noOftask)
 			throws InsightsCustomException {
+		int reportId = -1;
+		JsonObject emailDetails = null;
+		JsonObject responseJson = new JsonObject();
+		JsonObject assessmentReportJson = addTask(assessmentReport, noOftask);
 		try {
-			JsonObject emailDetails = null;
-			JsonObject assessmentReportJson = addTask(assessmentReport, noOftask);
-			int reportId = assessmentReportJson.get("reportTemplate").getAsInt();
+			log.debug(" Assessment Json to be saved {} ", assessmentReportJson);
+			reportId = assessmentReportJson.get("reportTemplate").getAsInt();
+			String reportName = assessmentReportJson.get(AssessmentReportAndWorkflowConstants.REPORTNAME).getAsString();
 			InsightsAssessmentReportTemplate reportTemplate = (InsightsAssessmentReportTemplate) reportConfigDAL
 					.getActiveReportTemplateByReportId(reportId);
+			if (reportTemplate == null) {
+				throw new InsightsCustomException(" report template is not available for report ID: " + reportId);
+			} 
+			
 			String workflowType = WorkflowTaskEnum.WorkflowType.REPORT.getValue();
-			String reportName = assessmentReportJson.get("reportName").getAsString();
+			long epochStartDate;
+			long epochEndDate;
+			
+			String emailList = assessmentReportJson.get("emailList").getAsString();
 			boolean isActive = true;
 			String schedule = assessmentReportJson.get("schedule").getAsString();
-			String emailList = assessmentReportJson.get("emailList").getAsString();
-			String datasource = assessmentReportJson.get("datasource").getAsString();
-			boolean reoccurence = assessmentReportJson.get("isReoccuring").getAsBoolean();
+			String datasource = assessmentReportJson.get(AssessmentReportAndWorkflowConstants.DATASOURCE).getAsString();
+			boolean reoccurence = assessmentReportJson.get(AssessmentReportAndWorkflowConstants.ISREOCCURING)
+					.getAsBoolean();
 			boolean runImmediate = Boolean.FALSE;
 			String asseementreportdisplayname = assessmentReportJson.get("asseementreportdisplayname").getAsString();
-			if (!assessmentReportJson.get("emailDetails").isJsonNull()) {
-				emailDetails = assessmentReportJson.get("emailDetails").getAsJsonObject();
+			if (!assessmentReportJson.get(AssessmentReportAndWorkflowConstants.EMAILDETAILS).isJsonNull()) {
+				emailDetails = assessmentReportJson.get(AssessmentReportAndWorkflowConstants.EMAILDETAILS)
+						.getAsJsonObject();
 			}
-			long epochStartDate = 0;
-			long epochEndDate = 0;
-			JsonElement startDateJsonObject = assessmentReportJson.get("startdate");
+			JsonElement startDateJsonObject = assessmentReportJson.get(AssessmentReportAndWorkflowConstants.STARTDATE);
 			if (startDateJsonObject.isJsonNull()) {
 				epochStartDate = 0;
 			} else {
 				epochStartDate = InsightsUtils.getEpochTime(startDateJsonObject.getAsString()) / 1000;
 				epochStartDate = InsightsUtils.getStartOfTheDay(epochStartDate) + 1;
-
+	
+			}
+			if (schedule.equals(WorkflowTaskEnum.WorkflowSchedule.ONETIME.toString())) {
+				JsonElement endDateJsonObject = assessmentReportJson.get("enddate");
+				if (endDateJsonObject.isJsonNull()) {
+					epochEndDate = 0;
+				} else {
+					epochEndDate = InsightsUtils.getEpochTime(endDateJsonObject.getAsString()) / 1000;
+					epochEndDate = InsightsUtils.getStartOfTheDay(epochEndDate) - 1;
+				}
+				if (epochStartDate > epochEndDate) {
+					throw new InsightsCustomException("Start Date cannot be greater than End date");
+				}
+			} else {
+				epochEndDate = 0;
 			}
 			String reportStatus = WorkflowTaskEnum.WorkflowStatus.NOT_STARTED.toString();
 			JsonArray taskList = assessmentReportJson.get("tasklist").getAsJsonArray();
-//		workflowId = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_"
-//				+ InsightsUtils.getCurrentTimeInSeconds();
-
+			String username = "admin";
+			String orgname = "testgroup";
 			InsightsAssessmentConfiguration assessmentConfig = new InsightsAssessmentConfiguration();
 			InsightsWorkflowConfiguration workflowConfig = saveWorkflowConfig(workflowid, isActive, reoccurence,
 					schedule, reportStatus, workflowType, taskList, epochStartDate, emailDetails,
 					runImmediate);
+	     	JsonObject dashboardPdfObj = new JsonObject();
+		
+			// Entity Setters
 			assessmentConfig.setActive(isActive);
-			assessmentConfig.setEmails(emailList);
 			assessmentConfig.setInputDatasource(datasource);
 			assessmentConfig.setAsseementreportname(reportName);
+			assessmentConfig.setEmails(emailList);
 			assessmentConfig.setStartDate(epochStartDate);
 			assessmentConfig.setEndDate(epochEndDate);
 			assessmentConfig.setReportTemplateEntity(reportTemplate);
-			assessmentConfig.setAsseementReportDisplayName(asseementreportdisplayname);
 			assessmentConfig.setWorkflowConfig(workflowConfig);
+			assessmentConfig.setAsseementReportDisplayName(asseementreportdisplayname);
+			assessmentConfig.setUserName(username);
+			assessmentConfig.setOrgName(orgname);
 			workflowConfig.setAssessmentConfig(assessmentConfig);
-			reportConfigDAL.saveInsightsAssessmentConfig(assessmentConfig);
+			
+			String vUtil = assessmentConfig.getReportTemplateEntity().getVisualizationutil();
+			if (vUtil.equalsIgnoreCase(AssessmentReportAndWorkflowConstants.GRAFANAPDF)){
+				String response = saveDashbaordInGrafana(reportTemplate,reportName);
+				if(response !=  null) {
+					JsonObject responseObj = JsonUtils.parseStringAsJsonObject(response);
+					String dashboardUrlStr = responseObj.get("url").getAsString();
+					String orgId = responseObj.get("orgId").getAsString();
+					String dateParam  = "";
+					if (schedule.equals(WorkflowTaskEnum.WorkflowSchedule.ONETIME.toString())) {
+						dateParam = "&from="+epochStartDate*1000+"&to="+epochEndDate*1000;
+					}else {
+						dateParam = "&from="+WorkflowTaskEnum.GrafanaPDFScheduleMapping.valueOf(schedule).getValue()+"&to=now";
+					}
+					dashboardUrlStr = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint().concat(dashboardUrlStr.substring(dashboardUrlStr.indexOf("/d"))) +"?orgId="+ orgId+dateParam;
+					log.debug(" dashboardUrlStr {} ",dashboardUrlStr);
+					dashboardPdfObj.addProperty("dashUrl", dashboardUrlStr);
+					dashboardPdfObj.addProperty("workflowId", assessmentConfig.getWorkflowConfig().getWorkflowId());
+					dashboardPdfObj.addProperty("variables", "");
+					dashboardPdfObj.addProperty(AssessmentReportAndWorkflowConstants.DASHBOARD, responseObj.get("uid").getAsString());
+					dashboardPdfObj.addProperty("theme", "dark");
+					dashboardPdfObj.addProperty("pdfType", "Dashboard");
+					dashboardPdfObj.addProperty(AssessmentReportAndWorkflowConstants.TITLE, assessmentConfig.getAsseementReportDisplayName());
+					dashboardPdfObj.addProperty("source", "PLATFORM");
+					dashboardPdfObj.addProperty("loadTime", "90");
+					dashboardPdfObj.addProperty("organisation", orgId);
+					responseJson.addProperty("dashboardUrl", dashboardUrlStr);
+				} else {
+					responseJson.addProperty("dashboardResponse", "unable to save dashboard in Grafana.");
+				}
+			}
+			
+			log.debug(" dashboardPdfObj {} ",dashboardPdfObj);
+			
+			assessmentConfig.setAdditionalDetail(dashboardPdfObj.toString());
+			int assessmentReportId = reportConfigDAL.saveInsightsAssessmentConfig(assessmentConfig);
+			//workflowDAL.saveInsightsWorkflowConfig(workflowConfig);
+			responseJson.addProperty("assessmentReportId", assessmentReportId);
 		} catch (Exception e) {
 			log.error(e);
 		}

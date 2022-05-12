@@ -30,6 +30,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformservice.insights.service.InsightsInference;
 import com.cognizant.devops.platformservice.insights.service.InsightsInferenceService;
@@ -42,23 +44,23 @@ import com.google.gson.JsonObject;
 @RestController
 @RequestMapping("/externalApi")
 public class InferenceDataProviderController {
+	
 	public static final String VECTORSCHEDULE ="vectorSchedule";
 	public static final String VECTORTYPE= "vectorType";
 	private static Logger LOG = LogManager.getLogger(InferenceDataProviderController.class);
 
-
-	@Autowired
 	InsightsInferenceService insightsInferenceReportService;
 	
 	
 	@GetMapping(value = "/inference/data/testDataSource", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject checkInferenceDS() {
 		JsonObject result = new JsonObject();
-		result.addProperty("result", "success");
+
+		result.addProperty(PlatformServiceConstants.RESULT, PlatformServiceConstants.SUCCESS);
+
 		return result;
 	}
-
-
+	
 	/** for Grafana 7.1.0 and InferencePanel Report **/
 	@PostMapping(value = "/inference/data/report", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonArray getInferenceReportData(HttpServletRequest request) {
@@ -92,7 +94,9 @@ public class InferenceDataProviderController {
 	@PostMapping(value = "/inference/data/report/testDataSource", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject checkInferenceDSReport() {
 		JsonObject result = new JsonObject();
-		result.addProperty("result", "success");
+
+		result.addProperty(PlatformServiceConstants.RESULT, PlatformServiceConstants.SUCCESS);
+
 		return result;
 	}
 
@@ -100,7 +104,9 @@ public class InferenceDataProviderController {
 	@PostMapping(value = "/inference/data/v7/testDataSource", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject checkInferenceDS7() {
 		JsonObject result = new JsonObject();
-		result.addProperty("result", "success");
+
+		result.addProperty(PlatformServiceConstants.RESULT, PlatformServiceConstants.SUCCESS);
+
 		return result;
 	}
 }

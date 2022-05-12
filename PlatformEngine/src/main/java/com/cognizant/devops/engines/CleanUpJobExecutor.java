@@ -47,7 +47,6 @@ public class CleanUpJobExecutor implements Job , ApplicationConfigInterface{
 		}
 	}
 
-
 	private void cleanUpTimerTaskStatusRecord() {
 		try {
 			String query= "	WITH limitStatusRecord AS " + 
@@ -81,6 +80,4 @@ public class CleanUpJobExecutor implements Job , ApplicationConfigInterface{
 		}
 		
 	}
-
-	
 }

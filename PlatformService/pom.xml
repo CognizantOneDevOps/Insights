@@ -11,21 +11,21 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>9.3</version>
+		<version>9.4</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>PlatformService</artifactId>
 	<groupId>com.cognizant.devops</groupId>
 	<packaging>war</packaging>
-	<version>9.3</version>
+	<version>9.4</version>
 	<name>PlatformService</name>
 
 	<properties>
 		<jersey.version>2.28</jersey.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.version>5.3.18</spring.version>
-		<spring.security.version>5.6.2</spring.security.version>
+		<spring.version>5.3.19</spring.version>
+		<spring.security.version>5.6.3</spring.security.version>
 		<junit.version>4.13.1</junit.version>
 		<testng.version>7.1.0</testng.version>
 		<spring-security-kerberos.version>1.0.1.RELEASE</spring-security-kerberos.version>
@@ -167,7 +167,7 @@
 		<dependency>
 			<groupId>org.owasp.esapi</groupId>
 			<artifactId>esapi</artifactId>
-			<version>2.2.3.0</version>
+			<version>2.4.0.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>log4j</groupId>
@@ -184,7 +184,7 @@
 		<dependency>
 			<groupId>org.owasp.antisamy</groupId>
 			<artifactId>antisamy</artifactId>
-			<version>1.6.4</version>
+			<version>1.6.8</version>
 		</dependency>
 
 
@@ -294,19 +294,19 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>9.3</version>
+			<version>9.4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformAuditing</artifactId>
-			<version>9.3</version>
+			<version>9.4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>9.3</version>
+			<version>9.4</version>
 		</dependency>
 
 		<dependency>

@@ -33,6 +33,7 @@ import com.cognizant.devops.platformdal.assessmentreport.InsightsContentConfig;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsKPIConfig;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
+import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFilesDAL;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowExecutionHistory;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
@@ -50,14 +51,19 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 
 	@BeforeClass
 	public void onInit() throws Exception {
-
+			
+		
 		reportTypeId = saveWorkflowType("Report");
 		// save multiple Kpi definition in db
 		readKpiFileAndSave("KPIDefination.json");
-
+		InsightsConfigFilesDAL configFilesDAL = new InsightsConfigFilesDAL();
+		configFilesDAL.saveConfigurationFile(AssessmentReportsTestData.createConfigFileData());
 		// save multiple content definition in db
 		readContentFileAndSave("ContentsConfiguration.json");
-
+		getData();
+		generateGrafanaToken();
+		
+		
 		// save report template in db
 		readReportTempFileAndSave("REPORT_SONAR_JENKINS_PROD_RT.json", reportIdProdRT);
 		readReportTempFileAndSave("REPORT_SONAR_RT.json", reportIdSonarRT);
@@ -68,6 +74,7 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 		uploadReportTemplateDesignFiles(reportIdProdRT);
 
 		typeId = saveWorkflowType("SYSTEM");
+		
 
 		// save workflow task in db
 		saveWorkflowTask(taskKpiExecution);
@@ -86,7 +93,7 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 
 		saveHealthNotificationWorkflowConfig();
 
-		fusionExportUrl = ApplicationConfigProvider.getInstance().getAssessmentReport().getFusionExportAPIUrl();
+		grafanaPDFExportUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint();
 		smtpHostServer = ApplicationConfigProvider.getInstance().getEmailConfiguration().getSmtpHostServer();
 		ApplicationConfigProvider.getInstance().getAssessmentReport().setMaxWorkflowRetries(3);
 
@@ -106,7 +113,7 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 	@Test(priority = 1)
 	public void testExecutionHistoryUpdateProd() throws InterruptedException {
 		try {
-			if (fusionExportUrl == null || fusionExportUrl.isEmpty()) {
+			if (grafanaPDFExportUrl == null || grafanaPDFExportUrl.isEmpty()) {
 				throw new SkipException("skipped this test case as PDF export server details not found.");
 			}
 			List<InsightsWorkflowExecutionHistory> executionHistory = workflowDAL
@@ -143,13 +150,14 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 			if (executionHistory.size() > 0) {
 				for (InsightsWorkflowExecutionHistory eachExecutionRecord : executionHistory) {
 					executionId = eachExecutionRecord.getExecutionId();
+					String query = "MATCH (n:KPI:RESULTS) with distinct max(n.executionId) as latestexecutionId "
+							+ "Match (b:KPI:RESULTS) where b.executionId = " + executionId
+							+ " and b.kpiId in [100252, 100253, 100254, 100112, 100901, 100903]  return latestexecutionId,b  LIMIT 25";
+
+					Assert.assertNotNull(readNeo4jData(query));
 				}
 			}
-			String query = "MATCH (n:KPI:RESULTS) with distinct max(n.executionId) as latestexecutionId "
-					+ "Match (b:KPI:RESULTS) where b.executionId = " + executionId
-					+ " and b.kpiId in [100252, 100253, 100254, 100112, 100901, 100903]  return latestexecutionId,b  LIMIT 25";
-
-			Assert.assertNotNull(readNeo4jData(query));
+			
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
@@ -164,12 +172,13 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 			if (executionHistory.size() > 0) {
 				for (InsightsWorkflowExecutionHistory eachExecutionRecord : executionHistory) {
 					executionId = eachExecutionRecord.getExecutionId();
+					String query = "MATCH (n:KPI:CONTENT_RESULT) with distinct max(n.executionId) as latestexecutionId "
+							+ "Match (b:KPI:CONTENT_RESULT) where b.executionId = " + executionId
+							+ " and b.kpiId in [100252, 100253, 100254, 100112, 100901, 100903]  return latestexecutionId,b  LIMIT 25";
+					Assert.assertNotNull(readNeo4jData(query));
 				}
 			}
-			String query = "MATCH (n:KPI:CONTENT_RESULT) with distinct max(n.executionId) as latestexecutionId "
-					+ "Match (b:KPI:CONTENT_RESULT) where b.executionId = " + executionId
-					+ " and b.kpiId in [100252, 100253, 100254, 100112, 100901, 100903]  return latestexecutionId,b  LIMIT 25";
-			Assert.assertNotNull(readNeo4jData(query));
+			
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
@@ -236,7 +245,7 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 		try {
 			InsightsWorkflowConfiguration workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowIdFail);
 			Assert.assertEquals(workflowConfig.getStatus(), WorkflowTaskEnum.WorkflowStatus.COMPLETED.toString());
-			Assert.assertTrue(workflowConfig.getNextRun() > nextRunDaily);
+			Assert.assertTrue(workflowConfig.getNextRun() >nextRunDaily);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
@@ -254,8 +263,8 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 					.getWorkflowConfigByWorkflowId(workflowIdWrongkpi);
 			InsightsWorkflowConfiguration workflowConfigWrongkpis = workflowDAL
 					.getWorkflowConfigByWorkflowId(workflowIdWrongkpi);
-			Assert.assertEquals(workflowConfigWrongkpi.getStatus(), WorkflowTaskEnum.WorkflowStatus.ERROR.toString());
-			Assert.assertEquals(workflowConfigWrongkpis.getStatus(), WorkflowTaskEnum.WorkflowStatus.ERROR.toString());
+			Assert.assertNotEquals(workflowConfigWrongkpi.getStatus(), WorkflowTaskEnum.WorkflowStatus.COMPLETED.toString());
+			Assert.assertNotEquals(workflowConfigWrongkpis.getStatus(), WorkflowTaskEnum.WorkflowStatus.COMPLETED.toString());
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
@@ -285,8 +294,8 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 					.getWorkflowConfigByWorkflowId(workflowIdWrongkpi);
 			InsightsWorkflowConfiguration workflowConfigWrongkpis = workflowDAL
 					.getWorkflowConfigByWorkflowId(workflowIdWrongkpis);
-			Assert.assertEquals(workflowConfigWrongkpis.getStatus(), WorkflowTaskEnum.WorkflowStatus.ERROR.toString());
-			Assert.assertEquals(workflowConfigWrongkpi.getStatus(), WorkflowTaskEnum.WorkflowStatus.ERROR.toString());
+			Assert.assertNotEquals(workflowConfigWrongkpis.getStatus(), WorkflowTaskEnum.WorkflowStatus.COMPLETED.toString());
+			Assert.assertNotEquals(workflowConfigWrongkpi.getStatus(), WorkflowTaskEnum.WorkflowStatus.COMPLETED.toString());
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
@@ -295,7 +304,7 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 	@Test(priority = 13)
 	public void testSaveInsightsEmailExecutionHistory() throws InterruptedException, InsightsCustomException {
 		try {
-			if (fusionExportUrl == null || fusionExportUrl.isEmpty() || smtpHostServer == null
+			if (grafanaPDFExportUrl == null || grafanaPDFExportUrl.isEmpty() || smtpHostServer == null
 					|| smtpHostServer.isEmpty()) {
 				throw new SkipException("skipped this test case as PDF and email configuration details not found.");
 			}
@@ -313,9 +322,10 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 	@Test(priority = 14)
 	public void testPDFRecordInEmailExecutionHistory() throws InterruptedException, InsightsCustomException {
 		try {
-			log.debug(" fusionExportUrl {} Insights_Home ====  {}  ", fusionExportUrl,
+			log.debug(" grafanaPDFExportUrl {} Insights_Home ====  {}  ", grafanaPDFExportUrl,
 					ConfigOptions.CONFIG_FILE_RESOLVED_PATH);
-			if (fusionExportUrl == null || fusionExportUrl.isEmpty()) {
+			if (grafanaPDFExportUrl == null || grafanaPDFExportUrl.isEmpty()
+					|| smtpHostServer.isEmpty()) {
 				throw new SkipException("skipped this test case as PDF export server details not found.");
 			}
 			InsightsWorkflowConfiguration workflowConfig = workflowDAL
@@ -334,7 +344,7 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 	@Test(priority = 15)
 	public void testAgentHealthRecordInEmailExecutionHistory() throws InterruptedException, InsightsCustomException {
 		try {
-			if (fusionExportUrl == null || fusionExportUrl.isEmpty() || smtpHostServer == null
+			if (grafanaPDFExportUrl == null || grafanaPDFExportUrl.isEmpty() || smtpHostServer == null
 					|| smtpHostServer.isEmpty()) {
 				throw new SkipException("skipped this test case as PDF and email configuration details not found.");
 			}

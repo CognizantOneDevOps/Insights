@@ -42,6 +42,9 @@ public class ServerConfigServiceImpl {
 	private static final Logger log = LogManager.getLogger(ServerConfigServiceImpl.class);
 	VaultHandler vaultHandler = new VaultHandler();
 	 Gson gson = new GsonBuilder().setPrettyPrinting().create();
+	 
+	 
+	 //private static final String trustedHosts="trustedHosts";
 	
 	/** This method fetch and validate server config data
 	 * @return
@@ -133,10 +136,10 @@ public class ServerConfigServiceImpl {
 		      */
 		    if(!serverConfigJsonfromVault.entrySet().isEmpty()) {
 		    	serverConfigJsonMerged= JsonUtils.mergeTwoJson(serverConfigTempate,serverConfigJsonfromVault);
-		    	serverConfigTempate.add("trustedHosts", serverConfigJsonfromVault.get("trustedHosts"));
+		    	serverConfigTempate.add(PlatformServiceConstants.TRUSTED_HOSTS, serverConfigJsonfromVault.get(PlatformServiceConstants.TRUSTED_HOSTS));
 		    }else {
 		    	serverConfigJsonMerged= JsonUtils.mergeTwoJson(serverConfigTempate,serverConfigJsonfromStorage);
-		    	serverConfigTempate.add("trustedHosts", serverConfigJsonfromStorage.get("trustedHosts"));
+		    	serverConfigTempate.add(PlatformServiceConstants.TRUSTED_HOSTS, serverConfigJsonfromStorage.get(PlatformServiceConstants.TRUSTED_HOSTS));
 		    }
 		    String passKey = UUID.randomUUID().toString().substring(0, 15);
 		    encodededData = passKey+AES256Cryptor.encrypt(serverConfigJsonMerged.toString(), passKey);

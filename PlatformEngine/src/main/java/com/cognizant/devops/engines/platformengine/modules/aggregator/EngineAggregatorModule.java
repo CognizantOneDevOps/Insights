@@ -34,6 +34,7 @@ import com.cognizant.devops.engines.platformengine.message.subscriber.AgentDataS
 import com.cognizant.devops.engines.platformengine.message.subscriber.AgentHealthSubscriber;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.EngineConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
@@ -52,6 +53,7 @@ import com.google.gson.JsonObject;
  *         subscribe for the incoming data
  */
 public class EngineAggregatorModule implements Job, ApplicationConfigInterface {
+
 	private static Logger log = LogManager.getLogger(EngineAggregatorModule.class.getName());
 	private static Map<String, EngineSubscriberResponseHandler> registry = new HashMap<>();
 	String jobName="";
@@ -143,11 +145,11 @@ public class EngineAggregatorModule implements Job, ApplicationConfigInterface {
 							PlatformServiceConstants.FAILURE,jobName);
 				}
 				EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
-						" Agent data queue " + dataRoutingKey + " subscribed successfully ",
+						" Agent data queue " + dataRoutingKey + EngineConstants.SUBSCRIBED,
 						PlatformServiceConstants.SUCCESS,jobName);
 			} else if (registry.containsKey(dataRoutingKey)) {
 				EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
-						" Agent data queue already has " + dataRoutingKey + " subscribed successfully ",
+						" Agent data queue already has " + dataRoutingKey + EngineConstants.SUBSCRIBED,
 						PlatformServiceConstants.SUCCESS,jobName);
 				AgentDataSubscriber dataSubscriber = (AgentDataSubscriber) registry.get(dataRoutingKey);
 				dataSubscriber.setMappingData(businessMappingList);
@@ -168,7 +170,7 @@ public class EngineAggregatorModule implements Job, ApplicationConfigInterface {
 							PlatformServiceConstants.FAILURE,jobName);
 				}
 				EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
-						" Agent health queue " + healthRoutingKey + " subscribed successfully ",
+						" Agent health queue " + healthRoutingKey + EngineConstants.SUBSCRIBED,
 						PlatformServiceConstants.SUCCESS,jobName);
 			}
 

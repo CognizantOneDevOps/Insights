@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
 import com.cognizant.devops.platformcommons.core.enums.JobSchedule;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformdal.dal.ElasticSearchNativeHandler;
@@ -40,7 +41,7 @@ import com.google.gson.JsonObject;
 
 public class ReportElasticSearchDataHandler implements ReportDataHandler {
 	private static Logger log = LogManager.getLogger(ReportElasticSearchDataHandler.class);
-
+	
 	ElasticSearchNativeHandler deoES = new ElasticSearchNativeHandler();
 	Gson gson = new Gson();
 
@@ -58,7 +59,6 @@ public class ReportElasticSearchDataHandler implements ReportDataHandler {
 		return esQuery;
 	}
 
-	
 	@Override
 	public void saveData(List<JsonObject> resultList) {
 		try {
@@ -94,8 +94,7 @@ public class ReportElasticSearchDataHandler implements ReportDataHandler {
 			log.debug("Worlflow Detail ==== In ES, Number of KPI result record return {} ",
 					kpiResultDetailList.size());
 			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-			log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
-					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+			log.debug(StringExpressionConstants.STR_EXP_TASKEXECUTION,contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
 					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
 					"ContentId :" + contentConfigDefinition.getContentId() + 
 					"ContentName :" +contentConfigDefinition.getContentName() +
@@ -103,8 +102,7 @@ public class ReportElasticSearchDataHandler implements ReportDataHandler {
 					+ "Schedule :" + contentConfigDefinition.getSchedule());
 		} catch (Exception e) {
 			log.error(" Error while parsing and fetchKPIResultData for ES  ", e);
-			log.error("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
-					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+			log.error(StringExpressionConstants.STR_EXP_TASKEXECUTION,contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
 					contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),0,
 					"ContentId :" + contentConfigDefinition.getContentId() + "ContentName :" +contentConfigDefinition.getContentName() +
 					"action :" + contentConfigDefinition.getAction() 
@@ -152,8 +150,7 @@ public class ReportElasticSearchDataHandler implements ReportDataHandler {
 				resultMapping.setResults(results);
 				kpiResultDetailList.add(resultMapping);
 				long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-				log.debug("Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}",
-						contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
+				log.debug(StringExpressionConstants.STR_EXP_TASKEXECUTION,contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
 						contentConfigDefinition.getKpiId(),contentConfigDefinition.getCategory(),processingTime,
 						"schedule:" +contentConfigDefinition.getSchedule() +
 						"resultField:" +contentConfigDefinition.getResultField());						
@@ -203,7 +200,6 @@ public class ReportElasticSearchDataHandler implements ReportDataHandler {
 			kpiResultObject.add("data", resultArray);
 			listOfResultJson.add(kpiResultObject);
 		}
-
 		return listOfResultJson;
 	}
 

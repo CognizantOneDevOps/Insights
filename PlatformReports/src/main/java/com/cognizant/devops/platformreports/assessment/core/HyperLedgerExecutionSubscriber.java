@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.cognizant.devops.platformreports.assessment.core;
 
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -253,8 +252,6 @@ public class HyperLedgerExecutionSubscriber extends WorkflowTaskSubscriberHandle
 			throw new InsightsJobFailedException(e.getMessage());
 		}
 	}
-
-	
 	/* Addition of assetId key for pdf report.
 	 * @param ledgerresponse
 	 * @param parentAsset 

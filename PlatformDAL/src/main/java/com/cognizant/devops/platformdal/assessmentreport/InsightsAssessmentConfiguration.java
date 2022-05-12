@@ -81,6 +81,9 @@ public class InsightsAssessmentConfiguration implements Serializable {
 	
 	@Column(name = "additionalDetail", length = 10000)
 	private String additionalDetail;
+	
+	@Column(name = "milestoneId", nullable = true)
+	private Integer milestoneId;
 
 	public int getId() {
 		return id;
@@ -184,6 +187,14 @@ public class InsightsAssessmentConfiguration implements Serializable {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+
+	public Integer getMilestoneId() {
+		return milestoneId;
+	}
+
+	public void setMilestoneId(int milestoneId) {
+		this.milestoneId = milestoneId;
 	}
 	
 }

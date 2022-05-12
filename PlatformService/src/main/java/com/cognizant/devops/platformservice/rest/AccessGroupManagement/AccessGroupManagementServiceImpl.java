@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.dal.vault.VaultHandler;
@@ -51,7 +52,7 @@ public class AccessGroupManagementServiceImpl {
 	VaultHandler vaultHandler = new VaultHandler();
 	GrafanaDatabaseDAL grafanaDBDAL = new GrafanaDatabaseDAL();
 	
-
+	
 	
 	public DashboardResponse loadGrafanaDashboardData() {
 		DashboardResponse dashboardResponse = new DashboardResponse();
@@ -75,8 +76,8 @@ public class AccessGroupManagementServiceImpl {
 			for (JsonElement data : dashboardsJsonArray) {
 				JsonObject dashboardData = data.getAsJsonObject();
 				DashboardModel model = new DashboardModel();
-				model.setId(dashboardData.get("title").getAsString());
-				model.setTitle(dashboardData.get("title").getAsString());
+				model.setId(dashboardData.get(PlatformServiceConstants.TITLE).getAsString());
+				model.setTitle(dashboardData.get(PlatformServiceConstants.TITLE).getAsString());
 				if (dashboardData.has("type") && "dash-db".equals(dashboardData.get("type").getAsString())) {
 						if (grafanaVersion.contains("5.")) {
 							model.setUrl(grafanaIframeUrl + grafanaDomainUrl + dashboardData.get("url").getAsString());
@@ -112,7 +113,7 @@ public class AccessGroupManagementServiceImpl {
 		records.stream().forEach(record -> {
 			JsonObject rec = new JsonObject();
 			rec.addProperty("uid",(String) record[0]);
-			rec.addProperty("title",(String) record[1]);
+			rec.addProperty(PlatformServiceConstants.TITLE,(String) record[1]);
 			rec.addProperty("orgId", orgid);
 			returnResponse.add(rec);
 		});

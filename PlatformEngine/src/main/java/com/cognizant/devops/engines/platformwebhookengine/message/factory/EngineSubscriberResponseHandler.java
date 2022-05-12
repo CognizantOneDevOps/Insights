@@ -33,7 +33,6 @@ public abstract class EngineSubscriberResponseHandler {
 	public abstract void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties,
 			byte[] body) throws IOException;
 	
-	
 	public Channel getChannel() {
 		return channel;
 	}

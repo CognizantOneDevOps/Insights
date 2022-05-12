@@ -35,6 +35,7 @@ export class ReportTemplateConfig implements OnInit {
     buttonName: string;
     showKpiList: boolean = false;
     visualizationUtilList = [];
+    templateTypeList = [];
     vTypeList = [];
     displayedColumns = [];
     kpiId: string;
@@ -44,6 +45,7 @@ export class ReportTemplateConfig implements OnInit {
     templateName: string;
     description: string;
     visualizationUtil: string;
+    templateType: string;
     kpiDetailItems: KpiDetailItem[] = [];
     isEdit: boolean = false;
     disableId: boolean = false;
@@ -68,6 +70,7 @@ export class ReportTemplateConfig implements OnInit {
             console.log(params);
             this.receivedParam = JSON.parse(params.templateParam);
             this.visualizationUtilList = JSON.parse(params.visualizaionUtil);
+            this.templateTypeList = JSON.parse(params.templateType);
             this.chartTypes = JSON.parse(params.vType);
             this.vTypeList = this.chartTypes['vTypes'];
             this.grafanaVtypes = this.chartTypes['grafanaCharts']
@@ -167,6 +170,8 @@ export class ReportTemplateConfig implements OnInit {
             this.status = this.receivedParam.data.isActive;
             this.visualizationUtil = this.receivedParam.data.visualizationutil;
             console.log(this.visualizationUtil);
+            this.templateType = this.receivedParam.data.templateType;
+            console.log(this.templateType);
             var receivedKpiDetails = this.receivedParam.data.kpiDetails;
             receivedKpiDetails.forEach(element => {
                 let kpiDetails = new KpiDetailItem();
@@ -182,8 +187,8 @@ export class ReportTemplateConfig implements OnInit {
 
     validateTemplateData() {
         var checkname = this.regex.test(this.templateName);
-        if (this.templateName == undefined || this.description == undefined || this.visualizationUtil == undefined ||
-            this.templateName == '' || this.description == '' || this.visualizationUtil == '') {
+        if (this.templateName == undefined || this.description == undefined || this.visualizationUtil == undefined || this.templateType == undefined ||
+            this.templateName == '' || this.description == '' || this.visualizationUtil == '' || this.templateType == '') {
             this.messageDialog.showApplicationsMessage('Please fill mandatory fields.', 'ERROR');
         } else if (!checkname) {
             this.messageDialog.showApplicationsMessage(
@@ -203,6 +208,7 @@ export class ReportTemplateConfig implements OnInit {
         templateAPIRequestJson['description'] = this.description;
         templateAPIRequestJson['isActive'] = this.status;
         templateAPIRequestJson['visualizationutil'] = this.visualizationUtil;
+        templateAPIRequestJson['templateType'] = this.templateType;
         this.kpiDetailItems.forEach(element => {
             var vConfigs = { kpiId: element.kpiId, visualizationConfigs: [{ vType: element.vType, vQuery: element.vQuery }] };
             kpiConfigs.push(vConfigs);
@@ -259,6 +265,7 @@ export class ReportTemplateConfig implements OnInit {
         }
         this.description = '';
         this.visualizationUtil = '';
+        this.templateType = '';
         this.kpiId = '';
         this.vType = '';
         this.vQuery = '';

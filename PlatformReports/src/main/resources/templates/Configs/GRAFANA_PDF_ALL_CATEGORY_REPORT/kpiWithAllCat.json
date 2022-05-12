@@ -38,7 +38,7 @@
       "group":"CODEQUALITY",
       "category":"COMPARISON",
       "toolName":"SONAR",
-      "DBQuery":"MATCH (n:SONAR) WHERE  n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKvector = 'CODEQUALITY' with n where n.SPKstatus='Success'  RETURN  toInt(ROUND(SUM(n.SPKbugs))) as Bugs , toInt(ROUND(SUM(n.SPKcodeSmells))) as CodeSmell, toInt(ROUND(SUM(n.SPKVulnerabilitiesStr))) as Vulnerablilities",
+      "DBQuery":"MATCH (n:SONAR) WHERE  n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKvector = 'CODEQUALITY' with n where n.SPKstatus='Success'  RETURN  toInteger(ROUND(SUM(n.SPKbugs))) as Bugs , toInteger(ROUND(SUM(n.SPKcodeSmells))) as CodeSmell, toInteger(ROUND(SUM(n.SPKVulnerabilitiesStr))) as Vulnerablilities",
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"CodeSmell"
@@ -61,7 +61,7 @@
       "group":"DEPLOYMENT",
       "category":"STANDARD",
       "toolName":"RUNDECK",
-      "DBQuery":"MATCH (n:RUNDECK) WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKstatus='Success' RETURN ceil(max(toInt(n.SPKduration))) as Deploy",
+      "DBQuery":"MATCH (n:RUNDECK) WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKstatus='Success' RETURN ceil(max(toInteger(n.SPKduration))) as Deploy",
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"Deploy"

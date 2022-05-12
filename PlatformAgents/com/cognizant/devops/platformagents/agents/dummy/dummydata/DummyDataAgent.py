@@ -21,7 +21,7 @@ Created on Jan 10, 2021
 '''
 from dateutil import parser
 import datetime
-from BaseAgent import BaseAgent
+from .BaseAgent import BaseAgent
 import time
 import calendar
 import random
@@ -37,8 +37,8 @@ class DummyDataAgent(BaseAgent):
 
     def process(self):
         # Project Variables
-        self.project_names = ['PaymentServices', 'MobileServices', 'ClaimFinder', 'AgentLocator']
-        self.projectKeys = ['PS', 'MS', 'CF', 'AL']
+        self.project_names = ['FinanceServices', 'MarketingServices'] 
+        self.projectKeys = ['FS', 'MS']
         self.projectIds = ["6", '7', '8', '9']
         self.boardIdForProjects = [101, 201, 301, 401]   
         self.startFrom = self.config.get("startFrom")
@@ -53,6 +53,7 @@ class DummyDataAgent(BaseAgent):
         self.issueTypes = ['Story', 'Task'] 
         self.storyPoints = ["8" , "5", "3", "2", "1"] 
         self.isStoryClosed = ["True", "False"] 
+        self.timeSpentInHr = ["32" , "20", "12", "8", "4"] 
         
         # GIT Variables
         self.repo = ['Insights', 'Spinnaker', 'OnBot', 'BuildOn']
@@ -76,6 +77,9 @@ class DummyDataAgent(BaseAgent):
         self.sonar_techdepth = ['3', '5', '17', '25', '21']
         self.resourceKey = ['09', '099', '89', '32']
         self.sonar_codeCoverage = ['40', '50', '60', '70', '80', '90']
+        self.sonar_bugs = ['25','38', '40', '54']
+        self.sonar_code_smells = ['45','58', '64', '72', '103']
+        self.sonar_vulnerabilities = ['0','1', '2', '3']
         
         # RUNDECK Variables
         self.rundeck_env = ['PROD', 'DEV', 'INTG', 'SIT', 'UAT'] 
@@ -85,9 +89,9 @@ class DummyDataAgent(BaseAgent):
         # self.artifacts_name = ["onlinebanking-0.0.1-20160505.105537-19.war","anybank-0.0.1-20160526.093210-15.war","demoapp-0.0.1-20160425.162709-16.war","demomavenapp-0.0.1-20160926.081623-11.war","iSightonlinebanking-0.0.1-20161213.042537-15.war","demomavenappxl-0.0.1-20161213.140419-19.war"  ]
         self.nexus_status = ['succeeded', 'failed', 'aborted'] 
         self.artifacts_id = ["Service", "UI", "Engine", "Webhook", "Mockserver", "Workflow"]
-        self.group_ids = ["com.cts.paymentService", 'com.cts.mobileServices', 'com.cts.claimFinder', 'com.cts.agentLocator']
-        self.repoIdSnapshot = ["PaymentService-buildOn", "MobileServices-buildOn", "ClaimFinder-buildOn", "AgentLocator-buildOn"]
-        self.repoIdRelease = ["PaymentService-Release", "MobileServices-Release", "ClaimFinder-Release", "AgentLocator-Release"]
+        self.group_ids = ["com.cts.financeServices", 'com.cts.marketingServices']
+        self.repoIdSnapshot = ["FinanceService-buildOn", "MarketingServices-buildOn"]
+        self.repoIdRelease = ["FinanceService-Release", "MarketingServices-Release"]
         
         # QTest Variables 
         self.module = ["Correlation Builder", " Webhook Module", "Agent Management", "Data Archival"]        
@@ -95,28 +99,43 @@ class DummyDataAgent(BaseAgent):
         self.severity = ['Critical', 'Non-Critical']
         self.submitter = ['Tony', 'John', 'Adam', 'Sumit', 'Jack']
         
-        self.releaseStatus = ["Success" , "Bug Raised"] #, "Rollback"
+        self.releaseStatus = ["Success" , "Bug Raised", "Rollback"] #, "Rollback"
+        
+        # SNOW Variables
+        self.requester = ['Amy', 'Bart', 'Chris', 'Diana']
+        self.approver = ['Bryan', 'Fred', 'Michael', 'Rusty']
+                
             
         # Looping over each project 
         try :
-            for projectName in self.project_names :
-                self.projectName = projectName
+            self.responseTemplate = self.config.get("dynamicTemplate", {}).get("responseTemplate", {})
+            self.projects = self.responseTemplate.get("Projects", {})
+            for project in self.projects.values():
+                self.projectDetails = project
+                self.projectName = project.get("projectName")
                 self.releaseBugData = []
-                self.createProjectData() 
+                self.createProjectData()
+#             for projectName in self.project_names :
+#                 self.projectName = projectName
+#                 self.releaseBugData = []
+#                 self.createProjectData() 
         except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)#                
+            print((exc_type, fname, exc_tb.tb_lineno))#                
                 
     def createProjectData (self): 
         try :       
-            self.projectKey = self.projectKeys[self.project_names.index(self.projectName)]
-            self.projectId = self.projectIds[self.project_names.index(self.projectName)]
-            self.groupId = self.group_ids[self.project_names.index(self.projectName)]
+#             self.projectKey = self.projectKeys[self.project_names.index(self.projectName)]
+#             self.projectId = self.projectIds[self.project_names.index(self.projectName)]
+#             self.groupId = self.group_ids[self.project_names.index(self.projectName)]
+            self.projectKey = self.projectDetails.get("projectKey")
+            self.projectId = self.projectDetails.get("projectId")
+            self.groupId = self.projectDetails.get("group_id")
             self.noOfSprintsClosedSoFar = 0  # To Track Total Number of Sprints closed for each project
-            self.jenkinsBuildNumber = 01  # Total Number of Builds trigerred in each project
+            self.jenkinsBuildNumber = 0o1  # Total Number of Builds trigerred in each project
             self.pullRequestNo = 1  # Total Number of pull requests raised in each project
-            time_offset_hours = (random.randint(01, 04))
+            time_offset_hours = (random.randint(0o1, 0o4))
             time_offset_seconds = (random.randint(101, 800))
             self.releaseStartDate = self.startDate #datetime.datetime.now() - datetime.timedelta(days=self.start_date_days)
             self.sprintEndDate = self.startDate #datetime.datetime.now() - datetime.timedelta(days=self.start_date_days)
@@ -135,7 +154,7 @@ class DummyDataAgent(BaseAgent):
         except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            print((exc_type, fname, exc_tb.tb_lineno))
             
     def startReleaseWork(self, release):
         try :                       
@@ -148,7 +167,7 @@ class DummyDataAgent(BaseAgent):
             self.listofEpicsKeyInCurrentRelease = []          
             self.totalIssuesInRelease = [] 
             self.releaseData =[] 
-            numberOfEpicsRequiredForRelease = (random.randint(02, 05)) #Range for epic releases         
+            numberOfEpicsRequiredForRelease = (random.randint(0o2, 0o5)) #Range for epic releases         
             # Creating epics in the beginning of the Release.
             epic_counts = 1    
             releaseSample = {}
@@ -185,7 +204,8 @@ class DummyDataAgent(BaseAgent):
                     isStoriesReleaseReady = False                             
                 rangeNumber = rangeNumber + 1            
                 if isStoriesReleaseReady :
-                    status = self.serviceNowProcessing(release)
+                    #status = self.serviceNowProcessing(release)
+                    status = self.serviceNowChangeRequestProcessing(release)
                     if status == "Success" :
                         issueDetailData = []
                         for issue in self.totalIssuesInRelease:
@@ -219,15 +239,16 @@ class DummyDataAgent(BaseAgent):
         except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno,ex)    
+            print((exc_type, fname, exc_tb.tb_lineno,ex))    
             
     def createEpicsForRelease(self, epic_count):
         try :
-            epicKey = self.projectKeys[self.project_names.index(self.projectName)] + '-' + str(self.noOfEpicsCreatedSoFar + 1)   
+#             epicKey = self.projectKeys[self.project_names.index(self.projectName)] + '-' + str(self.noOfEpicsCreatedSoFar + 1)  
+            epicKey = self.projectKey + '-' + str(self.noOfEpicsCreatedSoFar + 1)    
             jiraSample = {}                       
             jiraSample['key'] = epicKey                    
             jiraSample['priority'] = random.choice(self.Priority)
-            time_offset_hours_epic = (random.randint(01, 24))
+            time_offset_hours_epic = (random.randint(0o1, 24))
             time_offset_seconds_epic = (random.randint(101, 800))         
             createdDate = self.releaseStartDate + datetime.timedelta(hours=time_offset_hours_epic, seconds=time_offset_seconds_epic)
             self.updatedAt = createdDate        
@@ -246,7 +267,7 @@ class DummyDataAgent(BaseAgent):
         except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            print((exc_type, fname, exc_tb.tb_lineno))
             
     def startSprintWork(self, rangeNumber):
         try:
@@ -256,9 +277,9 @@ class DummyDataAgent(BaseAgent):
             self.detailsOfIssues = []  
             self.listofIssueInCurrentSprint = []  
             issue_counts = 1
-            time_offset_hours = (random.randint(01, 24))
+            time_offset_hours = (random.randint(0o1, 24))
             time_offset_seconds = (random.randint(101, 800))   
-            numberOfIssuesToBeCreatedForSprint = (random.randint(10, 30))   #  Number of issues in a sprint            
+            numberOfIssuesToBeCreatedForSprint = (random.randint(10, 20))   #  Number of issues in a sprint            
             #sprintEndDate = (self.sprintStartDate + datetime.timedelta(days=self.numberofDaysInSprint))
             #sprintCompleteDate = (self.sprintEndDate + datetime.timedelta(hours=time_offset_hours, seconds=time_offset_seconds)) 
             sprint_EndDate_InFormat = self.sprintEndDate.strftime("%Y-%m-%dT%H:%M:%S") 
@@ -271,7 +292,8 @@ class DummyDataAgent(BaseAgent):
             sprintSample['sprintName'] = (sprint_Name)
             self.sprintId = self.projectKey + '_SPRINT_' + str(self.noOfSprintsClosedSoFar + 1)
             sprintSample['sprintId'] = self.sprintId
-            sprintSample['boardId'] = self.boardIdForProjects[self.project_names.index(self.projectName)]
+#             sprintSample['boardId'] = self.boardIdForProjects[self.project_names.index(self.projectName)]
+            sprintSample['boardId'] = self.projectDetails.get("projectBoardId")
             sprintSample['projectName'] = self.projectName
             sprintSample['sprintStartDate'] = sprint_StartDate_InFormat
             sprintSample['sprintEndDate'] = sprint_EndDate_InFormat                    
@@ -317,7 +339,7 @@ class DummyDataAgent(BaseAgent):
                     sprintsAdded.append(spillStory['sprints'])
                     sprintsAdded.append(self.sprintId)            
                     time_offset_seconds = (random.randint(101, 800))                    
-                    time_offset_hours = (random.randint(01, 05))
+                    time_offset_hours = (random.randint(0o1, 0o5))
                     self.updatedAt = self.sprintStartDate + datetime.timedelta(hours=time_offset_hours, seconds=time_offset_seconds)
                     spillStory['lastUpdated'] = self.sprintStartDate.strftime("%Y-%m-%dT%H:%M:%S")
                     spillStory['lastUpdatedEpoch'] = int(time.mktime(time.strptime(self.sprintStartDate.strftime("%Y-%m-%dT%H:%M:%S"), "%Y-%m-%dT%H:%M:%S")))   
@@ -353,7 +375,7 @@ class DummyDataAgent(BaseAgent):
         except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno,ex)    
+            print((exc_type, fname, exc_tb.tb_lineno,ex))    
     
     def workingOnIssues(self, detail, rangeNumber, git_repo=None, git_branch=None, git_toBranch=None, git_author=None, originalStory=None, forceCloseInCurrentSprint=False):   
         try :
@@ -406,7 +428,8 @@ class DummyDataAgent(BaseAgent):
                 else :
                     bugData = []
                     bugDetail = detail.copy()                    
-                    bugKey = self.projectKeys[self.project_names.index(self.projectName)] + '-' + str(self.issueCreationStarted + 1)
+                    #bugKey = self.projectKeys[self.project_names.index(self.projectName)] + '-' + str(self.issueCreationStarted + 1)
+                    bugKey = self.projectKey + '-' + str(self.issueCreationStarted + 1)
                     self.issueCreationStarted = self.issueCreationStarted + 1    
                     bugDetail ["key"] = bugKey
                     bugDetail ['issueType'] = "Bug"
@@ -435,11 +458,12 @@ class DummyDataAgent(BaseAgent):
             logging.error(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            print((exc_type, fname, exc_tb.tb_lineno))
 
     def creatingIssue(self): 
         jiraSample = {}                             
-        issueKey = self.projectKeys[self.project_names.index(self.projectName)] + '-' + str(self.issueCreationStarted + 1)                                                  
+        #issueKey = self.projectKeys[self.project_names.index(self.projectName)] + '-' + str(self.issueCreationStarted + 1)                                                  
+        issueKey = self.projectKey + '-' + str(self.issueCreationStarted + 1)
         jiraSample['key'] = issueKey                                           
         jiraSample['priority'] = random.choice(self.Priority)
         self.updatedAt = self.sprintStartDate
@@ -454,12 +478,17 @@ class DummyDataAgent(BaseAgent):
         jiraSample['assignee'] = random.choice(self.jiraUsers)
         jiraSample['sprints'] = self.sprintId
         jiraSample['epicKey'] = random.choice(self.listofEpicsKeyInCurrentRelease)
-        jiraSample['boardId'] = self.boardIdForProjects[self.project_names.index(self.projectName)]
+        #jiraSample['boardId'] = self.boardIdForProjects[self.project_names.index(self.projectName)]
+        jiraSample['boardId'] = self.projectDetails.get("projectBoardId")
         jiraSample['fixVersion'] = "V." + str(self.releaseVersion)
         jiraSample['toolName'] = "JIRA"
         jiraSample['categoryName'] = "ALM"
         if issueType == 'Story':
-            jiraSample['storyPoints'] = random.choice(self.storyPoints)
+            storypoints = random.choice(self.storyPoints)
+            jiraSample['storyPoints'] = storypoints
+            timeSpent = self.timeSpentInHr[self.storyPoints.index(storypoints)]
+            jiraSample['timeSpent'] = timeSpent + 'h'
+            jiraSample['timeSpentSeconds'] = int(timeSpent) * 3600
         self.issueCreationStarted = self.issueCreationStarted + 1
         self.detailsOfIssues.append(jiraSample)
         self.requirement_data = self.createRequiremnetForQtest(issueKey)
@@ -479,8 +508,10 @@ class DummyDataAgent(BaseAgent):
         requirementSample['assignee'] = random.choice(self.assignedto)
         requirementSample['severity'] = random.choice(self.severity)
         requirementSample ['module'] = random.choice(self.module)
-        requirementSample['creationDate'] = self.updatedAt.strftime("%Y-%m-%dT%H:%M:%S")   
-        requirement_id = "RQ_" + str(''.join([random.choice(string.digits) for n in xrange(10)]))
+        requirementSample['creationDate'] = self.updatedAt.strftime("%Y-%m-%dT%H:%M:%S") 
+        requirementSample['toolName'] = "QTEST"
+        requirementSample['categoryName'] = "ALM"  
+        requirement_id = "RQ_" + str(''.join([random.choice(string.digits) for n in range(10)]))
         requirementSample['requirement_id'] = requirement_id        
         noOfTestCases = random.randint(1, 5)
         testCase = 1
@@ -501,7 +532,7 @@ class DummyDataAgent(BaseAgent):
         testCaseSample ['requirementId'] = requirement_id
         testCaseSample['almType'] = "test_case"
         testCaseSample['summary'] = "This test Case deals with " + requirement_id
-        testCaseId = "TEST_" + str(''.join([random.choice(string.digits) for n in xrange(10)]))
+        testCaseId = "TEST_" + str(''.join([random.choice(string.digits) for n in range(10)]))
         testCaseSample ['testCase_id'] = testCaseId
         testcase_data.append(testCaseSample)
         self.totalTestCases.append(testCaseSample)
@@ -602,16 +633,20 @@ class DummyDataAgent(BaseAgent):
             if jenkinsStatus == "Success" or jenkinsStatus == "Unstable":  # Example Maven compilation is suceess.
                 isJenkinsBuildSuccess = self.sonarProcessing(buildNumberString, self.updatedAt);            
                 if isJenkinsBuildSuccess == True:
-                    jenkinsSample['status'] = jenkinsStatus                    
+                    jenkinsSample['status'] = jenkinsStatus
+                    jenkinsSample['result'] = jenkinsStatus.upper()                    
                 else :
-                    jenkinsSample['status'] = "Failed"                                  
+                    jenkinsSample['status'] = "Failed"
+                    jenkinsSample['result'] = "FAILED"                                  
            
             else :
                 jenkinsSample['status'] = jenkinsStatus
+                jenkinsSample['result'] = jenkinsStatus.upper()
                 isJenkinsBuildSuccess = False
         else :
             jenkinsStatus = "Success"
             jenkinsSample['status'] = jenkinsStatus
+            jenkinsSample['result'] = jenkinsStatus.upper()
             jenkinsSample['scmcommitId'] = commitId
             jenkinsSample['message'] = "Force Success Build triggered for commit Id " + commitId 
             isJenkinsBuildSuccess = self.sonarProcessing(buildNumberString, self.updatedAt, True); 
@@ -627,7 +662,7 @@ class DummyDataAgent(BaseAgent):
     def sonarProcessing(self, buildNumberString, updatedAt, isForceSuccessRequired=False):
         sonar_data = []
         isManualAnalysis = bool(random.getrandbits(1)) 
-        ramdomSonarKey = str(''.join([random.choice(string.digits) for n in xrange(10)]))
+        ramdomSonarKey = str(''.join([random.choice(string.digits) for n in range(10)]))
         sonar_date = (updatedAt + datetime.timedelta(seconds=120))       
         time_offset = (random.randint(101, 800))
         # self.printLog('Jenkine build number '+jenkinsSampleData['buildNumber']+' Jenkine Date '+jenkinsSampleData['inSightsTimeX']+' Sonar Date '+str(sonar_date), False)
@@ -650,11 +685,15 @@ class DummyDataAgent(BaseAgent):
         sonarSample['sonarDuplicateCode'] = random.choice(self.sonar_duplicate)
         sonarSample['sonarTechDepth'] = random.choice(self.sonar_techdepth)
         sonarSample['code_coverage'] = random.choice(self.sonar_codeCoverage)
+        sonarSample['bugs'] = random.choice(self.sonar_bugs)
+        sonarSample['code_smells'] = random.choice(self.sonar_code_smells)
+        sonarSample['vulnerabilities'] = random.choice(self.sonar_vulnerabilities)
         sonarSample['toolName'] = "SONAR"
         sonarSample['categoryName'] = "CODEQUALITY"
         if isForceSuccessRequired == False:
             sonarStatus = random.choice(self.sonar_quality_gate_Status)
             sonarSample['sonarQualityGateStatus'] = sonarStatus
+            sonarSample['alert_status'] = sonarStatus
             if isManualAnalysis:
                 sonarSample['message'] = "Manually Initiated analysis"
                 buildNumberString = None 
@@ -673,6 +712,7 @@ class DummyDataAgent(BaseAgent):
         else :  
             sonarStatus = "OK"
             sonarSample['sonarQualityGateStatus'] = sonarStatus
+            sonarSample['alert_status'] = sonarStatus
             sonarSample['jenkinsBuildNumber'] = buildNumberString
             sonarSample['message'] = "Force Success"
             isJenkinsBuildSuccess = self.nexusProcessing(buildNumberString, self.updatedAt, True, True);
@@ -698,17 +738,20 @@ class DummyDataAgent(BaseAgent):
             nexusStatus = random.choice(self.nexus_status)
         else :
             nexusStatus = "succeeded"
+        #self.artifactList = []
         for artifactid in self.artifacts_id:
             nexusSample = {}
             nexusSample['status'] = nexusStatus
             nexusSample['artifactId'] = artifactid
-            nexusSample['groupId'] = self.group_ids[self.project_names.index(self.projectName)]
+            #nexusSample['groupId'] = self.group_ids[self.project_names.index(self.projectName)]
+            nexusSample['groupId'] = self.groupId
             if buildNumberString is not None :
                 nexusSample["jenkinsBuildNumber"] = buildNumberString
             nexusSample['projectName'] = self.projectName 
             nexusSample['uploadedDate'] = nexus_Date_in_format
             nexusSample['toolName'] = "NEXUS"
             nexusSample['categoryName'] = "ARTIFACTMANAGEMENT"
+            nexusSample['version'] = "V." + str(self.releaseVersion)
             if isSnapshot :
                 if artifactid == "UI" :
                     artifactName = artifactid + "-" + str(self.releaseVersion) + str(nexus_date_epoch) + ".zip"
@@ -716,9 +759,11 @@ class DummyDataAgent(BaseAgent):
                     artifactName = artifactid + "-" + str(self.releaseVersion) + str(nexus_date_epoch) + ".war"
                 else :
                     artifactName = artifactid + "-" + str(self.releaseVersion) + str(nexus_date_epoch) + ".jar"
-                repoName = self.repoIdSnapshot[self.project_names.index(self.projectName)]
+                #repoName = self.repoIdSnapshot[self.project_names.index(self.projectName)]
+                repoName = self.projectDetails.get("repoIdSnapshot")
             else :
-                repoName = self.repoIdRelease[self.project_names.index(self.projectName)]
+                #repoName = self.repoIdRelease[self.project_names.index(self.projectName)]
+                repoName = self.projectDetails.get("repoIdRelease")
                 if artifactid == "UI" :
                     artifactName = artifactid + "-" + str(self.releaseVersion) + ".zip"
                 elif artifactid == "Service":
@@ -734,7 +779,8 @@ class DummyDataAgent(BaseAgent):
         isEpoch = False            
         self.publishToolsData(nexus_data, nexusMetadata, "uploadedDate", "%Y-%m-%dT%H:%M:%S", isEpoch)
         if nexusStatus == "succeeded":            
-            isJenkinsBuildSuccess = self.rundeckProcessing(buildNumberString, self.updatedAt, isForceSuccessRequired);                       
+            #isJenkinsBuildSuccess = self.rundeckProcessing(buildNumberString, self.updatedAt, isForceSuccessRequired);                       
+            isJenkinsBuildSuccess = True
         else :
             isJenkinsBuildSuccess = False             
         return isJenkinsBuildSuccess                  
@@ -789,40 +835,51 @@ class DummyDataAgent(BaseAgent):
         self.publishToolsData(rundeck_data, RundeckMetadata, "startTime", "%Y-%m-%dT%H:%M:%S", isEpoch)
         return isJenkinsBuildSuccess   
     
-    def qaTestProcessing(self, key, updatedAt, isForceSuccessRequired=False):   
+    def qaTestProcessing(self, key, updatedAt, isForceSuccessRequired=False):  
         statusOfRequirement = "Passed"          
         requirementData = []
         testData = []
         for requirement in self.totalRequirements:
             if requirement['jiraKey'] == key :
                 requirementId = requirement['requirement_id']
+                requirement['startedAt'] = updatedAt.strftime("%Y-%m-%dT%H:%M:%S")
+                time_offset = (random.randint(1, 3)) 
+                lastUpdatedDate = (updatedAt + datetime.timedelta(hours=time_offset))
+                requirement['lastUpdatedDate'] = lastUpdatedDate.strftime("%Y-%m-%dT%H:%M:%S")
                 for testCase in self.totalTestCases: 
                     if requirementId == testCase['requirementId']: 
                         if isForceSuccessRequired == False :         
                             statusOfTest = bool(random.getrandbits(1))
                             if (statusOfTest == False) :
                                 statusOfRequirement = "Failed"
-                                statusOfTest = "Failed"                                                            
+                                statusOfTest = "Failed"   
+                            else :
+                                statusOfTest = "Success"
+                                statusOfRequirement = "Passed"                                                         
                         else :
                             statusOfTest = "Success"
                             statusOfRequirement = "Passed" 
                         testCase ['status'] = statusOfTest
+                        testCase['toolName'] = "QTEST"
+                        testCase['categoryName'] = "ALM"
                         testData.append(testCase)           
                 metadata = {  "labels":["ALM", "QTEST", "DATA"]}            
                 self.publishToolsData(testData, metadata)
                 requirement['status'] = statusOfRequirement
                 requirementData.append(requirement)
-                metadata = {  "labels":["ALM", "QTEST", "DATA"]}            
-                self.publishToolsData(requirementData, metadata) 
+                metadata = {  "labels":["ALM", "QTEST", "DATA"], "dataUpdateSupported" : True, "uniqueKey" : ["jiraKey"]}            
+                isEpoch = False
+                self.publishToolsData(requirementData, metadata, "startedAt", "%Y-%m-%dT%H:%M:%S", isEpoch)
                 break        
         
         return statusOfRequirement
-    
+        
+        
     def serviceNowProcessing(self, releaseVersion):
         serviceNowSample = {}
         serviceNowData = []
         self.releaseBugData = []
-        serviceNowSample ['incident_id'] = 'IN_' + str(''.join([random.choice(string.digits) for n in xrange(10)]))
+        serviceNowSample ['incident_id'] = 'IN_' + str(''.join([random.choice(string.digits) for n in range(10)]))
         serviceNowSample ['release_Version'] = "V."+str(releaseVersion)
         serviceNowSample ['project_name'] = self.projectName
         status = random.choice(self.releaseStatus)       
@@ -835,7 +892,8 @@ class DummyDataAgent(BaseAgent):
            bugSample = {}           
            bugSample['lastUpdated'] = self.sprintStartDate.strftime("%Y-%m-%dT%H:%M:%S")
            bugSample['lastUpdatedEpoch'] = int(time.mktime(time.strptime(self.sprintStartDate.strftime("%Y-%m-%dT%H:%M:%S"), "%Y-%m-%dT%H:%M:%S")))   
-           bugKey=self.projectKeys[self.project_names.index(self.projectName)] + '-' + str(self.issueCreationStarted + 1)
+           #bugKey=self.projectKeys[self.project_names.index(self.projectName)] + '-' + str(self.issueCreationStarted + 1)
+           bugKey=self.projectKey + '-' + str(self.issueCreationStarted + 1)
            self.issueCreationStarted = self.issueCreationStarted + 1
            bugSample ['key'] = bugKey
            bugSample ['issueType'] = "Bug"
@@ -847,7 +905,8 @@ class DummyDataAgent(BaseAgent):
             bugSample = {}           
             bugSample['lastUpdated'] = self.sprintStartDate.strftime("%Y-%m-%dT%H:%M:%S")
             bugSample['lastUpdatedEpoch'] = int(time.mktime(time.strptime(self.sprintStartDate.strftime("%Y-%m-%dT%H:%M:%S"), "%Y-%m-%dT%H:%M:%S")))   
-            bugKey=self.projectKeys[self.project_names.index(self.projectName)] + '-' + str(self.issueCreationStarted + 1)
+            #bugKey=self.projectKeys[self.project_names.index(self.projectName)] + '-' + str(self.issueCreationStarted + 1)
+            bugKey=self.projectKey + '-' + str(self.issueCreationStarted + 1)
             self.issueCreationStarted = self.issueCreationStarted + 1
             bugSample ['key'] = bugKey
             bugSample ['issueType'] = "Bug"
@@ -870,9 +929,9 @@ class DummyDataAgent(BaseAgent):
         changeLog["fromString"] = fromString
         changeLog['issueKey'] = changeKey
         changeLog['toString'] = toString
-        time_offset_hours_change = (random.randint(01, 24))
+        time_offset_hours_change = (random.randint(0o1, 24))
         time_offset_seconds_change = (random.randint(101, 800))
-        time_offset_days_change = (random.randint(01, 05))
+        time_offset_days_change = (random.randint(0o1, 0o5))
         self.updatedAt = (updatedAt + datetime.timedelta(days=time_offset_days_change, hours=time_offset_hours_change, seconds=time_offset_seconds_change))
         changeLog['changeDate'] = self.updatedAt.strftime("%Y-%m-%dT%H:%M:%S")                              
         changeLogData.append(changeLog)
@@ -889,9 +948,9 @@ class DummyDataAgent(BaseAgent):
         pullRequest['author'] = git_author
         pullRequest['state'] = state
         pullRequest ['jiraKey'] = changeKey
-        time_offset_hours_change = (random.randint(01, 24))
+        time_offset_hours_change = (random.randint(0o1, 24))
         time_offset_seconds_change = (random.randint(101, 800))
-        time_offset_days_change = (random.randint(01, 05))
+        time_offset_days_change = (random.randint(0o1, 0o5))
         self.updatedAt = (updatedAt + datetime.timedelta(days=time_offset_days_change, hours=time_offset_hours_change, seconds=time_offset_seconds_change))
         
         if state == "Open" : 
@@ -904,9 +963,139 @@ class DummyDataAgent(BaseAgent):
         metadata = {  "labels":["PULL_REQUESTS", "DATA"], "dataUpdateSupported":True, "uniqueKey":["pullrequest_id"]}            
         self.publishToolsData(pullRequestData, metadata) 
         # self.pullRequestNo =self.pullRequestNo +1   
+        
+    def serviceNowChangeRequestProcessing(self, releaseVersion):
+        snowChangeReqData = []
+        isReleaseDelayed = bool(random.getrandbits(1))
+        if (isReleaseDelayed == False) :
+            time_offset = (random.randint(1, 6))
+            snow_startDate = (self.releaseEndDate - datetime.timedelta(hours=time_offset))
+        else:
+            time_offset = (random.randint(14, 17))
+            print("offset", time_offset)
+            snow_startDate = (self.releaseEndDate + datetime.timedelta(hours=time_offset))
+        snow_startDate_in_format = snow_startDate.strftime("%Y-%m-%dT%H:%M:%S")
+        snow_startDate_epoch = int(time.mktime(time.strptime(snow_startDate_in_format, "%Y-%m-%dT%H:%M:%S")))
+        time_offset_seconds = (random.randint(1800, 3600))
+        snow_endDate = (snow_startDate + datetime.timedelta(seconds=time_offset))
+        changeId = 'CHG' + str(snow_startDate_epoch)
+        self.artifactList = self.artifacts_id
+        
+        snowSampleData = {}
+        snowSampleData['changeId'] = changeId
+        snowSampleData['environment'] = "Production"
+        snowSampleData['category'] = "Application Release"
+        snowSampleData['ticketType'] = "Normal"
+        snowSampleData['shortDescription'] = "Change request for Release " + "V." + str(releaseVersion)
+        snowSampleData['state'] = "Closed"
+        snowSampleData['plannedStartDate'] = (self.releaseStartDate).strftime("%Y-%m-%dT%H:%M:%S")
+        snowSampleData['plannedEndDate'] = (self.releaseEndDate).strftime("%Y-%m-%dT%H:%M:%S")
+        snowSampleData['artifacts'] = self.artifactList
+        snowSampleData['sys_created_on'] = snow_startDate_in_format
+        snowSampleData['priority'] = "Medium"
+        snowSampleData['requestedBy'] = random.choice(self.requester)
+        snowSampleData['assignedTo'] = random.choice(self.approver)
+        snowSampleData['releaseVersion'] = "V." + str(releaseVersion)
+        snowSampleData['toolName'] = "SNOW"
+        snowSampleData['categoryName'] = "ITSM"
+        snowSampleData['sys_updated_on'] = snow_endDate.strftime("%Y-%m-%dT%H:%M:%S")
+        snowSampleData['projectName'] = self.projectName
+        
+        snowChangeReqData.append(snowSampleData)
+        snowMetadata = {"labels" : ["ITSM", "SNOW", "DATA"]}
+        isEpoch = False
+        self.publishToolsData(snowChangeReqData, snowMetadata, "sys_created_on", "%Y-%m-%dT%H:%M:%S", isEpoch)
+        
+        status = self.xlReleaseProcessing(snow_endDate, changeId)
+        return status
+        
+        
+    def xlReleaseProcessing(self, updateDate, changeId):
+        xlReleaseData = []
+        xlReleaseSampleData = {}
+        time_offset = (random.randint(60, 120))
+        xlRelease_startDate = (updateDate + datetime.timedelta(minutes=time_offset)) 
+        xlRelease_startDate_in_format = xlRelease_startDate.strftime("%Y-%m-%dT%H:%M:%S")
+        xlRelease_startDate_epoch = int(time.mktime(time.strptime(xlRelease_startDate_in_format, "%Y-%m-%dT%H:%M:%S")))
+        time_offset_seconds = (random.randint(1200, 2400))
+        xlRelease_endDate = (xlRelease_startDate + datetime.timedelta(seconds=time_offset_seconds))
+        status = "Success"
+        releaseId = "Applications/Folder5678/Releaseeb12345"
+        
+        xlReleaseSampleData["snowId"] = changeId
+        xlReleaseSampleData["releaseRiskProfile"] = "Configuration/riskProfiles/RiskProfileDefault"
+        xlReleaseSampleData["releaseStartDate"] = xlRelease_startDate_in_format
+        xlReleaseSampleData["releaseEndDate"] = (xlRelease_endDate).strftime("%Y-%m-%dT%H:%M:%S")
+        xlReleaseSampleData["releaseScheduledStartDate"] = (self.releaseStartDate).strftime("%Y-%m-%dT%H:%M:%S")
+        xlReleaseSampleData["releaseDueDate"] = (self.releaseEndDate).strftime("%Y-%m-%dT%H:%M:%S")
+        xlReleaseSampleData["releaseCreatedFromTrigger"] = False
+        xlReleaseSampleData["releaseOverdueNotified"] = True
+        xlReleaseSampleData["releaseId"] = releaseId
+        xlReleaseSampleData["releaseOwner"] = random.choice(self.requester)
+        xlReleaseSampleData["releaseType"] = "xlrelease.Release"
+        xlReleaseSampleData["releaseStatus"] = status
+        xlReleaseSampleData["releaseAllowConcurrentReleasesFromTrigger"] = True
+        xlReleaseSampleData["releaseTitle"] = "Release " + "V." + str(self.releaseVersion)
+        xlReleaseSampleData["releasePath"] = "releasePath/"
+        xlReleaseSampleData["releaseMaxConcurrentReleases"] = 100
+        xlReleaseSampleData["categoryName"] = "RELEASEMANAGEMENT"
+        xlReleaseSampleData["toolName"] = "XLRELEASE"
+        xlReleaseSampleData['projectName'] = self.projectName
+        xlReleaseSampleData['releaseVersion'] = "V." + str(self.releaseVersion)
+        
+        
+        xlReleaseData.append(xlReleaseSampleData)
+        xlReleaseMetadata = {"labels" : ["RELEASEMANAGEMENT", "XLRELEASE", "DATA"]}
+        isEpoch = False
+        self.publishToolsData(xlReleaseData, xlReleaseMetadata, "releaseStartDate", "%Y-%m-%dT%H:%M:%S", isEpoch)
+        
+        self.processXlReleasePhaseAndTask(releaseId, xlRelease_startDate, xlRelease_endDate)
+        
+        return status
+        
+    def processXlReleasePhaseAndTask(self, releaseId, xlRelease_startDate, xlRelease_endDate):
+        xlReleasePhaseData = []
+        xlReleasePhaseSampleData = {} 
+        phaseId = "Applications/Folder5678/Releaseeb12345/Phasebd2345"
+        xlReleasePhaseSampleData["phaseEndDate"] = xlRelease_endDate.strftime("%Y-%m-%dT%H:%M:%S") 
+        xlReleasePhaseSampleData["phaseId"] = phaseId 
+        xlReleasePhaseSampleData["phaseTitle"] = "Deploy to Prod" 
+        xlReleasePhaseSampleData["phaseStatus"] = "COMPLETED" 
+        xlReleasePhaseSampleData["phaseType"] = "xlrelease.Phase" 
+        xlReleasePhaseSampleData["releaseId"] = releaseId 
+        xlReleasePhaseSampleData["phaseStartDate"] = xlRelease_startDate.strftime("%Y-%m-%dT%H:%M:%S") 
+        xlReleasePhaseSampleData["toolName"] = "XLRELEASE" 
+        xlReleasePhaseSampleData["categoryName"] = "RELEASEMANAGEMENT"
+        xlReleasePhaseData.append(xlReleasePhaseSampleData)
+        xlReleasePhaseMetadata = {"labels" : ["RELEASEMANAGEMENT",  "XLRELEASE_PHASES", "DATA"]}
+        isEpoch = False
+        self.publishToolsData(xlReleasePhaseData, xlReleasePhaseMetadata, "phaseStartDate", "%Y-%m-%dT%H:%M:%S", isEpoch)
+        
+        xlReleasePhaseTaskData = []
+        xlReleasePhaseTaskSampleData = {}
+        xlReleasePhaseTaskSampleData["taskHasBeenFlagged"] = False 
+        xlReleasePhaseTaskSampleData["phaseId"] = phaseId 
+        xlReleasePhaseTaskSampleData["taskFailuresCount"] = 0 
+        xlReleasePhaseTaskSampleData["taskEndDate"] = xlRelease_endDate.strftime("%Y-%m-%dT%H:%M:%S") 
+        xlReleasePhaseTaskSampleData["taskType"] = "xlrelease.SequentialGroup" 
+        xlReleasePhaseTaskSampleData["releaseId"] = releaseId 
+        xlReleasePhaseTaskSampleData["taskWaitForScheduledStartDate"] = True 
+        xlReleasePhaseTaskSampleData["taskStatus"] = "ABORTED" 
+        xlReleasePhaseTaskSampleData["taskOverdueNotified"] = False 
+        xlReleasePhaseTaskSampleData["taskDueSoonNotified"] = False 
+        xlReleasePhaseTaskSampleData["taskStartDate"] = xlRelease_startDate.strftime("%Y-%m-%dT%H:%M:%S") 
+        xlReleasePhaseTaskSampleData["taskDelayDuringBlackout"] = False 
+        xlReleasePhaseTaskSampleData["taskPostponedDueToBlackout"] = False 
+        xlReleasePhaseTaskSampleData["taskTitle"] = "Deploy to Prod" 
+        xlReleasePhaseTaskSampleData["taskId"] = "Applications/Folder5678/Releaseeb12345/Phaseb109876/Task22"
+        xlReleasePhaseTaskSampleData["categoryName"] = "RELEASEMANAGEMENT" 
+        xlReleasePhaseTaskSampleData["toolName"] = "XLRELEASE"
+        xlReleasePhaseTaskData.append(xlReleasePhaseTaskSampleData)
+        xlReleasePhaseTaskMetadata = {"labels" : ["RELEASEMANAGEMENT",  "XLRELEASE_TASKS", "DATA"]}
+        self.publishToolsData(xlReleasePhaseTaskData, xlReleasePhaseTaskMetadata, "taskStartDate", "%Y-%m-%dT%H:%M:%S", isEpoch)
+        
     
-  
-       
+        
 
 if __name__ == "__main__":
     DummyDataAgent() 

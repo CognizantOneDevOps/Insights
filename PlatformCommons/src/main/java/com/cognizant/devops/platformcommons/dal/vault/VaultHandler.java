@@ -18,8 +18,6 @@ package com.cognizant.devops.platformcommons.dal.vault;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.ProcessingException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,6 +30,8 @@ import com.cognizant.devops.platformcommons.exception.RestAPI404Exception;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+
+import jakarta.ws.rs.ProcessingException;
 
 
 

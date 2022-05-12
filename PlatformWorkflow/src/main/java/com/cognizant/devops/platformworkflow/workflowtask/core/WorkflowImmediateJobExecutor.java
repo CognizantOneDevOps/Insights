@@ -28,7 +28,9 @@ import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
@@ -45,7 +47,9 @@ public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInter
 	final int maxWorkflowsRetries = ApplicationConfigProvider.getInstance().getAssessmentReport()
 			.getMaxWorkflowRetries();
 	private WorkflowDataHandler workflowProcessing = new WorkflowDataHandler();
-
+	
+	//private static final String strExpression="Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetryCount={} processingTime={} message={}";
+	//private static final String workflowExceptionMessage="WorkflowEmmediateJobExecutorfailed to execute due to exception ";
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		log.debug(" Worlflow Detail ====  Schedular Inside WorkflowImmediateJobExecutor ");
@@ -93,8 +97,7 @@ public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInter
 							mqRequestJson);		
 							
 					Thread.sleep(1);
-					log.debug("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetryCount={} processingTime={} message={}"
-							,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),firstworkflowTask.getWorkflowTaskEntity().getDescription(),firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),workflowConfig.getStatus(),"-"
+					log.debug(StringExpressionConstants.STR_EXP_WORKFLOW_3,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),firstworkflowTask.getWorkflowTaskEntity().getDescription(),firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),workflowConfig.getStatus(),"-"
 							,"-",workflowConfig.getScheduleType(),"-",processingTime,"-");
 
 				} catch (WorkflowTaskInitializationException  | PersistenceException e) {
@@ -102,25 +105,21 @@ public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInter
 					log.debug(" Worlflow Detail ====  workflow failed to execute due to MQ exception {}  ",
 							workflowConfig.getWorkflowId());
 					InsightsStatusProvider.getInstance()
-							.createInsightStatusNode("WorkflowEmmediateJobExecutorfailed to execute due to exception "
-									+ workflowConfig.getWorkflowId(), PlatformServiceConstants.FAILURE);
+							.createInsightStatusNode(AssessmentReportAndWorkflowConstants.WORKFLOW_IMMEDIATE_JOB_EXECUTOR_EXCEPTION+ workflowConfig.getWorkflowId(), PlatformServiceConstants.FAILURE);
 					workflowProcessing.updateWorkflowDetails(workflowConfig.getWorkflowId(),
 							WorkflowTaskEnum.WorkflowStatus.TASK_INITIALIZE_ERROR.toString(), false);
-					log.debug("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetryCount={} processingTime={} message={}"
-							,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),"-","-",workflowConfig.getStatus(),"-"
+					log.debug(StringExpressionConstants.STR_EXP_WORKFLOW_3,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),"-","-",workflowConfig.getStatus(),"-"
 							,"-",workflowConfig.getScheduleType(),"-",processingTime,e.getMessage());				
 				}catch(InterruptedException e) {
 					   //same label with diff statis in case of error
 					log.debug(" Worlflow Detail ====  workflow failed to execute due to InterruptedException {}  ",
 							workflowConfig.getWorkflowId());
 					InsightsStatusProvider.getInstance()
-							.createInsightStatusNode("WorkflowEmmediateJobExecutorfailed to execute due to exception "
-									+ workflowConfig.getWorkflowId(), PlatformServiceConstants.FAILURE);
+							.createInsightStatusNode(AssessmentReportAndWorkflowConstants.WORKFLOW_IMMEDIATE_JOB_EXECUTOR_EXCEPTION+ workflowConfig.getWorkflowId(), PlatformServiceConstants.FAILURE);
 					workflowProcessing.updateWorkflowDetails(workflowConfig.getWorkflowId(),
 							WorkflowTaskEnum.WorkflowStatus.TASK_INITIALIZE_ERROR.toString(), false);
 					Thread.currentThread().interrupt();
-					log.debug("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetryCount={} processingTime={} message={}"
-							,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),"-","-",workflowConfig.getStatus(),"-"
+					log.debug(StringExpressionConstants.STR_EXP_WORKFLOW_3,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),"-","-",workflowConfig.getStatus(),"-"
 							,"-",workflowConfig.getScheduleType(),"-",processingTime,e.getMessage());					
 				}catch (Exception e) {
 					   //same label with diff statis in case of error
@@ -128,12 +127,11 @@ public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInter
 					log.debug(" Worlflow Detail ====  workflow failed to execute due exception {}  ",
 							workflowConfig.getWorkflowId());
 					InsightsStatusProvider.getInstance()
-							.createInsightStatusNode("WorkflowEmmediateJobExecutorfailed to execute due to exception "+e.getMessage()
+							.createInsightStatusNode(AssessmentReportAndWorkflowConstants.WORKFLOW_IMMEDIATE_JOB_EXECUTOR_EXCEPTION+e.getMessage()
 									+ workflowConfig.getWorkflowId(), PlatformServiceConstants.FAILURE);
 					workflowProcessing.updateWorkflowDetails(workflowConfig.getWorkflowId(),
 							WorkflowTaskEnum.WorkflowStatus.TASK_INITIALIZE_ERROR.toString(), false);
-					log.debug("Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetryCount={} processingTime={} message={}"
-							,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),"-","-",workflowConfig.getStatus(),"-"
+					log.debug(StringExpressionConstants.STR_EXP_WORKFLOW_3,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),"-","-",workflowConfig.getStatus(),"-"
 							,"-",workflowConfig.getScheduleType(),"-",processingTime,e.getMessage());					
 				}
 			}

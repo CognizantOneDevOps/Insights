@@ -69,7 +69,7 @@ export class MileStoneListComponent implements OnInit {
 
   ngOnInit() {
     this.getAllConfig();
-    this.displayedColumns = ['radio', 'mileStoneName', 'startDate', 'endDate', 'status', 'details'];
+    this.displayedColumns = ['radio', 'mileStoneName', 'milestoneReleaseID', 'startDate', 'endDate', 'status', 'details'];
     this.currentPageValue = this.paginator.pageIndex * this.MAX_ROWS_PER_TABLE;
   }
 
@@ -91,7 +91,7 @@ export class MileStoneListComponent implements OnInit {
      // let id = element.id;
      // let outcome = element.outcome;
      // selectedOutcomeList.push({id:id,outcome:outcome});
-     selectedOutcomeList.push(element.outcomeId);
+     selectedOutcomeList.push(element.outcomeName);
      existingOutcomeList.push(element.id);
      serviceName = element.serviceName;
     }
@@ -101,6 +101,7 @@ export class MileStoneListComponent implements OnInit {
       queryParams: {
         "id": milestoneJson.id,
         "mileStoneName": milestoneJson.mileStoneName,
+        "milestoneReleaseID": milestoneJson.milestoneReleaseID,
         "startDate": milestoneJson.startDate,
         "endDate": milestoneJson.endDate,
         "outcomeList": selectedOutcomeList,
@@ -124,6 +125,11 @@ export class MileStoneListComponent implements OnInit {
       this.disableRestart = false;
     } else {
       this.disableRestart = true;
+    }
+    let startDateEpoch = Date.parse(event.value.startDate);
+    this.enableEdit = false;
+    if(Date.now() < startDateEpoch && event.value.status == "NOT_STARTED"){
+      this.enableEdit = true;
     }
   }
 
@@ -197,11 +203,11 @@ export class MileStoneListComponent implements OnInit {
             if (data.status === "success") {
               self.messageDialog.showApplicationsMessage("<b>" + "Deleted Successfully" + "</b>", "SUCCESS");
               self.refresh();
-            } else if (data.status == 'failure') {
+            } else if (data.status == 'failure' && data.message != null) {
               console.error(data)
               self.messageDialog.showApplicationsMessage(data.message, "ERROR");
             } else {
-              self.messageDialog.showApplicationsMessage("Failed to delete Please check logs for details.", "ERROR");
+              self.messageDialog.showApplicationsMessage("Failed to delete milestone, Please check logs for details.", "ERROR");
             }
           })
           .catch(function (data) {

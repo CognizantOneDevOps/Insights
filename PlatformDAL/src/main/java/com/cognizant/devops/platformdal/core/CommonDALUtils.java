@@ -24,6 +24,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.constants.CommonsAndDALConstants;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentReportTemplate;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsContentConfig;
@@ -37,6 +38,7 @@ import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 
 public class CommonDALUtils {
+	
 	private static final Logger log = LogManager.getLogger(CommonDALUtils.class);
 	
 	private CommonDALUtils() {
@@ -75,8 +77,8 @@ public class CommonDALUtils {
 			} catch (IllegalArgumentException | IllegalAccessException e) {
 				throw new IllegalStateException(e);
 			}
-			Object oldValue = memberValues.get("columnDefinition");
-			memberValues.put("columnDefinition", "BLOB");
+			Object oldValue = memberValues.get(CommonsAndDALConstants.COLUMN_DEFINITION );
+			memberValues.put(CommonsAndDALConstants.COLUMN_DEFINITION  , "BLOB");
 		}
 		
 		Map<Object, String> classBooleanMap = new HashMap<>();
@@ -84,14 +86,14 @@ public class CommonDALUtils {
 		classBooleanMap.put(new AgentConfig(), "iswebhook");
 		classBooleanMap.put(new CorrelationConfiguration(), "enableCorrelation");
 		classBooleanMap.put(new CorrelationConfiguration(), "isSelfRelation");
-		classBooleanMap.put(new InsightsAssessmentReportTemplate() ,"isActive");
-		classBooleanMap.put(new InsightsContentConfig() ,"isActive");
-		classBooleanMap.put(new InsightsKPIConfig() ,"isActive");
-		classBooleanMap.put(new AutoMLConfig(), "isActive");
+		classBooleanMap.put(new InsightsAssessmentReportTemplate() ,CommonsAndDALConstants.ISACTIVE);
+		classBooleanMap.put(new InsightsContentConfig() ,CommonsAndDALConstants.ISACTIVE);
+		classBooleanMap.put(new InsightsKPIConfig() ,CommonsAndDALConstants.ISACTIVE);
+		classBooleanMap.put(new AutoMLConfig(), CommonsAndDALConstants.ISACTIVE);
 		classBooleanMap.put(new WebHookConfig(), "subscribeStatus");
 		classBooleanMap.put(new WebHookConfig(), "isUpdateRequired");
 		classBooleanMap.put(new WebHookConfig(), "isEventProcessing");
-		classBooleanMap.put(new InsightsWorkflowConfiguration(), "isActive");
+		classBooleanMap.put(new InsightsWorkflowConfiguration(), CommonsAndDALConstants.ISACTIVE);
 		classBooleanMap.put(new InsightsWorkflowConfiguration(), "runImmediate");
 		classBooleanMap.put(new InsightsWorkflowConfiguration(), "reoccurence");
 		
@@ -114,8 +116,8 @@ public class CommonDALUtils {
 			} catch (IllegalArgumentException | IllegalAccessException e) {
 				throw new IllegalStateException(e);
 			}
-			Object oldValue = memberValues.get("columnDefinition");
-			memberValues.put("columnDefinition", "INT");
+			Object oldValue = memberValues.get(CommonsAndDALConstants.COLUMN_DEFINITION );
+			memberValues.put(CommonsAndDALConstants.COLUMN_DEFINITION  , "INT");
 		}
 	}
 }

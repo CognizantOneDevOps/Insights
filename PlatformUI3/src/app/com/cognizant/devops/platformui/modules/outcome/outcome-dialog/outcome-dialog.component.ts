@@ -19,6 +19,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MessageDialogService } from '../../application-dialog/message-dialog-service';
 import { OutcomeService } from '../outcome.service';
+import { SelectionModel } from '@angular/cdk/collections';
 
 @Component({
   selector: 'app-outcomet-dialog',
@@ -31,6 +32,7 @@ export class OutComeDialogComponent implements OnInit {
   outcomeDatasource = new MatTableDataSource<any>();
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   selectedOutcome: any;
+  selection = new SelectionModel<[]>(true, []);
 
   constructor( private outcomeService: OutcomeService, public dialogRef: MatDialogRef<OutComeDialogComponent>,
               private messageDialog: MessageDialogService) {
@@ -44,14 +46,19 @@ export class OutComeDialogComponent implements OnInit {
     this.outcomeDatasource.paginator = this.paginator;
 
   }
+
+  selectHandler(element: any) {
+    this.selection.toggle(element);
+  }
+
   applyFilter(filterValue: string) {
     this.outcomeDatasource.filter = filterValue.trim();
   }
   setOutcomeValue() {
-    this.outcomeService.setOutcomeSubject.next(this.selectedOutcome);
+    this.outcomeService.setOutcomeSubject.next(this.selection.selected);
   }
   onOkClick() {
-    let data = this.selectedOutcome;
+    //let data = this.selectedOutcome;
     this.setOutcomeValue();
     this.dialogRef.close();
   }
@@ -79,6 +86,7 @@ export class OutComeDialogComponent implements OnInit {
   }
   }
   closeShowDetailsDialog(): void {
+    this.outcomeService.setOutcomeSubject.next([]);
     this.dialogRef.close();
   }
 

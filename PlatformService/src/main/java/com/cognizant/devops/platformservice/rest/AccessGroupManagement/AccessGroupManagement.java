@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.NewCookie;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,6 +49,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import jakarta.ws.rs.core.NewCookie;
 
 @RestController
 @RequestMapping("/accessGrpMgmt")
@@ -128,7 +129,7 @@ public class AccessGroupManagement {
 	}
 
 	@Deprecated
-	public String lastSeenOfUser(String name) {
+	/*public String lastSeenOfUser(String name) {
 		try {
 			String lastSeen = "";
 			GrafanaHandler grafanaHandler = new GrafanaHandler();
@@ -158,7 +159,7 @@ public class AccessGroupManagement {
 			return "-";
 		}
 
-	}
+	}*/
 
 	@PostMapping(value = "/assignUser", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject assignUser(@RequestBody String reqassignUserdata) {

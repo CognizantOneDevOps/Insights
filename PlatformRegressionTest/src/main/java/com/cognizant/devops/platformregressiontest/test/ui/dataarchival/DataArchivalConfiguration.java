@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.ui.dataarchival;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.openqa.selenium.By;
@@ -29,7 +30,7 @@ import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectMod
 
 public class DataArchivalConfiguration extends DataArchivalObjectRepository{
 
-	WebDriverWait wait = new WebDriverWait(driver, 20);
+	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
 	
 	private static final Logger log = LogManager.getLogger(DataArchivalConfiguration.class);

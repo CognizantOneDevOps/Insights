@@ -274,7 +274,7 @@ export class MenuItem {
               title: "Business Mapping",
               menuId : "BusinessMapping"
             },
-           /* {
+           {
               displayName: 'ROI',
               iconName: 'feature',
               isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
@@ -301,7 +301,7 @@ export class MenuItem {
                   menuId : "MileStoneConfig"
                 }
               ]
-            }, */
+            },
             {
               displayName: 'Report Configuration',
               iconName: 'feature',

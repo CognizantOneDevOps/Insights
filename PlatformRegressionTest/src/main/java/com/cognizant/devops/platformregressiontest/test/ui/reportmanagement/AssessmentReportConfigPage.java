@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.ui.reportmanagement;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -32,7 +33,7 @@ import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectMod
 
 public class AssessmentReportConfigPage extends AssessmentReportObjectRepository {
 
-	WebDriverWait wait = new WebDriverWait(driver, 20);
+	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
 	private static final Logger log = LogManager.getLogger(AssessmentReportConfigPage.class);
 

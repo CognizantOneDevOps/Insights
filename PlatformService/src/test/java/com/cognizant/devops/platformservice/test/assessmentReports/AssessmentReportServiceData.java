@@ -64,8 +64,10 @@ public class AssessmentReportServiceData {
 	JsonObject registerContentJson = null;
 	JsonObject incorrectregisterContentJson = null;
 	JsonObject registerkpiJson = null;
+	JsonObject registerROIkpiJson = null;
 	JsonObject contentWithoutKpiJson = null;
 	JsonObject reportTemplateJson = null;
+	JsonObject reportTemplateROIJson = null;
 	JsonObject reportTemplateWithoutKPIsJson = null;
 	JsonObject reportTemplateWithoutExistingKPIDsJson = null;
 	JsonObject incorrectReportTemplateJson = null;
@@ -102,6 +104,7 @@ public class AssessmentReportServiceData {
 	Long oneTimeExpectedAssessmentEndDate = 0L;
 	Long oneTimeExpectedNextRun = 0L;
 	JsonObject oneTimeAssessmentReportJson = null;
+	JsonObject oneTimeAssessmentROIReportJson = null;
 
 	Long biWeeklyExpectedAssessmentStartDate = 0L;
 	Long biWeeklyExpectedAssessmentEndDate = 0L;
@@ -148,6 +151,7 @@ public class AssessmentReportServiceData {
 
 	String deleteAssessmentReportWrongConfigId = "0";
 	int reportIdForList = 0;
+	int reportIdForROI = 0;
 	int grafanaReportId = 0;
 	int taskID = 0;
 	int pdftaskID = 0;
@@ -159,7 +163,7 @@ public class AssessmentReportServiceData {
 
 	String reportTemplateSave = "{\"reportName\":\"report_template_save\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":100201,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"Query\"}]}]}";
 
-	String editReportTemplate = "{\"reportName\":\"report_template_save\",\"reportId\":\"reportIdData\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":100201,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"Query\"}]},{\"kpiId\":100144,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"Query\"}]}]}";
+	String editReportTemplate = "{\"reportName\":\"report_template_save\",\"reportId\":\"reportIdData\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":100201,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"Query\"}]},{\"kpiId\":100144,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"Query\"}]}]}";	
 
 	public static List<Integer> contentIdList = new ArrayList<Integer>();
 	public static List<Integer> kpiIdList = new ArrayList<Integer>();
@@ -209,6 +213,9 @@ public class AssessmentReportServiceData {
 
 		String registerkpi = "{\"kpiId\":100201,\"name\":\"Total Successful Deployments\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN count(n.SPKstatus) as totalDeploymentCount\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"totalDeploymentCount\",\"outputDatasource\":\"NEO4J\",\"usecase\":\"\"}";
 		registerkpiJson = convertStringIntoJson(registerkpi);
+		
+		String registerROIkpi = "{\"kpiId\":100202,\"name\":\"Total Successful Deployments\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN count(n.SPKstatus) as totalDeploymentCount\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"totalDeploymentCount\",\"outputDatasource\":\"NEO4J\",\"usecase\":\"\"}";
+		registerROIkpiJson = convertStringIntoJson(registerROIkpi);
 
 		String incorrectRegisterkpi = "{\"kpiId\":1001,\"name\":\"Avg all employee productivity for threshold \",\"schedule\":\"DAILY\",\"toolName\":\"PRODUCTIVITY\",\"group\":\"PRODUCTIVITY\",\"lastRunTime\":\"1586284260000\",\"neo4jQuery\":\"MATCH (n:PRODUCTIVITY) where n.completionDateEpochTime > {startTime} AND n.completionDateEpochTime < {endTime} WITH  avg(n.storyPoints*8) as StoryPoint, avg(n.authorTimeSpent) as authorTimeSpent  return   StoryPoint, authorTimeSpent, round((toFloat(StoryPoint)/authorTimeSpent)*100) as Productivity\",\"resultField\":\"Productivity\"}";
 		incorrectregisterkpiJson = convertStringIntoJson(incorrectRegisterkpi);
@@ -224,6 +231,9 @@ public class AssessmentReportServiceData {
 
 		String reportTemplate = "{\"reportName\":\"Fail_Report_test\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":100201,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"Query\"}]}]}";
 		reportTemplateJson = convertStringIntoJson(reportTemplate);
+		
+		String reportTemplateROI = "{\"reportName\":\"ROI_ReportTest\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"templateType\":\"ROITemplate\",\"kpiConfigs\":[{\"kpiId\":100202,\"visualizationConfigs\":[{\"vId\":\"101\",\"vQuery\":\"Query\"}]}]}";
+		reportTemplateROIJson = convertStringIntoJson(reportTemplateROI);
 		
 		String registerGrafanakpi = "{\"kpiId\":200202,\"name\":\"Total Successful Deployments\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN count(n.SPKstatus) as totalDeploymentCount\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"totalDeploymentCount\",\"outputDatasource\":\"NEO4J\",\"usecase\":\"\"}";
 		registerGrafanakpiJson = convertStringIntoJson(registerGrafanakpi);
@@ -288,6 +298,10 @@ public class AssessmentReportServiceData {
 		oneTimeExpectedAssessmentEndDate = getEndDate("2020-07-03T00:00:00Z");
 		oneTimeExpectedNextRun = 0L;
 		oneTimeAssessmentReportJson = convertStringIntoJson(oneTimeAssessmentReport);
+		
+		String oneTimeAssessmentROIReport = "{\"reportName\":\"ROI_OneTime_deployment_test\",\"reportTemplate\":" + reportIdForROI + ", \"milestoneId\": 12220 ,\"emailList\":\"hi@gmail.com\",\"schedule\":\"ONETIME\",\"startdate\":\"2020-07-01T00:00:00Z\",\"enddate\":\"2020-07-03T00:00:00Z\",\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
+				+ taskID + ",\"sequence\":0}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null,\"orgName\":\"Test Org\",\"userName\":\"Test_User\"}";
+		oneTimeAssessmentROIReportJson = convertStringIntoJson(oneTimeAssessmentROIReport);
 
 		String biWeeklyAssessmentReport = "{\"reportName\":\"BiWeekly_deployment_test\",\"reportTemplate\":" + reportIdForList + ",\"emailList\":\"dib@dib.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"startdate\":\"2020-07-01T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
 				+ taskID + ",\"sequence\":0}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null,\"orgName\":\"Test Org\",\"userName\":\"Test_User\"}";

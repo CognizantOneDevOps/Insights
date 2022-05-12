@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonObject;
 
 public abstract class ComponentHealthLogger {
@@ -31,12 +32,12 @@ public abstract class ComponentHealthLogger {
 	private static final Logger log = LogManager.getLogger(ComponentHealthLogger.class);
 	private  static final String TIMEZONE = "GMT";
 	
-	public boolean createComponentStatusNode(String label,String version,String message,String status,Map<String,String> parameter) {
+	public boolean createComponentStatusNode(String label,String version,String message,String status,Map<String,String> parameter) throws InsightsCustomException {
 		JsonObject response = null;
 		try {
 			String utcdate = InsightsUtils.getUtcTime(TIMEZONE);
-			List<JsonObject> dataList = new ArrayList<JsonObject>();
-			List<String> labels = new ArrayList<String>();
+			List<JsonObject> dataList = new ArrayList<>(); 
+			List<String> labels = new ArrayList<>();
 			labels.addAll(Arrays.asList(label.split(":")));
 			JsonObject jsonObj = new JsonObject();
 			jsonObj.addProperty("version", version==null?"-":version);
@@ -48,10 +49,11 @@ public abstract class ComponentHealthLogger {
 				jsonObj.addProperty(entry.getKey(), entry.getValue());
 			}
 			dataList.add(jsonObj);
-			response = SystemStatus.addSystemInformationInNeo4j(version, dataList, labels);
+			response = SystemStatus.addSystemInformationInNeo4j( dataList, labels);
 		} catch (Exception e) {
 			log.error("Unable to create service health Node {} ",e.getMessage());
-			throw new RuntimeException(e.getMessage());
+			
+			throw new InsightsCustomException(e.getMessage());
 		}
 		if (response!=null) {
 			return Boolean.TRUE;

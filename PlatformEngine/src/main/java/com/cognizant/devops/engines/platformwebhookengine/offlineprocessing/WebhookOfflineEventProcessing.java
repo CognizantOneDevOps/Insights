@@ -51,7 +51,6 @@ public class WebhookOfflineEventProcessing implements Job, ApplicationConfigInte
 	private static Logger log = LogManager.getLogger(WebhookOfflineEventProcessing.class);
 	String jobName="";
 	
-
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		log.debug("Webhook Offline Event Processing Started ======");
@@ -76,7 +75,6 @@ public class WebhookOfflineEventProcessing implements Job, ApplicationConfigInte
 	}
 
 	public void execute(List<WebHookConfig> webhookEventConfigs) {
-
 		for (WebHookConfig webhookEventConfig : webhookEventConfigs) {
 			try {
 /*				WebhookEventProcessing webhookEventProcessing = null;
@@ -168,5 +166,4 @@ public class WebhookOfflineEventProcessing implements Job, ApplicationConfigInte
 		}
 		return isDue;
 	}
-
 }

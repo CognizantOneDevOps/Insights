@@ -16,6 +16,7 @@
 package com.cognizant.devops.platformregressiontest.test.ui.reportmanagement;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -43,7 +44,7 @@ import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectMod
 
 public class ContentConfigurationPage extends ContentConfigurationObjectRepository {
 
-	WebDriverWait wait = new WebDriverWait(driver, 20);
+	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
 	public static final String THRESHOLD_RANGE = "THRESHOLD_RANGE";
 	public static final String THRESHOLD = "THRESHOLD";

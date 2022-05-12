@@ -31,7 +31,7 @@ public class MasterDataDAL extends BaseDAL {
 	private static final Logger log = LogManager.getLogger(MasterDataDAL.class);
 	
 	public static final List<String> MASTER_TABLE_LIST = Collections.unmodifiableList(Arrays.asList("agent_configuration","INSIGHTS_SCHEDULER_TASK_DEFINITION"
-												,"INSIGHTS_WORKFLOW_TYPE","INSIGHTS_WORKFLOW_TASK","INSIGHTS_ROI_TOOLS"));
+												,"INSIGHTS_WORKFLOW_TYPE","INSIGHTS_WORKFLOW_TASK","INSIGHTS_ROI_TOOLS","INSIGHTS_ASSESSMENT_REPORT_TEMPLATE"));
 
 	public void processMasterDataQuery(String query) throws InsightsCustomException {
 		try {

@@ -24,10 +24,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -36,6 +38,7 @@ import org.springframework.util.FileCopyUtils;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.AgentCommonConstant;
+import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 
 public class AgentManagementTestData {
 	ClassLoader classLoader = ClassLoader.getSystemClassLoader();
@@ -64,6 +67,9 @@ public class AgentManagementTestData {
 	
 	
 	public void prepareOfflineAgent(String version, String tool) throws IOException {
+		String login = ApplicationConfigProvider.getInstance().getAgentDetails().getNexusUserName() 
+				+ ":" +ApplicationConfigProvider.getInstance().getAgentDetails().getNexusPassword();
+		String base64login = Base64.getEncoder().encodeToString(login.getBytes());
 		String folderPath = new File(offlineAgentPath+ File.separator + version + File.separator + tool).getCanonicalPath();
 		File offlineAgentFolder = new File(folderPath);
 		offlineAgentFolder.mkdirs();
@@ -71,7 +77,10 @@ public class AgentManagementTestData {
 				+ version + AgentCommonConstant.AGENTS + tool;
 		srcToolPath = srcToolPath.trim() + "/" + tool.trim() + AgentCommonConstant.ZIPEXTENSION;
 		File zip = File.createTempFile("agent_", ".zip", offlineAgentFolder);
-		try(InputStream in = new BufferedInputStream(new URL(srcToolPath).openStream(), 1024);
+		URL url = new URL(srcToolPath);
+		URLConnection urlConnection = url.openConnection();
+		urlConnection.setRequestProperty(AuthenticationUtils.AUTH_HEADER_KEY, "Basic " + base64login);
+		try(InputStream in = new BufferedInputStream(urlConnection.getInputStream(), 1024);
 				OutputStream out = new BufferedOutputStream(new FileOutputStream(zip))){
 			copyInputStream(in, out);
 		}

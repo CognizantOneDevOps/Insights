@@ -135,7 +135,8 @@ class DynatraceROIAgent(BaseAgent):
         outcomeMetadata = {"milestoneId": outcomeDetails["milestoneId"], 
                     "milestoneName": outcomeDetails["milestoneName"],
                     "outcomeName": outcomeDetails["outcomeName"],
-                    "outcomeId": outcomeDetails["outcomeId"],"from": startDate, "to": endDate}
+                    "outcomeId": outcomeDetails["outcomeId"],"from": startDate, "to": endDate,
+                    "milestoneReleaseId": outcomeDetails["milestoneReleaseId"]}
         if metricName in logQueries:
             self.headers["Accept"] = "application/json"
             query = logQueries.get(metricName, {}).get("query",None)

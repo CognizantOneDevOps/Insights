@@ -32,8 +32,6 @@ export class OutcomeEditComponent implements OnInit{
 
     isProgress: boolean = false;
     outcomeForm: FormGroup;
-    kpiId: any;
-    category: any;
     outcomeArray= [{'type':'Tech'},{'type':'Business'}];
     toolArray:[];
     toolConfigMap = new Map();
@@ -58,17 +56,17 @@ export class OutcomeEditComponent implements OnInit{
             outcomeName: ['', [Validators.required]],
             outcomeType: ['', [Validators.required]],
             toolName: ['', [Validators.required]],
-            newRelicAppId: [''],
             splunkIndex: [''],
-            metricName: [''],
-            metricKey: [''],
-            logKey: [''],
+            // newRelicAppId: [''],
+            // NewRelicMetricName: [''],
+            DynatraceMetricKey: [''],
+            ESLogKey: [''],
             isActive: [false,[Validators.required]],
             toolId: [''],
-            category: [''],
-            toolQueue: [''],
-            toolStatus: [''],
-            createdDate: [''],
+            // category: [''],
+            // toolQueue: [''],
+            // toolStatus: [''],
+            // createdDate: [''],
             metricUrl: ['', [Validators.required]],
             parameters: this.formBuilder.array([])
         });
@@ -174,11 +172,10 @@ export class OutcomeEditComponent implements OnInit{
                 result =  toolJson
                 break
             }
-            case 'NEWRELIC': {
+            case 'ELASTICSEARCH': {
                 let toolSpecificProps = {}
                 toolJson = {...value};
-                toolSpecificProps[NEW_RELIC_APPLICATION_ID] = value.newRelicAppId
-                toolSpecificProps[NEW_RELIC_METRIC_NAME] = value.metricName
+                toolSpecificProps["ESLogKey"] = value.ESLogKey
                 toolJson['toolConfigJson'] = toolSpecificProps
                 result =  toolJson
                 break
@@ -186,22 +183,27 @@ export class OutcomeEditComponent implements OnInit{
             case 'DYNATRACEROI': {
                 let toolSpecificProps = {}
                 toolJson = {...value};
-                toolSpecificProps[DynatraceROI_METRIC_KEY] = value.metricKey 
+                toolSpecificProps[DynatraceROI_METRIC_KEY] = value.DynatraceMetricKey 
                 toolJson['toolConfigJson'] = toolSpecificProps
                 result =  toolJson
                 break
             }
-            case 'ELASTICSEARCH': {
+            /* case 'NEWRELIC': {
                 let toolSpecificProps = {}
                 toolJson = {...value};
-                toolSpecificProps["logKey"] = value.logKey 
+                toolSpecificProps[NEW_RELIC_APPLICATION_ID] = value.newRelicAppId
+                toolSpecificProps[NEW_RELIC_METRIC_NAME] = value.NewRelicMetricName
                 toolJson['toolConfigJson'] = toolSpecificProps
                 result =  toolJson
                 break
-            }
+            } */
             default:
-                return value
+                result = value;
+                break
         }
+        delete result["ESLogKey"]
+        delete result[SPLUNK_SUMMARY_INDEX]
+        delete result[DynatraceROI_METRIC_KEY]
         return result;
     }
 

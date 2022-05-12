@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.ui.correlationbuilder;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -43,7 +44,7 @@ import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectMod
  */
 public class CorrelationBuilderConfiguration extends CorrelationObjectRepository {
 
-	WebDriverWait wait = new WebDriverWait(driver, 20);
+	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
 	Map<String, String> testData = new HashMap<>();
 
@@ -590,7 +591,7 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 	 * @param timeout
 	 */
 	public static void sendKeys(WebElement element, String value, int timeout) {
-		new WebDriverWait(driver, timeout).until(ExpectedConditions.visibilityOf(element));
+		new WebDriverWait(driver, Duration.ofSeconds(timeout)).until(ExpectedConditions.visibilityOf(element));
 		element.sendKeys(value);
 	}
 
@@ -601,7 +602,7 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 	 * @param timeout
 	 */
 	public static void clickOn(WebElement element, int timeout) {
-		new WebDriverWait(driver, timeout).until(ExpectedConditions.visibilityOf(element)).click();
+		new WebDriverWait(driver, Duration.ofSeconds(timeout)).until(ExpectedConditions.visibilityOf(element)).click();
 	}
 
 	/**
@@ -611,7 +612,7 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 	 * @return size of list of web elements
 	 */
 	public static int visibilityOfAllElements(List<WebElement> element, int timeout) {
-		new WebDriverWait(driver, timeout).until(ExpectedConditions.visibilityOfAllElements(element));
+		new WebDriverWait(driver, Duration.ofSeconds(timeout)).until(ExpectedConditions.visibilityOfAllElements(element));
 		return element.size();
 	}
 
@@ -623,7 +624,7 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 	 * @return true if element is displayed else false
 	 */
 	private boolean visibilityOf(WebElement element, int timeout) {
-		new WebDriverWait(driver, timeout).until(ExpectedConditions.visibilityOf(element));
+		new WebDriverWait(driver, Duration.ofSeconds(timeout)).until(ExpectedConditions.visibilityOf(element));
 		return element.isDisplayed();
 	}
 

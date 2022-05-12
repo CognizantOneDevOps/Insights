@@ -80,6 +80,19 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 			Assert.fail(e.getMessage());
 		}
 	}
+	
+	@Test(priority = 2)
+	public void testsaveROIKpiDefinition() throws InsightsCustomException, IOException {
+		try {
+			int response = assessmentService.saveKpiDefinition(registerROIkpiJson);
+			InsightsKPIConfig kpi = reportConfigDAL.getKPIConfig(registerROIkpiJson.get("kpiId").getAsInt());
+			Assert.assertNotNull(kpi);
+			Assert.assertNotNull(kpi.getKpiId());
+			Assert.assertEquals(kpi.getKpiId().intValue(), registerROIkpiJson.get("kpiId").getAsInt());
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
 
 	@Test(priority = 2, expectedExceptions = InsightsCustomException.class)
 	public void testsaveKpiDefinitionDuplicateKpiId() throws InsightsCustomException, IOException {
@@ -187,6 +200,21 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 			reportIdForList = assessmentService.saveTemplateReport(reportTemplateJson);
 			InsightsAssessmentReportTemplate report = (InsightsAssessmentReportTemplate) reportConfigDAL
 					.getReportTemplateByReportId(reportIdForList);
+			assessmentReportDataInit();
+			Assert.assertNotNull(report);
+			Assert.assertTrue(report.getReportsKPIConfig().size() > 0);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test(priority = 15)
+	public void testSaveROIReportTemplate() throws InsightsCustomException, InterruptedException {
+		Thread.sleep(1000);
+		try {
+			reportIdForROI = assessmentService.saveTemplateReport(reportTemplateROIJson);
+			InsightsAssessmentReportTemplate report = (InsightsAssessmentReportTemplate) reportConfigDAL
+					.getReportTemplateByReportId(reportIdForROI);
 			assessmentReportDataInit();
 			Assert.assertNotNull(report);
 			Assert.assertTrue(report.getReportsKPIConfig().size() > 0);
@@ -376,6 +404,34 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(),
 					oneTimeAssessmentReportJson.get("reportTemplate").getAsInt(),
+					"Report Template not present in db as expected");
+			Assert.assertEquals(assessment.getStartDate(), oneTimeExpectedAssessmentStartDate, "Start Date not equal");
+			Assert.assertEquals(assessment.getEndDate(), oneTimeExpectedAssessmentEndDate, "End date not equal");
+			Assert.assertEquals(assessment.getWorkflowConfig().getNextRun(), oneTimeExpectedNextRun,
+					"Next run not equal");
+			Assert.assertTrue(assessment.getWorkflowConfig().getTaskSequenceEntity().size() > 0,
+					"Records not present in Workflow Task Sequence table");
+			Set<InsightsWorkflowTaskSequence> set = assessment.getWorkflowConfig().getTaskSequenceEntity();
+			int noOfTasks = set.size();
+			set.forEach(x -> {
+				if (x.getSequence() == noOfTasks)
+					Assert.assertEquals(x.getNextTask().intValue(), -1, "Last task's next task not assigned -1");
+			});
+			Assert.assertFalse(assessment.getWorkflowConfig().isReoccurence());
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test(priority = 26)
+	public void testSaveROIOneTimeAssessmentReport() throws InsightsCustomException, InterruptedException {
+		Thread.sleep(1000);
+		try {
+			JsonObject responseJson = assessmentService.saveAssessmentReport(oneTimeAssessmentROIReportJson);
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJson.get("assessmentReportId").getAsInt());
+			Assert.assertNotNull(assessment, "Report not found in db");
+			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(),
+					oneTimeAssessmentROIReportJson.get("reportTemplate").getAsInt(),
 					"Report Template not present in db as expected");
 			Assert.assertEquals(assessment.getStartDate(), oneTimeExpectedAssessmentStartDate, "Start Date not equal");
 			Assert.assertEquals(assessment.getEndDate(), oneTimeExpectedAssessmentEndDate, "End date not equal");
@@ -788,6 +844,7 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 				quarterlyAssessmentReportJson.get("reportName").getAsString(),
 				yearlyAssessmentReportJson.get("reportName").getAsString(),
 				oneTimeAssessmentReportJson.get("reportName").getAsString(),
+				oneTimeAssessmentROIReportJson.get("reportName").getAsString(),
 				biWeeklyAssessmentReportJson.get("reportName").getAsString(),
 				triWeeklyAssessmentReportJson.get("reportName").getAsString(),
 				triWeeklyAssessmentWithDataSourceReportJson.get("reportName").getAsString(),
@@ -837,6 +894,7 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		try {
 			reportConfigDAL.deleteReportTemplatebyReportID(reportIdForList);
 			reportConfigDAL.deleteReportTemplatebyReportID(grafanaReportId);
+			reportConfigDAL.deleteReportTemplatebyReportID(reportIdForROI);
 		} catch (Exception e) {
 			log.error("Error cleaning up at AssessmentReportsServiceTest Report template", e);
 		}
@@ -851,6 +909,7 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		// Delete KPI
 		try {
 			reportConfigDAL.deleteKPIbyKpiID(registerkpiJson.get("kpiId").getAsInt());
+			reportConfigDAL.deleteKPIbyKpiID(registerROIkpiJson.get("kpiId").getAsInt());
 			reportConfigDAL.deleteKPIbyKpiID(registerGrafanakpiJson.get("kpiId").getAsInt());
 		} catch (Exception e) {
 			log.error("Error cleaning up at AssessmentReportsServiceTest KPI record", e);

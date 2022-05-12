@@ -36,6 +36,7 @@ class ElasticSearchAgent(BaseAgent):
         eventDetails = json.loads(data)
         milestoneId = eventDetails.get("milestoneId", None)
         milestoneName = eventDetails.get("milestoneName", None)
+        milestoneReleaseId = eventDetails.get("milestoneReleaseId", None)
         startDate = eventDetails.get("startDate", None)
         endDate = eventDetails.get("endDate", None)
         outcomeName = eventDetails.get("outcomeName", None)
@@ -65,7 +66,8 @@ class ElasticSearchAgent(BaseAgent):
                 "index_name": index_name,
                 "statusQueue": statusQueue,
                 "lastUpdatedDate": self.timeStampNow(),
-                "status": "NOT_STARTED"
+                "status": "NOT_STARTED",
+                "milestoneReleaseId": milestoneReleaseId
                 }
         if trackId in milestoneTrackingDetails and milestoneTrackingDetails[trackId]["status"] == "ERROR":
             milestoneTrackingDetails[trackId]["outcomeName"] = outcomeName
@@ -144,7 +146,8 @@ class ElasticSearchAgent(BaseAgent):
                     "milestoneName": outcomeDetails["milestoneName"],
                     "outcomeName": outcomeDetails["outcomeName"],
                     "outcomeId": outcomeDetails["outcomeId"],
-                    "count": count,"from": startDate, "to": endDate}
+                    "count": count,"from": startDate, "to": endDate,
+                    "milestoneReleaseId": outcomeDetails["milestoneReleaseId"]}
         self.publishToolsData(data)
         
     def updateStatusInTracking(self, status, trackId):

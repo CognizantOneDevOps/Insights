@@ -90,9 +90,22 @@
                     <input matinput maxlength="100" [(ngModel)]="description" class="form-control" type="text" autocomplete="off" 
                     placeholder="Enter description">
                 </td>
-                <td>
-                    <!-- <span class="infoText">Add description for report template</span> -->
-                </td>
+                <!-- <td>
+                    
+                </td> -->
+                <div class="infoText">
+                    <td class="mat-cell" class="columnName">
+                        <span class="mainText">Template Type</span>
+                        <span style="color:#ff0000;">*</span>
+                    </td>
+                    <td class="columnComponent" style="padding-top: 5px;">
+                        <mat-select  class="form-control" required placeholder="Select template type"
+                                color="primary" [(ngModel)]="templateType">
+                                <mat-option *ngFor="let vUtil of templateTypeList" value="{{vUtil}}" style="color:#0033A0">
+                                     {{vUtil}}</mat-option>
+                        </mat-select>
+                    </td>
+                </div>
             </tr>
         </tbody>
     </table>

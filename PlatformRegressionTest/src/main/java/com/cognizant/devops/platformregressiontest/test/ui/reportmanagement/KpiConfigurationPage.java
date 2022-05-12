@@ -16,6 +16,7 @@
 package com.cognizant.devops.platformregressiontest.test.ui.reportmanagement;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -44,7 +45,7 @@ import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectMod
 
 public class KpiConfigurationPage extends KPIObjectRepository {
 
-	WebDriverWait wait = new WebDriverWait(driver, 10);
+	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
 	private static final Logger log = LogManager.getLogger(KpiConfigurationPage.class);
 

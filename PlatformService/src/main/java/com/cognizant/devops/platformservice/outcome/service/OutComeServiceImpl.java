@@ -21,7 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import com.cognizant.devops.platformcommons.constants.MilestoneConstants;
+import com.cognizant.devops.platformcommons.constants.CommonsAndDALConstants;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.milestone.InsightsMileStoneOutcomeConfig;
@@ -53,8 +53,10 @@ public class OutComeServiceImpl implements OutComeService{
 		InsightsOutcomeTools insightsOutcomeTools = new InsightsOutcomeTools();
 		insightsOutcomeTools.setOutcomeName(outcomeName);
 		insightsOutcomeTools.setOutcomeType(configJson.get("outcomeType").getAsString());
-		insightsOutcomeTools.setConfigJson(configJson.get("toolConfigJson").getAsJsonObject().toString());
-		insightsOutcomeTools.setIsActive(configJson.get(MilestoneConstants.ISACTIVE).getAsBoolean());
+		if(configJson.has("toolConfigJson")) {
+			insightsOutcomeTools.setConfigJson(configJson.get("toolConfigJson").getAsJsonObject().toString());
+		}
+		insightsOutcomeTools.setIsActive(configJson.get(CommonsAndDALConstants.ISACTIVE).getAsBoolean());
 		insightsOutcomeTools.setMetricUrl(configJson.get("metricUrl").getAsString());
 		InsightsTools insightsMilestoneTools = outComeConfigDAL.getOutComeByToolId(configJson.get("toolName").getAsInt());
 		insightsOutcomeTools.setInsightsTools(insightsMilestoneTools);
@@ -86,16 +88,18 @@ public class OutComeServiceImpl implements OutComeService{
 			InsightsOutcomeTools insightsOutcomeTools = outComeConfigDAL.getOutcomeConfig(outcomeId);
 			insightsOutcomeTools.setOutcomeName(configJson.get("outcomeName").getAsString());
 			insightsOutcomeTools.setOutcomeType(configJson.get("outcomeType").getAsString());
-			insightsOutcomeTools.setConfigJson(configJson.get("toolConfigJson").getAsJsonObject().toString());
+			if(configJson.has("toolConfigJson")) {
+				insightsOutcomeTools.setConfigJson(configJson.get("toolConfigJson").getAsJsonObject().toString());
+			}
 			insightsOutcomeTools.setIsActive(configJson.get("isActive").getAsBoolean());
-			insightsOutcomeTools.setCreatedDate(configJson.get("createdDate").getAsLong());
+//			insightsOutcomeTools.setCreatedDate(configJson.get("createdDate").getAsLong());
 			insightsOutcomeTools.setMetricUrl(configJson.get("metricUrl").getAsString());
 			insightsOutcomeTools.setUpdatedDate(InsightsUtils.getCurrentTimeInEpochMilliSeconds());
 			insightsOutcomeTools.setRequestParameters(configJson.get("parameters").toString());
 			outComeConfigDAL.updateOutcomeConfig(insightsOutcomeTools);
 		} catch (Exception e) {
 			log.error(e);
-			throw new InsightsCustomException(" Error while saving record "+e.getMessage());
+			throw new InsightsCustomException(" Error while updating record "+e.getMessage());
 		}
 	}
 	
@@ -108,7 +112,7 @@ public class OutComeServiceImpl implements OutComeService{
 			outComeConfigDAL.updateOutcomeConfig(insightsOutcomeTools);
 		} catch (Exception e) {
 			log.error(e);
-			throw new InsightsCustomException(" Error while saving record "+e.getMessage());
+			throw new InsightsCustomException(" Error while updating outcome status "+e.getMessage());
 		}
 	}
 
@@ -135,7 +139,7 @@ public class OutComeServiceImpl implements OutComeService{
 			}
 			return element.getAsJsonArray();
 		} catch (Exception e) {
-			log.error("Error getting milestone list ..", e);
+			log.error("Error getting outcome list ..", e);
 			throw new InsightsCustomException(e.getMessage());
 		}
 	}

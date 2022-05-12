@@ -39,6 +39,7 @@ import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Envelope;
 
 public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
+
 	public static final String CREATE = " CREATE (new";
 	private static Logger log = LogManager.getLogger(AgentHealthSubscriber.class.getName());
 	GraphDBHandler dbHandler = new GraphDBHandler();
@@ -66,8 +67,8 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 				for (JsonElement e : asJsonArray) {
 					if (e.isJsonObject()) {
 						JsonObject jsonObject = e.getAsJsonObject();
-						if (jsonObject.has("agentId")) {
-							agentId = jsonObject.get("agentId").getAsString();
+						if (jsonObject.has(AgentCommonConstant.AGENTID)) {
+							agentId = jsonObject.get(AgentCommonConstant.AGENTID).getAsString();
 						}
 						if (jsonObject.has(AgentCommonConstant.TOOLNAME)) {
 							toolName = jsonObject.get(AgentCommonConstant.TOOLNAME).getAsString();
@@ -95,7 +96,7 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 							}
 						}
 						dataList.add(jsonObject);
-						log.debug(" Type=AgentEngine toolName={} category={} agentId={} routingKey={} dataSize={} execId={} ProcessingTime={} Agent Health message processed.",jsonObject.get("toolName"),jsonObject.get("categoryName"),jsonObject.get("agentId"),"-",0,jsonObject.get("execId"),0);
+						log.debug(" Type=AgentEngine toolName={} category={} agentId={} routingKey={} dataSize={} execId={} ProcessingTime={} Agent Health message processed.",jsonObject.get("toolName"),jsonObject.get("categoryName"),jsonObject.get(AgentCommonConstant.AGENTID),"-",0,jsonObject.get("execId"),0);
 					}
 				}
 				String healthLabels = ":LATEST:" + routingKey.replace(".", ":");
