@@ -30,6 +30,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
@@ -52,9 +53,8 @@ public class AgentManagementTest extends AgentManagementTestData{
 	@BeforeClass
 	public void prepareData() throws InsightsCustomException {
 		try {
-			prepareOfflineAgent(version, gitTool);
-			ApplicationConfigProvider.getInstance().getAgentDetails().setOfflineAgentPath(offlineAgentPath);
-			
+			ApplicationConfigCache.loadConfigCache();
+			prepareOfflineAgent(version);			
 		} catch (Exception e) {
 			log.error("message", e);
 		}
@@ -62,33 +62,33 @@ public class AgentManagementTest extends AgentManagementTestData{
 	}
 	
 	/*Method to get the available list of agents in the system. */
-	@Test(priority = 1)
-	public void testGetSystemAvailableAgentList() throws InsightsCustomException {
-		
-		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
-		try {
-			ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
-			Map<String, ArrayList<String>> availableAgents = agentServiceImpl.getDocrootAvailableAgentList();
-			Assert.assertNotNull(availableAgents);
-			Assert.assertTrue(availableAgents.size() > 0);
-			Assert.assertTrue(availableAgents.containsKey("v5.0"));
-			Assert.assertTrue(availableAgents.containsKey("v5.2"));
-			
-			for (Map.Entry<String, ArrayList<String>> entry : availableAgents.entrySet()) {
-				
-			    if(entry.getKey().equals("v5.2") || entry.getKey().equals("v5.0")){
-				    ArrayList<String> toolNameList = entry.getValue();
-				    Assert.assertTrue(toolNameList.size() > 0);
-				    Assert.assertTrue(toolNameList.contains("git"));
-			    }
-			}
-		} catch (InsightsCustomException e) {
-			if (e.getMessage().contains("java.net.ConnectException")) {
-				log.debug("Unable to connect to docroot on internet");
-			}
-		}
-	
-	}
+//	@Test(priority = 1)
+//	public void testGetSystemAvailableAgentList() throws InsightsCustomException {
+//		
+//		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
+//		try {
+//			ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
+//			Map<String, ArrayList<String>> availableAgents = agentServiceImpl.getDocrootAvailableAgentList();
+//			Assert.assertNotNull(availableAgents);
+//			Assert.assertTrue(availableAgents.size() > 0);
+//			Assert.assertTrue(availableAgents.containsKey("v5.0"));
+//			Assert.assertTrue(availableAgents.containsKey("v5.2"));
+//			
+//			for (Map.Entry<String, ArrayList<String>> entry : availableAgents.entrySet()) {
+//				
+//			    if(entry.getKey().equals("v5.2") || entry.getKey().equals("v5.0")){
+//				    ArrayList<String> toolNameList = entry.getValue();
+//				    Assert.assertTrue(toolNameList.size() > 0);
+//				    Assert.assertTrue(toolNameList.contains("git"));
+//			    }
+//			}
+//		} catch (InsightsCustomException e) {
+//			if (e.getMessage().contains("java.net.ConnectException")) {
+//				log.debug("Unable to connect to docroot on internet");
+//			}
+//		}
+//	
+//	}
 	
 	@Test(priority = 2)
 	public void testGetSystemAvailableAgentListForOfflineRegistration() throws InsightsCustomException {
@@ -112,25 +112,25 @@ public class AgentManagementTest extends AgentManagementTestData{
 		
 	}
 	
-	@Test(priority = 3)
-	public void testGetToolRawConfigFile() throws InsightsCustomException {
-		
-		try {
-			ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
-			AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
-			String configJson = agentServiceImpl.getToolRawConfigFile(version, gitTool,false);
-			
-			Gson gson = new Gson();
-			JsonElement jsonElement = gson.fromJson(configJson.trim(), JsonElement.class);
-			JsonObject json = jsonElement.getAsJsonObject();
-			Assert.assertNotNull(json);
-			Assert.assertEquals(json.get("toolCategory").getAsString(), "SCM");
-		} catch (InsightsCustomException e) {
-			if (e.getMessage().contains("java.net.ConnectException")) {
-				log.debug("Unable to connect to docroot on internet");
-			}
-		}
-	}
+//	@Test(priority = 3)
+//	public void testGetToolRawConfigFile() throws InsightsCustomException {
+//		
+//		try {
+//			ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
+//			AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
+//			String configJson = agentServiceImpl.getToolRawConfigFile(version, gitTool,false);
+//			
+//			Gson gson = new Gson();
+//			JsonElement jsonElement = gson.fromJson(configJson.trim(), JsonElement.class);
+//			JsonObject json = jsonElement.getAsJsonObject();
+//			Assert.assertNotNull(json);
+//			Assert.assertEquals(json.get("toolCategory").getAsString(), "SCM");
+//		} catch (InsightsCustomException e) {
+//			if (e.getMessage().contains("java.net.ConnectException")) {
+//				log.debug("Unable to connect to docroot on internet");
+//			}
+//		}
+//	}
 	
 	@Test(priority = 4)
 	public void testGetToolRawConfigFileForOfflineRegistration() throws InsightsCustomException {
@@ -151,7 +151,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		
 		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		String expectedOutcome = "SUCCESS";
-		String oldVersion = "v7.2";
+		String oldVersion = "v9.1";
 		String response = agentServiceImpl.registerAgent(gitTool, oldVersion, osversion, 
 				configDetails, trackingDetails, false,false, "Agent");
 		
@@ -396,9 +396,60 @@ public class AgentManagementTest extends AgentManagementTestData{
 		agentManagementServiceImpl.updateAgent("", configDetails, gitTool, version, osversion, false,false);
 	}
 	
+	
+	@Test(priority = 29)
+	public void testGetAvailableAgentTags() throws InsightsCustomException {
+		
+		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
+		try {
+			Map<String, String> availableAgentTags = agentServiceImpl.getAvailableAgentTags();
+			log.debug(availableAgentTags);
+			Assert.assertNotNull(availableAgentTags);
+			Assert.assertTrue(availableAgentTags.size() > 0);
+			Assert.assertTrue(availableAgentTags.containsValue("v9.1"));
+			Assert.assertTrue(availableAgentTags.containsValue("v9.2"));
+			
+		} catch (InsightsCustomException e) {
+			log.error("Unable to fetch agents tags");
+		}
+	
+	}
+	
+	@Test(priority = 30)
+	public void testDownloadAgentPackage() throws InsightsCustomException {
+		
+		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
+		
+		String version = "v9.1";
+		String dirPath = ApplicationConfigProvider.getInstance().getAgentDetails().getOfflineAgentPath() + File.separator + version;
+		try {
+			FileUtils.deleteDirectory(new File(dirPath));
+			ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
+			String response = agentServiceImpl.downloadAgentPackageFromGithub(version);
+			log.debug(response);
+			File targetDirPath = new File(dirPath);
+			 Assert.assertTrue(targetDirPath.exists());
+		} catch (InsightsCustomException | IOException e) {
+			log.error("Unable to download agent package");
+		}
+	
+	}
+	
+	@Test(priority = 31, expectedExceptions = InsightsCustomException.class)
+	public void testDownloadAgentPackageException() throws InsightsCustomException {
+		
+		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
+		String version = "v9.1";
+		String dirPath = ApplicationConfigProvider.getInstance().getAgentDetails().getOfflineAgentPath() + File.separator + version;
+		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
+		String response = agentServiceImpl.downloadAgentPackageFromGithub(version);
+		String expectedReponse = version + " - Package already exist!";
+		Assert.assertTrue(response.equalsIgnoreCase(expectedReponse));
+	}
+	
 	@AfterClass
 	public void cleanUp() throws InsightsCustomException, IOException {
-		FileUtils.deleteDirectory(new File(offlineAgentPath));
+		//FileUtils.deleteDirectory(new File(ApplicationConfigProvider.getInstance().getAgentDetails().getOfflineAgentPath()));
 	}
 	
 }

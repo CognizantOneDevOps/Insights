@@ -13,7 +13,7 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>9.4</version>
+		<version>9.5</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -21,7 +21,7 @@
 	<artifactId>PlatformInsightsWebHook</artifactId>
 	<packaging>jar</packaging>
 	<name>PlatformInsightsWebHook</name>
-	<version>9.4</version>
+	<version>9.5</version>
 	<description>PlatformInsightsWebHook for webhook testing</description>
 	<url>http://maven.apache.org</url>
 
@@ -165,7 +165,7 @@
 									<directory>${project.basedir}/../</directory>
 									<filtering>true</filtering>
 									<includes>
-										<include>OneDevOpInsights*.pdf</include>
+										<include>IPR_OneDevOps*.pdf</include>
 									</includes>
 								</resource>
 								<resource>
@@ -195,7 +195,7 @@
 									<directory>${project.basedir}/target/</directory>
 									<filtering>true</filtering>
 									<includes>
-										<include>OneDevOpInsights*.pdf</include>
+										<include>IPR_OneDevOps*.pdf</include>
 									</includes>
 								</resource>
 							</resources>

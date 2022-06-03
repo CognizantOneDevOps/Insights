@@ -1,0 +1,113 @@
+<!--
+ *********************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *******************************************************************************-->
+<div class="titleContainer">
+
+    <h1 *ngIf="showCardDetail"> Additional Details</h1>
+    <h1 *ngIf="showToolDetailProp">Additional Details - {{dispplaytoolname}}</h1>
+    <a (click)="closeShowDetailsDialog()" mat-dialog-close>
+        <mat-icon svgIcon="close_dialog" class="closeIcon" style="height: 11px !important; width: 11px !important;">
+        </mat-icon>
+    </a>
+</div>
+
+<mat-dialog-content class="matContent" [style.height.%]="showCardDetail ? 80 : 70" >
+    <!-- More info section -->
+        <table *ngIf="showCardDetail"  class="dialog-content" mat-table [dataSource]="cardDataDatasource">
+            <ng-container matColumnDef="property">
+                <th mat-header-cell *matHeaderCellDef class="tableHeader"> Property </th>
+                <td mat-cell *matCellDef="let element" style="padding-top:2px;padding-bottom:2px; line-height: 1.7em;">
+                    {{element.property}}</td>
+            </ng-container>
+            <ng-container matColumnDef="value">
+                <th mat-header-cell *matHeaderCellDef class="tableHeader"> Value </th>
+                <td mat-cell *matCellDef="let element" style="padding-top:2px;padding-bottom:2px; line-height: 1.7em;">
+                    {{element.value}}</td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumnsCardProprty" class="tableHeader"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumnsCardProprty;"> </tr>
+        </table>
+
+      <!-- For tool Detail section -->
+    <div *ngIf="showSearchBox" class="filterGroupCSS">
+        <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search" class="inputColCss">
+        <button (keyup)="applyFilter($event.target.value)" class="searchCss">
+            <mat-icon title="Search" svgIcon="searchIcon">
+            </mat-icon>
+        </button>
+    </div>
+
+    <div *ngIf="showToolDetailProp" class="dialog-content">
+
+        <table mat-table [dataSource]="agentDetailedDatasource">
+            <ng-container *ngFor="let header of finalHeaderToShow | keyvalue" matColumnDef="{{header.key}}">
+                <th mat-header-cell *matHeaderCellDef class="tableHeader">
+                    {{header.key | titlecase}}</th>
+                <td mat-cell *matCellDef="let element">
+                    <div *ngIf="header.key === 'statusLog'" matTooltip="{{element[header.key]}}">
+                        {{hideTextOverflow(element[header.key])}}
+                    </div>
+                    <div *ngIf="header.key !== 'statusLog'">
+                        {{element[header.key]}}
+                    </div>
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="headerArrayDisplay" class="tableHeader"></tr>
+            <tr mat-row *matRowDef="let row; columns: headerArrayDisplay;"
+                class="asset-details-element-row" [class.asset-details-expanded-row]="expandedElement === element"></tr>
+        </table>
+    </div>
+
+    <div class="noDataFoundCss" *ngIf="showNoData">
+        No Data Found
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions *ngIf="showToolDetailProp" class="dialog-actions" [style.height.%]="20">
+
+    <div class="footer">
+
+        <div *ngIf="showToolDetailProp" class="timezoneText" [style.height.%]="2">
+            Current Timezone: {{timeZone}}
+        </div>
+        <div class="paginator">
+            <mat-paginator style="visibility: hidden;" #paginator [pageSize]="MAX_ROWS_PER_TABLE">
+            </mat-paginator>
+            <div class="paginatorElement" (click)="goToPrevPage()" [attr.disabled]="!this.paginator.hasPreviousPage()"
+                [ngStyle]="!this.paginator.hasPreviousPage() ? {'cursor': 'not-allowed'} : ''">
+                <mat-icon svgIcon="prev-page" matTooltip="Previous Page" class="pageIcons "
+                    *ngIf="this.paginator.hasPreviousPage()" style="height: 24px !important; width: 24px !important;">
+                </mat-icon>
+                <mat-icon svgIcon="prev-page" matTooltip="Previous Page" class="pageIcons disabled-icon"
+                    *ngIf="!this.paginator.hasPreviousPage()" style="height: 24px !important; width: 24px !important;">
+                </mat-icon>
+            </div>
+            <div class="paginatorElement paginatorIndexElement">{{currentPageIndex}}</div>
+            <div class="paginatorElement" (click)="goToNextPage()" [attr.disabled]="!this.paginator.hasNextPage()"
+                [ngStyle]="!this.paginator.hasNextPage() ? {'cursor': 'not-allowed'} : ''">
+                <mat-icon svgIcon="next-page" matTooltip="Next Page" class="pageIcons"
+                    *ngIf="this.paginator.hasNextPage()" style="height: 24px !important; width: 24px !important;">
+                </mat-icon>
+                <mat-icon svgIcon="next-page" matTooltip="Next Page" class="pageIcons disabled-icon"
+                    *ngIf="!this.paginator.hasNextPage()" style="height: 24px !important; width: 24px !important;">
+                </mat-icon>
+            </div>
+            <div>
+                of {{totalPages}}
+            </div>
+        </div>
+    </div>
+
+</mat-dialog-actions>

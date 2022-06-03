@@ -1,0 +1,169 @@
+<!--
+*******************************************************************************
+ * Copyright 2020 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div class="arrange-horizontally-Dialog" style="height: 50px; padding: 1%">
+  <div class="gridheadercenter">Mailing details</div>
+  <div class="closeCss">
+    <a (click)="closeEmailConfigDialog()">
+      <mat-icon
+        class="closeicon"
+        svgIcon="close_dialog"
+        style="height: 11px !important; width: 11px !important"
+      >
+      </mat-icon>
+    </a>
+  </div>
+</div>
+<div class="flexColCss">
+  <div class="columnName">
+    <div class="lblText">From<span class="asteriskText">*</span></div>
+    <div class="columnComponent">
+      <mat-form-field
+        style="width: 120%"
+        appearance="fill"
+        maxlength="40"
+        class="formfield-custom"
+      >
+        <input
+          matInput
+          type="text"
+          [(ngModel)]="senderEmailAddress"
+          name="senderEmailAddress"
+          placeholder="From"
+        />
+      </mat-form-field>
+    </div>
+  </div>
+  <div class="columnName">
+    <div class="lblText">To<span class="asteriskText">*</span></div>
+    <div class="columnComponent">
+      <mat-form-field
+        style="width: 120%"
+        appearance="fill"
+        maxlength="40"
+        class="formfield-custom"
+      >
+        <input
+          matInput
+          type="text"
+          [(ngModel)]="receiverEmailAddress"
+          name="receiverEmailAddress"
+          placeholder="To"
+        />
+      </mat-form-field>
+    </div>
+  </div>
+  <div class="columnName">
+    <div class="lblText">Cc</div>
+    <div class="columnComponent">
+      <mat-form-field
+        style="width: 120%"
+        appearance="fill"
+        maxlength="40"
+        class="formfield-custom"
+      >
+        <input
+          matInput
+          type="text"
+          [(ngModel)]="receiverCCEmailAddress"
+          name="receiverCCEmailAddress"
+          placeholder="CC"
+        />
+      </mat-form-field>
+    </div>
+  </div>
+  <div class="columnName">
+    <div class="lblText">Bcc</div>
+    <div class="columnComponent">
+      <mat-form-field
+        style="width: 120%"
+        appearance="fill"
+        maxlength="40"
+        class="formfield-custom"
+      >
+        <input
+          matInput
+          type="text"
+          [(ngModel)]="receiverBCCEmailAddress"
+          name="receiverBCCEmailAddress"
+          placeholder="BCC"
+        />
+      </mat-form-field>
+    </div>
+  </div>
+  <div class="columnName">
+    <div class="lblText">Subject<span class="asteriskText">*</span></div>
+    <div class="columnComponent">
+      <mat-form-field
+        style="width: 120%"
+        appearance="fill"
+        maxlength="40"
+        class="formfield-custom"
+      >
+        <input
+          matInput
+          maxlength="100"
+          type="text"
+          [(ngModel)]="mailSubject"
+          name="mailSubject"
+          placeholder="Subject"
+        />
+      </mat-form-field>
+    </div>
+  </div>
+  <div class="columnName textarea-item">
+    <div class="lblText">
+      Mail Body Template<span class="asteriskText">*</span>
+    </div>
+    <div class="columnComponent">
+      <mat-form-field
+        style="width: 120%"
+        appearance="fill"
+        maxlength="40"
+        class="formfield-custom"
+      >
+        <textarea
+          matInput
+          maxlength="100"
+          type="text"
+          [(ngModel)]="mailBodyTemplate"
+          name="mailBodyTemplate"
+          placeholder="Mail Body"
+          rows="13"
+        ></textarea>
+      </mat-form-field>
+    </div>
+  </div>
+</div>
+
+<div class="btnbg">
+  <button
+    mat-button
+    (click)="closeEmailConfigDialog()"
+    class="whiteButton1"
+    style="width: 130px; margin-right: 3%"
+  >
+    CANCEL
+  </button>
+  <button
+    mat-button
+    (click)="saveEmailConfig()"
+    class="button button1"
+    style="width: 130px"
+  >
+    {{buttonName}}
+  </button>
+</div>

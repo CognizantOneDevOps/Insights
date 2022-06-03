@@ -1,0 +1,253 @@
+<!--
+*******************************************************************************
+ * Copyright 2021 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+
+<div class="cardCss">
+  <div layout layout-align="left" class="titleStyle">
+    <div>
+      <span class="main-section-title">Configuration | </span>OutCome
+      Configuration
+    </div>
+  </div>
+
+  <div class="sectionHeadingStyle">
+
+    <button
+    mat-icon-button
+    (click)="redirect()"
+    style="vertical-align: super"
+  >
+    <mat-icon svgIcon="backButton" matTooltip="Back"> </mat-icon>
+  </button>
+
+    <span class="alignSub" style="margin-left: 5px;"
+      ><b>Outcome Configuration</b> (Configure an Outcome)
+    </span>
+
+    <span class="btnAlign">
+      <button
+        type="submit"
+        mat-icon-button
+        [disabled]="!outcomeForm.valid"
+        (click)="onSubmit()"
+        class="btnHeight"
+      >
+        <mat-icon matTooltip="Save Configuration" svgIcon="save"> </mat-icon>
+      </button>
+      <button mat-icon-button (click)="reset()" class="btnHeight">
+        <mat-icon matTooltip="Reset" svgIcon="exit"> </mat-icon>
+      </button>
+      <!-- <button mat-icon-button (click)="redirect()" class="btnHeight">
+        <mat-icon svgIcon="homeBck" matTooltip="Redirect To Outcome Config">
+        </mat-icon>
+      </button> -->
+    </span>
+  </div>
+
+  <div class="add-agent-section-title add-agent-section-title-dimensions">
+    <span class="mainHeaderText">Add details to configure an Outcome</span>
+    <span class="infoHeaderText"
+      >(Please provide accurate details. Fields marked"<span
+        style="color: #ff0000"
+        >*</span
+      >" are mandatory)
+    </span>
+  </div>
+  <div class="section-body">
+    <form [formGroup]="outcomeForm" (ngSubmit)="onSubmit()">
+      <div class="two-grid-section">
+        <div class="grid-item">
+          <div class="select-label">
+            Outcome Name<span class="asteriskText">*</span>
+          </div>
+          <div class="columnComponent">
+            <mat-form-field appearance="fill" class="formfield-custom">
+              <input
+                matInput
+                maxlength="100"
+                class="inputColCss"
+                formControlName="outcomeName"
+                type="text"
+                autocomplete="off"
+                placeholder="Enter Outcome name"
+              />
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="grid-item">
+          <div class="select-label">
+            Outcome Type<span class="asteriskText">*</span>
+          </div>
+          <mat-form-field
+            appearance="fill"
+            class="formfield-custom columnComponent"
+          >
+            <mat-select
+              placeholder="Select OutcomeType"
+              formControlName="outcomeType"
+              required
+              [style.width.%]="100"
+              color="primary"
+            >
+              <mat-option
+                *ngFor="let type of outcomeArray"
+                value="{{ type.type }}"
+                class="optionCss"
+              >
+                {{ type.type }}
+              </mat-option>
+            </mat-select>
+            <mat-icon
+              matSuffix
+              svgIcon="arrow-down"
+              class="arrow-icon"
+              style="width: 12px !important; height: 12px !important"
+            ></mat-icon>
+          </mat-form-field>
+        </div>
+        <div class="grid-item">
+          <div class="select-label">
+            ToolName<span class="asteriskText">*</span>
+          </div>
+          <mat-form-field
+            appearance="fill"
+            class="formfield-custom columnComponent"
+          >
+            <mat-select
+              placeholder="Select ToolName"
+              formControlName="toolName"
+              required
+              color="primary"
+              [(ngModel)]="toolNameSelected"
+              (selectionChange)="getToolJson(toolNameSelected)"
+            >
+              <mat-option
+                *ngFor="let tool of toolArray"
+                value="{{ tool.id }}"
+                class="optionCss"
+              >
+                {{ tool.toolName }}
+              </mat-option>
+            </mat-select>
+            <mat-icon
+              matSuffix
+              svgIcon="arrow-down"
+              class="arrow-icon"
+              style="width: 12px !important; height: 12px !important"
+            ></mat-icon>
+          </mat-form-field>
+        </div>
+        <div *ngIf="enableFields">
+          <div *ngFor="let data of toolConfigMap.get(selectedTool).list">
+            <div class="grid-item">
+              <div class="select-label">
+                {{ data.label }}<span class="asteriskText">*</span>
+              </div>
+              <div class="columnComponent">
+                <mat-form-field appearance="fill" class="formfield-custom">
+                  <input
+                    matInput
+                    maxlength="100"
+                    class="inputColCss"
+                    formControlName="{{ data.name }}"
+                    type="text"
+                    autocomplete="off"
+                    placeholder="{{ data.tooltip }}"
+                  />
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-item textarea-item">
+          <div class="select-label">
+            Metric URL<span class="asteriskText">*</span>
+          </div>
+          <div class="columnComponent">
+            <mat-form-field appearance="fill" style="width: 100% !important;">
+              <textarea
+                matInput
+                rows="5"
+                formControlName="metricUrl"
+                type="text"
+                autocomplete="off"
+                placeholder="Enter metric url"
+              >
+              </textarea>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+      <div formArrayName="parameters">
+        <div class="select-label">Request Parameters</div>
+        <div class="req-param">
+          <div class="grid-row">
+            <div
+              class="flex-container"
+              *ngFor="
+                let param of outcomeForm['controls'].parameters['controls'];
+                let i = index
+              "
+              [formGroupName]="i"
+            >
+              <div class="flex-item">
+                <label class="input-label">Name</label>
+                <mat-form-field appearance="fill" class="formfield-custom">
+                  <input
+                    matInput
+                    formControlName="key"
+                    type="text"
+                    placeholder="Enter name"
+                    matTooltip="{{ param.value.key }}"
+                    required
+                  />
+                </mat-form-field>
+              </div>
+              <div class="flex-item" style="margin-left:3% ;">
+                <label class="input-label">Value</label>
+                <mat-form-field appearance="fill" class="formfield-custom">
+                  <input
+                    matInput
+                    formControlName="value"
+                    type="text"
+                    placeholder="Enter value"
+                    [title]="param.value.value"
+                    required
+                  />
+                </mat-form-field>
+              </div>
+              <div class="btn-container">
+                <button
+                  type="button"
+                  mat-icon-button
+                  (click)="removeParameter(i)"
+                >
+                  <mat-icon matTooltip="Remove Parameters" svgIcon="minus">
+                  </mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="">
+            <button type="button" mat-icon-button (click)="addParameter()">
+              <mat-icon matTooltip="Add Parameters" svgIcon="add"> </mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

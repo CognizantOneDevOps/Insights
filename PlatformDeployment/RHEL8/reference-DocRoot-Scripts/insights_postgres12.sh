@@ -18,21 +18,20 @@ echo "#################### Installing Postgres with configs , Databases and Role
 source /etc/environment
 source /etc/profile
 cd $INSIGHTS_APP_ROOT_DIRECTORY
-echo -n "Nexus(userName):"
-read userName
-echo "Nexus credential:"
-read -s credential
-sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/postgres/postgres12_dependencies_rhel8.zip
-sudo unzip postgres12_dependencies_rhel8.zip && cd postgres12_dependencies_rhel8
-sudo yum localinstall postgresql12-libs-12.5-1PGDG.rhel8.x86_64.rpm postgresql12-12.5-1PGDG.rhel8.x86_64.rpm postgresql12-server-12.5-1PGDG.rhel8.x86_64.rpm -y
-cd $INSIGHTS_APP_ROOT_DIRECTORY/postgres12_dependencies_rhel8/pgAdmin4
-sudo yum localinstall pgadmin4-4.30-1.el8.noarch.rpm pgadmin4-desktop-4.30-1.el8.x86_64.rpm pgadmin4-server-4.30-1.el8.x86_64.rpm pgadmin4-web-4.30-1.el8.noarch.rpm -y
+sudo yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+# Disable the built-in PostgreSQL module:
+sudo yum -qy module disable postgresql
+# Install PostgreSQL:
+sudo yum install -y postgresql12-server  postgresql12-contrib postgresql12-libs postgresql12
+sudo yum install -y https://ftp.postgresql.org/pub/pgadmin/pgadmin4/yum/pgadmin4-redhat-repo-2-1.noarch.rpm
+sudo yum install pgadmin4-web -y
+sudo yum install policycoreutils-python-utils
 sudo /usr/pgsql-12/bin/postgresql-12-setup initdb
 sudo systemctl enable postgresql-12.service
 sudo chkconfig postgresql-12 on
 sudo /usr/pgadmin4/bin/setup-web.sh
-sudo cp $INSIGHTS_APP_ROOT_DIRECTORY/postgres12_dependencies_rhel8/Conf/pg_hba.conf /var/lib/pgsql/12/data/pg_hba.conf
-sudo cp $INSIGHTS_APP_ROOT_DIRECTORY/postgres12_dependencies_rhel8/Conf/postgresql.conf /var/lib/pgsql/12/data/postgresql.conf
+sudo sed -i  '/^host / s/peer/trust/' /var/lib/pgsql/12/data/pg_hba.conf
+sudo sed -i  '/^local / s/peer/trust/' /var/lib/pgsql/12/data/pg_hba.conf
 sudo systemctl start postgresql-12.service
 sudo useradd grafana
 echo "Native system user 'grafana' is created. Need to set password for 'grafana' user."

@@ -30,15 +30,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformservice.insights.service.InsightsInference;
 import com.cognizant.devops.platformservice.insights.service.InsightsInferenceService;
-import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 @RestController
@@ -48,7 +45,8 @@ public class InferenceDataProviderController {
 	public static final String VECTORSCHEDULE ="vectorSchedule";
 	public static final String VECTORTYPE= "vectorType";
 	private static Logger LOG = LogManager.getLogger(InferenceDataProviderController.class);
-
+	
+	@Autowired
 	InsightsInferenceService insightsInferenceReportService;
 	
 	

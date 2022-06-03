@@ -20,11 +20,8 @@ source /etc/profile
 cd $INSIGHTS_APP_ROOT_DIRECTORY
 sudo mkdir Loki
 cd Loki
-echo -n "Nexus(userName):"
-read userName
-echo "Nexus credential:"
-read -s credential
-sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/Loki/loki-linux-amd64.zip
+read -p "Please enter Loki version number you want to install(ex. 2.4.2 or 2.5.0): " version_number
+sudo wget https://github.com/grafana/loki/releases/download/v${version_number}/loki-linux-amd64.zip
 sudo unzip "loki-linux-amd64.zip"
 sudo rm -r -f loki-linux-amd64.zip
 sudo chmod a+x "loki-linux-amd64"
@@ -33,7 +30,7 @@ export LOKI_HOME=`pwd`
 sudo echo LOKI_HOME=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" LOKI_HOME=`pwd` | sudo tee -a /etc/profile
 cd /etc/init.d/
-sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/InsightsLoki.sh
+sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL7/initscripts/InsightsLoki.sh
 sudo mv InsightsLoki.sh InsightsLoki
 sudo chmod +x InsightsLoki
 sudo chkconfig InsightsLoki on

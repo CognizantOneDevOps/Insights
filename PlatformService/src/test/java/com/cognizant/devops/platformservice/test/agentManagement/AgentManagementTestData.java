@@ -23,9 +23,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.SocketAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -34,10 +38,13 @@ import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.util.FileCopyUtils;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.AgentCommonConstant;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 
 public class AgentManagementTestData {
@@ -59,30 +66,45 @@ public class AgentManagementTestData {
 	String agentId = "git_testng";
 	String toolCategory = "SCM";
 	String oldOfflineAgentPath = "";
-	String version = "v8.0";
+	String version = "v9.1";
 	String gitTool = "git";
-	String offlineAgentPath = System.getenv().get("INSIGHTS_AGENT_HOME") + File.separator + "offlineAgent_Test";
+
 	File offlineAgentFolder;
 	String webhookAgentId = "webhook_git_testng";
 	
 	
-	public void prepareOfflineAgent(String version, String tool) throws IOException {
-		String login = ApplicationConfigProvider.getInstance().getAgentDetails().getNexusUserName() 
-				+ ":" +ApplicationConfigProvider.getInstance().getAgentDetails().getNexusPassword();
-		String base64login = Base64.getEncoder().encodeToString(login.getBytes());
-		String folderPath = new File(offlineAgentPath+ File.separator + version + File.separator + tool).getCanonicalPath();
+	public void prepareOfflineAgent(String version) throws IOException, InsightsCustomException {
+		String folderPath = new File(ApplicationConfigProvider.getInstance().getAgentDetails().getOfflineAgentPath()+ File.separator + version).getCanonicalPath();
 		File offlineAgentFolder = new File(folderPath);
+		if(offlineAgentFolder.exists()) {
+			FileUtils.deleteDirectory(offlineAgentFolder);
+		}
 		offlineAgentFolder.mkdirs();
-		String srcToolPath = ApplicationConfigProvider.getInstance().getAgentDetails().getDownloadRepoUrl() + "/"
-				+ version + AgentCommonConstant.AGENTS + tool;
-		srcToolPath = srcToolPath.trim() + "/" + tool.trim() + AgentCommonConstant.ZIPEXTENSION;
-		File zip = File.createTempFile("agent_", ".zip", offlineAgentFolder);
-		URL url = new URL(srcToolPath);
-		URLConnection urlConnection = url.openConnection();
-		urlConnection.setRequestProperty(AuthenticationUtils.AUTH_HEADER_KEY, "Basic " + base64login);
-		try(InputStream in = new BufferedInputStream(urlConnection.getInputStream(), 1024);
+		String packageURL = ApplicationConfigProvider.getInstance().getAgentDetails().getRepoUrl();
+		if(packageURL == null || packageURL.length() == 0) {
+			throw new InsightsCustomException("Repo URL not configured in server configuration!");
+		}
+		packageURL = packageURL + "/" + version + "/" + "agents.zip";
+		URL zipFileUrl = new URL(packageURL);
+		File zip = File.createTempFile("agents_", ".zip", offlineAgentFolder);
+		URLConnection conn;
+		if(ApplicationConfigProvider.getInstance().getProxyConfiguration().isEnableProxy()) {
+			SocketAddress addr = new InetSocketAddress(ApplicationConfigProvider.getInstance().getProxyConfiguration().getProxyHost(), ApplicationConfigProvider.getInstance().getProxyConfiguration().getProxyPort());
+			Proxy proxy = new Proxy(Proxy.Type.HTTP, addr);
+			conn = zipFileUrl.openConnection(proxy);
+		}else{
+			conn = zipFileUrl.openConnection();
+		}	
+		try(InputStream in = new BufferedInputStream(conn.getInputStream(), 1024);
 				OutputStream out = new BufferedOutputStream(new FileOutputStream(zip))){
 			copyInputStream(in, out);
+		}catch (IOException e) {
+			if(zip.exists()) {
+				Path zipPath = Paths.get(zip.getPath());
+				Files.delete(zipPath);
+			}
+			FileUtils.deleteDirectory(offlineAgentFolder);
+			throw new IOException("Failed to download Package");
 		}
 		unzip(zip.getPath(), offlineAgentFolder.getPath());
 		Files.delete(Paths.get(zip.toString()));
@@ -104,7 +126,9 @@ public class AgentManagementTestData {
         ZipEntry entry = zipIn.getNextEntry();
         // iterates over entries in the zip file
         while (entry != null) {
-            String filePath = new File(destDirectory + File.separator + entry.getName()).getCanonicalPath();
+        	String entryName = entry.getName();
+			entryName = entryName.replaceFirst("agents/", "");
+            String filePath = new File(destDirectory + File.separator + entryName).getCanonicalPath();
             if (!entry.isDirectory()) {
                 // if the entry is a file, extracts it
                 extractFile(zipIn, filePath);

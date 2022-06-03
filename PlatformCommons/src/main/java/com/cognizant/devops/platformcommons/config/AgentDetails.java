@@ -34,6 +34,9 @@ public class AgentDetails implements Serializable {
 	private String browseRepoUrl;
 	private String nexusUserName;
 	private String nexusPassword;
+	private String githubAPI;
+	private String githubAccessToken;
+	private String repoUrl;
 	
 	
 	public String getOnlineRegistrationMode() {
@@ -103,6 +106,25 @@ public class AgentDetails implements Serializable {
 	}
 	public void setNexusPassword(String nexusPassword) {
 		this.nexusPassword = nexusPassword;
+	}
+	public String getGithubAPI() {
+		return githubAPI;
+	}
+	public void setGithubAPI(String githubAPI) {
+		this.githubAPI = githubAPI;
+	}
+	public String getGithubAccessToken() {
+		return githubAccessToken;
+	}
+	public void setGithubAccessToken(String githubAccessToken) {
+		this.githubAccessToken = githubAccessToken;
+	}
+	
+	public String getRepoUrl() {
+		return repoUrl;
+	}
+	public void setRepoUrl(String repoUrl) {
+		this.repoUrl = repoUrl;
 	}
 
 }

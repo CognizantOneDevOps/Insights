@@ -1,0 +1,288 @@
+/*
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
+.ClickHereCss {
+	font-family: inherit;
+	font-size: 13pt;
+	margin-top: 0.9%;
+}
+
+.loading-indicator {
+  position: fixed;
+  z-index: 999;
+  height: 2em;
+  width: 2em;
+  overflow: show;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+.dashboardIcon {
+	color: #0033a0;
+	width: 20px;
+	height: 20px;
+	text-align: center;
+	margin-top: -60px !important;
+	margin-left: -5px;
+}
+p {
+	font-family: inherit;
+	font-size: 120%;
+}
+.mat-grid-tile .mat-figure {
+	text-align: center !important;
+	font-size: 12px !important;
+}
+.mat-grid-tile {
+  border: 1px solid var(--panel-border);
+  background: var(--backgnd-clr10) 0% 0% no-repeat padding-box;
+  box-shadow: 0px 1px 3px var(--box-exp-shadow);
+  opacity: 1;
+}
+
+.mat-grid-tile:nth-child(even) .mat-grid-tile-footer {
+  height: 68px;
+}
+
+.mat-grid-tile:nth-child(odd) .mat-grid-tile-footer {
+  height: 68px;
+}
+td {
+  padding: 5px 0;
+}
+
+.table {
+  margin-bottom: 0.5rem;
+  border: none;
+}input:focus {
+	outline: none;
+}
+.inputColCss {
+  font: normal normal normal 14px/24px Open Sans;
+}
+.columnComponent {
+  width: 400px;
+
+  ::ng-deep .mat-form-field-infix {
+    padding: 0 !important;
+    border-top: 0 !important;
+  }
+
+  ::ng-deep .mat-form-field.mat-focused .mat-form-field-underline {
+    display: none !important;
+  }
+}
+.overflow1 {
+  max-height: 98%;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+.headerdiv {
+  margin-top: 34px;
+  text-align: left;
+}
+
+.landingpageCss {
+	overflow-x: hidden;
+	overflow-y: hidden;
+}
+.textcenter {
+  text-align: left;
+  margin-left: 18px;
+}
+.textCss {
+	font-size: 25pt;
+	width: 400px;
+	margin-top: -25px;
+}
+
+.textCssSmall {
+	font-size: 13px;
+	width: 400px;
+	margin-top: -25px;
+}
+
+.BlackCss {
+	font-size: 13px;
+	width: 400px;
+	margin-top: -25px;
+}
+.heading1 {
+  font-size: 25pt;
+}
+
+.heading2 {
+	// color: #00B140;
+	font-size: 13px;
+}
+.bottomgreencode {
+	font-size: 12px;
+	text-align: left;
+  padding-left: 13px;
+	overflow: hidden;
+}
+
+sup {
+	vertical-align: super;
+	font-size: 18px;
+}
+@media screen and (max-width: 1366px) and (min-width: 600px) {
+	.table-text {
+		color: #00b140;
+		text-align: left;
+		margin-left: 9%;
+	}
+	.tableSection {
+		margin-left: -2%;
+	}
+}
+
+@media screen and (max-width: 1920px) and (min-width: 1380px) {
+	.table-text {
+		color: #00b140;
+		text-align: left;
+		margin-left: 20.5%;
+	}
+	.tableSection {
+		margin-left: 12.5%;
+	}
+}
+
+.table td,
+.table th {
+  border-top: 0px;
+}
+
+.landing-home td {
+  font-size: 10.5pt;
+  padding-bottom: 0px;
+}
+
+.landing-home td span {
+  display: list-item;
+  list-style-type: disc;
+}
+
+.landing-home td:nth-child(1) {
+  margin-right: -30px;
+}
+
+.landing-home td:nth-child(2) {
+  padding-left: 30px;
+}
+
+.landing-home{
+  ::ng-deep .mat-icon-button {
+    height: 35px;
+    width: 32px;
+    margin-bottom:10px;
+    padding-left: 0.8% !important;
+    color:var(--text-clr4);
+    margin-left: 61px;
+    line-height: 10px;
+  } 
+}
+.mat-card-content > :first-child,
+.mat-card > :first-child {
+  margin-top: 0;
+}
+
+.mat-expansion-panel {
+  border-radius: 0px !important;
+  background: var(--backgnd-clr11) 0% 0% no-repeat padding-box;
+  box-shadow: 0px 1px 3px var(--box-exp-shadow);
+  opacity: 1;
+  border: 1px solid var(--brdr-clr);
+}
+.dashboardLabelText {
+  font: normal normal normal 16px/22px Open Sans;
+  letter-spacing: 0px;
+  color: var(--text-clr);
+  opacity: 1;
+  margin-left: 7px !important ;
+}
+.dashboardLabelText:hover {
+  color: #000000;
+}
+::ng-deep .mat-expanded .mat-expansion-panel-header-title {
+  color: #296dfa !important;
+}
+::ng-deep .mat-expansion-indicator::after {
+  color: #296dfa !important;
+}
+.specific-class {
+  color: #296dfa !important;
+  background: var(--exp-hd) !important;
+  border: 1px solid var(--exp-hd);
+  height: 45px !important;
+}
+.searchCss {
+  border: none;
+  padding: 7px 7px 8px 5px;
+  border-bottom: 1px solid #000000;
+  background: var(--backgnd-clr8) 0% 0% no-repeat padding-box;
+  color: var(--text-clr);
+}
+
+::ng-deep .iconColor > .mat-icon-button {
+  color: var(--text-clr) !important;
+  border: 1px solid var(--brdr-clr) !important;
+}
+
+.mat-icon-button:focus {
+  color: #296dfa;
+}
+
+.mat-expansion-panel-body {
+  background: var(--backgnd-clr11) 0% 0% no-repeat padding-box;
+ }
+.mat-expansion-panel-header {
+  background-color: #f2f2f2;
+  padding: 0 2% !important;
+}
+.mat-expansion-panel-header:focus {
+  background-color: #f2f2f2;
+}
+table {
+  background: transparent !important;
+}
+.btnHgt {
+  padding-bottom: 5%;
+}
+.mat-grid-tile {
+  cursor: pointer;
+}
+.mat-grid-tile:hover {
+  background: #add1ff;
+}
+
+:host .mat-icon-button {
+  height: 45px !important;
+}
+
+.bgCss {
+  background: var(--pg-index-bg) 0% 0% no-repeat padding-box;
+  box-shadow: 0px 3px 8px var(--box-exp-shadow);
+  border: 1px solid var(--bg-card-border);
+  opacity: 1;
+  border-radius: 0px !important;
+  padding: 0px !important;
+}

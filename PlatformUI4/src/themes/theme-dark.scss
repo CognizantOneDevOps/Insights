@@ -1,0 +1,151 @@
+/*
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *******************************************************************************/
+
+@import '~@angular/material/theming';
+@import './theme-base.scss';
+
+$primary: (Main:#ffffff,
+  Light:#ffffff,
+  Dark: #ffffff,
+  contrast:(Main:#ffffff,
+    Light:#ffffff,
+    Dark: #ffffff,
+  ));
+
+$accent: (Main:#00b140,
+  Light:#58e46f,
+  Dark: #00800d,
+  contrast:(Main:#ffff,
+    Light:#ffff,
+    Dark: #ffff,
+  ));
+$warn:(Main:#ff8f1c,
+  Light:#ffc052,
+  Dark: #c66000,
+  contrast:(Main:#ffff,
+    Light:#ffff,
+    Dark: #ffff,
+  ));
+
+
+$primary: mat-palette($primary, Main, Light, Dark);
+$accent: mat-palette($accent, Main, Light, Dark);
+$warn: mat-palette($warn, Main, Light, Dark);
+
+$blue1: #2D67FF;
+$blue2: #328DFF;
+$blue3: #0033a0;
+$blue4: #2E67F9;
+$blue5: #00389D;
+$blue6: #296dfa;
+$blue7: #303239;
+$blue8: #2C6DF5;
+$blue9: #2562F9;
+
+$grey1: #F2F2F2;
+$grey2: #666666;
+$grey3: #D9D9D9;
+$grey4: #404040;
+$grey5: #77777B;
+$grey6: #31333A;
+$gray6: #E8EBEA;
+$grey7: #202226;
+$grey8: #2E2E2E;
+$grey9: #B0B3B4;
+$grey10: #9EA0A2;
+$grey11: #2c2c2c;
+$grey12: #605F5F;
+$grey13: #2e2e2e;
+
+$white: #FFFFFF;
+$white1: #b9bbbc;
+$white2: #fdfdfd;
+
+$black: #000000;
+$black2: #000063;
+$black3: #0B0C0E;
+$black4: #141619;
+$black5: #383737;
+$black6: #00000029;
+
+$red: #DA1E28;
+
+$theme-dark: mat-dark-theme((color: (primary: $primary,
+      accent: $accent,
+      warn: $warn)));
+@include theming($theme-dark);
+
+.theme-dark {
+  --text-clr: #{$white};
+  --text-clr2: #{$black2};
+  --text-clr3: #{$white};
+  --text-clr4: #{$white};
+  --text-clr5: #{$black};
+  --text-clr6: #{$blue4};
+  --text-clr7: #{$white};
+  --text-clr8: #{$blue8};
+  --text-clr9: #{$grey9};
+  --text-clr10: #{$grey9};
+
+  --backgnd-clr1: #{$blue1};
+  --backgnd-clr2: #{$blue2};
+  --backgnd-clr3: #{$blue5};
+  --backgnd-clr4: #{$grey4};
+  --backgnd-clr5: #{$grey5};
+  --backgnd-clr6: #{$grey6};
+  --backgnd-clr7: #{$grey6};
+  --backgnd-clr8: #{$black3};
+  --backgnd-clr9: #{$grey6};
+  --backgnd-clr10: #{$grey7};
+  --backgnd-clr11: #{$black3};
+  --backgnd-clr12: #{$blue7};
+  --backgnd-clr13: #{$black4};
+  --backgnd-clr14: #{$black4};
+  --backgnd-clr15: #{$black5};
+  --backgnd-clr16: #{$black};
+  --backgnd-clr17: #{$black};
+  --backgnd-clr18: #{$blue6};
+  --backgnd-clr19: #{$black5};
+  --btn-hover-bg: #{$blue3};
+  --btn-bg: #{$blue7};
+  --nobtn-bg: #{$blue7};
+
+  --brdr-clr: #{$grey4};
+  --brdr-clr1: #{$black4};
+  --brdr-clr2: #{$black};
+  --brdr-clr1: #{$grey10};
+  --toolbar-border:#{$black};
+  --panel-border: #{$grey4};
+  --select-panel-border:#{$black2};
+  --nobtn-border: #{$blue9};
+
+  --lblText: #{$white};
+  --frm-field-txt: #{$white1};
+  --radio-clr: #{$grey4};
+  --btnDisabled: #{$grey2};
+  --required: #{$red};
+  --tbl-evn-row: #{$grey7};
+  --tbl-odd-row: #{$black3};
+  --box-exp-shadow: #{$black6};
+  --web-scroll: #{$grey11};
+  --list-bg: #{$grey12};
+  --toolbar-text-color: #{$white2};
+  --dialog-content: #{$grey9};
+  --exp-hd: #{$grey7};
+  --bg-color-dis:#{$grey13};
+  --bg-test: #{$grey7};
+}

@@ -1,0 +1,339 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div class="cardCss">
+  <div layout layout-align="left" class="titleStyle">
+    <div>
+      <span class="main-section-title">Configuration | </span>
+      Forecasting
+    </div>
+  </div>
+  <div layout layout-align="left" class="sectionHeadingStyle">
+    <div class="alignSubHeader"><b>Model Management</b></div>
+    <span class="btnAlign">
+      <button mat-icon-button (click)="add()">
+        <mat-icon matTooltip="Add" svgIcon="add" style="margin-top: 10%">
+        </mat-icon>
+      </button>
+
+      <button mat-icon-button [disabled]="!enableRetry">
+        <mat-icon
+          matTooltip="Restart"
+          style="margin-bottom: -10%"
+          svgIcon="refresh"
+        >
+        </mat-icon>
+      </button>
+
+      <button
+        mat-icon-button
+        [disabled]="!enableLeaderboard"
+        (click)="navigateToLeaderboard()"
+      >
+        <mat-icon
+          matTooltip="Leaderboard"
+          style="margin-bottom: -10%"
+          svgIcon="chart"
+        >
+        </mat-icon>
+      </button>
+
+      <button mat-icon-button [disabled]="!enableDelete" (click)="onDelete()">
+        <mat-icon
+          matTooltip="Delete"
+          svgIcon="trash"
+          style="margin-bottom: -10%"
+        >
+        </mat-icon>
+      </button>
+
+      <button mat-icon-button>
+        <mat-icon
+          matTooltip="Refresh"
+          svgIcon="retry"
+          style="margin-bottom: -10%"
+          (click)="refresh()"
+        >
+        </mat-icon>
+      </button>
+    </span>
+  </div>
+
+  <div class="scrollDiv">
+    <mat-radio-group [(ngModel)]="selectedUsecase">
+      <table
+        mat-table
+        [dataSource]="UsecaseListDatasource"
+        class="mat-elevation-z8"
+        style="margin-top: 2% !important; box-shadow: none !important"
+      >
+        <ng-container matColumnDef="radio">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="tableHeader"
+            style="width: 5% !important;">
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            style="margin-left: 5%; width: 5% !important"
+          >
+            <mat-radio-button
+              style="margin-left: 5px"
+              [value]="element"
+              (click)="onSelect(element)"
+            ></mat-radio-button>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="UsecaseName">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="tableHeader"
+            style="width: 15%;"
+          >
+            Usecase
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            style="width: 15%; padding-left: 4px"
+          >
+            {{ element.usecaseName }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="PredictionColumn">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="tableHeader"
+            style="width: 20%;"
+          >
+            Prediction Column
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            style="padding-left: 6px; width: 20%"
+          >
+            {{ element.predictionColumn }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="ModelName">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="tableHeader"
+            style="width: 20%; text-align: center;"
+          >
+            Model Name
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            style="width: 20%; text-align: center; padding-right: 10px"
+            [matTooltip]="element.modelName"
+          >
+            {{
+              element.modelName.length > 1
+                ? element.modelName.slice(0, 25) + "..."
+                : element.modelName
+            }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="SplitRatio">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="tableHeader"
+            style="width: 10%; text-align: center"
+          >
+            Split Ratio Training/Testing
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            style="width: 10%; text-align: center"
+          >
+            {{ element.splitRatio }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Created">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="tableHeader"
+            style="
+              width: 10% !important;
+              text-align: center;
+            "
+          >
+            Created ({{ timeZoneAbbr }})
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            style="
+              padding-left: 6px !important;
+              width: 10% !important;
+              text-align: center;
+            "
+          >
+            {{ element.createdAt }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Status">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="tableHeader"
+            style="text-align: center"
+          >
+            Status
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            style="width: 15% !important; padding-left: 6px; text-align: center"
+          >
+            {{ element.status }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="active">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">Active</th>
+          <td
+            mat-cell
+            *matCellDef="let element; let i = index"
+            style="width: 5% !important"
+          >
+            <mat-slide-toggle
+              (change)="
+                updateUsecaseState($event, element.usecaseName, element)
+              "
+              [checked]="element.isActive"
+              [(ngModel)]="element.isActive"
+            >
+            </mat-slide-toggle>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="details">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="tableHeader"
+            style="text-align: center"
+          >
+            Details
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            style="width: 5% !important; text-align: center"
+          >
+            <a
+              (click)="
+                showWorkflowHistoryDetailsDialog(
+                  element.usecaseName,
+                  element.workflowId
+                )
+              "
+            >
+              <mat-icon
+                svgIcon="healthcheck_show_details"
+                class="details-icon"
+                matTooltip="View Details"
+              >
+              </mat-icon>
+            </a>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </mat-radio-group>
+  </div>
+  <div class="footer">
+    <div class="paginator" style="margin-left: 79%">
+      <mat-paginator
+        style="visibility: hidden"
+        #paginator
+        [pageSize]="MAX_ROWS_PER_TABLE"
+      >
+      </mat-paginator>
+      <div
+        class="paginatorElement"
+        (click)="goToPrevPage()"
+        [attr.disabled]="!this.paginator.hasPreviousPage()"
+        [ngStyle]="
+          !this.paginator.hasPreviousPage() ? { cursor: 'not-allowed' } : ''
+        "
+      >
+        <mat-icon
+          svgIcon="prev-page"
+          class="pageIcons"
+          style="cursor: pointer"
+          *ngIf="this.paginator.hasPreviousPage()"
+          style="height: 24px !important; width: 24px !important"
+        >
+        </mat-icon>
+        <mat-icon
+          svgIcon="prev-page"
+          class="pageIcons disabled-icon"
+          *ngIf="!this.paginator.hasPreviousPage()"
+          style="height: 24px !important; width: 24px !important"
+        >
+        </mat-icon>
+      </div>
+      <div class="paginatorElement paginatorIndexElement">
+        {{ currentPageIndex }}
+      </div>
+      <div
+        class="paginatorElement"
+        (click)="goToNextPage()"
+        [attr.disabled]="!this.paginator.hasNextPage()"
+        [ngStyle]="
+          !this.paginator.hasNextPage() ? { cursor: 'not-allowed' } : ''
+        "
+      >
+        <mat-icon
+          svgIcon="next-page"
+          style="cursor: pointer"
+          class="pageIcons"
+          *ngIf="this.paginator.hasNextPage()"
+          style="height: 24px !important; width: 24px !important"
+        >
+        </mat-icon>
+        <mat-icon
+          svgIcon="next-page"
+          class="pageIcons disabled-icon"
+          *ngIf="!this.paginator.hasNextPage()"
+          style="height: 24px !important; width: 24px !important"
+        >
+        </mat-icon>
+      </div>
+      <div>of {{ totalPages }}</div>
+    </div>
+  </div>
+</div>

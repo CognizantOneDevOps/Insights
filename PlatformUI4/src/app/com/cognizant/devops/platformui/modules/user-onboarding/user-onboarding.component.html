@@ -1,0 +1,590 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div class="cardCss">
+  <div layout layout-align="left" class="titleStyle">
+    <div>
+      <span class="main-section-title">Configuration | </span>
+      Group & Users Management
+    </div>
+  </div>
+
+  <div class="sectionHeadingStyle">
+    <span *ngIf="showAddUserDetail" style="padding-top: 3px; margin-left: 3px">
+      <button
+        mat-icon-button
+        (click)="redirectToLandingPage()"
+        style="vertical-align: super"
+      >
+        <mat-icon svgIcon="backButton" matTooltip="Back to Groups & Users">
+        </mat-icon>
+      </button>
+    </span>
+    <span *ngIf="showAddUserDetail" class="alignSubWithbackBtn">
+      <b
+        >Add Access Group / Edit User Role / Add User / Assign User to Various
+        Access Group
+      </b>
+    </span>
+    <span *ngIf="!showAddUserDetail" class="alignSub">
+      <b
+        >Add Access Group / Edit User Role / Add User / Assign User to Various
+        Access Group
+      </b>
+    </span>
+    <div class="btnAlign">
+      <button mat-icon-button (click)="displayaccessGroupCreateField()">
+        <mat-icon matTooltip="Add New Access Group" svgIcon="add"> </mat-icon>
+      </button>
+      <button
+        *ngIf="!showAddUserDetail"
+        mat-icon-button
+        (click)="addGlobalUser()"
+      >
+        <mat-icon
+          matTooltip="Add User to Current/Selected Access Group"
+          class="mat-icon material-icons"
+        >
+          person_add
+        </mat-icon>
+      </button>
+
+      <button
+        mat-icon-button
+        (click)="editUserData()"
+        [disabled]="!isbuttonenabled || isSaveEnable"
+      >
+        <mat-icon
+          matTooltip="Edit User for Selected Access Group"
+          svgIcon="edit"
+        >
+        </mat-icon>
+      </button>
+
+      <button
+        *ngIf="showDetail"
+        mat-icon-button
+        (click)="saveData()"
+        [disabled]="!isSaveEnable"
+      >
+        <mat-icon matTooltip="Save" svgIcon="saveHook"> </mat-icon>
+      </button>
+
+      <button
+        *ngIf="!showDetail2"
+        mat-icon-button
+        (click)="saveData()"
+        [disabled]="!isSaveEnable"
+      >
+        <mat-icon matTooltip="Save" svgIcon="saveHook"> </mat-icon>
+      </button>
+
+      <button
+        *ngIf="adduserSaveEnable"
+        mat-icon-button
+        (click)="saveUser()"
+        [disabled]="!adduserSaveEnable"
+      >
+        <mat-icon matTooltip="Save" svgIcon="saveHook"> </mat-icon>
+      </button>
+
+      <button
+        *ngIf="assignuserSaveEnable"
+        mat-icon-button
+        (click)="assignUser()"
+        [disabled]="!assignuserSaveEnable"
+      >
+        <mat-icon matTooltip="Save" svgIcon="saveHook"> </mat-icon>
+      </button>
+
+      <button
+        mat-icon-button
+        [disabled]="!isbuttonenabled || isSaveEnable"
+        (click)="deleteOrgUser()"
+      >
+        <mat-icon
+          matTooltip="Delete User for Selected Access Group "
+          svgIcon="trash"
+        >
+        </mat-icon>
+      </button>
+
+      <button mat-icon-button [disabled]="!showCancel" (click)="Refresh()">
+        <mat-icon matTooltip="Reset" svgIcon="exit"></mat-icon>
+      </button>
+
+      <button *ngIf="!showAddUserDetail" mat-icon-button>
+        <mat-icon
+          matTooltip="Refresh"
+          svgIcon="retry"
+          (click)="redirectToLandingPage()"
+        >
+        </mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="loading-indicator">
+    <mat-progress-spinner
+      [diameter]="70"
+      *ngIf="showThrobber"
+      color="primary"
+      mode="indeterminate"
+    >
+    </mat-progress-spinner>
+  </div>
+  <div>
+    <div class="grid-container">
+      <div *ngIf="showDetail" class="select-tool">
+        <span class="select-label">Current Access Group </span>
+        <mat-form-field appearance="fill" class="formfield-custom">
+          <mat-select
+            [(ngModel)]="selectedAdminOrg"
+            placeholder="Select Access Group"
+            (ngModelChange)="loadUsersInfo(selectedAdminOrg)"
+            name="selectedAdminOrg"
+            [style.width.%]="100"
+          >
+            <mat-option
+              *ngFor="let record of adminOrgDataArray"
+              [value]="record"
+              class="optionsBckgnd"
+            >
+              {{ record.name }}
+            </mat-option>
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+      <div *ngIf="showDetail" class="searchBox">
+        <mat-form-field
+          appearance="fill"
+          class="formfield-custom"
+          style="width: 70%"
+        >
+          <div class="input-search">
+            <input
+              matInput
+              type="text"
+              *ngIf="showDetail"
+              (keyup)="applyFilter($event.target.value)"
+              placeholder="Search by Login ID or Email Address"
+            />
+            <mat-icon
+              matTooltip="Search"
+              svgIcon="searchIcon"
+              style="
+                height: 14px !important;
+                width: 14px !important ;
+                color: var(--text-clr);
+              "
+            ></mat-icon>
+          </div>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div *ngIf="showDetail" class="task-management-table">
+      <mat-radio-group [(ngModel)]="selectedUser">
+        <table mat-table [dataSource]="userDataSource">
+          <!-- Radio Button Column -->
+          <ng-container matColumnDef="radio">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              class="tableHeader"
+              style="width: 6%"
+            ></th>
+            <td mat-cell *matCellDef="let element" style="padding-left: 2%">
+              <mat-radio-button
+                [value]="element"
+                (click)="statusEdit(element)"
+              ></mat-radio-button>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="UserName">
+            <th mat-header-cell *matHeaderCellDef class="tableHeader">Name</th>
+            <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="Login">
+            <th mat-header-cell *matHeaderCellDef class="tableHeader">
+              Login ID
+            </th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.login.replace(loginRegex, "*") }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="Email">
+            <th mat-header-cell *matHeaderCellDef class="tableHeader">
+              Email Address
+            </th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.email.replace(emailRegex, "$1***@$2") }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="Role">
+            <th mat-header-cell *matHeaderCellDef class="tableHeader">
+              User Role in Access Group
+            </th>
+            <td
+              mat-cell
+              *matCellDef="let element"
+              style="width: 226px; padding: 0.5%"
+            >
+              <mat-form-field appearance="fill" class="formfield-custom">
+                <mat-select
+                  [(ngModel)]="element.role"
+                  name="{{ element.role }}
+                     "
+                  required
+                  placeholder="Select number of records "
+                  [disabled]="
+                    isSelectedUserId != element.userId || !isSaveEnable
+                  "
+                  [ngClass]="{ 'input-disabled': !isSaveEnable }"
+                >
+                  <mat-option
+                    *ngFor="let record of roleRecord"
+                    [value]="record.value"
+                    class="optionsBckgnd"
+                  >
+                    {{ record.name }}
+                  </mat-option>
+                </mat-select>
+                <mat-icon
+                  matSuffix
+                  svgIcon="arrow-down"
+                  class="arrow-icon"
+                  style="
+                    width: 12px !important;
+                    height: 12px !important;
+                    color: var(--text-clr);
+                  "
+                ></mat-icon>
+              </mat-form-field>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+      </mat-radio-group>
+    </div>
+    <div *ngIf="showAddUserDetail" class="main-grid">
+      <div class="main-grid-item">
+        <div class="headerLbl">
+          <div>
+            <mat-radio-group style="margin-left: 16px">
+              <mat-radio-button
+                [checked]="addRadioSelected"
+                [value]="element1"
+                (click)="adduserenableSave()"
+              >
+              </mat-radio-button>
+            </mat-radio-group>
+            <span style="font-size: 14px"
+              >Add User to <b>{{ selectedAdminOrg.name }}</b></span
+            >
+          </div>
+        </div>
+        <div class="section-body">
+          <span class="input-label">Current Access Group </span>
+          <div class="two-field-grid" style="margin-top: 10px">
+            <div class="grid-item">
+              <mat-form-field
+                appearance="fill"
+                class="formfield-custom"
+                style="width: 187px; height: 40px"
+              >
+                <mat-select
+                  [disabled]="!adduserSaveEnable"
+                  [(ngModel)]="selectedAdminOrg"
+                  [ngClass]="{ 'input-disabled': readOnlyOrg }"
+                  [style.width.%]="100"
+                >
+                  <mat-option
+                    *ngFor="let record of adminOrgDataArray"
+                    [value]="record"
+                  >
+                    {{ record.name }}
+                  </mat-option>
+                </mat-select>
+                <mat-icon
+                  matSuffix
+                  svgIcon="arrow-down"
+                  class="arrow-icon"
+                  style="width: 12px !important; height: 12px !important"
+                ></mat-icon>
+              </mat-form-field>
+            </div>
+            <div class="grid-item">
+              <mat-form-field appearance="fill" class="formfield-custom">
+                <div class="input-search">
+                  <input
+                    matInput
+                    [disabled]="!adduserSaveEnable"
+                    type="text"
+                    [(ngModel)]="searchUser"
+                    [value]="searchuser"
+                    required
+                    placeholder=" Search by Login ID"
+                    (keydown)="trackEvent($event)"
+                  />
+                  <mat-icon
+                    matTooltip="Search"
+                    svgIcon="searchIcon"
+                    (click)="searchUserInAddUser(searchUser)"
+                    style="height: 14px !important; width: 14px !important"
+                  ></mat-icon>
+                </div>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="single-field-grid" style="margin-top: 10px">
+            <div class="grid-item">
+              <span class="input-label"
+                >Name<span class="asteriskText">*</span></span
+              >
+              <mat-form-field appearance="fill" class="formfield-custom">
+                <input
+                  matInput
+                  [disabled]="!adduserSaveEnable"
+                  type="text"
+                  [(ngModel)]="names"
+                  [value]="searchValue"
+                  required
+                  placeholder=" Input a Name"
+                />
+              </mat-form-field>
+              <div *ngIf="isNameIncorrect" class="wrnTxt">
+                Please enter a valid Name.
+              </div>
+            </div>
+            <div class="grid-item">
+              <span class="input-label"
+                >Email<span class="asteriskText">*</span></span
+              >
+              <mat-form-field appearance="fill" class="formfield-custom">
+                <input
+                  matInput
+                  [disabled]="!adduserSaveEnable"
+                  type="text"
+                  [(ngModel)]="email"
+                  [value]="emailvalue"
+                  required
+                  placeholder=" Provide a valid E-mail Address"
+                />
+              </mat-form-field>
+              <div *ngIf="isEmailIncorrect" class="wrnTxt">
+                Please enter a valid Email.
+              </div>
+            </div>
+          </div>
+          <div class="two-field-grid" style="margin-top: 10px">
+            <div class="grid-item">
+              <span class="input-label"
+                >Login ID<span class="asteriskText">*</span></span
+              >
+              <mat-form-field appearance="fill" class="formfield-custom">
+                <input
+                  matInput
+                  [disabled]="!adduserSaveEnable"
+                  type="text"
+                  [(ngModel)]="username"
+                  [value]="searchValue"
+                  required
+                  placeholder=" Input a Username"
+                />
+              </mat-form-field>
+              <div *ngIf="isUsernameIncorrect" class="wrnTxt">
+                Please enter a valid Username.
+              </div>
+            </div>
+            <div class="grid-item">
+              <span class="input-label"
+                >Password<span class="asteriskText">*</span></span
+              >
+              <mat-form-field appearance="fill" class="formfield-custom">
+                <input
+                  matInput
+                  [disabled]="!adduserSaveEnable"
+                  type="password"
+                  [(ngModel)]="pass"
+                  [value]="searchValue"
+                  required
+                  placeholder=" Input a Password"
+                />
+              </mat-form-field>
+              <div *ngIf="isPasswordIncorrect" class="wrnTxt">
+                Please enter a valid Password.
+              </div>
+            </div>
+          </div>
+          <div class="single-field-grid" style="margin-top: 10px">
+            <div class="grid-item" style="width: 48%">
+              <span class="input-label"
+                >Role<span class="asteriskText">*</span></span
+              >
+              <mat-form-field appearance="fill" class="formfield-custom">
+                <mat-select
+                  [disabled]="!adduserSaveEnable"
+                  [(ngModel)]="role"
+                  name="{{ role }}"
+                  required
+                  placeholder=" Select a Role"
+                  [ngClass]="{ 'input-disabled': !isSaveEnable }"
+                >
+                  <mat-option
+                    *ngFor="let record of roleRecord"
+                    [value]="record.value"
+                    class="optionsBckgnd"
+                  >
+                    {{ record.name }}
+                  </mat-option>
+                </mat-select>
+                <mat-icon
+                  matSuffix
+                  svgIcon="arrow-down"
+                  class="arrow-icon"
+                  style="width: 12px !important; height: 12px !important"
+                ></mat-icon>
+              </mat-form-field>
+              <div *ngIf="isRoleIncorrect" class="wrnTxt">
+                Please select a Role.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="main-grid-item" style="margin-right: 1%">
+        <div class="headerLbl">
+          <div>
+            <mat-radio-group style="margin-left: 16px">
+              <mat-radio-button
+                [checked]="assignRadioSelected"
+                [value]="element2"
+                (click)="assignuserenableSave()"
+              >
+              </mat-radio-button>
+            </mat-radio-group>
+            <span style="font-size: 14px"
+              >Assign users to various access groups</span
+            >
+          </div>
+        </div>
+        <div class="section-body">
+          <div>
+            <mat-form-field
+              appearance="fill"
+              class="formfield-custom"
+              style="width: 300px"
+            >
+              <div class="input-search">
+                <input
+                  matInput
+                  [disabled]="!assignuserSaveEnable"
+                  type="text"
+                  [(ngModel)]="searchOrgForUser"
+                  [value]="searchOrgForUser"
+                  required
+                  placeholder=" Search by Login ID"
+                  (keydown)="trackEvent1($event)"
+                />
+                <mat-icon
+                  matTooltip="Search"
+                  svgIcon="searchIcon"
+                  style="
+                    height: 14px !important;
+                    width: 14px !important;
+                    color: var(--text-clr);
+                  "
+                  (click)="searchUserInAssign(searchOrgForUser)"
+                ></mat-icon>
+              </div>
+            </mat-form-field>
+          </div>
+          <div
+            class="two-field-grid"
+            style="margin-top: 10px"
+            *ngFor="let row of rows?.controls; let index = index"
+          >
+            <div class="grid-item">
+              <span class="input-label">Access Group</span>
+              <mat-form-field appearance="fill" class="formfield-custom">
+                <mat-select
+                  [disabled]="!assignuserSaveEnable"
+                  required
+                  placeholder="Select Access Group"
+                  name="selectOrgForUser5"
+                  [formControl]="row.get('org')"
+                  [ngClass]="{ 'input-disabled': readOnlyOrg }"
+                >
+                  <mat-option
+                    [disabled]="!assignuserSaveEnable"
+                    *ngFor="let record of adminOrgDataArray"
+                    [value]="record"
+                  >
+                    {{ record.name }}
+                  </mat-option>
+                </mat-select>
+                <mat-icon
+                  matSuffix
+                  svgIcon="arrow-down"
+                  class="arrow-icon"
+                  style="width: 12px !important; height: 12px !important"
+                ></mat-icon>
+              </mat-form-field>
+            </div>
+            <div class="grid-item">
+              <span class="input-label">Role</span>
+              <mat-form-field appearance="fill" class="formfield-custom">
+                <mat-select
+                  [disabled]="!assignuserSaveEnable"
+                  required
+                  placeholder="Select Role"
+                  [ngClass]="{ 'input-disabled': readOnlyOrg }"
+                  [formControl]="row.get('role')"
+                  name="role5"
+                >
+                  <mat-option
+                    *ngFor="let record of roleRecord"
+                    [value]="record.value"
+                  >
+                    {{ record.name }}
+                  </mat-option>
+                </mat-select>
+                <mat-icon
+                  matSuffix
+                  svgIcon="arrow-down"
+                  class="arrow-icon"
+                  style="width: 12px !important; height: 12px !important"
+                ></mat-icon>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

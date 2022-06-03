@@ -1,0 +1,74 @@
+<!--
+   *********************************************************************************
+   * Copyright 2019 Cognizant Technology Solutions
+   * 
+   * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+   * use this file except in compliance with the License.  You may obtain a copy
+   * of the License at
+   * 
+   *   http://www.apache.org/licenses/LICENSE-2.0
+   * 
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+   * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+   * License for the specific language governing permissions and limitations under
+   * the License.
+   *******************************************************************************-->
+<div class="arrange-horizontally-Dialog">
+    <div class="gridheadercenter">
+        <pre class="showDialogHeadingCss">{{title}}</pre>
+    </div>
+    <div class="closeIconCss">
+        <a (click)="closeShowDetailsDialog()" mat-dialog-close>
+            <mat-icon svgIcon="close_dialog" style="height: 11px !important; width: 11px !important;">
+            </mat-icon>
+        </a>
+    </div>
+</div>
+<div style="margin-top: 70px" class="scrollData">
+    <span class="Relationnamecss"><b>{{relationName}}</b></span>
+    <table>
+        <tr>
+            <th><span style="margin-left: 200px;" class="dot"></span></th>
+            <th style="width: 0px !important">
+                <hr style="width: 550px; height: 3px;" size=10 noshade>
+            </th>
+            <td style="margin-right: 100px;"><span class="dot" style="margin-left: 0px"></span></td>
+        </tr>
+    </table>
+    <div style="display: flex;justify-content: space-between;margin:0 210px 0 200px;">
+        <div (mouseover)="sourceText=true" (mouseout)="sourceText=false">
+            <span *ngIf="!sourceText" style="color: var(--text-clr);;font-size: 14px;">{{source}}
+            </span>
+            <div *ngIf="sourceText" class="BlueColumnLeft">
+                <span style="color: var(--text-clr4);font-size: 14px;"><b>{{source}}</b></span>
+            </div>
+            <div *ngIf="sourceText" class="dialog-model">
+                <h4 style="font-size:14px;background-color: var(--backgnd-clr7);">
+                    Source Fields <span (click)="showModel = null"></span>
+                </h4>
+                <div class="body-content">
+                    <p class="multi_lines_text" [innerHTML]="sourceformattedString"></p>
+                </div>
+            </div>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+            <div (mouseover)="destText=true" (mouseout)="destText=false" style="width: 0%;">
+                <span *ngIf="(!destText && !sourceText)"
+                    style="color: var(--text-clr);font-size:14px;">{{destination}}</span>
+                <span *ngIf="(!destText && sourceText)"
+                    style="color: var(--text-clr);font-size:14px;">{{destination}}</span>
+                <div *ngIf="destText" class="BlueColumnRight">
+                    <span style="color: var(--text-clr4);font-size: 14px;"><b>{{destination}}</b></span>
+                </div>
+                <div *ngIf="destText" class="dialog-modelDest">
+                    <h4 style="font-size:14px;background-color: var(--backgnd-clr7);">
+                        Destination Fields<span (click)="showModel = null"></span>
+                    </h4>
+                    <div class="body-content">
+                        <p class="multi_lines_text" [innerHTML]="destformattedString"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

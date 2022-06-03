@@ -1,0 +1,151 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div class="cardCss">
+
+  <div layout layout-align="left" class="titleStyle">
+    <span class="main-section-title">Configuration | </span>
+   <b>Bulk Upload</b>
+  </div>
+  <div class="sectionHeadingStyle">
+    <span class="alignSub"><b> Bulk Upload</b> (Please note you may upload UPTO 5 .CSV files of maximum 2 MB ONE AT A
+      TIME)
+    </span>
+    <span class="btnAlign">
+      <button mat-icon-button (click)="validation()" [disabled]="!toolNameSaveEnable">
+        <mat-icon class="iconColor" matTooltip="Upload" svgIcon="upload">
+          <!-- cloud_upload -->
+        </mat-icon>
+      </button>
+      <button mat-icon-button (click)="Refresh()" [disabled]="!toolNameSaveEnable" [disabled]="!refresh">
+        <mat-icon class="iconColor" matTooltip="Reset" svgIcon="cancelBlkUpld">
+          <!-- cloud_upload -->
+        </mat-icon>
+      </button>
+      <button mat-icon-button>
+        <mat-icon class="iconColor" matTooltipClass="custom-tooltip"
+          matTooltip="Please ensure that the .CSV file is in correct format to avoid failure in uploading the file. For example
+          - In the header do not use quotes.
+          - In textual data do not use spaces. E.g. run time, instead use run_time
+          - Please ensure there is consistency in the header while uploading data for same Tool to avoid data mismatch
+            Please Note: Uploading incorrect data or inconsistent data may impact creation of Dashboards and other functionalities" svgIcon="help">
+        </mat-icon>
+      </button>
+    </span>
+  </div>
+
+  <div class="tableHeaderCss">
+    <div class="mainHeaderText">Bulk Upload</div>
+    <div class="infoHeaderText">(Please note: No changes can made to a file or the file cannot be retreived once it is
+      uploaded)</div>
+  </div>
+  <div style="border: 1px solid var(--brdr-clr);background-color: var(--backgnd-clr10);">
+    <div *ngFor="let row of rows.controls; let index = index"
+      class="add-agent-section-body add-agent-section-body-dimensions" style="padding-bottom: 0px;">
+      <div *ngIf="index!=0" style="width: 100%;display: flex; justify-content: center;margin: -15px 0 20px 0px; height: 1px;
+        background-color: var(--brdr-clr);">
+      </div>
+      <div class="agent-categories-grid">
+        <div class="agent-category-grid-item">
+          <div class="agent-categories-grid2">
+            <div class="agent-category-grid-item2">
+              <span class="input-label">Tool<span class="required">*</span></span>
+              <div class="input">
+                <mat-form-field appearance="fill" class="formfield-custom">
+                  <mat-select [disabled]="row.value.status == 'Success'" [(ngModel)]="selectedTool[index]" required
+                    [formControl]="row.get('toolName')" name="selectedTool"
+                    (ngModelChange)="onToolSelect(selectedTool[index], index, row)" placeholder="Select Tool">
+                    <mat-option *ngFor="let tool of toolsArr | keyvalue" value="{{ tool.value }}"
+                      (click)="toolNameenableSave()" class="optionsBckgnd" class="optionsBckgnd">{{ tool.value }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-icon matSuffix svgIcon="arrow-down" class="iconcolor arrow-icon iconDimension"></mat-icon>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="agent-category-grid-item2">
+              <span class="input-label">InsightsTimeField</span>
+              <div class="input">
+                <mat-form-field appearance="fill" class="formfield-custom">
+                  <input matInput type="text" [(ngModel)]="row.value.InsightsTimeField" name="InsightsTimeField"
+                    [formControl]="row.get('InsightsTimeField')" placeholder=" InsightsTimeField">
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="agent-category-grid-item" style="grid-row: span 2; display: flex;justify-content: center;">
+          <div class="input" style="padding-right: 15%;">
+            <div class="file-upload">
+              <button mat-button class="button" (click)="fileUpload.click()">Choose File
+              </button>
+            </div>
+            <br>
+            <div style="display: flex;justify-content: space-between;">
+              <div style="border: 1px solid var(--brdr-clr);background-color: var(--backgnd-clr11);">
+                <div style="display: flex; justify-content: space-between;padding: 5px 15px;">
+                  <div style="display: flex;min-width: 150px;">
+                    {{fileNameArr[index] || "No file uploaded yet."}}
+                  </div>
+                  <div style="display: flex;">
+                    <button mat-icon-button (click)="cancelUpload(index)"
+                      style="line-height: 0px;width: 20px;height: 20px;">
+                      <mat-icon class="iconColor" matTooltip="Cancel" svgIcon="cross"></mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <input hidden type="file" id="{{'file' + index }}" class="file-input"
+                (change)="onFileChanged($event, row, index)" #fileUpload>
+              &nbsp;&nbsp;
+              <div style="width:20px;height: 20px;margin-top: 5px;">
+                <mat-icon svgIcon="successBlk" *ngIf="row.value.status == 'Success'" class="iconcolor iconSuccClr">
+                </mat-icon>
+                <mat-icon svgIcon="failureBlk" matTooltip="{{ row.value.tooltipmessage }}"
+                  *ngIf="row.value.status == 'Fail'" class="iconcolor iconFlrClr">
+                </mat-icon>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="agent-category-grid-item">
+          <div class="agent-categories-grid2">
+            <div class="agent-category-grid-item2">
+              <span class="input-label">Label</span>
+              <div class="input">
+                <mat-form-field appearance="fill" class="formfield-custom">
+                  <input matInput type="text" [(ngModel)]="row.value.labelName" (click)="toolNameenableSave()"
+                    [formControl]="row.get('labelName')" name="selectedLabel" class="inputColCss"
+                    [(ngModel)]="row.value.labelName" value="{{ labelsArr[index] }}" placeholder="Label">
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="agent-category-grid-item2">
+              <span class="input-label">InsightsTimeFormat</span>
+              <div class="input">
+                <mat-form-field appearance="fill" class="formfield-custom">
+                  <input matInput type="text" [(ngModel)]="row.value.InsightsTimeFormat"
+                    [formControl]="row.get('InsightsTimeFormat')" name="InsightsTimeFormat"
+                    placeholder="InsightsTimeFormat">
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

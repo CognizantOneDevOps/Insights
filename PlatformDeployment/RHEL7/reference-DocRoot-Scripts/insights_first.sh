@@ -117,16 +117,12 @@ echo "#################### Setting up Insights Home ####################"
 cd $INSIGHTS_HOME_ROOT_DIRECTORY
 sudo mkdir INSIGHTS_HOME
 cd INSIGHTS_HOME
-echo -n "Nexus(userName):"
-read userName
-echo "Nexus credential:"
-read -s credential
-sudo wget  https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/InSightsConfig.zip
-sudo unzip InSightsConfig.zip && sudo rm -rf InSightsConfig.zip
-sudo cp -R InSightsConfig/.InSights/ .
 export INSIGHTS_HOME=`pwd`
 sudo echo INSIGHTS_HOME=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" INSIGHTS_HOME=`pwd` | sudo tee -a /etc/profile
+mkdir .InSights
+cd .InSights
+sudo wget  https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformService/src/main/resources/server-config-template.json -O server-config.json
 sudo chmod -R 777 $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/
 source /etc/environment
 source /etc/profile

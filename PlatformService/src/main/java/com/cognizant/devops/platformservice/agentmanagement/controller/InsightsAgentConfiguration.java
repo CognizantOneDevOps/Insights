@@ -188,5 +188,28 @@ public class InsightsAgentConfiguration {
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(agentList);
 	}
+	
+	@GetMapping(value = "/getAvailableAgentTags", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject getAvailableAgentTags() {
+		Map<String, String> agentDetails;
+		try {
+				agentDetails = agentManagementService.getAvailableAgentTags();
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+		return PlatformServiceUtil.buildSuccessResponseWithData(agentDetails);
+	}
+	
+	@GetMapping(value = "/downloadAgentPackage", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject downloadAgentPackage(@RequestParam String version) {
+		String result = null;
+		try {
+			String validatedversion = StringEscapeUtils.escapeHtml(ValidationUtils.validateRequestBody(version));
+			result = agentManagementService.downloadAgentPackageFromGithub(validatedversion);
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+		return PlatformServiceUtil.buildSuccessResponseWithData(result);
+	}
 
 }

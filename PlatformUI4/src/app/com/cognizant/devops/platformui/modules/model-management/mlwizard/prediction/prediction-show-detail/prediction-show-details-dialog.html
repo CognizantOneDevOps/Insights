@@ -1,0 +1,95 @@
+<!--
+ *********************************************************************************
+ * Copyright 2020 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *******************************************************************************-->
+
+<div class="titleContainer">
+  <h1>Prediction Details - {{model_id}}</h1>
+  <a (click)="closeShowDetailsDialog()" mat-dialog-close>
+    <mat-icon svgIcon="close_dialog" class="closeIcon" style="height: 11px !important; width: 11px !important">
+    </mat-icon>
+  </a>
+</div>
+
+<div class="loading-indicator">
+  <mat-progress-spinner [diameter]="100" *ngIf="showThrobber" color="primary" mode="indeterminate">
+  </mat-progress-spinner>
+</div>
+<div *ngIf="showPredictionDetails" class="scrollData" style="width: 100%">
+  <div class="rowContainer">
+    <div layout layout-align="right" class="rightAlignStyle">
+      <a>
+        <button mat-icon-button (click)="exportToExcel()">
+          <mat-icon title="Export To Excel" style="margin-bottom: -10%; margin-left: 4px"
+            class="mat-icon material-icons">
+            play_for_work
+          </mat-icon>
+        </button>
+      </a>
+    </div>
+  </div>
+
+  <mat-dialog-content>
+    <table mat-table [dataSource]="predictionDetailedDatasource">
+      <ng-container *ngFor="let header of finalHeaderToShow | keyvalue" matColumnDef="{{header.key}}">
+        <th mat-header-cell *matHeaderCellDef [ngClass]="{'tableHeader': header.key}">
+          {{(header.key == 'predict')? (header.key | titlecase):(header.key)}}
+        </th>
+        <td mat-cell class="cellCss" style="padding-top: 2px; padding-bottom: 2px; line-height: 1.2em"
+          *matCellDef="let element">
+          {{element[header.key]}}
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="headerArrayDisplay" class="tableHeader"></tr>
+      <tr mat-row *matRowDef="let row; columns: headerArrayDisplay;"></tr>
+    </table>
+  </mat-dialog-content>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="footer">
+          <div class="paginator" style="margin-left: 41%">
+            <mat-paginator style="visibility: hidden" #paginator [pageSize]="MAX_ROWS_PER_TABLE">
+            </mat-paginator>
+            <div class="paginatorElement" (click)="goToPrevPage()" [attr.disabled]="!this.paginator.hasPreviousPage()"
+              [ngStyle]="!this.paginator.hasPreviousPage() ? {'cursor':
+                        'not-allowed'} : ''">
+              <mat-icon svgIcon="prev-page" class="pageIcons" style="cursor: pointer"
+                *ngIf="this.paginator.hasPreviousPage()" style="height: 24px !important; width: 24px !important">
+              </mat-icon>
+              <mat-icon svgIcon="prev-page" class="pageIcons disabled-icon" *ngIf="!this.paginator.hasPreviousPage()"
+                style="height: 24px !important; width: 24px !important">
+              </mat-icon>
+            </div>
+            <div class="paginatorElement paginatorIndexElement">
+              {{currentPageIndex}}
+            </div>
+            <div class="paginatorElement" (click)="goToNextPage()" [attr.disabled]="!this.paginator.hasNextPage()"
+              [ngStyle]="!this.paginator.hasNextPage() ? {'cursor': 'not-allowed'}
+                        : ''">
+              <mat-icon svgIcon="next-page" style="cursor: pointer" class="pageIcons"
+                *ngIf="this.paginator.hasNextPage()" style="height: 24px !important; width: 24px !important">
+              </mat-icon>
+              <mat-icon svgIcon="next-page" class="pageIcons disabled-icon" *ngIf="!this.paginator.hasNextPage()"
+                style="height: 24px !important; width: 24px !important">
+              </mat-icon>
+            </div>
+            <div>of {{totalPages}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

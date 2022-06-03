@@ -127,7 +127,7 @@ public class HealthStatusServiceImpl  {
 				label.append(":").append(category);
 				label.append(":").append(tool);
 			}
-			return loadAgentsFailureHealthData(label.toString(), agentId, 20);
+			return loadAgentsFailureHealthData(label.toString(), agentId, 10);
 		} catch (Exception e) {
 			log.error("Error occured while creating agent failure health label {}", e.getMessage());
 			throw new InsightsCustomException(e.getMessage());

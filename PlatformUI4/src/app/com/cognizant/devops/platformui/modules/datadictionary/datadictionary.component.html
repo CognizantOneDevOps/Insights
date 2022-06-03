@@ -1,0 +1,202 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+
+<div class="cardCss" style="height: 94vh">
+    <div layout layout-align="left" class="titleStyle">
+        <a>Data Dictionary</a>
+    </div>
+    <div class="dropdownOuterDiv">
+        <div>
+            <div class="dropdownInnerDiv" style="overflow: hidden;">
+                <div style="float:left;width: 25%;">
+                    <div>
+                        <label class="select-label">Select Source Tool</label>
+                    </div>
+                    <div>
+                        <mat-form-field appearance="fill" class="formfield-custom">
+                            <mat-select [(ngModel)]="selectedSourceTool" name="selectedSourceTool"
+                                (ngModelChange)="selectLabelforsource(selectedSourceTool)" required placeholder="
+                                Select Source Tool">
+                                <mat-option [disabled]="data1 === selectedSourceTool"
+                                    *ngFor="let data1 of responseDataSource" [value]="data1" class="optionsBckgnd">
+                                    {{data1}} </mat-option>
+                            </mat-select>
+                            <mat-icon matSuffix svgIcon="arrow-down" class="arrow-icon"
+                                style="width: 12px !important; height: 12px !important;"></mat-icon>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div style="float:left;width: 25%;">
+                    <div>
+                        <label class="select-label"> Select Source Label </label>
+                    </div>
+                    <div>
+                        <mat-form-field appearance="fill" class="formfield-custom">
+                            <mat-select [(ngModel)]="selectedSourceLabel" [style.width.%]="100"
+                                (ngModelChange)="loadAgent1Info(selectedSourceLabel)" name="selectedLabels" required
+                                placeholder="Select Source Label">
+                                <mat-option [disabled]="data2 === selectedDestinationTool"
+                                    *ngFor="let data2 of labelSourceListDatasourceSelected" [value]="data2"
+                                    class="optionsBckgnd">
+                                    {{data2.labelName}} </mat-option>
+                            </mat-select>
+                            <mat-icon matSuffix svgIcon="arrow-down" class="arrow-icon"
+                                style="width: 12px !important; height: 12px !important;"></mat-icon>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div style="float:left;width: 25%;">
+                    <div>
+                        <label class="select-label"> Select Destination Tool </label>
+                    </div>
+                    <div>
+                        <mat-form-field appearance="fill" class="formfield-custom">
+                            <mat-select [(ngModel)]="selectedDestinationTool"
+                                (ngModelChange)="selectLabelfordestination(selectedDestinationTool)"
+                                [style.width.%]="100" name="selectedDestinationTool" required
+                                placeholder="Select Destination Tool">
+                                <mat-option *ngFor="let data2 of responseDataSource" [value]="data2"
+                                    class="optionsBckgnd">
+                                    {{data2}} </mat-option>
+                            </mat-select>
+                            <mat-icon matSuffix svgIcon="arrow-down" class="arrow-icon"
+                                style="width: 12px !important; height: 12px !important;"></mat-icon>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div style="float:left;width: 25%;">
+                    <div>
+                        <label class="select-label"> Select Destination Label </label>
+                    </div>
+                    <div>
+                        <mat-form-field appearance="fill" class="formfield-custom">
+                            <mat-select [(ngModel)]="selectedDestinationLabel" [style.width.%]="100"
+                                (ngModelChange)="loadAgent1Info2(selectedDestinationLabel)"
+                                name="selectedDestinationLabel" required placeholder="Select Destination label">
+                                <mat-option *ngFor="let data1 of labelDestListDatasourceSelected" [value]="data1"
+                                    class="optionsBckgnd">
+                                    {{data1.labelName}} </mat-option>
+                            </mat-select>
+                            <mat-icon matSuffix svgIcon="arrow-down" class="arrow-icon"
+                                style="width: 12px !important; height: 12px !important;"></mat-icon>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="rightAlign">
+            <button mat-button
+                [disabled]="(noShowDetail||noShowDetail2||!selectedSourceTool || !selectedDestinationTool||buttonOn)"
+                class="button" (click)="getCorrelation(selectedSourceLabel,selectedDestinationLabel)">Click
+                to show
+                Correlation
+            </button>
+        </div>
+    </div>
+    <div class="column1 correlationTbl">
+        <div class="headerLbl" style="text-align: center; padding: 5px;">
+            <b>&nbsp; Tool Properties</b>
+        </div>
+        <div style="height:100%;width:100%;">
+            <div class="property" style="float: left;width: 49%;">
+                <div *ngIf="noShowDetail || showDetail" class="propertyInnerDiv">
+                    <div *ngIf="noShowDetail" class="divTablesHeading">
+                        <div><b class="agentProperty">{{startToolNullPropertiesMessage}} for selected tool</b></div>
+                        <div class="lblNoProperty">Label:<b
+                                style="font-weight:bolder;color: var(--text-clr);">({{agent1Category}}:{{agent1Tool}})</b>
+                        </div>
+                    </div>
+                    <div *ngIf="showDetail" class="divTablesHeading">
+                        <div><b class="agentProperty">{{agent1Tool}} Properties</b></div>
+                        <div class="lblProperty"> Label:<b
+                                style="font-weight:bolder;color: var(--text-clr);">({{agent1LabelName}})</b>
+                        </div>
+                    </div>
+                    <table *ngIf="showDetail">
+                        <tbody style="display:grid;max-height:34vh;overflow:auto;width: 100%;">
+                            <tr class="dat-row" *ngFor="let element of tool1TableData">
+                                <td style="text-align:left;padding-left: 15px;padding-top: 8px;align-items: center;">
+                                    {{element}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="property" style="float: left;width: 49%;">
+                <div *ngIf="noShowDetail2 || showDetail2" class="propertyInnerDiv">
+                    <div *ngIf="noShowDetail2" class="divTablesHeading">
+                        <div><b class="agentProperty">{{endToolNullPropertiesMessage}} for selected tool</b></div>
+                        <div class="lblNoProperty">Label:<b
+                                style="font-weight:bolder;color: var(--text-clr);">({{agent2Category}}:{{agent2Tool}})</b>
+                        </div>
+                    </div>
+                    <div *ngIf="showDetail2" class="divTablesHeading">
+                        <div><b class="agentProperty">{{agent2Tool}} Properties</b></div>
+                        <div class="lblProperty"> Label:<b
+                                style="font-weight:bolder;color: var(--text-clr);">({{agent2LabelName}})</b>
+                        </div>
+                    </div>
+                    <table *ngIf="showDetail2">
+                        <tbody style="display:grid;max-height:34vh;overflow:auto;width: 100%;">
+                            <tr class="dat-row" *ngFor="let element of tool2TableData">
+                                <td style="text-align:left;padding-left: 15px;padding-top: 8px;">
+                                    {{element}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="column2 correlationTbl">
+        <div class="headerLbl" style="text-align: center; padding: 5px;">
+            <b>&nbsp; Correlation Details</b>
+        </div>
+        <div *ngIf="showDetail3" class="col2InnerDiv">
+            <div *ngIf="clicked">
+                <div layout layout-align="center center" *ngIf="noShowDetailCorr">
+                    <b class="agentProperty">No Correlations found between the selected
+                        tools:</b><b class="lblNoProperty">({{agent1Tool}}:{{agent2Tool}})</b>
+                </div>
+                <div *ngIf="!noShowDetailCorr" style="margin-left:15px;margin-right: 15px;margin-top: 15px;">
+                    <div><b class="agentProperty">Relationship Name:</b></div>
+                    <div class="divTablesHeadingLeft">
+                        <table mat-table style="border: 0px !important;" id="myTable"
+                            [dataSource]="neo4jRelationMappingLabels">
+                            <ng-container style="margin-top: 15px;" matColumnDef="relationName">
+                                <td mat-cell *matCellDef="let element "
+                                    style="border: none !important;padding-left: 0px !important" class="radiobuttonCol">
+                                    <ul style="list-style-type: circle;">
+                                        <div class="relationNames" (click)="showDetailsofCorrelation(element)">
+                                            <li style="color: var(--text-clr9)">{{element.relationName}}
+                                            </li>
+                                        </div>
+                                    </ul>
+                                </td>
+                            </ng-container>
+                            <tr mat-row *matRowDef="let row;columns: dataComponentColumns;"
+                                style="border-right: 0px !important;">
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

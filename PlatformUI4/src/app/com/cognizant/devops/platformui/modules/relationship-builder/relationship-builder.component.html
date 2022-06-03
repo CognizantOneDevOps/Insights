@@ -1,0 +1,300 @@
+<!--
+   *******************************************************************************
+    * Copyright 2019 Cognizant Technology Solutions.
+    * 
+    * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+    * use this file except in compliance with the License.  You may obtain a copy
+    * of the License at
+    * 
+    *   http://www.apache.org/licenses/LICENSE-2.0
+    * 
+    * Unless required by applicable law or agreed to in writing, software
+    * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+    * License for the specific language governing permissions and limitations under
+    * the License.
+    ****************************************************************************** -->
+<div class="cardCss" style="height: 112vh;">
+    <div class="alignElements">
+        <div layout layout-align="left" class="titleStyle">
+            <span class="main-section-title">Configuration | </span>
+            Co-Relation Builder
+        </div>
+    </div>
+
+    <div class="dropdownOuterDiv">
+        <div class="dropdownInnerDiv" style="overflow: hidden;">
+            <div style="float:left;width: 25%;">
+                <div>
+                    <label class="lblText">Select Source Tool</label>
+                </div>
+                <div>
+                    <mat-form-field appearance="fill" class="formfield-custom">
+                        <mat-select [(ngModel)]="selectedSourceTool" name="selectedSourceTool"
+                            (ngModelChange)="selectLabelforsource(selectedSourceTool)" required placeholder="
+                        Select Source Tool">
+                            <mat-option [disabled]="data1 === selectedSourceTool"
+                                *ngFor="let data1 of responseDataSource" [value]="data1"
+                                class="{{storedTheme}} optionsBckgnd"> {{data1}} </mat-option>
+                        </mat-select>
+                        <mat-icon class="iconColor" matSuffix svgIcon="arrow-down" class="arrow-icon"
+                            style="width: 12px !important; height: 12px !important;"></mat-icon>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div style="float:left;width: 25%;">
+                <div>
+                    <label class="lblText"> Select Source Label </label>
+                </div>
+                <div>
+                    <mat-form-field appearance="fill" class="formfield-custom">
+                        <mat-select [(ngModel)]="selectedSourceLabel" [style.width.%]="100"
+                            (ngModelChange)="loadAgent1Info(selectedSourceLabel)" name="selectedLabels" required
+                            placeholder="Select Source Label">
+                            <mat-option [disabled]="data2 === selectedDestinationTool"
+                                *ngFor="let data2 of labelSourceListDatasourceSelected" [value]="data2"
+                                class="{{storedTheme}} optionsBckgnd">
+                                {{data2.labelName}} </mat-option>
+                        </mat-select>
+                        <mat-icon class="iconColor" matSuffix svgIcon="arrow-down" class="arrow-icon"
+                            style="width: 12px !important; height: 12px !important;"></mat-icon>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div style="float:left;width: 25%;">
+                <div>
+                    <label class="lblText"> Select Destination Tool </label>
+                </div>
+                <div>
+                    <mat-form-field appearance="fill" class="formfield-custom">
+                        <mat-select [(ngModel)]="selectedDestinationTool"
+                            (ngModelChange)="selectLabelfordestination(selectedDestinationTool)" [style.width.%]="100"
+                            name="selectedDestinationTool" required placeholder="Select Destination Tool">
+                            <mat-option *ngFor="let data2 of responseDataSource" [value]="data2"
+                                class="{{storedTheme}} optionsBckgnd">
+                                {{data2}} </mat-option>
+                        </mat-select>
+                        <mat-icon class="iconColor" matSuffix svgIcon="arrow-down" class="arrow-icon"
+                            style="width: 12px !important; height: 12px !important;"></mat-icon>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div style="float:left;width: 25%;">
+                <div>
+                    <label class="lblText"> Select Destination Label </label>
+                </div>
+                <div>
+                    <mat-form-field appearance="fill" class="formfield-custom">
+                        <mat-select [(ngModel)]="selectedDestinationLabel" [style.width.%]="100"
+                            (ngModelChange)="loadAgent1Info2(selectedDestinationLabel)" name="selectedDestinationLabel"
+                            required placeholder="Select Destination label">
+                            <mat-option *ngFor="let data1 of labelDestListDatasourceSelected" [value]="data1"
+                                class="{{storedTheme}} optionsBckgnd">
+                                {{data1.labelName}} </mat-option>
+                        </mat-select>
+                        <mat-icon class="iconColor" matSuffix svgIcon="arrow-down" class="arrow-icon"
+                            style="width: 12px !important; height: 12px !important;"></mat-icon>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="sectionHeadingStyle">
+        <span class="btnAlign">
+            <button mat-icon-button (click)="updateRelation()" [disabled]="!isbuttonenabled">
+                <mat-icon class="iconColor" matTooltip="{{ (flag)? 'Disable Correlation' : 'Enable Correlation'}}"
+                    svgIcon="flag">
+                </mat-icon>
+            </button>
+            <button mat-icon-button (click)="saveData(relationshipName)" [disabled]="!isSaveEnabled">
+                <mat-icon class="iconColor" matTooltip="Save" svgIcon="save">
+                </mat-icon>
+            </button>
+            <button mat-icon-button [disabled]="!isbuttonenabled" (click)="relationDelete()">
+                <mat-icon class="iconColor" matTooltip="Delete" svgIcon="trash">
+                </mat-icon>
+            </button>
+            <button mat-icon-button mat-icon-button [disabled]="!isrefresh" (click)="Refresh()">
+                <mat-icon class="iconColor" matTooltip="Cancel" svgIcon="cancelBlkUpld">
+                </mat-icon>
+            </button>
+        </span>
+    </div>
+    <div>
+        <div class="column1 correlationTbl">
+            <div class="headerLbl" style="text-align: center; padding: 5px;">
+                <b
+                    matTooltip="A prefix FROM_SOURCETOOL_TO_DESTINATIONTOOL_ will be added to the Co-Relation name you input">&nbsp;
+                    Tool Properties</b>
+            </div>
+            <div style="margin-left: 17px; margin-top: 11px;display: flex;justify-content: space-between;">
+                <div class="input">
+                    <mat-form-field appearance="fill" class="formfield-custom2">
+                        <input matInput type="text" [(ngModel)]='relationshipName' [value]="searchValue" required
+                            placeholder="Please input a Co-Relation name">
+                    </mat-form-field>
+                </div>
+                <button mat-button style="margin-left: 16px; margin-right: 40px;"
+                    [disabled]="(noShowDetail||noShowDetail2||!selectedSourceTool || !selectedDestinationTool||buttonOn)"
+                    class="button" (click)="showaddPropertyDialog()">Add Relationship
+                    Properties</button>
+            </div>
+            <div style="height:100%;width:100%;">
+                <div class="property" style="float: left;width: 49%;">
+                    <div *ngIf="noShowDetail || showDetail" class="propertyInnerDiv">
+                        <div *ngIf="noShowDetail" class="divTablesHeading" style="border: 1px solid var(--brdr-clr);">
+                            <div><b>{{startToolNullPropertiesMessage}} for source tool</b></div>
+                            <div class="lblNoProperty">Label:<b
+                                    style="font-weight:bolder;color: var(--text-clr);">({{agent1Category}}:{{agent1Tool}})</b>
+                            </div>
+                        </div>
+                        <div *ngIf="showDetail" style="border: 1px solid var(--brdr-clr);">
+                            <div *ngIf="showDetail" class="divTablesHeading">
+                                <div><b class="agentProperty">{{agent1Tool}} Properties</b></div>
+                                <div class="lblProperty"> Label:<b
+                                        style="font-weight:bolder;color: var(--text-clr);">({{agent1LabelName}})</b>
+                                </div>
+                            </div>
+                            <div style="height: 42vh;overflow: auto;">
+                                <table *ngIf="showDetail" mat-table [dataSource]="agent1TableData"
+                                    style="overflow: hidden;">
+                                    <tbody style="display:grid;max-height:34vh;overflow:auto;max-width: 238px;">
+                                        <ng-container matColumnDef="checkbox">
+                                            <th mat-header-cell style="height:0% !important;" *matHeaderCellDef></th>
+                                            <td *matCellDef="let row">
+                                                <mat-checkbox color="primary" (change)="saveSourceFields(row, $event)"
+                                                    style="margin: 4px 12px 0px 12px;">
+                                                </mat-checkbox>
+                                            </td>
+                                        </ng-container>
+                                        <ng-container matColumnDef="toolproperties">
+                                            <th mat-header-cell style="height:0% !important;" *matHeaderCellDef></th>
+                                            <td *matCellDef="let element">{{element}}</td>
+                                        </ng-container>
+                                        <tr class="dat-row" mat-header-row *matHeaderRowDef="displayedToolColumns"></tr>
+                                        <tr class="dat-row" mat-row showRow
+                                            *matRowDef="let row; columns: displayedToolColumns;">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="property" style="float: left;width: 49%;">
+                    <div *ngIf="noShowDetail2 || showDetail2" class="propertyInnerDiv">
+                        <div *ngIf="noShowDetail2" class="divTablesHeading" style="border: 1px solid var(--brdr-clr);">
+                            <div><b>{{endToolNullPropertiesMessage}} for destination tool</b></div>
+                            <div class="lblNoProperty">Label:<b>({{agent2Category}}:{{agent2Tool}})</b>
+                            </div>
+                        </div>
+                        <div *ngIf="showDetail2" style="border: 1px solid var(--brdr-clr);">
+                            <div *ngIf="showDetail2" class="divTablesHeading">
+                                <div><b class="agentProperty">{{agent2Tool}} Properties</b></div>
+                                <div class="lblProperty"> Label:<b style="font-weight:bolder;">({{agent2LabelName}})</b>
+                                </div>
+                            </div>
+                            <div style="height: 42vh;overflow: auto;">
+                                <table *ngIf="showDetail2" mat-table [dataSource]="agent2TableData"
+                                    style="overflow: hidden;">
+                                    <tbody style="display:grid;max-height:34vh;overflow:auto;max-width: 238px;">
+                                        <ng-container matColumnDef="checkbox">
+                                            <th mat-header-cell *matHeaderCellDef></th>
+                                            <td *matCellDef="let row">
+                                                <mat-checkbox color="primary"
+                                                    (change)="saveDestinationFields(row,$event)"
+                                                    style="margin: 4px 12px 0px 12px;">
+                                                </mat-checkbox>
+                                            </td>
+                                        </ng-container>
+                                        <ng-container matColumnDef="toolproperties">
+                                            <th mat-header-cell *matHeaderCellDef></th>
+                                            <td *matCellDef="let element">{{element}}</td>
+                                        </ng-container>
+                                        <tr class="dat-row" mat-header-row *matHeaderRowDef="displayedToolColumns"></tr>
+                                        <tr class="dat-row" mat-row showRow
+                                            *matRowDef="let row; columns: displayedToolColumns;">
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="column2 correlationTbl">
+            <div class="headerLbl" style="text-align: center; padding: 5px;">
+                <b matTooltip="Please delete and re-create existing relation to change properties with UNIQUE name">&nbsp;
+                    List of Co-Relations in Database</b>
+            </div>
+            <div style="border: 1px solid var(--brdr-clr);margin: 16px;">
+                <div style="display: flex;justify-content: space-between;margin: 12px 12px 6px 12px;">
+                    <label class="subHeading">Display Co-Relation</label>
+                    <button mat-icon-button [disabled]="!isbuttonenabled">
+                        <mat-icon class="iconColor" svgIcon="correlation" matTooltip="View Correlation"
+                            (click)="showDetailsofCorrelation(selectRelation)">
+                        </mat-icon>
+                    </button>
+                </div>
+                <div style="margin: 6px 12px 12px 12px;">
+                    <span class="noteCssFirst"><b>Please Note:</b></span> <span class="noteCss"> Ensure that the
+                        properties selected to build Correlation are indexed in
+                        Neo4j for Optimal Performance.
+                    </span>
+                </div>
+            </div>
+            <div class="col2InnerDiv">
+                <div style="border: 1px solid var(--brdr-clr);">
+                    <table mat-table id="myTable" [dataSource]="dataSource">
+                        <ng-container matColumnDef="radio">
+                            <td mat-cell *matCellDef="let element " class="radiobuttonCol">
+                                <mat-radio-group [(ngModel)]="selectRelation">
+                                    <mat-radio-button style="margin-top: 15px;" [value]="element"
+                                        [checked]="radioRefresh" color="primary" (click)="enableDelete(element)">
+                                    </mat-radio-button>
+                                </mat-radio-group>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="relationName">
+                            <td mat-cell *matCellDef="let element">
+                                <div class="tableText">{{element.relationName}}</div>
+                                <div [innerHTML]="element.detailProp"></div>
+                            </td>
+                        </ng-container>
+                        <tr mat-row *matRowDef="let row; columns: dataComponentColumns;">
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="paginator rightAlignOnly" style="margin-top: 7px;">
+                    <mat-paginator class="visiblityHidden" #paginator [pageSize]="MAX_ROWS_PER_TABLE">
+                    </mat-paginator>
+                    <div class="paginatorElement" (click)="goToPrevPage()"
+                        [attr.disabled]="!this.paginator.hasPreviousPage()"
+                        [ngStyle]="!this.paginator.hasPreviousPage() ? {'cursor': 'not-allowed'} : ''">
+                        <mat-icon svgIcon="prev-page" class="pageIcons cursorDisplay"
+                            *ngIf="this.paginator.hasPreviousPage()">
+                        </mat-icon>
+                        <mat-icon svgIcon="prev-page" class="pageIcons disabled-icon flexDisplay"
+                            *ngIf="!this.paginator.hasPreviousPage()">
+                        </mat-icon>
+                    </div>
+                    <div class="paginatorElement paginatorIndexElement">{{currentPageIndex}}</div>
+                    <div class="paginatorElement" (click)="goToNextPage()"
+                        [attr.disabled]="!this.paginator.hasNextPage()"
+                        [ngStyle]="!this.paginator.hasNextPage() ? {'cursor': 'not-allowed'} : ''">
+                        <mat-icon svgIcon="next-page" class="pageIcons  cursorDisplay"
+                            *ngIf="this.paginator.hasNextPage()">
+                        </mat-icon>
+                        <mat-icon svgIcon="next-page" class="pageIcons disabled-icon flexDisplay"
+                            *ngIf="!this.paginator.hasNextPage()">
+                        </mat-icon>
+                    </div>
+                    <div style="margin-right: 5px;white-space: nowrap">
+                        of {{totalPages}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

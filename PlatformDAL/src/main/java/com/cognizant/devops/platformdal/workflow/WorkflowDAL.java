@@ -28,6 +28,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.Type;
+import org.owasp.esapi.Validator;
 
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.CommonsAndDALConstants;
@@ -50,8 +51,11 @@ public class WorkflowDAL extends BaseDAL {
 	public String deleteWorkflowTaskSequence(String workflowId) {
 
 		try {
+			Validator validate = getESAPIValidator() ;
+			String validatedworkflowId = validate.getValidInput("DAL_workflowId_parameter_checking", workflowId,
+					"SafeString", 600, false);
 			Map<String, Object> parameters = new HashMap<>();
-			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
+			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, validatedworkflowId);
 			List<InsightsWorkflowTaskSequence> asssessmentList = getResultList(
 					"FROM InsightsWorkflowTaskSequence a WHERE a.workflowConfig.workflowId= :workflowId",
 					InsightsWorkflowTaskSequence.class, parameters);
@@ -68,8 +72,7 @@ public class WorkflowDAL extends BaseDAL {
 			return PlatformServiceConstants.SUCCESS;
 		} catch (Exception e) {
 			log.error(e);
-			throw e;
-		}
+			return PlatformServiceConstants.FAILURE;		}
 	}
 
 	/**
@@ -573,12 +576,18 @@ public class WorkflowDAL extends BaseDAL {
 	 * @param workflowId
 	 * @param latestExecutionId
 	 * @return InsightsWorkflowExecutionHistory object
+	 * @throws Exception 
 	 */
-	public InsightsWorkflowExecutionHistory getLastestTaskByEndTime(String workflowId, long latestExecutionId) {
+	public InsightsWorkflowExecutionHistory getLastestTaskByEndTime(String workflowId, long latestExecutionId) throws Exception {
 		try {
+			Validator validate = getESAPIValidator() ;
+			String validatedworkflowId = validate.getValidInput("DAL_workflowId_parameter_checking_while_retrieving_task", workflowId,
+					"SafeString", 600, false);
+			String validatedlatestExecutionId = validate.getValidInput("DAL_workflow_executionId_parameter_checking", String.valueOf(latestExecutionId),
+					"ExecutionId", 600, false);
 			Map<String, Object> parameters = new HashMap<>();
-			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-			parameters.put("latestExecutionId", latestExecutionId);
+			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, validatedworkflowId);
+			parameters.put("latestExecutionId", Long.parseLong(validatedlatestExecutionId));
 			List<InsightsWorkflowExecutionHistory> nextTasks = getResultList(
 					"FROM InsightsWorkflowExecutionHistory EH WHERE EH.workflowConfig.isActive = true and EH.workflowConfig.workflowId=:workflowId and EH.executionId=:latestExecutionId order by EH.endTime desc",
 					InsightsWorkflowExecutionHistory.class, parameters);
@@ -867,11 +876,15 @@ public class WorkflowDAL extends BaseDAL {
 	 * 
 	 * @param workflowId
 	 * @return String
+	 * @throws Exception 
 	 */
-	public String deleteEmailExecutionHistoryByWorkflowId(String workflowId) {
+	public String deleteEmailExecutionHistoryByWorkflowId(String workflowId) throws InsightsCustomException {
 		try {
+			Validator validate = getESAPIValidator() ;
+			String validatedworkflowId = validate.getValidInput("DAL_workflowId_parameter_checking_For_Email_deletion", workflowId,
+								"SafeString", 600, false);
 			Map<String, Object> parameters = new HashMap<>();
-			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
+			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, validatedworkflowId);
 			List<InsightsReportVisualizationContainer> executionRecords = getResultList(
 					"FROM InsightsReportVisualizationContainer a WHERE a.workflowId= :workflowId",
 					InsightsReportVisualizationContainer.class, parameters);
@@ -882,7 +895,7 @@ public class WorkflowDAL extends BaseDAL {
 			return PlatformServiceConstants.SUCCESS;
 		} catch (Exception e) {
 			log.error(e);
-			throw e;
+			throw new InsightsCustomException("Error while deleting email execution history  ");
 		}
 	}
 
@@ -895,8 +908,11 @@ public class WorkflowDAL extends BaseDAL {
 	 */
 	public String deleteEmailTemplateByWorkflowId(String workflowId) throws InsightsCustomException {
 		try {
+			Validator validate = getESAPIValidator() ;
+			String validatedworkflowId = validate.getValidInput("DAL_workflowId_parameter_checking_while_deleting_email_template", workflowId,
+								"SafeString", 600, false);
 			Map<String, Object> parameters = new HashMap<>();
-			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
+			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, validatedworkflowId);
 			List<InsightsEmailTemplates> executionRecords = getResultList(
 					"FROM InsightsEmailTemplates a WHERE a.workflowConfig.workflowId= :workflowId",
 					InsightsEmailTemplates.class, parameters);

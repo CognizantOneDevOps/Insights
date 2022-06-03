@@ -1,0 +1,132 @@
+/* /*******************************************************************************
+ * Copyright 2020 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+
+* {
+  box-sizing: border-box;
+}
+.closeCss {
+  margin-top: 0.5%;
+  margin-right: 1%;
+}
+
+.infoHeaderText {
+  font-size: 11px;
+  color: black;
+  padding-right: 58px;
+  background-color: white !important;
+  text-align: right;
+  height: 1.2em;
+}
+
+.asteriskText {
+  color: #ff0000;
+}
+.columnName {
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+  padding-top: 1.5%;
+  padding-left: 2%;
+  font: normal normal normal 14px/24px Open Sans, Tahoma, San Serif, Helvitica;
+  letter-spacing: 0px;
+  color: var(--text-clr);
+}
+.flexColCss {
+  height: 390px;
+  background-color: var(--backgnd-clr10);
+  opacity: 1;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  flex-wrap: wrap;
+  padding: 2%;
+}
+
+.columnComponent {
+  margin: 2% 0 0 0;
+}
+.inputColCss {
+  height: 40px;
+  width: 400px;
+  background: var(--backgnd-clr8) 0% 0% no-repeat padding-box;
+  font: normal normal normal 14px/24px Open Sans;
+  opacity: 1;
+  border: none;
+  border-bottom: 1px solid #000000;
+}
+input:focus {
+  outline: none;
+}
+textarea:focus {
+  outline: none;
+}
+
+tr:last-child td:first-child {
+  border-radius: 0 0 0 0 !important;
+}
+
+tr:last-child td:last-child {
+  border-radius: 0 0 0 0 !important;
+}
+.btnbg {
+  background-color: var(--nobtn-bg);
+  padding-left: 66%;
+  height: 55px;
+  padding-top: 1%;
+}
+.textarea-item {
+  display: flex;
+  flex-direction: column;
+  font: normal normal normal 14px/24px "Open Sans";
+  height: 75%;
+
+  .formfield-custom {
+    height: -webkit-fill-available;
+
+    ::ng-deep .mat-form-field-wrapper {
+      height: 75%;
+    }
+  }
+
+  ::ng-deep .mat-form-field-appearance-fill .mat-form-field-flex {
+    height: 75% !important;
+  }
+
+  ::ng-deep .mat-form-field-infix {
+    height: -webkit-fill-available;
+  }
+
+  textarea {
+    height: 75% !important;
+  }
+}
+
+.whiteButton1 {
+  background-color: var(--backgnd-clr10) !important;
+  color: var(--backgnd-clr18) !important;
+  border: 1px solid var(--text-clr6) !important;
+}
+
+.button1 {
+  font: bold 14px/19px "Open Sans";
+  width: 106px !important;
+  height: 40px !important;
+  border: none !important;
+  border-radius: 0 !important;
+  cursor: pointer;
+  padding: 11px 16px;
+}

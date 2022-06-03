@@ -1,0 +1,10 @@
+<svg id="Dark_Toggle_Button" data-name="Dark Toggle Button" xmlns="http://www.w3.org/2000/svg" width="59" height="24" viewBox="0 0 59 24">
+  <g id="Group_37993" data-name="Group 37993" transform="translate(1263 474) rotate(180)">
+    <path id="Union_2" data-name="Union 2" d="M46.932,24H12.068a12,12,0,1,1,0-24H46.932a12,12,0,1,1,0,24Z" transform="translate(1204 450)" fill="#ededed" opacity="0.995"/>
+    <text id="Dark" transform="translate(1253 458) rotate(-180)" font-size="10" font-family="OpenSans, Open Sans"><tspan x="0" y="0">Dark</tspan></text>
+    <g id="Group_37746" data-name="Group 37746" transform="translate(-35)">
+      <circle id="Ellipse_19" data-name="Ellipse 19" cx="10" cy="10" r="10" transform="translate(1241 452)"/>
+      <path id="noun-dark-mode-4514137" d="M138.313,61.4a.453.453,0,0,0-.578-.556,4.519,4.519,0,0,1-5.5-6.283.453.453,0,0,0-.476-.647,5.875,5.875,0,1,0,6.555,7.487Zm-5.64,3.3a4.98,4.98,0,0,1-1.583-9.7,5.349,5.349,0,0,0-.226,1.549,5.439,5.439,0,0,0,5.433,5.433,5.359,5.359,0,0,0,.845-.067,5.015,5.015,0,0,1-4.469,2.783Z" transform="translate(1383.559 521.905) rotate(180)" fill="#fff"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,179 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div class="cardCss">
+  <div layout layout-align="left" class="titleStyle">
+    <div>
+      <span class="main-section-title">Configuration | </span>
+      Server Configuration
+    </div>
+  </div>
+
+  <div class="sectionHeadingStyle">
+    <span class="alignSub"><b>Server Configuration</b> (Add / update) </span>
+
+    <span class="btnAlign">
+      <button
+        mat-icon-button
+        (click)="saveData(frmserverconfig.value)"
+        [disabled]="!isConfigAvailable"
+      >
+        <mat-icon matTooltip="Save" svgIcon="save"> </mat-icon>
+      </button>
+
+      <button
+        mat-icon-button
+        (click)="redirectToLandingPage()"
+        [disabled]="frmserverconfig.invalid"
+      >
+        <mat-icon svgIcon="homeBck" matTooltip="Redirect To Landing Page">
+        </mat-icon>
+      </button>
+    </span>
+  </div>
+
+  <form #frmserverconfig="ngForm" class="form">
+    <div style="display: flex; justify-content: center; align-items: center">
+      <div class="loading-indicator">
+        <mat-progress-spinner
+          [diameter]="70"
+          *ngIf="showThrobber"
+          color="primary"
+          mode="indeterminate"
+        >
+        </mat-progress-spinner>
+      </div>
+    </div>
+
+    <!-- Main Configurations -->
+
+    <div
+      class="grid-section"
+      *ngFor="let configData of getServerConfigItems('object')"
+    >
+      <div
+        class="tableHeader"
+        style="height: 40px; padding: 11px 11px 10px 24px"
+      >
+        {{ configAbbr[configData.key] }}
+      </div>
+      <div class="grid-section-body">
+        <div
+          class="grid-item"
+          *ngFor="let configDataChild of configData.children; let i = index"
+        >
+          <span class="input-label">
+            <span matTooltip="{{ configDataChild.key | titlecase }}">
+              {{
+                configDataChild.key.length > 21
+                  ? configDataChild.key.slice(0, 21).concat("..")
+                  : configDataChild.key
+              }}</span
+            >
+            <span style="color: #ff0000" *ngIf="configDataChild.isRequired"
+              >*</span
+            >
+          </span>
+          <div class="input">
+            <mat-form-field appearance="fill" class="formfield-custom">
+              <input
+                matInput
+                type="{{ configDataChild.inputType }}"
+                [(ngModel)]="configDataChild.value"
+                name="{{ configData.key + '_' + configDataChild.key }}"
+                id="{{ configDataChild.id }}"
+              />
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Other configurations -->
+
+    <div *ngIf="isConfigAvailable">
+      <div class="grid-section">
+        <div
+          class="tableHeader"
+          style="height: 40px; padding: 11px 11px 10px 24px"
+        >
+          Others
+        </div>
+        <div class="grid-section-body">
+          <div
+            class="grid-item"
+            *ngFor="let configData of getServerConfigItems('all')"
+          >
+            <span class="input-label">
+              <span matTooltip="{{ configData.key | titlecase }}">
+                {{
+                  configData.key.length > 21
+                    ? configData.key.slice(0, 21).concat("..")
+                    : configData.key
+                }}
+              </span>
+              <span style="color: #ff0000" *ngIf="configData.isRequired"
+                >*</span
+              >
+            </span>
+            <div class="input">
+              <mat-form-field appearance="fill" class="formfield-custom">
+                <input
+                  matInput
+                  type="{{ configData.inputType }}"
+                  [(ngModel)]="configData.value"
+                  name="{{ configData.key }}"
+                  id="{{ configData.id }}"
+                />
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Textarea -->
+
+    <div
+      class="grid-section"
+      *ngFor="let configData of getServerConfigItems('textArea')"
+    >
+      <div
+        class="tableHeader"
+        style="height: 40px; padding: 11px 11px 10px 24px"
+      >
+        <span>
+          {{ configAbbr[configData.key] }}
+          <span style="color: #ff0000">*</span>
+        </span>
+      </div>
+      <div class="grid-section-textarea-body">
+        <div class="grid-item-textarea">
+          <div class="text-area">
+            <mat-form-field appearance="fill" class="formfield-custom">
+              <textarea
+                matInput
+                [(ngModel)]="configData.value"
+                name="{{ configData.key }}"
+                rows="10"
+              ></textarea>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

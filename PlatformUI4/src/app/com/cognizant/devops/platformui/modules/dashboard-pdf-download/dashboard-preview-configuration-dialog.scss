@@ -1,0 +1,77 @@
+/********************************************************************************
+ * Copyright 2022 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *******************************************************************************/
+.noHover {
+  pointer-events: none;
+}
+.arrange-horizontally-Dialog {
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  width: 100%;
+  background: #ff8f1c;
+}
+
+.titleContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--backgnd-clr7) 0% 0% no-repeat padding-box;
+  padding: 1% 2%;
+  color: #ffffff;
+}
+.btnStyle {
+  background: #ff8f1c;
+  color: white;
+}
+.closeIconCss {
+  float: right;
+  margin-right: 2%;
+  color: white;
+  line-height: 40px;
+  vertical-align: middle;
+}
+.mat-dialog-actions {
+  padding: 0px 0;
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 52px;
+  align-items: center;
+  box-sizing: content-box;
+  margin-bottom: 0px;
+  justify-content: flex-end;
+}
+
+.whiteButton1 {
+  background-color: var(--backgnd-clr10) !important;
+  color: var(--backgnd-clr18) !important;
+  border: 1px solid var(--text-clr6) !important;
+}
+
+.button {
+  font: bold 14px/19px "Open Sans";
+  width: 106px !important;
+  height: 40px !important;
+  border: none !important;
+  border-radius: 0 !important;
+  cursor: pointer;
+  background-color: var(--backgnd-clr1) !important;
+  color: var(--text-clr3) !important;
+  padding: 11px 16px;
+}

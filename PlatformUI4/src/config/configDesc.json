@@ -1,0 +1,64 @@
+{
+	"agentsOsList": {
+		"Windows": "windows",
+		"RHEL/CentOS": "linux",
+		"Docker/Alpine": "dockerAlpine",
+		"Ubuntu": "Ubuntu"
+	},
+	"desriptions": {
+		"mqConfig": "Message Queue Config",
+		"subscribe": "Subscribe",
+		"publish": "Publish",
+		"communication": "Communication",
+		"loggingSetting": "Logging Setting",
+		"enrichData": "Enrich Data"
+	},
+	"mlDataTypes": {
+		"Numeric": "Numeric",
+		"Enum": "Enum",
+		"String": "String",
+		"Time": "Time",
+		"UUID": "UUID",
+		"Unknown": "Unknown"
+	},
+	"product":{
+        "name":"Cognizant<sup>®</sup> Cloud Acceleration Platform Insights"
+	},
+	"serverConfig": {
+		"vault": "Vault",
+		"graph": "Neo4j",
+		"grafana": "Grafana",
+		"postgre": "Postgre",
+		"messageQueue": "Message Queue Config",
+		"agentDetails": "Agent Configuration",
+		"trustedHosts": "Trusted Hosts",
+		"endpointData": "Elastic Search Config",
+		"queryCache": "Query Cache",
+		"emailConfiguration": "Email Configuration",
+		"correlations": "Correlations",
+		"schedulerConfigInMin": "Scheduler Config",
+		"singleSignOnConfig": "Single Sign On Config",
+		"assessmentReport": "Assessment Report",
+		"workflowDetails": "Workflow Details",
+		"mlConfiguration": "Forecasting Configuration",
+		"ldapConfiguration": "Ldap Configuration",
+		"webhookEngine": "Webhook Engine",
+		"applicationLogLevel": "Application Log Level"
+	},
+	"NativeGrafana": {
+		"loginURL": "/PlatformService/user/authenticate",
+		"logoutURL": "/PlatformService/user/logout"
+	},
+	"SAML": {
+		"loginURL": "/PlatformService/saml/login",
+		"logoutURL": "/PlatformService/saml/logout"
+	},
+	"Kerberos": {
+		"loginURL": "/PlatformService/user/insightsso/kerberosLogin",
+		"logoutURL": ""
+	},
+	"JWT": {
+		"loginURL": "/PlatformService/user/insightsso/authenticateJWT",
+		"logoutURL": "/PlatformService/user/insightsso/logout"
+	}
+}

@@ -46,14 +46,17 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.util.FileCopyUtils;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -175,5 +178,78 @@ public class AgentManagementUtil {
 			throw new IOException("No Such file found -- " + configFile);
 		} 
 		return jsonObject;
+	}
+	
+	
+	public String getAgentPackageFromGithub(URL zipFileUrl, File targetDir, String version) throws IOException {
+		String message = "";
+		if (targetDir.exists()) {
+			throw new IOException(version + " - Package already exist!");
+		} else {
+			targetDir.mkdirs();
+			File zip = File.createTempFile("agents_", ".zip", targetDir);
+			URLConnection conn;
+			if(ApplicationConfigProvider.getInstance().getProxyConfiguration().isEnableProxy()) {
+				SocketAddress addr = new InetSocketAddress(ApplicationConfigProvider.getInstance().getProxyConfiguration().getProxyHost(), ApplicationConfigProvider.getInstance().getProxyConfiguration().getProxyPort());
+				Proxy proxy = new Proxy(Proxy.Type.HTTP, addr);
+				conn = zipFileUrl.openConnection(proxy);
+			}else{
+				conn = zipFileUrl.openConnection();
+			}	
+			try(InputStream in = new BufferedInputStream(conn.getInputStream(), 1024);
+					OutputStream out = new BufferedOutputStream(new FileOutputStream(zip))){
+				copyInputStream(in, out);
+			}catch (IOException e) {
+				if(zip.exists()) {
+					Path zipPath = Paths.get(zip.getPath());
+					Files.delete(zipPath);
+				}
+				FileUtils.deleteDirectory(targetDir);
+				throw new IOException("Failed to download Package");
+			}
+			
+			String result = unzipAgentsPackage(zip, targetDir);
+			if(result.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
+				message = "Downloaded agents package - " + version + " at " + targetDir.toString();
+			}
+		}
+		return message;
+	}
+	
+	private String unzipAgentsPackage(File zip, File targetDir) throws IOException {
+		String message =  "";
+		if (!zip.exists()) {
+			throw new IOException(zip.getAbsolutePath() + " does not exist");
+		}
+		if (!buildDirectory(targetDir)) {
+			throw new IOException("Could not create directory" + targetDir);
+		}
+		try(ZipFile zipFile = new ZipFile(zip);){
+			for (Enumeration entries = zipFile.entries(); entries.hasMoreElements();) {
+				ZipEntry entry = (ZipEntry) entries.nextElement();
+				String entryName = entry.getName();
+				entryName = entryName.replaceFirst("agents/", "");
+					File file = new File(targetDir, File.separator + entryName);
+					if (!buildDirectory(file.getParentFile())) {
+						throw new IOException("Could not create directory: " + file.getParentFile());
+					}
+					if (!entry.isDirectory()) {
+						copyInputStream(zipFile.getInputStream(entry),
+								new BufferedOutputStream(new FileOutputStream(file)));
+
+					} else {
+						if (!buildDirectory(file)) {
+							throw new IOException("Could not create directory: " + file);
+						}
+					}
+				
+			}
+			message = PlatformServiceConstants.SUCCESS;
+		}
+		if(zip.exists()){
+			Path path = Paths.get(zip.getPath());
+			Files.delete(path);
+		}
+		return message;
 	}
 }

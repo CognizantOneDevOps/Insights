@@ -1,0 +1,429 @@
+<!--
+*******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div class="cardCss">
+  <div layout layout-align="left" class="main-section-title">
+    <div>
+      <b
+        >Reporting |
+        <span class="blueTitleTxt" style="color: #2d67ff"
+          >Assessment Report Configuration
+        </span></b
+      >
+    </div>
+
+    <div style="display: flex; justify-content: center; align-items: center">
+      <div class="loading-indicator">
+        <mat-progress-spinner
+          [diameter]="100"
+          *ngIf="showThrobber"
+          color="primary"
+          mode="indeterminate"
+        >
+        </mat-progress-spinner>
+      </div>
+    </div>
+    <div *ngIf="!showThrobber" class="sectionHeadingStyle">
+      <span style="padding-top: 3px; margin-left: 3px">
+        <button
+          mat-icon-button
+          (click)="redirectToLandingPage()"
+          style="vertical-align: super"
+        >
+          <mat-icon svgIcon="backButton" matTooltip="Back"> </mat-icon>
+        </button>
+      </span>
+      <span *ngIf="!isUpdate" class="alignSubHeader" style="margin-left: 5px">
+        <b>Add Report </b>(Configure a report)
+      </span>
+      <span *ngIf="isUpdate" class="alignSubHeader" style="margin-left: 5px">
+        <b>Edit Report </b>(Edit the configured report)
+      </span>
+      <span class="btnAlignHeader">
+        <button mat-icon-button (click)="validateAndSaveReportData()">
+          <mat-icon
+            matTooltip="Preview And Save"
+            style="margin-top: 12%"
+            svgIcon="save"
+            class="mat-icon material-icons"
+          >
+          </mat-icon>
+        </button>
+        <button mat-icon-button (click)="Refresh()" [disabled]="disableRefresh">
+          <mat-icon
+            matTooltip="Reset"
+            style="margin-top: 12%"
+            svgIcon="exit"
+            class="mat-icon material-icons"
+          >
+          </mat-icon>
+        </button>
+      </span>
+    </div>
+
+    <div class="tableHeaderCss">
+      <div *ngIf="!isUpdate">
+        <span class="mainHeaderText"
+          >Add details to configure an Assessment Report</span
+        >
+        <span class="infoHeaderText" style="margin-top: 5px"
+          >(Please provide accurate details. Fields marked "<span
+            style="color: #ff0000"
+            >*</span
+          >" are mandatory)
+        </span>
+      </div>
+      <div *ngIf="isUpdate">
+        <span class="mainHeaderText"
+          >Edit details of the selected Assessment Report</span
+        >
+        <span class="infoHeaderText"
+          >(Please provide accurate details. Fields marked "<span
+            style="color: #ff0000"
+            >*</span
+          >" are mandatory)
+        </span>
+      </div>
+    </div>
+    <div class="flexColCss">
+      <div class="columnName">
+        <div class="lblCss">Report Name<span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <input
+            matInput
+            maxlength="40"
+            [disabled]="disableInputFields"
+            placeholder="Enter a valid report name."
+            type="text"
+            [(ngModel)]="reportName"
+            name="reportName"
+          />
+        </mat-form-field>
+      </div>
+      <div class="columnName">
+        <div class="lblCss">
+          Report Title<span class="asteriskText">*</span>
+        </div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <input
+            matInput
+            maxlength="40"
+            [disabled]="disableInputFields"
+            placeholder="Enter a valid Report Title"
+            type="text"
+            [(ngModel)]="reportdisplayName"
+            name="reportdisplayName"
+          />
+        </mat-form-field>
+      </div>
+      <div class="columnName">
+        <div class="lblCss">
+          Report Template<span class="asteriskText">*</span>
+          <button
+            [disabled]="viewListDisabled"
+            style="border: none; background: none; float: right"
+            (click)="viewListOfKPISofSelectedReport()"
+          >
+            <mat-icon svgIcon="view" matTooltip="ViewKpi" class="eyeCss">
+            </mat-icon>
+          </button>
+        </div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            [disabled]="disableInputFields"
+            [(ngModel)]="selectedReport.reportId"
+            style="background: none"
+            (ngModelChange)="getTemplateName()"
+            required
+            placeholder="Select a report template to be configured."
+            color="primary"
+            [style.width.%]="100"
+          >
+            <mat-option
+              *ngFor="let report of listOfReports"
+              [value]="report.reportId"
+              class="optionsBckgnd"
+            >
+              {{ report.templateName }}
+            </mat-option>
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 25px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+      <div *ngIf="isROITemplate" class="columnName">
+            <div class="lblCss">Milestone
+            <span style="color:#ff0000;">*</span></div>
+            <mat-form-field appearance="fill" class="columnComponent">
+                <mat-select [disabled]="disableInputFields" [(ngModel)]="selectedMilestone.id"
+                (ngModelChange)="getMilestoneName()" class="form-control" required placeholder="Select milestone"
+                color="primary">
+                <mat-option *ngFor="let milestone of listOfMilestones" [value]="milestone.id" style="color:#0033A0">
+                    {{milestone.mileStoneName}} </mat-option>
+            </mat-select>
+            <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 25px !important"
+          ></mat-icon>
+            </mat-form-field>
+    </div>
+
+      <div class="columnName">
+        <div class="lblCss">Frequency<span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            [(ngModel)]="schedule"
+            (ngModelChange)="checkSchedule()"
+            [disabled]="disableInputFields"
+            required
+            name="schedule"
+            placeholder="Select a frequency"
+            [style.width.%]="100"
+          >
+            <mat-option
+              *ngFor="let schedule of receivedScheduleList"
+              [value]="schedule"
+              class="optionCss"
+            >
+              {{ schedule }}
+            </mat-option>
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 25px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+      <div class="columnName" *ngIf="!customeScheduleSelected">
+        <div class="lblCss">
+          Reoccurrence
+          <span style="color: #77777b; font-size: 12px"
+            >(Enable if the execution is required more than once.)</span
+          >
+        </div>
+        <div class="columnComponent">
+          <mat-slide-toggle
+            [disabled]="customeScheduleSelected"
+            [(ngModel)]="isReoccuring"
+            [checked]="isReoccuring"
+          >
+          </mat-slide-toggle>
+        </div>
+      </div>
+
+      <div *ngIf="showStartDate" style="margin-bottom: 6%">
+        <div class="lblCss">
+          Start Date (MM/DD/YYYY)<span class="asteriskText">*</span>
+        </div>
+        <mat-form-field
+          style="width: 93%; padding-top: 10px"
+          appearance="fill"
+          class="formfield-custom select-formField"
+        >
+          <input
+            matInput
+            #startDateMatInput
+            [matDatepicker]="startDatePicker"
+            required
+            [max]="today"
+            [(ngModel)]="startDateInput"
+            readonly
+            (dateChange)="getstartDate('change', $event)"
+          />
+          <mat-datepicker-toggle matSuffix [for]="startDatePicker">
+            <mat-icon
+              matDatepickerToggleIcon
+              svgIcon="calendar"
+              class="iconClr"
+            ></mat-icon>
+          </mat-datepicker-toggle>
+          <mat-datepicker
+            #startDatePicker
+            startView="month"
+            [startAt]="startDate"
+            disabled="false"
+          ></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <div *ngIf="customeScheduleSelected" style="margin-bottom: 6%">
+        <div class="lblCss">
+          End Date (MM/DD/YYYY)<span class="asteriskText">*</span>
+        </div>
+        <mat-form-field
+          appearance="fill"
+          style="width: 93%; padding-top: 10px"
+          class="formfield-custom select-formField"
+        >
+          <input
+            matInput
+            #endDateMatInput
+            [matDatepicker]="endDatePicker"
+            required
+            [max]="today"
+            [(ngModel)]="endDateInput"
+            readonly
+            (dateChange)="getendDate('change', $event)"
+          />
+          <mat-datepicker-toggle matSuffix [for]="endDatePicker">
+            <mat-icon
+              matDatepickerToggleIcon
+              svgIcon="calendar"
+              class="iconClr"
+            ></mat-icon>
+          </mat-datepicker-toggle>
+          <mat-datepicker #endDatePicker disabled="false"></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <div class="columnName">
+        <div class="lblCss">
+          Add Task<span class="asteriskText">*</span>
+          <span style="color: #77777b; font-size: 12px"
+            >(Add tasks associated to workflow.)</span
+          >
+          <span *ngIf="enablecanel">
+            <button mat-icon-button (click)="addTasks()">
+              <mat-icon
+                title="Add Tasks"
+                svgIcon="add"
+                class="mat-icon material-icons svgCss"
+              >
+              </mat-icon>
+            </button>
+            <button mat-icon-button (click)="deleteTasks()">
+              <mat-icon
+                title="Remove All Tasks"
+                svgIcon="minus_icon"
+                class="mat-icon material-icons svgCss"
+              >
+              </mat-icon>
+            </button>
+          </span>
+        </div>
+        <div *ngIf="!disableInputFields" class="columnComponent">
+          <table style="margin-top: 0px">
+            <tr style="width: 30px">
+              <div
+                *ngFor="let task of taskListTobeSaved.slice(0, 9)"
+                [matTooltip]="getToolTipData()"
+                class="taskLabelDivCss"
+              >
+                <label class="taskLabelCss">
+                  {{ task.description }}
+                </label>
+              </div>
+            </tr>
+          </table>
+          <button *ngIf="enableadd" mat-icon-button (click)="addTasks()">
+            <mat-icon
+              title="Add Tasks"
+              svgIcon="add"
+              class="mat-icon material-icons"
+            >
+            </mat-icon>
+          </button>
+        </div>
+
+        <div *ngIf="disableInputFields" class="columnComponent">
+          <table style="margin-top: 0px !important">
+            <tr style="width: 30px">
+              <div
+                *ngFor="let task of taskListTobeSaved.slice(0, 9)"
+                [matTooltip]="getToolTipData()"
+                class="taskLabelDivCss"
+              >
+                <label class="taskLabelCss">
+                  {{ task.description }}
+                </label>
+              </div>
+            </tr>
+          </table>
+
+          <button *ngIf="enableadd" mat-icon-button (click)="addTasks()">
+            <mat-icon
+              matTooltip="Add Tasks"
+              svgIcon="add"
+              class="mat-icon material-icons"
+            >
+            </mat-icon>
+          </button>
+        </div>
+      </div>
+      <div class="columnName" *ngIf="enableEmailDetails">
+        <div class="lblCss">
+          Mailing Details
+          <span class="asteriskText">*</span>
+        </div>
+        <div class="columnComponent">
+          <button mat-icon-button (click)="addEmailConfig()">
+            <mat-icon
+              *ngIf="!emailDetails"
+              matTooltip="Add Email"
+              svgIcon="add"
+              class="mat-icon material-icons"
+            >
+            </mat-icon>
+            <mat-icon
+              *ngIf="emailDetails"
+              svgIcon="edit"
+              matTooltip="Edit email"
+              class="mat-icon material-icons"
+            >
+            </mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="columnName">
+        <span class="lblCss">Select DataSource </span>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            [(ngModel)]="datasource"
+            [disabled]="disableInputFields"
+            required
+            name="datasource"
+            [style.width.%]="100"
+            [placeholder]="inputDataSourcePlaceholder"
+            color="primary"
+          >
+            <mat-option
+              *ngFor="let datasource of dataSourceList"
+              [value]="datasource"
+              class="optionsBckgnd"
+            >
+              {{ datasource }}
+            </mat-option>
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+</div>

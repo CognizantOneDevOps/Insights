@@ -1,0 +1,87 @@
+/********************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License. */
+
+.loading-indicator {
+  position: fixed;
+  z-index: 999;
+  height: 1em;
+  width: 1em;
+  overflow: show;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+.logDetails {
+  .logText {
+    color: var(--text-clr9);
+    font: normal normal normal 14px/24px Open Sans;
+  }
+  .logPath {
+    font: normal normal bold 14px/24px Open Sans;
+    color: var(--text-clr7);
+    text-decoration: none;
+  }
+}
+
+::ng-deep .mat-dialog-content {
+  padding: 10px 30px !important;
+  margin: 0 !important;
+}
+
+.mat-tab-group {
+  overflow: hidden !important;
+}
+.mat-tab-body-wrapper {
+  overflow: hidden !important;
+}
+.mat-tab-body.mat-tab-body-active {
+  overflow: hidden !important;
+}
+.mat-tab-body-content {
+  overflow: hidden !important;
+}
+
+.tableContainerStyle {
+  overflow-x: auto !important;
+}
+
+.mat-dialog-actions {
+  width: 100%;
+  margin-bottom: 0 !important;
+  position: fixed;
+  bottom: 15px !important;
+}
+
+.footer {
+  width: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  padding: 0 30px !important;
+  align-items: center;
+}
+
+.tab-style {
+  ::ng-deep .mat-tab-list {
+    height: 49px !important;
+  }
+
+  ::ng-deep .mat-tab-header {
+    border-bottom: 1px solid var(--brdr-clr1) !important;
+  }
+}

@@ -59,4 +59,9 @@ public interface AgentManagementService {
 	public boolean isROIAgentCheck(String tool) throws InsightsCustomException;
 	// Provides currently registered Agents in DB and their health
 	public List<AgentConfigTO> getRegisteredAgentsAndHealth() throws InsightsCustomException;
+	
+	// This is used during Agent registration, provide list of Agents versions available in GitHub
+	public Map<String, String> getAvailableAgentTags() throws InsightsCustomException;
+	
+	public String downloadAgentPackageFromGithub(String version) throws InsightsCustomException;
 }

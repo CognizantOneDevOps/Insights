@@ -1,0 +1,256 @@
+/*
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *******************************************************************************/
+
+/* You can add global styles to this file, and also import other style files */
+
+@import "../node_modules/bootstrap/dist/css/bootstrap.css";
+@import "./themes/theme-light.scss";
+@import "./themes/theme-dark.scss";
+
+body {
+  font-family: Open Sans, Tahoma, San Serif, Helvitica;
+  margin: 0;
+  background-color: #00389d;
+}
+
+// Button section start
+.mat-button,
+.mat-stroked-button {
+  font: bold 14px/19px "Open Sans";
+  min-width: 140px !important;
+  height: 40px !important;
+  border: none !important;
+  border-radius: 0 !important;
+  cursor: pointer;
+  padding: 11px 16px;
+  &.button {
+    background-color: var(--backgnd-clr1) !important;
+    color: var(--text-clr3) !important;
+  }
+  &.whiteButton {
+    background-color: var(--backgnd-clr10) !important;
+    color: var(--text-clr) !important;
+    border: 1px solid #000000 !important;
+  }
+}
+
+.button:default {
+  font: bold 14px/19px "Open Sans";
+  min-width: 140px !important;
+  height: 40px !important;
+  border: none !important;
+  border-radius: 0 !important;
+  cursor: pointer;
+}
+
+.button:active {
+  background-color: var(--backgnd-clr1) !important;
+  color: var(--text-clr3) !important;
+}
+
+.button:hover {
+  background-color: var(--backgnd-clr2) !important;
+  color: var(--text-clr2) !important;
+}
+
+.button:disabled {
+  background-color: var(--backgnd-clr4) !important;
+  color: var(--btnDisabled) !important;
+}
+
+.whiteButton:disabled {
+  background-color: var(--backgnd-clr4) !important;
+  color: var(--btnDisabled) !important;
+}
+
+// Input ,Select field styles
+.mat-input-element:disabled {
+  opacity: 1;
+  color: var(--frm-field-txt) !important;
+  font: normal normal normal 14px/17px Open Sans;
+}
+.mat-input-element {
+  background: var(--backgnd-clr8) 0% 0% no-repeat padding-box;
+  opacity: 1;
+  color: var(--frm-field-txt) !important;
+  font: normal normal normal 14px/17px Open Sans;
+}
+
+.mat-select-value {
+  background: none;
+  opacity: 1;
+  color: var(--frm-field-txt) !important;
+  font: normal normal normal 14px/17px Open Sans;
+}
+
+.mat-form-field-appearance-fill.mat-form-field-disabled .mat-form-field-flex {
+  background-color: var(--bg-color-dis) !important;
+}
+.mat-select-disabled .mat-select-value {
+  color: var(--text-clr) !important;
+}
+// Button section end Label for all mat form fields
+.lblText {
+  color: var(--lblText);
+  font: normal normal normal 14px/17px Open Sans;
+  padding-bottom: 10px;
+  margin-bottom: 0;
+}
+.mat-form-field-appearance-fill .mat-form-field-underline::before {
+  background-color: #77777b !important;
+  height: 2px !important;
+}
+
+.mat-form-field.mat-focused {
+  border: 2px solid var(--backgnd-clr1);
+}
+
+.mat-form-field-underline {
+  bottom: 0px !important;
+  position: initial !important;
+  transform: none !important;
+}
+
+.mat-form-field-wrapper {
+  padding-bottom: 0px !important;
+}
+
+.mat-expansion-panel-body {
+  padding: 0 10px 16px !important;
+}
+.mat-form-field.mat-focused .mat-form-field-ripple {
+  background-color: #2d67ff !important;
+}
+
+.mat-form-field-ripple {
+  background-color: #2d67ff !important;
+}
+
+.mat-form-field.mat-form-field-invalid .mat-form-field-ripple {
+  background-color: #da1e28 !important;
+}
+
+// Dropdown select section
+.mat-select-placeholder {
+  //font: 16px/22px normal;
+  font-family: "Open Sans";
+}
+
+// Text input section
+.mat-input-element,
+::placeholder {
+  font-family: "Open Sans";
+}
+
+//Background shadow of input text boxes
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px var(--grey1) inset !important;
+}
+
+//Dialog box
+.custom-dialog-container .mat-dialog-container {
+  padding: 0px !important;
+  margin: 0px !important;
+  overflow: hidden !important;
+  border-radius: 0px !important;
+  background-color: var(--backgnd-clr13) !important;
+}
+
+// Overflow with scrollbars
+.mat-drawer-inner-container {
+  width: 18%;
+  height: 100%;
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+}
+
+//Landing page grid tile
+.mat-grid-tile-content {
+  align-items: unset !important;
+  justify-content: unset !important;
+  padding: 10px !important;
+}
+
+.mat-grid-tile-content > span {
+  margin-top: 12%;
+}
+
+//Show the tooltip in customized background and style
+.mat-tooltip {
+  font: normal normal normal 12px/24px Open Sans !important;
+  letter-spacing: 0px !important;
+  color: var(--text-clr) !important;
+  text-align: left !important;
+  max-width: 600px !important;
+  border-radius: 0px !important;
+  background: var(--backgnd-clr8) 0% 0% no-repeat padding-box !important;
+  box-shadow: 0px 0px 6px var(--brdr-clr) !important;
+  opacity: 1 !important;
+  white-space: pre-line !important;
+}
+
+.mat-drawer-inner-container {
+  width: 18%;
+  height: 100%;
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+}
+
+.theme-light mat-drawer-container {
+  background-color: #f2f2f2;
+}
+
+.theme-dark mat-drawer-container {
+  background-color: #141619;
+}
+
+.theme-dark .mat-drawer {
+  background-color: #383737;
+  color: #ffff;
+  font-weight: bolder;
+  font-family: Open Sans;
+}
+
+.mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
+  background-color: #2d67ff !important;
+}
+
+.mat-slide-toggle.mat-checked .mat-slide-toggle-thumb {
+  background-color: #2d67ff !important;
+}
+.mat-expansion-panel-body {
+  background: var(--backgnd-clr11) 0% 0% no-repeat padding-box;
+}
+
+.mat-snack-bar-container {
+  margin-top: 45vh !important;
+  margin-bottom: 55vh !important;
+  margin-left: 78vh !important;
+  margin-right: 40vh !important;
+  max-width: none !important;
+  min-width: auto !important;
+}
+.mat-expansion-panel {
+  box-shadow: none !important;
+}
+
+.mat-radio-label-content{
+  padding-left: 0px !important;
+}

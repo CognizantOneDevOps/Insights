@@ -1,0 +1,179 @@
+<!--
+*******************************************************************************
+ * Copyright 2022 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div class="cardCss" style="height: 81vh; padding: 13px">
+  <div layout layout-align="left" class="main-section-title1">
+    <div style="border-left: 1px">
+      <b>Configuration</b> |
+      <span class="blueTitleTxt" style="color: #2d67ff"
+        ><b>Logo Settings</b></span
+      >
+    </div>
+  </div>
+  <div layout layout-align="left" class="tableHeader1">
+    <div layout><b>Add Customer Logo</b></div>
+  </div>
+  <div
+    class="subContainer1"
+    style="float: left; padding-top: 4px; width: 927px"
+  >
+    <div>
+      <div
+        style="
+          color: var(--text-clr8);
+          font-size: 14px;
+          padding-left: 24px;
+          padding-top: 9px;
+        "
+      >
+        <b
+          >Please follow the EXACT instructions to upload your logo to avoid any
+          DISTORTION!</b
+        >
+      </div>
+      <ul
+        style="
+          padding-left: 24px;
+          padding-top: 0px;
+          list-style-position: inside;
+          margin: 0;
+        "
+      >
+        <li class="bulletColor" style="padding-top: 16px">
+          <span class="liGenearl"
+            >Please ENSURE that the logo edge to edge is 180px * 42px (any other
+            size may distort the logo). Image size should be less than
+            1Mb.</span
+          >
+        </li>
+        <li class="bulletColor" style="padding-top: 12px">
+          <span class="liGenearl"
+            >Please LOGOUT and LOGIN again in to the Insights Application to see
+            the uploaded logo</span
+          >
+        </li>
+        <div class="liGeneral2" style="padding-top: 12px">
+          (PS: Request you to use the exact dimension of 180px * 42px for logo
+          size)
+        </div>
+      </ul>
+    </div>
+    <div
+      class="subContainer1"
+      style="
+        margin-top: 32px;
+        margin-left: 0px;
+        border-radius: 0px;
+        height: 178px;
+        width: 927px;
+      "
+    >
+      <div style="display: inline-block">
+        <div style="margin-left: 0">
+          <div
+            style="
+              font-size: 14px;
+              padding-left: 20px;
+              padding-top: 15px;
+              color: var(--text-clr1) !important;
+            "
+          >
+            Upload File<span style="color: #d91b2c">*</span>
+          </div>
+          <div
+            class="agent-category-grid-item"
+            style="grid-row: span 2; display: flex; justify-content: center"
+          >
+            <div class="input" style="padding-right: 15%">
+              <div
+                class="file-upload"
+                style="padding-left: 20px; margin-top: 20px; width: 414px"
+              >
+                <button mat-button class="button" (click)="fileUpload.click()">
+                  Add File
+                </button>
+                <span class="subText">only .png files at 1MB or less</span>
+                <button
+                  [disabled]="!buttonEnable"
+                  mat-icon-button
+                  (click)="uploadFile()"
+                >
+                  <mat-icon
+                    style="
+                      margin-top: -26px;
+                      margin-left: 530px;
+                      margin-bottom: -130px;
+                    "
+                    matTooltip="Upload Image"
+                    svgIcon="upload"
+                    class="iconColor"
+                  >
+                  </mat-icon>
+                </button>
+              </div>
+            </div>
+            <br />
+            <div
+              style="border: 1px solid #d9d9d9; margin-left: 20px; width: 303px"
+            >
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  padding: 5px 15px;
+                "
+              >
+                <div style="display: flex">
+                  {{ fileNameArr[index] || "No file uploaded yet." }}
+                </div>
+                <div style="display: flex">
+                  <button
+                    mat-icon-button
+                    (click)="cancelUpload(index)"
+                    style="line-height: 0px; width: 20px; height: 20px"
+                  >
+                    <mat-icon
+                      class="iconColor"
+                      matTooltip="Cancel"
+                      svgIcon="cross"
+                    ></mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <input
+              hidden
+              type="file"
+              id="file"
+              class="file-input"
+              (change)="onFileChanged($event, index)"
+              #fileUpload
+            />
+          </div>
+        </div>
+      </div>
+      <div *ngIf="buttonEnable" class="subBlock2">
+        <div class="subBlock2" style="font-size: 12px">
+          <b
+            >Preview Image <span style="color: #2da350">.PNG</span> file as
+            dimension of <span style="color: #fd8d36">180px * 42px</span></b
+          >
+        </div>
+        <img [src]="url" class="subBlock2" /> <br />
+      </div>
+    </div>
+  </div>
+</div>

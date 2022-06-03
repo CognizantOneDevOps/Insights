@@ -16,7 +16,6 @@
 package com.cognizant.devops.platformservice.agentmanagement.service;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -38,7 +37,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.TimeoutException;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -52,8 +50,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.owasp.esapi.ESAPI;
 import org.owasp.esapi.Validator;
-import org.owasp.esapi.errors.IntrusionException;
-import org.owasp.esapi.errors.ValidationException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -67,6 +63,7 @@ import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.AGENTACTION;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
+import com.cognizant.devops.platformcommons.dal.RestApiHandler;
 import com.cognizant.devops.platformcommons.dal.vault.VaultHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
@@ -94,6 +91,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	private static final String LAST_RUN_TIME = "lastRunTime";
 	private static final String HEALTH_STATUS = "healthStatus";
 	private static final String FORWARD_SLASH = "/";
+	private static final String ACCEPT_TYPE_GITHUB = "application/vnd.github.v3+json";
 		
 	boolean isProxyEnabled = ApplicationConfigProvider.getInstance().getProxyConfiguration().isEnableProxy();
 	AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
@@ -972,5 +970,77 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			throw new InsightsCustomException(e.toString());
 		}
 		return agentList;
+	}
+	
+	
+	/**
+	 * fetches Insights releases from the GitHub and returns a Map of release id and tags
+	 * 
+	 * @return agentTags
+	 * @throws InsightsCustomException
+	 */
+	@Override
+	public Map<String, String> getAvailableAgentTags() throws InsightsCustomException  {
+		Map<String, String> agentTags = new TreeMap<>();
+		log.debug("Inside getAvailableAgentTags ");
+		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getGithubAPI();
+		if(url == null || url.length() == 0) {
+			throw new InsightsCustomException("GithubAPI not configured in server configuration!");
+		}
+		Map<String, String> headers = new HashMap<>();
+		headers.put("Accept", ACCEPT_TYPE_GITHUB);
+		ApplicationConfigProvider.getInstance().getAgentDetails();
+		String accessToken = ApplicationConfigProvider.getInstance().getAgentDetails().getGithubAccessToken();
+		if(accessToken != null && accessToken.length() > 0) {
+			headers.put(ConfigOptions.AUTHORIZATION, accessToken);
+		}
+		String getResponse;
+		try {
+			getResponse = RestApiHandler.doGet(url, headers);
+		} catch (InsightsCustomException e) {
+			throw new InsightsCustomException("Configure the Github API correctly in server configuration");
+
+		}
+		JsonArray responseArray = JsonUtils.parseStringAsJsonArray(getResponse);
+		for (JsonElement jsonElement : responseArray) {
+			agentTags.put(jsonElement.getAsJsonObject().get("id").getAsString(), jsonElement.getAsJsonObject().get("tag_name").getAsString());
+		}
+		return agentTags;
+	}
+	
+	/**
+	 * downloads the required agents package from GitHub and stores it in the offline path
+	 * 
+	 * @param version
+	 * @return downloadResult
+	 * @throws InsightsCustomException
+	 */
+	@Override
+	public String downloadAgentPackageFromGithub(String version) throws InsightsCustomException {
+		String downloadResult = "";
+		try {
+			if(!version.startsWith("v") ||  ! ValidationUtils.checkAgentVersion(version) ) {
+				throw new InsightsCustomException("Not a valid version ");
+			}
+			if (!ApplicationConfigProvider.getInstance().getAgentDetails().isOnlineRegistration()) {
+				String offlinePath = PlatformServiceUtil.sanitizePathTraversal(ApplicationConfigProvider.getInstance().getAgentDetails().getOfflineAgentPath()
+						+ File.separator + version);
+				String packageURL = ApplicationConfigProvider.getInstance().getAgentDetails().getRepoUrl();
+				if(packageURL == null || packageURL.length() == 0) {
+					throw new InsightsCustomException("Repo URL not configured in server configuration!");
+				}
+				packageURL = packageURL + "/" + version + "/" + "agents.zip";
+				ESAPI.initialize("org.owasp.esapi.reference.DefaultSecurityConfiguration");
+				Validator validate = ESAPI.validator();
+				packageURL = validate.getValidInput("URL checking", packageURL, "URLPattern", 300, true);
+				downloadResult = AgentManagementUtil.getInstance()
+				.getAgentPackageFromGithub(new URL(packageURL), new File(offlinePath), version);
+			}
+		} catch (Exception e) {
+			log.error("Error downloading agents package ", e);
+			throw new InsightsCustomException(e.getMessage());
+		}
+		
+		return downloadResult;
 	}
 }

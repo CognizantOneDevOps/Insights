@@ -1,0 +1,100 @@
+<!--
+*******************************************************************************
+ * Copyright 2022 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+
+<div style="height: 200px">
+  <div class="arrange-horizontally-fileDialog">
+    <div class="gridHeader">
+      <div class="dialogHeader">
+        {{ dialogHeader }}
+        <a style="margin-left: auto">
+          <mat-icon
+            (click)="closeDialog()"
+            svgIcon="close_dialog"
+            style="
+              height: 11px !important;
+              width: 11px !important;
+              margin-right: 18px;
+            "
+          >
+          </mat-icon>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div
+      class="agent-category-grid-item"
+      style="grid-row: span 2; display: flex; justify-content: center"
+    >
+      <div class="input" style="padding-right: 15%">
+        <div
+          class="file-upload"
+          style="padding-left: 20px; margin-top: 20px; width: 414px"
+        >
+          <button class="button" (click)="fileUpload.click()">Add File</button>
+        </div>
+      </div>
+      <br />
+      <div style="border: 1px solid #d9d9d9; margin-left: 20px; width: 303px">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 15px;
+          "
+        >
+          <div style="display: flex">
+            {{ fileNameArr[index] || "No file uploaded yet." }}
+          </div>
+          <div style="display: flex">
+            <button
+              mat-icon-button
+              (click)="cancelUpload(index)"
+              style="line-height: 0px; width: 20px; height: 20px"
+            >
+              <mat-icon
+                class="iconColor"
+                matTooltip="Cancel"
+                svgIcon="cross"
+              ></mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+      <input
+        hidden
+        type="file"
+        id="file"
+        class="file-input"
+        (change)="onFileChangedUpload($event, index)"
+        #fileUpload
+      />
+    </div>
+
+    <div class="btnStyle">
+      <button mat-icon-button (click)="upload()">
+        <mat-icon
+          style="font-size: 40px; height: 24px; width: 24px; margin-top: -195px"
+          title="Upload "
+          class="mat-icon material-icons"
+          svgIcon="upload"
+        >
+        </mat-icon>
+      </button>
+    </div>
+  </div>
+</div>

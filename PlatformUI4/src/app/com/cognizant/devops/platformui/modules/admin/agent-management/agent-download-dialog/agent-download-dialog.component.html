@@ -1,0 +1,66 @@
+<!--
+*******************************************************************************
+ * Copyright 2022 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div class="titleContainer">
+  <h1>Download Agent Package</h1>
+  <a (click)="closeDialog()" mat-dialog-close>
+    <mat-icon
+      svgIcon="close_dialog"
+      class="closeIcon"
+      style="height: 11px !important; width: 11px !important"
+    >
+    </mat-icon>
+  </a>
+</div>
+
+<mat-dialog-content>
+  Please select the release version and click on download, then proceed to add
+  the agent.
+  <div class="select-tool">
+    <div class="content-container">
+      <mat-form-field appearance="fill" class="formfield-custom">
+        <mat-select
+          [(ngModel)]="selectedVersion"
+          name="selectedVersion"
+          [style.width.%]="100"
+          placeholder="Select Release Version"
+        >
+          <mat-option
+            *ngFor="let data of agentTags"
+            [value]="data"
+            class="optionsBckgnd"
+          >
+            {{ data }}
+          </mat-option>
+        </mat-select>
+        <mat-icon
+          matSuffix
+          svgIcon="arrow-down"
+          class="arrow-icon"
+          style="width: 12px !important; height: 12px !important"
+        ></mat-icon>
+      </mat-form-field>
+      <button mat-icon-button (click)="downloadAgent()" class="download-button">
+        <mat-icon
+          matTooltip="Download agent package"
+          svgIcon="download"
+          style="margin-bottom: 10px"
+        >
+        </mat-icon>
+      </button>
+    </div>
+  </div>
+</mat-dialog-content>

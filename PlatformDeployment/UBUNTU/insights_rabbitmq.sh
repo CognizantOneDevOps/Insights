@@ -16,30 +16,22 @@
 #-------------------------------------------------------------------------------
 # install erlang
 #echo "#################### Installing Erlang , required for Rabbit MQ ####################"
-cd /opt
-echo -n "Nexus(userName):"
-read userName
-echo "Nexus credential:"
-read -s credential
-#wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/rabbitmq/erlang.zip
-wget https://github.com/rabbitmq/erlang-rpm/archive/refs/tags/v23.3.4.11.zip
-unzip erlang.zip && cd erlang
-sudo dpkg -i *.deb
-mkdir rabbitmq && cd rabbitmq
-echo "deb http://www.rabbitmq.com/debian/ testing main" | sudo tee -a /etc/apt/sources.list
-wget -O- https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc | sudo apt-key add -
-#wget -O- https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/rabbitmq/rabbitmq-release-signing-key.asc | sudo apt-key add -
-wget https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.9.13/rabbitmq-server_3.9.13-1_all.deb
-sudo dpkg -i rabbitmq-server_3.9.13-1_all.deb
-#wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/rabbitmq/rabbitmq-server.deb
-#sudo dpkg -i rabbitmq-server.deb
-sleep 15
-wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/rabbitmq/RabbitMQ.zip
-sudo unzip RabbitMQ.zip && cd RabbitMQ && sudo cp rabbitmq.config /etc/rabbitmq/
-sudo systemctl enable rabbitmq-server && sudo systemctl start rabbitmq-server
-sudo rabbitmq-plugins enable rabbitmq_management
-sleep 15
-curl -X PUT -u guest:guest -H "Content-Type: application/json" -d '{"password":"iSight","tags":"administrator"}' "http://localhost:15672/api/users/iSight"
-sleep 15
-curl -X PUT -u guest:guest -H "Content-Type: application/json" -d '{"configure":".*","write":".*","read":".*"}' "http://localhost:15672/api/permissions/%2f/iSight"
-sleep 15
+#Installation of Erlang
+
+sudo apt update
+read -p "Please enter version number you want to install(3.8 or 3.9): " version_number
+version_number=`echo $version_number | sed -e 's/^[[:space:]]*//'`
+
+sudo apt install curl software-properties-common apt-transport-https lsb-release
+curl -fsSL https://packages.erlang-solutions
+sudo apt update
+sudo apt install erlang
+echo "deb https://packages.erlang-solutions.com/ubuntu $(lsb_release -cs) contrib" | sudo tee /etc/apt/sources.list.d/erlang.list
+sudo apt update
+sudo apt install erlang
+
+#Installation of RabbitMQ
+curl -s https://packagecloud.io/install/repositories/rabbitmq/rabbitmq-server/script.deb.sh | sudo bash
+sudo apt install rabbitmq-server
+sudo systemctl enable rabbitmq-server
+sudo ufw allow proto tcp from any to any port 5672,15672

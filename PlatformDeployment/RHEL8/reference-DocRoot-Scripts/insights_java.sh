@@ -19,16 +19,15 @@ yum update
 source /etc/environment
 source /etc/profile
 cd $INSIGHTS_APP_ROOT_DIRECTORY
-echo -n "Nexus(userName):"
-read userName
-echo "Nexus credential:"
-read -s credential
-sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/java/jdklinux.tar.gz
-sudo tar xzf jdklinux.tar.gz
-mv jdk-11.0.2 jdklinux
-export JAVA_HOME=$INSIGHTS_APP_ROOT_DIRECTORY/jdklinux/bin
-echo JAVA_HOME=$INSIGHTS_APP_ROOT_DIRECTORY/jdklinux/bin  | sudo tee -a /etc/environment
-echo "export" JAVA_HOME=$INSIGHTS_APP_ROOT_DIRECTORY/jdklinux/bin | sudo tee -a /etc/profile
+sudo  curl -O  https://download.java.net/openjdk/jdk11/ri/openjdk-11+28_linux-x64_bin.tar.gz
+sudo tar xvf openjdk*.tar.gz
+mv jdk-11 jdklinux
+export JAVA_HOME=$INSIGHTS_APP_ROOT_DIRECTORY/jdklinux
+export JRE_HOME=$INSIGHTS_APP_ROOT_DIRECTORY/jdklinux
+echo JAVA_HOME=$INSIGHTS_APP_ROOT_DIRECTORY/jdklinux | sudo tee -a /etc/environment
+echo JRE_HOME=$INSIGHTS_APP_ROOT_DIRECTORY/jdklinux | sudo tee -a /etc/environment
+echo "export" JAVA_HOME=$INSIGHTS_APP_ROOT_DIRECTORY/jdklinux | sudo tee -a /etc/profile
+echo "export" JRE_HOME=$INSIGHTS_APP_ROOT_DIRECTORY/jdklinux | sudo tee -a /etc/profile
 
 export PATH=$PATH:$INSIGHTS_APP_ROOT_DIRECTORY/jdklinux/bin
 echo PATH=$PATH:$INSIGHTS_APP_ROOT_DIRECTORY/jdklinux/bin | sudo tee -a /etc/environment

@@ -1,0 +1,96 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+
+<div class="container-fluid {{storedTheme}}">
+  <mat-sidenav-container autosize fullscreen>
+    <mat-sidenav #sidenav mode="side" opened="true" autosize="true" disableClose>
+      <div *ngIf="isExpanded" class="logSectionCss">
+        <img mat-icon align="left" style="cursor: pointer;" height="54px" width="181px" (click)="showLandingPage()" [src]="insightsCustomerLogo"
+          alt="Cognizant Insights log" class="cogLogo" />
+        <img mat-icon (click)="onMenuClick()" height="32px" width="32px" class="toggleMenu"
+          src='icons/svg/homePage/Menu_icon.png' alt="toggleMenu" />
+      </div>
+      <div *ngIf="!isExpanded">
+        <img mat-icon (click)="onMenuClick()" height="32px" width="32px"
+          src='icons/svg/homePage/menu_iconclose.png' alt="toggleMenuNotExp" class="toggleMenuNotExp" />
+      </div>
+      <div class="menu">
+        <mat-nav-list >
+          <div style="border-top: 1px solid #add2fb;"></div>
+          <app-menu-list-item *ngFor="let item of getNavItemsByFilter()" [item]="item" [depth]="depth" [isExpanded]="isExpanded"
+            [selectedOrg]="selectedOrg"></app-menu-list-item>
+        </mat-nav-list>
+      </div>
+      <div *ngIf="isExpanded" style="padding-top: 5px; height: 13.5%; ">
+        <table class="bottomBorder">
+          <tr>
+            <td class="bottomData" *ngFor="let itemBottom of getNavItemsBottomByFilter()">
+              <a [attr.title]="itemBottom.title"
+                [ngClass]="{ 'mat-list-item-bottom' : showLogoutButton ,'mat-list-item-bottomWithoutlogout': !showLogoutButton}"
+                (click)="onItemSelected(itemBottom)">
+                <span matLine *ngIf="isExpanded"
+                  class="mat-line-bottom mat-list-text-bottom ">{{itemBottom.displayName}}</span>
+              </a>
+            </td>
+          </tr>
+        </table>
+        <div class="textCopyright" *ngIf="isExpanded">
+          © {{year}} Cognizant Technologies Solutions Limited.
+          <br>All rights reserved.
+        </div>
+      </div>
+      <mat-nav-list *ngIf="!isExpanded && showLogoutButton"
+        [ngClass]="{  'navItemImageForCollpases' : showLogoutButton ,  'navItemImageForCollpasesWithoutlogout': !showLogoutButton}">
+        <a *ngIf="!isExpanded && showLogoutButton" title="Logout" class="mat-list-item-bottom logOut"
+          (click)="logout()">
+          <img mat-icon class="mat-icon ng-tns-c10-10 material-icons ng-star-inserted" height="24px"
+            align="center" src='icons/svg/homePage/logout.png' />
+        </a>
+      </mat-nav-list>
+    </mat-sidenav>
+    <mat-sidenav-content class="mat-drawer-content backgnd">
+      <mat-toolbar *ngIf="isToolbarDisplay">
+        <div class="app-toolbar">
+          <div class="toolbar-left">
+            <img mat-icon src='icons/png/insights.png' />
+          </div>
+          <div class="toolbar-right">
+            <div title="Toggle Theme" class="theme-toggler">
+              <button *ngIf="toggleDark=='Dark'" mat-icon-button (click)="onTogglingTheme()" class="toggler-icon">
+                <img mat-icon style="height:24px;width:59px" src='icons/png/darkToggle.png' />
+              </button>
+              <button *ngIf="toggleDark=='Light'" mat-icon-button (click)="onTogglingTheme()" class="toggler-icon">
+                <img mat-icon style="height:24px;width:59px" src='icons/png/lightToggle.png' />
+              </button>
+            </div>
+            <div class="user-details">
+              <div class="user-details-innerdiv">
+                <h2 title="{{userName}}" class="user-name">{{userDisplayName}}</h2>
+              </div>
+              <div class="user-details-innerdiv">
+                <div class="user-role" title="{{userRole}} ({{selectedOrg}})">{{userRole}} ({{selectedOrgName}})</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-toolbar>
+      <div class="contentsection">
+        <router-outlet></router-outlet>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

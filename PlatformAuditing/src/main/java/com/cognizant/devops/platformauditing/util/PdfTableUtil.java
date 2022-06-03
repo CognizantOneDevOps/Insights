@@ -38,6 +38,10 @@ import java.util.Set;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -75,7 +79,8 @@ public class PdfTableUtil {
 	
 	private static final boolean ALLOW_PRINTING = false;
 	private static final String PDF_PATH = System.getenv().get("INSIGHTS_HOME") + File.separator + ConfigOptions.CONFIG_DIR + File.separator + "Pdf" + File.separator;
-
+	private String pdf_title="Software Traceability Report";
+	
 	/**
 	 * Define Table props and write its content in dynamic fashion.
 	 * @param pdfName 
@@ -88,6 +93,7 @@ public class PdfTableUtil {
 	 * @throws NoSuchAlgorithmException 
 	 * @throws KeyStoreException 
 	 * @throws UnrecoverableKeyException 
+	 * @throws XMLStreamException 
 	 * @throws URISyntaxException 
 	 */
 	public byte[] generateTableContent(JsonArray assetList, String pdfName) throws IOException, JAXBException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException{
@@ -136,8 +142,10 @@ public class PdfTableUtil {
 	private void generatePageStaticContent(PDDocument doc, float margin, PDPage page, float yStartNewPage,
 			float tableWidth, boolean drawContent, float ystaticStart, float bottomMargin) throws IOException, JAXBException {
 		try{
-		String staticFilePath = new File(PDF_PATH+"static/static.xml").getCanonicalPath();
-		File staticFile = new File(staticFilePath);
+		XMLInputFactory xif = XMLInputFactory.newFactory();
+		xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+		XMLStreamReader staticFile = xif.createXMLStreamReader(new StreamSource(PDF_PATH+"static/static.xml"));	
+			
 		JAXBContext jaxbContext = JAXBContext.newInstance(PdfStaticContent.class);
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 		PdfStaticContent pdfStaticContent = (PdfStaticContent) jaxbUnmarshaller.unmarshal(staticFile);
@@ -157,7 +165,10 @@ public class PdfTableUtil {
 		String imagePath = new File(PDF_PATH+"sign/Insights.png").getCanonicalPath();
 		Cell<PDPage> cell = row.createImageCell(25f, ImageUtils.readImage(new File(imagePath)));
 		cell = row.createCell(10f, "");
-		cell = row.createCell(50f, pdfStaticContent.getTitle());
+		if (pdfStaticContent.getTitle() != null && pdfStaticContent.getTitle() != "") {
+			pdf_title = pdfStaticContent.getTitle();
+		}
+		cell = row.createCell(50f, pdf_title);
 		cell.setFont(PDType1Font.HELVETICA);
 		cell.setFontSize(20);
 		cell.setWidth(ystaticStart);
@@ -392,7 +403,7 @@ public class PdfTableUtil {
 				contentStream.beginText();
 				contentStream.newLineAtOffset(200, 780);
 				contentStream.setFont(PDType1Font.HELVETICA, 7);
-				contentStream.showText("OneDevOps Insights â€“ Software Traceability Report");
+				contentStream.showText("Cognizant� Cloud Acceleration Platform Insights : "+pdf_title);
 				contentStream.endText();
 				contentStream.beginText();
 				contentStream.newLineAtOffset(120, 15);
@@ -418,6 +429,7 @@ public class PdfTableUtil {
 	 * @return 
 	 * @throws IOException 
 	 * @throws JAXBException 
+	 * @throws XMLStreamException 
 	 * @throws URISyntaxException 
 	 */
 	public PDDocument generateStaticContent() throws IOException, JAXBException {
@@ -451,8 +463,17 @@ public class PdfTableUtil {
 		boolean drawLines = true;
 		float yStart = yStartNewPage;
 		float bottomMargin = 70;
-		String staticFilePath = new File(PDF_PATH+"static/static.xml").getCanonicalPath();
-		File staticFile = new File(staticFilePath);
+//		String staticFilePath = new File(PDF_PATH+"static/static.xml").getCanonicalPath();
+//		File staticFile = new File(staticFilePath);
+		XMLInputFactory xif = XMLInputFactory.newFactory();
+		xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+		XMLStreamReader staticFile = null ;
+		try {
+			staticFile = xif.createXMLStreamReader(new StreamSource(PDF_PATH+"static/static.xml"));
+		} catch (XMLStreamException e) {
+			log.error("Error while reading static.xml file");
+		}
+		
 		JAXBContext jaxbContext = JAXBContext.newInstance(PdfStaticContent.class);
 
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();

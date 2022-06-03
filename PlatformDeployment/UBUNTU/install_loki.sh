@@ -15,16 +15,14 @@
 #-------------------------------------------------------------------------------
 # Install Loki
 echo "#################### Installing Loki ####################"
+touch /etc/profile.d/insightsenvvar.sh
 . /etc/environment
-. /etc/profile
+. /etc/profile.d/insightsenvvar.sh
 cd /opt
 sudo mkdir Loki
 cd Loki
-echo -n "Nexus(userName):"
-read userName
-echo "Nexus credential:"
-read -s credential
-sudo wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/Loki/loki-linux-amd64.zip
+read -p "Please enter Loki version number you want to install(ex. 2.4.2 or 2.5.0): " version_number
+sudo wget https://github.com/grafana/loki/releases/download/v${version_number}/loki-linux-amd64.zip
 sudo apt-get install unzip
 sudo unzip "loki-linux-amd64.zip"
 sudo rm -r -f loki-linux-amd64.zip
@@ -32,9 +30,9 @@ sudo chmod a+x "loki-linux-amd64"
 #sudo ./loki-linux-amd64 -config.file=loki-local-config.yaml
 export LOKI_HOME=`pwd`
 sudo echo LOKI_HOME=`pwd` | sudo tee -a /etc/environment
-sudo echo "export" LOKI_HOME=`pwd` | sudo tee -a /etc/profile
+sudo echo "export" LOKI_HOME=`pwd` | sudo tee -a /etc/profile.d/insightsenvvar.sh
 cd /etc/systemd/system
-sudo wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/loki/Loki.service
+sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/UBUNTU/Loki.service
 sudo systemctl enable Loki.service
 sudo systemctl start Loki
 echo "#################### Loki is up ####################"

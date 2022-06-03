@@ -1,0 +1,84 @@
+/*
+*******************************************************************************
+ * Copyright 2022 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *******************************************************************************/
+
+.add-agent-section-title-dimensions {
+    justify-content: space-between;
+    margin-top: 16px;
+}
+
+.mainHeaderText {
+    letter-spacing: 0px;
+    color: #ffffff;
+    opacity: 1;
+    font: normal normal 600 14px/24px Open Sans, Tahoma, San Serif, Helvitica;
+}
+
+.infoHeaderText {
+    font-size: 14px;
+    color: #ffffff;
+    float: right;
+    margin-right: 1%;
+    opacity: 1;
+}
+
+.columnName {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    font: normal normal normal 14px/24px Open Sans, Tahoma, San Serif, Helvitica;
+    padding: 0 30px 30px 0;
+    color: var(--text-clr);
+}
+
+.columnComponent {
+    margin: 2% 0 0 0;
+}
+
+
+
+.optionCss {
+    color: var(--text-clr);
+}
+
+.formfield-custom {
+    width: 85%;
+}
+
+.asteriskText {
+    color: #ff0000;
+}
+
+.mainTextCss {
+    margin-top: 1%;
+    margin-left: 1%;
+    font: normal normal normal 14px/24px "Open Sans";
+    letter-spacing: 0px;
+    color: var(--dd-tbl-dat-row-txt-clr);
+    vertical-align: sub;
+    overflow: auto;
+    min-width: 15%;
+    opacity: 1;
+}
+
+.mat-icon-button {
+    color: #2d67ff;
+}
+
+
+.textarea-grid{
+    margin-top: 24px;
+}

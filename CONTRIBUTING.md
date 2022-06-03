@@ -1,4 +1,4 @@
-Thank you for your interest in Cognizant OneDevOps Insights. In order to clarify the intellectual property license
+Thank you for your interest in Cognizant® Cloud Acceleration Platform Insights(Formally OneDevOps Insights). In order to clarify the intellectual property license
 granted with Contributions from any person or entity, the Foundation
 must have a Contributor License Agreement ("CLA") on file that has
 been signed by each Contributor, indicating agreement to the license

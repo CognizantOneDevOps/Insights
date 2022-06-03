@@ -14,7 +14,7 @@
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformParent</artifactId>
 	<packaging>pom</packaging>
-	<version>9.4</version>
+	<version>9.5</version>
 	<name>PlatformParent</name>
 
 	<dependencies>
@@ -65,6 +65,7 @@
 		<module>PlatformDeployment/WebHookFaultTolerance/AWSLambdaFunctions/PlatformInsightsLambdaRetrieval</module>
 		<!--<module>PlatformDeployment/WebHookFaultTolerance/PlatformInsightsAzureWebhook</module> -->
 		<module>PlatformUI3</module>
+		<module>PlatformUI4</module>
 		<module>PlatformRegressionTest</module>
 
 	</modules>

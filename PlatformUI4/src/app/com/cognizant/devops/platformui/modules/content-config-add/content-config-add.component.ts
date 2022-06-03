@@ -1,0 +1,463 @@
+/*******************************************************************************
+ * Copyright 2022 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+
+import { Component, OnChanges, OnInit } from "@angular/core";
+import { BulkUploadService } from "../bulkupload/bulkupload.service";
+import { MessageDialogService } from "../application-dialog/message-dialog-service";
+import { ActivatedRoute, Router, NavigationExtras } from "@angular/router";
+import { MatDialog } from "@angular/material/dialog";
+import { KpiListDialog } from "../kpiList-Dialog/kpiList-Dialog.component";
+import { KpiService } from "../kpi-addition/kpi-service";
+import { ContentService } from "../content-config-list/content-service";
+
+@Component({
+  selector: "app-content-config-addition",
+  templateUrl: "./content-config-add.component.html",
+  styleUrls: ["./content-config-add.component.scss", "./../home.module.scss"],
+})
+export class ContentConfigAddition implements OnInit, OnChanges {
+  categoryDetail = [];
+  dataSourceDetail = [];
+  toolsDetail = [];
+  labelsArr = [];
+  toolsArr = [];
+  contentId: any;
+  kpiId: any;
+  contentName: any;
+  isActive: any;
+  type: string;
+  kpiList: any;
+  onEdit: boolean = false;
+  message: any;
+  expectedTrend: any;
+  directionThreshold: any;
+  resultField: any;
+  threshold: any;
+  thresholds: any;
+  category: any;
+  action: any;
+  trend = ["UPWARDS", "DOWNWARDS"];
+  thresholdDir = ["ABOVE", "BELOW"];
+  actionDetail: any[];
+  isDataValid: boolean;
+  constructor(
+    public router: Router,
+    public dialog: MatDialog,
+    public route: ActivatedRoute,
+    public messageDialog: MessageDialogService,
+    private bulkuploadService: BulkUploadService,
+    public kpiService: KpiService,
+    public contentService: ContentService
+  ) {}
+
+  ngOnChanges() {
+    this.onEdit = true;
+  }
+
+  ngOnInit() {
+    this.type = this.contentService.getType();
+    this.kpiService.setKpiSubject.subscribe((res) => {
+      this.kpiId = res.kpiId;
+      this.category = res.category;
+    });
+    this.route.queryParams.subscribe((params) => {
+      if (params) {
+        (this.contentId = params.contentId),
+          (this.contentName = params.contentName),
+          (this.kpiId = params.kpiId),
+          (this.expectedTrend = params.expectedTrend),
+          (this.directionThreshold = params.directionThreshold),
+          (this.resultField = params.resultField),
+          (this.action = params.action),
+          (this.isActive = true),
+          (this.message = params.message),
+          (this.threshold = params.threshold),
+          (this.thresholds = params.thresholds),
+          (this.action = params.action);
+        this.category = params.category;
+      }
+    });
+    if (this.type === "EDIT") {
+      this.onEdit = true;
+    }
+    this.getActions();
+  }
+  async getActions() {
+    var self = this;
+    try {
+      self.actionDetail = [];
+      let actionlabelresponse = await this.contentService.loadActions();
+      if (actionlabelresponse.status == "success") {
+        this.actionDetail = actionlabelresponse.data;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  validateKpiData() {
+    let cat = this.category;
+    var isValidated = true;
+    if (
+      this.contentId === "" ||
+      this.contentId === undefined ||
+      this.contentName === "" ||
+      this.contentName === undefined ||
+      this.isActive === "" ||
+      this.isActive === undefined ||
+      this.expectedTrend === "" ||
+      this.expectedTrend === undefined ||
+      this.kpiId === "" ||
+      this.kpiId === undefined ||
+      this.message === "" ||
+      this.message === undefined ||
+      this.resultField === "" ||
+      this.resultField === undefined
+    ) {
+      isValidated = false;
+    }
+    if (this.category === "THRESHOLD") {
+      if (
+        this.threshold === "" ||
+        this.threshold === undefined ||
+        this.directionThreshold === "" ||
+        this.directionThreshold === undefined
+      ) {
+        isValidated = false;
+      }
+    }
+    if (this.category === "THRESHOLD_RANGE") {
+      if (
+        this.thresholds === "" ||
+        this.thresholds === undefined ||
+        this.directionThreshold === "" ||
+        this.directionThreshold === undefined
+      ) {
+        isValidated = false;
+      }
+    }
+    if (isValidated) {
+      this.validateCategory();
+    } else {
+      this.messageDialog.openSnackBar("Please fill mandatory fields", "error");
+    }
+  }
+  validateCategory() {
+    this.isDataValid = this.validateJson(this.message);
+    if (this.isDataValid) {
+      switch (this.category) {
+        case "STANDARD":
+          this.valStandardCategory()
+            ? this.onClickSave()
+            : this.messageDialog.openSnackBar(
+                "Message should contain Content and Neutral Messages",
+                "error"
+              );
+          break;
+        case "COMPARISON":
+          this.valComparisonCategory()
+            ? this.onClickSave()
+            : this.messageDialog.openSnackBar(
+                "Message should contain Positive,Negative and Neutral Messages",
+                "error"
+              );
+          break;
+        case "THRESHOLD":
+          if (this.validateThresholdCategory()) {
+            let actionArr = ["COUNT", "PERCENTAGE", "AVERAGE"];
+            if (actionArr.includes(this.action)) {
+              this.valStandardCategory()
+                ? this.onClickSave()
+                : this.messageDialog.openSnackBar(
+                    "Message should contain Content and Neutral Messages",
+                    "error"
+                  );
+            } else {
+              this.messageDialog.openSnackBar(
+                "Action should be Count,Percentage or Average",
+                "error"
+              );
+            }
+          } else {
+            this.messageDialog.openSnackBar(
+              "Threshold should contain only integer values",
+              "error"
+            );
+          }
+          break;
+        case "THRESHOLD_RANGE":
+          if (this.validateJson(this.thresholds)) {
+            if (this.action === "COUNT" || this.action === "PERCENTAGE") {
+              this.validateThresholdRangeCategory()
+                ? this.valStandardCategory()
+                  ? this.onClickSave()
+                  : this.messageDialog.openSnackBar(
+                      "Message should contain Content and Neutral Messages",
+                      "ERROR"
+                    )
+                : this.messageDialog.openSnackBar(
+                    "Thresholds should contain red,amber and green values",
+                    "ERROR"
+                  );
+            } else {
+              this.messageDialog.openSnackBar(
+                "Action should be either Count or Percentage",
+                "error"
+              );
+            }
+          } else {
+            this.messageDialog.openSnackBar(
+              "Threshold value is in incorrect json format",
+              "error"
+            );
+          }
+          break;
+        case "MINMAX":
+          if (this.action === "MIN" || this.action === "MAX") {
+            this.valStandardCategory()
+              ? this.onClickSave()
+              : this.messageDialog.openSnackBar(
+                  "Message should contain Content and Neutral Messages",
+                  "error"
+                );
+          } else {
+            this.messageDialog.openSnackBar(
+              "Action should be Min or Max",
+              "error"
+            );
+          }
+          break;
+        case "TREND":
+          if (this.action === "COUNT" || this.action === "AVERAGE") {
+            this.valStandardCategory()
+              ? this.onClickSave()
+              : this.messageDialog.openSnackBar(
+                  "Message should contain Content and Neutral Messages",
+                  "error"
+                );
+          } else {
+            this.messageDialog.openSnackBar(
+              "Action should be Count or Average",
+              "error"
+            );
+          }
+          break;
+      }
+    } else {
+      this.messageDialog.openSnackBar(
+        "Message should be in JSON Format",
+        "error"
+      );
+    }
+  }
+  valArrayEquality(arr1, arr2) {
+    const containsAll = (arr1, arr2) =>
+      arr2.every((arr2Item) => arr1.includes(arr2Item));
+
+    const sameMembers = (arr1, arr2) =>
+      containsAll(arr1, arr2) && containsAll(arr2, arr1);
+
+    return sameMembers(arr1, arr2);
+  }
+  validateJson(message) {
+    try {
+      JSON.parse(message);
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+  valStandardCategory() {
+    let stdMsg = ["contentMessage", "neutralMessage"];
+    let msgArr = Object.keys(JSON.parse(this.message));
+    return this.valArrayEquality(stdMsg, msgArr);
+  }
+  valComparisonCategory() {
+    let compMsg = ["positive", "negative", "neutral"];
+    let msgArr = Object.keys(JSON.parse(this.message));
+    return this.valArrayEquality(compMsg, msgArr);
+  }
+  validateThresholdRangeCategory() {
+    let thresholds = ["red", "amber", "green"];
+    let msgArr = Object.keys(JSON.parse(this.thresholds));
+    return this.valArrayEquality(thresholds, msgArr);
+  }
+
+  validateThresholdCategory() {
+    return !isNaN(Number(this.threshold));
+  }
+
+  validateContentData() {
+    let valid = false;
+    switch (this.category) {
+      case "Standard":
+        valid = this.valStandardCategory();
+        break;
+      case "Comparision":
+        valid = this.valComparisonCategory();
+        break;
+    }
+  }
+  openKpiDialog() {
+    this.dialog.open(KpiListDialog, {
+      panelClass: "custom-dialog-container",
+      height: "85%",
+      width: "70%",
+      disableClose: true,
+    });
+  }
+  defaultStop(event) {
+    if (
+      (event.which != 8 && event.which != 0 && event.which < 48) ||
+      event.which > 57
+    ) {
+      event.preventDefault();
+    }
+  }
+  constructData() {
+    var self = this;
+    var contentRequestJson = {};
+    contentRequestJson["contentId"] = this.contentId;
+    contentRequestJson["isActive"] = this.isActive;
+    contentRequestJson["expectedTrend"] = this.expectedTrend;
+    contentRequestJson["contentName"] = this.contentName;
+    contentRequestJson["kpiId"] = this.kpiId;
+    contentRequestJson["resultField"] = this.resultField;
+    contentRequestJson["noOfResult"] = 15;
+    contentRequestJson["threshold"] = this.threshold;
+    contentRequestJson["action"] = this.action;
+    contentRequestJson["directionOfThreshold"] = this.directionThreshold;
+    contentRequestJson["message"] = JSON.parse(this.message);
+    if (this.category === "THRESHOLD_RANGE")
+      contentRequestJson["thresholds"] = JSON.parse(this.thresholds);
+
+    return contentRequestJson;
+  }
+  onClickSave() {
+    if (this.type === "EDIT") {
+      this.updateContentData();
+    } else {
+      this.saveContentData();
+    }
+  }
+  updateContentData() {
+    var self = this;
+    var dialogmessage =
+      " You have updated a Content <b>" +
+      this.contentId +
+      "</b> .Do you want continue? ";
+    var title = "Update Content ";
+    const dialogRef = this.messageDialog.showConfirmationMessage(
+      title,
+      dialogmessage,
+      "",
+      "ALERT",
+      "30%"
+    );
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result == "yes") {
+        this.contentService
+          .updateDataforContent(JSON.stringify(this.constructData()))
+          .then(function (response) {
+            let res = response;
+            if (response.status == "success") {
+              self.messageDialog.openSnackBar(
+                "<b>" + response.data.message,
+                "success"
+              );
+              self.router.navigateByUrl("InSights/Home/contentConfig", {
+                skipLocationChange: true,
+              });
+              self.type = "EDIT";
+            } else {
+              self.messageDialog.openSnackBar(
+                "<b>" + response.data.message,
+                "error"
+              );
+            }
+          });
+      }
+    });
+  }
+
+  saveContentData() {
+    var self = this;
+    var dialogmessage =
+      " You have created a new Content <b>" +
+      this.contentId +
+      "</b> .Do you want continue? ";
+    var title = "Save Content ";
+    const dialogRef = this.messageDialog.showConfirmationMessage(
+      title,
+      dialogmessage,
+      "",
+      "ALERT",
+      "30%"
+    );
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result == "yes") {
+        this.contentService
+          .saveDataforContent(JSON.stringify(this.constructData()))
+          .then(function (response) {
+            let res = response;
+            if (response.status == "success") {
+              setTimeout(() => {
+                self.messageDialog.openSnackBar(
+                  "<b>" +
+                    "Content with id " +
+                    self.contentId +
+                    "</b> created successfully.",
+                  "success"
+                );
+              }, 500);
+              self.router.navigateByUrl("InSights/Home/contentConfig", {
+                skipLocationChange: true,
+              });
+              self.type = "EDIT";
+            } else {
+              debugger;
+              self.messageDialog.openSnackBar(
+                "<b>" + response.message,
+                "error"
+              );
+            }
+          });
+      }
+    });
+  }
+
+  redirectToLandingPage() {
+    let navigationExtras: NavigationExtras = {
+      skipLocationChange: true,
+    };
+    this.router.navigate(["InSights/Home/contentConfig"], navigationExtras);
+  }
+
+  refreshData() {
+    this.contentId = "";
+    this.kpiId = "";
+    this.contentName = "";
+    this.isActive = "";
+    this.message = "";
+    this.expectedTrend = "";
+    this.directionThreshold = "";
+    this.resultField = "";
+    this.threshold = "";
+    this.thresholds = "";
+    this.category = "";
+    this.action = "";
+  }
+}

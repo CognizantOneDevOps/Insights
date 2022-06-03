@@ -16,6 +16,7 @@
 package com.cognizant.devops.automl.service;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -171,7 +172,14 @@ public class TrainModelsServiceImpl implements ITrainModelsService {
 		try {
 			InputStream fileStream = h2oApiCommunicator.downloadMojo(usecase, modelId);
 			if (fileStream != null) {
-				byte[] mojoByteArray = IOUtils.toByteArray(fileStream);
+				ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+			    int nRead;
+			    byte[] data = new byte[4];
+			    while ((nRead = fileStream.read(data, 0, data.length)) != -1) {
+			        buffer.write(data, 0, nRead);
+			    }
+			    buffer.flush();
+				byte[] mojoByteArray = buffer.toByteArray();
 				response = new JsonObject();
 				response.addProperty("Message", "Mojo has been saved successfully.");
 				AutoMLConfig mlConfig = autoMLConfigDAL.getMLConfigByUsecase(usecase);

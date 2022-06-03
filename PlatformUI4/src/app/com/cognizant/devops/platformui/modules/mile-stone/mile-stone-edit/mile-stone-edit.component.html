@@ -1,0 +1,194 @@
+<!--
+*******************************************************************************
+ * Copyright 2021 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+
+<div class="cardCss">
+  <div layout layout-align="left" class="titleStyle">
+    <div>
+      <span class="main-section-title">Configuration | </span>MileStone
+      Configuration
+    </div>
+  </div>
+  <div class="sectionHeadingStyle">
+
+    <button
+    mat-icon-button
+    (click)="redirect()"
+    style="vertical-align: super"
+  >
+    <mat-icon svgIcon="backButton" matTooltip="Back"> </mat-icon>
+  </button>
+
+    <span class="alignSub" style="margin-left: 5px;"
+      ><b>MileStone Configuration</b> (Configure a MileStone)
+    </span>
+    <span class="btnAlign">
+      <button
+        type="submit"
+        mat-icon-button
+        [disabled]="!mileStoneForm.valid"
+        (click)="onSubmit()"
+        class="btnHeight"
+      >
+        <mat-icon matTooltip="Save Configuration" svgIcon="save"> </mat-icon>
+      </button>
+      <!-- <button mat-icon-button (click)="redirect()" class="btnHeight">
+        <mat-icon svgIcon="homeBck" matTooltip="Redirect To MileStone Config">
+        </mat-icon>
+      </button> -->
+    </span>
+  </div>
+
+  <div class="add-agent-section-title add-agent-section-title-dimensions">
+    <span class="mainHeaderText">Add Configuration Details</span>
+    <span class="infoHeaderText"
+      >(Please provide accurate details. Fields marked"<span
+        class="asteriskText"
+        >*</span
+      >" are mandatory)
+    </span>
+  </div>
+  <div class="section-body">
+    <form [formGroup]="mileStoneForm" (ngSubmit)="onSubmit()">
+      <div class="two-grid-section">
+        <div class="grid-item">
+          <div class="select-label">
+            MileStone Name<span class="asteriskText">*</span>
+          </div>
+          <div class="columnComponent">
+            <mat-form-field appearance="fill" class="formfield-custom">
+              <input
+                matInput
+                maxlength="100"
+                formControlName="mileStoneName"
+                type="text"
+                autocomplete="off"
+                placeholder="Enter Milestone name"
+                disabled
+              />
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="grid-item">
+          <div class="select-label">
+            MileStone Release ID<span class="asteriskText">*</span>
+          </div>
+          <div class="columnComponent">
+            <mat-form-field appearance="fill" class="formfield-custom">
+              <input
+                matInput
+                maxlength="100"
+                formControlName="milestoneReleaseID"
+                type="text"
+                autocomplete="off"
+                placeholder="Enter Milestone Release Id"
+              />
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="grid-item">
+          <div class="select-label">
+            Start Date (MM/DD/YYYY)<span class="asteriskText">*</span>
+          </div>
+          <mat-form-field
+            style="width: 85%"
+            appearance="fill"
+            class="formfield-custom select-formField"
+          >
+            <input
+              matInput
+              #startDateMatInput
+              [matDatepicker]="startpicker"
+              required
+              formControlName="startDate"
+              [(ngModel)]="startDate"
+            />
+            <mat-datepicker-toggle matSuffix [for]="startpicker">
+              <mat-icon
+                matDatepickerToggleIcon
+                svgIcon="calendar"
+                class="iconClr"
+              ></mat-icon>
+            </mat-datepicker-toggle>
+            <mat-datepicker #startpicker [disabled]="false"> </mat-datepicker>
+          </mat-form-field>
+        </div>
+        <div class="grid-item">
+          <div class="select-label">
+            End Date (MM/DD/YYYY)<span class="asteriskText">*</span>
+          </div>
+          <mat-form-field
+            style="width: 85%"
+            appearance="fill"
+            class="formfield-custom select-formField"
+          >
+            <input
+              matInput
+              #endDateMatInput
+              [matDatepicker]="endpicker"
+              formControlName="endDate"
+              [(ngModel)]="endDate"
+            />
+            <mat-datepicker-toggle matSuffix [for]="endpicker">
+              <mat-icon
+                matDatepickerToggleIcon
+                svgIcon="calendar"
+                class="iconClr"
+              ></mat-icon>
+            </mat-datepicker-toggle>
+            <mat-datepicker #endpicker [disabled]="false"></mat-datepicker>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="textarea-grid">
+        <div class="grid-item">
+          <div class="select-label">
+            Choose Outcome<span class="asteriskText">*</span>
+          </div>
+          <mat-form-field
+            style="width: 85%"
+            appearance="fill"
+            class="formfield-custom select-formField"
+          >
+            <textarea
+              matInput
+              type="text"
+              formControlName="outcomeList"
+              placeholder="Select Outcome"
+              readonly
+              disabled
+            >
+            </textarea>
+            <mat-icon
+              matSuffix
+              svgIcon="search"
+              class="arrow-icon"
+              style="
+                width: 20px !important;
+                height: 20px !important;
+                position: absolute;
+                bottom: 15px !important;
+                right: 0px;
+              "
+              (click)="openOutcomeDialog()"
+              disabled="true"
+            ></mat-icon>
+          </mat-form-field>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

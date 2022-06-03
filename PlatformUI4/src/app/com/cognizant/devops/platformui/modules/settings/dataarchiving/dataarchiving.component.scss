@@ -1,0 +1,71 @@
+/*
+*******************************************************************************
+ * Copyright 2020 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *******************************************************************************/
+
+.add-agent-section-title {
+  color: var(--text-clr3) !important;
+}
+
+.displayFlexSpaceBtw {
+  display: flex;
+  justify-content: space-between;
+}
+.two-field-grid {
+  display: grid;
+  grid-template-columns: 45% 45%;
+  background-color: var(--backgnd-clr10);
+  column-gap: 20px;
+  row-gap: 10px;
+  padding: 2%;
+  span {
+    margin-bottom: 5px;
+  }
+  .grid-item {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    font: normal normal normal 14px/24px "Open Sans";
+
+    ::ng-deep .mat-form-field-infix {
+      margin-top: 12px !important;
+      font-weight: 600 !important;
+      opacity: 0.9 !important;
+      padding: 0 !important;
+      border-top: none !important;
+      width: 100%;
+    }
+  }
+}
+.section-body {
+  display: flex;
+  flex-direction: column;
+}
+.asteriskText {
+  color: #ff0000;
+}
+.iconClr {
+  color: var(--text-clr);
+}
+.labelTxt {
+  color: var(--backgnd-clr5);
+  font-size: 85%;
+}
+.footer {
+  justify-content: flex-end;
+}
+.select-label {
+  display: flex;
+}

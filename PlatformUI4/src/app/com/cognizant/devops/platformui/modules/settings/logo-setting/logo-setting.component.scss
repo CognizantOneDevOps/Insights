@@ -1,0 +1,105 @@
+/*
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *******************************************************************************/
+
+.subBlock2 {
+  max-height: 12vh;
+  border-radius: 10px 10px 0 0;
+  background-color: #ffffff 0% 0% no-repeat padding-box;
+  padding: 6px;
+  padding-left: 10px;
+  color: var(--text-clr);
+  font-size: 14px;
+  width: 55vh;
+  display: inline-block;
+  margin-left: -10px;
+  vertical-align: top;
+  padding-bottom: 5px;
+  margin-top: 10px;
+}
+
+.liGenearl {
+  color: var(--text-clr);
+  font-size: 14px;
+}
+
+.bulletColor {
+  color: var(--text-clr7);
+}
+
+.liGeneral2 {
+  color: var(#B9BBBC);
+  font-size: 14px;
+  padding-left: 23px;
+  padding-top: 12px;
+}
+
+.subText {
+  font-size: 14px;
+  color: var(#B9BBBC);
+  padding-left: 10px;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-image: initial;
+  background-position-x: initial;
+  background-position-y: initial;
+  background-size: initial;
+  background-attachment: initial;
+  background-origin: initial;
+  background-clip: initial;
+  background-color: #676666;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
+
+.tableHeader1 {
+  background-color: var(--backgnd-clr7);
+  color: #ffffff !important;
+  font: normal normal normal 14px/24px "Open Sans";
+  margin-top: 19px;
+  border-radius: 0px 0px 0px 0px;
+  padding-left: 24px;
+  padding-top: 5px;
+  height: 40px;
+  width: 927px;
+}
+
+.subContainer1 {
+  top: 185px;
+  left: 288px;
+  width: 899px;
+  height: 157px;
+  background: var(--unnamed-color-ffffff) 0% 0% no-repeat padding-box;
+  background: var(--bg-test);
+  opacity: 1;
+  border: 1px solid;
+  border-color: var(--bg-color-dis);
+  color: var(#B9BBBC);
+}
+
+.main-section-title1 {
+  color: var(--text-clr1);
+  font-weight: bold;
+  font-size: 18px;
+}

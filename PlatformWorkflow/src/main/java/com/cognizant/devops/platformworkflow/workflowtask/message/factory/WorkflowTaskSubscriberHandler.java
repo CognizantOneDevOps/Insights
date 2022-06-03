@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformworkflow.workflowtask.message.factory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -81,15 +82,19 @@ public abstract class WorkflowTaskSubscriberHandler {
 					int exectionHistoryId = -1;
 					setStatusLog("{}");
 					try {
-
+						
+						ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+						byteArrayOutputStream.write(body);
+						byte[] message = byteArrayOutputStream.toByteArray();
+						
 						log.debug("Worlflow Detail ==== before  workflowTaskPreProcesser ");
-						exectionHistoryId = workflowTaskPreProcesser(body);
+						exectionHistoryId = workflowTaskPreProcesser(message);
 						log.debug("Worlflow Detail ==== before  handleTaskExecution ");
 						/* return */
-						engineSubscriberResponseHandler.handleTaskExecution(body);
+						engineSubscriberResponseHandler.handleTaskExecution(message);
 						log.debug("Worlflow Detail ==== after handleTaskExecution");
 
-						workflowTaskPostProcesser(body, exectionHistoryId,
+						workflowTaskPostProcesser(message, exectionHistoryId,
 								WorkflowTaskEnum.WorkflowStatus.COMPLETED.toString());
 					} catch (Exception e) {
 						log.error("Worlflow Detail ==== Error in handle delivery  ", e);

@@ -15,26 +15,24 @@
 #-------------------------------------------------------------------------------
 # Install Promtail
 echo "#################### Starting Loki and Promtail Post configurations ####################"
+touch /etc/profile.d/insightsenvvar.sh
 . /etc/environment
-. /etc/profile
+. /etc/profile.d/insightsenvvar.sh
 cd /opt
 sudo mkdir Promtail
 cd Promtail
 sudo apt-get install wget
-echo -n "Nexus(userName):"
-read userName
-echo "Nexus credential:"
-read -s credential
-sudo wget wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/Promtail/promtail-linux-amd64.zip
+read -p "Please enter Promtail version number you want to install(ex. 2.4.2 or 2.5.0): " version_number
+sudo wget https://github.com/grafana/loki/releases/download/v${version_number}/promtail-linux-amd64.zip
 sudo apt-get install unzip
 sudo unzip "promtail-linux-amd64.zip"
 sudo rm -rf promtail-linux-amd64.zip
 sudo chmod a+x "promtail-linux-amd64"
 export PROMTAIL_HOME=`pwd`
 sudo echo PROMTAIL_HOME=`pwd` | sudo tee -a /etc/environment
-sudo echo "export" PROMTAIL_HOME=`pwd` | sudo tee -a /etc/profile
+sudo echo "export" PROMTAIL_HOME=`pwd` | sudo tee -a /etc/profile.d/insightsenvvar.sh
 cd /etc/systemd/system
-sudo wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/promtail/Promtail.service
+sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/UBUNTU/Promtail.service
 sudo systemctl enable Promtail.service
 sudo systemctl start Promtail
 echo "#################### Promtail is up ####################"

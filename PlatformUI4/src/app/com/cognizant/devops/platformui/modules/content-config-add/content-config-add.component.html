@@ -1,0 +1,283 @@
+<!--
+*******************************************************************************
+ * Copyright 2022 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div class="cardCss">
+  <div
+    layout
+    layout-align="left"
+    class="main-section-title"
+    style="font-size: 18px"
+  >
+    <div>
+      <b
+        >Configuration |
+        <span style="color: #2d67ff">Content Configuration </span></b
+      >
+    </div>
+  </div>
+
+  <div class="sectionHeadingStyle">
+    <span style="padding-top: 3px; margin-left: 3px">
+      <button
+        mat-icon-button
+        (click)="redirectToLandingPage()"
+        style="vertical-align: super"
+      >
+        <mat-icon svgIcon="backButton" matTooltip="Back"> </mat-icon>
+      </button>
+    </span>
+
+    <span class="alignSubHeader1"
+      ><b>Content Configuration</b> (Configure a content)</span
+    >
+    <div class="btnAlign" style="margin-top: 0px">
+      <button mat-icon-button (click)="validateKpiData()">
+        <mat-icon
+          matTooltip="Save Content Configuration"
+          class="mat-icon material-icons"
+          svgIcon="save"
+        >
+        </mat-icon>
+      </button>
+      <button mat-icon-button (click)="refreshData()">
+        <mat-icon
+          matTooltip="Reset"
+          class="mat-icon material-icons"
+          svgIcon="exit"
+        >
+        </mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="tableHeaderCss">
+    <span *ngIf="!onEdit" class="mainHeaderText"
+      >Add details to Configure a Content
+    </span>
+    <span *ngIf="onEdit" class="mainHeaderText"
+      >Edit details to Configure a Content
+    </span>
+    <span class="infoHeaderText"
+      >(Please provide accurate details to Configure a Content. Fields marked
+      "<span class="asteriskText">*</span>" are mandatory)
+    </span>
+  </div>
+
+  <div class="section-body" style="margin-bottom: 15px">
+    <div class="two-grid-section">
+      <div class="grid-item">
+        <div class="lblText">Content Id<span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <input
+            matInput
+            maxlength="7"
+            placeholder="Input a unique Content Id"
+            type="number"
+            id="contentId"
+            style="background: transparent"
+            [disabled]="type === 'EDIT'"
+            oninput="this.value.length> 7? this.value = this.value.slice(0,
+              this.maxLength):' ';"
+            [(ngModel)]="contentId"
+            name="contentId"
+            (keypress)="defaultStop($event)"
+          />
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item">
+        <div class="lblText">
+          Content Name<span class="asteriskText">*</span>
+        </div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <input
+            matInput
+            placeholder="Input a logical Name a make it simpler to identify"
+            maxlength="40"
+            type="text"
+            [(ngModel)]="contentName"
+            name="contentName"
+          />
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item">
+        <div class="lblText">KPI Id<span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <input
+            matInput
+            maxlength="40"
+            type="text"
+            [(ngModel)]="kpiId"
+            name="kpiId"
+            disabled
+            placeholder="Search for a Kpi Id"
+          />
+          <button
+            (click)="openKpiDialog()"
+            matSuffix
+            class="searchCss"
+            style="border: none; background: transparent; margin-left: -30px"
+          >
+            <mat-icon svgIcon="search" style="color: var(--text-clr)">
+            </mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item">
+        <div class="lblText">
+          Expected Trend<span class="asteriskText">*</span>
+        </div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            required
+            [(ngModel)]="expectedTrend"
+            name="expectedTrend"
+            placeholder="Select Trend"
+            color="primary"
+          >
+            <mat-option *ngFor="let data of trend" value="{{ data }}">
+              {{ data }}</mat-option
+            >
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item">
+        <div class="lblText">
+          Direction Of Threshold<span class="asteriskText">*</span>
+        </div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            required
+            [(ngModel)]="directionThreshold"
+            name="directionThreshold"
+            placeholder="Select threshold direction"
+            color="primary"
+          >
+            <mat-option *ngFor="let data of thresholdDir" value="{{ data }}">
+              {{ data }}
+            </mat-option>
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item">
+        <div class="lblText">
+          Result Field<span class="asteriskText">*</span>
+        </div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <input
+            matInput
+            maxlength="40"
+            placeholder="Select a ResultField"
+            type="text"
+            [(ngModel)]="resultField"
+            name="resultField"
+          />
+        </mat-form-field>
+      </div>
+
+      <div
+        class="grid-item"
+        *ngIf="
+          category === 'THRESHOLD' ||
+          category === 'THRESHOLD_RANGE' ||
+          category === 'MINMAX' ||
+          category === 'TREND'
+        "
+      >
+        <div class="lblText">Action<span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            required
+            [(ngModel)]="action"
+            name="action"
+            placeholder="Select Action"
+            color="primary"
+          >
+            <mat-option *ngFor="let data of actionDetail" value="{{ data }}">
+              {{ data }}
+            </mat-option>
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item">
+        <div class="lblText">Message<span class="asteriskText">*</span></div>
+        <div class="text-area">
+          <mat-form-field appearance="fill" class="formfield-custom">
+            <textarea
+              matInput
+              [(ngModel)]="message"
+              name="message"
+              required
+              placeholder="Please add a Message"
+              style="width: 100%; resize: vertical; height: 119px"
+              rows="10"
+            ></textarea>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="grid-item" *ngIf="category === 'THRESHOLD'">
+        <div class="lblText">Threshold<span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="formfield-custom">
+          <textarea
+            [(ngModel)]="threshold"
+            type="number"
+            name="threshold"
+            class="frmTxtarea"
+            required
+            style="width: 85%; resize: none"
+          ></textarea>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item" *ngIf="category === 'THRESHOLD_RANGE'">
+        <div class="lblText">Thresholds<span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="formfield-custom">
+          <textarea
+            [(ngModel)]="thresholds"
+            name="thresholds"
+            class="frmTxtarea"
+            required
+            style="width: 85%; resize: none"
+          ></textarea>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+</div>

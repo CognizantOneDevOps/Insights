@@ -20,24 +20,13 @@ echo "#################### Installing Python 2.7.11 with Virtual Env ###########
 #sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/python/dependencies.zip
 #sudo unzip dependencies.zip
 #cd dependencies
-#sudo dpkg -i *.deb
-echo -n "Nexus(userName):"
-read userName
-echo "Nexus credential:"
-read -s credential
-sudo mkdir /opt/python && cd /opt/python && sudo wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/python/Python.tar.gz 
-sudo tar -zxf Python.tar.gz
-cd Python
-sudo apt-get install gcc -y
-sudo apt-get install libssl-dev -y
-sudo apt-get install bzip2-dev -y
-sudo apt-get install libffi-dev -y
-sudo apt-get install make -y
-sudo ./configure --enable-optimizations
+sudo apt update
+sudo apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev wget libbz2-dev
+wget https://www.python.org/ftp/python/2.7.10/Python-2.7.10.tgz
+tar -xf Python-2.7.10.*.tgz
+cd Python-2.7.10.*/
+./configure --enable-optimizations
+make -j $(nproc)
 sudo make altinstall
-sudo rm -f /usr/bin/python
-sudo ln -s /opt/python/Python/python /usr/bin/python
-sudo python -m pip install pika==1.1.0
-sudo python -m pip install requests apscheduler python-dateutil xmltodict pytz requests_ntlm boto3 urllib3 neotime neo4j neobolt elasticsearch
-python --version
+python2.7 --version
 sleep 5

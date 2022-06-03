@@ -1,0 +1,197 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div class="cardCssTraceability">
+	<div layout layout-align="left" class="titleStyle">
+		<div> <span>Traceability Dashboard </span>
+		</div>
+	</div>
+
+
+	<form #frmagentconfig="ngForm">
+		<div class="searchBorder">
+			<div class="field-categories">
+				<div class="field-category" [style.width.%]="20">
+					<span class="select-label">Tools</span>
+					<mat-form-field appearance="fill" class="formfield-custom">
+						<mat-select required [(ngModel)]="selectedTool" name="selectedTool" placeholder="Select Tool"
+							(ngModelChange)="toolOnChange()">
+							<mat-option *ngFor="let tool of tools " value="{{tool}}" class="optionsBckgnd">
+								{{tool}}</mat-option>
+						</mat-select>
+						<mat-icon matSuffix svgIcon="arrow-down" class="arrow-icon"
+							style="width: 12px !important; height: 12px !important;"></mat-icon>
+					</mat-form-field>
+				</div>
+
+				<div class="field-category" [style.width.%]="20">
+					<span class="select-label">Field</span>
+					<mat-form-field *ngIf="isToolSelected" appearance="fill" class="formfield-custom">
+						<mat-select required [(ngModel)]="selectedField" name="selectedField" placeholder="Select Field"
+							(ngModelChange)="FieldOnChange(selectedField, btnValue)">
+							<mat-option *ngFor="let key of fieldList" value="{{key}}" class="optionsBckgnd">
+								{{key}}</mat-option>
+						</mat-select>
+						<mat-icon matSuffix svgIcon="arrow-down" class="arrow-icon"
+							style="width: 12px !important; height: 12px !important;"></mat-icon>
+					</mat-form-field>
+				</div>
+
+				<div class="field-category" [style.width.%]="20">
+					<span class="select-label">Issue</span>
+					<mat-form-field appearance="fill" class="formfield-custom">
+						<mat-select required [(ngModel)]="issueTypeSelected" name="issueTypeSelected"
+							placeholder="Issue Type" (selectionChange)="issueTypeOnChange($event.value)">
+							<mat-option *ngFor="let issue of issueTypes " value="{{issue}}" class="optionsBckgnd">
+								{{issue}}</mat-option>
+						</mat-select>
+						<mat-icon matSuffix svgIcon="arrow-down" class="arrow-icon"
+							style="width: 12px !important; height: 12px !important;"></mat-icon>
+					</mat-form-field>
+				</div>
+
+				<div class="field-category" [style.width.%]="55">
+					<span class="select-label">Value</span>
+					<mat-form-field appearance="fill" class="formfield-custom">
+						<input matInput placeholder="Value field" type="text" [(ngModel)]="fieldValue"
+							name="toolFieldValue">
+					</mat-form-field>
+				</div>
+
+			</div>
+			<div class="button-section-actions">
+				<button (click)="getDetails()" [disabled]="frmagentconfig.invalid"
+					class="button-save button-save-dimensions">
+					Search
+				</button>
+				<button (click)="clear()" class="button-cancel button-cancel-dimensions">
+					Clear
+				</button>
+			</div>
+			<div style="display: flex; justify-content: center; align-items: center">
+				<div class="loading-indicator">
+					<mat-progress-spinner *ngIf="isDatainProgress" [diameter]="100" color="primary"
+						mode="indeterminate">
+					</mat-progress-spinner>
+				</div>
+			</div>
+		</div>
+
+		<div>
+			<div class="notification-section"
+				[ngStyle]="{'margin-top': this.selectedTabIndex == 0 ? '1.5%' : '0.5%', 'width': this.selectedTabIndex == 0 ? '30%' : '45%' }">
+				<label class="main-tab-help-text" *ngIf="this.selectedTabIndex == 0 "> Summary - Shows pipeline
+					inferences </label>
+
+				<label class="main-tab-help-text" *ngIf="this.selectedTabIndex == 1"> Pipeline View (Shows overall
+					pipeline view. Click on any individual tool section for more detail.) </label>
+
+			</div>
+			<mat-tab-group color="primary" class="tab-style tabGroup" (selectedTabChange)="tabChanged($event)">
+
+				<mat-tab label="Summary" class="tabStyle">
+					<div class="tabSection">
+						<div class="summaryDiv" *ngIf="list1.length > 0">
+							<div>This search has fetched : </div>
+							<div>
+								<label *ngFor="let item of list1;let i=index"
+									[ngStyle]="{'background-color': getToolColor(item.toolName)}"
+									class="totalSummaryPropCount">{{item.displayProperty}} : <b>{{item.recordCount}}
+									</b>
+								</label>
+							</div>
+						</div>
+						<div class="summaryCardList" *ngFor="let item of list1;let i=index">
+							<mat-card class="summaryCard" id="{{i}}">
+								<div class="summarySection">
+									<div class="socialimg">
+										<img src="icons/svg/traceability/{{item.toolName}}.svg" height="60px"
+											width="60px" onError="this.src=item.toolName" class=" circled" />
+										<span class="summaryToolName">{{item.toolName}}</span>
+									</div>
+
+									<div class="divIndividualSummaryTool">
+										<div>
+											<span class="summaryPropCount"
+												[ngStyle]="{'background-color': getToolColor(item.toolName)}">{{item.displayProperty}}
+												: <b>{{item.recordCount}}
+												</b></span>
+										</div>
+										<ul class="summaryContentList bullectPoint">
+											<span *ngFor="let summaryItems of item.summaryDetail; let j = index">
+												<li class="summaryContentText">{{summaryItems}}</li>
+											</span>
+										</ul>
+									</div>
+
+									<div class="avgToolSummarySummaryTool">
+										<div layout layout-align="right" class="rightAlignStyle">
+											<span *ngIf="item.handOverTime != null" class="handoverTime">Avg. Handover
+												Time: <span style="font-weight:bold"> {{item.handOverTime == null ?
+													'N/A' :item.handOverTime}} </span>
+											</span>
+										</div>
+									</div>
+								</div>
+							</mat-card>
+						</div>
+
+
+					</div>
+				</mat-tab>
+
+				<mat-tab label="Pipeline" class="tab-style">
+					<div class="tabSection">
+						<div class="columnToolPipeline" *ngFor="let data of map | keyvalue">
+							<div class="parentCard" (click)="showDetailsDialog(data.key.split('_')[1])">
+								<div class="toolNameCss">
+									<label class="toollableCss"> <u> {{data.key.split('_')[1]}} </u> </label>
+									<div [ngStyle]="{'background-color': getToolColor(data.key.split('_')[1])}"
+										class="lableCss">
+										<span class="rowCount"> {{data.value.length}} </span>
+									</div>
+								</div>
+								<div>
+									<span class="toolSublableCss">
+										{{traceabilityData.data.metaData.displayTextProperty[data.key.split('_')[1]]}}
+									</span>
+								</div>
+							</div>
+
+							<div class="scroll">
+								<div class="childCardList" *ngFor="let epic of data.value;let i=index">
+									<mat-card class="childCard" id="{{i}}">
+
+										<span (click)="onCardClickJira(i,$event,epic)" class="formatCardText"
+											title="{{disProp.value }} : {{epic[disProp.value]}}"
+											*ngFor="let disProp of displayProperty[data.key.split('_')[1]] | keyvalue">
+											<span class="childCardLabel">{{disProp.value }}</span>
+											:<span class="childCardLabelValue ">{{epic[disProp.value]}} </span>
+											<br>
+										</span>
+										<label (click)="showOnHoverDialog(i,epic)" class="moreInfoClass">
+											<u> more info </u>
+										</label>
+									</mat-card>
+								</div>
+							</div>
+						</div>
+					</div>
+				</mat-tab>
+			</mat-tab-group>
+		</div>
+	</form>
+</div>

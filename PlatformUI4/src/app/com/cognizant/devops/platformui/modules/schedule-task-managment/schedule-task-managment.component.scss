@@ -1,0 +1,136 @@
+/*******************************************************************************
+ * Copyright 2021 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+.task-management-table {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.mat-icon-button {
+  color: #2d67ff;
+}
+
+.task-module-col {
+  max-height: 65px;
+  padding: 10px !important;
+
+  p {
+    max-width: 450px;
+    overflow: hidden;
+    margin: 0;
+    margin-right: 10px !important;
+    white-space: break-spaces;
+    word-wrap: break-word;
+    line-height: 20px;
+  }
+}
+
+.config-section {
+  margin: 16px 0;
+
+  .title {
+    height: 40px;
+    color: var(--text-clr3) !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px 0 24px;
+    font-size: 14px;
+    font-family: "Open Sans";
+    letter-spacing: 0px;
+    background: var(--backgnd-clr7) 0% 0% no-repeat padding-box;
+
+    .main-title {
+      font-weight: 600;
+    }
+
+    .sub-title {
+      font-weight: normal;
+    }
+  }
+
+  .section-body {
+    padding: 24px 25px;
+    border: 1px solid var(--brdr-clr);
+    background-color: var(--backgnd-clr10);
+
+    form {
+      display: flex;
+      justify-content: space-between;
+
+      .left-col {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        width: 40%;
+
+        .input-item {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          font: normal normal normal 14px/24px "Open Sans";
+        }
+      }
+      .right-col {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        width: 55%;
+
+        .textarea-item {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          font: normal normal normal 14px/24px "Open Sans";
+          height: 100%;
+
+          .formfield-custom {
+            height: -webkit-fill-available;
+
+            ::ng-deep .mat-form-field-wrapper {
+              height: 100%;
+            }
+          }
+
+          ::ng-deep .mat-form-field-appearance-fill .mat-form-field-flex {
+            height: 100% !important;
+          }
+
+          ::ng-deep .mat-form-field-infix {
+            height: -webkit-fill-available;
+          }
+
+          textarea {
+            height: 100% !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+.comments {
+  text-align: left;
+  font: normal normal normal 12px/24px Open Sans;
+  letter-spacing: 0px;
+  color: #77777b;
+  opacity: 1;
+  margin-top: 13px;
+}
+
+.footer {
+  justify-content: flex-end;
+  margin-bottom: 16px !important;
+}

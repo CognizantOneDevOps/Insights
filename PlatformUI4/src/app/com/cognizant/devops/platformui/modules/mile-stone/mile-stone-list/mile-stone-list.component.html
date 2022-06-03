@@ -1,0 +1,213 @@
+<!--
+*******************************************************************************
+ * Copyright 2021 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+
+<div class="cardCss">
+  <div layout layout-align="left" class="titleStyle" style="cursor: pointer">
+    <div>
+      <span class="main-section-title">Configuration | </span>MileStone
+      Configuration
+    </div>
+  </div>
+  <div class="sectionHeadingStyle">
+    <span class="alignSub"
+      ><b>MileStone Configuration</b> (Configure a MileStone)
+    </span>
+
+    <span class="btnAlign">
+      <button mat-icon-button (click)="add()" class="btnHeight">
+        <mat-icon matTooltip="Configure a MileStone" svgIcon="add"> </mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        [disabled]="!enableEdit"
+        (click)="edit()"
+        class="btnHeight"
+      >
+        <mat-icon matTooltip="Edit MileStone config" svgIcon="edit"> </mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        [disabled]="disableRestart"
+        (click)="restartMileStone()"
+        class="btnHeight"
+      >
+        <mat-icon matTooltip="Restart" svgIcon="restart"> </mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        [disabled]="!onRadioBtnSelect"
+        (click)="delete()"
+        class="btnHeight"
+      >
+        <mat-icon matTooltip="Delete" svgIcon="trash"> </mat-icon>
+      </button>
+      <button mat-icon-button (click)="refresh()" class="btnHeight">
+        <mat-icon matTooltip="Refresh" svgIcon="retry"> </mat-icon>
+      </button>
+    </span>
+  </div>
+  <div class="scrollDiv">
+    <mat-radio-group [(ngModel)]="milestone">
+      <table
+        mat-table
+        [dataSource]="mileStoneDatasource"
+        style="margin-top: 2% !important"
+      >
+        <!-- Radio Button Column -->
+        <ng-container matColumnDef="radio">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader"></th>
+          <td
+            mat-cell
+            *matCellDef="let element; let i = index"
+            style="width: 5% !important"
+          >
+            <mat-radio-button
+              [value]="element"
+              [checked]="refreshRadio"
+              (change)="enableButtons($event, i)"
+            ></mat-radio-button>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="mileStoneName">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            MileStone
+          </th>
+          <td mat-cell *matCellDef="let element" style="width: 18% !important">
+            {{ element.mileStoneName }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="milestoneReleaseID">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            MileStone Release ID
+          </th>
+          <td mat-cell *matCellDef="let element" style="width: 18% !important">
+            {{ element.milestoneReleaseID }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="startDate">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            Start Date
+          </th>
+          <td mat-cell *matCellDef="let element" style="width: 12% !important">
+            {{ element.startDate }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="endDate">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            End Date
+          </th>
+          <td mat-cell *matCellDef="let element" style="width: 12% !important">
+            {{ element.endDate }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            Data Collection Status
+          </th>
+          <td mat-cell *matCellDef="let element" style="width: 15% !important">
+            {{ element.status }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="details">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">Details</th>
+          <td
+            mat-cell
+            *matCellDef="let element; let i = index"
+            style="width: 10% !important"
+          >
+            <button
+              mat-icon-button
+              (click)="showAllDetails(element)"
+              [disabled]="selectedIndex != i + currentPageValue"
+            >
+              <mat-icon
+                svgIcon="healthcheck_show_details"
+                style="
+                  height: '20px';
+                  width: '20px';
+                  vertical-align: inherit !important;
+                "
+              >
+              </mat-icon>
+            </button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </mat-radio-group>
+
+    <div class="paginator" style="float: right; margin-top: 1%">
+      <mat-paginator
+        style="visibility: hidden"
+        #paginator
+        [pageSize]="MAX_ROWS_PER_TABLE"
+      >
+      </mat-paginator>
+      <div
+        class="paginatorElement"
+        (click)="goToPrevPage()"
+        [attr.disabled]="!this.paginator.hasPreviousPage()"
+        [ngStyle]="
+          !this.paginator.hasPreviousPage() ? { cursor: 'not-allowed' } : ''
+        "
+      >
+        <mat-icon
+          svgIcon="prev-page"
+          class="pageIcons"
+          style="cursor: pointer; display: flex"
+          *ngIf="this.paginator.hasPreviousPage()"
+        >
+        </mat-icon>
+        <mat-icon
+          svgIcon="prev-page"
+          class="pageIcons disabled-icon"
+          *ngIf="!this.paginator.hasPreviousPage()"
+          style="display: flex"
+        >
+        </mat-icon>
+      </div>
+      <div class="paginatorElement paginatorIndexElement">
+        {{ currentPageIndex }}
+      </div>
+      <div
+        class="paginatorElement"
+        (click)="goToNextPage()"
+        [attr.disabled]="!this.paginator.hasNextPage()"
+        [ngStyle]="
+          !this.paginator.hasNextPage() ? { cursor: 'not-allowed' } : ''
+        "
+      >
+        <mat-icon
+          svgIcon="next-page"
+          style="cursor: pointer; display: flex"
+          class="pageIcons"
+          *ngIf="this.paginator.hasNextPage()"
+        >
+        </mat-icon>
+        <mat-icon
+          svgIcon="next-page"
+          class="pageIcons disabled-icon"
+          *ngIf="!this.paginator.hasNextPage()"
+          style="display: flex"
+        >
+        </mat-icon>
+      </div>
+      <div>of {{ totalPages }}</div>
+    </div>
+  </div>
+</div>

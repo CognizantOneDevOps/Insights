@@ -1,0 +1,427 @@
+/********************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** */
+:host ::ng-deep {
+  display: block;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.mat-toolbar {
+  background-color: var(--backgnd-clr6);
+  height: 12.5%;
+  border-bottom: 1px solid var(--backgnd-clr6);
+}
+
+.cogLogo {
+  margin-top: 9px;
+  margin-bottom: 9px;
+  padding-left: 16px;
+}
+
+.toggleMenuNotExp {
+  margin-top: 20px;
+  margin-left: 11px;
+  margin-bottom: 20px;
+  float: right;
+  margin-right: 10px;
+}
+
+.mat-nav-list {
+  font-size: 18px !important;
+  font-weight: bolder !important;
+  font-family: Open Sans;
+  color: #ffff !important;
+  padding: 0 8px !important;
+}
+
+.mat-line {
+  opacity: 0.8;
+  padding: 1px !important;
+  font-weight: bolder !important;
+  font-family: Open Sans;
+  font-size: 16px;
+}
+
+.mat-line.active {
+  font-weight: bolder;
+  font-size: 16px !important;
+  opacity: 1 !important;
+  filter: brightness(100%), contrast(100%) !important;
+  font-family: Open Sans;
+}
+
+.textCopyright {
+  height: 66px;
+  color: #9e9a9a;
+  font-size: 10px;
+  text-align: center;
+  padding-left: 1px;
+  padding-top: 1%;
+  padding-bottom: 1%;
+}
+
+::ng-deep .mat-list-item-content {
+  height: 50px !important;
+  font: normal normal normal 16px/22px Open Sans;
+  padding-top: 0px;
+  padding-right: 0px !important;
+  padding-bottom: 0px;
+  padding-left: 0px !important;
+}
+
+.menuItemBorder {
+  border-bottom: 1px solid #add2fb !important;
+}
+
+.allMenuWidth {
+  width: 265px;
+}
+
+.mat-list-item {
+  opacity: 1;
+  font: normal normal normal 16px/22px Open Sans;
+  height: 50px !important;
+  padding-left: 12px;
+}
+
+.menu {
+  width: 100%;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  height: 74%;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-image: initial;
+  background-position-x: initial;
+  background-position-y: initial;
+  background-size: initial;
+  background-attachment: initial;
+  background-origin: initial;
+  background-clip: initial;
+  background-color: var(--web-scroll);
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
+
+.mat-list-item.active,
+.mat-list-item.active:hover {
+  color: var(--text-clr4) !important;
+  font: normal normal normal 16px/22px Open Sans;
+  background-color: var(--list-bg);
+  opacity: 1;
+  height: 50px !important;
+  padding-left: 16px;
+
+  .menu-icon-color {
+    fill: var(--text-clr4);
+  }
+}
+
+.expandStyle {
+  color: var(--text-clr3);
+}
+
+.mat-list-item:hover {
+  color: var(--text-clr4) !important;
+  font: normal normal normal 16px/22px Open Sans;
+  background-color: var(--list-bg);
+  opacity: 1;
+  height: 50px !important;
+  padding-left: 16px;
+
+  .displayNameParentMenuActive {
+    color: var(--text-clr3);
+  }
+
+  .mat-list-item-parent {
+    background-color: var(--backgnd-clr3);
+  }
+
+  .expandStyle {
+    color: var(--text-clr3);
+  }
+
+  .menu-img {
+    color: var(--text-clr3) !important;
+  }
+
+  .menu-icon-color {
+    path {
+      fill: var(--text-clr3) !important;
+    }
+  }
+}
+
+.mat-list-item-parent {
+  color: var(--text-clr4) !important;
+  font: normal normal normal 16px/22px Open Sans;
+  background-color: var(--backgnd-clr3);
+  opacity: 1;
+  height: 50px !important;
+  padding-left: 16px;
+
+  .expandStyle {
+    color: var(--text-clr4);
+  }
+
+  .menu-img {
+    color: var(--text-clr4) !important;
+  }
+
+  .menu-icon-color {
+    path {
+      fill: var(--text-clr4) !important;
+    }
+  }
+}
+
+.logOut {
+  padding-bottom: 8px;
+  margin-left: 0px;
+  padding-top: 4px;
+  margin-left: 7px;
+}
+
+.mat-line-bottom {
+  color: #ffff !important;
+  opacity: 0.8;
+  padding: 2px !important;
+  font-size: 14px !important;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.mat-line-heading {
+  color: #ffff !important;
+  opacity: 0.8;
+  padding-top: 0px !important;
+  padding-right: 5px !important;
+}
+
+.bottomData {
+  border: 0.5px solid #add2fb;
+  text-align: center;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.bottomBorder {
+  border: 0.5px solid #add2fb;
+  width: 100%;
+}
+
+.example-sidenav-content {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-img {
+  top: 287px;
+  left: 16px;
+  width: 12px;
+  height: 13px;
+  background: transparent;
+  opacity: 1;
+  vertical-align: super;
+  color: var(--text-clr3);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  color: #d81313;
+}
+
+.sidenav-container {
+  flex: 1;
+  color: #d81313;
+}
+
+.displayNameMenu {
+  padding-left: 8px;
+  text-align: left;
+  font: bolder normal normal 15px/22px Open Sans;
+  letter-spacing: 0px;
+  opacity: 1;
+  vertical-align: super;
+  color: var(--text-clr3);
+}
+
+.displayNameParentMenuActive {
+  padding-left: 8px;
+  text-align: left;
+  font: bolder normal normal 15px/22px Open Sans;
+  letter-spacing: 0px;
+  opacity: 1;
+  vertical-align: super;
+  color: var(--text-clr4);
+}
+
+.pageCss {
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+.userStyle {
+  padding-left: 1em;
+  padding-right: 16px;
+  width: 102px;
+  height: 22px;
+  text-align: left;
+  font-size: 16px;
+  font-weight: bolder;
+  letter-spacing: 0px;
+  color: var(--text-clr);
+  opacity: 1;
+}
+
+.user {
+  position: relative;
+  bottom: -10px;
+  text-align: left;
+  padding-left: 10px;
+  padding-right: 16px;
+  font-size: 16px;
+  font-weight: bolder;
+  letter-spacing: 0px;
+}
+
+.role {
+  position: relative;
+  text-align: left;
+  padding-left: 10px;
+  padding-right: 16px;
+  font-size: 14px;
+  font-weight: normal;
+  letter-spacing: 0px;
+}
+
+.mat-drawer-content,
+.mat-sidenav-content {
+  background-color: var(--backgnd-clr16);
+}
+
+.app-toolbar {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.toolbar-left img {
+  width: 88px;
+  height: 30px;
+}
+
+.toolbar-right {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.theme-toggler {
+  width: 40%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 12px;
+}
+
+.toggler-icon {
+  width: auto !important;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  color: var(--toolbar-text-color);
+}
+
+.user-details-innerdiv {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.user-name {
+  font: normal normal bold 16px "Open Sans";
+  letter-spacing: 0px;
+  opacity: 1;
+  text-align: left;
+  text-transform: capitalize;
+}
+
+.user-role {
+  font: normal normal normal 14px "Open Sans";
+  letter-spacing: 0px;
+  opacity: 1;
+  text-align: left;
+}
+
+.backgnd {
+  background-color: var(--backgnd-clr14);
+}
+
+.mat-drawer {
+  background-color: var(--backgnd-clr15);
+  font-weight: bolder;
+  font-family: Open Sans;
+}
+
+.hiddenMenuLabel {
+  visibility: hidden;
+  width: 0px;
+}
+
+.contentsection {
+  overflow-y: auto;
+  height: 86vh;
+}
+
+.navItemImageForCollpases {
+ cursor: pointer;
+}
+
+.navItemImageForCollpasesWithoutlogout {
+  cursor: pointer;
+}
+
+.logSectionCss{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 12.5%;
+}

@@ -1,0 +1,174 @@
+<!--
+   *********************************************************************************
+   * Copyright 2022 Cognizant Technology Solutions
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+   * use this file except in compliance with the License.  You may obtain a copy
+   * of the License at
+   *
+   *   http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+   * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+   * License for the specific language governing permissions and limitations under
+   * the License.
+   *******************************************************************************-->
+
+<div>
+  <div class="titleStyle1">
+    <ul>
+      <li style="margin-left: -820px">KPI Details - {{ templateName }}</li>
+      <li (click)="closeShowDetailsDialog()">
+        <mat-icon
+          svgIcon="close_dialog"
+          style="
+            height: 11px !important;
+            width: 11px !important;
+            margin-right: 18px;
+          "
+        >
+        </mat-icon>
+      </li>
+    </ul>
+  </div>
+  <div style="margin-left: 15px; margin-top: 15px">
+    <div class="scrollData" style="width: 96%; margin-left: 10px">
+      <mat-dialog-content>
+        <table
+          mat-table
+          [dataSource]="kpiDatasource"
+          multiTemplateDataRows
+          matSort
+          style="width: 96%; margin-top: 10px; border: 1px solid #b9bbbc"
+        >
+          <ng-container matColumnDef="kpiId">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              class="dialogtableHeaderCss"
+              style="border: 1px solid #b9bbbc"
+            >
+              KPI ID
+            </th>
+            <td
+              mat-cell
+              *matCellDef="let element"
+              style="width: 10%; border: 1px solid #b9bbbc"
+            >
+              {{ element.kpiId }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="vType">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              class="dialogtableHeaderCss"
+              style="border: 1px solid #b9bbbc"
+            >
+              VTYPE
+            </th>
+            <td
+              mat-cell
+              *matCellDef="let element"
+              style="width: 20%; border: 1px solid #b9bbbc"
+            >
+              {{ element.vType }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="vQuery">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              class="dialogtableHeaderCss"
+              style="border: 1px solid #b9bbbc"
+            >
+              VQUERY
+            </th>
+            <td
+              mat-cell
+              *matCellDef="let element"
+              style="width: 0%; border: 1px solid #b9bbbc"
+            >
+              {{ element.vQuery }}
+            </td>
+          </ng-container>
+
+          <tr
+            mat-header-row
+            *matHeaderRowDef="displayedColumns"
+            class="dialogtableHeaderCss"
+          ></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+      </mat-dialog-content>
+    </div>
+    <div class="footer" style="margin-top: 0px; height: 80px">
+      <div class="logDetails" style="margin-right: 480px; margin-left: 12px">
+        Current Timezone: {{ timezone }}
+      </div>
+      <div class="paginator" style="margin-right: 40px">
+        <mat-paginator
+          style="visibility: hidden"
+          #paginator
+          [pageSize]="MAX_ROWS_PER_TABLE"
+        >
+        </mat-paginator>
+        <div
+          class="paginatorElement"
+          (click)="goToPrevPage()"
+          [attr.disabled]="!this.paginator.hasPreviousPage()"
+          [ngStyle]="
+            !this.paginator.hasPreviousPage() ? { cursor: 'not-allowed' } : ''
+          "
+        >
+          <mat-icon
+            svgIcon="prev-page"
+            class="pageIcons"
+            style="cursor: pointer"
+            *ngIf="this.paginator.hasPreviousPage()"
+            style="height: 24px !important; width: 24px !important"
+          >
+          </mat-icon>
+          <mat-icon
+            svgIcon="prev-page"
+            class="pageIcons disabled-icon"
+            *ngIf="!this.paginator.hasPreviousPage()"
+            style="height: 24px !important; width: 24px !important"
+          >
+          </mat-icon>
+        </div>
+        <div class="paginatorElement paginatorIndexElement">
+          {{ currentPageIndex }}
+        </div>
+        <div
+          class="paginatorElement"
+          (click)="goToNextPage()"
+          [attr.disabled]="!this.paginator.hasNextPage()"
+          [ngStyle]="
+            !this.paginator.hasNextPage() ? { cursor: 'not-allowed' } : ''
+          "
+        >
+          <mat-icon
+            svgIcon="next-page"
+            style="cursor: pointer"
+            class="pageIcons"
+            *ngIf="this.paginator.hasNextPage()"
+            style="height: 24px !important; width: 24px !important"
+          >
+          </mat-icon>
+          <mat-icon
+            svgIcon="next-page"
+            class="pageIcons disabled-icon"
+            *ngIf="!this.paginator.hasNextPage()"
+            style="height: 24px !important; width: 24px !important"
+          >
+          </mat-icon>
+        </div>
+        <div>of {{ totalPages }}</div>
+      </div>
+    </div>
+  </div>
+</div>

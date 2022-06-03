@@ -1,0 +1,249 @@
+<!--
+*******************************************************************************
+ * Copyright 2022 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+
+<div class="cardCss" style="height: 710px">
+  <div layout layout-align="left" class="main-section-title">
+    <div style="color: var(--text-clr1)">
+      <b
+        >Configuration |
+        <span class="blueTitleTxt" style="color: #2d67ff"
+          >KPI Configuration
+        </span></b
+      >
+    </div>
+  </div>
+  <div class="sectionHeadingStyle">
+    <span style="padding-top: 3px; margin-left: 3px">
+      <button
+        mat-icon-button
+        (click)="redirectToLandingPage()"
+        style="vertical-align: super"
+      >
+        <mat-icon svgIcon="backButton" matTooltip="Back"> </mat-icon>
+      </button>
+    </span>
+
+    <span class="alignSubHeader1" style="font-size: 14px"
+      ><b>KPI Configuration</b> (Configure a KPI)</span
+    >
+    <div class="btnAlign" style="margin-top: 0px">
+      <button mat-icon-button (click)="validateKpiData()">
+        <mat-icon
+          matTooltip="Save KPI Configuration"
+          svgIcon="save"
+          class="mat-icon material-icons"
+          style="color: #2d67ff"
+        >
+        </mat-icon>
+      </button>
+      <button mat-icon-button (click)="refreshData()">
+        <mat-icon
+          matTooltip="Reset"
+          class="mat-icon material-icons"
+          svgIcon="exit"
+        >
+        </mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="tableHeaderCss">
+    <span *ngIf="!onEdit" class="mainHeaderText"
+      >Add Configuration Details
+    </span>
+    <span *ngIf="onEdit" class="mainHeaderText"
+      >Edit Configuration Details
+    </span>
+    <span class="infoHeaderText"
+      >(Please provide accurate details.Fields marked "<span
+        class="asteriskText"
+        >*</span
+      >" are mandatory)
+    </span>
+  </div>
+  <div class="section-body">
+    <div class="two-grid-section">
+      <div class="grid-item">
+        <span class="lblText">KPI Id<span class="asteriskText">*</span> </span>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <input
+            matInput
+            type="number"
+            placeholder="Input a unique KPI id"
+            oninput="this.value.length> 7? this.value = this.value.slice(0,
+          this.maxLength):' ';"
+            id="kpiId"
+            [disabled]="onEdit"
+            [(ngModel)]="kpiId"
+            name="kpiId"
+            (keypress)="defaultStop($event)"
+          />
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item">
+        <div class="lblText">KPI Name<span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <input
+            matInput
+            maxlength="100"
+            type="text"
+            [(ngModel)]="kpiName"
+            name="kpiName"
+            placeholder="Input a logical name to make it simpler"
+            [ngClass]="{ 'input-disabled': onEdit }"
+            [disabled]="onEdit"
+          />
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item">
+        <div class="lblText">Tool<span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            required
+            [(ngModel)]="selectedTool"
+            name="selectedTool"
+            placeholder="Select Tool to configure KPI"
+            [disabled]="onEdit"
+            [ngClass]="{ 'input-disabled': onEdit }"
+          >
+            <mat-option *ngFor="let tool of toolsArr" value="{{ tool }}">
+              {{ tool }}</mat-option
+            >
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item">
+        <div class="lblText">Category<span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            required
+            [(ngModel)]="category"
+            name="category"
+            (selectionChange)="categorySelected($event.value)"
+            placeholder="Select Category"
+            [ngClass]="{ 'input-disabled': onEdit }"
+            [disabled]="onEdit"
+          >
+            <mat-option
+              *ngFor="let catDtl of categoryDetail"
+              value="{{ catDtl }}"
+            >
+              {{ catDtl }}
+            </mat-option>
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item">
+        <div class="lblText">
+          Result Field<span class="asteriskText">*</span>
+        </div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <input
+            matInput
+            maxlength="40"
+            type="text"
+            [(ngModel)]="resultField"
+            name="resultField"
+            [disabled]="isForecast"
+            [ngClass]="{ 'input-disabled': isForecast }"
+            placeholder="Enter a Result Field"
+          />
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item">
+        <div class="lblText">Group Name<span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <input
+            matInput
+            maxlength="40"
+            type="text"
+            [ngClass]="{ 'input-disabled': onEdit }"
+            [(ngModel)]="groupName"
+            name="groupName"
+            [disabled]="onEdit"
+            placeholder="Enter Group Name"
+          />
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item">
+        <div class="lblText">
+          Input DataSource<span class="asteriskText">*</span>
+        </div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            required
+            [(ngModel)]="dataSource"
+            name="dataSource"
+            placeholder="Select Input dataSource"
+          >
+            <mat-option
+              *ngFor="let data of dataSourceDetail"
+              value="{{ data }}"
+            >
+              {{ data }}
+            </mat-option>
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item">
+        <div class="lblText">
+          DB Query<span
+            class="asteriskText"
+            *ngIf="dataSource !== 'HYPERLEDGER'"
+            >*</span
+          >
+        </div>
+        <div class="text-area">
+          <mat-form-field appearance="fill" class="formfield-custom">
+            <textarea
+              matInput
+              [(ngModel)]="dbQuery"
+              name="dbQuery"
+              required
+              style="width: 100%; resize: vertical; height: 119px"
+              rows="10"
+            ></textarea>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

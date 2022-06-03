@@ -1,0 +1,162 @@
+<!--/*******************************************************************************
+ * Copyright 2021 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************-->
+<div class="cardCss">
+  <div layout layout-align="left" class="titleStyle">
+    <div>
+      <span class="main-section-title">Configuration | </span>
+      Workflow Task Management
+    </div>
+  </div>
+
+  <div class="sectionHeadingStyle">
+
+    <button
+        mat-icon-button
+        (click)="refresh()"
+        style="vertical-align: super"
+      >
+        <mat-icon svgIcon="backButton" matTooltip="Back"> </mat-icon>
+      </button>
+
+    <span class="alignSub" style="margin-left: 5px;"
+      ><b>Workflow Task</b> ( Add / Edit / Delete /Refresh - Workflow Task)
+    </span>
+
+    <span class="btnAlign">
+      <button mat-icon-button (click)="validateTaskDetails()">
+        <mat-icon svgIcon="save" matTooltip="Save Workflow Task"> </mat-icon>
+      </button>
+      <button mat-icon-button (click)="reset()">
+        <mat-icon svgIcon="exit" matTooltip="Reset"> </mat-icon>
+      </button>
+      <!-- <button mat-icon-button (click)="refresh()">
+        <mat-icon
+          svgIcon="homeBck"
+          matTooltip="Back To Workflow Task Management"
+        >
+        </mat-icon>
+      </button> -->
+    </span>
+  </div>
+
+  <div class="add-task-section">
+    <div class="title">
+      <span class="main-title">{{ feature }} workflow task details</span>
+      <span class="sub-title"
+        >(Please provide accurate details. Fields marked "<span
+          style="color: #ff0000"
+          >*</span
+        >" are mandatory)</span
+      >
+    </div>
+    <div class="section-body">
+      <div class="two-field-grid">
+        <div class="grid-item">
+          <label class="input-label" for="workflowType">
+            Workflow Type<span style="color: #ff0000">*</span>
+          </label>
+          <mat-form-field appearance="fill" class="formfield-custom">
+            <mat-select
+              [style.width.%]="100"
+              [disabled]="disableInputFields"
+              [(ngModel)]="workflowType"
+              required
+              placeholder="Select workflow type"
+              panelClass="custom-select-class"
+            >
+              <mat-option
+                *ngFor="let wType of workflowTypeList"
+                value="{{ wType }}"
+                class="optionsBckgnd"
+              >
+                {{ wType }}
+              </mat-option>
+            </mat-select>
+            <mat-icon
+              matSuffix
+              svgIcon="arrow-down"
+              class="arrow-icon"
+              style="width: 12px !important; height: 12px !important"
+            ></mat-icon>
+          </mat-form-field>
+        </div>
+        <div class="grid-item">
+          <label class="input-label" for="mqChannel">
+            MQ Channel Name<span style="color: #ff0000">*</span>
+          </label>
+          <mat-form-field appearance="fill" class="formfield-custom">
+            <input
+              matInput
+              maxlength="40"
+              [disabled]="disableInputFields"
+              [(ngModel)]="mqChannel"
+              type="text"
+              autocomplete="off"
+              placeholder="Enter MqChannel"
+            />
+          </mat-form-field>
+        </div>
+        <div class="grid-item">
+          <label class="input-label" for="description">
+            Description<span style="color: #ff0000">*</span>
+          </label>
+          <mat-form-field appearance="fill" class="formfield-custom">
+            <input
+              matInput
+              maxlength="40"
+              [(ngModel)]="description"
+              type="text"
+              autocomplete="off"
+              placeholder="Enter description"
+            />
+          </mat-form-field>
+        </div>
+
+        <div class="grid-item">
+          <label class="input-label">
+            Dependency<span style="color: #ff0000">*</span>
+          </label>
+          <mat-form-field appearance="fill" class="formfield-custom">
+            <input
+              matInput
+              [(ngModel)]="dependency"
+              type="text"
+              autocomplete="off"
+              placeholder="Enter dependency"
+            />
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="single-field-grid">
+        <div class="grid-item-textarea">
+          <label class="input-label" for="componentName">
+            Component Class Detail<span style="color: #ff0000">*</span>
+          </label>
+          <mat-form-field appearance="fill" class="formfield-custom">
+            <textarea
+              matInput
+              [(ngModel)]="componentName"
+              type="text"
+              autocomplete="off"
+              placeholder="Enter Component Class Detail"
+              rows="5"
+            ></textarea>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

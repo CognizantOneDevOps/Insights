@@ -100,21 +100,41 @@ public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandle
 	}
 	
 	private void updateErrorStateInArchivalRecord(JsonObject messageJson) {
-		if (messageJson.has(DataArchivalConstants.ARCHIVALNAME)) {
-			if (!messageJson.get(DataArchivalConstants.ARCHIVALNAME).getAsString().isEmpty()) {
-				if(messageJson.has(DataArchivalConstants.TASK) && "remove_container".equalsIgnoreCase(messageJson.get(DataArchivalConstants.TASK).getAsString())) {
-					dataArchivalConfigDal.updateArchivalStatus(messageJson.get(DataArchivalConstants.ARCHIVALNAME).getAsString(),
-							DataArchivalStatus.ERROR_REMOVE_CONTAINER.toString());
+		try {
+			if (messageJson.has(DataArchivalConstants.ARCHIVALNAME)) {
+				if (!messageJson.get(DataArchivalConstants.ARCHIVALNAME).getAsString().isEmpty()) {
+					if (messageJson.has(DataArchivalConstants.TASK) && "remove_container"
+							.equalsIgnoreCase(messageJson.get(DataArchivalConstants.TASK).getAsString())) {
+						dataArchivalConfigDal.updateArchivalStatus(
+								messageJson.get(DataArchivalConstants.ARCHIVALNAME).getAsString(),
+								DataArchivalStatus.ERROR_REMOVE_CONTAINER.toString());
+					} else {
+						dataArchivalConfigDal.updateArchivalStatus(
+								messageJson.get(DataArchivalConstants.ARCHIVALNAME).getAsString(),
+								DataArchivalStatus.ERROR.toString());
+					}
+					log.debug(
+							" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Updated Error state in Data Archival record.",
+							loggingInfo.get(AgentCommonConstant.TOOLNAME),
+							loggingInfo.get(AgentCommonConstant.CATEGORY), loggingInfo.get(AgentCommonConstant.AGENTID),
+							"-", loggingInfo.get(EngineConstants.EXECID));
 				} else {
-					dataArchivalConfigDal.updateArchivalStatus(messageJson.get(DataArchivalConstants.ARCHIVALNAME).getAsString(),
-							DataArchivalStatus.ERROR.toString());
+					log.error(" toolName={} category={} agentId={} execId={} Archival name not provided",
+							loggingInfo.get(AgentCommonConstant.TOOLNAME),
+							loggingInfo.get(AgentCommonConstant.CATEGORY), loggingInfo.get(AgentCommonConstant.AGENTID),
+							loggingInfo.get(EngineConstants.EXECID));
 				}
-				log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Updated Error state in Data Archival record.",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),"-",loggingInfo.get(EngineConstants.EXECID));
 			} else {
-				log.error(" toolName={} category={} agentId={} execId={} Archival name not provided",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),loggingInfo.get(EngineConstants.EXECID));
+				log.error(" toolName={} category={} agentId={} execId={} Archival name property not present in message",
+						loggingInfo.get(AgentCommonConstant.TOOLNAME), loggingInfo.get(AgentCommonConstant.CATEGORY),
+						loggingInfo.get(AgentCommonConstant.AGENTID), loggingInfo.get(EngineConstants.EXECID));
 			}
-		} else {
-			log.error(" toolName={} category={} agentId={} execId={} Archival name property not present in message",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),loggingInfo.get(EngineConstants.EXECID));
+		} catch (Exception e) {
+			log.error(
+					" toolName={} category={} agentId={} execId={} Error occured in Data Archival Health Subscriber.Health message: {}",
+					loggingInfo.get(AgentCommonConstant.TOOLNAME), loggingInfo.get(AgentCommonConstant.CATEGORY),
+					loggingInfo.get(AgentCommonConstant.AGENTID), loggingInfo.get(EngineConstants.EXECID),
+					e.getMessage(), e);
 		}
 	}
 	private void createHealthNodes(List<JsonObject> dataList, String agentId, String nodeLabels, int nodeCount,

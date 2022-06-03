@@ -1,0 +1,20 @@
+<svg id="Light_Toggle_Button" data-name="Light Toggle Button" xmlns="http://www.w3.org/2000/svg" width="59" height="24" viewBox="0 0 59 24">
+  <g id="Group_37991" data-name="Group 37991" transform="translate(1263 474) rotate(180)">
+    <path id="Union_2" data-name="Union 2" d="M46.932,24H12.068a12,12,0,1,1,0-24H46.932a12,12,0,1,1,0,24Z" transform="translate(1204 450)" fill="#d9d9d9" opacity="0.995"/>
+    <text id="Light" transform="translate(1236 458) rotate(-180)" font-size="10" font-family="OpenSans, Open Sans"><tspan x="0" y="0">Light</tspan></text>
+    <g id="Group_38161" data-name="Group 38161">
+      <circle id="Ellipse_19" data-name="Ellipse 19" cx="10" cy="10" r="10" transform="translate(1241 452)" fill="#fff"/>
+      <g id="noun-brightness-2018251" transform="translate(1326.388 467.389) rotate(180)">
+        <path id="Path_16467" data-name="Path 16467" d="M336,0h.6V1.788H336Z" transform="translate(-260.91)"/>
+        <path id="Path_16468" data-name="Path 16468" d="M546,266.47h1.788v.6H546Z" transform="translate(-467.012 -261.371)"/>
+        <path id="Path_16469" data-name="Path 16469" d="M70,266.47h1.788v.6H70Z" transform="translate(0 -261.371)"/>
+        <path id="Path_16470" data-name="Path 16470" d="M336,476h.6v1.788H336Z" transform="translate(-260.91 -467.011)"/>
+        <path id="Path_16471" data-name="Path 16471" d="M478.7,73.376l1.264-1.264.421.421L479.121,73.8Z" transform="translate(-401.144 -70.577)"/>
+        <path id="Path_16472" data-name="Path 16472" d="M478.36,409.444l.421-.421,1.264,1.264-.421.421Z" transform="translate(-400.811 -401.46)"/>
+        <path id="Path_16473" data-name="Path 16473" d="M141.78,72.862l.421-.421,1.264,1.264-.421.421Z" transform="translate(-70.252 -70.899)"/>
+        <path id="Path_16474" data-name="Path 16474" d="M142.11,409.959l1.264-1.264.421.421-1.264,1.264Z" transform="translate(-70.575 -401.139)"/>
+        <path id="Path_16475" data-name="Path 16475" d="M194.934,122.635a2.3,2.3,0,1,1-1.621.673,2.293,2.293,0,0,1,1.621-.673m0-.495a2.788,2.788,0,1,0,1.972.817A2.788,2.788,0,0,0,194.934,122.14Z" transform="translate(-119.546 -119.54)"/>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -25,14 +25,13 @@ echo -n "Nexus(userName):"
 read userName
 echo "Nexus credential:"
 read -s credential
-sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/postgres/postgres_dependencies.zip
-sudo unzip postgres_dependencies.zip && cd postgres_dependencies
-sudo rpm -ivh *.rpm
+sudo rpm -Uvh http://yum.postgresql.org/9.5/redhat/rhel-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+sudo yum install -y postgresql95-server postgresql95
 sudo /usr/pgsql-9.5/bin/postgresql95-setup initdb
 sudo systemctl enable postgresql-9.5.service
 sudo chkconfig postgresql-9.5 on
-sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/postgres/pg_hba.conf
-sudo cp pg_hba.conf /var/lib/pgsql/9.5/data/pg_hba.conf
+sudo sed -i  '/^host / s/peer/trust/' /var/lib/pgsql/9.5/data/pg_hba.conf
+sudo sed -i  '/^local / s/peer/trust/' /var/lib/pgsql/9.5/data/pg_hba.conf
 sudo systemctl start  postgresql-9.5.service
 sudo useradd grafana
 echo "Native system user 'grafana' is created. Need to set password for 'grafana' user."

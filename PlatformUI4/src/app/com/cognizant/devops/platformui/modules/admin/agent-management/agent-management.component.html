@@ -1,0 +1,322 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div class="cardCss">
+  <div layout layout-align="left" class="titleStyle">
+    <div>
+      <span class="main-section-title">Configuration | </span>
+      Agent Management
+    </div>
+  </div>
+
+  <div class="sectionHeadingStyle">
+    <span class="alignSub"
+      ><b>Agent List</b> (Add / Change Status / Edit / Delete Agents)
+    </span>
+
+    <span class="btnAlign">
+      <button mat-icon-button (click)="showAgentDownloadDialog()">
+        <mat-icon matTooltip="Download agent package" svgIcon="download">
+        </mat-icon>
+      </button>
+      <button mat-icon-button (click)="addAgentData()">
+        <mat-icon matTooltip="Add Agent" svgIcon="add"> </mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        [disabled]="buttonDisableStatus"
+        (click)="editAgent()"
+      >
+        <mat-icon matTooltip="Edit " svgIcon="edit"> </mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        (click)="agentStartStopAction('START')"
+        [disabled]="runDisableStatus == 'START' || runDisableStatus == ''"
+      >
+        <mat-icon matTooltip=" Start " svgIcon="play"> </mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        (click)="agentStartStopAction('STOP')"
+        [disabled]="runDisableStatus == 'STOP' || runDisableStatus == ''"
+      >
+        <mat-icon matTooltip="Stop " svgIcon="stop"> </mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        [disabled]="isCopyLinkDisabled"
+        (click)="copyInputMessage(selectedAgent)"
+      >
+        <mat-icon
+          matTooltip="Copy the Webhook Url to Clipboard"
+          svgIcon="webhookCopyClipboard"
+        >
+        </mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        [disabled]="runDisableStatus != 'STOP'"
+        (click)="uninstallAgent()"
+      >
+        <mat-icon matTooltip="Delete " svgIcon="trash"> </mat-icon>
+      </button>
+    </span>
+  </div>
+
+  <div class="select-tool">
+    <h4 class="input-label">Tool</h4>
+    <mat-form-field appearance="fill" class="formfield-custom">
+      <mat-select
+        [(ngModel)]="selectTool"
+        (ngModelChange)="selectToolAgent(selectTool)"
+        name="selectTool"
+        [style.width.%]="100"
+        placeholder="Select Tool"
+      >
+        <mat-option
+          *ngFor="let data of agentNameList"
+          [value]="data"
+          class="optionsBckgnd"
+        >
+          {{ data }}
+        </mat-option>
+      </mat-select>
+      <mat-icon
+        matSuffix
+        svgIcon="arrow-down"
+        class="arrow-icon"
+        style="width: 12px !important; height: 12px !important"
+      ></mat-icon>
+    </mat-form-field>
+  </div>
+
+  <div class="agent-table">
+    <table mat-table [dataSource]="agentListDatasource">
+      <mat-radio-group [(ngModel)]="selectedAgent" style="padding: 16px">
+        <!-- Radio Button Column -->
+
+        <ng-container matColumnDef="radio">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader"></th>
+          <td mat-cell *matCellDef="let element; let i = index">
+            <mat-radio-button
+              [value]="element"
+              (click)="statusEdit(element, i)"
+              style="margin-top: 10px !important"
+            >
+            </mat-radio-button>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="ToolName">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            Tool Name
+          </th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.toolName }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="ToolCategory">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            Tool Category
+          </th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.toolCategory }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="AgentKey">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            Instance ID
+          </th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.agentKey }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Type">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">Type</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.iswebhook ? "Webhook" : "Agent" }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="OS">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">OS</th>
+          <td mat-cell *matCellDef="let element">{{ element.osVersion }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="Version">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">Version</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.agentVersion }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Status">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">Status</th>
+          <td mat-cell *matCellDef="let element">
+            <div class="status-div">
+              <span>
+                {{ element.agentStatus }}
+              </span>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Time">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="tableHeader"
+            style="white-space: pre-wrap !important"
+          >
+            Last run time ({{ timeZoneAbbr }})
+          </th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.lastRunTime | date: "yyyy-MM-dd
+            HH:mm:ss" }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="CurrentStatus">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="tableHeader"
+            style="white-space: pre-wrap !important"
+          >
+            Current State
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            style="text-align: center; padding: 0 10px"
+          >
+            <mat-icon
+              svgIcon="success_status"
+              *ngIf="element.healthStatus == 'success'"
+              matTooltip="Success"
+            >
+            </mat-icon>
+            <mat-icon
+              svgIcon="failure_status"
+              *ngIf="element.healthStatus == 'failure'"
+              matTooltip="Failure"
+              class="failure-icon"
+            >
+            </mat-icon>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Details">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">Details</th>
+          <td mat-cell *matCellDef="let element; let i = index">
+            <button
+              mat-icon-button
+              (click)="
+                showDetailsDialog(
+                  element.toolName,
+                  element.toolCategory,
+                  element.agentKey
+                )
+              "
+              [disabled]="selectedIndex != i + currentPageValue"
+            >
+              <mat-icon
+                svgIcon="healthcheck_show_details"
+                matTooltip="View Details"
+                style="margin-bottom: 10px !important"
+              >
+              </mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </mat-radio-group>
+    </table>
+  </div>
+  <div class="footer">
+    <!-- <mat-paginator (page)="changeCurrentPageValue()" #paginator [pageSize]="MAX_ROWS_PER_TABLE" showFirstLastButtons
+      class="">
+    </mat-paginator> -->
+    <div class="paginator">
+      <mat-paginator
+        style="visibility: hidden"
+        #paginator
+        [pageSize]="MAX_ROWS_PER_TABLE"
+      >
+      </mat-paginator>
+      <div
+        class="paginatorElement"
+        (click)="goToPrevPage()"
+        [attr.disabled]="!this.paginator.hasPreviousPage()"
+        [ngStyle]="
+          !this.paginator.hasPreviousPage() ? { cursor: 'not-allowed' } : ''
+        "
+      >
+        <mat-icon
+          svgIcon="prev-page"
+          matTooltip="Previous Page"
+          class="pageIcons"
+          *ngIf="this.paginator.hasPreviousPage()"
+          style="height: 24px !important; width: 24px !important"
+        >
+        </mat-icon>
+        <mat-icon
+          svgIcon="prev-page"
+          matTooltip="Previous Page"
+          class="pageIcons disabled-icon"
+          *ngIf="!this.paginator.hasPreviousPage()"
+          style="height: 24px !important; width: 24px !important"
+        >
+        </mat-icon>
+      </div>
+      <div class="paginatorElement paginatorIndexElement">
+        {{ currentPageIndex }}
+      </div>
+      <div
+        class="paginatorElement"
+        (click)="goToNextPage()"
+        [attr.disabled]="!this.paginator.hasNextPage()"
+        [ngStyle]="
+          !this.paginator.hasNextPage() ? { cursor: 'not-allowed' } : ''
+        "
+      >
+        <mat-icon
+          svgIcon="next-page"
+          matTooltip="Next Page"
+          class="pageIcons"
+          *ngIf="this.paginator.hasNextPage()"
+          style="height: 24px !important; width: 24px !important"
+        >
+        </mat-icon>
+        <mat-icon
+          svgIcon="next-page"
+          matTooltip="Next Page"
+          class="pageIcons disabled-icon"
+          *ngIf="!this.paginator.hasNextPage()"
+          style="height: 24px !important; width: 24px !important"
+        >
+        </mat-icon>
+      </div>
+      <div>of {{ totalPages }}</div>
+    </div>
+  </div>
+</div>

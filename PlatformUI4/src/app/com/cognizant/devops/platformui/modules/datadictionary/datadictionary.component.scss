@@ -1,0 +1,136 @@
+/*
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *******************************************************************************/
+
+.divTablesHeading {
+    font-size: 14px;
+    margin-top: 10px;
+    margin-bottom: 6px;
+    text-align: left;
+    width: 100%;
+    padding-left: 15px;
+}
+
+.dat-row {
+    height: 30px !important;
+    text-align: left !important;
+    vertical-align: middle;
+    color: var(--text-clr3);
+}
+
+.dropdownOuterDiv {
+    margin-top: 10px;
+    border: 1px solid var(--brdr-clr);
+    background-color: var(--backgnd-clr10);
+}
+
+.dropdownInnerDiv {
+    margin-left: 16px;
+    margin-top: 12px;
+    margin-bottom: 16px;
+}
+
+.correlationTbl {
+    margin-bottom: 1%;
+    border: 1px solid var(--brdr-clr);
+    height: 55.5vh;
+    margin-top: 1%;
+    background-color: var(--backgnd-clr10);
+}
+
+.property {
+    float: left;
+}
+
+.agentProperty {
+    color: var(--text-clr4);
+    font-size: 14px;
+}
+
+.lblProperty {
+    color: var(--backgnd-clr5);
+    font-size: 12px;
+    color: var(--text-clr9);
+}
+
+.lblNoProperty {
+    color: var(--backgnd-clr5);
+    font-size: 12px;
+    color: var(--text-clr9);
+}
+
+.relationNames {
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.propertyInnerDiv {
+    width: 90%;
+    display: inline-block;
+    margin-left: 16px;
+    margin-top: 16px;
+    vertical-align: top;
+    padding-right: 0px;
+    border: 1px solid var(--brdr-clr);
+}
+
+.col2InnerDiv {
+    border: 1px solid var(--brdr-clr);
+    margin: 16px;
+    height: 44vh;
+}
+
+.column1 {
+    float: left;
+    width: 59%;
+    overflow: hidden;
+}
+
+.column2 {
+    float: right;
+    width: 39%;
+    overflow: hidden;
+}
+
+.mat-form-field-appearance-fill .mat-form-field-infix {
+    width: 210px;
+}
+
+.formfield-custom {
+    width: 210px;
+}
+
+.mat-form-field.mat-focused .mat-form-field-underline {
+    display: none !important;
+}
+
+
+.mat-select-panel {
+    min-width: auto !important;
+    max-width: none !important;
+    width: 210px !important;
+}
+
+::ng-deep .mat-cell .mat-header-cell {
+    border-right: none !important;
+}
+
+.rightAlign {
+    margin-top: 1%;
+    display: flex;
+    justify-content: right;
+    margin: 0 15px 10px 0;
+}

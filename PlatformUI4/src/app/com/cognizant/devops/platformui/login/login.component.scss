@@ -1,0 +1,224 @@
+/*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+
+.login-box {
+  margin-top: 6%;
+  margin-left: 2%;
+  height: auto;
+  background: #ffff;
+  text-align: center;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  border-radius: 16px;
+  font-style: Open sans;
+}
+
+.container-bg {
+  background: #00389d;
+}
+
+.clientLogo {
+  text-align: center;
+  padding-top: 36px;
+  padding-left: 155px;
+}
+
+.welcome {
+  padding-left: 10px;
+  padding-top: 30px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0px;
+  color: #404040;
+}
+
+.sign {
+  font-size: 16px;
+  font-weight: bolder;
+  text-align: center;
+  font: normal;
+  font-family: Open Sans;
+  letter-spacing: 0px;
+  color: #00389d;
+  opacity: 1;
+  padding-top: 16px;
+  padding-left: 90px;
+  padding-bottom: 25px;
+}
+
+.loading-indicator {
+  position: fixed;
+  z-index: 999;
+  height: 2em;
+  width: 2em;
+  overflow: show;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+.copyRightCss {
+  color: #fff;
+  font-size: 12px;
+  margin-left: 7em;
+  text-align: center;
+}
+
+.inputCss {
+  padding-left: 59px;
+  padding-bottom: 20px;
+}
+
+.loginCss {
+  text-align: center;
+  margin-left: 50px;
+}
+
+.md-button.md-raised:not([disabled]) {
+  box-shadow: 0 0px 0px 0 rgba(0, 0, 0, 0);
+}
+
+.disableIcon {
+  margin: 0 !important;
+  right: 0px !important;
+  left: 0px !important;
+}
+
+.wrnTxt {
+  color: #ff8f1c !important;
+  font-size: 13px !important;
+}
+
+.errTxt {
+  text-align: center;
+  color: #ff8f1c !important;
+  font-size: 16px !important;
+  padding-left: 124px;
+  padding-bottom: 10px;
+  padding-top: 16px;
+}
+
+.containerMargin {
+  margin: 0px 0 !important;
+  width: 300px;
+}
+
+.copyRightDivCss {
+  margin-top: 1%;
+  margin-left: 15em;
+}
+
+.loginFormField {
+  width: 295px;
+  font-size: larger;
+}
+.loginPadd {
+  .mat-form-field-appearance-fill .mat-form-field-flex {
+    border-radius: 4px 4px 0 0;
+    padding: 0.75em 0.75em 0 0 !important;
+  }
+}
+.mat-form-field.mat-focused .mat-form-field-underline {
+  background-color: #2d67ff !important;
+}
+
+.mat-form-field.mat-focused .mat-form-field-ripple {
+  background-color: #2d67ff !important;
+}
+
+.mat-form-field-appearance-legacy .mat-form-field-underline {
+  color: #afafaf !important;
+}
+
+.eyeCss {
+  color: #404040;
+  height: 13px;
+  width: 20px;
+}
+
+.mat-form-field-appearance-fill .mat-form-field-infix {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px white inset !important;
+}
+
+.mat-toolbar-single-row {
+  display: block !important;
+  height: 72px !important;
+}
+
+.inputIcons > svg {
+  vertical-align: super !important;
+}
+
+.button:default {
+  font: bold 14px/19px "Open Sans";
+  width: 140px !important;
+  height: 40px !important;
+  border: none !important;
+  border-radius: 0 !important;
+  cursor: pointer;
+  background-color: #2d67ff !important;
+  color: #ffffff !important;
+}
+
+.button:active {
+  background-color: #2d67ff !important;
+  color: #ffffff !important;
+}
+
+.button:hover {
+  background-color: #328dff !important;
+  color: #000063 !important;
+}
+
+.button:disabled {
+  background-color: #d9d9d9 !important;
+  color: var(--btnDisabled) !important;
+}
+.mat-form-field-label {
+  color: #6c6c6f !important;
+}
+.mat-form-field.mat-form-field-invalid .mat-form-field-label {
+  color: #f13a33 !important;
+  text-align: left;
+  letter-spacing: 0px;
+  opacity: 1;
+}
+.mat-form-field.mat-form-field-invalid .mat-form-field-required-marker {
+  color: red !important;
+}
+
+.mat-form-field .mat-form-field-required-marker {
+  color: #6c6c6f !important;
+}
+
+.mat-form-field-appearance-fill .mat-form-field-underline::before {
+  content: "";
+  display: block;
+  position: absolute;
+  bottom: 0;
+  height: 1px;
+  width: 100%;
+}

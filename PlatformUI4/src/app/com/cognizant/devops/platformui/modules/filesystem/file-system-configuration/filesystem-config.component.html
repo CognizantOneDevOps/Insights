@@ -1,0 +1,123 @@
+<!-- /*******************************************************************************
+ * Copyright 2020 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/ -->
+
+<div class="cardCss">
+    <div class="alignElements">
+        <div layout layout-align="left" class="titleStyle">
+            <span class="main-section-title">Configuration | </span>
+            File Management
+        </div>
+        <div class="sectionHeadingStyle">
+            <span style="padding-top: 3px;margin-left: 3px;">
+                <button mat-icon-button (click)="refresh()" style="vertical-align: super;">
+                    <mat-icon matTooltip="Back To Home Page" svgIcon="backButton">
+                    </mat-icon>
+                </button>
+            </span>
+            <span class="alignSubWithbackBtn"><b> Upload File</b> (Configure a Webhook)</span>
+            <span class="btnAlign">
+                <button mat-icon-button (click)="validateAndUpload()">
+                    <mat-icon matTooltip="Save Configuration File" svgIcon="save">
+                    </mat-icon>
+                </button>
+                <button mat-icon-button (click)="reset()">
+                    <mat-icon matTooltip="Reset" svgIcon="exit">
+                    </mat-icon>
+                </button>
+            </span>
+        </div>
+
+        <div class="tableHeaderCss">
+            <span *ngIf="!isEdit" class="mainHeaderText">Add file details and upload</span>
+            <span *ngIf="isEdit" class="mainHeaderText">Edit screen. Upload a File</span>
+            <span *ngIf="!isEdit" class="infoHeaderText">(Please provide accurate details.
+                Fields marked "<span class="required">*</span>" are mandatory)
+            </span>
+        </div>
+        <div class="add-agent-section borderOnly">
+            <div class="add-agent-section-body add-agent-section-body-dimensions"
+                style="background-color: var(--backgnd-clr10)">
+                <div class="agent-categories-grid">
+                    <div class="agent-category-grid-item">
+                        <span class="input-label">Name<span class="required">*</span></span>
+                        <div class="field-category input">
+                            <mat-form-field appearance="fill" class="formfield-custom">
+                                <input matInput maxlength="40" [disabled]="disableInputFields" [(ngModel)]="fileName"
+                                    type="text" autocomplete="off" placeholder="Enter file name" name="Name"
+                                    class="inputColCss">
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="agent-category-grid-item">
+                        <span class="input-label">File Type<span class="required">*</span></span>
+                        <div class="input">
+                            <mat-form-field appearance="fill" class="formfield-custom">
+                                <mat-select placeholder="Select file type" [(ngModel)]="fileType"
+                                    [disabled]="disableInputFields">
+                                    <mat-option *ngFor="let type of fileTypeList" value="{{type}}"
+                                        class="optionsBckgnd">
+                                        {{type}}</mat-option>
+                                </mat-select>
+                                <mat-icon matSuffix svgIcon="arrow-down" class="arrow-icon iconDimension">
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="agent-category-grid-item">
+                        <span class="input-label">Module<span class="required">*</span></span>
+                        <div class="input">
+                            <mat-form-field appearance="fill" class="formfield-custom">
+                                <mat-select [(ngModel)]="module" required placeholder="Select file module"
+                                    [disabled]="disableInputFields">
+                                    <mat-option *ngFor="let module of fileModuleList" value="{{module}}"
+                                        class="optionsBckgnd">
+                                        {{module}}</mat-option>
+                                </mat-select>
+                                <mat-icon matSuffix svgIcon="arrow-down" class="arrow-icon iconDimension">
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="agent-category-grid-item" style="grid-template-columns: 100%;">
+                        <span class="input-label">Upload File<span class="required">*</span></span>
+                        <div class="input">
+                            <div class="file-upload">
+                                <button mat-button class="button" (click)="fileUpload.click()">Choose File
+                                </button>
+                            </div>
+                            <br>
+                            <div class="borderOnly">
+                                <div
+                                    style="display: flex; justify-content: space-between;padding: 5px 15px;background-color: var(--backgnd-clr11);">
+                                    <div class="flexDisplay">
+                                        {{fileName2 || "No file uploaded yet."}}
+                                    </div>
+                                    <div class="flexDisplay">
+                                        <button mat-icon-button (click)="cancelUpload()" class="iconStyle">
+                                            <mat-icon matTooltip="Cancel" svgIcon="cross"></mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <input hidden type="file" id="file" class="file-input" (change)="onFileChanged($event)"
+                                #fileUpload>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

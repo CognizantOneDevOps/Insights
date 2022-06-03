@@ -16,21 +16,20 @@
 #-------------------------------------------------------------------------------
 echo "#################### Installing Tomcat ####################"
 cd /opt
-echo -n "Nexus(userName):"
-read userName
-echo "Nexus credential:"
-read -s credential
-sudo wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformUI3.zip -O PlatformUI3.zip
+echo -n "Enter Release Version: " 
+read releaseVersion
+sudo wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${releaseVersion}/PlatformUI3-${releaseVersion}.zip -O PlatformUI3.zip
 sudo unzip PlatformUI3.zip && sudo rm -rf PlatformUI3.zip
-sudo wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformService.war -O PlatformService.war
-sudo wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/tomcat/apache-tomcat.tar.gz
+sudo wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${releaseVersion}/PlatformService-${releaseVersion}.war -O PlatformService.war
+sudo wget --no-check-certificate https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.63/bin/apache-tomcat-9.0.63.tar.gz
 sudo tar -zxvf apache-tomcat.tar.gz
+sudo mv apache-tomcat-9.0.63 apache-tomcat
 sudo cp -R ./app /opt/apache-tomcat/webapps
 sudo cp PlatformService.war /opt/apache-tomcat/webapps
 sudo rm -rf PlatformService.war
 cd apache-tomcat
 sudo chmod -R 777 /opt/apache-tomcat
 cd /etc/systemd/system
-sudo wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/tomcat/Tomcat.service
+sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/UBUNTU/Tomcat.service
 sudo systemctl enable Tomcat.service
 sudo systemctl start Tomcat

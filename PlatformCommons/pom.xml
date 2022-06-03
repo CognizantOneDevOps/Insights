@@ -12,14 +12,14 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>9.4</version>
+		<version>9.5</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformCommons</artifactId>
-	<version>9.4</version>
+	<version>9.5</version>
 	<packaging>jar</packaging>
 
 	<name>PlatformCommons</name>
@@ -137,7 +137,7 @@
 									<directory>${project.basedir}/../</directory>
 									<filtering>true</filtering>
 									<includes>
-										<include>OneDevOpInsights*.pdf</include>
+										<include>IPR_OneDevOps*.pdf</include>
 									</includes>
 								</resource>
 							</resources>
@@ -160,7 +160,7 @@
 									<directory>${project.basedir}/target/</directory>
 									<filtering>true</filtering>
 									<includes>
-										<include>OneDevOpInsights*.pdf</include>
+										<include>IPR_OneDevOps*.pdf</include>
 									</includes>
 								</resource>
 							</resources>

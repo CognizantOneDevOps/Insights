@@ -1,0 +1,252 @@
+/*
+*******************************************************************************
+ * Copyright 2020 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *******************************************************************************/
+
+table,
+mat-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.columnComponent {
+  width: 85%;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.mat-cell {
+  font-size: 14px;
+  height: 40px;
+  text-align: left;
+  font-family: inherit;
+}
+
+tr.mat-footer-row,
+tr.mat-row-webhook {
+  height: 45px !important;
+  text-align: left !important;
+  vertical-align: middle;
+  padding-right: 65px !important;
+  padding-left: 65px !important;
+}
+
+.mat-row-webhook:nth-child(even) {
+  background-color: #e1e3e7;
+}
+
+.mat-row-webhook:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+.btnAlign {
+  margin-right: 7px;
+  float: right;
+}
+
+.mainHeaderText {
+  font-size: 15px;
+  color: white;
+}
+
+td.mat-cell:first-of-type {
+  padding-left: 24px !important;
+}
+
+td.mat-cell:last-of-type {
+  padding-left: 15px !important;
+  padding-right: 0px !important;
+}
+
+tr.mat-header-row {
+  height: 40px;
+}
+
+td.mat-cell {
+  border-bottom-width: 0px;
+  border-bottom-style: none;
+}
+
+.mat-header-cell {
+  padding: 0 10px 0 10px;
+  font: normal normal normal 14px "Open Sans";
+  white-space: nowrap;
+}
+
+.column1 {
+  float: left;
+  width: 50%;
+  box-shadow: 0 2px 2px -3px rgba(0, 0, 0, 0.2),
+    0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  -o-box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  margin-bottom: 1%;
+  border: 1px solid var(--bg-color-dis);
+  border-radius: 0px;
+  background: var(--bg-test);
+  height: 74vh;
+}
+
+.column2 {
+  float: right;
+  width: 48%;
+  box-shadow: 0 2px 2px -3px rgba(0, 0, 0, 0.2),
+    0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  -o-box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  margin-bottom: 1%;
+  margin-right: 1px;
+  border-radius: 0px;
+  background: var(--bg-test);
+  height: 74vh;
+  border: 1px solid var(--bg-color-dis);
+}
+
+.showTable {
+  background-color: var(--backgnd-clr7);
+  color: white;
+  text-align: left;
+  padding: 5px;
+  height: 40px;
+  font-size: 14px;
+}
+
+.detailHeaderCss {
+  background: var(--backgnd-clr10);
+  color: var(--text-clr);
+  font-size: 16px;
+  height: 30px;
+  margin: 0px;
+  flex: 0 0 10px;
+  text-align: left;
+  border-radius: 0px;
+  font-weight: bolder;
+}
+
+.loading-indicator {
+  position: fixed;
+  z-index: 999;
+  height: 2em;
+  width: 2em;
+  overflow: show;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+.whiteButton1 {
+  background-color: var(--backgnd-clr10) !important;
+  color: var(--backgnd-clr18) !important;
+  border: 1px solid var(--text-clr6) !important;
+}
+
+.alignSubHeader1 {
+  display: inline-block;
+  padding-top: 19px;
+  padding-left: 5px;
+}
+
+.asteriskText {
+  color: #ff0000;
+}
+
+.section-body {
+  padding: 24px 0 0 25px;
+  border: 1px solid var(--bg-color-dis);
+  height: 230px;
+  background: var(--bg-test);
+}
+
+.two-grid-section {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  row-gap: 24px;
+}
+
+.grid-item {
+  width: 85%;
+  display: flex;
+  flex-direction: column;
+  font: normal normal normal 14px/24px "Open Sans";
+}
+
+.mainHeaderText {
+  font-size: 15px;
+  color: white;
+}
+
+.infoHeaderText {
+  font-size: 12px;
+  color: white;
+  padding-left: 205px;
+}
+
+.tableHeaderCss {
+  background-color: var(--backgnd-clr7);
+  color: white;
+  font-size: 14px;
+  margin: 0px;
+  flex: 0 0 10px;
+  text-align: left;
+  margin-top: 16px;
+  height: 40px;
+  padding-top: 10px;
+  padding-left: 22px;
+}
+
+.text-area {
+  ::ng-deep .mat-form-field-appearance-fill .mat-form-field-flex {
+    height: 100%;
+  }
+}
+
+.formfield-custom {
+  width: 85%;
+}
+
+.footer {
+  justify-content: flex-end;
+}
+
+.button {
+  font: bold 14px/19px "Open Sans";
+  width: 106px !important;
+  height: 40px !important;
+  border: none !important;
+  border-radius: 0 !important;
+  cursor: pointer;
+  background-color: var(--backgnd-clr1) !important;
+  color: var(--text-clr3) !important;
+  padding: 11px 16px;
+}
+
+:host ::ng-deep .mat-radio-container {
+  height: 12px;
+  width: 14px;
+}
+
+.task {
+  background: rgba(255, 255, 255, 0);
+  list-style: none;
+  padding: 8px;
+  border: var(--select-panel-border);
+  color: var(--text-clr) !important;
+  overflow: auto;
+  font: normal normal bold 16px/20px Open Sans;
+}
+
+.task:nth-child(odd) {
+  background-color: var(--tbl-odd-row);
+}

@@ -18,6 +18,7 @@ package com.cognizant.devops.platformdal.core;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import javax.persistence.PersistenceException;
@@ -29,6 +30,9 @@ import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.hibernate.type.Type;
+import org.owasp.esapi.ESAPI;
+import org.owasp.esapi.Validator;
+import org.owasp.esapi.reference.DefaultSecurityConfiguration;
 
 import com.cognizant.devops.platformdal.config.PlatformDALSessionFactoryProvider;
 
@@ -436,6 +440,24 @@ public class BaseDAL implements IBaseDAL {
 						+ "processingTime={} sourceProperty={} rows={} ",
 				stackTrace.getFileName(), stackTrace.getMethodName(), stackTrace.getLineNumber(),stacktraceService.getFileName(),stacktraceService.getMethodName(),stacktraceService.getLineNumber(), processingTime,
 				sourceProperty, rowCount);
+	}
+	
+	/** use to create ESAPI validator object 
+	 * @param startTime
+	 * @param sourceProperty
+	 * @param rowCount
+	 */
+	public Validator getESAPIValidator() {
+		Properties esapiProps = new Properties();
+		try {
+			esapiProps.load(getClass().getClassLoader().getResourceAsStream("ESAPI.properties"));
+
+		} catch (Exception e) {
+			logger.error(e);
+		}
+		ESAPI.override(new DefaultSecurityConfiguration(esapiProps));
+		Validator validate = ESAPI.validator();
+		return validate;
 	}
 
 }

@@ -1,0 +1,437 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div style="display: flex; justify-content: center; align-items: center">
+  <div class="loading-indicator">
+    <mat-progress-spinner
+      [diameter]="100"
+      *ngIf="showThrobber"
+      color="primary"
+      mode="indeterminate"
+    >
+    </mat-progress-spinner>
+  </div>
+</div>
+<div class="cardCss" *ngIf="showDashboards">
+  <div layout layout-align="left" class="titleStyle">
+    <div>{{ orgName }}</div>
+  </div>
+  <div style="margin-top: 2%">
+    <mat-form-field appearance="fill" class="columnComponent">
+      <input
+        matInput
+        placeholder="Search"
+        class="inputColCss"
+        (keyup)="applyFilter($event.target.value)"
+      />
+      <button
+        matSuffix
+        class="searchCss"
+        style="border: none; background: transparent"
+      >
+        <mat-icon
+          matTooltip="Search"
+          svgIcon="searchIcon"
+          style="height: 14px !important; width: 14px !important"
+        >
+        </mat-icon>
+      </button>
+    </mat-form-field>
+    <span style="float: right;">
+      <button
+        mat-icon-button
+        class="btnHgt"
+        (click)="gridListToggleLoad('list')"
+        id="listColor"
+      >
+        <mat-icon matTooltip="List View" svgIcon="list"> </mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        class="btnHgt"
+        (click)="gridListToggleLoad('grid')"
+        id="gridColor"
+      >
+        <mat-icon matTooltip="Grid View" svgIcon="thumb"> </mat-icon>
+      </button>
+    </span>
+  </div>
+  <div *ngIf="!isListView">
+    <table style="border: none">
+      <tr>
+        <td *ngIf="getDashboardList('recent').length > 0">
+          <div>
+            <mat-expansion-panel [expanded]="isExpand">
+              <mat-expansion-panel-header
+                class="specific-class"
+                style="background: #f2f2f2"
+              >
+                <mat-panel-title>
+                  <mat-icon class="iconColor" svgIcon="time-reverse"></mat-icon>
+                  <label class="mainText" style="margin-top: 1%">
+                    Recent Dashboards</label
+                  >
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <mat-grid-list
+                cols="4"
+                [rowHeight]="gridHeight"
+                [gutterSize]="gutter"
+                style="margin-top: 2%"
+              >
+                <mat-grid-tile
+                  *ngFor="let item of getDashboardList('recent')"
+                  [colspan]="1"
+                  [rowspan]="1"
+                  (click)="onRowClicked(item)"
+                >
+                  <mat-icon
+                    class="dashboardIcon"
+                    svgIcon="folder"
+                  ></mat-icon>
+                  <span id="labelText" class="dashboardLabelText">{{
+                    item.title
+                  }}</span>
+                </mat-grid-tile>
+              </mat-grid-list>
+            </mat-expansion-panel>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td *ngIf="getDashboardList('starred').length > 0">
+          <mat-expansion-panel [expanded]="isExpand">
+            <mat-expansion-panel-header
+              class="specific-class"
+              style="background: #f2f2f2"
+            >
+              <mat-panel-title>
+                <mat-icon svgIcon="star" class="iconColor"> </mat-icon>
+                <label class="mainText" style="margin-top: 1%">
+                  Favorite Dashboards</label
+                >
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <mat-grid-list
+              cols="4"
+              [rowHeight]="gridHeight"
+              [gutterSize]="gutter"
+              style="margin-top: 2%"
+            >
+              <mat-grid-tile
+                *ngFor="let item of getDashboardList('starred')"
+                (click)="onRowClicked(item)"
+              >
+                <mat-icon class="dashboardIcon" svgIcon="folder"></mat-icon>
+                <span id="labelText" class="dashboardLabelText">{{
+                  item.title
+                }}</span>
+              </mat-grid-tile>
+            </mat-grid-list>
+          </mat-expansion-panel>
+        </td>
+      </tr>
+      <tr *ngFor="let folder of getDashboardList('all') | keyvalue">
+        <td *ngIf="showAllDashbordKey(folder)">
+          <mat-expansion-panel [expanded]="isExpand">
+            <mat-expansion-panel-header
+              class="specific-class"
+              style="background: #f2f2f2"
+            >
+              <mat-panel-title>
+                <mat-icon svgIcon="folder" class="iconColor"> </mat-icon>
+                <label class="mainText" style="margin-top: 1.5%">
+                  {{ folder.key }}</label
+                >
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-grid-list
+              cols="4"
+              [rowHeight]="gridHeight"
+              [gutterSize]="gutter"
+              style="margin-top: 2%"
+            >
+              <mat-grid-tile
+                [style.width.px]="gridWidth"
+                *ngFor="let item of folder.value"
+                (click)="onRowClicked(item)"
+              >
+                <mat-icon class="dashboardIcon" svgIcon="folder"></mat-icon>
+                <span id="labelText" class="dashboardLabelText">{{
+                  item.title
+                }}</span>
+              </mat-grid-tile>
+            </mat-grid-list>
+          </mat-expansion-panel>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div *ngIf="isListView && !isFolderListEmpty">
+    <table style="border: none">
+      <tr>
+        <td *ngIf="getDashboardList('recent').length > 0">
+          <div>
+            <mat-expansion-panel [expanded]="isExpand">
+              <mat-expansion-panel-header
+                class="specific-class"
+                style="background: #f2f2f2"
+              >
+                <mat-panel-title>
+                  <mat-icon class="iconColor" svgIcon="time-reverse"></mat-icon>
+                  <label class="mainText" style="margin-top: 1%">
+                    Recent Dashboards</label
+                  >
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <mat-grid-list
+                cols="4"
+                [rowHeight]="gridHeight"
+                [gutterSize]="gutter"
+                style="margin-top: 2%"
+              >
+                <mat-grid-tile
+                  colspan="4"
+                  [style.width.px]="gridWidth"
+                  *ngFor="let item of getDashboardList('recent')"
+                  (click)="onRowClicked(item)"
+                >
+                  <figure class="mat-figure listView">
+                    <span id="labelText" class="dashboardLabelText">{{
+                      item.title
+                    }}</span>
+                  </figure>
+                </mat-grid-tile>
+              </mat-grid-list>
+            </mat-expansion-panel>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td *ngIf="getDashboardList('starred').length > 0">
+          <mat-expansion-panel [expanded]="isExpand">
+            <mat-expansion-panel-header
+              class="specific-class"
+              style="background: #f2f2f2"
+            >
+              <mat-panel-title>
+                <mat-icon
+                  svgIcon="star"
+                  class="iconColor"
+                  style="margin-bottom: 8px !important"
+                >
+                </mat-icon>
+                <label class="mainText" style="margin-top: 1%">
+                  Favorite Dashboards</label
+                >
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-grid-list
+              cols="4"
+              [rowHeight]="gridHeight"
+              [gutterSize]="gutter"
+              style="margin-top: 2%"
+            >
+              <mat-grid-tile
+                colspan="4"
+                [style.width.px]="gridWidth"
+                *ngFor="let item of getDashboardList('starred')"
+                (click)="onRowClicked(item)"
+              >
+                <figure class="mat-figure listView">
+                  <span id="labelText" class="dashboardLabelText">{{
+                    item.title
+                  }}</span>
+                </figure>
+              </mat-grid-tile>
+            </mat-grid-list>
+          </mat-expansion-panel>
+        </td>
+      </tr>
+      <tr *ngFor="let folder of getDashboardList('all') | keyvalue">
+        <td *ngIf="showAllDashbordKey(folder)">
+          <mat-expansion-panel [expanded]="isExpand">
+            <mat-expansion-panel-header
+              class="specific-class"
+              style="background: #f2f2f2"
+            >
+              <mat-panel-title>
+                <mat-icon svgIcon="folder" class="iconColor"> </mat-icon>
+                <label class="mainText" style="margin-top: 1.5%">
+                  {{ folder.key }}</label
+                >
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-grid-list
+              cols="4"
+              [rowHeight]="gridHeight"
+              [gutterSize]="gutter"
+              style="margin-top: 2%"
+            >
+              <mat-grid-tile
+                colspan="4"
+                [style.width.px]="gridWidth"
+                *ngFor="let item of folder.value"
+                (click)="onRowClicked(item)"
+                style="justify-content: left !important"
+                class="listView"
+              >
+                <figure class="mat-figure listView">
+                  <span id="labelText" class="dashboardLabelText">{{
+                    item.title
+                  }}</span>
+                </figure>
+              </mat-grid-tile>
+            </mat-grid-list>
+          </mat-expansion-panel>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+<div *ngIf="showLandingPage">
+  <div class="overflow1 cardCss">
+    <div [ngClass]="landingpageCss">
+      <div class="headerdiv" autosize="true">
+        <p style="margin-top: -40px; margin-left: 15px">
+          <span class="heading1"> Welcome to </span>
+          <span class="heading1"
+            >Cognizant<sup>®</sup> Cloud Acceleration Platform Insights</span
+          >
+        </p>
+      </div>
+      <div class="textcenter">
+        <p>
+          <span class="BlackCss">Leverage </span>
+          <span class="textCssSmall">Real-Time Dashboard </span>
+          <span class="BlackCss">for</span>
+          <span class="heading2"> Devops Journey. </span>
+          <span class="BlackCss">Achieve end-to-end </span>
+          <span class="textCssSmall">Traceability </span>
+          <span class="BlackCss">across the</span>
+          <span class="heading2"> Devops Lifecycle</span>
+        </p>
+      </div>
+
+      <div class="row">
+        <div
+          style="
+            font-size: 15px;
+            padding-left: 35px;
+            padding-top: 5px;
+          "
+        >
+          <b>What does Insights mean to you?</b>
+        </div>
+      </div>
+
+      <div style="margin-left: -48px">
+        <div class="table-responsive-sm">
+          <table class="table landing-home" style="margin-top: 10px !important">
+            <thead>
+              <tr>
+                <td>
+                  <!-- <button mat-icon-button>
+                      <mat-icon svgIcon="admin" >
+                      </mat-icon>
+                  </button> -->
+                  <img
+                    src="icons/svg/welcomePage/admin.svg"
+                    style="margin-left: 61px;color:var(--text-clr4);"
+                  />
+                  <b style="color:var(--text-clr4); font-size: 16px; margin-left: 11px"
+                    >For Admin and Powerusers</b
+                  >
+                </td>
+                <td>
+                  <img
+                    src="icons/svg/welcomePage/users.svg"
+                    style="color:var(--text-clr4);margin-left: -21px"
+                  />
+                  <b style="color:var(--text-clr4);font-size: 16px; margin-left: 7px">
+                    For Users and Editors</b
+                  >
+                </td>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td style="padding-left: 8.3%; padding-top: 20px">
+                  <span
+                    >Configure Agents for Collecting Data from DevOps
+                    tools</span
+                  >
+                </td>
+                <td style="padding-left: 2.3%; padding-top: 20px">
+                  <span>Create Dashboards and Panels for measuring KPI</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding-left: 8.3%; padding-top: 20px">
+                  <span
+                    >Create and Modify Access Groups and add Users to them</span
+                  >
+                </td>
+                <td style="padding-left: 2.3%; padding-top: 20px">
+                  <span
+                    >Create Playlists to display Dashboards in Round Robin</span
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td style="padding-left: 8.3%; padding-top: 20px">
+                  <span>Archive your data</span>
+                </td>
+                <td style="padding-left: 2.3%; padding-top: 20px">
+                  <span>Measure the overall Progress of DevOps Maturity</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding-left: 8.3%; padding-top: 20px">
+                  <span
+                    >Monitor the status of the Various Components in
+                    Insights</span
+                  >
+                </td>
+                <td style="padding-left: 2.3%; padding-top: 20px">
+                  <span>Life of a Code - Know where your code is</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding-left: 8.3%; padding-top: 20px">
+                  <span
+                    >Get real time notifications by integrating with
+                    Communication Channels</span
+                  >
+                </td>
+                <td style="padding-left: 2.3%; padding-top: 20px">
+                  <span>Search and Download Reports for Auditing</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="bottomgreencode" style="border-top: 1px solid #e1e1d8">
+        <br />
+        For more information - please refer to our detailed help section.
+      </div>
+    </div>
+  </div>
+</div>

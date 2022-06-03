@@ -1,0 +1,110 @@
+/********************************************************************************
+ * Copyright 2022 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License. */
+
+table {
+  width: 100%;
+  overflow: scroll;
+}
+
+tr:nth-child(odd) td {
+  background-color: #ffffff;
+}
+
+tr:nth-child(even) td {
+  background-color: #e1e3e7;
+}
+
+tr.mat-footer-row,
+tr.mat-row {
+  height: 30px !important;
+  font-size: 12px !important;
+}
+
+td.mat-cell,
+td.mat-footer-cell,
+th.mat-header-cell {
+  height: 30px !important;
+  font-size: 12px !important;
+  letter-spacing: 0.01em;
+  line-height: 1.2em;
+  text-align: left;
+}
+
+th.mat-header-cell {
+  color: #ffffff;
+}
+
+.mat-cell,
+.mat-header-cell {
+  word-wrap: initial;
+  display: table-cell;
+  padding: 0px 10px;
+  line-break: unset;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+.mat-row,
+.mat-header-row {
+  display: table-row;
+}
+
+.mat-dialog-content {
+  overflow: scroll;
+  margin: 0px;
+  padding: 0px;
+  overflow-y: scroll;
+}
+
+mat-dialog-content::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.gridheadercenterover {
+  font-weight: bold;
+  font-size: 14px;
+  text-decoration: none;
+  color: white;
+  width: 120%;
+  margin-right: 30px;
+  margin-left: 6px;
+  text-align: center;
+  margin-top: auto;
+  margin-bottom: auto;
+  vertical-align: middle;
+}
+
+.arrange-horizontally-Dialog {
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  width: 100%;
+  background: #ff8f1c;
+}
+
+.closeIconCss {
+  text-align: center;
+  color: white !important;
+  margin-top: auto;
+  margin-bottom: auto;
+  vertical-align: middle;
+  margin-right: 1%;
+}

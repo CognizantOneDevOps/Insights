@@ -29,11 +29,9 @@ sudo chmod -R 755 AgentDaemon
 sudo chmod -R 755 PlatformAgents
 echo $INSIGHTS_AGENT_HOME
 cd AgentDaemon
-echo -n "Nexus(userName):"
-read userName
-echo "Nexus credential:"
-read -s credential
-sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/release/latest/agentdaemon.zip -O agentdaemon.zip
+echo -n "Enter Release Version: " 
+read releaseVersion
+sudo wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${releaseVersion}/agentdaemon.zip -O agentdaemon.zip
 sudo unzip agentdaemon.zip && sudo rm -rf agentdaemon.zip
 source /etc/environment
 source /etc/profile

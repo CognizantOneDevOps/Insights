@@ -1,0 +1,228 @@
+/********************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License. */
+
+.timezoneText {
+    font-size: 12px !important;
+    letter-spacing: 0.01em;
+    line-height: 1.2em;
+    text-align: left;
+    margin-left: 10px;
+    margin-top: 5px;
+    color: var(--text-clr7);
+}
+
+ul {
+    position: relative;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+li {
+    display: flex;
+    margin: 1px;
+    padding: 5px;
+}
+
+.mat-cell,
+.mat-header-cell {
+    word-wrap: initial;
+    display: table-cell;
+    padding: 0px 10px;
+    line-break: unset;
+    width: 100%;
+    white-space: nowrap;
+    overflow: auto;
+    vertical-align: middle;
+}
+
+.mat-row,
+.mat-header-row {
+    display: table-row;
+}
+
+li:last-child {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.mat-dialog-content::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.mat-dialog-content::-webkit-scrollbar-thumb {
+    background-image: initial;
+    background-position-x: initial;
+    background-position-y: initial;
+    background-size: initial;
+    background-attachment: initial;
+    background-origin: initial;
+    background-clip: initial;
+    background-color: #676666;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-image: initial;
+    background-position-x: initial;
+    background-position-y: initial;
+    background-size: initial;
+    background-attachment: initial;
+    background-origin: initial;
+    background-clip: initial;
+    background-color: #676666;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 10px;
+}
+
+.mat-dialog-content::-webkit-scrollbar-track {
+    border-radius: 10px;
+}
+
+.mat-table {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 1rem;
+    display: table;
+    border-collapse: collapse;
+    margin: 0px;
+    font-family: inherit;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-image: initial;
+    background-position-x: initial;
+    background-position-y: initial;
+    background-size: initial;
+    background-attachment: initial;
+    background-origin: initial;
+    background-clip: initial;
+    background-color: #676666;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 10px;
+}
+
+::ng-deep .mat-paginator-icon {
+    width: 21px !important;
+}
+
+::ng-deep .healthcheck-agent-detail-tab-style .mat-tab-header {
+    border-bottom-style: none !important;
+}
+
+/* Styles for the ink bar */
+
+::ng-deep .healthcheck-agent-detail-tab-style .mat-ink-bar {
+    background-color: #00b140 !important;
+}
+
+::ng-deep .mat-paginator-container {
+    min-height: 0px !important;
+}
+
+.mat-paginator {
+    background-color: #dedbdb;
+    margin-top: -8px;
+}
+
+.dialog-content {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+}
+
+th.mat-header-cell,
+td.mat-cell,
+td.mat-footer-cell {
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+}
+
+.matContent {
+    padding: 0 !important;
+    margin: 24px 30px 2px 30px !important;
+    min-height: 220px !important;
+    overflow: auto;
+}
+
+input:focus {
+    outline: none;
+}
+.inputColCss {
+    height: 40px;
+    width: 400px;
+    border: none;
+    background: var(--backgnd-clr8) 0% 0% no-repeat padding-box;
+    font: normal normal normal 14px/24px Open Sans;
+    opacity: 1;
+    border-bottom: 1px solid var(--text-clr2);
+    padding-left: 1%;
+}
+
+.searchCss {
+    border: none;
+    padding: 7px 7px 8px 5px;
+    border-bottom: 1px solid var(--text-clr2);
+    background: var(--backgnd-clr8) 0% 0% no-repeat padding-box;
+}
+
+.filterGroupCSS {
+    margin-bottom: 2%;
+}
+
+.mat-dialog-content::-webkit-scrollbar-track {
+    background: var(--backgnd-clr12) 0% 0% no-repeat padding-box;
+    border-radius: 0;
+}
+
+.mat-dialog-content::-webkit-scrollbar-thumb {
+    background-color: var(--backgnd-clr18); /* color of the scroll thumb */
+    border-radius: 10px !important;
+    cursor: pointer !important;
+}
+
+.footer {
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    padding: 0 30px !important;
+    align-items: center;
+}
+
+.dialog-actions {
+    padding: 15px 0 !important;
+    flex-wrap: nowrap !important;
+    min-height: 0px !important;
+    display: inherit;
+}

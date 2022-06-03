@@ -11,20 +11,20 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>9.4</version>
+		<version>9.5</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>PlatformService</artifactId>
 	<groupId>com.cognizant.devops</groupId>
 	<packaging>war</packaging>
-	<version>9.4</version>
+	<version>9.5</version>
 	<name>PlatformService</name>
 
 	<properties>
 		<jersey.version>2.28</jersey.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.version>5.3.19</spring.version>
+		<spring.version>5.3.20</spring.version>
 		<spring.security.version>5.6.3</spring.security.version>
 		<junit.version>4.13.1</junit.version>
 		<testng.version>7.1.0</testng.version>
@@ -294,19 +294,19 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>9.4</version>
+			<version>9.5</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformAuditing</artifactId>
-			<version>9.4</version>
+			<version>9.5</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>9.4</version>
+			<version>9.5</version>
 		</dependency>
 
 		<dependency>
@@ -394,7 +394,7 @@
 									<directory>${project.basedir}/../</directory>
 									<filtering>true</filtering>
 									<includes>
-										<include>OneDevOpInsights*.pdf</include>
+										<include>IPR_OneDevOps*.pdf</include>
 									</includes>
 								</resource>
 							</resources>

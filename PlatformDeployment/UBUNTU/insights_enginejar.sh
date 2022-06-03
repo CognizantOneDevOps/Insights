@@ -17,18 +17,17 @@
 # get insights engine jar
 # get insights engine jar
 echo "#################### Getting Insights Engine Jar ####################"
+touch /etc/profile.d/insightsenvvar.sh
 sudo mkdir /opt/insightsengine
 sudo cd /opt/insightsengine
 export INSIGHTS_ENGINE=`pwd`
 echo INSIGHTS_ENGINE=`pwd` | sudo tee -a /etc/environment
-echo "export" INSIGHTS_ENGINE=`pwd` | sudo tee -a /etc/profile
+echo "export" INSIGHTS_ENGINE=`pwd` | sudo tee -a /etc/profile.d/insightsenvvar.sh
 . /etc/environment
-. /etc/profile
+. /etc/profile.d/insightsenvvar.sh
 sudo cd /opt/insightsengine
-echo -n "Nexus(userName):"
-read userName
-echo "Nexus credential:"
-read -s credential
-sudo wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformEngine.jar -O PlatformEngine.jar
+echo -n "Enter Release Version: " 
+read releaseVersion
+sudo wget  https://github.com/CognizantOneDevOps/Insights/releases/download/v${releaseVersion}/PlatformEngine-${releaseVersion}.jar -O PlatformEngine.jar
 sleep 2
 sudo nohup java -jar PlatformEngine.jar &

@@ -1,0 +1,105 @@
+/*
+*******************************************************************************
+ * Copyright 2022 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *******************************************************************************/
+.mat-button {
+  font-size: 16px;
+  font-weight: 500;
+  min-width: 50px;
+}
+
+.btnAlign {
+    margin-right: 7px;
+    float: right;
+    color: #0033a0;
+}
+
+.mat-select-value {
+  color: #9e9a9a;
+}
+
+.inline-fields label {
+    display: inline-block !important;
+}
+
+.infoText {
+    font-size: 13px;
+    color: #ff8f1c;
+    padding-left: 0px;
+}
+
+.columnComponent {
+  width: 50%;
+}
+
+.asteriskText {
+  color: #ff0000;
+}
+
+.mainHeaderText {
+    font-size: 15px;
+    color: #ffffff;
+}
+.lblCss {
+    color: var(--lblText);
+    font: normal normal normal 14px/17px Open Sans;
+}
+.infoHeaderText {
+  font-size: 11px;
+  color: white;
+  padding-left: 4px;
+}
+.columnComponent {
+    width: 40%;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.asteriskText {
+    color: #ff0000;
+}
+
+.btnAlign {
+    margin-right: 7px;
+    float: right;
+    color: #0033a0;
+}
+.alignMain {
+    margin: 1vh;
+}
+
+.mat-date-range-input-start-wrapper {
+    position: relative;
+    width: 13vh;
+}
+.block {
+    margin-left: 1.5%;
+}
+.loading-indicator {
+    position: fixed;
+    z-index: 999;
+    height: 2em;
+    width: 2em;
+    overflow: show;
+    margin: auto;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+::ng-deep .mat-radio-label-content {
+ margin-left: 10px;
+}

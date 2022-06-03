@@ -101,9 +101,12 @@ sudo yum install dos2unix -y
 cd $INSIGHTS_HOME_ROOT_DIRECTORY
 sudo mkdir INSIGHTS_HOME
 cd INSIGHTS_HOME
-sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/InSightsConfig.zip
-sudo unzip InSightsConfig.zip && sudo rm -rf InSightsConfig.zip
-sudo cp -R InSightsConfig/.InSights/ .
+#sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/InSightsConfig.zip
+#sudo unzip InSightsConfig.zip && sudo rm -rf InSightsConfig.zip
+#sudo cp -R InSightsConfig/.InSights/ .
+mkdir .Insights
+cd .InSights
+sudo wget  https://github.com/CognizantOneDevOps/Insights/blob/master/PlatformService/src/main/resources/server-config-template.json -O server-config.json
 export INSIGHTS_HOME=`pwd`
 sudo echo INSIGHTS_HOME=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" INSIGHTS_HOME=`pwd` | sudo tee -a /etc/profile

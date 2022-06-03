@@ -96,7 +96,7 @@ public class AutoMLPrediction {
 			EasyPredictModelWrapper model = new EasyPredictModelWrapper(MojoModel.load(new TmpMojoReaderBackend(file)));
 			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
 			log.debug("Worlflow Detail ====  Mojo {}  Loaded Successfully",deployedMojoName);
-			log.debug(StringExpressionConstants.STR_EXP_TASKEXECUTION,"-",autoMLConfig.getWorkflowConfig().getWorkflowId(),autoMLConfig.getWorkflowConfig().getAssessmentConfig().getId(),autoMLConfig.getWorkflowConfig().getWorkflowType(),"-","-",processingTime,
+			log.debug(StringExpressionConstants.STR_EXP_TASKEXECUTION,"-",autoMLConfig.getWorkflowConfig().getWorkflowId(),autoMLConfig.getId(),autoMLConfig.getWorkflowConfig().getWorkflowType(),"-","-",processingTime,
 					ReportStatusConstants.MODELID +autoMLConfig.getModelId() + ReportStatusConstants.USECASENAME +autoMLConfig.getUseCaseName() + ReportStatusConstants.PREDICTIONCOLUMN +autoMLConfig.getPredictionColumn()
 					 +ReportStatusConstants.PREDICTIONTYPE +autoMLConfig.getPredictionType()
 					+ ReportStatusConstants.TRAININGPERCENTAGE + autoMLConfig.getTrainingPerc() + ReportStatusConstants.STATUS + autoMLConfig.getStatus() +"Mojo Loaded Successfully");
@@ -127,7 +127,7 @@ public class AutoMLPrediction {
 			
 		} catch (Exception e) {
 			log.error(e);
-			log.error(StringExpressionConstants.STR_EXP_TASKEXECUTION,"-",autoMLConfig.getWorkflowConfig().getWorkflowId(),autoMLConfig.getWorkflowConfig().getAssessmentConfig().getId(),autoMLConfig.getWorkflowConfig().getWorkflowType(),"-","-",0,
+			log.error(StringExpressionConstants.STR_EXP_TASKEXECUTION,"-",autoMLConfig.getWorkflowConfig().getWorkflowId(),autoMLConfig.getId(),autoMLConfig.getWorkflowConfig().getWorkflowType(),"-","-",0,
 					ReportStatusConstants.MODELID +autoMLConfig.getModelId() + ReportStatusConstants.USECASENAME +autoMLConfig.getUseCaseName() + ReportStatusConstants.PREDICTIONCOLUMN +autoMLConfig.getPredictionColumn()
 					 +ReportStatusConstants.PREDICTIONTYPE +autoMLConfig.getPredictionType()
 					+ ReportStatusConstants.TRAININGPERCENTAGE + autoMLConfig.getTrainingPerc() + ReportStatusConstants.STATUS + autoMLConfig.getStatus()
@@ -180,13 +180,13 @@ public class AutoMLPrediction {
 
 			}
 			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-			log.debug(StringExpressionConstants.STR_EXP_TASKEXECUTION,"-",autoMLConfig.getWorkflowConfig().getWorkflowId(),autoMLConfig.getWorkflowConfig().getAssessmentConfig().getId(),autoMLConfig.getWorkflowConfig().getWorkflowType(),"-","-",processingTime,
+			log.debug(StringExpressionConstants.STR_EXP_TASKEXECUTION,"-",autoMLConfig.getWorkflowConfig().getWorkflowId(),autoMLConfig.getId(),autoMLConfig.getWorkflowConfig().getWorkflowType(),"-","-",processingTime,
 					ReportStatusConstants.MODELID +autoMLConfig.getModelId() + ReportStatusConstants.USECASENAME +autoMLConfig.getUseCaseName() + ReportStatusConstants.PREDICTIONCOLUMN +autoMLConfig.getPredictionColumn()
 					 +ReportStatusConstants.PREDICTIONTYPE +autoMLConfig.getPredictionType()
 					+ ReportStatusConstants.TRAININGPERCENTAGE + autoMLConfig.getTrainingPerc() + ReportStatusConstants.STATUS + autoMLConfig.getStatus());
 		} catch (Exception e) {
 			log.error(e);
-			log.error(StringExpressionConstants.STR_EXP_TASKEXECUTION,"-",autoMLConfig.getWorkflowConfig().getWorkflowId(),autoMLConfig.getWorkflowConfig().getAssessmentConfig().getId(),autoMLConfig.getWorkflowConfig().getWorkflowType(),"-","-",0,
+			log.error(StringExpressionConstants.STR_EXP_TASKEXECUTION,"-",autoMLConfig.getWorkflowConfig().getWorkflowId(),autoMLConfig.getId(),autoMLConfig.getWorkflowConfig().getWorkflowType(),"-","-",0,
 					ReportStatusConstants.MODELID +autoMLConfig.getModelId() + ReportStatusConstants.USECASENAME +autoMLConfig.getUseCaseName() + ReportStatusConstants.PREDICTIONCOLUMN +autoMLConfig.getPredictionColumn()
 					 +ReportStatusConstants.PREDICTIONTYPE +autoMLConfig.getPredictionType()
 					+ ReportStatusConstants.TRAININGPERCENTAGE + autoMLConfig.getTrainingPerc() + ReportStatusConstants.STATUS + autoMLConfig.getStatus()+

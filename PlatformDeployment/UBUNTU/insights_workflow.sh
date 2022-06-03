@@ -18,17 +18,16 @@
 echo "#################### Getting Insights Workflow Jar ####################"
 sudo mkdir /opt/insightsworkflow
 cd /opt/insightsworkflow
+touch /etc/profile.d/insightsenvvar.sh
 export INSIGHTS_WORKFLOW=`pwd`
 sudo echo INSIGHTS_WORKFLOW=`pwd` | sudo tee -a /etc/environment
-sudo echo "export" INSIGHTS_WORKFLOW=`pwd` | sudo tee -a /etc/profile
+sudo echo "export" INSIGHTS_WORKFLOW=`pwd` | sudo tee -a /etc/profile.d/insightsenvvar.sh
 . /etc/environment
-. /etc/profile
+. /etc/profile.d/insightsenvvar.sh
 cd /opt/insightsworkflow
-echo -n "Nexus(userName):"
-read userName
-echo "Nexus credential:"
-read -s credential
-sudo wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformWorkflow.jar -O PlatformWorkflow.jar
+echo -n "Enter Release Version: " 
+read releaseVersion
+sudo wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${releaseVersion}/PlatformWorkflow-${releaseVersion}.jar -O PlatformWorkflow.jar
 sleep 2
 INSIGHTS_HOME=/usr/INSIGHTS_HOME
 sudo nohup java -cp PlatformWorkflow.jar:$INSIGHTS_HOME/workflowjar/* com.cognizant.devops.platformworkflow.workflowtask.app.PlatformWorkflowApplication &

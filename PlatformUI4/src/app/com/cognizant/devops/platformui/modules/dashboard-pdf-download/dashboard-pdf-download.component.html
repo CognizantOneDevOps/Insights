@@ -1,0 +1,638 @@
+<!--
+*******************************************************************************
+ * Copyright 2022 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+
+<div class="cardCss">
+  <div layout layout-align="left" class="titleStyle">
+    <div>Dashboard Report Configuration</div>
+  </div>
+  <div layout layout-align="left" class="sectionHeadingStyle">
+    <span style="padding-top: 3px; margin-left: 3px">
+      <button mat-icon-button (click)="list()" style="vertical-align: super">
+        <mat-icon svgIcon="backButton" matTooltip="Back"> </mat-icon>
+      </button>
+    </span>
+
+    <span class="alignSubHeader" style="margin-left: 5px"
+      ><b>Dashboard Report Configuration</b> (Configure a Dashboard Report)
+    </span>
+
+    <span class="btnAlign" style="margin-top: 0px !important">
+      <button mat-icon-button (click)="onPreviewClick()">
+        <mat-icon
+          matTooltip="Preview And Save"
+          style="margin-top: 20%"
+          svgIcon="save"
+          class="iconColor"
+        >
+        </mat-icon>
+      </button>
+      <button mat-icon-button (click)="reset()">
+        <mat-icon
+          matTooltip="Reset"
+          style="margin-top: 20%"
+          svgIcon="exit"
+          class="iconColor"
+        >
+        </mat-icon>
+      </button>
+    </span>
+  </div>
+
+  <div style="display: flex; justify-content: center; align-items: center">
+    <div class="loading-indicator">
+      <mat-progress-spinner
+        *ngIf="isDatainProgress"
+        [diameter]="100"
+        color="primary"
+        mode="indeterminate"
+      >
+      </mat-progress-spinner>
+    </div>
+  </div>
+  <div class="tableHeaderCss">
+    <span class="mainHeaderText">Add Configuration Details </span>
+    <span class="infoHeaderText"
+      >(Please provide accurate details.Fields marked "<span
+        class="asteriskText"
+        >*</span
+      >" are mandatory)
+    </span>
+  </div>
+  <div class="section-body" style="margin-bottom: 15px">
+    <div class="two-grid-section">
+      <div class="grid-item">
+        <div class="lblCss">
+          Organisation<span class="asteriskText">*</span>
+        </div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            [(ngModel)]="organisation"
+            required
+            placeholder="Select a Organisation"
+            color="primary"
+            (selectionChange)="getDashboardsByOrg(organisation)"
+          >
+            <mat-option *ngFor="let org of orgArr" value="{{ org.orgId }}">
+              {{ org.name }}
+            </mat-option>
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item">
+        <div class="lblCss">
+          Dashboard List<span class="asteriskText">*</span>
+        </div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            [(ngModel)]="dashboard"
+            required
+            placeholder="Select a Dashboard"
+            color="primary"
+            (selectionChange)="getDashboardJson(dashboard)"
+          >
+            <mat-option *ngFor="let dash of dashOptions" value="{{ dash.uid }}">
+              {{ dash.title }}
+            </mat-option>
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+      <div class="grid-item">
+        <div class="lblCss">Title<span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <input
+            matInput
+            maxlength="100"
+            [(ngModel)]="title"
+            type="text"
+            autocomplete="off"
+            placeholder="Enter the Title"
+          />
+        </mat-form-field>
+      </div>
+      <div class="grid-item">
+        <div class="lblCss">Theme<span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            [(ngModel)]="theme"
+            required
+            placeholder="Select Dashboard Theme"
+            color="primary"
+          >
+            <mat-option [value]="themes.dark">Dark</mat-option>
+            <mat-option [value]="themes.light">Light</mat-option>
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+      <div class="grid-item">
+        <div class="lblCss">Pdf Type<span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            [(ngModel)]="pdfType"
+            required
+            placeholder="Select PdfType"
+            color="primary"
+            (ngModelChange)="changePdftype($event)"
+          >
+            <mat-option value="Dashboard">Dashboard View</mat-option>
+            <mat-option value="Printable">Printable View</mat-option>
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item" *ngIf="pdfType === 'Dashboard'">
+        <div class="lblCss">
+          Load Time For Dashboard(in Sec)<span class="asteriskText">*</span>
+        </div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            [(ngModel)]="loadTime"
+            required
+            placeholder="Select loadTime"
+            color="primary"
+          >
+            <mat-option value="10">10</mat-option>
+            <mat-option value="15">15</mat-option>
+            <mat-option value="30">30</mat-option>
+            <mat-option value="60">60</mat-option>
+            <mat-option value="90">90</mat-option>
+            <mat-option value="120">120</mat-option>
+            <mat-option value="150">150</mat-option>
+            <mat-option value="180">180</mat-option>
+            <mat-option value="210">210</mat-option>
+            <mat-option value="240">240</mat-option>
+            <mat-option value="270">270</mat-option>
+            <mat-option value="300">300</mat-option>
+          </mat-select>
+          <mat-select
+            *ngIf="pdfType === 'Printable'"
+            [(ngModel)]="loadTime"
+            required
+            placeholder="Select  for entire dashboard"
+            color="primary"
+          >
+            <mat-option value="3">3</mat-option>
+            <mat-option value="5">5</mat-option>
+            <mat-option value="8">8</mat-option>
+            <mat-option value="10">10</mat-option>
+            <mat-option value="15">15</mat-option>
+            <mat-option value="20">20</mat-option>
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+      <div class="grid-item">
+        <div class="lblCss">Frequency<span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            required
+            [(ngModel)]="frequency"
+            name="schedule"
+            placeholder="Select frequency"
+            color="primary"
+            (ngModelChange)="checkfrequency($event)"
+          >
+            <mat-option
+              *ngFor="let schedule of scheduleList"
+              [value]="schedule"
+            >
+              {{ schedule }}
+            </mat-option>
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+      <div class="grid-item" *ngIf="!showTimePicker">
+        <div class="lblCss">
+          Data Time Range<span class="asteriskText">*</span>
+        </div>
+
+        <mat-radio-group
+          aria-label="Select a TimeRange"
+          (change)="onRangeChange($event)"
+          [(ngModel)]="timeRange"
+          class="columnComponent"
+        >
+          <mat-radio-button *ngIf="frequency === 'ONETIME'" value="absolute">
+            Absolute</mat-radio-button
+          >
+          <mat-radio-button value="relative" style="padding-left: 10px"
+            >Relative</mat-radio-button
+          >
+          <mat-radio-button value="other" style="padding-left: 10px"
+            >Other</mat-radio-button
+          >
+        </mat-radio-group>
+      </div>
+
+      <div
+        *ngIf="timeRange === 'absolute' && frequency === 'ONETIME'"
+        class="grid-item"
+      >
+        <label class="lblCss">Absolute TimeRange</label>
+        <mat-form-field
+          appearance="fill"
+          class="columnComponent"
+          style="width: 92% !important"
+        >
+          <mat-datepicker-toggle matSuffix [for]="picker">
+            <mat-icon
+              style="width: 32px !important; margin-top: -10px"
+              matDatepickerToggleIcon
+              svgIcon="calendar"
+              class="iconClr"
+            ></mat-icon>
+          </mat-datepicker-toggle>
+          <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
+            <input
+              matStartDate
+              formControlName="start"
+              placeholder="MM/DD/YYYY"
+            />
+            <input matEndDate formControlName="end" placeholder="MM/DD/YYYY" />
+          </mat-date-range-input>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
+      </div>
+      <div *ngIf="timeRange === 'relative'" class="grid-item">
+        <label class="lblCss">Relative TimeRange</label>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            id="relative"
+            required
+            color="primary"
+            (selectionChange)="onTimeChange($event)"
+          >
+            <mat-option
+              *ngFor="let relativeTime of relativeRange"
+              [value]="relativeTime"
+            >
+              {{ relativeTime.text }}
+            </mat-option>
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+      <div *ngIf="timeRange === 'other'" class="grid-item">
+        <label class="lblCss">Other TimeRange</label>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            id="other"
+            required
+            color="primary"
+            (selectionChange)="onTimeChange($event)"
+          >
+            <mat-option
+              *ngFor="let otherTime of otherRelativeRange"
+              [value]="otherTime"
+            >
+              {{ otherTime.text }}
+            </mat-option>
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="two-grid-section" style="margin-top: 24px">
+      <div class="grid-item" *ngIf="templateVariableArr.length > 0">
+        <div class="lblCss">Filters<span class="asteriskText">*</span></div>
+        <div class="columnComponent">
+          <form [formGroup]="variableForm">
+            <div *ngFor="let list of templateVariableArr">
+              <div *ngIf="list.hide !== 2">
+                <div
+                  class="align-element"
+                  *ngIf="list.type === 'query' && list.multi"
+                >
+                  <label class="block">{{
+                    list.label ? list.label : list.name
+                  }}</label>
+                  <mat-form-field appearance="fill" class="columnComponent">
+                    <mat-select
+                      id="{{ list.name }}"
+                      (selectionChange)="onChangeVariables($event, list)"
+                      formControlName="{{ list.name }}"
+                      required
+                      color="primary"
+                      multiple
+                    >
+                      <div *ngIf="list.includeAll">
+                        <mat-option #allSelected value="All"> All </mat-option>
+                      </div>
+                      <mat-option
+                        *ngFor="let option of list.options"
+                        value="{{ option }}"
+                      >
+                        {{ option }}</mat-option
+                      >
+                    </mat-select>
+                    <mat-icon
+                      matSuffix
+                      svgIcon="arrow-down"
+                      class="arrow-icon"
+                      style="width: 12px !important; height: 12px !important"
+                    ></mat-icon>
+                  </mat-form-field>
+                </div>
+                <div
+                  class="align-element"
+                  *ngIf="list.type === 'query' && !list.multi"
+                >
+                  <label class="block">{{
+                    list.label ? list.label : list.name
+                  }}</label>
+                  <mat-form-field appearance="fill" class="columnComponent">
+                    <mat-select
+                      id="{{ list.name }}"
+                      formControlName="{{ list.name }}"
+                      (selectionChange)="onChangeVariables($event, list)"
+                      required
+                      color="primary"
+                      [(value)]="list.selectedValue"
+                    >
+                      <div *ngIf="list.includeAll">
+                        <mat-option value="All" #allSelected> All </mat-option>
+                      </div>
+                      <mat-option
+                        *ngFor="let option of list.options"
+                        value="{{ option }}"
+                      >
+                        {{ option }}</mat-option
+                      >
+                    </mat-select>
+                    <mat-icon
+                      matSuffix
+                      svgIcon="arrow-down"
+                      class="arrow-icon"
+                      style="width: 12px !important; height: 12px !important"
+                    ></mat-icon>
+                  </mat-form-field>
+                </div>
+                <div
+                  class="align-element"
+                  *ngIf="list.type === 'custom' && list.multi"
+                >
+                  <label class="block">{{
+                    list.label ? list.label : list.name
+                  }}</label>
+                  <mat-form-field appearance="fill" class="columnComponent">
+                    <mat-select
+                      id="{{ list.name }}"
+                      formControlName="{{ list.name }}"
+                      required
+                      color="primary"
+                      multiple
+                      [(value)]="list.selectedValue"
+                    >
+                      <mat-option
+                        *ngFor="let option of list.options"
+                        value="{{ option.value }}"
+                      >
+                        {{ option.text }}</mat-option
+                      >
+                    </mat-select>
+                    <mat-icon
+                      matSuffix
+                      svgIcon="arrow-down"
+                      class="arrow-icon"
+                      style="width: 12px !important; height: 12px !important"
+                    ></mat-icon>
+                  </mat-form-field>
+                </div>
+                <div
+                  class="align-element"
+                  *ngIf="list.type === 'custom' && !list.multi"
+                >
+                  <label class="block">{{
+                    list.label ? list.label : list.name
+                  }}</label>
+                  <mat-form-field appearance="fill" class="columnComponent">
+                    <mat-select
+                      id="{{ list.name }}"
+                      formControlName="{{ list.name }}"
+                      required
+                      color="primary"
+                      [(value)]="list.selectedValue"
+                    >
+                      <div *ngIf="list.includeAll">
+                        <mat-option value="All" #allSelected> All </mat-option>
+                      </div>
+                      <mat-option
+                        *ngFor="let option of list.options"
+                        value="{{ option.value }}"
+                      >
+                        {{ option.text }}</mat-option
+                      >
+                    </mat-select>
+                    <mat-icon
+                      matSuffix
+                      svgIcon="arrow-down"
+                      class="arrow-icon"
+                      style="width: 12px !important; height: 12px !important"
+                    ></mat-icon>
+                  </mat-form-field>
+                </div>
+                <div
+                  class="align-element"
+                  *ngIf="list.type === 'textbox' || list.type === 'constant'"
+                >
+                  <label class="block">{{
+                    list.label ? list.label : list.name
+                  }}</label>
+                  <mat-form-field appearance="fill" class="columnComponent">
+                    <input
+                      matInput
+                      id="{{ list.name }}"
+                      formControlName="{{ list.name }}"
+                      type="text"
+                      [(value)]="list.selectedValue"
+                      value="{{ list.options[0].value }}"
+                    />
+                  </mat-form-field>
+                </div>
+                <div class="align-element" *ngIf="list.type === 'interval'">
+                  <label class="block">{{
+                    list.label ? list.label : list.name
+                  }}</label>
+                  <mat-form-field appearance="fill" class="columnComponent">
+                    <mat-select
+                      id="{{ list.name }}"
+                      formControlName="{{ list.name }}"
+                      required
+                      color="primary"
+                      [(value)]="list.selectedValue"
+                    >
+                      <mat-option
+                        *ngFor="let option of list.options"
+                        value="{{ option.value }}"
+                        selected="{{ option.selected }}"
+                      >
+                        {{ option.text }}</mat-option
+                      >
+                    </mat-select>
+                    <mat-icon
+                      matSuffix
+                      svgIcon="arrow-down"
+                      class="arrow-icon"
+                      style="width: 12px !important; height: 12px !important"
+                    ></mat-icon>
+                  </mat-form-field>
+                </div>
+                <div
+                  class="align-element"
+                  *ngIf="list.type === 'datasource' && list.multi"
+                >
+                  <label class="block">{{
+                    list.label ? list.label : list.name
+                  }}</label>
+                  <mat-form-field appearance="fill" class="columnComponent">
+                    <mat-select
+                      id="{{ list.name }}"
+                      formControlName="{{ list.name }}"
+                      required
+                      color="primary"
+                      multiple
+                    >
+                      <div *ngIf="list.includeAll">
+                        <mat-option value="All"> All </mat-option>
+                      </div>
+                      <mat-option
+                        *ngFor="let option of list.current.value"
+                        value="{{ option }}"
+                      >
+                        {{ option }}</mat-option
+                      >
+                    </mat-select>
+                    <mat-icon
+                      matSuffix
+                      svgIcon="arrow-down"
+                      class="arrow-icon"
+                      style="width: 12px !important; height: 12px !important"
+                    ></mat-icon>
+                  </mat-form-field>
+                </div>
+                <div
+                  class="align-element"
+                  *ngIf="list.type === 'datasource' && !list.multi"
+                >
+                  <label class="block">{{
+                    list.label ? list.label : list.name
+                  }}</label>
+                  <mat-form-field appearance="fill" class="columnComponent">
+                    <mat-select
+                      id="{{ list.name }}"
+                      formControlName="{{ list.name }}"
+                      required
+                      color="primary"
+                      (selectionChange)="toggleAllSelection($event, list)"
+                    >
+                      <div *ngIf="list.includeAll">
+                        <mat-option value="All"> All </mat-option>
+                      </div>
+                      <mat-option
+                        *ngFor="let option of list.current.value"
+                        value="{{ option }}"
+                      >
+                        {{ option }}</mat-option
+                      >
+                    </mat-select>
+                    <mat-icon
+                      matSuffix
+                      svgIcon="arrow-down"
+                      class="arrow-icon"
+                      style="width: 12px !important; height: 12px !important"
+                    ></mat-icon>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="grid-item">
+        <div class="lblCss">Mailing Details</div>
+        <button mat-icon-button>
+          <mat-icon
+            *ngIf="!emailDetails"
+            (click)="addEmailConfig()"
+            matTooltip="Add Email"
+            class="iconColor mailCss"
+            svgIcon="add"
+          >
+          </mat-icon>
+          <mat-icon
+            *ngIf="emailDetails"
+            (click)="editEmailConfig()"
+            matTooltip="Edit email"
+            class="iconColor"
+            svgIcon="edit"
+          >
+          </mat-icon>
+        </button>
+        <div>
+          <span *ngIf="!enableEmail" class="infoText"
+            >Email Server not configured. Please contact the admin</span
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

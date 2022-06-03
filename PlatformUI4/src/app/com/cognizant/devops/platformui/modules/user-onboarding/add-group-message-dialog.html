@@ -1,0 +1,80 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div class="titleContainer">
+  <h1>Confirm Access Group Name</h1>
+  <a (click)="closeShowDetailsDialog()" mat-dialog-close>
+    <mat-icon
+      svgIcon="close_dialog"
+      class="closeIcon"
+      style="height: 11px !important; width: 11px !important"
+    >
+    </mat-icon>
+  </a>
+</div>
+<mat-dialog-content class="dialog-content">
+  <div class="column1">
+    <div class="select-tool">
+      <span class="select-label">Access Group Name</span>
+      <mat-form-field appearance="fill" class="formfield-custom">
+        <input
+          matInput
+          [(ngModel)]="accessGroupName"
+          name="accessGroupName"
+          placeholder="Please input an Access Group Name"
+          required
+        />
+      </mat-form-field>
+    </div>
+    <div class="column2">
+      <span class="messageText" *ngIf="message!=''">{{message}}</span>
+      <ul class="warningText">
+        <li>
+          <span
+            >Access Group name is added you will not be able to RENAME or DELETE
+            the Access Group.</span
+          >
+        </li>
+        <li><span>an Access Group cannot be REVERTED.</span></li>
+        <br />
+      </ul>
+      <br />
+    </div>
+  </div>
+  <div style="margin-left: 20%">
+    <span class="column3">
+      <br />
+      Are you sure you want to create New Access Group
+      <b> {{accessGroupName}} </b>?
+    </span>
+  </div>
+</mat-dialog-content>
+<div class="add-access-group-actions">
+  <button
+    (click)="dialogRef.close('no')"
+    class="button-no button-no-dimensions"
+    style="width: 100px"
+  >
+    NO
+  </button>
+  <button
+    (click)="onYesClick()"
+    class="button-yes button-yes-dimensions"
+    style="width: 100px"
+  >
+    YES
+  </button>
+</div>

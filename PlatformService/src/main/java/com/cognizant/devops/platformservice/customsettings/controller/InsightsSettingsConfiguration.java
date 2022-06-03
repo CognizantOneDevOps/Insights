@@ -16,6 +16,7 @@
 package com.cognizant.devops.platformservice.customsettings.controller;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
@@ -54,8 +55,15 @@ public class InsightsSettingsConfiguration {
 		if (fileExt.equalsIgnoreCase("png") && file.getSize() < 1048576) {
 			byte[] imageBytes = null;
 			try {
-				inputStream = new BufferedInputStream(file.getInputStream());
-				imageBytes = IOUtils.toByteArray(inputStream);
+				inputStream = file.getInputStream();
+				ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+			    int nRead;
+			    byte[] data = new byte[4];
+			    while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+			        buffer.write(data, 0, nRead);
+			    }
+			    buffer.flush();
+				imageBytes = buffer.toByteArray();
 			} catch (IOException e) {
 				LOG.error("Unable to upload custom logo", e);
 			}

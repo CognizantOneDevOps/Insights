@@ -1,0 +1,45 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div class="menuItemBorder">
+  <a routerLinkActive=active id="{{item.menuId}}" *ngIf="item.activeCount > 0" mat-list-item
+    (click)="onItemSelected(item)" [attr.title]="item.title" [ngStyle]="{'padding-left': depthCal(depth, item)}"
+    [ngClass]="{'active': (item.route && isExpanded) ? router.isActive(item.route, true): false, 
+        'expanded': expanded,'allMenuWidth':isExpanded}">
+    <div mat-line [hidden]="!isExpanded" [ngClass]="{'hiddenMenuLabel': !isExpanded}">
+      <mat-icon *ngIf="item.showIcon" class="menu-img menu-icon-color" height="35px" svgIcon="{{item.iconName}}">
+      </mat-icon>
+      <span id="{{item.menuId}}Name" [ngClass]="{'displayNameMenu': true }">
+        {{item.displayName}}</span>
+      <span *ngIf="item.iconName =='grafana'"> {{selectedOrg}} </span>
+    </div>
+    <div mat-line *ngIf="!isExpanded">
+      <mat-icon *ngIf="item.showIcon" [ngStyle]="{'margin-left': '6px'}" class="menu-img menu-icon-color" height="35px"
+        svgIcon="{{item.iconName}}"></mat-icon>
+    </div>
+    <span fxFlex *ngIf="item.children && item.children.length">
+      <span fxFlex></span>
+      <mat-icon class="expandStyle" *ngIf="isExpanded" [@indicatorRotate]="expanded ? 'expanded': 'collapsed'">
+        expand_more
+      </mat-icon>
+    </span>
+  </a>
+</div>
+<div *ngIf="expanded && isExpanded">
+  <app-menu-list-item *ngFor="let child of getNavItemsChildernByFilter(item.children)" [item]="child"
+    [depth]="depth + 1" [isExpanded]="isExpanded" [selectedOrg]="selectedOrg" [leftNavWidthpx]="leftNavWidthpx">
+  </app-menu-list-item>
+</div>

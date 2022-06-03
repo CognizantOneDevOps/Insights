@@ -1,0 +1,361 @@
+<!--
+*******************************************************************************
+ * Copyright 2021 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div class="cardCss">
+  <div layout layout-align="left" class="titleStyle">
+    <div>
+      <span class="main-section-title">Configuration | </span>
+      Schedule Task Management
+    </div>
+  </div>
+
+  <div class="sectionHeadingStyle">
+
+    <button
+        mat-icon-button *ngIf="!showListView"
+        (click)="refresh()"
+        style="vertical-align: super"
+      >
+        <mat-icon svgIcon="backButton" matTooltip="Back"> </mat-icon>
+      </button>
+
+    <span *ngIf="showListView" style="margin-left: 5px;"></span>
+    <span class="alignSub" style="margin-left: 5px;"
+      ><b>Schedule Task</b> ( Add / Edit / Delete / Restart / Reschedule -
+      Schedule Task)
+    </span>
+
+    <span class="btnAlign">
+      <button *ngIf="showListView" mat-icon-button (click)="addTask()">
+        <mat-icon svgIcon="add" matTooltip="Add Task"> </mat-icon>
+      </button>
+
+      <button
+        *ngIf="showListView"
+        mat-icon-button
+        (click)="editTaskConfiguration()"
+        [disabled]="disableRadioChangeButton"
+      >
+        <mat-icon svgIcon="edit" matTooltip="Edit Task"> </mat-icon>
+      </button>
+
+      <button
+        *ngIf="!showListView"
+        type="submit"
+        mat-icon-button
+        (click)="onSubmit()"
+        [disabled]="!taskForm.valid"
+      >
+        <mat-icon svgIcon="save" matTooltip="Save Schedule Task"> </mat-icon>
+      </button>
+
+      <button
+        *ngIf="showListView"
+        mat-icon-button
+        (click)="statusUpdate('STOP')"
+        [disabled]="disableRadioChangeButton || seletedAction == 'STOP'"
+      >
+        <mat-icon svgIcon="stop" matTooltip="Stop"> </mat-icon>
+      </button>
+
+      <button
+        *ngIf="showListView"
+        mat-icon-button
+        (click)="statusUpdate('START')"
+        [disabled]="
+          disableRadioChangeButton ||
+          seletedAction != 'STOP' ||
+          seletedAction != 'STOP'
+        "
+      >
+        <mat-icon svgIcon="play" matTooltip="Start"> </mat-icon>
+      </button>
+
+      <button
+        *ngIf="showListView"
+        mat-icon-button
+        (click)="deleteTask()"
+        [disabled]="disableRadioChangeButton || seletedAction != 'STOP'"
+      >
+        <mat-icon svgIcon="trash" matTooltip="Delete Task"> </mat-icon>
+      </button>
+
+      <button mat-icon-button *ngIf="showListView" (click)="refresh()">
+        <mat-icon svgIcon="retry" matTooltip="Clear andRefresh"> </mat-icon>
+      </button>
+
+      <!-- <button mat-icon-button *ngIf="!showListView" (click)="refresh()">
+        <mat-icon
+          svgIcon="homeBck"
+          matTooltip="Back To Schedule Task Management"
+        >
+        </mat-icon>
+      </button> -->
+    </span>
+  </div>
+
+  <div class="loading-indicator">
+    <mat-progress-spinner
+      [diameter]="70"
+      *ngIf="showThrobber"
+      color="primary"
+      mode="indeterminate"
+    >
+    </mat-progress-spinner>
+  </div>
+
+  <div [hidden]="!showListView" class="task-management-table">
+    <table
+      mat-table
+      [dataSource]="taskuserDataSource"
+      multiTemplateDataRows
+      matSort
+    >
+      <mat-radio-group [(ngModel)]="selectedTask">
+        <!-- Radio Button Column -->
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader"></th>
+          <td mat-cell *matCellDef="let element; let i = dataIndex">
+            <mat-radio-button
+              style="margin-top: 10px !important"
+              [value]="element"
+              (change)="radioChange($event, i)"
+            ></mat-radio-button>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="componentName">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            Task Name
+          </th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.componentName }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="componentClassDetail">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            Task Module class
+          </th>
+          <td mat-cell *matCellDef="let element" [ngClass]="'task-module-col'">
+            <p>{{ element.componentClassDetail }}</p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="schedule">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            Schedule
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            [title]="getTitle(element.schedule)"
+          >
+            {{ element.schedule }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">Status</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.action }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="lastrun">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            Last Run
+          </th>
+
+          <td mat-cell *matCellDef="let element">
+            {{ element.lastrun }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="details">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="tableHeader"
+            style="white-space: pre-line"
+          >
+            Execution History
+          </th>
+
+          <td mat-cell *matCellDef="let element; let i = dataIndex">
+            <button
+              mat-icon-button
+              matTooltip="View Details"
+              (click)="
+                showTaskExecutionHistoryDetailsDialog(element.componentName)
+              "
+              [disabled]="selectedIndex != i + currentPageValue"
+            >
+              <mat-icon
+                svgIcon="healthcheck_show_details"
+                style="margin-bottom: 10px !important"
+              >
+              </mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr
+          mat-header-row
+          *matHeaderRowDef="displayedColumns"
+          class="tableHeader"
+        ></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </mat-radio-group>
+    </table>
+  </div>
+  <div class="footer" [hidden]="!showListView" style="margin-bottom: 15px">
+    <div class="paginator">
+      <mat-paginator
+        style="visibility: hidden"
+        #paginator
+        [pageSize]="this.MAX_ROWS_PER_TABLE"
+      >
+      </mat-paginator>
+      <div
+        class="paginatorElement"
+        (click)="goToPrevPage()"
+        [attr.disabled]="!this.paginator.hasPreviousPage()"
+        [ngStyle]="
+          !this.paginator.hasPreviousPage() ? { cursor: 'not-allowed' } : ''
+        "
+      >
+        <mat-icon
+          svgIcon="prev-page"
+          matTooltip="Previous Page"
+          class="pageIcons"
+          *ngIf="this.paginator.hasPreviousPage()"
+          style="height: 24px !important; width: 24px !important"
+        >
+        </mat-icon>
+        <mat-icon
+          svgIcon="prev-page"
+          matTooltip="Previous Page"
+          class="pageIcons disabled-icon"
+          *ngIf="!this.paginator.hasPreviousPage()"
+          style="height: 24px !important; width: 24px !important"
+        >
+        </mat-icon>
+      </div>
+      <div class="paginatorElement paginatorIndexElement">
+        {{ currentPageIndex }}
+      </div>
+      <div
+        class="paginatorElement"
+        (click)="goToNextPage()"
+        [attr.disabled]="!this.paginator.hasNextPage()"
+        [ngStyle]="
+          !this.paginator.hasNextPage() ? { cursor: 'not-allowed' } : ''
+        "
+      >
+        <mat-icon
+          svgIcon="next-page"
+          matTooltip="Next Page"
+          class="pageIcons"
+          *ngIf="this.paginator.hasNextPage()"
+          style="height: 24px !important; width: 24px !important"
+        >
+        </mat-icon>
+        <mat-icon
+          svgIcon="next-page"
+          matTooltip="Next Page"
+          class="pageIcons disabled-icon"
+          *ngIf="!this.paginator.hasNextPage()"
+          style="height: 24px !important; width: 24px !important"
+        >
+        </mat-icon>
+      </div>
+      <div>of {{ totalPages }}</div>
+    </div>
+  </div>
+
+  <div class="config-section" *ngIf="!showListView">
+    <div class="title">
+      <span class="main-title">{{ feature }} Configuration Details</span>
+      <span class="sub-title"
+        >(Please provide accurate details. Fields marked "<span
+          style="color: #ff0000"
+          >*</span
+        >" are mandatory)</span
+      >
+    </div>
+    <div class="section-body">
+      <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+        <div class="left-col">
+          <div class="input-item" style="margin-bottom: 30px">
+            <span class="input-label">
+              Task Name<span style="color: #ff0000">*</span>
+            </span>
+            <mat-form-field appearance="fill" class="formfield-custom">
+              <input
+                matInput
+                maxlength="100"
+                formControlName="componentName"
+                [disabled]="isEdit"
+                placeholder="Enter Task name"
+              />
+            </mat-form-field>
+          </div>
+          <div class="input-item">
+            <span class="input-label">
+              Schedule<span style="color: #ff0000">*</span>
+            </span>
+            <mat-form-field appearance="fill" class="formfield-custom">
+              <input
+                matInput
+                maxlength="100"
+                formControlName="schedule"
+                type="text"
+                autocomplete="off"
+                placeholder="Enter Schedule Expression"
+              />
+            </mat-form-field>
+            <span class="comments"
+              >Please add cron expression ex ‘0 */10 * ? * *’ for 10 min</span
+            >
+          </div>
+        </div>
+        <div class="right-col">
+          <div class="textarea-item">
+            <span class="input-label">
+              Description<span style="color: #ff0000">*</span>
+            </span>
+            <mat-form-field appearance="fill" class="formfield-custom">
+              <textarea
+                matInput
+                maxlength="1000"
+                rows="2"
+                formControlName="componentClassDetail"
+                type="text"
+                autocomplete="off"
+                placeholder="Task Module Class Detail"
+              >
+              </textarea>
+            </mat-form-field>
+
+            <span class="comments"
+              >Task Module Class Detail, Please provide full path</span
+            >
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

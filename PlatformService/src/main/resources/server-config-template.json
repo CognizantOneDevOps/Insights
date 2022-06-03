@@ -44,15 +44,13 @@
 	"agentDetails": {
 		"isOnlineRegistration": true,
 		"onlineRegistrationMode": "nexus",
-		"browseRepoUrl": "https://infra.cogdevops.com/service/rest/repository/browse/docroot/insights_install/release",
-		"downloadRepoUrl": "https://infra.cogdevops.com/repository/docroot/insights_install/release",
-		"nexusUserName": "",
-		"nexusPassword": "",
-		"docrootUrl": "https://platform.cogdevops.com//insights_install/release",
 		"offlineAgentPath": "C:\\InSights_Windows\\Agents\\offlineAgent",
 		"unzipPath": "C:\\InSights_Windows\\Agents\\PlatformAgents\\unzip",
 		"agentExchange": "iAgent",
-		"agentPkgQueue": "INSIGHTS.AGENTS.PACKAGE"
+		"agentPkgQueue": "INSIGHTS.AGENTS.PACKAGE",
+		"githubAPI": "",
+    	"githubAccessToken": "",
+		"repoUrl" : ""
 	},
 	"endpointData": {
 		"elasticSearchEndpoint": "http://localhost:9200"

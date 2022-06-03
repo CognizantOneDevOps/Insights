@@ -17,12 +17,10 @@
 source /etc/environment
 source /etc/profile
 cd $INSIGHTS_APP_ROOT_DIRECTORY
-echo -n "Nexus(userName):"
-read userName
-echo "Nexus credential:"
-read -s credential
-sudo mkdir python3 && cd python3 && sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/python/Python.tar.gz
+sudo mkdir python3 && cd python3 && sudo wget https://www.python.org/ftp/python/3.8.13/Python-3.8.13.tgz
+sudo mv Python-3.8.13.tgz Python.tgz
 sudo tar -zxf Python.tar.gz
+sudo mv Python-3.8.13 Python
 cd Python
 sudo yum install gcc -y
 sudo yum install openssl-devel -y 
@@ -32,7 +30,7 @@ sudo ./configure --enable-optimizations
 sudo make altinstall
 sudo rm -f /usr/bin/python3
 sudo ln -s $INSIGHTS_APP_ROOT_DIRECTORY/python3/Python/python /usr/bin/python3
-cd $INSIGHTS_APP_ROOT_DIRECTORY/python3 && sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/python/get-pip.py
+cd $INSIGHTS_APP_ROOT_DIRECTORY/python3 && sudo wget  https://bootstrap.pypa.io/get-pip.py
 python3 --version
 sudo python3 get-pip.py
 sudo python3 -m pip install setuptools -U

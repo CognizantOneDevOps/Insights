@@ -1,0 +1,479 @@
+/*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+
+.cardCssTraceability {
+    background-color: var(--backgnd-clr13);
+    margin-left: 16px;
+    margin-right: 16px;
+    margin-top: 16px;
+    padding: 16px;
+    position: relative;
+    min-height: 80vh;
+    border: 1px solid var(--brdr-clr);
+    overflow-y: auto;
+}
+
+.tabGroup {
+    height: 84vh;
+    overflow: auto;
+}
+
+:host ::ng-deep .mat-tab-body-wrapper {
+    height: 84vh;
+}
+
+.button-section-actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-top: 1%;
+    margin-bottom: 1%;
+}
+
+.button-cancel-dimensions {
+    width: 75px;
+    height: 37px;
+    font: normal normal 600 14px/24px "Open Sans";
+    letter-spacing: 0px;
+    text-transform: capitalize;
+    text-align: center;
+    margin-right: 2%;
+}
+
+.button-cancel {
+    background: var(--backgnd-clr11) 0% 0% no-repeat padding-box;
+    border: 1px solid var(--text-clr6);
+    color: var(--text-clr6);
+    opacity: 1;
+    cursor: pointer;
+}
+
+.button-save-dimensions {
+    width: 75px;
+    height: 37px;
+    font: normal normal 600 14px/24px "Open Sans";
+    letter-spacing: 0px;
+    text-transform: capitalize;
+    text-align: center;
+    margin-right: 2%;
+}
+
+.button-save {
+    background: var(--backgnd-clr18) 0% 0% no-repeat padding-box;
+    opacity: 1;
+    color: var(--text-clr3);
+    border: none;
+}
+
+.button-save:hover {
+    background: var(--btn-hover-bg);
+}
+
+.field-categories {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 1%;
+}
+
+.searchBorder {
+    border: 1px solid var(--toolbar-border);
+    margin-top: 1%;
+    margin-bottom: 1%;
+    background-color: var(--backgnd-clr6);
+}
+
+.field-categories-grid {
+    display: grid;
+    grid-template-columns: 50% 50%;
+}
+.field-categories-grid-textarea {
+    display: grid;
+    grid-template-columns: auto;
+}
+
+.field-categories-grid-file {
+    display: grid;
+    grid-template-columns: 40% 60%;
+}
+
+.field-category {
+    display: flex;
+    flex-direction: column;
+    font: normal normal normal 14px/24px "Open Sans";
+    margin-right: 1%;
+    margin-left: 1%;
+}
+.field-category-grid-item {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    font: normal normal normal 14px/24px "Open Sans";
+    padding: 0 30px 30px 0;
+}
+.field-category-grid-item-textarea {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    font: normal normal normal 14px/24px "Open Sans";
+}
+
+.select-label {
+    margin-left: 2%;
+}
+
+:host ::ng-deep .mat-select-panel::-webkit-scrollbar-thumb {
+    background-image: initial;
+    background-position-y: initial;
+    background-size: initial;
+    background-attachment: initial;
+    background-origin: initial;
+    background-clip: initial;
+    background-color: var(--backgnd-clr18);
+    cursor: pointer;
+}
+
+:host ::ng-deep .mat-select-panel::-webkit-scrollbar-track {
+    border-radius: 20px;
+}
+
+:host ::ng-deep .mat-select-panel::-webkit-scrollbar {
+    width: 5px;
+    height: 6px;
+}
+
+.mat-option:hover:not(.mat-option-disabled) {
+    background-color: var(--backgnd-clr19) !important;
+}
+
+:host ::ng-deep .mat-select-panel .mat-option.mat-selected:not(.mat-option-multiple) {
+    background-color: var(--backgnd-clr19);
+}
+
+.columnToolPipeline {
+    /* width: 190px; */
+    margin-bottom: 1%;
+    margin-right: 1px;
+    border-radius: 10px;
+    padding: 3px;
+    display: table-cell;
+    //height: 58vh;
+    border: white;
+    border-radius: 10px;
+    padding-left: 5px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    margin: 1%;
+}
+.tabSection {
+    overflow-y: auto;
+    height: inherit;
+    margin-bottom: 5px;
+    border-left: 1px solid var(--brdr-clr);
+    border-right: 1px solid var(--brdr-clr);
+    border-bottom: 1px solid var(--brdr-clr);
+    padding-top: 10px;
+}
+
+:host ::ng-deep .mat-tab-body-content {
+    overflow: hidden !important ;
+}
+
+:host ::ng-deep .mat-tab-body .mat-tab-body-active {
+    overflow-y: hidden !important;
+}
+
+.parentCard {
+    background-color: var(--backgnd-clr13);
+    color: var(--text-clr6);
+    height: 20%;
+    font-size: 14px;
+    width: 160px;
+    border: 5px solid var(--brdr-clr2);
+    display: inline-table;
+}
+
+.toolNameCss {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.scroll {
+    overflow-x: hidden;
+    overflow-y: hidden;
+    height: 61vh;
+}
+
+.scroll:hover {
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 61vh;
+}
+
+.childCard {
+    border-width: 5px 5px 0px 5px;
+    border-style: solid;
+    border-color: var(--brdr-clr2);
+    background-color: var(--backgnd-clr6);
+    width: 160px;
+    height: 20%;
+    display: block;
+    position: relative;
+    padding: 5px;
+    border-radius: inherit;
+    cursor: pointer;
+}
+
+.formatCardText {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: block;
+    white-space: nowrap;
+    font-size: 11px;
+}
+
+.childCardLabel {
+    color: var(--backgnd-clr5);
+}
+
+.childCardLabelValue {
+    color: var(--text-clr);
+    padding-left: 5px;
+}
+
+.moreInfoClass {
+    color: #2c6df5;
+    font-size: 11px;
+}
+
+.summaryCard {
+    border-width: 1px 1px 1px 1px;
+    border-style: solid;
+    border-color: #e8ebea;
+    width: 98%;
+    height: 20%;
+    display: block;
+    position: relative;
+    padding: 5px;
+    border-radius: inherit;
+    margin: 1%;
+    background: var(--backgnd-clr10);
+}
+
+.summaryDiv {
+    font-size: 16px;
+    margin-left: 1%;
+    display: flex;
+    flex-direction: row;
+    margin-top: 1%;
+}
+
+.lableCss {
+    color: var(--text-clr5);
+    width: 40px;
+    height: 22px;
+    margin-right: 5%;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover {
+    -webkit-box-shadow: 0 0 0 30px var(--backgnd-clr8) inset !important;
+    -webkit-text-fill-color: var(--frm-field-txt) !important ;
+}
+
+.rowCount {
+    font-size: 14px;
+    font-weight: bold;
+    text-align: left;
+    font-family: Open Sans;
+    letter-spacing: 0px;
+    color: var(--text-clr5);
+    opacity: 1;
+}
+
+.toollableCss {
+    font-size: 14px;
+    font-weight: bolder;
+    margin-top: 3%;
+    vertical-align: middle;
+    margin-left: 8%;
+    cursor: pointer;
+}
+
+.toolSublableCss {
+    font-size: 12px;
+    vertical-align: middle;
+    margin-left: 8%;
+    font-weight: normal;
+    color: var(--text-clr);
+}
+
+.childCardList:nth-child(1) {
+    border-top-width: 0px;
+}
+
+.childCardList:nth-last-child(1) {
+    border-bottom-width: 5px;
+    border-bottom: solid;
+    border-bottom-color: var(--brdr-clr2);
+    box-shadow: none;
+}
+
+.summaryToolName {
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 15%;
+    text-align: center;
+}
+
+.socialimg {
+    width: 12%;
+    display: flex;
+    flex-direction: column;
+    padding-top: 1%;
+    align-items: center;
+}
+
+.circled {
+    height: 60px;
+    width: 60px;
+    background: transparent;
+    text-align: center;
+    z-index: 2;
+    text-align: center;
+    position: relative;
+    line-height: 60px;
+}
+
+.summarySection {
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+
+.summaryPropCount {
+    margin-left: 2%;
+    padding: 3px 5px 3px 5px;
+    border-radius: 5px;
+    color: var(--text-clr5);
+    align-items: end;
+}
+.summaryContentText {
+    margin-left: 5%;
+    padding: 3px 5px 3px 5px;
+    border-radius: 5px;
+}
+
+.totalSummaryPropCount {
+    margin-left: 1%;
+    padding: 3px 5px 3px 5px;
+    border-radius: 5px;
+    color: var(--text-clr5);
+}
+
+.handoverTime {
+    margin-left: 1%;
+    padding: 3px 5px 3px 5px;
+    border-radius: 5px;
+    color: var(--frm-field-txt);
+    display: flex;
+    flex-direction: column;
+    //justify-content: flex-start;
+}
+
+:host ::ng-deep .mat-tab-header {
+    border: 1px solid var(--brdr-clr) !important;
+    background-color: var(--backgnd-clr6);
+}
+
+.divIndividualSummaryTool {
+    padding-left: 0.5%;
+    padding-top: 2%;
+    width: 68%;
+    font-size: 14px;
+}
+
+.avgToolSummarySummaryTool {
+    padding-left: 0.5%;
+    padding-top: 1%;
+    width: 20%;
+    font-size: 14px;
+}
+
+::marker {
+    unicode-bidi: isolate;
+    font-variant-numeric: tabular-nums;
+    text-transform: none;
+    text-indent: 0px !important;
+    text-align: start !important;
+    text-align-last: start !important;
+}
+
+.summaryContentList {
+    margin-left: -2%;
+}
+
+.bullectPoint {
+    list-style-type: inherit;
+}
+
+.tabStyle {
+    font-size: 16px !important;
+    font-family: inherit !important;
+}
+
+input:focus {
+    outline: none;
+}
+
+.mat-form-field-underline {
+    margin-left: 0px !important;
+    position: initial !important;
+    transform: none !important;
+}
+
+.notification-section {
+    position: absolute;
+    right: 1px;
+    z-index: 100;
+    display: flex;
+    flex-direction: row;
+    margin-left: 10%;
+    word-wrap: inherit;
+}
+
+.main-tab-help-text {
+    font-size: 14px !important;
+    margin-right: 10px !important;
+}
+
+.mat-tab-labels {
+    height: 50px !important;
+}
+
+.rightAlignStyle {
+    text-align: right;
+    padding-right: 16px;
+    margin-left: 2%;
+    margin-top: 1%;
+    margin-bottom: 1%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}

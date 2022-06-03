@@ -22,6 +22,7 @@ sudo mv Python-3.10.2.tgz Python.tgz
 sudo tar -zxf Python.tgz
 sudo mv Python-3.10.2 Python
 cd Python
+sudo yum groupinstall "Development Tools" -y
 sudo yum install gcc -y
 sudo yum install gcc-c++ -y
 sudo yum install zlib -y  

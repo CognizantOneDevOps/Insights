@@ -18,17 +18,16 @@
 echo "#################### Getting Insights WebHook Jar ####################"
 sudo mkdir /opt/insightsWebHook
 cd /opt/insightsWebHook
+touch /etc/profile.d/insightsenvvar.sh
 export INSIGHTS_WEBHOOK=`pwd`
 sudo echo INSIGHTS_WEBHOOK=`pwd` | sudo tee -a /etc/environment
-sudo echo "export" INSIGHTS_WEBHOOK=`pwd` | sudo tee -a /etc/profile
+sudo echo "export" INSIGHTS_WEBHOOK=`pwd` | sudo tee -a /etc/profile.d/insightsenvvar.sh
 . /etc/environment
-. /etc/profile
+. /etc/profile.d/insightsenvvar.sh
 cd /opt/insightsWebHook
-echo -n "Nexus(userName):"
-read userName
-echo "Nexus credential:"
-read -s credential
-sudo wget https://$userName:$credential@infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformInsightsWebHook.jar -O PlatformInsightsWebHook.jar
+echo -n "Enter Release Version: " 
+read releaseVersion
+sudo wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${releaseVersion}/PlatformInsightsWebHook-${releaseVersion}.jar -O PlatformInsightsWebHook.jar
 sleep 2
 sudo nohup java -jar PlatformInsightsWebHook.jar &
 sleep 10

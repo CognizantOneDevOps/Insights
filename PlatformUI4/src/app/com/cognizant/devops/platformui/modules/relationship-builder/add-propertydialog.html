@@ -1,0 +1,60 @@
+<!--
+ *********************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *******************************************************************************-->
+<div>
+    <div class="titleContainer">
+        <h1>Please Add Relationship Properties</h1>
+        <a (click)="closeShowDetailsDialog()" mat-dialog-close>
+            <mat-icon svgIcon="close_dialog" class="closeIcon"> </mat-icon>
+        </a>
+    </div>
+</div>
+<div style="overflow: auto; height: 250px;padding: 0 30px;">
+    <div>
+        <label class="lblText" style="margin-top: 10px;">
+            Property Name(s):
+        </label>
+    </div>
+    <div>
+        <form [formGroup]="propertyForm">
+            <div formArrayName="property_points">
+                <div *ngFor="let item of property_points.controls; let pointIndex=index;first as isFirst;" [formGroupName]="pointIndex"
+                    style="margin: 10px 0;">
+                    <mat-form-field appearance="fill" class="formfield-custom"
+                        style="font: normal normal normal 14px/24px Open Sans">
+                        <input matInput type="text"
+                            formControlName="point" />
+                    </mat-form-field>
+                    <button mat-icon-button (click)="addPropertyPoints()" style="margin-bottom: 10px;">
+                        <mat-icon matTooltip="Add New Property" svgIcon="add">
+                        </mat-icon>
+                    </button>
+                    <button mat-icon-button *ngIf="!isFirst" (click)="deletePropertyPoints(pointIndex)">
+                        <mat-icon matTooltip="Remove New Property" svgIcon="minus">
+                        </mat-icon>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div style="position: fixed; bottom: 10px !important; right: 10px !important;">
+    <div style="display: flex; justify-content: flex-end;"><button mat-button class="button" style="background-color: var(--backgnd-clr10) !important;color: var(--text-clr) !important; 
+            border: 1px solid #000000 !important;margin-right: 12px;"
+            (click)="closeShowDetailsDialog()">Cancel</button>
+        <button mat-button class="button" (click)="getFinalList()">Save</button>
+    </div>
+</div>

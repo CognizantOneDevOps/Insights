@@ -16,17 +16,4 @@
 source /etc/environment
 source /etc/profile
 sudo yum install httpd -y
-cd /etc/httpd/conf
-rm -f httpd.conf
-echo -n "Nexus(userName):"
-read userName
-echo "Nexus credential:"
-read -s credential
-wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/httpd/RHEL/http/httpd.conf
-cd /etc/httpd/conf.d
-rm -f httpd-vhosts.conf
-wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/httpd/RHEL/http/httpd-vhosts.conf
-cd $INSIGHTS_APP_ROOT_DIRECTORY/grafana/conf
-wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL8/httpd/RHEL/http/custom.ini
-apachectl -k start
-service grafana restart
+echo "Please follow the instructions mentioned at https://onedevops.atlassian.net/wiki/spaces/OI/pages/93192312/Apache2+Httpd+Installation+and+Proxy+Setup for further setup"

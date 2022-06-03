@@ -26,16 +26,14 @@ sudo echo INSIGHTS_ENGINE=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" INSIGHTS_ENGINE=`pwd` | sudo tee -a /etc/profile
 source /etc/environment
 source /etc/profile
-echo -n "Nexus(userName):"
-read userName
-echo "Nexus credential:"
-read -s credential
-sudo wget  https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/release/latest/PlatformEngine.jar -O PlatformEngine.jar
+echo -n "Enter Release Version: " 
+read releaseVersion
+sudo wget  https://github.com/CognizantOneDevOps/Insights/releases/download/v${releaseVersion}/PlatformEngine-${releaseVersion}.jar -O PlatformEngine.jar
 sleep 2
 sudo nohup java -jar PlatformEngine.jar > /dev/null 2>&1 &
 sudo chmod -R 777 $INSIGHTS_APP_ROOT_DIRECTORY/insightsengine
 cd /etc/init.d/
-sudo wget  https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/InSightsEngine.sh
+sudo wget  https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL7/initscripts/InSightsEngine.sh
 sudo mv InSightsEngine.sh InSightsEngine
 sudo chmod +x InSightsEngine
 sudo chkconfig InSightsEngine on

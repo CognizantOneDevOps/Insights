@@ -23,6 +23,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -36,8 +37,10 @@ import com.google.gson.JsonObject;
 public class DataDictionaryTest extends DataDictionaryTestData {
 	public static final DataDictionaryTestData dataDictionaryTestData = new DataDictionaryTestData();
 	DataDictionaryServiceImpl dataDictionaryImpl;
+	
 	@BeforeClass
 	public void beforeMethod() throws InsightsCustomException {
+		ApplicationConfigCache.loadConfigCache();
 		WebHookServiceImpl webhookServiceImp = new WebHookServiceImpl();
 		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		dataDictionaryImpl = new DataDictionaryServiceImpl();
@@ -55,8 +58,8 @@ public class DataDictionaryTest extends DataDictionaryTestData {
 
 		List<AgentConfigTO> registeredAgents = agentServiceImpl.getRegisteredAgentsAndHealth();
 		if (registeredAgents.isEmpty()) {
-			String configJson = agentServiceImpl.getToolRawConfigFile("v8.2", "git",false);
 			ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
+			String configJson = agentServiceImpl.getToolRawConfigFile("v9.1", "git",false);
 			String response = agentServiceImpl.registerAgent(dataDictionaryTestData.toolName,
 					dataDictionaryTestData.agentVersion, dataDictionaryTestData.osversion,
 					dataDictionaryTestData.configDetails, dataDictionaryTestData.trackingDetails, false,false,"Agent");

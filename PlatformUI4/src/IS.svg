@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100" height="85" viewBox="0 0 100 85">
+  <defs>
+    <style>
+      .cls-1 {
+        font-size: 72px;
+        fill: #0033a0;
+        font-family: "Open Sans";
+        font-weight: 700;
+      }
+    </style>
+  </defs>
+  <image id="ISBG" width="100" height="85" xlink:href="data:img/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABVCAQAAAAVzYnXAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QAAKqNIzIAAAAJcEhZcwAACxIAAAsSAdLdfvwAAAAHdElNRQfiCh0NFxkWqzjPAAAAnklEQVR42u3c0QnCUAxA0VQcwP2HE9zADqB1iUKPj3smyCX5znY85zH/770dn7ldPcUJvrfZr57hFPsK25iZWeKsCiEVoilEU4imEE0hmkI0hWgK0RSiKURTiKYQTSGaQjSFaArRFKIpRFOIphBNIZpCNIVoCtEUoilEU4imEE0hmkI0hWgK0RSiKURTiKYQTSGaQjTLfBi4z2uNnw8/Q4oNQnSZBoAAAAAASUVORK5CYII="/>
+  <text id="IS" class="cls-1" transform="translate(4.571 74.64) scale(1.27 1.277)">IS</text>
+</svg>

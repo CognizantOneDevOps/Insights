@@ -1,0 +1,200 @@
+/* /*******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+
+/*
+ * this helps the mirrored elements be the right size
+ * and it's generally a good practice
+ */
+
+* {
+  box-sizing: border-box;
+}
+
+.flex {
+  display: flex;
+  padding: 0px 0px 6px;
+  background-color: var(--backgnd-clr13);
+  height: 40vh;
+}
+.taskLabelDivCss {
+  display: inline-block;
+  cursor: pointer;
+  font-size: 12px;
+  background-color: #e0e0e0;
+  box-shadow: 0 2px 4px 0 hsla(0, 0%, 100%, 0.5);
+  border-radius: 3px;
+  margin: 2px 4px;
+  overflow: hidden;
+  transition: background-color 0.1s;
+  max-width: 200px;
+  padding: 8px;
+}
+
+.arrange-horizontally-Dialog {
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+  display: flex;
+  background: var(--backgnd-clr7) !important;
+}
+
+.taskLabelCss {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  vertical-align: bottom;
+  margin-left: 8px;
+  max-width: 90%;
+  display: inline-block;
+}
+
+.containerCls::-webkit-scrollbar-track {
+  margin-bottom: 3%;
+  border-radius: 10px;
+  margin-top: 3%;
+}
+
+.containerCls::-webkit-scrollbar {
+  width: 6px;
+  height: 16px;
+}
+
+.containerCls::-webkit-scrollbar-thumb {
+  background-image: initial;
+  background-position-x: initial;
+  background-position-y: initial;
+  background-size: initial;
+  background-attachment: initial;
+  background-origin: initial;
+  background-clip: initial;
+  background-color: #676666;
+}
+
+.containerCls {
+  overflow-y: auto;
+  flex: 1;
+  border: 1px solid var(--brdr-clr);
+  cursor: move;
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
+}
+
+.task {
+  list-style: none;
+  padding: 8px;
+  border: 1px solid var(--brdr-clr);
+  color: var(--text-clr) !important;
+  overflow: auto;
+  font: normal normal bold 16px/20px Open Sans;
+}
+
+.task:nth-child(odd) {
+  background-color: var(--tbl-odd-row);
+}
+
+a:link,
+a:visited,
+a:hover,
+a:active {
+  color: lightblue;
+}
+.SubHeading {
+  text-align: center;
+  font: normal normal bold 16px/20px Open Sans;
+  letter-spacing: 0px;
+  color: var(--text-clr3) !important;
+  margin-top: 1px;
+  background-color: var(--backgnd-clr7);
+  flex: 1;
+  border: 1px solid var(--brdr-clr);
+}
+.popupCard {
+  background-color: var(--backgnd-clr13);
+}
+.SubHeading2 {
+  margin-left: 7px;
+  text-align: center;
+  font: normal normal bold 16px/20px Open Sans;
+  letter-spacing: 0px;
+  color: var(--text-clr3) !important;
+  margin-top: 1px;
+  background-color: var(--backgnd-clr7);
+  flex: 1;
+  border: 1px solid var(--brdr-clr);
+}
+
+.closeicon {
+  text-align: right;
+  color: white;
+  margin-left: 50%;
+}
+
+.infoHeaderText {
+  text-align: center;
+  font: normal normal normal 12px/20px Open Sans;
+  letter-spacing: 0px;
+  padding-right: 97px;
+  text-align: right;
+}
+.btnbg {
+  background-color: var(--btn-bg);
+  padding: 2%;
+  float: right;
+}
+
+.whiteButton1 {
+  background-color: var(--backgnd-clr10) !important;
+  color: var(--backgnd-clr18) !important;
+  border: 1px solid var(--text-clr6) !important;
+}
+
+.button {
+  font: bold 14px/19px "Open Sans";
+  width: 106px !important;
+  height: 40px !important;
+  border: none !important;
+  border-radius: 0 !important;
+  cursor: pointer;
+  background-color: var(--backgnd-clr1) !important;
+  color: var(--text-clr3) !important;
+  padding: 11px 16px;
+}
+
+.gridheadercenter1 {
+  text-align: left;
+  font: normal normal 600 14px/24px Open Sans;
+  letter-spacing: 0px;
+  color: var(--text-clr3) !important;
+  opacity: 1;
+  text-decoration: none;
+  margin-right: 30px;
+  margin-left: 6px;
+  margin-top: auto;
+  margin-bottom: auto;
+  vertical-align: middle;
+  width: 120%;
+}
+.footerTsk {
+  padding-left: 66%;
+  background-color: var(--nobtn-bg);
+  height: 55px;
+  padding-top: 1%;
+  display: flex;
+}

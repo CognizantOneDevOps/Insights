@@ -1,0 +1,389 @@
+/*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+.loading-indicator {
+  position: fixed;
+  z-index: 999;
+  height: 2em;
+  width: 2em;
+  overflow: show;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+.btnAlignHeader {
+  margin-right: 7px;
+  float: right;
+}
+
+.taskLabelDivCss {
+  display: inline-block;
+  cursor: pointer;
+  font-size: 12px;
+  background-color: #e0e0e0;
+  box-shadow: 0 2px 4px 0 hsla(0, 0%, 100%, 0.5);
+  border-radius: 3px;
+  margin: 2px 4px;
+  overflow: hidden;
+  transition: background-color 0.1s;
+  max-width: 200px;
+  padding-left: 8px;
+  padding-top: 8px;
+}
+
+.optionCss {
+  color: var(--text-clr);
+}
+
+::ng-deep .mat-select-panel .mat-option.mat-selected:not(.mat-option-multiple) {
+  background-color: var(--backgnd-clr19);
+}
+
+.taskLabelCss {
+  font-family: inherit;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  vertical-align: bottom;
+  margin-left: 8px;
+  max-width: 80%;
+  display: inline-block;
+}
+
+.mat-button {
+  font-family: inherit !important;
+  font-size: 15px;
+  font-weight: 500;
+  min-width: 50px;
+}
+
+.mat-cell-header {
+  font-size: 16px;
+  height: 40px;
+  text-align: left;
+  font-family: inherit;
+  width: 40%;
+  padding-left: 10px;
+  text-transform: capitalize;
+}
+
+.mat-cell-value {
+  font-size: 13px;
+  height: 40px;
+  text-align: left;
+  font-family: inherit;
+  width: 200px;
+  padding-left: 10px;
+  padding-right: 10px;
+  width: 80%;
+}
+
+.mat-cell-value-single {
+  font-size: 13px;
+  height: 40px;
+  text-align: left;
+  font-family: inherit;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.btnAlign {
+  margin-right: 7px;
+  float: right;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-image: initial;
+  background-position-x: initial;
+  background-position-y: initial;
+  background-size: initial;
+  background-attachment: initial;
+  background-origin: initial;
+  background-clip: initial;
+  background-color: #cab7b7;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
+
+.tableHeader {
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
+
+.tbody tr {
+  height: 60px;
+  width: 100%;
+  background-color: white !important;
+  margin-bottom: 5px !important;
+}
+
+.mat-dialog-content {
+  margin-top: 10px;
+}
+
+.mat-dialog-actions {
+  float: center;
+}
+
+.eyeCss {
+  height: 35px !important;
+}
+
+::placeholder {
+  margin-left: 10px;
+}
+
+.formBorder h1 {
+  background: #00b140;
+  color: #ffffff;
+  padding: 6px;
+  font-family: Open Sans !important;
+}
+
+.mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
+  background-color: #2d67ff !important;
+}
+
+.dialogtableHeaderCss {
+  background-color: grey;
+  color: white;
+  font-size: 14px;
+  height: 30px;
+  margin: 0px;
+  flex: 0 0 10px;
+  text-align: left;
+}
+
+tr.mat-footer-row,
+tr.mat-row-webhook {
+  height: 45px !important;
+  text-align: left !important;
+  vertical-align: middle;
+  padding-right: 65px !important;
+  padding-left: 65px !important;
+}
+
+.mat-row-webhook:nth-child(even) {
+  background-color: #e1e3e7;
+}
+
+.mat-row-webhook:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+.btnAlign {
+  margin-right: 20px;
+  float: right;
+}
+.footer {
+  justify-content: flex-end;
+}
+
+.mat-select-value {
+  color: #9e9a9a;
+}
+
+.iconClr {
+  color: var(--text-clr);
+}
+
+::ng-deep .mat-select-value {
+  background: none !important;
+}
+
+.inline-fields label {
+  display: inline-block !important;
+}
+
+.mainHeaderText {
+  letter-spacing: 0px;
+  color: var(--text-clr3) !important;
+  opacity: 1;
+  font: normal normal 600 14px/24px Open Sans, Tahoma, San Serif, Helvitica;
+}
+
+.infoHeaderText {
+  font-size: 12px;
+  color: var(--text-clr3) !important;
+  float: right;
+  margin-right: 1%;
+  opacity: 1;
+  margin-top: 0.75%;
+}
+
+.tableHeaderCss {
+  background-color: var(--backgnd-clr7);
+  padding-top: 1%;
+  padding-bottom: 1%;
+  padding-left: 2%;
+  margin-top: 2%;
+}
+
+td.mat-cell:first-of-type {
+  padding-left: 10px !important;
+}
+
+td.mat-cell:last-of-type {
+  padding-right: 10px !important;
+}
+
+.mat-select-disabled {
+  color: rgba(0, 0, 0, 0.38);
+}
+
+tr.mat-header-row {
+  height: 40px;
+}
+
+td.mat-cell {
+  border-bottom-width: 0px;
+  border-bottom-style: none;
+}
+
+.gridheadercenter {
+  font-weight: bold;
+  font-size: 18px;
+  text-decoration: none;
+  color: white;
+  width: 120%;
+  text-align: center;
+  padding-top: 8px;
+  margin-right: -10px;
+}
+
+.columnName {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  font: normal normal normal 14px/24px Open Sans, Tahoma, San Serif, Helvitica;
+  padding: 0 30px 30px 0;
+  color: var(--text-clr);
+}
+
+input:focus {
+  outline: none;
+}
+.closeCss {
+  float: right;
+  padding-right: 30px;
+  color: white;
+  margin-top: 2%;
+  margin-bottom: auto;
+  vertical-align: middle;
+}
+.closeIconCss {
+  padding-right: 30px;
+  color: white;
+  margin-top: auto;
+  margin-bottom: auto;
+  vertical-align: middle;
+}
+
+.columnComponent {
+  margin: 2% 0 0 0;
+}
+
+.flexColCss {
+  background: var(--backgnd-clr10) 0% 0% no-repeat padding-box;
+  border: 1px solid var(--brdr-clr);
+  opacity: 1;
+  padding: 2%;
+  display: grid;
+  grid-template-columns: 50% 50%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.asteriskText {
+  color: #ff0000;
+}
+
+th :first-child {
+  border-radius: 0 0 0 0 !important;
+}
+::ng-deep.mat-paginator-container {
+  min-height: 48px !important;
+}
+.noDataFoundCss {
+  margin-top: 3%;
+  margin-left: 45%;
+  height: 100%;
+  margin-bottom: 3%;
+  font-weight: bold;
+}
+
+::ng-deep .theme-dark .mat-paginator-outer-container {
+  background-color: #141619 !important;
+}
+
+.pageIcons {
+  margin: 14px !important;
+  color: #2c6df5;
+}
+
+.disabled-icon {
+  color: #77777b;
+}
+::ng-deep .mat-datepicker-content .mat-calendar {
+  width: 235px !important;
+  height: 290px !important;
+  background-color: var(--backgnd-clr10) !important;
+  color: var(--text-clr) !important;
+}
+:ng-deep .mat-calendar-arrow {
+  fill: var(--text-clr) !important;
+}
+
+:ng-deep .mat-datepicker-toggle,
+.mat-datepicker-content .mat-calendar-next-button,
+.mat-datepicker-content .mat-calendar-previous-button {
+  color: var(--text-clr) !important;
+}
+
+:ng-deep .mat-calendar-table-header,
+.mat-calendar-body-label {
+  color: var(--text-clr) !important;
+}
+:ng-deep .mat-calendar-body-cell-content {
+  color: var(--text-clr) !important;
+}
+:ng-deep .mat-calendar-header {
+  padding: 0px !important;
+}
+
+.mat-form-field-appearance-fill .mat-form-field-infix {
+  width: 400px;
+}
+.formfield-custom {
+  width: 400px;
+}
+
+.dateInCss {
+  margin-bottom: 0px !important;
+}
+.lblCss {
+  color: var(--lblText);
+  font: normal normal normal 14px/17px Open Sans;
+}

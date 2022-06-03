@@ -1,0 +1,250 @@
+/*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+
+.add-agent-section-dimensions {
+  margin-top: 16px !important;
+}
+
+.add-agent-section-title-dimensions {
+  height: 40px;
+  color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  font-size: 14px;
+  font-family: "Open Sans";
+  letter-spacing: 0px;
+}
+
+.add-agent-section-title {
+  background: var(--backgnd-clr7) 0% 0% no-repeat padding-box;
+}
+
+.add-agent-section-body-dimensions {
+  padding: 16px 24px;
+}
+
+.add-agent-section-body {
+  border: 1px solid var(--brdr-clr);
+  background: var(--backgnd-clr10) 0% 0% no-repeat padding-box;
+}
+
+.agent-categories {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.agent-categories-grid {
+  display: grid;
+  grid-template-columns: 50% 50%;
+}
+.agent-categories-grid-textarea {
+  display: grid;
+  grid-template-columns: auto;
+}
+
+.agent-categories-grid-file {
+  display: grid;
+  grid-template-columns: 40% 60%;
+}
+.agent-category {
+  width: 190px;
+  display: flex;
+  flex-direction: column;
+  font: normal normal normal 14px/24px "Open Sans";
+}
+.agent-category-grid-item {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  font: normal normal normal 14px/24px "Open Sans";
+  padding: 0 30px 30px 0;
+}
+.agent-category-grid-item-textarea {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  font: normal normal normal 14px/24px "Open Sans";
+}
+
+textarea {
+  width: 100%;
+  padding: 0px 10px;
+}
+
+::ng-deep textarea::-webkit-scrollbar-track {
+  background: var(--backgnd-clr12) 0% 0% no-repeat padding-box;
+  border-radius: 0 !important;
+}
+
+::ng-deep textarea::-webkit-scrollbar-thumb {
+  background-color: var(--backgnd-clr18); /* color of the scroll thumb */
+  border-radius: 10px !important;
+}
+
+.add-agent-section-actions {
+  display: flex;
+  flex-direction: row;
+  margin-top: 24px;
+  justify-content: flex-end;
+}
+
+.button-cancel-dimensions {
+  width: 90px;
+  height: 37px;
+
+  font: normal normal 600 14px/24px "Open Sans";
+  letter-spacing: 0px;
+  text-transform: capitalize;
+  text-align: center;
+}
+
+.button-cancel {
+  background: var(--backgnd-clr10) 0% 0% no-repeat padding-box;
+  border: 1px solid var(--text-clr6);
+  color: var(--backgnd-clr18);
+  opacity: 1;
+  cursor: pointer;
+}
+
+.button-save-dimensions {
+  width: 90px;
+  height: 37px;
+  margin-right: 16px;
+  font: normal normal 600 14px/24px "Open Sans";
+  letter-spacing: 0px;
+  text-transform: capitalize;
+  text-align: center;
+  cursor: pointer;
+}
+
+.button-save {
+  background: var(--backgnd-clr18) 0% 0% no-repeat padding-box;
+  opacity: 1;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+}
+
+.button-save:hover {
+  background: var(--btn-hover-bg);
+}
+
+.mat-form-field-appearance-fill .mat-form-field-infix {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  font-size: 14px !important;
+  width: 190px !important;
+  height: 40px;
+}
+.formfield-custom {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  font-size: 14px !important;
+  font-family: "Open Sans";
+  width: 100%;
+}
+.mat-form-field-label,
+.mat-select {
+  font-size: 14px;
+}
+
+.mat-select-panel {
+  width: 190px !important;
+  max-width: none !important;
+  min-width: auto !important;
+}
+
+.mat-select-panel-wrap {
+  width: 190px !important;
+  min-width: 190px !important;
+}
+
+.file-input-style::-webkit-file-upload-button {
+  background-color: var(--backgnd-clr18) !important;
+  width: 140px !important;
+  height: 40px !important;
+  border: none !important;
+  border-radius: 0 !important;
+  color: #fff !important;
+  margin-right: 20px !important;
+  cursor: pointer;
+}
+.file-input-style::-webkit-file-upload-button:hover {
+  background-color: var(--btn-hover-bg) !important;
+}
+
+.mat-icon {
+  height: 25px !important;
+  width: 25px !important;
+}
+
+.file-upload-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.file-name-container {
+  width: 50%;
+  height: 80%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #b9bbbc;
+  padding: 12px 16px 10px 20px;
+}
+
+.upload-action {
+  border: 1px solid var(--brdr-clr);
+  border-radius: 0;
+}
+
+.buttonUploader {
+  background-color: var(--backgnd-clr18) !important;
+  width: 140px !important;
+  height: 40px !important;
+  border: none !important;
+  border-radius: 0 !important;
+  color: #fff !important;
+  margin-right: 20px !important;
+  cursor: pointer;
+}
+
+.textarea {
+  ::ng-deep .mat-form-field-appearance-fill .mat-form-field-flex {
+    height: 100%;
+  }
+}
+
+.button {
+  font: bold 14px/19px "Open Sans";
+  width: 106px !important;
+  height: 40px !important;
+  border: none !important;
+  border-radius: 0 !important;
+  cursor: pointer;
+  background-color: var(--backgnd-clr1) !important;
+  color: var(--text-clr3) !important;
+  padding: 11px 16px;
+}
+
+.whiteButton1 {
+  background-color: var(--backgnd-clr10) !important;
+  color: var(--backgnd-clr18) !important;
+  border: 1px solid var(--text-clr6) !important;
+}

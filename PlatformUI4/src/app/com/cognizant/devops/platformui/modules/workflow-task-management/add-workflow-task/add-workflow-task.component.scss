@@ -1,0 +1,101 @@
+/*
+*******************************************************************************
+ * Copyright 2021 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *******************************************************************************/
+
+.add-task-section {
+  margin: 16px 0;
+
+  .title {
+    height: 40px;
+    color: var(--text-clr3) !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px 0 24px;
+    font-size: 14px;
+    font-family: "Open Sans";
+    letter-spacing: 0px;
+    background: var(--backgnd-clr7) 0% 0% no-repeat padding-box;
+
+    .main-title {
+      font-weight: 600;
+    }
+
+    .sub-title {
+      font-weight: normal;
+    }
+  }
+
+  .section-body {
+    padding: 24px 25px;
+    border: 1px solid var(--brdr-clr);
+    background-color: var(--backgnd-clr10);
+
+    .two-field-grid {
+      display: grid;
+      grid-template-columns: 45% 45%;
+      column-gap: 20px;
+      row-gap: 24px;
+
+      .grid-item {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        font: normal normal normal 14px/24px "Open Sans";
+
+        ::ng-deep .mat-form-field-infix {
+          margin-top: 12px !important;
+          opacity: 0.9 !important;
+          padding: 0 !important;
+          border-top: none !important;
+          width: 100%;
+        }
+      }
+    }
+
+    .single-field-grid {
+      display: grid;
+      grid-template-columns: auto;
+      width: 95%;
+      margin-top: 24px;
+
+      .grid-item-textarea {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        font: normal normal normal 14px/24px "Open Sans";
+      }
+
+      ::ng-deep .mat-form-field-appearance-fill .mat-form-field-flex {
+        height: 100%;
+      }
+    }
+  }
+}
+
+.mat-icon-button {
+  color: var(--backgnd-clr1);
+}
+
+::ng-deep .mat-select-panel-wrap {
+  .custom-select-class {
+    margin-top: 5px !important;
+  }
+}
+
+::ng-deep .mat-select-panel-wrap:has(.custom-select-class) {
+  width: 100%;
+}

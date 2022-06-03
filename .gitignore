@@ -10,3 +10,9 @@
 **/package-lock.json
 **/test-output/*
 /.metadata/
+**/PlatformUI4/.angular/**
+**/PlatformUI3/.angular/**
+**/PlatformUI4/node_modules/**
+**/PlatformUI4/node/**
+**/PlatformUI4/insights/**
+

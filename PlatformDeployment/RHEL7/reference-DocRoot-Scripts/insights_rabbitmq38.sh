@@ -18,11 +18,7 @@ yum update
 source /etc/environment
 source /etc/profile
 cd $INSIGHTS_APP_ROOT_DIRECTORY
-echo -n "Nexus(userName):"
-read userName
-echo "Nexus credential:"
-read -s credential
-wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/rabbitmq/epel-release-latest-7.noarch.rpm
+wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 sudo yum install epel-release-latest-7.noarch.rpm
 sudo yum --disablerepo="*" --enablerepo="epel" list available
 sudo yum search htop
@@ -30,20 +26,17 @@ sudo yum info htop
 sudo yum install htop
 cd $INSIGHTS_APP_ROOT_DIRECTORY
 sudo mkdir erlang && cd erlang
-sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/rabbitmq/esl-erlang_23.0-1~centos~7_amd64.rpm
-sudo mv esl-erlang_23.0-1~centos~7_amd64.rpm erlang.rpm
-#sudo rpm -ivh erlang.rpm
+sudo wget https://github.com/rabbitmq/erlang-rpm/releases/download/v23.0.1/erlang-23.0.1-1.el7.x86_64.rpm
+sudo mv erlang-23.0.1-1.el7.x86_64.rpm erlang.rpm
 sudo yum install erlang.rpm
 echo "#################### Installing Rabbit MQ with configs and user creation ####################"
 sudo mkdir rabbitmq && cd rabbitmq
-sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/rabbitmq/socat-1.7.3.2-2.el7.x86_64.rpm
+sudo wget http://mirror.centos.org/centos/7/os/x86_64/Packages/socat-1.7.3.2-2.el7.x86_64.rpm
 sudo rpm -ivh socat-1.7.3.2-2.el7.x86_64.rpm
-sudo rpm --import https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/rabbitmq/rabbitmq-signing-key-public.asc
-sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/rabbitmq/rabbitmq-server-3.8.5-1.el7.noarch.rpm
+sudo rpm --import https://www.rabbitmq.com/rabbitmq-signing-key-public.asc
+sudo wget https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.8.5/rabbitmq-server-3.8.5-1.el7.noarch.rpm
 sudo mv rabbitmq-server-3.8.5-1.el7.noarch.rpm rabbitmq-server.noarch.rpm
 sudo rpm -ivh rabbitmq-server.noarch.rpm
-sudo wget https://$userName:$credential@infra.cogdevops.com/repository/docroot/insights_install/installationScripts/latest/RHEL/rabbitmq/RabbitMQ.zip
-sudo unzip RabbitMQ.zip && cd RabbitMQ && sudo cp rabbitmq.config /etc/rabbitmq/
 sudo chkconfig rabbitmq-server on && sudo service rabbitmq-server start
 sudo rabbitmq-plugins enable rabbitmq_management
 sleep 15

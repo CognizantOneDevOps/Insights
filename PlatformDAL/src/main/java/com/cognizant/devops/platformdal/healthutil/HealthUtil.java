@@ -15,8 +15,13 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.healthutil;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -97,8 +102,31 @@ public class HealthUtil {
 					}
 					returnResponse = buildSuccessResponse(strResponse, hostEndPoint, displayType, version);
 				} else if (serviceType.equalsIgnoreCase(ServiceStatusConstants.PgSQL)) {
+					hostEndPoint = ApplicationConfigProvider.getInstance().getPostgre().getInsightsDBUrl();
 					PostgresMetadataHandler pgdbHandler = new PostgresMetadataHandler();
 					version = pgdbHandler.getPostgresDBVersion();
+					returnResponse = buildSuccessResponse(strResponse, hostEndPoint, displayType, version);
+				} else if (serviceType.equalsIgnoreCase(ServiceStatusConstants.GRAFANA)
+						|| serviceType.equalsIgnoreCase(ServiceStatusConstants.LOKI)
+						|| serviceType.equalsIgnoreCase(ServiceStatusConstants.VAULT)
+						) {
+					json = JsonUtils.parseStringAsJsonObject(serviceResponse);
+					version = json.get(VERSION).getAsString();
+					returnResponse = buildSuccessResponse(strResponse, hostEndPoint, displayType, version);
+				} else if (serviceType.equalsIgnoreCase(ServiceStatusConstants.PROMTAIL)) {
+					version = "";
+					returnResponse = buildSuccessResponse(strResponse, hostEndPoint, displayType, version);
+				} else if (serviceType.equalsIgnoreCase(ServiceStatusConstants.H2O)) {
+					json = JsonUtils.parseStringAsJsonObject(serviceResponse);
+					JsonArray entries = json.getAsJsonArray("entries");
+					for (JsonElement entry : entries) {
+						JsonObject entryJson = entry.getAsJsonObject();
+						String entryName = entryJson.get("name").getAsString();
+						if(entryName.equalsIgnoreCase("Build project version")) {
+							version = entryJson.get("value").getAsString();
+						}
+					}
+					
 					returnResponse = buildSuccessResponse(strResponse, hostEndPoint, displayType, version);
 				}
 			} else {
@@ -440,38 +468,45 @@ public class HealthUtil {
 	public JsonObject getDataComponentStatus() {
 		JsonObject dataComponentStatus = new JsonObject();
 		try {
-			String username = null;
-			String password = null;
-			String authToken = null;
-			String hostEndPoint = "";
-			String apiUrl = "";
-			hostEndPoint = ServiceStatusConstants.POSTGRESQL_HOST;
-			apiUrl = hostEndPoint;
-			JsonObject postgreStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,
-					ServiceStatusConstants.PgSQL, Boolean.FALSE, username, password, authToken);
+			JsonObject grafanaStatus = getComponentStatusResponse(ServiceStatusConstants.GRAFANA);
+			dataComponentStatus.add(ServiceStatusConstants.GRAFANA, grafanaStatus);
+			JsonObject postgreStatus = getComponentStatusResponse(ServiceStatusConstants.PgSQL);
 			dataComponentStatus.add(ServiceStatusConstants.PgSQL, postgreStatus);
-			hostEndPoint = ServiceStatusConstants.NEO4J_HOST;
-			apiUrl = hostEndPoint; 
-			if(ApplicationConfigProvider.getInstance().getGraph().getVersion().contains("3.5")) {
-				apiUrl += "/db/data/";
-			}
-			authToken = ApplicationConfigProvider.getInstance().getGraph().getAuthToken();
-			JsonObject neo4jStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,
-					ServiceStatusConstants.Neo4j, Boolean.TRUE, username, password, authToken);
+			JsonObject neo4jStatus = getComponentStatusResponse(ServiceStatusConstants.Neo4j);
 			dataComponentStatus.add(ServiceStatusConstants.Neo4j, neo4jStatus);
-			hostEndPoint = ServiceStatusConstants.ES_HOST;
-			apiUrl = hostEndPoint;
-			JsonObject esStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,
-					ServiceStatusConstants.ES, Boolean.FALSE, username, password, authToken);
-			dataComponentStatus.add(ServiceStatusConstants.ES, esStatus);
-			hostEndPoint = ServiceStatusConstants.RABBIT_MQ;
-			apiUrl = hostEndPoint + "/api/overview";
-			authToken = null;
-			username = ApplicationConfigProvider.getInstance().getMessageQueue().getUser();
-			password = ApplicationConfigProvider.getInstance().getMessageQueue().getPassword();
-			JsonObject rabbitMq = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,
-					ServiceStatusConstants.RabbitMq, Boolean.TRUE, username, password, authToken);
-			dataComponentStatus.add(ServiceStatusConstants.RabbitMq, rabbitMq);
+			JsonObject rabbitMqStatus = getComponentStatusResponse(ServiceStatusConstants.RabbitMq);
+			dataComponentStatus.add(ServiceStatusConstants.RabbitMq, rabbitMqStatus);
+			String pythonVersion = getPythonVersion();
+			if(pythonVersion != null && pythonVersion.length() != 0) {
+				JsonObject pythonStatus= new JsonObject();
+				pythonStatus.addProperty("status", "success");
+				pythonStatus.addProperty("message", "");
+				pythonStatus.addProperty("type", ServiceStatusConstants.OTHERS);
+				pythonStatus.addProperty("endpoint", "");
+				pythonStatus.addProperty( VERSION, pythonVersion.substring(7));
+				dataComponentStatus.add(ServiceStatusConstants.PYTHON, pythonStatus);
+			}
+			if(ServiceStatusConstants.ES_HOST != null && !ServiceStatusConstants.ES_HOST.isEmpty() ) {				
+				JsonObject esStatus = getComponentStatusResponse(ServiceStatusConstants.ES);
+				dataComponentStatus.add(ServiceStatusConstants.ES, esStatus);
+			}
+			if(ServiceStatusConstants.LOKI_HOST != null && !ServiceStatusConstants.LOKI_HOST.isEmpty() ) {			
+				JsonObject lokiStatus = getComponentStatusResponse(ServiceStatusConstants.LOKI);
+				dataComponentStatus.add(ServiceStatusConstants.LOKI, lokiStatus);
+			}
+			if(ServiceStatusConstants.PROMTAIL_HOST != null && !ServiceStatusConstants.PROMTAIL_HOST.isEmpty() ) {	
+				JsonObject promtailStatus = getComponentStatusResponse(ServiceStatusConstants.PROMTAIL);
+				dataComponentStatus.add(ServiceStatusConstants.PROMTAIL, promtailStatus);
+			}
+			if(ServiceStatusConstants.VAULT_HOST != null && !ServiceStatusConstants.VAULT_HOST.isEmpty() ) {				
+				JsonObject vaultStatus = getComponentStatusResponse(ServiceStatusConstants.VAULT);
+				dataComponentStatus.add(ServiceStatusConstants.VAULT, vaultStatus);
+			}
+			if(ServiceStatusConstants.H2O_HOST != null && !ServiceStatusConstants.H2O_HOST.isEmpty() ) {				
+				JsonObject h2oStatus = getComponentStatusResponse(ServiceStatusConstants.H2O);
+				dataComponentStatus.add(ServiceStatusConstants.H2O, h2oStatus);
+			}
+			
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== Error creating HTML body for data components");
 		}
@@ -559,6 +594,97 @@ public class HealthUtil {
 		}
 		
 		return agentJson;
+	}
+	
+	private String getPythonVersion() {
+		StringBuilder version = new StringBuilder();
+		try {
+			Process process;
+			process = Runtime.getRuntime().exec("python -V");
+			BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			String line;
+			while((line = in.readLine()) != null) {
+				version.append(line);
+			}
+			process.destroy();
+		} catch (IOException e) {
+			log.error("Error getting python versions ", e);
+		}
+		return version.toString();
+	}
+	
+	private JsonObject getComponentStatusResponse(String componentName) {
+		JsonObject response;
+		
+		String username = null;
+		String password = null;
+		String authToken = null;
+		String hostEndPoint = "";
+		String apiUrl = "";
+		String componentType = "";
+		Boolean isAuthRequired = false;
+		
+		switch (componentName) {
+		case ServiceStatusConstants.PgSQL:
+			hostEndPoint = ServiceStatusConstants.POSTGRESQL_HOST;
+			apiUrl = hostEndPoint;
+			componentType = ServiceStatusConstants.DB;
+			break;
+		case ServiceStatusConstants.Neo4j:
+			hostEndPoint = ServiceStatusConstants.NEO4J_HOST;
+			if(ApplicationConfigProvider.getInstance().getGraph().getVersion().contains("3.5")) {
+			apiUrl = hostEndPoint + "/db/data/";
+			}
+			componentType = ServiceStatusConstants.DB;
+			isAuthRequired = true;
+			authToken = ApplicationConfigProvider.getInstance().getGraph().getAuthToken();
+			break;
+		case ServiceStatusConstants.RabbitMq:
+			hostEndPoint = ServiceStatusConstants.RABBIT_MQ_HOST;
+			apiUrl = hostEndPoint + "/api/overview";
+			componentType = ServiceStatusConstants.DB;
+			isAuthRequired = true;
+			username = ApplicationConfigProvider.getInstance().getMessageQueue().getUser();
+			password = ApplicationConfigProvider.getInstance().getMessageQueue().getPassword();
+			break;
+		case ServiceStatusConstants.GRAFANA:
+			hostEndPoint = ServiceStatusConstants.GRAFANA_HOST;
+			apiUrl = hostEndPoint + "/api/health";
+			componentType = ServiceStatusConstants.OTHERS;
+			break;
+		case ServiceStatusConstants.ES:
+			hostEndPoint = ServiceStatusConstants.ES_HOST;
+			apiUrl = hostEndPoint;
+			componentType = ServiceStatusConstants.OTHERS;
+			break;
+		case ServiceStatusConstants.LOKI:
+			hostEndPoint = ServiceStatusConstants.LOKI_HOST;
+			apiUrl = hostEndPoint + "/loki/api/v1/status/buildinfo";
+			componentType = ServiceStatusConstants.OTHERS;
+			break;
+		case ServiceStatusConstants.PROMTAIL:
+			hostEndPoint = ServiceStatusConstants.PROMTAIL_HOST;
+			apiUrl = hostEndPoint + "/ready";
+			componentType = ServiceStatusConstants.OTHERS;
+			break;
+		case ServiceStatusConstants.VAULT:
+			hostEndPoint = ServiceStatusConstants.VAULT_HOST;
+			apiUrl = hostEndPoint + "/sys/health";
+			componentType = ServiceStatusConstants.OTHERS;
+			break;
+		case ServiceStatusConstants.H2O:
+			hostEndPoint = ServiceStatusConstants.H2O_HOST;
+			apiUrl = hostEndPoint + "/3/About"; 
+			componentType = ServiceStatusConstants.OTHERS;
+			break;
+		default:
+			break;
+		}
+		
+		response = getClientResponse(hostEndPoint, apiUrl, componentType,
+				componentName, isAuthRequired, username, password, authToken);
+		
+		return response;
 	}
 
 }
