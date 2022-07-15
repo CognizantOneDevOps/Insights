@@ -40,7 +40,7 @@ body {
   &.button {
     background-color: var(--backgnd-clr1) !important;
     color: var(--text-clr3) !important;
-  }
+}
   &.whiteButton {
     background-color: var(--backgnd-clr10) !important;
     color: var(--text-clr) !important;
@@ -83,6 +83,7 @@ body {
   color: var(--frm-field-txt) !important;
   font: normal normal normal 14px/17px Open Sans;
 }
+
 .mat-input-element {
   background: var(--backgnd-clr8) 0% 0% no-repeat padding-box;
   opacity: 1;
@@ -116,7 +117,9 @@ body {
 }
 
 .mat-form-field.mat-focused {
-  border: 2px solid var(--backgnd-clr1);
+  border-top:2px solid var(--backgnd-clr1);
+  border-left:2px solid var(--backgnd-clr1);
+  border-right:2px solid var(--backgnd-clr1);
 }
 
 .mat-form-field-underline {
@@ -171,6 +174,36 @@ input:-webkit-autofill:active {
   overflow: hidden !important;
   border-radius: 0px !important;
   background-color: var(--backgnd-clr13) !important;
+}
+
+//Session Dialog box
+.session-dialog-container .mat-dialog-container {
+  padding: 0px !important;
+  margin: 0px !important;
+  overflow: hidden !important;
+  border-radius: 0px !important;
+  background-color: #ffffff !important;
+  color: #000000;
+}
+
+.buttonSession {
+  background-color: #2d67ff !important;
+  color: #ffffff !important;
+}
+
+.buttonSession:active {
+  background-color: #2d67ff !important;
+  color: #ffffff !important;
+}
+
+.buttonSession:hover {
+  background-color: #328dff !important;
+  color: #000063 !important;
+}
+
+.buttonSession:disabled {
+  background-color: var(--backgnd-clr4) !important;
+  color: var(--btnDisabled) !important;
 }
 
 // Overflow with scrollbars

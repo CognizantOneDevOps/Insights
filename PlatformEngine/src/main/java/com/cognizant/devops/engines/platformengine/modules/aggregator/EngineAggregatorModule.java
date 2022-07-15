@@ -112,31 +112,22 @@ public class EngineAggregatorModule implements Job, ApplicationConfigInterface {
 
 	private void registerAggragators(AgentConfig agentConfig, GraphDBHandler graphDBHandler, String toolName,
 			List<BusinessMappingData> businessMappingList) {
-			Boolean isEnrichmentRequired= false;
-		String targetProperty="";
-		String keyPattern="";
-		String sourceProperty ="";
 		try {
 			JsonObject config = JsonUtils.parseStringAsJsonObject(agentConfig.getAgentJson());
 			JsonObject json = config.get("publish").getAsJsonObject();
 			String dataRoutingKey = json.get("data").getAsString();
 			boolean hasenrichTool = config.has("enrichData");
-			
+			JsonObject enrichTool = null;
 			
 			if (hasenrichTool) {
-				JsonObject enrichTool = config.get("enrichData").getAsJsonObject();
-				isEnrichmentRequired = enrichTool.get("isEnrichmentRequired").getAsBoolean();
-				targetProperty = enrichTool.get("targetProperty").getAsString();
-				keyPattern = enrichTool.get("keyPattern").getAsString();
-				sourceProperty = enrichTool.get("sourceProperty").getAsString();				
+				 enrichTool = config.get("enrichData").getAsJsonObject();
 			}
 			log.debug(" Type=AgentEngine toolName={} category={} agentId={} routingKey={} dataSize={} execId={} ProcessingTime={} dataRoutingKey {} Tool Info {}" ,toolName,agentConfig.getToolCategory(),agentConfig.getAgentKey(),dataRoutingKey,0,"-",0,dataRoutingKey,toolName);
 
 			if (dataRoutingKey != null && !registry.containsKey(dataRoutingKey)) {
 				try {
 					registry.put(dataRoutingKey, new AgentDataSubscriber(dataRoutingKey,
-							agentConfig.getToolCategory(), agentConfig.getLabelName(), toolName, businessMappingList,isEnrichmentRequired, targetProperty,
-							keyPattern,sourceProperty,agentConfig.getAgentKey()));
+							agentConfig.getToolCategory(), agentConfig.getLabelName(), toolName, businessMappingList,agentConfig.getAgentKey(),enrichTool));
 					log.debug(" Type=AgentEngine toolName={} category={} agentId={} routingKey={} dataSize={} execId={} ProcessingTime={} Successfully registered data subscriber for routing key: {}  " ,toolName,agentConfig.getToolCategory(),agentConfig.getAgentKey(),dataRoutingKey,0,"-",0,dataRoutingKey);
 				} catch (Exception e) {
 					log.error(" toolName={} category={} agentId={} routingKey={} Unable to add data subscriber for routing key: {} " ,toolName,agentConfig.getToolCategory(),agentConfig.getAgentKey(),dataRoutingKey, dataRoutingKey, e);

@@ -47,10 +47,19 @@
         </mat-icon>
       </button>
 
-      <button mat-icon-button>
+      <button *ngIf="!isEdit" mat-icon-button>
         <mat-icon
           matTooltip="Reset"
           (click)="reset()"
+          svgIcon="exit"
+          class="mat-icon material-icons"
+        >
+        </mat-icon>
+      </button>
+      <button *ngIf="isEdit" mat-icon-button>
+        <mat-icon
+          matTooltip="Reset"
+          (click)="resetData()"
           svgIcon="exit"
           class="mat-icon material-icons"
         >
@@ -105,7 +114,6 @@
             <mat-option
               *ngFor="let vUtil of visualizationUtilList"
               value="{{ vUtil }}"
-              style="color: #0033a0"
             >
               {{ vUtil }}</mat-option
             >
@@ -148,7 +156,6 @@
             <mat-option
               *ngFor="let vUtil of templateTypeList"
               value="{{ vUtil }}"
-              style="color: #0033a0"
             >
               {{ vUtil }}</mat-option
             >

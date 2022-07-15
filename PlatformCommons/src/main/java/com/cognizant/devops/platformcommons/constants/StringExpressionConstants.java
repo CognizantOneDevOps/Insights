@@ -14,20 +14,21 @@
 * the License.
 ******************************************************************************/
 package com.cognizant.devops.platformcommons.constants;
-public interface StringExpressionConstants {
 
-	String STR_EXP_TASKEXECUTION= "Type=TaskExecution executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}";
-	String STR_REGEX = "<[^>]*>";
-	String STR_EXP_TASKEXECUTION_1="Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}";
-	String STR_EXP_WORKFLOW="Type=WorkFlow ExecutionId={} WorkflowId={} WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetry={} isTaskRetry={} processingTime={} message={}";
-	String STR_EXP_WORKFLOW_1="Type=WorkFlow ExecutionId={} WorkflowId={} WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetryCount={} isTaskRetry={} processingTime={} message={}";
-	String STR_EXP_TASKMQ="TaskMQChannel={} WorkflowType={} processingTime={} status ={} message={}" ;
-	String STR_EXP_WORKFLOW_2="Type=WorkFlow executionId={} WorkflowId={} LastRunTime={} NextRunTime={} schedule={} isTaskRetry={} TaskRetryCount={} TaskDescription={} ";
-	String STR_EXP_EMAIL_EXECUTION="Type=EmailExecution executionId={} workflowId={} ReportName={} mailto={} mailFrom={} ProcessingTime={} message={}";
-	String STR_EXP_WORKFLOW_3="Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetryCount={} processingTime={} message={}";
-	String STR_EXP_WORKFLOW_4="Type=WorkFlow executionId={} workflowId={} LastRunTime={} NextRunTime={} schedule={} isTaskRetry={} ";
-	String STR_EXP_TASKRETRYCOUNT="TaskRetryCount={} TaskDescription={} TaskMQChannel={} WorkflowType={} processingTime={} status ={} message={}";
-	String STR_EXP_WORKFLOWINITIALIZER="Type=WorkFlowInitializer TaskDescription={} TaskMQChannel={} componentName{} WorkflowType={} processingTime={} status ={} message={}";
-	String STR_EXP_TASK = "Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}";
+public final class StringExpressionConstants {
+
+	public static final String STR_EXP_TASKEXECUTION= "Type=TaskExecution executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}";
+	public static final String STR_REGEX = "<[^>]*>";
+	public static final String STR_EXP_TASKEXECUTION_1="Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}";
+	public static final String STR_EXP_WORKFLOW="Type=WorkFlow ExecutionId={} WorkflowId={} WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetry={} isTaskRetry={} processingTime={} message={}";
+	public static final String STR_EXP_WORKFLOW_1="Type=WorkFlow ExecutionId={} WorkflowId={} WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetryCount={} isTaskRetry={} processingTime={} message={}";
+	public static final String STR_EXP_TASKMQ="TaskMQChannel={} WorkflowType={} processingTime={} status ={} message={}" ;
+	public static final String STR_EXP_WORKFLOW_2="Type=WorkFlow executionId={} WorkflowId={} LastRunTime={} NextRunTime={} schedule={} isTaskRetry={} TaskRetryCount={} TaskDescription={} ";
+	public static final String STR_EXP_EMAIL_EXECUTION="Type=EmailExecution executionId={} workflowId={} ReportName={} mailto={} mailFrom={} ProcessingTime={} message={}";
+	public static final String STR_EXP_WORKFLOW_3="Type=WorkFlow ExecutionId={}  WorkflowId={}  WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetryCount={} processingTime={} message={}";
+	public static final String STR_EXP_WORKFLOW_4="Type=WorkFlow executionId={} workflowId={} LastRunTime={} NextRunTime={} schedule={} isTaskRetry={} ";
+	public static final String STR_EXP_TASKRETRYCOUNT="TaskRetryCount={} TaskDescription={} TaskMQChannel={} WorkflowType={} processingTime={} status ={} message={}";
+	public static final String STR_EXP_WORKFLOWINITIALIZER="Type=WorkFlowInitializer TaskDescription={} TaskMQChannel={} componentName{} WorkflowType={} processingTime={} status ={} message={}";
+	public static final String STR_EXP_TASK = "Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}";
 
 }

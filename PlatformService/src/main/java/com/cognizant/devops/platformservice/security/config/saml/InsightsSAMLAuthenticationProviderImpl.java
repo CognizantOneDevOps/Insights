@@ -101,8 +101,8 @@ public class InsightsSAMLAuthenticationProviderImpl extends SAMLAuthenticationPr
         Object principal = getPrincipal(credential, userDetails);
         
         List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
-		updatedAuthorities.add(SpringAuthority.valueOf("Viewer"));
-
+       
+		updatedAuthorities.add(SpringAuthority.valueOf("Viewer")); 
         Date expiration = getExpirationDate(credential);
 
         SAMLCredential authenticationCredential = excludeCredential ? null : credential;

@@ -55,8 +55,7 @@ public class ServerConfigController {
 		JsonObject serverConfigDetail = new JsonObject();
 		try {
 			serverConfigJson = serverConfigJson.replace("\n", "").replace("\r", "");
-			String validatedResponse = ValidationUtils.validateRequestBody(serverConfigJson);
-			log.debug("validatedResponse  ===== {}",validatedResponse);
+			ValidationUtils.validateRequestBody(serverConfigJson);
 			
 			boolean isAdded = serverConfigServiceImpl.saveServerConfigTemplate(serverConfigJson,"local");
 			serverConfigDetail.addProperty("message", "Server Config successfully added ... "+isAdded);

@@ -15,11 +15,11 @@
  ******************************************************************************/
 package com.cognizant.devops.platformcommons.constants;
 
-public interface MilestoneConstants  {
-	 String STARTDATE = "startDate";
-	 String ENDDATE = "endDate";
-	 String MILESTONENAME = "mileStoneName";
-	 String STATUS = "status";
-	 String EXECID ="execId";
-	 String MILESTONE_RELEASEID = "milestoneReleaseID";
+public final class MilestoneConstants  {
+	 public static final String STARTDATE = "startDate";
+	 public static final String ENDDATE = "endDate";
+	 public static final String MILESTONENAME = "mileStoneName";
+	 public static final String STATUS = "status";
+	 public static final String EXECID ="execId";
+	 public static final String MILESTONE_RELEASEID = "milestoneReleaseID";
 }

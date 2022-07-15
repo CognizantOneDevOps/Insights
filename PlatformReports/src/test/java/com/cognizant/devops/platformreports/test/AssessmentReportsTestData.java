@@ -112,12 +112,12 @@ public class AssessmentReportsTestData {
 	JsonObject reportTemplateJson = JsonUtils.parseStringAsJsonObject(reportTemplatekpi);
 	JsonObject reportTemplateKpisJson = JsonUtils.parseStringAsJsonObject(reportTemplatekpis);
 
-	String assessmentReportWithEmail = "{\"reportName\":\"report_Email_test10002154\",\"reportTemplate\":" + reportIdProdRT + ",\"emailList\":\"abc@abc.com\",\"vUtil\":\"GRAFANAPDF\",\"schedule\":\"ONETIME\",\"startdate\":\"2022-03-04T00:00:00Z\",\"enddate\":\"2022-04-04T00:00:00Z\",\"isReoccuring\":false,\"datasource\":\"\",\"emailDetails\": {\"senderEmailAddress\":\"abc@abc.com\",\"receiverEmailAddress\":\"abcd@abcd.com\",\"receiverCCEmailAddress\":\"sb@sb.com\",\"receiverBCCEmailAddress\":\"sb@sb.com\",\"mailSubject\":\"Sub_mail\",\"mailBodyTemplate\":\"sending a mail for report\"},\"asseementreportdisplayname\":\"Report_test\"}";
+	String assessmentReportWithEmail="";
 	String assessmentReportWithoutEmail = "{\"reportName\":\"report_test100021548\",\"reportTemplate\":" + reportIdProdRT + ",\"emailList\":\"abc@abc.com\",\"vUtil\":\"GRAFANAPDF\",\"schedule\":\"ONETIME\",\"startdate\":\"2022-03-04T00:00:00Z\",\"enddate\":\"2022-04-04T00:00:00Z\",\"isReoccuring\":false,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
 	String assessmentReportFail = "{\"reportName\":\"report_test_Sonar100064032\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":" + reportIdSonarRT + ",\"vUtil\":\"GRAFANAPDF\",\"emailList\":\"abc@abc.com\",\"schedule\":\"QUARTERLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
 	String assessmentReportWrongkpi = "{\"reportName\":\"report_test_10083556935\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":" + reportIdkpiRT + ",\"vUtil\":\"GRAFANAPDF\",\"emailList\":\"abc@abc.com\",\"schedule\":\"MONTHLY\",\"startdate\":null,\"enddate\":\"2022-04-04T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
 	String assessmentReportWrongkpis = "{\"reportName\":\"report_test_10083563542\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":" + reportIdkpisRT + ",\"vUtil\":\"GRAFANAPDF\",\"emailList\":\"abc@abc.com\",\"schedule\":\"MONTHLY\",\"startdate\":null,\"enddate\":\"2022-04-04T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-	String assessmentReport = "{\"reportName\":\"report_test100021547\",\"reportTemplate\":" + reportIdProdRT + ",\"emailList\":\"abc@abc.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"vUtil\":\"GRAFANAPDF\",\"startdate\":\"2022-03-12T00:00:00Z\",\"enddate\":\"2022-04-04T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"emailDetails\":null,\"asseementreportdisplayname\":\"Report_test\"}";
+	String assessmentReport = "{\"reportName\":\"report_test100021547\",\"reportTemplate\":" + reportIdProdRT + ",\"emailList\":\"onedevops@cogdevops.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"vUtil\":\"GRAFANAPDF\",\"startdate\":\"2022-03-12T00:00:00Z\",\"enddate\":\"2022-04-04T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"emailDetails\":null,\"asseementreportdisplayname\":\"Report_test\"}";
 
 	String mqChannelKpiExecution = "TEST.WORKFLOW.TASK.KPI.EXCECUTION";
 	String mqChannelPDFExecution = "TEST.WORKFLOW.TASK.PDF.EXCECUTION";
@@ -483,9 +483,15 @@ public class AssessmentReportsTestData {
 		return reportId;
 
 	}
+	
+	public void populateDataWithEmail() {
+		String From= testAuthData.get("From");
+		String To= testAuthData.get("TO");
+		assessmentReportWithEmail = "{\"reportName\":\"report_Email_test10002154\",\"reportTemplate\":" + reportIdProdRT + ",\"emailList\":\"onedevops@cogdevops.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"startdate\":\"2020-05-12T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\": {\"senderEmailAddress\":\""+ From +"\",\"receiverEmailAddress\":\""+ To +"\",\"receiverCCEmailAddress\":\"\",\"receiverBCCEmailAddress\":\"\",\"mailSubject\":\"Sub_mail\",\"mailBodyTemplate\":\"sending a mail for report\"}}";	
+	}
 	public void getData() {
-		String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + UnitTestConstant.Report_Test_Data+ File.separator
-				+ "grafanaAuthReport.json";
+		String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + UnitTestConstant.TESTNG_TESTDATA+ File.separator
+				+ "grafanaAuth.json";
 		JsonElement jsonData;
 		try {
 			jsonData = JsonUtils.parseReader(new FileReader(new File(path).getCanonicalPath()));
@@ -562,8 +568,8 @@ public class AssessmentReportsTestData {
 			//httpRequest.addHeader("Authorization", testAuthData.get(AUTHORIZATION));
 			headers.put("Content-Type", "application/json");
 			log.debug(testAuthData);
-			username=testAuthData.get("user_name");
-			credential=testAuthData.get("credential");
+			username=testAuthData.get("username");
+			credential=testAuthData.get("password");
 			String basicAuth = username+":"+credential;
 			String basicAuthHeader =  "Basic " + new String(Base64.getEncoder().encode(basicAuth.getBytes()));
 			headers.put("Authorization",basicAuthHeader);

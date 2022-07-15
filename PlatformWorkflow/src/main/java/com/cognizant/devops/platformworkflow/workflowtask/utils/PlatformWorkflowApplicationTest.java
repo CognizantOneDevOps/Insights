@@ -39,7 +39,7 @@ import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadP
  * Initialize Inference Module. 3. Log Platform Insight Health data in DB
  */
 
-public class PlatformWorkflowApplicationTest implements AssessmentReportAndWorkflowConstants {
+public class PlatformWorkflowApplicationTest  {
 	private static Logger log = LogManager.getLogger(PlatformWorkflowApplicationTest.class);
 	
 
@@ -67,23 +67,23 @@ public class PlatformWorkflowApplicationTest implements AssessmentReportAndWorkf
 
 			Scheduler scheduler = new StdSchedulerFactory().getScheduler();
 			scheduler.start();
-			JobDetail jobWorkflow = JobBuilder.newJob(WorkflowExecutor.class).withIdentity("WorkflowExecutor", WORKFLOW)
+			JobDetail jobWorkflow = JobBuilder.newJob(WorkflowExecutor.class).withIdentity("WorkflowExecutor", AssessmentReportAndWorkflowConstants.WORKFLOW)
 					.build();
 
-			Trigger triggerWorkflow = TriggerBuilder.newTrigger().withIdentity("WorkflowExecutortrigger", WORKFLOW)
+			Trigger triggerWorkflow = TriggerBuilder.newTrigger().withIdentity("WorkflowExecutortrigger", AssessmentReportAndWorkflowConstants.WORKFLOW)
 					.startNow().build();
 
 			JobDetail jobWorkflowRetry = JobBuilder.newJob(WorkflowRetryExecutor.class)
-					.withIdentity("WorkflowRetryExecutor", WORKFLOW).build();
+					.withIdentity("WorkflowRetryExecutor", AssessmentReportAndWorkflowConstants.WORKFLOW).build();
 
 			Trigger triggeWorkflowRetry = TriggerBuilder.newTrigger()
-					.withIdentity("WorkflowRetryExecutortrigger", WORKFLOW).startNow().build();
+					.withIdentity("WorkflowRetryExecutortrigger", AssessmentReportAndWorkflowConstants.WORKFLOW).startNow().build();
 
 			JobDetail jobImmediateWorkflow = JobBuilder.newJob(WorkflowImmediateJobExecutor.class)
-					.withIdentity("WorkflowImmediateJobExecutorTest", WORKFLOW).build();
+					.withIdentity("WorkflowImmediateJobExecutorTest", AssessmentReportAndWorkflowConstants.WORKFLOW).build();
 
 			Trigger triggeImmediateWorkflow = TriggerBuilder.newTrigger()
-					.withIdentity("WorkflowImmediateJobExecutortriggerTEst", WORKFLOW).startNow().build();
+					.withIdentity("WorkflowImmediateJobExecutortriggerTEst", AssessmentReportAndWorkflowConstants.WORKFLOW).startNow().build();
 
 			scheduler.start();
 			scheduler.scheduleJob(jobWorkflow, triggerWorkflow);

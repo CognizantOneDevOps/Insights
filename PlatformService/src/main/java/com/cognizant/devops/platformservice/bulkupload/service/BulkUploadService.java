@@ -170,7 +170,7 @@ public class BulkUploadService implements IBulkUpload {
 		try {
 			List<List<JsonObject>> partitionList = partitionList(dataList, 1000);
 			for (List<JsonObject> chunk : partitionList) {
-				JsonObject graphResponse = dbHandler.bulkCreateNodes(chunk, null, cypherQuery);
+				JsonObject graphResponse = dbHandler.bulkCreateNodes(chunk, cypherQuery);
 				if (graphResponse.get(DatataggingConstants.RESPONSE).getAsJsonObject().get(DatataggingConstants.ERRORS)
 						.getAsJsonArray().size() > 0) {
 					throw new InsightsCustomException("Error while uploading to Neo4j");

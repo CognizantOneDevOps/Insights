@@ -58,7 +58,7 @@
           "
         >
           <div style="display: flex">
-            {{ fileNameArr[index] || "No file uploaded yet." }}
+            {{ fileNameArr || "No file uploaded yet." }}
           </div>
           <div style="display: flex">
             <button
@@ -80,7 +80,7 @@
         type="file"
         id="file"
         class="file-input"
-        (change)="onFileChangedUpload($event, index)"
+        (change)="onFileChanged($event)"
         #fileUpload
       />
     </div>

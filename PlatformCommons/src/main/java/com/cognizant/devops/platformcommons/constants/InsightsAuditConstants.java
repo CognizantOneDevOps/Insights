@@ -15,32 +15,32 @@
  ******************************************************************************/
 package com.cognizant.devops.platformcommons.constants;
 
-public interface InsightsAuditConstants {
-	  String SERACHING_FOR_ASSET_HISTORY = "searching for asset history";
-	  String STATUS_CODE = "statusCode";
-	  String UPLINK = "uplink";
-	  String DOWNLINK = "downlink";
-	  String TIMESTAMP = "timestamp";
-	  String DATA = "data";
-	  String MSG = "msg";
-	  String STEPS = "Steps";
-	  String ENTITY = "Entity";
-	  String SUBWORKFLOW = "Subworkflow";
-	  String INSERTINTOLEDGER = "insertIntoLedger";
-	  String FIELDNAME = "fieldName";
-	  String TO_STRING = "toString";
-	  String ATTACHMENTS = "attachments";
-	  String FROM_STRING = "fromString";
-	  String TOOLNAME = "toolName";
-	  String TYPES = "Types";
-	  String TRENSFORM_PARAMS = "TransformParams";
-	  String DIGITALSIGNATURE = "digitalSignature";
-	  String RESULTS="results";
-	  String STATUS = "status";
-	  String REPORTNAME = "reportName";
-	  String LOGFILENAME = "logFileName";
-	  String QUERY_BUILDER_FETCH_QUERIES = "/PlatformService/blockchain/queryBuilder/fetchQueries";
-	  String CYPHER = "CYPHER";
-	  String LEDGER = "LEDGER";
-	
+public final class InsightsAuditConstants {
+    public static final String SERACHING_FOR_ASSET_HISTORY = "searching for asset history";
+    public static final String STATUS_CODE = "statusCode";
+    public static final String UPLINK = "uplink";
+    public static final String DOWNLINK = "downlink";
+    public static final String TIMESTAMP = "timestamp";
+    public static final String DATA = "data";
+    public static final String MSG = "msg";
+    public static final String STEPS = "Steps";
+    public static final String ENTITY = "Entity";
+    public static final String SUBWORKFLOW = "Subworkflow";
+    public static final String INSERTINTOLEDGER = "insertIntoLedger";
+    public static final String FIELDNAME = "fieldName";
+    public static final String TO_STRING = "toString";
+    public static final String ATTACHMENTS = "attachments";
+    public static final String FROM_STRING = "fromString";
+    public static final String TOOLNAME = "toolName";
+    public static final String TYPES = "Types";
+    public static final String TRENSFORM_PARAMS = "TransformParams";
+    public static final String DIGITALSIGNATURE = "digitalSignature";
+    public static final String RESULTS = "results";
+    public static final String STATUS = "status";
+    public static final String REPORTNAME = "reportName";
+    public static final String LOGFILENAME = "logFileName";
+    public static final String QUERY_BUILDER_FETCH_QUERIES = "/PlatformService/blockchain/queryBuilder/fetchQueries";
+    public static final String CYPHER = "CYPHER";
+    public static final String LEDGER = "LEDGER";
+
 }

@@ -129,7 +129,6 @@ public class ApplicationConfigCache {
 	 * @throws Exception
 	 */
 	public static boolean loadInitialConfigCache() throws InsightsCustomException {
-
 		JsonObject serverConfigJsonfromStorage = new JsonObject();
 		JsonObject serverConfigJsonfromVault = new JsonObject();
 		Gson gson = new Gson();
@@ -146,10 +145,11 @@ public class ApplicationConfigCache {
 				} catch (Exception e) {
 					log.error(e);
 				}
-			}
+			}			
 			if (!serverConfigJsonfromVault.entrySet().isEmpty()) {
 				ApplicationConfigCache.initializeUsingJson(serverConfigJsonfromVault);
-			} else {
+			} 
+			else {
 				ApplicationConfigCache.initializeUsingJson(serverConfigJsonfromStorage);
 			}
 		} catch (Exception e) {
@@ -158,7 +158,7 @@ public class ApplicationConfigCache {
 		}
 		return true;
 	}
-
+	
 	public static JsonObject loadServerConfigFromFile() {
 		JsonObject serverConfig = new JsonObject();
 		if (System.getenv().get(ConfigOptions.INSIGHTS_HOME) == null) {
@@ -339,11 +339,7 @@ public class ApplicationConfigCache {
 			log.info(" logLevel : {} ====== appenderUpdated Name : {}  ==== appender file Name : {}  ", logLevel,
 					appenderServiceBase.getName(), appenderServiceBase.getFileName());
 			
-			/*
-			context.getConfiguration().getAppenders().forEach((key, appender) -> {
-				log.debug("file Appender information {} ", key);
-			});
-			*/
+			
 
 			/*In LoggerConfig and in Configuration we are not allowed to update any object property like appenderRef 
 			 * so best way to delete that LoggerConfig and add it again 
@@ -381,15 +377,7 @@ public class ApplicationConfigCache {
 				context.getConfiguration().addLogger(addNewLooger.getKey(), loggerConfig);
 				context.updateLoggers();
 			}
-			/*
-			context.getConfiguration().getLoggers().forEach((key, loggerConfig) -> {
-				log.error("logger level information Updated {} {} {} ", key, loggerConfig.getName(),
-						loggerConfig.getLevel());
-				loggerConfig.getAppenderRefs().forEach((appenderRef) -> {
-					log.error("   AppenderRef for log level {} is {} ", loggerConfig.getName(), appenderRef.getRef());
-				});
-			});
-			*/
+			
 		} catch (Exception e) {
 			log.error(e);
 		}

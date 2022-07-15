@@ -15,13 +15,16 @@
  ******************************************************************************/
 package com.cognizant.devops.platformcommons.config;
 
+import java.io.Serializable;
+
 import com.google.gson.JsonObject;
 
-public class ApplicationLogLevel {
-
+public class ApplicationLogLevel implements Serializable {
+	private static final long serialVersionUID = 2405172041950251807L;
+	
 	private boolean updateLevelTransitiveDependency = Boolean.FALSE;
-
-	private JsonObject serviceLogLevel = new JsonObject();
+   
+	private transient JsonObject serviceLogLevel = new JsonObject();	 
 
 	public boolean isUpdateLevelTransitiveDependency() {
 		return updateLevelTransitiveDependency;

@@ -93,7 +93,7 @@
             style="margin-left: 5%; width: 5% !important"
           >
             <mat-radio-button
-              style="margin-left: 5px"
+              style="margin-top: 10px"
               [value]="element"
               (click)="onSelect(element)"
             ></mat-radio-button>
@@ -115,6 +115,24 @@
             style="width: 15%; padding-left: 4px"
           >
             {{ element.usecaseName }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="PredictionType">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="tableHeader"
+            style="width: 20%;"
+          >
+            Prediction Type
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            style="padding-left: 6px; width: 20%"
+          >
+            {{ element.predictionType }}
           </td>
         </ng-container>
 

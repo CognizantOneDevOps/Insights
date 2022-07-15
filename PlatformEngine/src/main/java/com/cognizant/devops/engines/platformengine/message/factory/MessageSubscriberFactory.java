@@ -16,6 +16,7 @@
 package com.cognizant.devops.engines.platformengine.message.factory;
 
 import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,7 +49,7 @@ public class MessageSubscriberFactory {
 	}
 
 	public void registerSubscriber(String routingKey, final EngineSubscriberResponseHandler responseHandler)
-			throws IOException, InsightsCustomException {
+			throws IOException, InsightsCustomException, TimeoutException {
 		String queueName = routingKey.replace(".", "_");
 		Channel channel = RabbitMQConnectionProvider.getChannel(routingKey, queueName,MQMessageConstants.EXCHANGE_NAME,MQMessageConstants.EXCHANGE_TYPE);
 		responseHandler.setChannel(channel);

@@ -29,6 +29,7 @@ import com.cognizant.devops.engines.platformwebhookengine.parser.InsightsWebhook
 import com.cognizant.devops.engines.util.WebhookEventProcessing;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.google.gson.JsonObject;
 import com.rabbitmq.client.AMQP.BasicProperties;
@@ -59,34 +60,9 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 			long startTime = System.nanoTime();
 			
 			if (!message.equalsIgnoreCase("") || !message.isEmpty()) {
-				InsightsWebhookParserInterface webHookParser = InsightsWebhookParserFactory
-						.getParserInstance(this.webhookConfig.getToolName());
-				List<JsonObject> toolData = webHookParser.parseToolData(this.webhookConfig, message);
-				// Insert into Neo4j
-				if (!toolData.isEmpty()) {
-					Boolean b=webhookConfig.isEventProcessing();
-					if (Boolean.TRUE.equals(b)) {
-						WebhookEventProcessing wep = new WebhookEventProcessing(toolData, webhookConfig,false);
-						boolean status = wep.doEvent();
-						if (status) {
-							getChannel().basicAck(envelope.getDeliveryTag(), false);
-						}
-					} else if (this.webhookConfig.getIsUpdateRequired().booleanValue()) {
-						updateNeo4jNode(toolData, this.webhookConfig);
-						getChannel().basicAck(envelope.getDeliveryTag(), false);
-					} else {
-						String query = "UNWIND $props AS properties " + "CREATE (n:RAW:"
-								+ this.webhookConfig.getLabelName().toUpperCase() + ") " + "SET n = properties";
-						dbHandler.bulkCreateNodes(toolData, null, query);
-						getChannel().basicAck(envelope.getDeliveryTag(), false);
-					}
-					
-				} else {
-					log.error(" Unmatched Response Template found for {} ", this.webhookConfig.getWebHookName());
-					EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
-							"No Webhook Nodes are inserted in DB for " + this.webhookConfig.getWebHookName(),
-							PlatformServiceConstants.FAILURE,jobName);
-				}
+				
+				insertIntoNeo4j(envelope,message);				
+			
 			} else {
 				log.error(" No valid payload found for webhook  message{} {} ", this.webhookConfig.getWebHookName(),
 						message);
@@ -101,6 +77,41 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 			getChannel().basicReject(envelope.getDeliveryTag(), false);
 		}
 	}
+	
+
+	private void insertIntoNeo4j(Envelope envelope, String message) throws Exception{
+		
+		InsightsWebhookParserInterface webHookParser = InsightsWebhookParserFactory
+				.getParserInstance(this.webhookConfig.getToolName());
+		List<JsonObject> toolData = webHookParser.parseToolData(this.webhookConfig, message);
+		// Insert into Neo4j
+		if (!toolData.isEmpty()) {
+			Boolean b=webhookConfig.isEventProcessing();
+			if (Boolean.TRUE.equals(b)) {
+				WebhookEventProcessing wep = new WebhookEventProcessing(toolData, webhookConfig,false);
+				boolean status = wep.doEvent();
+				if (status) {
+					getChannel().basicAck(envelope.getDeliveryTag(), false);
+				}
+			} else if (this.webhookConfig.getIsUpdateRequired().booleanValue()) {
+				updateNeo4jNode(toolData, this.webhookConfig);
+				getChannel().basicAck(envelope.getDeliveryTag(), false);
+			} else {
+				String query = "UNWIND $props AS properties " + "CREATE (n:RAW:"
+						+ this.webhookConfig.getLabelName().toUpperCase() + ") " + "SET n = properties";
+				dbHandler.bulkCreateNodes(toolData, query);
+				getChannel().basicAck(envelope.getDeliveryTag(), false);
+			}
+			
+		} else {
+			log.error(" Unmatched Response Template found for {} ", this.webhookConfig.getWebHookName());
+			EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
+					"No Webhook Nodes are inserted in DB for " + this.webhookConfig.getWebHookName(),
+					PlatformServiceConstants.FAILURE,jobName);
+		}
+		
+	}
+	
 	// Execution of the Query in which node updation in Neo4j is required,based on
 	// the unique property.
 	private void updateNeo4jNode(List<JsonObject> toolData, WebHookConfig webhookConfig2) throws Exception {

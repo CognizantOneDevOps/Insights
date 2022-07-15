@@ -21,9 +21,9 @@ sudo yum update -y
 sudo yum install wget -y
 sudo yum install unzip -y
 sudo yum install dos2unix -y
-echo "Enter INSIGHTS_HOME_ROOT_DIRECTORY root directory example: /usr/Insights or /apps/Insights"
+echo "Enter INSIGHTS_HOME_ROOT_DIRECTORY root directory : /usr/Insights or /apps/Insights"
 read INSIGHTS_HOME_ROOT_DIRECTORY
-echo "Enter INSIGHTS_APP_ROOT_DIRECTORY root directory example: /opt/Insights or /apps/Insights"
+echo "Enter INSIGHTS_APP_ROOT_DIRECTORY root directory : /opt/Insights or /apps/Insights"
 read INSIGHTS_APP_ROOT_DIRECTORY
 
 # Remove trailing \\ - INSIGHTS_HOME_ROOT_DIRECTORY and NSIGHTS_APP_ROOT_DIRECTORY
@@ -136,33 +136,3 @@ wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
 chmod +x ./jq
 sudo cp jq /usr/bin
 sudo rm -rf jq
-#Set insights configuration for postgres, rabbitmq, insights, and grafana
-echo "Configuring Insights: Grafana(adminUserName), postgre(userName), RabbitMQ(user), Insights(userId)."
-#Postgres grafana user credentials using jq
-echo -n "Postgre(userName):"
-read POSTGRE_USER_NAME
-echo "Password:"
-read -s POSTGRE_USER_PASSWORD
-jq --arg user $POSTGRE_USER_NAME '.postgre.userName=$user' $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json > $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json.tmp && mv $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json.tmp $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json -f
-jq --arg pass $POSTGRE_USER_PASSWORD '.postgre.password=$pass' $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json > $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json.tmp && mv $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json.tmp $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json -f
-#RabbitMQ
-echo -n "RabbitMQ(user):"
-read RABBIT_MQ_USER
-echo "Password:"
-read -s RABBIT_MQ_USER_PASSWORD
-jq --arg user $RABBIT_MQ_USER '.messageQueue.user=$user' $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json > $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json.tmp && mv $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json.tmp $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json -f
-jq --arg pass $RABBIT_MQ_USER_PASSWORD '.messageQueue.password=$pass' $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json > $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json.tmp && mv $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json.tmp $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json -f
-#Grafana
-echo -n "Grafana(adminUserName):"
-read GRAFANA_ADMIN_USER_NAME
-echo "Password:"
-read -s GRAFANA_ADMIN_USER_PASSWORD
-jq --arg user $GRAFANA_ADMIN_USER_NAME '.grafana.adminUserName=$user' $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json > $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json.tmp && mv $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json.tmp $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json -f
-jq --arg pass $GRAFANA_ADMIN_USER_PASSWORD '.grafana.adminUserPassword=$pass' $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json > $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json.tmp && mv $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json.tmp $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json -f
-#Insights
-echo -n "Insights(userId):"
-read INSIGHTS_USER_ID
-echo "Password:"
-read -s INSIGHTS_PASSWORD
-jq --arg user $INSIGHTS_USER_ID '.userId=$user' $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json > $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json.tmp && mv $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json.tmp $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json -f
-jq --arg pass $INSIGHTS_PASSWORD '.password=$pass' $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json > $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json.tmp && mv $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json.tmp $INSIGHTS_HOME_ROOT_DIRECTORY/INSIGHTS_HOME/.InSights/server-config.json -f

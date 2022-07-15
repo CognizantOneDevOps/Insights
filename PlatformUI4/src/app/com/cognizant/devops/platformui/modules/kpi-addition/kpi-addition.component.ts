@@ -53,6 +53,7 @@ export class KpiAdditionComponent implements OnInit {
   isForecast: boolean = false;
   outputDatasource = [];
   dataSourceOutput: any;
+  inputDataJson:any;
 
   constructor(
     public router: Router,
@@ -70,6 +71,7 @@ export class KpiAdditionComponent implements OnInit {
     }
     this.route.queryParams.subscribe((params) => {
       if (params) {
+        this.inputDataJson=params;
         this.kpiId = params.kpiId;
         this.kpiName = params.kpiName;
         this.selectedTool = params.selectedTool;
@@ -365,6 +367,11 @@ export class KpiAdditionComponent implements OnInit {
           });
       }
     });
+  }
+  reset(){
+    this.resultField = this.inputDataJson.resultField;
+    this.dataSource = this.inputDataJson.dataSource;
+    this.dbQuery = this.inputDataJson.dbQuery; 
   }
   refreshData() {
     this.type = "ADD";

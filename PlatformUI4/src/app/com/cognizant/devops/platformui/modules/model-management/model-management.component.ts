@@ -72,6 +72,7 @@ export class ModelManagementComponent implements OnInit {
     this.displayedColumns = [
       "radio",
       "UsecaseName",
+      "PredictionType",
       "PredictionColumn",
       "ModelName",
       "SplitRatio",
@@ -207,6 +208,7 @@ export class ModelManagementComponent implements OnInit {
                   "</b> and uploaded csv file both has been deleted succesfully.",
                 "success"
               );
+              this.refresh();
             } else if (
               event.status == "success" &&
               event.data.statusCode == 0
@@ -217,6 +219,7 @@ export class ModelManagementComponent implements OnInit {
                   "</b> has been deleted succesfully but failed to delete uploaded csv file",
                 "success"
               );
+              this.refresh();
             } else if (event.status == "failure" && event.StatusCode == 409) {
               this.messageDialog.openSnackBar(event.message, "error");
             } else {
@@ -225,9 +228,6 @@ export class ModelManagementComponent implements OnInit {
                 "error"
               );
             }
-            dialog.afterClosed().subscribe((result) => {
-              this.refresh();
-            });
           });
       }
     });

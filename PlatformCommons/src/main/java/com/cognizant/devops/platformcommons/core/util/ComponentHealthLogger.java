@@ -35,7 +35,7 @@ public abstract class ComponentHealthLogger {
 	public boolean createComponentStatusNode(String label,String version,String message,String status,Map<String,String> parameter) throws InsightsCustomException {
 		JsonObject response = null;
 		try {
-			String utcdate = InsightsUtils.getUtcTime(TIMEZONE);
+			String utcdate = InsightsUtils.getUtcTimeComponentStatus(TIMEZONE);
 			List<JsonObject> dataList = new ArrayList<>(); 
 			List<String> labels = new ArrayList<>();
 			labels.addAll(Arrays.asList(label.split(":")));

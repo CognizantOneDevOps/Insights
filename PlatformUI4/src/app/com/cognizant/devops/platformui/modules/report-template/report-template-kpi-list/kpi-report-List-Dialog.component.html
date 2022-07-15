@@ -17,20 +17,19 @@
 
 <div>
   <div class="titleStyle1">
-    <ul>
-      <li style="margin-left: -820px">KPI Details - {{ templateName }}</li>
-      <li (click)="closeShowDetailsDialog()">
-        <mat-icon
-          svgIcon="close_dialog"
-          style="
-            height: 11px !important;
-            width: 11px !important;
-            margin-right: 18px;
-          "
-        >
-        </mat-icon>
-      </li>
-    </ul>
+    <div>KPI Details - {{ templateName }}</div>
+    <div>
+      <mat-icon
+        svgIcon="close_dialog"
+        style="
+          height: 11px !important;
+          width: 11px !important;
+          margin-right: 18px;
+        "
+        (click)="closeShowDetailsDialog()"
+      >
+      </mat-icon>
+    </div>
   </div>
   <div style="margin-left: 15px; margin-top: 15px">
     <div class="scrollData" style="width: 96%; margin-left: 10px">
@@ -40,7 +39,7 @@
           [dataSource]="kpiDatasource"
           multiTemplateDataRows
           matSort
-          style="width: 96%; margin-top: 10px; border: 1px solid #b9bbbc"
+          style="border: 1px solid #b9bbbc"
         >
           <ng-container matColumnDef="kpiId">
             <th

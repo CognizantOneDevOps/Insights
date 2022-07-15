@@ -30,120 +30,10 @@
     right: 0;
 }
 
-tr:nth-child(odd) td {
-    background-color: #ffffff;
-}
-
-tr:nth-child(even) td {
-    background-color: #E1E3E7;
-}
-
-tr.mat-footer-row, tr.mat-row {
-    height: 30px !important;
-    font-size: 12px !important;
-}
-
-td.mat-cell, td.mat-footer-cell, th.mat-header-cell {
-    height: 30px !important;
-    font-size: 12px !important;
-    letter-spacing: .010em;
-    text-align: left;
-    padding-left:10px;
-}
-
-ul {
-    position: relative;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-}
-
-li {
-    display: flex;
-    margin: 1px;
-    padding: 5px;
-}
-
-li:last-child {
-    position: absolute;
-    top: 0;
-    right: 0;
-}
-
-.titleStyle {
-    background-color: #FF8F1C;
-    color: white;
-    margin: 0;
-    padding-bottom: 5px;
-    padding-top: 5px;
-    font-weight: bold;
-    border: 3px solid #FF8F1C;
-}
-
-.mat-table {
-    font-family: inherit;
-}
 
 table {
     width: 100%;
     overflow: scroll;
-}
-
-.mat-dialog-content {
-    overflow: auto;
-    margin: 0px;
-    padding: 0px;
-}
-
-.tableTimeHeaderCss {
-    background-color: grey;
-    color: white;
-    font-size: 14px !important;
-    height: 40px !important;
-    margin: 0px;
-    letter-spacing: .010em;
-    line-height: 1.2em;
-    text-align: center;
-    width: 165px !important;
-}
-
-.tableExceIdHeaderCss {
-    background-color: grey;
-    color: white;
-    font-size: 14px !important;
-    height: 40px !important;
-    margin: 0px;
-    padding: 0px;
-    letter-spacing: .010em;
-    line-height: 1.2em;
-    text-align: center;
-    width: 150px !important;
-}
-
-.noDataFoundCss {
-    margin-top: 3%;
-    margin-left: 45%;
-    height: 80px;
-    width: 800px;
-    margin-bottom: 3%;
-    font-weight: bold;
-}
-
-.timeZone {
-    text-align: left;
-    padding-top: 1.5%;
-    padding-bottom: 1%;
-    font-family: Roboto, Helvetica Neue, sans-serif;
-    color: blue;
-    font-size: 12px;
-    padding-left: 2%;
-}
-
-::ng-deep.mat-paginator-container {
-    min-height: 48px !important;
 }
 
 .cellCss{
@@ -151,44 +41,6 @@ table {
     padding-bottom:2px;
     padding-left:10px;
 }
-
-.tableHeaderCss {
-    background-color: grey;
-    color: white;
-    font-size: 14px !important;
-    height: 40px !important;
-    margin: 0px;
-    padding: 0px;
-    letter-spacing: .010em;
-    line-height: 1.2em;
-    text-align: center;
-}
-
-.tableDynamicHeaderCss {
-    background-color: grey;
-    color: white;
-    font-size: 14px !important;
-    height: 40px !important;
-    margin: 0px;
-    padding: 0px;
-    letter-spacing: .010em;
-    line-height: 1.2em;
-    text-align: center;
-    width: 150px !important;
-}
-
-.tableMessageHeaderCss {
-    background-color: grey;
-    color: white;
-    font-size: 14px !important;
-    height: 40px !important;
-    margin: 0px;
-    padding: 0px;
-    letter-spacing: .010em;
-    line-height: 1.2em;
-    text-align: center;
-}
-
 .rowContainer {
     display:flex;
     flex-direction:row;                   
@@ -200,7 +52,7 @@ table {
 
 .rightAlignStyle {
 	text-align: right;
-	padding-right: 5px;
+    padding-right:3%;
 }
 
 .mat-icon-button ::ng-deep .mat-button-focus-overlay {
@@ -210,5 +62,3 @@ table {
 button:focus {
     outline: none;
 }
-
-

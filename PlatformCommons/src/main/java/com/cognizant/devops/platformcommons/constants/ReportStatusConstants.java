@@ -15,28 +15,31 @@
 ******************************************************************************/
 package com.cognizant.devops.platformcommons.constants;
 
-public interface ReportStatusConstants {
+public final class ReportStatusConstants {
 
-	String MODELID="ModelId :";
-	String PREDICTIONTYPE= "predictionType :";
-	String TRAININGPERCENTAGE="trainingPercentage : ";
-	String USECASENAME="UsecaseName :";
-	String PREDICTIONCOLUMN="PredictionColumn : ";
-	String CONTENT_ID="ContentId :";
-	String CONTENT_NAME="ContentName :";
-	String ACTION="action :";
-	String CONTENT_RESULT="ContentResult :";
-	String SCHEDULE="schedule: ";
-	String REPORT_NAME=" ReportName :";
-	String VISUALIZATION_UTIL=" Visualizationutil :";
-	String TR_TAG="</tr>";
-	String TD_TAG="</td>";
-	String QUERY_END_TIME="queryEndTime: ";
-	String QUERY_START_TIME="queryStartTime: ";
-	String REPORT_ID="reportId: ";
-	String UPSHIFT_UUID = "UpShiftUuid :";
-	String CREATED_DATE = "CreatedDate :";
-	String UPDATED_DATE = "UpdatedDate :";
-	String FILENAME = "fileName :";
-	String STATUS = "status :";
+	public static final String MODELID="ModelId :";
+	public static final String PREDICTIONTYPE= "predictionType :";
+	public static final String TRAININGPERCENTAGE="trainingPercentage : ";
+	public static final String USECASENAME="UsecaseName :";
+	public static final String PREDICTIONCOLUMN="PredictionColumn : ";
+	public static final String CONTENT_ID="ContentId :";
+	public static final String CONTENT_NAME="ContentName :";
+	public static final String ACTION="action :";
+	public static final String CONTENT_RESULT="ContentResult :";
+	public static final String SCHEDULE="schedule: ";
+	public static final String REPORT_NAME=" ReportName :";
+	public static final String VISUALIZATION_UTIL=" Visualizationutil :";
+	public static final String TR_TAG="</tr>";
+	public static final String TD_TAG="</td>";
+	public static final String QUERY_END_TIME="queryEndTime: ";
+	public static final String QUERY_START_TIME="queryStartTime: ";
+	public static final String REPORT_ID="reportId: ";
+	public static final String UPSHIFT_UUID = "UpShiftUuid :";
+	public static final String CREATED_DATE = "CreatedDate :";
+	public static final String UPDATED_DATE = "UpdatedDate :";
+	public static final String FILENAME = "fileName :";
+	public static final String STATUS = "status :";
+	public static final String MILESTONE_ID = "milestoneId";
+	public static final String TEMPLATE_TYPE = "templateType";
+	public static final String TOOL_CONFIG_JSON = "toolConfigJson";
 }

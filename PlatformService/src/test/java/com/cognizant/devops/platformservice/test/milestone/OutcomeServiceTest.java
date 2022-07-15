@@ -53,7 +53,7 @@ public class OutcomeServiceTest extends MilestoneOutcomeTestData {
 	@BeforeClass
 		public void prepareData() throws InsightsCustomException {
 		try {
-			ApplicationConfigCache.loadConfigCache();
+			//ApplicationConfigCache.loadConfigCache();
 		} catch (Exception e) {
 			log.error("message", e);
 		}
@@ -174,9 +174,11 @@ public class OutcomeServiceTest extends MilestoneOutcomeTestData {
 	public void testDeleteOutcomeRecord() throws InsightsCustomException {
 		log.debug(" filterList {} ",filterList);
 		try {
+			
 			for (JsonObject recordForDelete : filterList) {
 				outcomeConfigController.deleteOutcomeConfig(recordForDelete.get("id").getAsInt());
 			}
+
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}

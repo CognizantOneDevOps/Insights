@@ -108,7 +108,7 @@ public class TrainModelsServiceTestData {
 	
 	public JsonObject runAutoML(String usecase, String trainingFrame,String predictionColumn, String numOfModels) throws InsightsCustomException {
         
-		String httpResponse = h2oApiCommunicator.runAutoML(usecase + "AutoML", trainingFrame, trainingFrame,
+		String httpResponse = h2oApiCommunicator.runAutoML(usecase + "AutoML", trainingFrame,
 				predictionColumn, numOfModels);
 		log.info(httpResponse);
 		JsonObject response = JsonUtils.parseStringAsJsonObject(httpResponse);

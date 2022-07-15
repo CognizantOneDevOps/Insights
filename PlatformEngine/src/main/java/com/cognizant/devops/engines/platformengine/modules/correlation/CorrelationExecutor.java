@@ -71,14 +71,9 @@ public class CorrelationExecutor {
 		if (correlationConfig != null) {
 			loadCorrelationConfiguration(correlationConfig);
 			List<CorrelationConfiguration> correlations = getRelation();
-			if (correlations.isEmpty()) { // No information in DB (CORRELATION_CONFIGURATION table)
-				DataExtractor dataExtractor = new DataExtractor();
-				dataExtractor.setExecId(loggingInfo.get(EngineConstants.EXECID));
-				dataExtractor.execute();
-				List<Correlation> correlationsList = loadCorrelationsFromFile();
-				if(correlationsList != null && !correlationsList.isEmpty()) {
-					getRelationFromFile(correlationsList, correlations);
-				}
+			if (correlations.isEmpty()) {
+				// No information in DB fetch correlation detail from file
+				loadCorrelationConfigfromJson(correlations);		
 			}
 			if (correlations.isEmpty()) {
 				log.error(" execId={} No Correlation Configuration found in DB as well as in correlation.json",loggingInfo.get(EngineConstants.EXECID));
@@ -93,16 +88,9 @@ public class CorrelationExecutor {
 					continue;
 				}
 				updateNodesMissingCorrelationFields(correlation);
-				int availableRecords = 1;
-				while (availableRecords > 0) {
-					List<JsonObject> sourceDataList = loadDestinationData(correlation);
-					availableRecords = sourceDataList.size();
-					if (!sourceDataList.isEmpty()) {
-						executeCorrelations(correlation, sourceDataList);
-					} else {
-						log.debug(" Type=Correlator execId={} correlationName={} sourceTool={} destinationTool={} ProcessingTime={} processedRecords={} No record found for Correlation of {}" ,loggingInfo.get(EngineConstants.EXECID),loggingInfo.get(EngineConstants.CORRELATION_NAME),loggingInfo.get(EngineConstants.SOURCE_TOOL),loggingInfo.get(EngineConstants.DESTINATION_TOOL),0,0, correlation.getRelationName());
-					}
-				}
+				
+				loadDestinationDataAndExecuteCorrelation(correlation);
+				
 				removeRawLabel(correlation);
 				log.debug(" Type=Correlator execId={} correlationName={} sourceTool={} destinationTool={} ProcessingTime={} processedRecords={} Correlation end for{}",loggingInfo.get(EngineConstants.EXECID),loggingInfo.get(EngineConstants.CORRELATION_NAME),loggingInfo.get(EngineConstants.SOURCE_TOOL),loggingInfo.get(EngineConstants.DESTINATION_TOOL),0,0, correlation.getRelationName());
 			}
@@ -111,6 +99,26 @@ public class CorrelationExecutor {
 		}
 	}
 
+	private void loadDestinationDataAndExecuteCorrelation(CorrelationConfiguration correlation) {
+		int availableRecords = 1;
+		while (availableRecords > 0) {
+			List<JsonObject> sourceDataList = loadDestinationData(correlation);
+			availableRecords = sourceDataList.size();
+			log.debug(" Type=Correlator execId={} correlationName={} sourceTool={} destinationTool={} fetch Destination tool record {}" ,loggingInfo.get(EngineConstants.EXECID),loggingInfo.get(EngineConstants.CORRELATION_NAME),loggingInfo.get(EngineConstants.SOURCE_TOOL),loggingInfo.get(EngineConstants.DESTINATION_TOOL),availableRecords);
+			if (!sourceDataList.isEmpty()) {
+				executeCorrelations(correlation, sourceDataList);
+			} else {
+				log.debug(" Type=Correlator execId={} correlationName={} sourceTool={} destinationTool={} ProcessingTime={} processedRecords={} No record found for Correlation of {}" ,loggingInfo.get(EngineConstants.EXECID),loggingInfo.get(EngineConstants.CORRELATION_NAME),loggingInfo.get(EngineConstants.SOURCE_TOOL),loggingInfo.get(EngineConstants.DESTINATION_TOOL),0,0, correlation.getRelationName());
+			}
+		}
+	}
+   
+	private void loadCorrelationConfigfromJson(List<CorrelationConfiguration> correlations) { 
+		List<Correlation> correlationsList = loadCorrelationsFromFile();
+		if(correlationsList != null && !correlationsList.isEmpty()) {
+			convertCorrelationDTO(correlationsList, correlations);
+		}
+	}
 	/**
 	 * Update the destination node max time where the correlation fields are
 	 * missing.
@@ -120,7 +128,7 @@ public class CorrelationExecutor {
 	private void updateNodesMissingCorrelationFields(CorrelationConfiguration correlation) {
 		String destinationLabelName = correlation.getDestinationLabelName();
 		List<String> destinationFields = Arrays.asList(correlation.getDestinationFields().split("\\s*,\\s*"));
-		StringBuffer cypher = new StringBuffer();
+		StringBuilder cypher = new StringBuilder();
 		cypher.append("MATCH (destination:RAW:DATA:").append(destinationLabelName).append(") ");
 		cypher.append("where destination.maxCorrelationTime IS NULL AND ");
 		cypher.append(" ");
@@ -156,20 +164,24 @@ public class CorrelationExecutor {
 	 * @return
 	 */
 	private List<JsonObject> loadDestinationData(CorrelationConfiguration correlation) {
-		log.debug(" Type=Correlator execId={} correlationName={} sourceTool={} destinationTool={} ProcessingTime={} processedRecords={} In loadDestinationData, lastCorrelationTime {} maxCorrelationTime  {} currentCorrelationTime {}",loggingInfo.get(EngineConstants.EXECID),loggingInfo.get(EngineConstants.CORRELATION_NAME),loggingInfo.get(EngineConstants.SOURCE_TOOL),loggingInfo.get(EngineConstants.DESTINATION_TOOL),0,0,correlation.getDestinationToolName(),lastCorrelationTime,maxCorrelationTime,currentCorrelationTime);
+		log.debug(" Type=Correlator execId={} correlationName={} sourceTool={} destinationTool={} ProcessingTime={} processedRecords={} In loadDestinationData, lastCorrelationTime {} maxCorrelationTime  {} currentCorrelationTime {}",loggingInfo.get(EngineConstants.EXECID),loggingInfo.get(EngineConstants.CORRELATION_NAME),loggingInfo.get(EngineConstants.SOURCE_TOOL),loggingInfo.get(EngineConstants.DESTINATION_TOOL),0,0,lastCorrelationTime,maxCorrelationTime,currentCorrelationTime);
 		List<JsonObject> destinationDataList = new ArrayList<>();
+		
 		String destinationLabelName = correlation.getDestinationLabelName();
 		List<String> destinationFields = Arrays.asList(correlation.getDestinationFields().split("\\s*,\\s*"));
-		StringBuffer cypher = new StringBuffer();
+		
+		StringBuilder cypher = new StringBuilder();
 		cypher.append("MATCH (destination:RAW:DATA:").append(destinationLabelName).append(") ");
 		cypher.append("where not ((destination) <-[:").append(correlation.getRelationName()).append("]- (:DATA:")
 				.append(correlation.getSourceLabelName()).append(")) ");
 		cypher.append("AND (destination.correlationTime IS NULL OR ");
 		cypher.append("destination.correlationTime < ").append(lastCorrelationTime).append(" ) ");
 		cypher.append("AND (");
+		
 		for (String field : destinationFields) {
 			cypher.append("destination.").append(field).append(" IS NOT NULL OR ");
 		}
+		
 		cypher.delete(cypher.length() - 3, cypher.length());
 		cypher.append(") ");
 		cypher.append("WITH distinct destination limit ").append(dataBatchSize).append(" ");
@@ -183,9 +195,8 @@ public class CorrelationExecutor {
 		}
 		cypher.append("as values WITH destination.uuid as uuid, values UNWIND values as value WITH uuid, ");
 		cypher.append(" CASE ");
-		cypher.append(" WHEN (toString(value) contains \",\") THEN split(value, \",\") ");// If the value contains
-		// comma, the split the
-		// value
+		// If the value contains comma, the split the value
+		cypher.append(" WHEN (toString(value) contains \",\") THEN split(value, \",\") ");
 		cypher.append(" ELSE value ");
 		cypher.append(" END as values ");
 		cypher.append("UNWIND values as value WITH uuid, value where value <> \"\" ");
@@ -193,19 +204,24 @@ public class CorrelationExecutor {
 				"WITH distinct uuid, collect(distinct value) as values WITH { uuid : uuid, values : values} as data ");
 		cypher.append("RETURN collect(data) as data");
 		log.debug(" Type=Correlator execId={} correlationName={} sourceTool={} destinationTool={} ProcessingTime={} processedRecords={} DestinationData {} ", loggingInfo.get(EngineConstants.EXECID),loggingInfo.get(EngineConstants.CORRELATION_NAME),loggingInfo.get(EngineConstants.SOURCE_TOOL),loggingInfo.get(EngineConstants.DESTINATION_TOOL),0,0,cypher);
+		
 		GraphDBHandler dbHandler = new GraphDBHandler();
 		try {
+			
 			GraphResponse response = dbHandler.executeCypherQuery(cypher.toString());
+			
 			JsonArray rows = response.getJson().get(RESULT).getAsJsonArray().get(0).getAsJsonObject().get("data")
 					.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray();
-			destinationDataList = new ArrayList<>();
+			
 			if (rows.isJsonNull() || rows.size() == 0 || rows.get(0).getAsJsonArray().size() == 0) {
 				return destinationDataList;
 			}
 			JsonArray dataArray = rows.get(0).getAsJsonArray();
+			
 			for (JsonElement data : dataArray) {
 				destinationDataList.add(data.getAsJsonObject());
 			}
+			
 		} catch (InsightsCustomException e) {
 			log.error(" execId={} correlationName={} sourceTool={} destinationTool={} Error occured while loading the destination data for correlations.",loggingInfo.get(EngineConstants.EXECID),loggingInfo.get(EngineConstants.CORRELATION_NAME),loggingInfo.get(EngineConstants.SOURCE_TOOL),loggingInfo.get(EngineConstants.DESTINATION_TOOL), e);
 		}
@@ -220,8 +236,10 @@ public class CorrelationExecutor {
 	 * @param allowedSourceRelationCount
 	 */
 	private int executeCorrelations(CorrelationConfiguration correlation, List<JsonObject> dataList) {
-		StringBuffer correlationCypher = new StringBuffer();
+		
+		StringBuilder correlationCypher = new StringBuilder();
 		String sourceField = correlation.getSourceFields(); // currently, we will support only one source field.
+		
 		correlationCypher.append("UNWIND $props as properties ");
 		correlationCypher.append("MATCH (destination:DATA:RAW:").append(correlation.getDestinationLabelName())
 				.append(" {uuid: properties.uuid}) ");
@@ -235,22 +253,30 @@ public class CorrelationExecutor {
 		 .append(" {uuid:(source.uuid+'.'+destination.uuid)} ]-> (destination) ");
 	
 		String propertyVal = appendRelationshipProperties(correlation);
+		
 		if (!propertyVal.isEmpty()) {
 			correlationCypher.append("set ").append(propertyVal).append(" ");
 		}
+		
 		correlationCypher.append("RETURN count(distinct destination) as count");
 		log.debug(" Type=Correlator execId={} correlationName={} sourceTool={} destinationTool={} ProcessingTime={} processedRecords={} CorrelationExecution Started executeCorrelations {} ",loggingInfo.get(EngineConstants.EXECID),loggingInfo.get(EngineConstants.CORRELATION_NAME),loggingInfo.get(EngineConstants.SOURCE_TOOL),loggingInfo.get(EngineConstants.DESTINATION_TOOL),0,0, correlationCypher);
+		
 		GraphDBHandler dbHandler = new GraphDBHandler();
 		JsonObject correlationExecutionResponse;
 		int processedRecords = 0;
 		try {
+			
 			long st = System.currentTimeMillis();
-			correlationExecutionResponse = dbHandler.bulkCreateNodes(dataList, null, correlationCypher.toString());
+			
+			correlationExecutionResponse = dbHandler.bulkCreateNodes(dataList,correlationCypher.toString());
+
 			log.debug(" Type=Correlator execId={} correlationName={} sourceTool={} destinationTool={} ProcessingTime={} processedRecords={} CorrelationExecution Response = {} ",loggingInfo.get(EngineConstants.EXECID),loggingInfo.get(EngineConstants.CORRELATION_NAME),loggingInfo.get(EngineConstants.SOURCE_TOOL),loggingInfo.get(EngineConstants.DESTINATION_TOOL),0,0,correlationExecutionResponse);
+			
 			processedRecords = correlationExecutionResponse.get("response").getAsJsonObject().get(RESULT)
 					.getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject()
 					.get("row").getAsInt();
 			log.debug(" Type=Correlator execId={} correlationName={} sourceTool={} destinationTool={} ProcessingTime={} processedRecords={} Processed Records for correlation= {}  ",loggingInfo.get(EngineConstants.EXECID),loggingInfo.get(EngineConstants.CORRELATION_NAME),loggingInfo.get(EngineConstants.SOURCE_TOOL),loggingInfo.get(EngineConstants.DESTINATION_TOOL),(System.currentTimeMillis() - st),processedRecords,processedRecords);
+		
 		} catch (InsightsCustomException e) {
 			log.error(" execId={} correlationName={} sourceTool={} destinationTool={} Error occured while executing correlations",loggingInfo.get(EngineConstants.EXECID),loggingInfo.get(EngineConstants.CORRELATION_NAME),loggingInfo.get(EngineConstants.SOURCE_TOOL),loggingInfo.get(EngineConstants.DESTINATION_TOOL),e);
 			EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
@@ -262,8 +288,10 @@ public class CorrelationExecutor {
 	private String appendRelationshipProperties(CorrelationConfiguration configuration) {
 
 		StringBuilder propertyValueBuilder = new StringBuilder();
+		
 		List<RelationshipConfiguration> allRelationshipConfigList = new ArrayList<>(
 				configuration.getRelationshipConfig());
+		
 		for (RelationshipConfiguration rc : allRelationshipConfigList) {
 			String operationName = rc.getOperation();
 			if (operationName.equals("DIFF")) {
@@ -285,11 +313,13 @@ public class CorrelationExecutor {
 				}
 			}
 		}
+		
 		return propertyValueBuilder.toString();
 	}
 	
 	private int removeRawLabel(CorrelationConfiguration destination) {
-		StringBuffer correlationCypher = new StringBuffer();
+		
+		StringBuilder correlationCypher = new StringBuilder();
 		correlationCypher.append("MATCH (destination:DATA:RAW:").append(destination.getDestinationLabelName())
 				.append(") ");
 		correlationCypher.append("where destination.maxCorrelationTime < ").append(currentCorrelationTime).append(" ");
@@ -297,9 +327,11 @@ public class CorrelationExecutor {
 		correlationCypher
 				.append("remove destination.maxCorrelationTime, destination.correlationTime, destination:RAW ");
 		correlationCypher.append("return count(distinct destination) ");
+		
 		GraphDBHandler dbHandler = new GraphDBHandler();
 		JsonObject correlationExecutionResponse;
 		int processedRecords = 1;
+		
 		try {
 			while (processedRecords > 0) {
 				long st = System.currentTimeMillis();
@@ -313,6 +345,7 @@ public class CorrelationExecutor {
 			log.error(" Error occured while removing RAW label from tool:{}",destination.getDestinationLabelName(),
 					e);
 		}
+		
 		return processedRecords;
 	}
 
@@ -322,22 +355,30 @@ public class CorrelationExecutor {
 	 * @return
 	 */
 	private List<Correlation> loadCorrelationsFromFile() {
+		
 		List<Correlation> correlations = null;
+		
 		try {
+			
 			List<InsightsConfigFiles> configFile = configFilesDAL
 					.getAllConfigurationFilesForModule(FileDetailsEnum.FileModule.CORRELATION.name());
 			if (configFile != null && !configFile.isEmpty()) {
+				
 				String configFileData = new String(configFile.get(0).getFileData(), StandardCharsets.UTF_8);
 				Correlation[] correlationArray = new Gson().fromJson(configFileData, Correlation[].class);
 				correlations = Arrays.asList(correlationArray);
+				
 				EngineStatusLogger.getInstance().createSchedularTaskStatusNode("Correlation.json is successfully loaded.",
 						PlatformServiceConstants.SUCCESS, jobName);
+				
 				log.debug(" Type=Correlator execId={} correlationName={} sourceTool={} destinationTool={} ProcessingTime={} processedRecords={} Correlation.json is successfully loaded.",loggingInfo.get(EngineConstants.EXECID),"-","-","-",0,0);
+			
 			} else {
 				log.error(" execId={} Correlation.json not found in DB.",loggingInfo.get(EngineConstants.EXECID));
 				EngineStatusLogger.getInstance().createSchedularTaskStatusNode("Correlation.json not found in DB.",
 						PlatformServiceConstants.FAILURE, jobName);
 			}
+			
 		} catch (JsonSyntaxException e) {
 			EngineStatusLogger.getInstance().createSchedularTaskStatusNode("Correlation.json is not formatted.",
 					PlatformServiceConstants.FAILURE, jobName);
@@ -347,12 +388,14 @@ public class CorrelationExecutor {
 					PlatformServiceConstants.FAILURE, jobName);
 			log.error(" execId={} Exception while loading Correlation.json",loggingInfo.get(EngineConstants.EXECID));
 		}
+		
 		return correlations;
 	}
 
-	private void getRelationFromFile(List<Correlation> correlationsJson, List<CorrelationConfiguration> correlations) {
+	private void convertCorrelationDTO(List<Correlation> correlationsJson, List<CorrelationConfiguration> correlations) {
 
 		for (Correlation correlation : correlationsJson) {
+			
 			CorrelationConfiguration correlationConfiguration = new CorrelationConfiguration();
 			correlationConfiguration.setSourceToolName(correlation.getSource().getToolName());
 			correlationConfiguration.setSourceToolCategory(correlation.getSource().getToolCategory());
@@ -373,20 +416,26 @@ public class CorrelationExecutor {
 			correlationConfiguration.setDestinationFields(String.join(",", correlation.getDestination().getFields()));
 			correlationConfiguration.setRelationName(correlation.getRelationName());
 			correlations.add(correlationConfiguration);
+			
 		}
 
 	}
 
 	private List<CorrelationConfiguration> getRelation() {
+		
 		CorrelationConfigDAL correlationConfigDAL = new CorrelationConfigDAL();
 		List<CorrelationConfiguration> correlationList = new ArrayList<>();
+		
 		try {
+			
 			correlationList = correlationConfigDAL.getActiveCorrelations();
+			
 		} catch (Exception e) {
 			log.error(" execId={} unable to get correlation from database",loggingInfo.get(EngineConstants.EXECID));
 			EngineStatusLogger.getInstance().createSchedularTaskStatusNode("unable to get correlation from database",
 					PlatformServiceConstants.FAILURE, jobName);
 		}
+		
 		return correlationList;
 	}
 

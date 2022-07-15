@@ -103,6 +103,7 @@ export class EditDashboardComponent implements OnInit {
   userName: string;
   theme: string;
   themes: any;
+  inputDataJson:any;
 
   constructor(
     public router: Router,
@@ -151,6 +152,7 @@ export class EditDashboardComponent implements OnInit {
   }
   initialiseVariables(params) {
     this.getDashboardsByOrg(Number(params.organisation));
+    this.inputDataJson=params;
     this.loadTime = params.loadTime == undefined ? "30" : params.loadTime;
     this.type = params.type;
     this.editData = params;
@@ -653,8 +655,8 @@ export class EditDashboardComponent implements OnInit {
     this.getUrlArray();
     const dialogRef = self.dialog.open(DashboardPreviewConfigDialog, {
       panelClass: "custom-dialog-container",
-      height: "550px",
-      width: "1170px",
+      height: "85%",
+      width: "86%",
       disableClose: true,
       data: {
         route: this.dashUrl,
@@ -775,14 +777,13 @@ export class EditDashboardComponent implements OnInit {
     if (this.range !== undefined) this.range.reset();
     this.showTimePicker = true;
   }
-
-  refresh(){
-    console.log("Cancel Button")
-      this.pdfType = "";
-      this.frequency = "";
-      this.loadTime = "";
-      this.theme = "";
-      this.timeRange = "";
+  dataReset(){
+    console.log(this.inputDataJson);
+      this.pdfType = this.inputDataJson.pdfType;
+      this.frequency = this.inputDataJson.scheduleType;;
+      this.loadTime = this.inputDataJson.loadTime == undefined ? "30" :  this.inputDataJson.loadTime;;
+      this.theme = this.inputDataJson.theme;
+      this.timeRange = this.inputDataJson.range;
   }
 
   resetOnDashboardChange() {

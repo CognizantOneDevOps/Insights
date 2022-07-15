@@ -35,7 +35,11 @@ echo "Install Tomcat "
 wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL7/reference-DocRoot-Scripts/insights_tomcat.sh -O insights_tomcat.sh && dos2unix insights_tomcat.sh && sh insights_tomcat.sh
 echo "Get Insights Engine"
 wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL7/reference-DocRoot-Scripts/insights_enginejar.sh -O insights_enginejar.sh && dos2unix insights_enginejar.sh && sh insights_enginejar.sh
+echo "Install Insights Workflow"
+wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL7/reference-DocRoot-Scripts/insights_workflow.sh -O insights_workflow.sh && dos2unix insights_workflow.sh && sh insights_workflow.sh
 echo "Get Insights Agents"
 wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL7/reference-DocRoot-Scripts/insights_agents.sh -O insights_agents.sh && dos2unix insights_agents.sh && sh insights_agents.sh
+echo "Server-Config Setup Details"
+wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL7/reference-DocRoot-Scripts/server_setup_details.sh -O server_setup_details.sh && dos2unix server_setup_details.sh && sh server_setup_details.sh
 #echo "Get Insights Initd scripts"
 #wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_initscripts.sh -O insights_initscripts.sh && dos2unix insights_initscripts.sh && sh insights_initscripts.sh

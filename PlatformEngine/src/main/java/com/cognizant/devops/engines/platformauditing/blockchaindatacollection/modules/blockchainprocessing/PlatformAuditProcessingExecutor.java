@@ -139,16 +139,12 @@ public class PlatformAuditProcessingExecutor implements Job, ApplicationConfigIn
                         byte[] decryptedBytes = cipher.doFinal(byteArray);
                         LOG.debug("decryptedBytes");
                         LOG.debug(new String(decryptedBytes));
-                        if (hc.equals(new String(decryptedBytes)))                        	
-                            successfulWriteFlag = insertNode(dataElem, successfulWriteFlag);
-                        else
-                            LOG.debug("Hash values do not match.. skipping uuid: {}",
-								dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("uuid"));
+                        
+                        successfulWriteFlag = setWriteFlag(successfulWriteFlag, dataElem, hc, decryptedBytes); 
                     }else
                         LOG.debug("INVALID ASSET OR DigitalSignature not found for uuid:{} ",
 							dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("uuid")+"\nNode skipped...");
-                    //successfulWriteFlag = insertNode(dataElem, successfulWriteFlag);
-                }
+                    }
 
                 //check for success for updating tracking
 
@@ -173,6 +169,15 @@ public class PlatformAuditProcessingExecutor implements Job, ApplicationConfigIn
         }
 
     }
+
+	private Boolean setWriteFlag(Boolean successfulWriteFlag, JsonElement dataElem, String hc, byte[] decryptedBytes) {
+		if (hc.equals(new String(decryptedBytes)))                        	
+		    successfulWriteFlag = insertNode(dataElem, successfulWriteFlag);
+		else
+		    LOG.debug("Hash values do not match.. skipping uuid: {}",
+				dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("uuid"));
+		return successfulWriteFlag;
+	}
     
     private String getHash(JsonArray row) {
         String dataString = "";
@@ -182,27 +187,7 @@ public class PlatformAuditProcessingExecutor implements Job, ApplicationConfigIn
             TreeMap<String, String> t = new TreeMap<String, String>();
             dt.getAsJsonObject().entrySet().parallelStream().forEach(entry -> {
                 if (!entry.getKey().equals("uuid") && !entry.getKey().equals(InsightsAuditConstants.DIGITALSIGNATURE) &&  !entry.getKey().equals("correlationTime") && !entry.getKey().equals("maxCorrelationTime") ) {
-                    if (entry.getKey().equals("inSightsTime") ||entry.getKey().endsWith("Epoch"))
-                        t.put(entry.getKey(), String.valueOf(entry.getValue().getAsLong()) + ".0");
-                    else {
-                    	LOG.debug("{} jsonarray*****",Boolean.toString(entry.getValue().isJsonArray()));
-                        if(entry.getValue().isJsonArray()) {
-                            for (JsonElement e: entry.getValue().getAsJsonArray()) {
-                                if(t.containsKey(entry.getKey())) {
-                                    LOG.debug("t.get(entry.getKey()).toString()");
-                                    LOG.debug(t.get(entry.getKey()).toString());
-                                    t.put(entry.getKey(), t.get(entry.getKey()).toString().concat(e.getAsString()));
-                                }else
-                                    t.put(entry.getKey(), e.getAsString());
-                            }
-                        }
-                        else {
-                        	//LOG.debug(entry.getValue().getClass().getName());
-                        	LOG.debug(entry.getKey(),"-->",entry.getValue());
-                            t.put(entry.getKey(), entry.getValue().getAsString());
-                        }
-                        //LOG.debug(entry.getValue().getAsString());
-                    }
+                    setTreeMapForEpoch(t, entry);
                 }
             });
             Set<?> data = t.entrySet();
@@ -214,8 +199,45 @@ public class PlatformAuditProcessingExecutor implements Job, ApplicationConfigIn
             LOG.debug(dataString);
             sb = Hashing.sha256().hashString(dataString, StandardCharsets.UTF_8);
         }
+        
+        try {
         return sb.toString();
+        } catch (Exception e) {
+        	LOG.error(e.getMessage());
+        	throw e;
+        }
     }
+
+	private void setTreeMapForEpoch(TreeMap<String, String> t, Entry<String, JsonElement> entry) {
+		if (entry.getKey().equals("inSightsTime") ||entry.getKey().endsWith("Epoch")) {
+		    t.put(entry.getKey(), String.valueOf(entry.getValue().getAsLong()) + ".0");
+			}
+		else {
+			if(LOG.isDebugEnabled()) {
+			LOG.debug("{} jsonarray*****",Boolean.toString(entry.getValue().isJsonArray()));
+			}
+		    if(entry.getValue().isJsonArray()) {
+		        setTreeMap(t, entry);
+		    }
+		    else {
+		    	//LOG.debug(entry.getValue().getClass().getName());
+		    	LOG.debug(entry.getKey(),"-->",entry.getValue());
+		        t.put(entry.getKey(), entry.getValue().getAsString());
+		    }
+		    //LOG.debug(entry.getValue().getAsString());
+		}
+	}
+
+	private void setTreeMap(TreeMap<String, String> t, Entry<String, JsonElement> entry) {
+		for (JsonElement e: entry.getValue().getAsJsonArray()) {
+		    if(t.containsKey(entry.getKey())) {
+		        LOG.debug("t.get(entry.getKey()).toString()");
+		        LOG.debug(t.get(entry.getKey()).toString());
+		        t.put(entry.getKey(), t.get(entry.getKey()).toString().concat(e.getAsString()));
+		    }else
+		        t.put(entry.getKey(), e.getAsString());
+		}
+	}
 
     private boolean insertNode(JsonElement dataElem, boolean successfulWriteFlag) {
         try {

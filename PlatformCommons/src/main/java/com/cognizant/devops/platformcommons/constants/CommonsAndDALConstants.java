@@ -15,13 +15,14 @@
 ******************************************************************************/
 package com.cognizant.devops.platformcommons.constants;
 
-public interface CommonsAndDALConstants {
+public final class CommonsAndDALConstants {
 
-	String RABBIT_MQ_EXCEPTION = "Exception while initializing RabbitMQ connection.";
-	String COLUMN_DEFINITION = "columnDefinition";
-	String MAX_RESULTS = "MaxResults";
-	String ISACTIVE = "isActive";
-	String MATCH_PATTERN_STRING = "{\"size\": 2,\"sort\": [{ \"executionId\": \"desc\" }],\"query\": {\"bool\":{ \"must\":[{ \"match\":{ \"kpiId\":%kpiId% } } ]}}}";
-	String MATCH_PATTERN_STRING_1 = " {\"size\": 400,\"sort\": [{ \"executionId\": \"desc\" }],\"query\": {\"bool\":{ \"must\":[{ \"match\":{ \"kpiId\":%kpiId% } },{ \"match\":{ \"executionId\":%executionId% } } ]}}}";
-	String MATCH_B_PATTERN="Match (b:";
+	public static final String RABBIT_MQ_EXCEPTION = "Exception while initializing RabbitMQ connection.";
+	public static final String COLUMN_DEFINITION = "columnDefinition";
+	public static final String MAX_RESULTS = "MaxResults";
+	public static final String ISACTIVE = "isActive";
+	public static final String MATCH_PATTERN_STRING = "{\"size\": 2,\"sort\": [{ \"executionId\": \"desc\" }],\"query\": {\"bool\":{ \"must\":[{ \"match\":{ \"kpiId\":%kpiId% } } ]}}}";
+	public static final String MATCH_PATTERN_STRING_1 = " {\"size\": 400,\"sort\": [{ \"executionId\": \"desc\" }],\"query\": {\"bool\":{ \"must\":[{ \"match\":{ \"kpiId\":%kpiId% } },{ \"match\":{ \"executionId\":%executionId% } } ]}}}";
+	public static final String MATCH_B_PATTERN="Match (b:";
+
 }

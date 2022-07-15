@@ -43,8 +43,10 @@ echo "1)insights_first
 7)insights_rabbitmq
 8)insights_tomcat
 9)insights_enginejar
-10)insights_agents
-11)insights_all"
+10)insights_workflow
+11)insights_agents
+12)server_setup_details
+13)insights_all"
 read input
 echo -n "Nexus(userName):"
 read userName
@@ -57,7 +59,7 @@ case $package in
    ;;
    "insights_java") sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL8/reference-DocRoot-Scripts/insights_java.sh -O insights_java.sh && dos2unix insights_java.sh && sh insights_java.sh
    ;;
-   "insights_postgres") sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL8/reference-DocRoot-Scripts/insights_postgres.sh -O insights_postgres.sh && dos2unix insights_postgres.sh && sh insights_postgres.sh
+   "insights_postgres") sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL8/reference-DocRoot-Scripts/insights_postgres12.sh -O insights_postgres12.sh && dos2unix insights_postgres12.sh && sh insights_postgres12.sh
    ;;
    "insights_neo4j") sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL8/reference-DocRoot-Scripts/insights_neo4j.sh -O insights_neo4j.sh && dos2unix insights_neo4j.sh && sh insights_neo4j.sh
    ;;
@@ -71,7 +73,11 @@ case $package in
    ;;
    "insights_enginejar") sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL8/reference-DocRoot-Scripts/insights_enginejar.sh -O insights_enginejar.sh && dos2unix insights_enginejar.sh && sh insights_enginejar.sh
    ;;
+   "insights_workflow") sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL8/reference-DocRoot-Scripts/insights_workflow.sh -O insights_workflow.sh && dos2unix insights_workflow.sh && sh insights_workflow.sh
+   ;;
    "insights_agents") sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL8/reference-DocRoot-Scripts/insights_agents.sh -O insights_agents.sh && dos2unix insights_agents.sh && sh insights_agents.sh
+   ;;
+   "server_setup_details") sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL8/reference-DocRoot-Scripts/server_setup_details.sh -O server_setup_details.sh && dos2unix server_setup_details.sh && sh server_setup_details.sh
    ;;
    "insights_all") sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL8/reference-DocRoot-Scripts/insights_all.sh -O insights_all.sh && dos2unix insights_all.sh && sh insights_all.sh
    ;;

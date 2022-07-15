@@ -50,7 +50,7 @@
         >
         </mat-icon>
       </button>
-      <button mat-icon-button (click)="refreshData()">
+      <button *ngIf="!onEdit" mat-icon-button (click)="refreshData()">
         <mat-icon
           matTooltip="Reset"
           class="mat-icon material-icons"
@@ -58,6 +58,15 @@
         >
         </mat-icon>
       </button>
+      <button *ngIf="onEdit" mat-icon-button (click)="reset()">
+        <mat-icon
+          matTooltip="Reset"
+          class="mat-icon material-icons"
+          svgIcon="exit"
+        >
+        </mat-icon>
+      </button>
+      
     </div>
   </div>
   <div class="tableHeaderCss">
@@ -160,6 +169,36 @@
             style="width: 12px !important; height: 12px !important"
           ></mat-icon>
         </mat-form-field>
+      </div>
+
+      <div class="grid-item" *ngIf="category == 'PREDICTION'">
+        <div class="lblText">UseCase<span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            required
+            [(ngModel)]="selectedUsecase"
+            name="selectedTool"
+            (selectionChange)="usecaseSelected($event.value)"
+            placeholder="Select Usecase"
+            color="primary"
+          >
+            <mat-option
+              *ngFor="let usecase of usecaseList"
+              value="{{ usecase }}"
+            >
+              {{ usecase }}</mat-option
+            >
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+        <!-- <td>
+          <span class="infoText">Please select a usecase for prediction. </span>
+        </td> -->
       </div>
 
       <div class="grid-item">

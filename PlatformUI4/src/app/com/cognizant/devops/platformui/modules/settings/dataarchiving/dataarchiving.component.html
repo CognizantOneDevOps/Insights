@@ -25,7 +25,7 @@
   <div class="sectionHeadingStyle">
     <span *ngIf="showAdd" style="padding-top: 3px; margin-left: 3px">
       <button mat-icon-button (click)="refresh()" style="vertical-align: super">
-        <mat-icon svgIcon="backButton" matTooltip="Back to Data Archival">
+        <mat-icon svgIcon="backButton" matTooltip="Back">
         </mat-icon>
       </button>
     </span>
@@ -196,7 +196,7 @@
   </div>
   <div [hidden]="!showDetail">
     <div class="footer">
-      <div class="paginator">
+      <div *ngIf="totalPages > 1" class="paginator">
         <mat-paginator
           style="visibility: hidden"
           #paginator
@@ -268,7 +268,9 @@
           class="add-agent-section-title add-agent-section-title-dimensions seperateDivs displayFlexSpaceBtw"
         >
           <div>Add details to Archive data</div>
-          <div>(Please provide accurate details.)</div>
+          <div style="font-size: 12 px;">(Please provide accurate details.)
+            <span class="asteriskText">*</span>
+          </div>
         </div>
       </div>
       <div class="section-body">
@@ -290,12 +292,13 @@
                 autocomplete="off"
                 [ngClass]="{ 'input-disabled': disableInputFields }"
                 type="text"
-                placeholder="Please input a valid Archival Name"
+                placeholder="Please enter a valid Archival Name"
                 [(ngModel)]="archivalName"
                 name="archivalName"
+                style="font-weight: 100;"
               />
             </mat-form-field>
-            <div class="labelTxt">
+            <div class="comments">
               It contains only alphanumeric character and underscore.
             </div>
           </div>
@@ -312,12 +315,13 @@
               <input
                 matInput
                 type="number"
-                placeholder="Please input number of days to retain data."
+                placeholder="Please enter number of days to retain data."
                 [(ngModel)]="noOfDays"
                 name="DaysToRetain"
                 min="1"
                 max="90"
                 integer
+                style="font-weight: 100;"
               />
             </mat-form-field>
           </div>
@@ -342,6 +346,7 @@
                 readonly
                 (dateChange)="getstartDate('change', $event)"
                 placeholder="MM/DD/YYYY"
+                style="font-weight: 100;"
               />
               <mat-datepicker-toggle matSuffix [for]="startDatePicker">
                 <mat-icon
@@ -353,14 +358,14 @@
               <mat-datepicker #startDatePicker [disabled]="disableInputFields">
               </mat-datepicker>
             </mat-form-field>
-            <div class="labelTxt">
+            <div class="comments">
               Enter the date when Data Archival records collection starts.
             </div>
           </div>
           <div class="grid-item">
             <div class="select-label">
               Records To (MM/DD/YYYY)
-              <span class="asteriskText">* </span>
+              <span class="asteriskText">*</span>
             </div>
             <mat-form-field
               style="width: 100%"
@@ -377,6 +382,7 @@
                 readonly
                 (dateChange)="getendDate('change', $event)"
                 placeholder="MM/DD/YYYY"
+                style="font-weight: 100;"
               />
               <mat-datepicker-toggle matSuffix [for]="endDatePicker">
                 <mat-icon
@@ -390,7 +396,7 @@
                 [disabled]="disableInputFields"
               ></mat-datepicker>
             </mat-form-field>
-            <div class="labelTxt">
+            <div class="comments">
               Enter the date when Data Archival records collection stops.
             </div>
           </div>

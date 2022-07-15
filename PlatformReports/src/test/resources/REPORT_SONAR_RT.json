@@ -9,7 +9,7 @@
          "visualizationConfigs":[
             {
                "vType":"Table_100131",
-    	       "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN n"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.AvgDuplicateBlocksCoverage as AvgDuplicateBlocksCoverage LIMIT 5"
             }
          ]
       },
@@ -18,7 +18,7 @@
          "visualizationConfigs":[
             {
                "vType":"Table_100132",
-       		   "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN n"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.AvgDuplicateBlocksCoverage as AvgDuplicateBlocksCoverage LIMIT 5"
             }
          ]
       },
@@ -27,7 +27,7 @@
          "visualizationConfigs":[
             {
                "vType":"Table_100133",
-         	   "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN n"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.NumberOfQualityBlocks as NumberOfQualityBlocks LIMIT 5"
             }
          ]
       },
@@ -35,18 +35,26 @@
          "kpiId":100134,
          "visualizationConfigs":[
             {
-               "vType":"Table_100134",
-          	   "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN n"
+               "vType":"Table_134",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.NumberOfQualityBlocks as NumberOfQualityBlocks LIMIT 5"
             }
          ]
       },
-      
+      {
+         "kpiId":100331,
+         "visualizationConfigs":[
+            {
+               "vType":"Table_100331",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.AvgComplexityCoverage as AvgComplexityCoverage LIMIT 5"
+            }
+         ]
+      },
       {
          "kpiId":100332,
          "visualizationConfigs":[
             {
                "vType":"Table_100332",
-          	   "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN n"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.AvgComplexityCoverage as AvgComplexityCoverage LIMIT 5"
             }
          ]
       },
@@ -55,7 +63,7 @@
          "visualizationConfigs":[
             {
                "vType":"Table_100101",
-               "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN n"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.NumberOfQualityBlocks as NumberOfQualityBlocks LIMIT 5"
             }
          ]
       },
@@ -64,7 +72,7 @@
          "visualizationConfigs":[
             {
                "vType":"Table_100102",
-               "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN n"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.NumberOfQualityBlocks as NumberOfQualityBlocks LIMIT 5"
             }
          ]
       },
@@ -73,7 +81,7 @@
          "visualizationConfigs":[
             {
                "vType":"Table_100235",
-               "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN n"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} with DISTINCT MAX(n.executionId) as latestExecutionId,n.SPKendTime as SPKendTime MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId RETURN  SPKendTime , n.AvgCodeCoverage as AvgCodeCoverage ORDER BY SPKendTime DESC"
             }
          ]
       },
@@ -82,7 +90,7 @@
          "visualizationConfigs":[
             {
                "vType":"Table_100236",
-               "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN n"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.AvgCodeCoverage as AvgCodeCoverage LIMIT 5"
             }
          ]
       },
@@ -91,7 +99,7 @@
          "visualizationConfigs":[
             {
                "vType":"Table_100237",
-               "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN n"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} with DISTINCT MAX(n.executionId) as latestExecutionId,n.SPKendTime as SPKendTime MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId RETURN  SPKendTime , n.AvgCodeCoverage as AvgCodeCoverage ORDER BY SPKendTime DESC"
             }
          ]
       },
@@ -100,7 +108,7 @@
          "visualizationConfigs":[
             {
                "vType":"Table_100238",
-               "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN n"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.AvgCodeCoverage as AvgCodeCoverage LIMIT 5"
             }
          ]
       },
@@ -109,7 +117,7 @@
          "visualizationConfigs":[
             {
                "vType":"Table_100138",
-               "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN n"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.NumberOfSonarExecutions as NumberOfSonarExecutions LIMIT 5"
             }
          ]
       },
@@ -118,7 +126,7 @@
          "visualizationConfigs":[
             {
                "vType":"Table_100137",
-               "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN n"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.NumberOfSonarExecutions as NumberOfSonarExecutions LIMIT 5"
             }
          ]
       },
@@ -127,7 +135,7 @@
          "visualizationConfigs":[
             {
                "vType":"Table_100136",
-               "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN n"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.NumberOfSonarExecutions as NumberOfSonarExecutions LIMIT 5"
             }
          ]
       },
@@ -136,7 +144,7 @@
          "visualizationConfigs":[
             {
                "vType":"Table_100135",
-               "vQuery": "MATCH (n:KPI:RESULTS) where n.assessmentReportName = {assessmentReportName}  and n.kpiId={kpiId} with distinct max(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN n"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.NumberOfSonarExecutions as NumberOfSonarExecutions LIMIT 5"
             }
          ]
       }

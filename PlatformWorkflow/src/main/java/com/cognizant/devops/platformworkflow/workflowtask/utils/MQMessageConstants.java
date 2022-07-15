@@ -15,10 +15,10 @@
  ******************************************************************************/
 package com.cognizant.devops.platformworkflow.workflowtask.utils;
 
-public interface MQMessageConstants {
+public final class MQMessageConstants {
 	
-	String EXCHANGE_NAME = "iWorkflow";
-	String EXCHANGE_TYPE = "topic";	
-	String MESSAGE_ENCODING = "UTF-8";
+	public static final String EXCHANGE_NAME = "iWorkflow";
+	public static final String EXCHANGE_TYPE = "topic";	
+	public static final String MESSAGE_ENCODING = "UTF-8";
 
 }

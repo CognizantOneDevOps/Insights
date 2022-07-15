@@ -21,10 +21,8 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.RestApiHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformcommons.exception.RestAPI404Exception;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonSyntaxException;
 
 public class ElasticSearchDBHandler {
 	private static Logger log = LogManager.getLogger(ElasticSearchDBHandler.class);

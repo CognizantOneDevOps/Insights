@@ -20,7 +20,7 @@ source /etc/profile
 cd /opt
 #sudo mkdir grafana
 #cd grafana
-read -p "Please enter Grafana version number you want to install(ex. 7.5.10 or 8.1.3): " version_number
+read -p "Please enter Grafana version number you want to install(ex. 7.5.10 or 8.4.5): " version_number
 version_number=`echo $version_number | sed -e 's/^[[:space:]]*//'`
 sudo wget https://dl.grafana.com/oss/release/grafana-${version_number}.linux-amd64.tar.gz
 sudo tar -zxvf grafana-${version_number}.linux-amd64.tar.gz
@@ -38,14 +38,16 @@ cd /opt/grafana/public/dashboards
 wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformGrafanaPlugins/ScriptedDashboard/iSight_ui3.js
 cd /opt/grafana/conf
 wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformGrafanaPlugins/GrafanaConf/ldap.toml
-echo "Please provide postgres grafana user credentials"
+echo "Please provide grafana user credentials created in postgres"
 echo -n "credentials: "
 read -s grafanacreds
-sudo sed -i "/type =/ s/=.*/=postgres/" defaults.ini
+sudo sed -i '/^\[database\]$/,/^\[/{s/^type[[:space:]]*=.*/type = postgres/}' defaults.ini
 sudo sed -i "/host =/ s/=.*/=localhost:5432/" defaults.ini
-sudo sed -i "/name =/ s/=.*/=grafana/" defaults.ini
-sudo sed -i "/user =/ s/=.*/=grafana/" defaults.ini
-sudo sed -i "/password =/ s/=.*/=$grafanacreds/" defaults.ini
+sudo sed -i '/^\[database\]$/,/^\[/{s/^name[[:space:]]*=.*/name = grafana/}' defaults.ini
+sudo sed -i '/^\[database\]$/,/^\[/{s/^user[[:space:]]*=.*/user = grafana/}' defaults.ini
+sudo sed -i '/^\[database\]$/,/^\[/{s/^password[[:space:]]*=.*/password = '$grafanacreds'/}' defaults.ini
+#sudo sed -i "/user =/ s/=.*/=grafana/" defaults.ini
+#sudo sed -i "/password =/ s/=.*/=$grafanacreds/" defaults.ini
 sudo sed -i "/allow_loading_unsigned_plugins =/ s/=.*/=neo4j-datasource,Inference,cde-inference-plugin,cde-fusion-panel,cognizant-insights-charts/" defaults.ini
 sudo sed -i "/allow_embedding =/ s/=.*/=true/" defaults.ini
 sudo sed -i 's@</body>@<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script></body>@g' /opt/grafana/public/views/index.html
@@ -60,7 +62,7 @@ sudo echo $! > grafana-pid.txt
 sleep 10
 sudo chmod -R 777 /opt/grafana
 cd /etc/init.d/
-sudo wget  https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL8/initscripts/Grafana.sh
+sudo wget  https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL7/initscripts/Grafana.sh
 sudo yum install dos2unix -y
 sudo dos2unix Grafana.sh
 sudo mv Grafana.sh Grafana

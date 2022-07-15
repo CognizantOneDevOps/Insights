@@ -15,12 +15,12 @@
  ******************************************************************************/
 package com.cognizant.devops.platformcommons.constants;
 
-public interface DataArchivalConstants {
-	 String TOOLNAME = "elastictransfer";
-	 String TOOLCATEGORY = "SYSTEM";
-	 String ARCHIVALNAME= "archivalName";
-	 String SOURCEURL = "sourceUrl";
-	 String TASK = "task";
-	 String CONTAINERID = "containerID";
-	 String BOLTPORT = "boltPort";
+public final class DataArchivalConstants {
+	 public static final String TOOLNAME = "elastictransfer";
+	 public static final String TOOLCATEGORY = "SYSTEM";
+	 public static final String ARCHIVALNAME= "archivalName";
+	 public static final String SOURCEURL = "sourceUrl";
+	 public static final String TASK = "task";
+	 public static final String CONTAINERID = "containerID";
+	 public static final String BOLTPORT = "boltPort";
 }

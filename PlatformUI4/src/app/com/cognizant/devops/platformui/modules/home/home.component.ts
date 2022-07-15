@@ -79,7 +79,7 @@ export class HomeComponent implements OnInit {
   leftNavWidthInPer: number;
   leftNavMinWidthInPer: number;
   leftNavWidthpx: number;
-  displayLandingPage: boolean = false;
+  displayLandingPage: boolean = false; 
   currentUserOrgsArray = []
   currentUserWithOrgs: any;
   insightsCustomerLogo: any;
@@ -90,11 +90,12 @@ export class HomeComponent implements OnInit {
   isServerConfigAvailable: boolean = false;
   menuItem : MenuItem;
   loginName: any;
-  toggleDark: string = "Dark";
+  themePreference: string;
   themeOptions: string = "theme-light";
   storedTheme: any = this.dataShare.getTheme();
   isValid = true;
   isLight: boolean = false;
+  grafanaCheck: boolean = false;
 
   selectedMenu:NavItem ;
 
@@ -102,7 +103,8 @@ export class HomeComponent implements OnInit {
     private cookieService: CookieService, private config: InsightsInitService,
     public router: Router, private dataShare: DataSharedService,public overlayContainer:OverlayContainer,
     private dialog: MatDialog, private imageHandeler: ImageHandlerService,
-    public messageDialog: MessageDialogService, public serverconfigService: ServerConfigurationService
+    public messageDialog: MessageDialogService, 
+    public serverconfigService: ServerConfigurationService
     ) {
     console.log("Home page constructer ");
     if (this.depth === undefined) {
@@ -135,6 +137,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     console.log("Home page constructer nginit ");
+    this.getUserThemePreference();
     this.loadCustomerLogo();
     const overlayClasses=this.overlayContainer.getContainerElement().classList;
     const classToRemove=Array.from(overlayClasses).filter((item:String) => item.includes('theme'));
@@ -329,21 +332,39 @@ export class HomeComponent implements OnInit {
     this.menuItem.removeParentClassCSS();
   }
 
-  onTogglingTheme(): void{
-    if(this.toggleDark == 'Light'){
+  async onTogglingTheme(){
+    var themeNew = this.themePreference;
+    this.getThemeDetails(themeNew);
+    await this.grafanaService.editUserPreference(themeNew);
+    if(this.grafanaCheck===true){
+      this.router.navigateByUrl('/InSights/Home/landingPage/' + this.dataShare.getOrgId(), { skipLocationChange: true });
+    }
+  }
+
+  async getUserThemePreference(){
+    let theme = await this.grafanaService.getUserPreferenceTheme();
+    let themeNew = theme.data.theme;
+    if(themeNew===undefined || themeNew===''){
+      this.getThemeDetails('light');
+    }else{
+      this.getThemeDetails(themeNew);
+    }
+  }
+
+  getThemeDetails(theme: string){
+    if(theme == 'light'){
       this.overlayContainer.getContainerElement().classList.remove('theme-dark');
       this.overlayContainer.getContainerElement().classList.add('theme-light');
-      this.toggleDark = 'Dark';
       this.themeOptions = 'theme-light';
-      console.log("Inside dark mode setter theme " + this,this.themeOptions);
+      this.themePreference = 'dark';
     }else{
       this.overlayContainer.getContainerElement().classList.remove('theme-light');
       this.overlayContainer.getContainerElement().classList.add('theme-dark');
-      this.toggleDark = 'Light';
       this.themeOptions = 'theme-dark';
-      console.log("Inside Light mode setter theme " + this,this.themeOptions);
+      this.themePreference = 'light';
     }
     this.dataShare.setTheme(this.themeOptions);
     this.storedTheme = this.dataShare.getTheme();
   }
+  
 }

@@ -18,13 +18,13 @@ package com.cognizant.devops.platformservice.security.config;
 import org.springframework.security.core.GrantedAuthority;
 
 public enum SpringAuthority implements GrantedAuthority {
+
+	  Viewer("Viewer"),
+	  Editor("Editor"),
+	  Admin("Admin"),
+	  Read_Only_Editor("Read Only Editor"),
+	  INVALID("INVALID"); 
 	
-	Viewer("Viewer"),
-    Editor("Editor"),
-    Admin("Admin"),
-    Read_Only_Editor("Read Only Editor"),
-    INVALID("INVALID");
- 
     private String name;
  
     SpringAuthority(String name) {

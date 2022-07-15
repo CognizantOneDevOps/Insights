@@ -31,9 +31,6 @@
   height: 1.2em;
 }
 
-.asteriskText {
-  color: #ff0000;
-}
 .columnName {
   display: flex;
   flex-direction: column;
@@ -92,7 +89,7 @@ tr:last-child td:last-child {
   display: flex;
   flex-direction: column;
   font: normal normal normal 14px/24px "Open Sans";
-  height: 75%;
+  height: 72%;
 
   .formfield-custom {
     height: -webkit-fill-available;

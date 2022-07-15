@@ -25,7 +25,7 @@ import * as XLSX from "xlsx";
 @Component({
     selector: "prediction-show-details-dialog",
     templateUrl: "./prediction-show-details-dialog.html",
-    styleUrls: ["./prediction-show-details-dialog.scss"]
+    styleUrls: ["./prediction-show-details-dialog.scss","../../../../home.module.scss"]
 })
 export class PredictionShowDetailsDialog implements OnInit {
   predictionDetailedDatasource = new MatTableDataSource([]);
@@ -65,6 +65,7 @@ export class PredictionShowDetailsDialog implements OnInit {
 
   ngAfterViewInit() {
     this.predictionDetailedDatasource.paginator = this.paginator;
+    this.currentPageIndex = this.paginator.pageIndex + 1;
   }
 
   async getPrediction() {

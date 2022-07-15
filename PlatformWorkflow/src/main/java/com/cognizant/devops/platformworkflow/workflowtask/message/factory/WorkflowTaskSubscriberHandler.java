@@ -49,7 +49,7 @@ public abstract class WorkflowTaskSubscriberHandler {
 	WorkflowDataHandler workflowStateProcess;
 
 	public WorkflowTaskSubscriberHandler(String routingKey)
-			throws IOException, InsightsCustomException {
+			throws IOException, InsightsCustomException, TimeoutException {
 		engineSubscriberResponseHandler = this;
 		this.workflowStateProcess = new WorkflowDataHandler();
 		registerSubscriber(routingKey);
@@ -65,7 +65,7 @@ public abstract class WorkflowTaskSubscriberHandler {
 	 * @throws InsightsCustomException
 	 * @throws Exception
 	 */
-	public void registerSubscriber(String routingKey) throws IOException, InsightsCustomException {
+	public void registerSubscriber(String routingKey) throws IOException, InsightsCustomException, TimeoutException {
 
 		try {
 			String queueName = routingKey.replace(".", "_");
@@ -81,9 +81,8 @@ public abstract class WorkflowTaskSubscriberHandler {
 						byte[] body) throws IOException {
 					int exectionHistoryId = -1;
 					setStatusLog("{}");
-					try {
-						
-						ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+					try(ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();) {						
+				
 						byteArrayOutputStream.write(body);
 						byte[] message = byteArrayOutputStream.toByteArray();
 						

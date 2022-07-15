@@ -58,7 +58,7 @@ public class WebHookMessagePublisher {
 		LOG.debug(" In initilizeMq ======== host = {} port = {} user = {} passcode = {} exchangeName= {} enableDeadLetterExchange = {}",
 				AppProperties.mqHost, AppProperties.port, AppProperties.mqUser, AppProperties.mqPassword,
 				AppProperties.mqExchangeName,AppProperties.enableDeadLetterExchange);
-		try {
+		try{
 			this.exchangeName = AppProperties.mqExchangeName;
 			this.routingKey = WebHookConstants.WEBHOOK_EVENTDATA;
 			factory = new ConnectionFactory();
@@ -67,7 +67,7 @@ public class WebHookMessagePublisher {
 			factory.setPassword(AppProperties.mqPassword);
 			factory.setPort(AppProperties.port);
 			connection = factory.newConnection();
-			Channel channelForDeadLetter = connection.createChannel();
+			Channel channelForDeadLetter = connection.createChannel(); 
 			channelForDeadLetter.exchangeDeclare(WebHookConstants.RECOVER_EXCHANGE_NAME, WebHookConstants.RECOVER_EXCHANGE_TYPE, true);
 			channelForDeadLetter.queueDeclare(WebHookConstants.RECOVER_QUEUE, true, false, false, null);
 			channelForDeadLetter.queueBind(WebHookConstants.RECOVER_QUEUE, WebHookConstants.RECOVER_EXCHANGE_NAME, WebHookConstants.RECOVER_ROUNTINGKEY_QUEUE);
@@ -83,7 +83,7 @@ public class WebHookMessagePublisher {
 					WebHookConstants.FAILURE);
 			throw e;
 
-		}
+		} 
 
 	}
 

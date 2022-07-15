@@ -133,7 +133,7 @@ public class WebhookEventProcessing {
 		String query = "UNWIND $props AS properties " + "CREATE (n:" + this.webhookConfig.getLabelName().toUpperCase()
 				+ ") " + "SET n = properties";
 		try {
-			dbHandler.bulkCreateNodes(Arrays.asList(payload), null, query);
+			dbHandler.bulkCreateNodes(Arrays.asList(payload),query);
 			log.debug("Webhook event processing ==== event node saved for offline processing payload {} and query {} ",
 					payload, query);
 		} catch (InsightsCustomException e) {

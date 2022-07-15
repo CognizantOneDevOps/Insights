@@ -52,7 +52,15 @@
         >
         </mat-icon>
       </button>
-      <button mat-icon-button (click)="refreshData()">
+      <button *ngIf="!onEdit" mat-icon-button (click)="refreshData()">
+        <mat-icon
+          matTooltip="Reset"
+          class="mat-icon material-icons"
+          svgIcon="exit"
+        >
+        </mat-icon>
+      </button>
+      <button *ngIf="onEdit" mat-icon-button (click)="reset()">
         <mat-icon
           matTooltip="Reset"
           class="mat-icon material-icons"

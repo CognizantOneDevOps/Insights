@@ -403,7 +403,7 @@ public class PdfTableUtil {
 				contentStream.beginText();
 				contentStream.newLineAtOffset(200, 780);
 				contentStream.setFont(PDType1Font.HELVETICA, 7);
-				contentStream.showText("Cognizant® Cloud Acceleration Platform Insights : "+pdf_title);
+				contentStream.showText("Cognizant Cloud Acceleration Platform Insights  "+pdf_title);
 				contentStream.endText();
 				contentStream.beginText();
 				contentStream.newLineAtOffset(120, 15);
@@ -633,19 +633,9 @@ public class PdfTableUtil {
 			String parentAsset = "NA";
 			for(int i=0;i<ledgerMap.size();i++){
 				
-				if(i>0){
-					PDPage page1 = addNewPage(doc);
-					BaseTable dataTable = new BaseTable(page1.getMediaBox().getHeight() - (4 * margin),
-									yStartNewPage, bottomMargin, tableWidth, margin, doc, page1, true, drawContent);
-					JsonArray assetList= ledgerMap.get(i) == null ? null : ledgerMap.get(i).get("data").getAsJsonArray();
-					if(assetList !=null && assetList.size()>0){
-						JsonElement parentID = assetList.get(0).getAsJsonObject().get("parentAsset");
-						parentAsset = parentID == null?"NA":parentID.getAsString();
-					}
-					addText(ystaticStart, parentAsset, dataTable);
-					List<String[]> assetResults = formatAsset(assetList);
-					Row<PDPage> headerRow = generateHeader(dataTable);
-					generateDynamicRows(assetResults, headerRow, dataTable, page1, parentAsset);
+				if(i>0){	
+					
+					procesledgerMap(yStartNewPage,bottomMargin,tableWidth,drawContent,ledgerMap,doc,i,ystaticStart);					
 				}else {
 					BaseTable dataTable = new BaseTable(page.getMediaBox().getHeight() - (4 * margin)-120,
 									yStartNewPage, bottomMargin, tableWidth, margin, doc, page, true, drawContent);
@@ -673,6 +663,27 @@ public class PdfTableUtil {
 		}
 		
 		return response;
+	}
+	
+	private void procesledgerMap(float yStartNewPage, float bottomMargin, float tableWidth,
+			boolean drawContent, List<JsonObject> ledgerMap, PDDocument doc, int i, float ystaticStart) throws IOException {
+		
+		String parentAsset = "NA";
+		float margin = 10;
+		
+		PDPage page1 = addNewPage(doc);
+		BaseTable dataTable = new BaseTable(page1.getMediaBox().getHeight() - (4 * margin),
+						yStartNewPage, bottomMargin, tableWidth, margin, doc, page1, true, drawContent);
+		JsonArray assetList= ledgerMap.get(i) == null ? null : ledgerMap.get(i).get("data").getAsJsonArray();
+		if(assetList !=null && assetList.size()>0){
+			JsonElement parentID = assetList.get(0).getAsJsonObject().get("parentAsset");
+			parentAsset = parentID == null?"NA":parentID.getAsString();
+		}
+		addText(ystaticStart, parentAsset, dataTable);
+		List<String[]> assetResults = formatAsset(assetList);
+		Row<PDPage> headerRow = generateHeader(dataTable);
+		generateDynamicRows(assetResults, headerRow, dataTable, page1, parentAsset);
+		
 	}
 
 	/**

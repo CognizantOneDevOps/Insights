@@ -26,7 +26,7 @@ height: 20px;
 }
 
 .radiobtnStyle{
-    width: 7% !important;
+    width: 4% !important;
 }
 
 .mat-form-field-appearance-fill .mat-form-field-infix {
@@ -63,3 +63,7 @@ height: 20px;
     color: white;
     margin-right: 15px;
 }
+
+th.mat-header-cell:first-of-type, td.mat-cell:first-of-type, td.mat-footer-cell:first-of-type {
+    padding-left: 10px !important;
+  }

@@ -116,16 +116,7 @@ mat-figure {
 	opacity: 1;
 }
 
-.subStyle {
-	text-align: left;
-	font: normal normal normal 14px/24px Open Sans;
-	letter-spacing: 0px;
-	color: #000000;
-}
-
 .sectionHeadingStyle {
-	/* background-color: #0033A0;
-	color: white; */
 	background-color: var(--backgnd-clr9);
 	font-size: 14px;
 	margin-top: 16px;
@@ -191,8 +182,6 @@ table {
 	font-family: inherit;
 }
 .mat-drawer {
-	//background-color: #383737;
-	//color: #ffff;
 	font-weight: bolder;
 	font-family: Open Sans;
 }
@@ -283,11 +272,6 @@ table {
 	width: 120%;
 }
 
-.greenTitleTxt {
-	color: #00b140;
-	font-family: Open Sans !important;
-	font-size: 26px;
-}
 .cardCss {
 	background-color: var(--backgnd-clr13);
 	margin: 16px 16px 0 16px;
@@ -320,11 +304,6 @@ tr.mat-header-row {
 	letter-spacing: 0px;
 	color: var(--dialog-content);
 	opacity: 1;
-}
-
-.dialogHeaderBackground {
-	background: #5c068c;
-	height: 50px;
 }
 
 .paginationStyle {
@@ -362,14 +341,6 @@ tr.mat-header-row {
 	width: 20px !important;
 }
 
-.AppDialogIconCss {
-	/*margin-top: -10px !important;*/
-	margin-left: -10px;
-	margin-top: auto;
-	margin-bottom: auto;
-	vertical-align: middle;
-}
-
 .arrange-horizontally-Dialog {
 	-webkit-box-orient: horizontal;
 	-webkit-box-direction: normal;
@@ -378,24 +349,10 @@ tr.mat-header-row {
 	background: var(--backgnd-clr7);
 }
 
-.labelInfo {
-	font-weight: 800;
-	margin-top: 1%;
-}
 ::ng-deep .mat-icon-button .mat-button-disabled {
 	color: #d9d9d9 !important;
 }
-.yesbtn {
-	opacity: 1;
-	text-align: center;
-	font: normal normal 600 14px/24px Open Sans;
-	letter-spacing: 0px;
-	color: #ffffff;
-	background: #296dfa 0% 0% no-repeat padding-box;
-	width: 102px;
-	height: 37px;
-	border: 1px solid #296dfa;
-}
+
 .nobtn {
 	border: 1px solid var(--nobtn-border);
     background-color: var(--nobtn-bg);
@@ -408,6 +365,7 @@ tr.mat-header-row {
 	height: 37px;
 	margin-right: 12px;
 }
+
 .main-section-title {
 	color: var(--text-clr);
   font-size: 18px;
@@ -422,11 +380,6 @@ tr.mat-header-row {
 .alignSubWithbackBtn {
 	display: inline-block;
 	padding-top: 18px;
-}
-
-alignSubWithbackBtnOnly{
-	display: inline-block;
-	padding-top: 8px;
 }
 
 .btnAlign {
@@ -452,6 +405,7 @@ input, textarea{
 	font-size: 14px !important;
 	font-family: "Open Sans";
 }
+
 .mat-form-field-label,
 .mat-select {
 	font-size: 14px;
@@ -727,6 +681,7 @@ td {
 	margin-left: 16px;
 	padding-top: 19px;
 }
+
 .scrollDiv {
 	overflow-x: auto;
 	overflow-y: hidden;
@@ -745,6 +700,7 @@ td {
 	/* color of the scroll thumb */
 	border-radius: 10px !important;
 }
+
 .footer {
 	width: 100%;
 	display: flex;
@@ -766,10 +722,16 @@ td {
 	padding: 0 0 0 0.75em !important;
 	height: 40px;
 }
+
 //mat-icon setting removing background color change on click
 ::ng-deep span.mat-ripple.mat-button-ripple.mat-button-ripple-round {
-	height: 0px;
-	width: 0px;
+	height: 0px !important;
+	width: 0px !important;
+}
+
+::ng-deep span.mat-button-focus-overlay{
+	height: 0px !important;
+	width: 0px !important;
 }
 
 .titleContainer {
@@ -781,7 +743,22 @@ td {
 	color: #ffffff;
 }
 
+.titleContainerSession {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background: #0033a0 0% 0% no-repeat padding-box;
+	padding: 12px 30px;
+	color: #ffffff;
+}
+
 .titleContainer h1 {
+	margin: 0 !important;
+	font: normal normal 600 14px/24px Open Sans;
+	letter-spacing: 0px;
+}
+
+.titleContainerSession h1 {
 	margin: 0 !important;
 	font: normal normal 600 14px/24px Open Sans;
 	letter-spacing: 0px;
@@ -951,3 +928,7 @@ svg {
 .mat-icon-button > .crossColor{
 	color: var(--frm-field-txt);
 }
+
+.asteriskText {
+	color: #ff0000;
+  }

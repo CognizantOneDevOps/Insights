@@ -34,7 +34,7 @@ public class ApplicationConfigProvider implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1624602880L;
+	private static final long serialVersionUID = 1905122041950251207L;
 	
 	private static ApplicationConfigProvider instance = new ApplicationConfigProvider();
 	private EndpointData endpointData = new EndpointData();

@@ -884,7 +884,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	 * @throws IOException
 	 */
 	private void updateSecrets(String agentId, Map<String, String> updatedDataMap, JsonObject json)
-			throws InsightsCustomException, IOException {
+			throws InsightsCustomException {
 		String url = ApplicationConfigProvider.getInstance().getVault().getVaultEndPoint() + vaultURL + agentId;
 		String vaultresponse = null;
 		try {

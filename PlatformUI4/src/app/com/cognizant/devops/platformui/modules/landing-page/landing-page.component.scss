@@ -286,3 +286,7 @@ table {
   border-radius: 0px !important;
   padding: 0px !important;
 }
+
+::ng-deep .mat-form-field.mat-focused .mat-form-field-ripple {
+  border-style: none !important;
+}

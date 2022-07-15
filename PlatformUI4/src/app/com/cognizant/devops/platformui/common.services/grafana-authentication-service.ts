@@ -34,6 +34,7 @@ export class GrafanaAuthenticationService implements IAuthenticationService {
     public serverConfigSubject = new BehaviorSubject<any>('');
     public onOkSubject=new BehaviorSubject<any>('');
     public iconClkSubject=new BehaviorSubject<any>('');
+    private restHandler: RestCallHandlerService;
 
     response: any;
     location: Location;
@@ -113,5 +114,19 @@ export class GrafanaAuthenticationService implements IAuthenticationService {
     setActiveState(jsonObject : string) : Promise<any> {
         return this.restCallHandlerService.postWithData("SET_DASHBOARD_ACTIVE_STATE", jsonObject, "", { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
     }
+
+    editUserPreference(theme: String): Promise<any> {
+        return this.restCallHandlerService
+        .putWithParameter(
+            "UPDATE_UESRS_PREFERENCE",
+            { themePreference: theme },
+            { "Content-Type": "application/json" }
+        )
+        .toPromise();
+    }
+
+  getUserPreferenceTheme(): Promise<any> {
+    return this.restCallHandlerService.get("GET_USER_PREFERENCE_THEME");
+  }
 
 }

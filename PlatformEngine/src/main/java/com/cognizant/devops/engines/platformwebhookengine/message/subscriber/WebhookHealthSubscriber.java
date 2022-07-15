@@ -75,7 +75,7 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 			}
 		} catch (InsightsCustomException e) {
 			log.error("Type=WebhookHealth routingKey={} message={}  status={} serverPort={} error={}"
-					,routingKey,messageObj.get("message").getAsString(),messageObj.get("status").getAsString(),messageObj.get("serverPort").getAsString(),e);
+					,routingKey,messageObj.get("message").getAsString(),messageObj.get("status").getAsString(),messageObj.get("serverPort").getAsString(),e.getMessage());
 			getChannel().basicReject(envelope.getDeliveryTag(), false);
 		}
 	}

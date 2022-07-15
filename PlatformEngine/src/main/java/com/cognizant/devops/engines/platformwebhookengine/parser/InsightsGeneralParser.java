@@ -137,30 +137,9 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 				String operationName = webhookDerivedConfig.getOperationName();
 				JsonObject operationFieldsList = JsonUtils.parseStringAsJsonObject(webhookDerivedConfig.getOperationFields());
 				if (operationName.equalsIgnoreCase(DerivedOperations.INSIGHTSTIMEX.getValue())) {
-					isEpochTime = operationFieldsList.get("epochTime").getAsBoolean();
-					String timeFieldKey = operationFieldsList.get("timeField").getAsString();
-					timeFieldValue = fetchValuefromJson(timeFieldKey, responseTemplateJson);
-					if (timeFieldValue != null) {
-						if (!isEpochTime) {
-							dateFormat = operationFieldsList.get("timeFormat").getAsString();
-							epochTime = InsightsUtils.getEpochTime(timeFieldValue, dateFormat);
-							responseTemplateJson.addProperty(DerivedOperations.INSIGHTSTIME_DB.getValue(), epochTime);
-							if (dateFormat.equals(InsightsUtils.DATE_TIME_FORMAT)) {
-								responseTemplateJson.addProperty(DerivedOperations.INSIGHTSTIMEX_DB.getValue(),
-										timeFieldValue);
-							} else {
-								dateTimeFromEpoch = InsightsUtils.insightsTimeXFormatFromSeconds(epochTime);
-								responseTemplateJson.addProperty(DerivedOperations.INSIGHTSTIMEX_DB.getValue(),
-										dateTimeFromEpoch);
-							}
-						} else {
-							responseTemplateJson.addProperty(DerivedOperations.INSIGHTSTIME_DB.getValue(),
-									timeFieldValue);
-							dateTimeFromEpoch = InsightsUtils.insightsTimeXFormat(Long.parseLong(timeFieldValue));
-							responseTemplateJson.addProperty(DerivedOperations.INSIGHTSTIMEX_DB.getValue(),
-									dateTimeFromEpoch);
-						}
-					}
+					
+					processInsightsTimeX(operationFieldsList,responseTemplateJson);					
+				
 				} else if (operationName.equalsIgnoreCase(DerivedOperations.TIMEFIELDMAPPING.getValue())) {
 					String timeFieldKey = operationFieldsList.get("mappingTimeField").getAsString();
 					timeFieldValue = fetchValuefromJson(timeFieldKey, responseTemplateJson);
@@ -176,6 +155,41 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 				LOG.error("Error while Webhook derived operation {} and configuration  Error is {}",
 						webhookDerivedConfig.getOperationName(), webhookDerivedConfig.getOperationFields(), e);
 				throw new InsightsCustomException(e.getMessage());
+			}
+		}
+	}
+	
+	
+	private void processInsightsTimeX(JsonObject operationFieldsList,JsonObject responseTemplateJson) throws InsightsCustomException {
+		
+		String dateFormat = "";
+		String dateTimeFromEpoch = "";
+		boolean isEpochTime = false;
+		String timeFieldValue = "";
+		long epochTime = 0;
+		
+		isEpochTime = operationFieldsList.get("epochTime").getAsBoolean();
+		String timeFieldKey = operationFieldsList.get("timeField").getAsString();
+		timeFieldValue = fetchValuefromJson(timeFieldKey, responseTemplateJson);
+		if (timeFieldValue != null) {
+			if (!isEpochTime) {
+				dateFormat = operationFieldsList.get("timeFormat").getAsString();
+				epochTime = InsightsUtils.getEpochTime(timeFieldValue, dateFormat);
+				responseTemplateJson.addProperty(DerivedOperations.INSIGHTSTIME_DB.getValue(), epochTime);
+				if (dateFormat.equals(InsightsUtils.DATE_TIME_FORMAT)) {
+					responseTemplateJson.addProperty(DerivedOperations.INSIGHTSTIMEX_DB.getValue(),
+							timeFieldValue);
+				} else {
+					dateTimeFromEpoch = InsightsUtils.insightsTimeXFormatFromSeconds(epochTime);
+					responseTemplateJson.addProperty(DerivedOperations.INSIGHTSTIMEX_DB.getValue(),
+							dateTimeFromEpoch);
+				}
+			} else {
+				responseTemplateJson.addProperty(DerivedOperations.INSIGHTSTIME_DB.getValue(),
+						timeFieldValue);
+				dateTimeFromEpoch = InsightsUtils.insightsTimeXFormat(Long.parseLong(timeFieldValue));
+				responseTemplateJson.addProperty(DerivedOperations.INSIGHTSTIMEX_DB.getValue(),
+						dateTimeFromEpoch);
 			}
 		}
 	}

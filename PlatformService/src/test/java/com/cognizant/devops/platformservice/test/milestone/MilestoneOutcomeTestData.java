@@ -32,7 +32,7 @@ public class MilestoneOutcomeTestData {
 	String deleteOutcomeJson = "{\"id\":iiddee}";
 	String statusUpdate = "{\"id\":iiddee,\"isActive\":activee}";
 	
-	String milestoneNameString = "Mile6";
+	String milestoneNameString = "Mile9";
 	String saveMilestoneJson = "{\"mileStoneName\":\""+milestoneNameString+"\",\"milestoneReleaseID\":\"Version_1\",\"startDate\":\"2021-09-01T00:00:00Z\",\"endDate\":\"2021-09-22T00:00:00Z\",\"outcomeList\":[\"Outcommmme\"]}";
 	String statusUpdateMilstone = "{\"id\":iiddee}";
 	

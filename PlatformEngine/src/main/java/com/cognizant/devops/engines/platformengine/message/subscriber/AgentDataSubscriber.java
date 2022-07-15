@@ -61,28 +61,31 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 	private String category;
 	private String toolName;
 	private String labelName;
-	private String targetProperty;
-	private String keyPattern;
-	private String sourceProperty;
-	private Boolean isEnrichmentRequired;
+	private Boolean isEnrichmentRequired= false;
+	private String targetProperty="";
+	private String keyPattern="";
+	private String sourceProperty ="";
 	private String agentId;
 	List<BusinessMappingData> businessMappingList = new ArrayList<>(0);
 	private Map<String,String> loggingInfo = new ConcurrentHashMap<>();
 
 	public AgentDataSubscriber(String routingKey, String category, String labelName, String toolName,
-			List<BusinessMappingData> businessMappingList, boolean isEnrichmentRequired, String targetProperty,
-			String keyPattern, String sourceProperty, String agentId) throws Exception {
+			List<BusinessMappingData> businessMappingList, String agentId,JsonObject enrichTool) throws Exception {
 		super(routingKey);
 		this.category = category;
 		this.toolName = toolName;
 		this.labelName = labelName;
 		this.businessMappingList = businessMappingList;
-		this.isEnrichmentRequired = isEnrichmentRequired;
-		this.targetProperty = targetProperty;
-		this.keyPattern = keyPattern;
-		this.sourceProperty = sourceProperty;
+		if(enrichTool != null) {
+			isEnrichmentRequired = enrichTool.get("isEnrichmentRequired").getAsBoolean();
+			targetProperty = enrichTool.get("targetProperty").getAsString();
+			keyPattern = enrichTool.get("keyPattern").getAsString();
+			sourceProperty = enrichTool.get("sourceProperty").getAsString();
+		}
 		this.agentId = agentId;
 	}
+	
+	
 
 	public void setMappingData(List<BusinessMappingData> businessMappingList) {
 		this.businessMappingList = businessMappingList;
@@ -102,113 +105,41 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 					toolName, category, agentId, routingKey, message.length(), "-", 0, routingKey, message.length());
 			List<String> labels = new ArrayList<>();
 			labels.add("RAW");
-			if (this.labelName == null) {
-				labels.addAll(Arrays.asList(routingKey.split(MQMessageConstants.ROUTING_KEY_SEPERATOR)));
-			} else {
-				labels.add(this.category.toUpperCase());
-				labels.add(this.toolName.toUpperCase());
-				labels.add(this.labelName);
-				labels.add("DATA");
-			}
+			
+			prepareDataLabels(routingKey, labels);
 
-			List<JsonObject> dataList = new ArrayList<>();
 			JsonElement json = JsonUtils.parseString(message);
 			boolean dataUpdateSupported = false;
 			String uniqueKey = "";
 			JsonObject relationMetadata = null;
+		
 			if (json.isJsonObject()) {
 				JsonObject messageObject = json.getAsJsonObject();
 				json = messageObject.get("data");
-				if (messageObject.has("metadata")) {
+				if (messageObject.has("metadata")) {			
 					JsonObject metadata = messageObject.get("metadata").getAsJsonObject();
-					if (metadata.has(AgentDataConstants.LABELS)) {
-						JsonArray additionalLabels = metadata.get(AgentDataConstants.LABELS).getAsJsonArray();
-						for (JsonElement additionalLabel : additionalLabels) {
-							String label = additionalLabel.getAsString();
-							if (!labels.contains(label)) {
-								labels.add(label);
-							}
-						}
-					}
-					if (metadata.has("dataUpdateSupported")) {
-						dataUpdateSupported = metadata.get("dataUpdateSupported").getAsBoolean();
-					}
-					if (metadata.has("uniqueKey")) {
-						JsonArray uniqueKeyArray = metadata.getAsJsonArray("uniqueKey");
-						StringBuffer keys = new StringBuffer();
-						for (JsonElement key : uniqueKeyArray) {
-							keys.append(key.getAsString()).append(",");
-						}
-						keys.delete(keys.length() - 1, keys.length());
-						uniqueKey = keys.toString();
-					}
-					if (metadata.has("relation")) {
-						relationMetadata = metadata.get("relation").getAsJsonObject();
-					}
+					labels = extractMetadataLabel(metadata,labels);	
+					
+					dataUpdateSupported = extractDataSupportedFlag(dataUpdateSupported, metadata);
+					
+					uniqueKey = extractUniqueKeyFromMetadata(uniqueKey, metadata);
+					
+					relationMetadata = extractRelationMetadata(relationMetadata, metadata);
 				}
-			}
+			} 
 
 			if (json.isJsonArray()) {
-				JsonArray asJsonArray = json.getAsJsonArray();
-				JsonObject dataWithproperty;
-				for (JsonElement e : asJsonArray) {
-					if (e.isJsonObject()) {
-						dataWithproperty = e.getAsJsonObject();						
-						loggingInfo.put(EngineConstants.EXECID,String.valueOf(dataWithproperty.get(EngineConstants.EXECID)));
-						// Below Code has the ability to add derived properties as part of Nodes
-						if (Boolean.TRUE.equals(this.isEnrichmentRequired) && e.getAsJsonObject().has(sourceProperty)) {
-							JsonElement sourceElem = e.getAsJsonObject().get(sourceProperty);
-							if (sourceElem.isJsonPrimitive()) {
-								String enrichedData = DataEnrichUtils.dataExtractor(sourceElem.getAsString(),
-										keyPattern);
-								if (enrichedData != null) {
-									dataWithproperty.addProperty(targetProperty, enrichedData);
-								}
-							}
-						}
-						if (enableOnlineDatatagging) {
-							JsonObject jsonWithLabel = applyDataTagging(dataWithproperty);
-							if (jsonWithLabel != null) {
-								dataList.add(jsonWithLabel);// finalJson
-							} else {
-								dataList.add(dataWithproperty);
-							}
-						} else {
-							dataList.add(dataWithproperty);
-						}
-					}
-				}
-
-				String cypherQuery = "";
-				String queryLabel = "";
-				for (String label : labels) {
-					if (label != null && label.trim().length() > 0) {
-						queryLabel += ":" + label;
-					}
-				}
-				if (relationMetadata != null) {
-					cypherQuery = buildRelationCypherQuery(relationMetadata, queryLabel);
-				} else if (dataUpdateSupported) {
-					cypherQuery = buildCypherQuery(queryLabel, uniqueKey);
-				} else {
-					cypherQuery = "UNWIND $props AS properties CREATE (n" + queryLabel
-							+ ") set n=properties return count(n)";
-				}
-
-				List<List<JsonObject>> partitionList = partitionList(dataList, 1000);
-				for (List<JsonObject> chunk : partitionList) {
-					JsonObject graphResponse = dbHandler.bulkCreateNodes(chunk, labels, cypherQuery);
-					if (graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0) {
-						log.error("Unable to insert nodes for routing key: {}  error occured: {} ", routingKey,
-								graphResponse);
-					}
-				}
+				
+				List<JsonObject> dataList = prepareDatalist(json,enableOnlineDatatagging);
+				String cypherQuery = prepareCypherQuery(labels,relationMetadata,dataUpdateSupported,uniqueKey);			
+				insertNodes(dataList,cypherQuery,routingKey);
 				long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
 				log.debug(
 						" Type=AgentEngine toolName={} category={} agentId={} routingKey={} dataSize={} execId={} ProcessingTime={} Data ==== Processingtime={} ms",
 						toolName, category, agentId, "-", 0, loggingInfo.get(EngineConstants.EXECID), processingTime, processingTime);
 				getChannel().basicAck(envelope.getDeliveryTag(), false);
 			}
+			
 		} catch (ProcessingException e) {
 			log.error(" toolName={} category={} agentId={} execId={} ProcessingException occured ", toolName, category,
 					agentId, loggingInfo.get(EngineConstants.EXECID), e);
@@ -226,10 +157,153 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		}
 	}
 
-	private JsonObject applyDataTagging(JsonObject asJsonObject) {
-		List<String> selectedBusinessMappingArray = new ArrayList<>(0);
-		Map<String, String> labelMappingMap = new TreeMap<>();
-		for (BusinessMappingData businessMappingData : businessMappingList) {
+
+
+	private boolean extractDataSupportedFlag(boolean dataUpdateSupported, JsonObject metadata) {
+		if (metadata.has("dataUpdateSupported")) {
+			dataUpdateSupported = metadata.get("dataUpdateSupported").getAsBoolean();
+		}
+		return dataUpdateSupported;
+	}
+
+	private String extractUniqueKeyFromMetadata(String uniqueKey, JsonObject metadata) {
+		if (metadata.has("uniqueKey")) {					
+			uniqueKey = getUniqueKey(metadata);
+		}
+		return uniqueKey;
+	}
+
+	private JsonObject extractRelationMetadata(JsonObject relationMetadata, JsonObject metadata) {
+		if (metadata.has("relation")) {
+			relationMetadata = metadata.get("relation").getAsJsonObject();
+		}
+		return relationMetadata;
+	}
+
+	private void prepareDataLabels(String routingKey, List<String> labels) {
+		if (this.labelName == null) {
+			labels.addAll(Arrays.asList(routingKey.split(MQMessageConstants.ROUTING_KEY_SEPERATOR)));
+		} else {
+			labels.add(this.category.toUpperCase());
+			labels.add(this.toolName.toUpperCase());
+			labels.add(this.labelName);
+			labels.add("DATA");
+		}
+	}
+	
+    private String getUniqueKey(JsonObject metadata) {
+    	String uniqueKey = "";
+    	JsonArray uniqueKeyArray = metadata.getAsJsonArray("uniqueKey");
+    	StringBuilder keys = new StringBuilder();
+		for (JsonElement key : uniqueKeyArray) {
+			keys.append(key.getAsString()).append(",");
+		}
+		keys.delete(keys.length() - 1, keys.length());
+		uniqueKey = keys.toString();
+		return uniqueKey;    	
+    }
+    
+	private void insertNodes(List<JsonObject> dataList, String cypherQuery, String routingKey) throws InsightsCustomException {
+		List<List<JsonObject>> partitionList = partitionList(dataList, 1000);
+		for (List<JsonObject> chunk : partitionList) {
+			JsonObject graphResponse = dbHandler.bulkCreateNodes(chunk,cypherQuery);
+			if (graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0) {
+				log.error("Unable to insert nodes for routing key: {}  error occured: {} ", routingKey,
+						graphResponse);
+			}
+		}
+	}
+	
+	
+	private String prepareCypherQuery(List<String> labels, JsonObject relationMetadata, boolean dataUpdateSupported, String uniqueKey) {
+		
+		String preparedCypherQuery = "";
+		StringBuilder queryLabel = new StringBuilder();
+		for (String label : labels) {
+			if (label != null && label.trim().length() > 0) {
+				queryLabel.append(":").append(label);
+			}
+		}
+		if (relationMetadata != null) {
+			preparedCypherQuery = buildRelationCypherQuery(relationMetadata, queryLabel.toString());
+		} else if (dataUpdateSupported) {
+			preparedCypherQuery = buildCypherQuery(queryLabel.toString(), uniqueKey);
+		} else {
+			preparedCypherQuery = "UNWIND $props AS properties CREATE (n" + queryLabel
+					+ ") set n=properties return count(n)";
+		}
+		
+		return preparedCypherQuery;
+	}
+		
+	private List<String> extractMetadataLabel(JsonObject metadata,List<String> labels){
+		
+		if (metadata.has(AgentDataConstants.LABELS)) {
+			JsonArray additionalLabels = metadata.get(AgentDataConstants.LABELS).getAsJsonArray();
+			for (JsonElement additionalLabel : additionalLabels) {
+				String label = additionalLabel.getAsString();
+				if (!labels.contains(label)) {
+					labels.add(label);
+				}
+			}
+		}
+		return labels;
+	}
+	
+	private List<JsonObject> prepareDatalist(JsonElement json, boolean enableOnlineDatatagging) {
+		
+		JsonArray asJsonArray = json.getAsJsonArray();
+		JsonObject dataWithproperty;
+		List<JsonObject> prepareDatalist = new ArrayList<>();
+		
+		for (JsonElement e : asJsonArray) {
+			if (e.isJsonObject()) {
+				dataWithproperty = e.getAsJsonObject();						
+				loggingInfo.put(EngineConstants.EXECID,String.valueOf(dataWithproperty.get(EngineConstants.EXECID)));
+				
+				// Below Code has the ability to add derived properties as part of Nodes
+				if (Boolean.TRUE.equals(this.isEnrichmentRequired) && e.getAsJsonObject().has(sourceProperty)) {
+					addEnrichmentProperties(e,dataWithproperty);			
+				}
+				if (enableOnlineDatatagging) {
+					applyDataTagging(dataWithproperty);
+				}
+				prepareDatalist.add(dataWithproperty);
+			}
+		}
+		return prepareDatalist;
+	}
+
+
+	private void addEnrichmentProperties(JsonElement e, JsonObject dataWithproperty) {
+
+		JsonElement sourceElem = e.getAsJsonObject().get(sourceProperty);
+		if (sourceElem.isJsonPrimitive()) {
+			String enrichedData = DataEnrichUtils.dataExtractor(sourceElem.getAsString(), keyPattern);
+			if (enrichedData != null) {
+				dataWithproperty.addProperty(targetProperty, enrichedData);
+			}
+		}
+	}
+
+	
+	private void applyDataTagging(JsonObject asJsonObject) {
+		
+		List<String> selectedBusinessMappingArray = prepareBusinessMappingArray(asJsonObject);
+		if (!selectedBusinessMappingArray.isEmpty()) {			
+			Map<String, String>  labelMappingMap = prepareLabelMapping(selectedBusinessMappingArray);
+			for (Entry<String, String> entry : labelMappingMap.entrySet()) {
+				List<String> items = Arrays.asList(entry.getValue().split("\\s*,\\s*"));
+				JsonArray jsonArray = JsonUtils.parseStringAsJsonArray(items.toString());
+				asJsonObject.add(entry.getKey(), jsonArray);
+			}
+		}
+	}
+	
+    private List<String> prepareBusinessMappingArray(JsonObject asJsonObject){
+    	List<String> businessMappingArray = new ArrayList<>(0);
+    	
+    	for (BusinessMappingData businessMappingData : businessMappingList) {
 			Map<String, String> map = businessMappingData.getPropertyMap();
 			int totalCount = businessMappingData.getPropertyMap().size();
 			int matchLabelcount = 0;
@@ -242,38 +316,34 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 				}
 			}
 			if (totalCount == matchLabelcount) {
-				selectedBusinessMappingArray.add(businessMappingData.getBusinessMappingLabel());
+				businessMappingArray.add(businessMappingData.getBusinessMappingLabel());
 			}
 		}
-
-		if (!selectedBusinessMappingArray.isEmpty()) {
-			for (int i = 0; i < selectedBusinessMappingArray.size(); i++) {
-				StringTokenizer sk = new StringTokenizer(selectedBusinessMappingArray.get(i), ":");
-				int level = 0;
-				while (sk.hasMoreTokens()) {
-					String token = sk.nextToken();
-					level++;
-					String key = "orgLevel_" + level;
-					if (!labelMappingMap.containsKey(key)) {
-						labelMappingMap.put(key, token);
-					} else {
-						if (!labelMappingMap.get(key).contains(token)) {
-							labelMappingMap.put(key, labelMappingMap.get(key).concat("," + token));
-						}
+    	return businessMappingArray;
+    }
+    
+    private Map<String, String> prepareLabelMapping(List<String> selectedBusinessMappingArray) {
+    	
+    	Map<String, String> labelMap = new TreeMap<>();
+    	
+    	for (int i = 0; i < selectedBusinessMappingArray.size(); i++) {
+			StringTokenizer sk = new StringTokenizer(selectedBusinessMappingArray.get(i), ":");
+			int level = 0;
+			while (sk.hasMoreTokens()) {
+				String token = sk.nextToken();
+				level++;
+				String key = "orgLevel_" + level;
+				if (!labelMap.containsKey(key)) {
+					labelMap.put(key, token);
+				} else {
+					if (!labelMap.get(key).contains(token)) {
+						labelMap.put(key, labelMap.get(key).concat("," + token));
 					}
 				}
 			}
-			Gson gson = new Gson();
-			for (Entry<String, String> entry : labelMappingMap.entrySet()) {
-				List<String> items = Arrays.asList(entry.getValue().split("\\s*,\\s*"));
-				JsonArray jsonArray = JsonUtils.parseStringAsJsonArray(items.toString());
-				asJsonObject.add(entry.getKey(), jsonArray);
-			}
-
 		}
-		return asJsonObject;
-	}
-
+    	return labelMap;
+    }
 
 	private <T> List<List<T>> partitionList(List<T> list, final int size) {
 		List<List<T>> parts = new ArrayList<>();
@@ -289,7 +359,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 	}
 
 	private String buildCypherQuery(String labels, String fieldName) {
-		StringBuffer query = new StringBuffer();
+		StringBuilder query = new StringBuilder();
 		query.append("UNWIND $props AS properties MERGE (node:LATEST").append(labels).append(" { ");
 		if (fieldName.contains(",")) {
 			String[] fields = fieldName.split(",");
@@ -312,16 +382,10 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		JsonObject source = relationMetadata.getAsJsonObject("source");
 		JsonObject destination = relationMetadata.getAsJsonObject("destination");
 		String relationName = relationMetadata.get("name").getAsString();
-		StringBuffer cypherQuery = new StringBuffer();
+		StringBuilder cypherQuery = new StringBuilder();
 		cypherQuery.append("UNWIND $props AS properties MERGE (source").append(labels);
 		if (source.has(AgentDataConstants.LABELS)) {
-			JsonArray sourceLabels = source.getAsJsonArray(AgentDataConstants.LABELS);
-			for (JsonElement sourceLabel : sourceLabels) {
-				String label = sourceLabel.getAsString();
-				if (label != null && !labels.contains(label)) {
-					cypherQuery.append(":").append(label);
-				}
-			}
+			setLabelToCypherQuery(labels, source, cypherQuery);
 		}
 		cypherQuery.append(buildPropertyConstraintQueryPart(source, "constraints"));
 		cypherQuery.append(") ");
@@ -329,13 +393,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		cypherQuery.append(" WITH source, properties ");
 		cypherQuery.append("MERGE (destination").append(labels);
 		if (destination.has(AgentDataConstants.LABELS)) {
-			JsonArray destinationLabels = destination.getAsJsonArray(AgentDataConstants.LABELS);
-			for (JsonElement destinationLabel : destinationLabels) {
-				String label = destinationLabel.getAsString();
-				if (label != null && !labels.contains(label)) {
-					cypherQuery.append(":").append(label);
-				}
-			}
+			setLabelToCypherQuery(labels, destination, cypherQuery);
 		}
 		cypherQuery.append(buildPropertyConstraintQueryPart(destination, "constraints"));
 		cypherQuery.append(") ");
@@ -353,8 +411,18 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 
 		return cypherQuery.toString();
 	}
+	//to reduce the cognitive complexity
+	private void setLabelToCypherQuery(String labels, JsonObject relationMetadata, StringBuilder cypherQuery) {
+		JsonArray relationMetadataLabels = relationMetadata.getAsJsonArray(AgentDataConstants.LABELS);
+		for (JsonElement relationMetadataLabelsLabel : relationMetadataLabels) {
+			String label = relationMetadataLabelsLabel.getAsString();
+			if (label != null && !labels.contains(label)) {
+				cypherQuery.append(":").append(label);
+			}
+		}
+	}
 
-	private void buildNodePropertiesQueryPart(JsonObject metaDataNode, String nodeName, StringBuffer cypherQuery) {
+	private void buildNodePropertiesQueryPart(JsonObject metaDataNode, String nodeName, StringBuilder cypherQuery) {
         if (metaDataNode.has(AgentDataConstants.PROPERTIES)) {
             cypherQuery.append(EngineConstants.SET).append(nodeName).append("+=properties ");
         } else if (metaDataNode.has(AgentDataConstants.SELECTED_PROPERTIES)) {
@@ -364,7 +432,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
     }
 
 	private String buildPropertyConstraintQueryPart(JsonObject json, String memberName) {
-		StringBuffer cypherQuery = new StringBuffer();
+		StringBuilder cypherQuery = new StringBuilder();
 		if (json.has(memberName)) {
 			JsonArray properties = json.getAsJsonArray(memberName);
 			cypherQuery.append("{");

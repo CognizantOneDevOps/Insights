@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.constants.CommonsAndDALConstants;
+import com.cognizant.devops.platformcommons.constants.ReportStatusConstants;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.milestone.InsightsMileStoneOutcomeConfig;
@@ -53,8 +54,10 @@ public class OutComeServiceImpl implements OutComeService{
 		InsightsOutcomeTools insightsOutcomeTools = new InsightsOutcomeTools();
 		insightsOutcomeTools.setOutcomeName(outcomeName);
 		insightsOutcomeTools.setOutcomeType(configJson.get("outcomeType").getAsString());
-		if(configJson.has("toolConfigJson")) {
-			insightsOutcomeTools.setConfigJson(configJson.get("toolConfigJson").getAsJsonObject().toString());
+		if(configJson.has(ReportStatusConstants.TOOL_CONFIG_JSON)) {
+			insightsOutcomeTools.setConfigJson(configJson.get(ReportStatusConstants.TOOL_CONFIG_JSON).getAsJsonObject().toString());
+		} else {
+			insightsOutcomeTools.setConfigJson("{}");
 		}
 		insightsOutcomeTools.setIsActive(configJson.get(CommonsAndDALConstants.ISACTIVE).getAsBoolean());
 		insightsOutcomeTools.setMetricUrl(configJson.get("metricUrl").getAsString());
@@ -88,11 +91,10 @@ public class OutComeServiceImpl implements OutComeService{
 			InsightsOutcomeTools insightsOutcomeTools = outComeConfigDAL.getOutcomeConfig(outcomeId);
 			insightsOutcomeTools.setOutcomeName(configJson.get("outcomeName").getAsString());
 			insightsOutcomeTools.setOutcomeType(configJson.get("outcomeType").getAsString());
-			if(configJson.has("toolConfigJson")) {
-				insightsOutcomeTools.setConfigJson(configJson.get("toolConfigJson").getAsJsonObject().toString());
+			if(configJson.has(ReportStatusConstants.TOOL_CONFIG_JSON)) {
+				insightsOutcomeTools.setConfigJson(configJson.get(ReportStatusConstants.TOOL_CONFIG_JSON).getAsJsonObject().toString());
 			}
 			insightsOutcomeTools.setIsActive(configJson.get("isActive").getAsBoolean());
-//			insightsOutcomeTools.setCreatedDate(configJson.get("createdDate").getAsLong());
 			insightsOutcomeTools.setMetricUrl(configJson.get("metricUrl").getAsString());
 			insightsOutcomeTools.setUpdatedDate(InsightsUtils.getCurrentTimeInEpochMilliSeconds());
 			insightsOutcomeTools.setRequestParameters(configJson.get("parameters").toString());

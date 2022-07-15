@@ -67,12 +67,11 @@ public class GraphDBHandler{
 
 	/**
 	 * @param dataList
-	 * @param labels
 	 * @param cypherQuery
 	 * @return JsonObject
 	 * @throws InsightsCustomException
 	 */
-	public JsonObject bulkCreateNodes(List<JsonObject> dataList, List<String> labels, String cypherQuery)
+	public JsonObject bulkCreateNodes(List<JsonObject> dataList, String cypherQuery)
 			throws InsightsCustomException {
 		if (dataList == null || dataList.isEmpty() || cypherQuery == null || cypherQuery.trim().length() == 0) {
 			return new JsonObject();

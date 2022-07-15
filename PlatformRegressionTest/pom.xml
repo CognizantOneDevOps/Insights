@@ -12,13 +12,13 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>9.5</version>
+		<version>9.6</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformRegressionTest</artifactId>
 	<packaging>jar</packaging>
-	<version>9.5</version>
+	<version>9.6</version>
 	<name>PlatformRegressionTest</name>
 	<url>http://maven.apache.org</url>
 	<properties>
@@ -35,12 +35,16 @@
 					<groupId>org.yaml</groupId>
 					<artifactId>snakeyaml</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>9.5</version>
+			<version>9.6</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/io.rest-assured/rest-assured -->
 		<dependency>
@@ -65,9 +69,14 @@
 			<version>0.9.5.4</version>
 		</dependency>
 		<dependency>
+		    <groupId>com.google.guava</groupId>
+		    <artifactId>guava</artifactId>
+		    <version>31.1-jre</version>
+		</dependency>
+		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
-			<version>4.1.4</version>
+			<version>4.2.1</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.google.guava</groupId>
@@ -98,7 +107,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>9.5</version>
+			<version>9.6</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -175,7 +184,7 @@
 									<directory>${project.basedir}/../</directory>
 									<filtering>true</filtering>
 									<includes>
-										<include>OneDevOpInsights*.pdf</include>
+										<include>IPR_OneDevOps*.pdf</include>
 									</includes>
 								</resource>
 							</resources>
@@ -198,7 +207,7 @@
 									<directory>${project.basedir}/target/</directory>
 									<filtering>true</filtering>
 									<includes>
-										<include>OneDevOpInsights*.pdf</include>
+										<include>IPR_OneDevOps*.pdf</include>
 									</includes>
 								</resource>
 							</resources>

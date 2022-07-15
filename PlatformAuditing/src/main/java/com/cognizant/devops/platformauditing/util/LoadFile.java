@@ -29,18 +29,18 @@ import java.io.FileReader;
 
 public class LoadFile {
     private static final Logger LOG = LogManager.getLogger(InsightsAuditImpl.class);
-    private static JsonObject dataModel = new JsonObject();
-    private static JsonObject processModel = new JsonObject();
-    private static JsonObject Config;
+    private JsonObject dataModel = new JsonObject();
+    private JsonObject processModel = new JsonObject();
+    private JsonObject config;
     //this object creation loads the datamodel by calling the constructor
     private static final LoadFile loadDataModelObj = new LoadFile();
 
     private LoadFile(){
         try {
             //Reading the blockchain network network config
-            Config = JsonUtils.parseReaderAsJsonObject(new FileReader(ConfigOptions.BLOCKCHAIN_CONFIG_FILE_RESOLVED_PATH));
-            dataModel = JsonUtils.parseReaderAsJsonObject(new FileReader(Config.get("DATAMODEL_JSON_PATH").getAsString()));
-            processModel = JsonUtils.parseReaderAsJsonObject(new FileReader(Config.get("PROCESS_JSON_PATH").getAsString()));
+            config = JsonUtils.parseReaderAsJsonObject(new FileReader(ConfigOptions.BLOCKCHAIN_CONFIG_FILE_RESOLVED_PATH));
+            dataModel = JsonUtils.parseReaderAsJsonObject(new FileReader(config.get("DATAMODEL_JSON_PATH").getAsString()));
+            processModel = JsonUtils.parseReaderAsJsonObject(new FileReader(config.get("PROCESS_JSON_PATH").getAsString()));
         }catch (FileNotFoundException fnf){
             LOG.error(fnf);
         }catch (Exception e){
@@ -61,7 +61,7 @@ public class LoadFile {
     }
 
     public JsonObject getConfig() {
-        return Config;
+        return config;
     }
 
 }

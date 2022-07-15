@@ -70,7 +70,7 @@ public class MilestoneStatusCommunicationSubscriber extends EngineSubscriberResp
 			
 			getChannel().basicAck(envelope.getDeliveryTag(), false);
 		} catch (Exception e) {
-			log.error("Error in payload {} ",e);
+			log.error("Error in payload {} ",e.getMessage());
 			getChannel().basicReject(envelope.getDeliveryTag(), false);
 		}
 	}

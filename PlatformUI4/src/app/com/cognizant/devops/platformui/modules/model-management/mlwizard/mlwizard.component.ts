@@ -23,6 +23,7 @@ import { MLWizardService } from "@insights/app/modules/model-management/mlwizard
 import { MessageDialogService } from "@insights/app/modules/application-dialog/message-dialog-service";
 import { InsightsInitService } from "@insights/common/insights-initservice";
 import { ReportManagementService } from "@insights/app/modules/reportmanagement/reportmanagement.service";
+import { DataSharedService } from "@insights/common/data-shared-service";
 
 export interface dataNtype {
   FieldName: string;
@@ -72,7 +73,8 @@ export class MLWizardComponent implements OnInit {
   selectedIndex: number;
   totalPages: number = -1;
   currentPageIndex: number = -1;
-  fileName: string;
+  fileName: String;
+  fileNameToolTip: string;
   MAX_ROWS_PER_TABLE = 10;
 
   constructor(
@@ -81,7 +83,8 @@ export class MLWizardComponent implements OnInit {
     private route: ActivatedRoute,
     public messageDialog: MessageDialogService,
     public config: InsightsInitService,
-    public reportmanagementService: ReportManagementService
+    public reportmanagementService: ReportManagementService,
+    private dataShare: DataSharedService
   ) {
     this.getTaskList();
   }
@@ -150,7 +153,8 @@ export class MLWizardComponent implements OnInit {
       this.fileDetails = this.csvFileDiv.nativeElement.files[0];
       this.file = event.target.files.item(0);
       console.log(this.file);
-      this.fileName = this.file.name;
+      this.fileName = this.dataShare.getCustomizeName(this.file.name, 40);
+      this.fileNameToolTip = this.file.name;
       this.headers = [];
       var reader = new FileReader();
       reader.readAsText(event.target.files[0]); // read file
@@ -433,6 +437,7 @@ export class MLWizardComponent implements OnInit {
         "Please provide a valid id for this usecase",
         "ERROR"
       );
+      this.cancelUpload();
       return false;
     } else return true;
   }

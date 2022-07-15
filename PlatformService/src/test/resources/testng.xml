@@ -6,7 +6,7 @@
 			<class
 				name="com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest" />
 			<class
-				name="com.cognizant.devops.platformservice.test.agentManagement.AgentManagementTest" />
+				name="com.cognizant.devops.platformservice.test.agentManagement.AgentManagementTest" /> 
 			<class
 				name="com.cognizant.devops.platformservice.test.CorrelationBuilder.CorrelationBuilderTest" />
 			<class
@@ -43,10 +43,10 @@
 				name="com.cognizant.devops.platformservice.test.grafanadashboard.GrafanaDashboardReportTest" /> 
 			<class
 				name="com.cognizant.devops.platformservice.test.TaskManagement.TaskManagementServiceTest" />
-			<!-- <class
+			<class
 				name="com.cognizant.devops.platformservice.test.milestone.OutcomeServiceTest" />
 			<class
-				name="com.cognizant.devops.platformservice.test.milestone.MilestoneServiceTest" /> -->
+				name="com.cognizant.devops.platformservice.test.milestone.MilestoneServiceTest" />
 		</classes>
 	</test>
 </suite>

@@ -72,13 +72,13 @@ public class TrainModelsUtils {
 		JsonArray contents = null;
 		JsonObject response = new JsonObject();
 		CSVParser csvParser = null;
-		Reader reader = null;
+		//Reader reader = null;
 		String originalFilename = file.getName();
 		String fileExt = FilenameUtils.getExtension(originalFilename);
-		try {
+		try(Reader reader = new FileReader(file);) {
 			if (fileExt.equalsIgnoreCase("csv")) {
 				CSVFormat format = CSVFormat.RFC4180.withHeader();
-				reader = new FileReader(file);
+				//reader = new FileReader(file);
 				csvParser = new CSVParser(reader, format);
 				header = getHeader(csvParser);
 				contents = getcsvContents(csvParser, header);
@@ -104,9 +104,9 @@ public class TrainModelsUtils {
 			throw new InsightsCustomException(ex.getMessage());
 		} finally {
 			try {
-				if (reader != null) {
-					reader.close();
-				}
+				//if (reader != null) {
+				//	reader.close();
+				//}
 				if (csvParser != null) {
 					csvParser.close();
 				}
@@ -241,7 +241,7 @@ public class TrainModelsUtils {
 	  
 	  public JsonObject runAutoML(String usecase, String trainingFrame,String predictionColumn, String numOfModels) throws InsightsCustomException {
 	        
-		String httpResponse = h2oApiCommunicator.runAutoML(usecase + "AutoML", trainingFrame, trainingFrame,
+		String httpResponse = h2oApiCommunicator.runAutoML(usecase + "AutoML", trainingFrame,
 				predictionColumn, numOfModels);
 		log.info(httpResponse);
 		JsonObject response = JsonUtils.parseStringAsJsonObject(httpResponse);
@@ -361,6 +361,19 @@ public class TrainModelsUtils {
 			}
 		}
 		JsonArray vectors = new JsonArray();
+		
+		    vectors = prepareVectors(nlpColumns,contents,usecase);	
+			String data=getFormattedData(contents, vectors, config);
+			response.addProperty("NLP", nlpFlag);
+			response.addProperty("data", data);
+			return response;
+	}
+	
+	
+	private JsonArray prepareVectors(List<String> nlpColumns, JsonArray contents, String usecase) throws InsightsCustomException {
+		
+		JsonArray preParevectors = new JsonArray();
+		
 		if (!nlpColumns.isEmpty()) {
 			List<String> nlpInputData = new ArrayList<>();
 			for (JsonElement e : contents) {
@@ -384,18 +397,15 @@ public class TrainModelsUtils {
 					log.debug("Parsing Success");
 					if (h2oApiCommunicator.trainWord2Vec(usecase + "ParsedTokens.hex", usecase + "W2V") ==200) {
 						log.debug("Word2VecModel Trained successfully!");
-						vectors =h2oApiCommunicator.transformWord2Vec(usecase + PARSEDTOKENS, usecase + "W2V",
+						preParevectors =h2oApiCommunicator.transformWord2Vec(usecase + PARSEDTOKENS, usecase + "W2V",
 								contents.size());
 					}
 				}
 			}
 			
 		}
-		 
-			String data=getFormattedData(contents, vectors, config);
-			response.addProperty("NLP", nlpFlag);
-			response.addProperty("data", data);
-			return response;
+		
+		return preParevectors;
 	}
 
 	/**

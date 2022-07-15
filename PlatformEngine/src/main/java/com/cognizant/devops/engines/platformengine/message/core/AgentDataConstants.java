@@ -16,19 +16,19 @@
 
 package com.cognizant.devops.engines.platformengine.message.core;
 
-public interface AgentDataConstants {
+public final class AgentDataConstants {
 
-	String PROPERTY_1 = "toolProperty1";
-	String PROPERTY_2 = "toolProperty2";
-	String PROPERTY_3 = "toolProperty3";
-	String PROPERTY_4 = "toolProperty4";
-	String PROPERTYVALUE_1 = "propertyValue1";
-	String PROPERTYVALUE_2 = "propertyValue2";
-	String PROPERTYVALUE_3 = "propertyValue3";
-	String PROPERTYVALUE_4 = "propertyValue4";
-	String COLON = ":";
-	String LABELS="labels";
-	String PROPERTIES ="properties";
-	String SELECTED_PROPERTIES = "selectedProperties";
+	public static final String PROPERTY_1 = "toolProperty1";
+	public static final String PROPERTY_2 = "toolProperty2";
+	public static final String PROPERTY_3 = "toolProperty3";
+	public static final String PROPERTY_4 = "toolProperty4";
+	public static final String PROPERTYVALUE_1 = "propertyValue1";
+	public static final String PROPERTYVALUE_2 = "propertyValue2";
+	public static final String PROPERTYVALUE_3 = "propertyValue3";
+	public static final String PROPERTYVALUE_4 = "propertyValue4";
+	public static final String COLON = ":";
+	public static final String LABELS="labels";
+	public static final String PROPERTIES ="properties";
+	public static final String SELECTED_PROPERTIES = "selectedProperties";
 
 }

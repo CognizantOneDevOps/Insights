@@ -16,7 +16,6 @@
 package com.cognizant.devops.platformservice.rest.grafana;
 
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,7 +25,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,7 +42,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 @RestController
@@ -55,11 +55,13 @@ public class UserManagementService {
 	GrafanaHandler grafanaHandler = new GrafanaHandler();
 	private static final String PATH = "/api/orgs/"; 
 	private static final String USERS = "/users"; 
+	private static final String USER_PREFERENCE = "/api/user/preferences";
 	private static final String FORWARD_SLASH = "/";
 	private static final String ORG_ID = "orgId";
 	private static final String NAME = "name";
 	private static final String LOGIN = "login";
 	private static final String ROLE = "role";
+	private static final String THEME = "theme";
 	private static final String USER_ID = "userId";
 	private static final String EMAIL = "email";
 	private static final String COLON = ":";
@@ -141,5 +143,29 @@ public class UserManagementService {
 		headers.put(AUTHORIZATION, BASIC + encodedString);
 		return grafanaHandler.grafanaDelete(PATH + orgId + USERS + FORWARD_SLASH + userId, headers);
 		
+	}
+	
+	@GetMapping(value = "/getThemePreference", produces = MediaType.APPLICATION_JSON_VALUE)
+	public JsonObject getThemePreference() {
+		log.debug("Getting user preference");
+		try {
+			Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
+			String response = grafanaHandler.grafanaGet(USER_PREFERENCE, headers);
+			return PlatformServiceUtil
+					.buildSuccessResponseWithData(JsonUtils.parseString(response));
+		} catch (JsonSyntaxException e) {
+			return PlatformServiceUtil.buildFailureResponse("Unable to get current org users");
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse("Unable to get current org users,Permission denide ");
+		}
+	}
+
+	@PutMapping(value = "/updateThemePreference", produces = MediaType.APPLICATION_JSON_VALUE)
+	public String updateThemePreference(@RequestParam String themePreference) throws InsightsCustomException {
+		log.debug("Updating user preference details to Grafana with details {}", themePreference);
+		JsonObject request = new JsonObject();
+		request.addProperty(THEME, themePreference);
+		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
+		return grafanaHandler.grafanaPut(USER_PREFERENCE, request, headers);
 	}
 }

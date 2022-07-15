@@ -30,6 +30,8 @@ sudo /usr/pgsql-12/bin/postgresql-12-setup initdb
 sudo systemctl enable postgresql-12.service
 sudo chkconfig postgresql-12 on
 sudo /usr/pgadmin4/bin/setup-web.sh
+sudo sed -i  '/^host / s/ident/trust/' /var/lib/pgsql/12/data/pg_hba.conf
+sudo sed -i  '/^local / s/ident/trust/' /var/lib/pgsql/12/data/pg_hba.conf
 sudo sed -i  '/^host / s/peer/trust/' /var/lib/pgsql/12/data/pg_hba.conf
 sudo sed -i  '/^local / s/peer/trust/' /var/lib/pgsql/12/data/pg_hba.conf
 sudo systemctl start postgresql-12.service

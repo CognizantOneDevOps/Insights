@@ -37,11 +37,9 @@ export class DataSharedService {
   private currOrg = new Subject<string>();
   currOrgTitle = this.currOrg.asObservable();
 
-
   constructor(@Inject(SESSION_STORAGE) private storage: StorageService, private datePipe: DatePipe,
     private cookieService: CookieService, public router: Router,
     public dialog: MatDialog) { }
-
   public changeUser(user: String) {
     this.userSource.next(user)
   }
@@ -281,15 +279,16 @@ export class DataSharedService {
   //Method used only for session expired
   public sessionExpiredMessage(message, type, values): MatDialogRef<ApplicationMessageDialog> {
     const dialogRef = this.dialog.open(ApplicationMessageDialog, {
-      panelClass: 'custom-dialog-container',
+      panelClass: "session-dialog-container",
       width: '40%',
-      height: '35%',
+      height: '32%',
       disableClose: true,
       data: {
         title: "Message",
         message: message,
         type: type,
-        values: true
+        values: true,
+        sessionCheck: true
       }
     });
 
@@ -313,15 +312,22 @@ export class DataSharedService {
     return Year;
   }
 
-  getCustomizeName(name): String {
+  getCustomizeName(name, charlength?): String {
     var returnName: String = "";
-    if (name != undefined && name.length > 16) {
+    if(charlength!=null){
+      if(name != undefined && charlength > 16 && name.length > charlength){
+        returnName = (name.substring(0, charlength)) + '..';
+      } else {
+        returnName = (name);
+      }
+    } else if (name != undefined && name.length > 16) {
       returnName = (name.substring(0, 16)) + '..';
     } else {
       returnName = (name);
     }
     return returnName;
   }
+  
 
   validateEmailAddresses(emailAddress):boolean {
     var emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -351,4 +357,5 @@ export class DataSharedService {
   public getTheme() {
     return this.storage.get("theme-color");
   }
+
 }

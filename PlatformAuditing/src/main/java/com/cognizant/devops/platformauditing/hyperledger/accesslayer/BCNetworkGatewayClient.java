@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
+
 import org.hyperledger.fabric.gateway.Contract;
 
 import org.hyperledger.fabric.gateway.Gateway;
@@ -78,8 +79,7 @@ public class BCNetworkGatewayClient {
 		wallet.put(certUser, Identities.newX509Identity(orgmsp, certificate, privateKey));
 
 		// Load an existing wallet holding identities used to access the network.
-		// Path walletDirectory = Paths.get("wallet");
-		// wallet = Wallets.newFileSystemWallet(walletDirectory);
+
 		// Path to a common connection profile describing the network.
 		Path networkConfigFile = Paths.get(ConfigOptions.BLOCKCHAIN_CONFIG_FILE_RESOLVED_PATH);
 
@@ -90,9 +90,7 @@ public class BCNetworkGatewayClient {
 
 		// Obtain a smart contract deployed on the network.
 		Network network = gateway.getNetwork(channel);
-		Contract contract = network.getContract(contractName);
-
-		return contract;
+		return network.getContract(contractName);
 	}
 
 	// Read signcert and keystore file content. Read file content into the string
@@ -102,7 +100,8 @@ public class BCNetworkGatewayClient {
 
 		try (Stream<String> stream = Files.lines(Paths.get(filePath), StandardCharsets.UTF_8)) {
 			stream.forEach(s -> contentBuilder.append(s).append("\n"));
-		} catch (IOException e) {						
+		} catch (IOException e) {
+			//No Code
 		}
 
 		return contentBuilder.toString();
@@ -155,7 +154,6 @@ public class BCNetworkGatewayClient {
 		BCNetworkGatewayClient gatewayObject = new BCNetworkGatewayClient();
 		byte[] createChainCodeResult = gatewayObject.gatewayContract().createTransaction(ChainCodeMethods.INSTANTIATE)
 				.submit(functionArgs);
-		JsonObject response = JsonUtils.parseStringAsJsonObject(new String(createChainCodeResult, StandardCharsets.UTF_8));
-		return response;
+		return JsonUtils.parseStringAsJsonObject(new String(createChainCodeResult, StandardCharsets.UTF_8));
 	}
 }

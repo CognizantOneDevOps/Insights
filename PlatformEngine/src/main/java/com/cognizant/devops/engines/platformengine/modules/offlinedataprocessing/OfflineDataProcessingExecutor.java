@@ -256,14 +256,27 @@ public class OfflineDataProcessingExecutor implements Job, ApplicationConfigInte
 				log.error(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} Unable to parse the CRON expression:{} ",loggingInfo.get(MilestoneConstants.EXECID),loggingInfo.get(EngineConstants.FILENAME),loggingInfo.get(EngineConstants.QUERYNAME),cronSchedule, e);
 			}
 		}else {
-			if (dateTime != null && now != null) {
-				Duration d = Duration.between(dateTime, now);
-				timeDifferenceInMinutes = d.abs().toMinutes();
-			}
-			if (timeDifferenceInMinutes > runSchedule) {
-				return true;
-			}
+		
+			return isScheduled(dateTime,now,runSchedule);		
+
 		}
 		return false;
 	}
+	
+	
+	private boolean isScheduled(ZonedDateTime dateTime, ZonedDateTime now, Long runSchedule) {
+		Long timeDifferenceInMinutes = null;
+		
+		if (dateTime != null && now != null) {
+			Duration d = Duration.between(dateTime, now);
+			timeDifferenceInMinutes = d.abs().toMinutes();
+		}
+		if (timeDifferenceInMinutes > runSchedule) {
+			return true;
+		}
+		
+		return false;
+		
+	}
+	
 }

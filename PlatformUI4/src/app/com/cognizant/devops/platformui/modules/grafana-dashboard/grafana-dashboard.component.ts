@@ -23,7 +23,6 @@ import { GrafanaDashboardService } from '@insights/app/modules/grafana-dashboard
 import { GrafanaDashboardMode } from '@insights/app/modules/grafana-dashboard/grafana-dashboard-model';
 import { CookieService } from 'ngx-cookie-service';
 
-
 @Component({
     selector: 'app-grafana-dashboard',
     templateUrl: './grafana-dashboard.component.html',
@@ -45,7 +44,8 @@ export class GrafanaDashboardComponent implements OnInit {
     dashboards = [];
     enableToolbar: boolean;
     constructor(private route: ActivatedRoute, private router: Router,
-        private sanitizer: DomSanitizer, private grafanadashboardservice: GrafanaDashboardService, private cookieService: CookieService) {
+        private sanitizer: DomSanitizer, private grafanadashboardservice: GrafanaDashboardService, 
+        private cookieService: CookieService) {
         var self = this;
         this.enableToolbar = InsightsInitService.enableInsightsToolbar;
         if(this.enableToolbar) {

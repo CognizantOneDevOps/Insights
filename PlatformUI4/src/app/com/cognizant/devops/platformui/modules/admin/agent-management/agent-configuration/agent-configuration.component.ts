@@ -101,6 +101,7 @@ export class AgentConfigurationComponent implements OnInit {
     "docker_repo_passwd",
   ];
   fileName: String = "";
+  fileNameTooltip: String = "";
   isEdit: boolean = false;
 
   constructor(
@@ -183,12 +184,12 @@ export class AgentConfigurationComponent implements OnInit {
         for (var key in this.toolVersionData.data) {
           this.versionList.push(key);
         }
-        this.versionListSorted = this.versionList.sort((n1, n2) => n1 - n2);
+        this.versionListSorted = this.versionList.sort((n1, n2) => n1 > n2 ? -1 : 1);
       } else {
         for (var key in this.toolVersionData.data) {
           this.versionList.push(key);
         }
-        this.versionListSorted = this.versionList.sort((n1, n2) => n1 - n2);
+        this.versionListSorted = this.versionList.sort((n1, n2) => n1 > n2 ? -1 : 1);
       }
     } else {
       self.showMessage =
@@ -836,6 +837,7 @@ export class AgentConfigurationComponent implements OnInit {
     this.fileUploadSuccessMessage = "";
     this.fileUploadErrorMessage = "";
     this.fileName = null;
+    this.fileNameTooltip = null;
   }
 
   cancelChange(actionType) {
@@ -867,7 +869,8 @@ export class AgentConfigurationComponent implements OnInit {
 
   onFileChanged(event) {
     const file: File = event.target.files[0];
-    this.fileName = file.name;
+    this.fileName = this.dataShare.getCustomizeName(file.name);
+    this.fileNameTooltip = file.name;
   }
 
   redirectToLandingPage() {

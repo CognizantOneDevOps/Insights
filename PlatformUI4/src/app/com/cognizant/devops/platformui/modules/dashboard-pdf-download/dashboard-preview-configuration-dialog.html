@@ -37,9 +37,9 @@
 </mat-dialog-content>
 <mat-dialog-actions
   class="mat-dialog-actions-button"
-  style="margin-top: 39px; background: var(--nobtn-bg)"
+  style="background: var(--nobtn-bg)"
 >
-  <span style="margin-right: 30%" *ngIf="isAssessmentReport">
+  <span style="margin-right: 38%;padding-top: 15px;" *ngIf="isAssessmentReport">
     <b>Please note:</b> To save changes in current dashboard, click the Save
     icon on top.</span
   >
@@ -64,7 +64,7 @@
     mat-button
     class="whiteButton1"
     (click)="closeDialog()"
-    style="margin-right: 2%"
+    style="margin-right: 2%;margin-top: -37px;"
     *ngIf="isAssessmentReport"
   >
     OK

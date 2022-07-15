@@ -124,6 +124,8 @@ export class PredictionComponent implements OnInit {
     if (!isSessionExpired) {
       this.dialog.open(PredictionShowDetailsDialog, {
         panelClass: "custom-dialog-container",
+        width: "75%",
+        height: "75%",  
         disableClose: true,
         data: {
           usecase: this.usecaseid,

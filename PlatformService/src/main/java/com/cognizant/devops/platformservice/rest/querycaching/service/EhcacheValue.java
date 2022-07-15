@@ -23,12 +23,12 @@ public class EhcacheValue<T> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private T JsonObject;
+    private transient  T jsonObject;
 
     private long timeToLive;
 
     public EhcacheValue(T theObject, Duration theDuration) {
-        JsonObject = theObject;
+        jsonObject = theObject;
         timeToLive = theDuration.getSeconds();
     }
 
@@ -37,11 +37,11 @@ public class EhcacheValue<T> implements Serializable {
     }
 
     public T getObject() {
-        return JsonObject;
+        return jsonObject;
     }
 
     public void setObject(T theObject) {
-        JsonObject = theObject;
+        jsonObject = theObject;
     }
 
     public long getTimeToLive() {

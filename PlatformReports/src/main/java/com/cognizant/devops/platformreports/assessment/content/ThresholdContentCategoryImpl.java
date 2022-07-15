@@ -32,12 +32,15 @@ import com.cognizant.devops.platformreports.assessment.datamodel.ContentConfigDe
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsContentDetail;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsKPIResultDetails;
 import com.cognizant.devops.platformreports.assessment.util.ReportEngineEnum;
+import com.cognizant.devops.platformreports.assessment.util.ReportEngineEnum.KPISentiment;
 import com.cognizant.devops.platformreports.assessment.util.ReportEngineUtils;
 import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 
 public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 
 	private static Logger log = LogManager.getLogger(ThresholdContentCategoryImpl.class);
+	
+	public static final String NEUTRAL = "Neutral";
 
 	public ThresholdContentCategoryImpl(ContentConfigDefinition inferenceContentConfigDefinition) {
 		super(inferenceContentConfigDefinition);
@@ -107,25 +110,17 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 			String result = "";
 			String inferenceText = "";
 			InsightsKPIResultDetails resultFirstData = inferenceResults.get(0);
-			String actaulDirection = "Neutral";
+			String actaulDirection = NEUTRAL;
 			addTimeValueinResult(resultValuesMap, contentConfigDefinition.getSchedule());
-			for (InsightsKPIResultDetails inferenceResultDetails : inferenceResults) {
-				String comparisonField = getResultFieldFromContentDefination();
-				Double currentValue = (Double) inferenceResultDetails.getResults().get(comparisonField);
-				if (currentValue < getContentConfig().getThreshold()) {
-					listBelow.add(inferenceResultDetails);
-				} else {
-					listAbove.add(inferenceResultDetails);
-				}
-			}
+			
+			 prepareListAboveAndBelowValue(inferenceResults,listBelow,listAbove);
 
 			resultValuesMap.put("belowThresholdCount", listBelow.size());
 			resultValuesMap.put("aboveThresholdCount", listAbove.size());
 
 			if (getContentConfig().getDirectionOfThreshold() == ReportEngineEnum.DirectionOfThreshold.BELOW) {
 				result = String.valueOf(listBelow.size());
-				actaulDirection = listBelow.size() > listAbove.size() ? AssessmentReportAndWorkflowConstants.BELOW
-						: AssessmentReportAndWorkflowConstants.ABOVE;
+				actaulDirection = getActualDirectionBelow(listAbove,listBelow); 
 				if (getContentConfig().getAction() == ReportEngineEnum.ExecutionActions.PERCENTAGE) {
 					result = String.valueOf(listBelow.size() * 100 / inferenceResults.size());
 					actaulDirection = (listBelow.size() * 100 / inferenceResults.size() > (listAbove.size() * 100)
@@ -136,8 +131,7 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 
 			} else if (getContentConfig().getDirectionOfThreshold() == ReportEngineEnum.DirectionOfThreshold.ABOVE) {
 				result = String.valueOf(listAbove.size());
-				actaulDirection = listAbove.size() > listBelow.size() ? AssessmentReportAndWorkflowConstants.ABOVE
-						: AssessmentReportAndWorkflowConstants.BELOW;
+				actaulDirection = getActualDirectionAbove(listAbove,listBelow); 
 				if (getContentConfig().getAction() == ReportEngineEnum.ExecutionActions.PERCENTAGE) {
 					result = String.valueOf((listAbove.size() * 100) / inferenceResults.size());
 					actaulDirection = ((listAbove.size() * 100) / inferenceResults.size() > (listBelow.size() * 100)
@@ -152,21 +146,9 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 							: ReportEngineEnum.KPISentiment.NEGATIVE;
 
 			resultValuesMap.put("result", result);
-
-			if (result.equalsIgnoreCase("0.0") || result.equalsIgnoreCase("0")) {
-				inferenceText = getContentText(ReportEngineUtils.NEUTRAL_MESSAGE_KEY, resultValuesMap);
-			} else {
-				inferenceText = getContentText(ReportEngineUtils.STANDARD_MESSAGE_KEY, resultValuesMap);
-			}
-
-			if (inferenceText != null) {
-				inferenceContentResult = setContentDetail(resultFirstData, resultValuesMap, sentiment, "",
-						inferenceText);
-			} else {
-				log.debug(
-						"Worlflow Detail ====   inference text is null for count and percentage threshold KPIId {} contentId {} result {} ",
-						getContentConfig().getKpiId(), getContentConfig().getContentId(), resultFirstData);
-			}
+			
+			inferenceContentResult = processInferenceText(result,resultValuesMap,sentiment,resultFirstData);
+       
 			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
 			log.debug(StringExpressionConstants.STR_EXP_TASK,
 					contentConfigDefinition.getExecutionId(),contentConfigDefinition.getWorkflowId(),contentConfigDefinition.getReportId(),"-",
@@ -189,6 +171,64 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 
 		return inferenceContentResult;
 	}
+	
+
+	private void prepareListAboveAndBelowValue(List<InsightsKPIResultDetails> inferenceResults,
+			List<InsightsKPIResultDetails> listBelow, List<InsightsKPIResultDetails> listAbove) {
+		
+		for (InsightsKPIResultDetails inferenceResultDetails : inferenceResults) {
+			String comparisonField = getResultFieldFromContentDefination();
+			Double currentValue = (Double) inferenceResultDetails.getResults().get(comparisonField);
+			if (currentValue < getContentConfig().getThreshold()) {
+				listBelow.add(inferenceResultDetails);
+			} else {
+				listAbove.add(inferenceResultDetails);
+			}
+		}
+
+	}
+
+	private String getActualDirectionBelow(List<InsightsKPIResultDetails> listAbove, List<InsightsKPIResultDetails> listBelow) {
+		String actaulDirection = NEUTRAL;
+		actaulDirection = listBelow.size() > listAbove.size() ? AssessmentReportAndWorkflowConstants.BELOW
+				: AssessmentReportAndWorkflowConstants.ABOVE;
+		
+		return actaulDirection;
+	}
+	
+	
+	private String getActualDirectionAbove(List<InsightsKPIResultDetails> listAbove, List<InsightsKPIResultDetails> listBelow) {
+		String actaulDirection = NEUTRAL;
+		
+		actaulDirection = listAbove.size() > listBelow.size() ? AssessmentReportAndWorkflowConstants.ABOVE
+				: AssessmentReportAndWorkflowConstants.BELOW;
+		
+		return actaulDirection;
+		
+	}
+	
+	
+	private InsightsContentDetail processInferenceText(String result, Map<String, Object> resultValuesMap, KPISentiment sentiment, InsightsKPIResultDetails resultFirstData) {
+		
+		String inferenceText = "";
+		InsightsContentDetail processInferenceContentResult = null;
+		
+		if (result.equalsIgnoreCase("0.0") || result.equalsIgnoreCase("0")) {
+			inferenceText = getContentText(ReportEngineUtils.NEUTRAL_MESSAGE_KEY, resultValuesMap);
+		} else {
+			inferenceText = getContentText(ReportEngineUtils.STANDARD_MESSAGE_KEY, resultValuesMap);
+		}
+
+		if (inferenceText != null) {
+			processInferenceContentResult = setContentDetail(resultFirstData, resultValuesMap, sentiment, "",
+					inferenceText);
+		} else {
+			log.debug(
+					"Worlflow Detail ====   inference text is null for count and percentage threshold KPIId {} contentId {} result {} ",
+					getContentConfig().getKpiId(), getContentConfig().getContentId(), resultFirstData);
+		}
+		return processInferenceContentResult;
+	}
 
 	/**
 	 * Process KPI result to create content text using average method
@@ -204,7 +244,7 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 		InsightsKPIResultDetails resultDetailObj = inferenceResults.get(0);
 		try {
 			ReportEngineEnum.KPISentiment sentiment = ReportEngineEnum.KPISentiment.NEUTRAL;
-			String actaulDirection = "Neutral";
+			String actaulDirection = NEUTRAL;
 			Double avgValue = inferenceResults.stream()
 					.mapToDouble((result -> (Double) result.getResults().get(comparisonField))).average().getAsDouble();
 			if (getContentConfig().getDirectionOfThreshold() == ReportEngineEnum.DirectionOfThreshold.BELOW) {

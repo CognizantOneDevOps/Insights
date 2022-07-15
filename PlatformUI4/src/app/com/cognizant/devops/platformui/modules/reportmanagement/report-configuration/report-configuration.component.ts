@@ -95,12 +95,11 @@ export class ReportConfigComponent implements OnInit {
   ngOnInit() {
     this.route.queryParams.subscribe((params) => {
       this.receivedParam = JSON.parse(params["reportparam"]);
+      console.log("RecievedParams :",this.receivedParam);
       this.receivedReportTemplates = JSON.parse(params["reportTemplates"]);
       this.receivedScheduleList = JSON.parse(params["scheduleList"]);
-      console.log(this.receivedParam, this.receivedReportTemplates);
       this.receivedReportTemplates = JSON.parse(params["reportTemplates"]);
       this.receivedScheduleList = JSON.parse(params["scheduleList"]);
-      console.log(this.receivedParam, this.receivedReportTemplates);
     });
     this.initializeVariable();
   }
@@ -123,8 +122,9 @@ export class ReportConfigComponent implements OnInit {
           this.receivedParam.data.asseementreportdisplayname;
       }
       this.listOfReports.push(this.receivedParam.data.template);
+      console.log("List Of Reports:",this.listOfReports);
       this.schedule = this.receivedParam.data.schedule;
-      this.schedule = this.receivedParam.data.schedule;
+      //this.schedule = this.receivedParam.data.schedule;
       this.datasource = this.receivedParam.data.inputDatasource;
       this.inputDataSourcePlaceholder = this.receivedParam.data.inputDatasource;
       this.emailDetails = this.receivedParam.data.emailDetails;
@@ -132,6 +132,7 @@ export class ReportConfigComponent implements OnInit {
         this.customeScheduleSelected = true;
         this.showStartDate = true;
         this.endDateInput = this.receivedParam.data.enddate;
+        this.startDateInput = this.receivedParam.data.startdate;
       }
       if (
         this.schedule == "BI_WEEKLY_SPRINT" ||
@@ -143,7 +144,6 @@ export class ReportConfigComponent implements OnInit {
       this.taskidInOrder = this.taskListTobeSaved;
       this.selectedReport = this.receivedParam.data.template;
       this.templateName = this.receivedParam.data.template.templateName;
-      this.startDateInput = this.receivedParam.data.startdate;
       this.isReoccuring = this.receivedParam.data.isReoccuring;
       this.viewListDisabled = false;
       this.loadMilestones();
@@ -167,7 +167,12 @@ export class ReportConfigComponent implements OnInit {
 
   Refresh() {
     if (this.receivedParam.type == "edit") {
-      this.isReoccuring = false;
+      if (this.schedule == "ONETIME"){
+      this.startDateInput = this.receivedParam.data.startdate;
+      this.endDateInput =  this.receivedParam.data.enddate;
+      }
+      else
+      this.isReoccuring =  this.receivedParam.data.isReoccuring;
       this.disableRefresh = false;
     } else {
       this.reportName = "";
@@ -259,11 +264,14 @@ export class ReportConfigComponent implements OnInit {
   }
 
   getTemplateName() {
+    console.log("Inside getTemplateName");
     for (var data of this.listOfReports) {
+      console.log("data:",data);
       if (data.reportId == this.selectedReport.reportId) {
         this.templateName = data.templateName;
+        console.log("Inside GetTemplate:",this.templateName)
         if(data.templateType !== undefined && data.templateType == 'ROITemplate'){
-          this.isROITemplate = true; 
+          this.isROITemplate = true;
           this.listOfSchedule = ["ONETIME"];
           this.loadMilestones();
         }
@@ -276,6 +284,7 @@ export class ReportConfigComponent implements OnInit {
     this.viewListDisabled = false;
   }
   async loadMilestones() {
+    console.log("Inside lOadMilestones");
     this.responseForMilestone = await this.milestoneservice.fetchMileStoneConfig();
     if (this.responseForMilestone.data != null && this.responseForMilestone.status == 'success') {
       this.listOfMilestones = [];
@@ -329,6 +338,7 @@ export class ReportConfigComponent implements OnInit {
   }
 
   checkSchedule() {
+    console.log("inside checkschedule");
     if (this.schedule == "ONETIME") {
       this.customeScheduleSelected = true;
       this.showStartDate = true;
@@ -438,6 +448,7 @@ export class ReportConfigComponent implements OnInit {
           this.reportmanagementservice
             .saveDataforReport(JSON.stringify(reportAPIRequestJson))
             .then(function (response) {
+              console.log(response);
               if (response.status == "success") {
                 message = "<b>" + self.reportName + "</b> saved successfully.";
                 if (response.data.dashboardResponse != null) {
@@ -536,7 +547,7 @@ export class ReportConfigComponent implements OnInit {
     const dialogRef = this.dialog.open(DashboardPreviewConfigDialog, {
       panelClass: "custom-dialog-container",
       width: "75%",
-      height: "75%",
+      height: "84%",
       disableClose: true,
       data: {
         route: dashUrl,

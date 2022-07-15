@@ -172,5 +172,5 @@ public class InsightsWorkflowConfiguration implements Serializable {
 	public void setEmailConfig(InsightsEmailTemplates emailConfig) {
 		this.emailConfig = emailConfig;
 	}
-
+	
 }

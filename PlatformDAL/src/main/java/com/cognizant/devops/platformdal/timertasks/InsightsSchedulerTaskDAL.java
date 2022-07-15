@@ -130,9 +130,9 @@ public class InsightsSchedulerTaskDAL extends BaseDAL {
 		try {
 			Map<String,Type> scalarList = new LinkedHashMap<>();
 			Map<String,Object> parameters = new HashMap<>();
-			String query = "	select max(STS.recordtimestamp) as maxrecordtimestamp ,STS.timerTaskMapping as taskname " + 
-					"	from \"INSIGHTS_SCHEDULER_TASK_STATUS\" STS " + 
-					"	Group By STS.timerTaskMapping ";
+			String query = "  select max(STS.recordtimestamp) as maxrecordtimestamp ,STS.timerTaskMapping as taskname " + 
+					"  from \"INSIGHTS_SCHEDULER_TASK_STATUS\" STS " + 
+					"  Group By STS.timerTaskMapping ";
 			scalarList.put("maxrecordtimestamp", StandardBasicTypes.LONG);
 			scalarList.put("taskname", StandardBasicTypes.STRING);
 			return executeSQLQueryAndRetunList(query,scalarList,parameters);

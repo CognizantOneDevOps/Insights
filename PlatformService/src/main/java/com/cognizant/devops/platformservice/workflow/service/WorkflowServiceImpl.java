@@ -38,6 +38,7 @@ import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentConfi
 import com.cognizant.devops.platformdal.assessmentreport.InsightsEmailTemplates;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
+import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfigDAL;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
@@ -51,8 +52,9 @@ public class WorkflowServiceImpl {
 	private static final Logger log = LogManager.getLogger(WorkflowServiceImpl.class);
 	WorkflowDAL workflowConfigDAL = new WorkflowDAL();
 	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
+	GrafanaDashboardPdfConfigDAL grafanaDashboardPDFConfigDAL = new GrafanaDashboardPdfConfigDAL();
 	String healthNotificationWorkflowId = WorkflowTaskEnum.WorkflowType.SYSTEM.getValue() + "_" + "HealthNotification";
-	
+
 	
 	/**
 	 * Adding tasks to the workflow task table *
@@ -717,6 +719,28 @@ public class WorkflowServiceImpl {
 			log.error("Error while updating tasks to the workflow task  {}", e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
 		}
+	}
+	
+	/**
+	 * Prepares details needed for downloadDashboardReportPDF
+	 * @param reportTitle
+	 * @return JsonObject
+	 * @throws InsightsCustomException
+	 */
+	public JsonObject preparePdfDetailsJson(String reportTitle) throws InsightsCustomException {
+		JsonObject pdfDetailsJson = new JsonObject();
+		try {
+			String workflowId = grafanaDashboardPDFConfigDAL.getWorkflowIdByTitle(reportTitle);
+			String latestExecutionId = getLatestExecutionId(workflowId).get(AssessmentReportAndWorkflowConstants.EXECUTIONID).getAsString();
+			pdfDetailsJson.addProperty(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
+			pdfDetailsJson.addProperty(AssessmentReportAndWorkflowConstants.EXECUTIONID, latestExecutionId);
+			pdfDetailsJson.addProperty("pdfName", reportTitle);
+		} catch (InsightsCustomException e) {
+			log.error(e.getMessage());
+			throw new InsightsCustomException("Error while generating the PDF: Report Not Found!");
+		}
+		return pdfDetailsJson;
+		
 	}
 
 }

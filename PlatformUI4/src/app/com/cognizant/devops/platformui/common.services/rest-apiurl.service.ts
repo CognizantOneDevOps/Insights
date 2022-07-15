@@ -266,6 +266,9 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("SCHEDULE_TASK_STATUS_UPDATE", '/PlatformService/admin/scheduletaskmanagement/statusUpdateForTaskDefinition');
         this.addEndPoint("DELETE_SCHEDULE_TASK_STATUS", '/PlatformService/admin/scheduletaskmanagement/deleteTaskDefinition');
 
+        //User Preference
+        this.addEndPoint("UPDATE_UESRS_PREFERENCE", '/PlatformService/admin/userMgmt/updateThemePreference');
+        this.addEndPoint("GET_USER_PREFERENCE_THEME", '/PlatformService/admin/userMgmt/getThemePreference');
     }
 
     public addEndPoint(name: String, url: String) {

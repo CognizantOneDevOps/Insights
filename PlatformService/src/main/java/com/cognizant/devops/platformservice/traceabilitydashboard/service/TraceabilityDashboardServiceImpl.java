@@ -17,6 +17,7 @@ package com.cognizant.devops.platformservice.traceabilitydashboard.service;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -401,48 +402,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 		for (String toolFromNeo4j : toolPayloadFromNeo4j) {
 			List<JsonObject> toolsPayload = new ArrayList<>();
 
-			if (dataModel.has(toolFromNeo4j)) {
-				JsonObject toolPayloadFromDatamodel = dataModel.get(toolFromNeo4j).getAsJsonObject();
-				if (toolPayloadFromDatamodel != null) {
-					Set<Entry<String, JsonElement>> keyset = toolPayloadFromDatamodel.entrySet();
-					List<JsonObject> toolPayload=response.get(toolFromNeo4j);
-					for (JsonObject eachObjectFromNeo4j : toolPayload) {
-						JsonObject formattedJsonObject = new JsonObject();
-						for (Map.Entry<String, JsonElement> toolKeyValueSetFromDataModel : keyset) {
-							// Every tool is JsonArray so loop it if it has more than one element get
-							// extract the value of the each key
-							if (toolKeyValueSetFromDataModel.getKey().equals(TraceabilityConstants.ORDER)) {
-								formattedJsonObject.addProperty(toolKeyValueSetFromDataModel.getKey(),
-										toolKeyValueSetFromDataModel.getValue().toString());
-							}
-							if (!toolKeyValueSetFromDataModel.getValue().isJsonArray()) {
-
-								JsonElement propertyValFromNeo4j = eachObjectFromNeo4j
-										.get(toolKeyValueSetFromDataModel.getValue().getAsString());
-
-								if (propertyValFromNeo4j != null) {
-									String neo4jValue = propertyValFromNeo4j.getAsString();
-									formattedJsonObject.addProperty(toolKeyValueSetFromDataModel.getKey(), neo4jValue);
-								}
-							}
-						}
-						/* Add toolStatus property explicitly if the object does not have it already */
-						if (formattedJsonObject.get("toolstatus") == null)
-							formattedJsonObject.addProperty("toolstatus", "Success");
-						formattedJsonObject.addProperty(TraceabilityConstants.COUNT,
-								Integer.toString(toolPayload.size()));
-						toolsPayload.add(formattedJsonObject);
-
-					}
-
-					/* sort the tools payload with timestamp before adding into the mastermap */
-					List<JsonObject> sortedPayload = sortToolsPayload(toolsPayload);
-					/* prepare the summary */
-					/* Add each tool list payload to mastermap with toolname as key */
-					masterMap.put(toolFromNeo4j, sortedPayload);
-
-				}
-			}
+			checkToolFromNeo4j(response, dataModel, masterMap, toolFromNeo4j, toolsPayload);
 		}
 		List<Map.Entry<String, List<JsonObject>>> list = new LinkedList<>(masterMap.entrySet());
 		Collections.sort(list, (Map.Entry<String, List<JsonObject>> o1, Map.Entry<String, List<JsonObject>> o2) -> {
@@ -458,6 +418,37 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 		}
 		LOG.debug("Traceability ===== Master Response Received Successfully");
 		return sortedmasterMap;
+	}
+
+	private void checkToolFromNeo4j(Map<String, List<JsonObject>> response, JsonObject dataModel,
+			HashMap<String, List<JsonObject>> masterMap, String toolFromNeo4j, List<JsonObject> toolsPayload) {
+		if (dataModel.has(toolFromNeo4j)) {
+			JsonObject toolPayloadFromDatamodel = dataModel.get(toolFromNeo4j).getAsJsonObject();
+			if (toolPayloadFromDatamodel != null) {
+				Set<Entry<String, JsonElement>> keyset = toolPayloadFromDatamodel.entrySet();
+				List<JsonObject> toolPayload=response.get(toolFromNeo4j);
+				for (JsonObject eachObjectFromNeo4j : toolPayload) {
+					JsonObject formattedJsonObject = new JsonObject();
+					for (Map.Entry<String, JsonElement> toolKeyValueSetFromDataModel : keyset) {
+						getToolKeyValueSet(eachObjectFromNeo4j, formattedJsonObject, toolKeyValueSetFromDataModel);
+					}
+					/* Add toolStatus property explicitly if the object does not have it already */
+					if (formattedJsonObject.get("toolstatus") == null)
+						formattedJsonObject.addProperty("toolstatus", "Success");
+					formattedJsonObject.addProperty(TraceabilityConstants.COUNT,
+							Integer.toString(toolPayload.size()));
+					toolsPayload.add(formattedJsonObject);
+
+				}
+
+				/* sort the tools payload with timestamp before adding into the mastermap */
+				List<JsonObject> sortedPayload = sortToolsPayload(toolsPayload);
+				/* prepare the summary */
+				/* Add each tool list payload to mastermap with toolname as key */
+				masterMap.put(toolFromNeo4j, sortedPayload);
+
+			}
+		}
 	}
 	
 
@@ -490,41 +481,9 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 				summaryMessage.append(payload.size()+" "+displayText);
 				summaryMessage.append(", ");
 				if (toolObjectFromDataModel.has(TraceabilityConstants.MESSAGES)) // check the toolname has message
-				{
-					int messageSize = toolObjectFromDataModel.get(TraceabilityConstants.MESSAGES).getAsJsonArray()
-							.size();
-					for (int i = 0; i < messageSize; i++) {
-						JsonObject messageClause = toolObjectFromDataModel.get(TraceabilityConstants.MESSAGES)
-								.getAsJsonArray().get(i).getAsJsonObject();
-						
-						String operationName = messageClause.get("Operation").getAsString();
-						String operandName = messageClause.get(OPERAND_NAME).getAsString();
-						JsonArray operandValue = messageClause.get(OPERAND_VALUE).getAsJsonArray();
-						String message = messageClause.get(TraceabilityConstants.MESSAGE).getAsString();
-						String resp="";
-						if (operationName.equals("SUM")) {
-							resp = TraceabilitySummaryUtil.calSUM(operandName, operandValue, payload, message);
-						}else if (operationName.equals("COUNT")) {
-							resp = TraceabilitySummaryUtil.calCount(operandName, operandValue, payload, message);
-						}else if (operationName.equals("PROPERTY_COUNT")) {
-							resp = TraceabilitySummaryUtil.calPropertyCount(operandName, operandValue, payload, message);
-						}else if (operationName.equals("PERCENTAGE")) {
-							resp = TraceabilitySummaryUtil.calPercentage(operandName, operandValue, payload,
-									message);
-						}else if (operationName.equals("TIMEDIFF")) {
-							resp = TraceabilitySummaryUtil.calTimeDiffrence(operandName, payload, message);
-						}else if (operationName.equals("DISTINCT_COUNT")) {
-							resp = TraceabilitySummaryUtil.calDistinctCount(operandName, operandValue, payload, message);
-						}else {
-							LOG.error("No claculation method found to calculate summary information ");
-						}
-						if (!resp.equals("")) {
-							summary.addProperty(String.valueOf(i), resp);
-							messagesArray.add(resp);
-						}
-					}
-					LOG.debug("prepareSummary toolWiseSummaryMap tool {} messagesArray {} ",tool,messagesArray);
-					toolWiseSummaryMap.put(tool, messagesArray);
+				{								
+					 prepareToolMessage(toolObjectFromDataModel,payload,tool);
+					
 				}
 			} catch (Exception e) {
 				LOG.error(e);
@@ -535,6 +494,57 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 		summaryObject.addProperty("Total", summaryMessage.toString());
 		return summaryObject;
 
+	}
+	
+	private void prepareToolMessage(JsonObject toolObjectFromDataModel, List<JsonObject> payload, String tool) throws ParseException {
+		
+		final String OPERAND_NAME = "OperandName";
+		final String OPERAND_VALUE = "OperandValue";
+		JsonArray messagesArray = new JsonArray();
+		JsonObject summary = new JsonObject();
+		
+		int messageSize = toolObjectFromDataModel.get(TraceabilityConstants.MESSAGES).getAsJsonArray()
+				.size();
+		for (int i = 0; i < messageSize; i++) {
+			JsonObject messageClause = toolObjectFromDataModel.get(TraceabilityConstants.MESSAGES)
+					.getAsJsonArray().get(i).getAsJsonObject();
+			
+			String operationName = messageClause.get("Operation").getAsString();
+			String operandName = messageClause.get(OPERAND_NAME).getAsString();
+			JsonArray operandValue = messageClause.get(OPERAND_VALUE).getAsJsonArray();
+			String message = messageClause.get(TraceabilityConstants.MESSAGE).getAsString();
+			String resp="";
+			resp = checkOperationName(payload, operationName, operandName, operandValue, message, resp);
+			if (!resp.equals("")) {
+				summary.addProperty(String.valueOf(i), resp);
+				messagesArray.add(resp);
+			}
+		}
+		LOG.debug("prepareSummary toolWiseSummaryMap tool {} messagesArray {} ",tool,messagesArray);
+		toolWiseSummaryMap.put(tool, messagesArray);
+	}
+		
+	
+
+	private String checkOperationName(List<JsonObject> payload, String operationName, String operandName,
+			JsonArray operandValue, String message, String resp) throws ParseException {
+		if (operationName.equals("SUM")) {
+			resp = TraceabilitySummaryUtil.calSUM(operandName, operandValue, payload, message);
+		}else if (operationName.equals("COUNT")) {
+			resp = TraceabilitySummaryUtil.calCount(operandName, operandValue, payload, message);
+		}else if (operationName.equals("PROPERTY_COUNT")) {
+			resp = TraceabilitySummaryUtil.calPropertyCount(operandName, operandValue, payload, message);
+		}else if (operationName.equals("PERCENTAGE")) {
+			resp = TraceabilitySummaryUtil.calPercentage(operandName, operandValue, payload,
+					message);
+		}else if (operationName.equals("TIMEDIFF")) {
+			resp = TraceabilitySummaryUtil.calTimeDiffrence(operandName, payload, message);
+		}else if (operationName.equals("DISTINCT_COUNT")) {
+			resp = TraceabilitySummaryUtil.calDistinctCount(operandName, operandValue, payload, message);
+		}else {
+			LOG.error("No claculation method found to calculate summary information ");
+		}
+		return resp;
 	}
 
 	/** extracts the list of downtool for given provided base tool using traceability json
@@ -640,62 +650,81 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 				if (type.equals("Epic")) {
 					return processEpic(toolName, fieldName, toolCategory, new ArrayList<String>(fieldValue));
 
-				} else {
-					String cypher = buildCypherQuery(toolName, fieldName, toolCategory,
-							new ArrayList<String>(fieldValue), Collections.emptyList(), 6);
-					toolsListMap.putAll(format(executeCypherQuery(cypher)));
-
-					/* Get the upTool and DownTool of the selected tool in UI */
-					List<String> upTools = getUpTool(toolName, dataModel);
-					List<String> downTools = getDownTool(toolName, dataModel);
-					/*
-					 * Execute the first query to get the linked tools for the tool selected in UI
-					 */
-					List<String> excludeLabels =getExcludeLabelList(toolName);
-					String cypherQuery = buildCypherQuery(toolName, fieldName, toolCategory,
-							new ArrayList<String>(fieldValue), excludeLabels, 2);
-					JsonObject hopQueryOutput = executeCypherQuery(cypherQuery);
-					HashMap<String, List<String>> temp = (HashMap<String, List<String>>) format(hopQueryOutput);
-
-					if (temp.size() > 0) {
-						uplinkMap = (HashMap<String, List<String>>) temp.entrySet().stream()
-								.filter(e -> upTools.stream().anyMatch(e.getKey()::equals))
-								.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-
-						downlinkMap = (HashMap<String, List<String>>) temp.entrySet().stream()
-								.filter(e -> downTools.stream().anyMatch(e.getKey()::equals))
-								.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-					}
-					if (uplinkMap.size() > 0) {
-						toolsListMap.putAll(resolveUpAndDownLinks(uplinkMap, Arrays.asList(toolName)));
-						LOG.debug("drilldown completed for uplink");
-					}
-					if (downlinkMap.size() > 0) {
-						toolsListMap.putAll(resolveUpAndDownLinks(downlinkMap, Arrays.asList(toolName)));
-						LOG.debug("drilldown completed for downlink");
-					}
-					List<String> uuids = new ArrayList<>();
-					for (List<String> uuidList : toolsListMap.values()) {
-						uuidList.forEach(uuids::add);
-					}				
-					/* Get the MasterResponse Map which will used for caching */				
-					LinkedHashMap<String, List<JsonObject>> masterMap= (LinkedHashMap<String, List<JsonObject>>) getMasterResponse(mapOfPayload,dataModel);
-					LOG.debug("Traceability data has been loaded successfully");
-					/* Filter MaterMap and send only first 4 JsonObjects for the tool */
-					JsonObject response = getPipeLineResponse(masterMap, dataModel);
-					if (type.equals(TraceabilityConstants.OTHER_PIPELINE)) {
-						response = formatOrder(response);
-					}
-					LOG.debug("Pipeline response prepared successfully");
-					/* Get the MasterResponse Map which will used for caching */
-					pipelineCache.put(cacheKey, response.toString());
-					return response;
+				} else {				
+					
+					return getMasterMapResponse(toolCategory,type);
+					
 				}
 
 			} catch (JsonSyntaxException | JsonIOException | InsightsCustomException ex1) {
 				LOG.error(ex1.getMessage());
 				throw new InsightsCustomException(ex1.getMessage());
 			}
+		}
+	}
+	
+	private JsonObject getMasterMapResponse(String toolCategory,String type) throws InsightsCustomException {
+		
+		HashMap<String, List<String>> uplinkMap = new HashMap<>();
+		HashMap<String, List<String>> downlinkMap = new HashMap<>();
+		HashMap<String, List<String>> toolsListMap = new HashMap<>();
+		
+		String cypher = buildCypherQuery(toolName, fieldName, toolCategory,
+				new ArrayList<String>(fieldValue), Collections.emptyList(), 6);
+		toolsListMap.putAll(format(executeCypherQuery(cypher)));
+
+		/* Get the upTool and DownTool of the selected tool in UI */
+		List<String> upTools = getUpTool(toolName, dataModel);
+		List<String> downTools = getDownTool(toolName, dataModel);
+		/*
+		 * Execute the first query to get the linked tools for the tool selected in UI
+		 */
+		List<String> excludeLabels =getExcludeLabelList(toolName);
+		String cypherQuery = buildCypherQuery(toolName, fieldName, toolCategory,
+				new ArrayList<String>(fieldValue), excludeLabels, 2);
+		JsonObject hopQueryOutput = executeCypherQuery(cypherQuery);
+		HashMap<String, List<String>> temp = (HashMap<String, List<String>>) format(hopQueryOutput);
+
+		getLinkMapSize(toolName, uplinkMap, downlinkMap, toolsListMap, upTools, downTools, temp);
+		List<String> uuids = new ArrayList<>();
+		for (List<String> uuidList : toolsListMap.values()) {
+			uuidList.forEach(uuids::add);
+		}				
+		/* Get the MasterResponse Map which will used for caching */				
+		LinkedHashMap<String, List<JsonObject>> masterMap= (LinkedHashMap<String, List<JsonObject>>) getMasterResponse(mapOfPayload,dataModel);
+		LOG.debug("Traceability data has been loaded successfully");
+		/* Filter MaterMap and send only first 4 JsonObjects for the tool */
+		JsonObject response = getPipeLineResponse(masterMap, dataModel);
+		if (type.equals(TraceabilityConstants.OTHER_PIPELINE)) {
+			response = formatOrder(response);
+		}
+		LOG.debug("Pipeline response prepared successfully");
+		/* Get the MasterResponse Map which will used for caching */
+		pipelineCache.put(cacheKey, response.toString());
+		
+		return response;
+		
+	}
+
+	private void getLinkMapSize(String toolName, HashMap<String, List<String>> uplinkMap,
+			HashMap<String, List<String>> downlinkMap, HashMap<String, List<String>> toolsListMap, List<String> upTools,
+			List<String> downTools, HashMap<String, List<String>> temp) throws InsightsCustomException {
+		if (temp.size() > 0) {
+			uplinkMap = (HashMap<String, List<String>>) temp.entrySet().stream()
+					.filter(e -> upTools.stream().anyMatch(e.getKey()::equals))
+					.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+
+			downlinkMap = (HashMap<String, List<String>>) temp.entrySet().stream()
+					.filter(e -> downTools.stream().anyMatch(e.getKey()::equals))
+					.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+		}
+		if (uplinkMap.size() > 0) {
+			toolsListMap.putAll(resolveUpAndDownLinks(uplinkMap, Arrays.asList(toolName)));
+			LOG.debug("drilldown completed for uplink");
+		}
+		if (downlinkMap.size() > 0) {
+			toolsListMap.putAll(resolveUpAndDownLinks(downlinkMap, Arrays.asList(toolName)));
+			LOG.debug("drilldown completed for downlink");
 		}
 	}
 
@@ -833,32 +862,46 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 			LOG.debug("Data From Neo4J has been loaded properly for tool {} ",toolName);
 			JsonArray toolsArray = responseArray.get(j).getAsJsonObject().get("row").getAsJsonArray();
 			JsonObject toolPayloadFromDatamodel = dataModel.get(toolName).getAsJsonObject();
-			if (toolPayloadFromDatamodel != null) {
-				Set<Entry<String, JsonElement>> keyset = toolPayloadFromDatamodel.entrySet();
-				JsonObject neo4jEacRowResponse = toolsArray.get(0).getAsJsonObject();
-				JsonObject formattedJsonObject = new JsonObject();
-				for (Map.Entry<String, JsonElement> toolKeyValueSetFromDataModel : keyset) {
-					// Every tool is JsonArray so loop it if it has more than one element get
-					// extract the value of the each key
-					if (toolKeyValueSetFromDataModel.getKey().equals(TraceabilityConstants.ORDER)) {
-						formattedJsonObject.addProperty(toolKeyValueSetFromDataModel.getKey(),
-								toolKeyValueSetFromDataModel.getValue().toString());
-					}
-					if (!toolKeyValueSetFromDataModel.getValue().isJsonArray()) {
-						JsonElement propertyValFromNeo4j = neo4jEacRowResponse
-								.get(toolKeyValueSetFromDataModel.getValue().getAsString());
-						if (propertyValFromNeo4j != null) {
-							String neo4jValue = propertyValFromNeo4j.getAsString();
-							formattedJsonObject.addProperty(toolKeyValueSetFromDataModel.getKey(), neo4jValue);
-						}
-					}
-				}
-				formattedJsonObject.addProperty("count", Integer.toString(count));
-				issues.add(formattedJsonObject);
-			}
+			
+			issues = formatJsonObject(toolsArray ,toolPayloadFromDatamodel ,count);
 		}
 		sortedList = sortToolsPayload(issues);
 		return sortedList;
+	}
+	
+	private List<JsonObject> formatJsonObject(JsonArray toolsArray ,JsonObject toolPayloadFromDatamodel , int count) {
+		
+		List<JsonObject> formattedJsonObjectList  = new ArrayList<>();
+		
+		if (toolPayloadFromDatamodel != null) {
+			Set<Entry<String, JsonElement>> keyset = toolPayloadFromDatamodel.entrySet();
+			JsonObject neo4jEacRowResponse = toolsArray.get(0).getAsJsonObject();
+			JsonObject formattedJsonObject = new JsonObject();
+			for (Map.Entry<String, JsonElement> toolKeyValueSetFromDataModel : keyset) {
+				// Every tool is JsonArray so loop it if it has more than one element get
+				// extract the value of the each key
+				getToolKeyValueSet(neo4jEacRowResponse, formattedJsonObject, toolKeyValueSetFromDataModel);
+			}
+			formattedJsonObject.addProperty("count", Integer.toString(count));
+			formattedJsonObjectList.add(formattedJsonObject);
+		}
+		return formattedJsonObjectList;
+	}
+
+	private void getToolKeyValueSet(JsonObject neo4jEacRowResponse, JsonObject formattedJsonObject,
+			Map.Entry<String, JsonElement> toolKeyValueSetFromDataModel) {
+		if (toolKeyValueSetFromDataModel.getKey().equals(TraceabilityConstants.ORDER)) {
+			formattedJsonObject.addProperty(toolKeyValueSetFromDataModel.getKey(),
+					toolKeyValueSetFromDataModel.getValue().toString());
+		}
+		if (!toolKeyValueSetFromDataModel.getValue().isJsonArray()) {
+			JsonElement propertyValFromNeo4j = neo4jEacRowResponse
+					.get(toolKeyValueSetFromDataModel.getValue().getAsString());
+			if (propertyValFromNeo4j != null) {
+				String neo4jValue = propertyValFromNeo4j.getAsString();
+				formattedJsonObject.addProperty(toolKeyValueSetFromDataModel.getKey(), neo4jValue);
+			}
+		}
 	}
 
 	@Override

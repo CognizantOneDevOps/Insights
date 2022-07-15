@@ -124,6 +124,27 @@ public class GrafanaHandler {
 	}
 	
 	/**
+	 * @param url
+	 * @param requestJson
+	 * @param headers
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	public String grafanaPut(String path, JsonElement requestJson, Map<String, String> headers) throws InsightsCustomException{
+		String response = null;
+		try {
+			String url = GRAFANA_END_POINT + path;
+			JsonObject jsonObject = requestJson.getAsJsonObject();
+			response = RestApiHandler.doPut(url, jsonObject, headers);
+		} catch (RestAPI404Exception e) {
+			response = getResponseMessage(e.getMessage());
+		} catch (InsightsCustomException e) {
+			throw e;
+		}
+		return response;
+	}
+	
+	/**
 	 * @param loginApiUrl
 	 * @param loginRequestParams
 	 * @return

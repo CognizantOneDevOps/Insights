@@ -26,6 +26,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -133,24 +134,16 @@ public class JiraProcessingExecutor implements Job, ApplicationConfigInterface {
 						byte[] decryptedBytes = cipher.doFinal(byteArray);
 						LOG.debug("decryptedBytes");
 						LOG.debug(new String(decryptedBytes));
-						if(hc.equals(new String(decryptedBytes)))
-							successfulWriteFlag = insertJiraNodes(dataElem, successfulWriteFlag);
-						else
-							LOG.debug("Hash values do not match.. skipping uuid: " +
-									dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("uuid"));
+						successfulWriteFlag = setWritingFlag(successfulWriteFlag, dataElem, hc, decryptedBytes);
 					}else
-						LOG.debug("INVALID ASSET OR DigitalSignature not found for uuid: "+
+						 LOG.debug("INVALID ASSET OR DigitalSignature not found for uuid: "+
 							dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("uuid")+"\nNode skipped...");
                     //successfulWriteFlag = insertJiraNodes(dataElem, successfulWriteFlag);
 				}
 				// check for success for updating tracking
 
-				if (successfulWriteFlag && lastTimestamp != 0) {
-					JsonObject tracking = new JsonObject();
-					tracking.addProperty("jiraTimestamp", lastTimestamp);
-					
-					utilObj.writeTracking(tracking);
-				}
+				addTrackingProperty(successfulWriteFlag);
+				
 				int processedRecords = rows.size();
 				nextBatchSize += dataBatchSize;
 				if (processedRecords == 0) {
@@ -164,6 +157,25 @@ public class JiraProcessingExecutor implements Job, ApplicationConfigInterface {
 			LOG.error(e);
 		}
 	}
+
+	private Boolean setWritingFlag(Boolean successfulWriteFlag, JsonElement dataElem, String hc,
+			byte[] decryptedBytes) {
+		if(hc.equals(new String(decryptedBytes)))
+			successfulWriteFlag = insertJiraNodes(dataElem, successfulWriteFlag);
+		else
+			LOG.debug("Hash values do not match.. skipping uuid: " +
+					dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("uuid"));
+		return successfulWriteFlag;
+	}
+
+	private void addTrackingProperty(Boolean successfulWriteFlag) throws IOException, InsightsCustomException {
+		if (successfulWriteFlag && lastTimestamp != 0) {
+			JsonObject tracking = new JsonObject();
+			tracking.addProperty("jiraTimestamp", lastTimestamp);
+			
+			utilObj.writeTracking(tracking);
+		}
+	}
 	
     private String getHash(JsonArray row) {
         String dataString = "";
@@ -174,41 +186,12 @@ public class JiraProcessingExecutor implements Job, ApplicationConfigInterface {
             if(!row.get(0).getAsJsonObject().has("fromString"))
                 row.get(0).getAsJsonObject().addProperty("fromString","None");
         }
-        for (JsonElement dt : row) {
-            //put dataObject into treemap to get sorted
-        	//LOG.debug(dt);
+        for (JsonElement dt : row) {       
             TreeMap<String, String> t = new TreeMap<String, String>();
             dt.getAsJsonObject().entrySet().parallelStream().forEach(entry -> {
-                if (!entry.getKey().equals("uuid") && !entry.getKey().equals(InsightsAuditConstants.DIGITALSIGNATURE)) {
-                    if (entry.getKey().equals("inSightsTime") || entry.getKey().endsWith("Epoch")) {
-                    	LOG.debug("has epoch time");
-                        t.put(entry.getKey(), String.valueOf(entry.getValue().getAsLong()) + ".0");
-                    }
-					else {
-                    	LOG.debug("jsonarray*****"+Boolean.toString(entry.getValue().isJsonArray()));
-                        if(entry.getValue().isJsonArray()) {
-                            for (JsonElement e: entry.getValue().getAsJsonArray()) {
-                                if(t.containsKey(entry.getKey())) {
-                                    LOG.debug("t.get(entry.getKey()).toString()");
-                                    LOG.debug(t.get(entry.getKey()).toString());
-                                    t.put(entry.getKey(), t.get(entry.getKey()).toString().concat(e.getAsString()));
-                                }else
-                                    t.put(entry.getKey(), e.getAsString());
-                            }
-                        }
-                        else {
-                        	//LOG.debug(entry.getValue().getClass().getName());
-                        	LOG.debug(entry.getKey()+"-->"+entry.getValue());
-                            t.put(entry.getKey(), entry.getValue().getAsString());
-                        }
-                        //LOG.debug(entry.getValue().getAsString());
-                    }
-                    /*else {
-                    	//LOG.debug(t);
-                    	LOG.debug(entry.getValue().getClass().getName());
-                    	LOG.debug(entry.getKey()+"-->"+entry.getValue().getClass().getName());
-                        t.put(entry.getKey(), entry.getValue().getAsString());
-                    }*/
+                if (!entry.getKey().equals("uuid") && !entry.getKey().equals(InsightsAuditConstants.DIGITALSIGNATURE)) {                    
+                	setTreeMapForEpoch(t, entry);              	
+                   
                 }
             });
             Set data = t.entrySet();
@@ -223,6 +206,36 @@ public class JiraProcessingExecutor implements Job, ApplicationConfigInterface {
         }
         return sb.toString();
     }
+
+	private void setTreeMapForEpoch(TreeMap<String, String> t, Entry<String, JsonElement> entry) {
+		if (entry.getKey().equals("inSightsTime") || entry.getKey().endsWith("Epoch")) {
+			LOG.debug("has epoch time");
+		    t.put(entry.getKey(), String.valueOf(entry.getValue().getAsLong()) + ".0");
+		}
+		else {
+			if(LOG.isDebugEnabled()) {
+			LOG.debug("jsonarray*****"+Boolean.toString(entry.getValue().isJsonArray()));
+			}
+		    if(entry.getValue().isJsonArray()) {
+		        setTreeMap(t, entry); 
+		    }
+		    else {
+		    	LOG.debug(entry.getKey()+"-->"+entry.getValue());
+		        t.put(entry.getKey(), entry.getValue().getAsString());
+		    }
+		}
+	}
+
+	private void setTreeMap(TreeMap<String, String> t, Entry<String, JsonElement> entry) {
+		for (JsonElement e: entry.getValue().getAsJsonArray()) {
+		    if(t.containsKey(entry.getKey())) {
+		        LOG.debug("t.get(entry.getKey()).toString()");
+		        LOG.debug(t.get(entry.getKey()).toString());
+		        t.put(entry.getKey(), t.get(entry.getKey()).toString().concat(e.getAsString()));
+		    }else
+		        t.put(entry.getKey(), e.getAsString());
+		}
+	}
 
 	private boolean insertJiraNodes(JsonElement dataElem, boolean successfulWriteFlag) {
 		GraphDBHandler dbHandler = new GraphDBHandler();

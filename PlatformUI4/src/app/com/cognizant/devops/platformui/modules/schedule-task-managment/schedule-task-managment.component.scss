@@ -134,3 +134,7 @@
   justify-content: flex-end;
   margin-bottom: 16px !important;
 }
+
+th.mat-header-cell:first-of-type, td.mat-cell:first-of-type, td.mat-footer-cell:first-of-type {
+  padding-left: 10px !important;
+}

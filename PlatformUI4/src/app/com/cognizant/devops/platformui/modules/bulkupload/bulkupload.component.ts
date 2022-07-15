@@ -38,6 +38,7 @@ export class BulkUploadComponent implements OnInit {
   toolsArr = [];
   labelsArr = [];
   fileNameArr = [];
+  fileNameArrToolTip = [];
   fileFormDataArr = [];
   toolsDetail = [];
   toolVersionData: any;
@@ -82,12 +83,14 @@ export class BulkUploadComponent implements OnInit {
   }
   cancelUpload(index) {
     this.fileNameArr[index] = null;
+    this.fileNameArrToolTip = null;
     (<HTMLInputElement>document.getElementById("file" + index)).value = '';
   }
 
   cancelAllUpload() {
     for (let index of [0, 1, 2, 3, 4]) {
       this.fileNameArr[index] = null;
+      this.fileNameArrToolTip = null;
       (<HTMLInputElement>document.getElementById("file" + index)).value = '';
     }
   }
@@ -137,7 +140,8 @@ export class BulkUploadComponent implements OnInit {
   onFileChanged(event, row, index) {
     this.selectedFile = <File>event.target.files[0];
     row.value.fileFormData = <File>event.target.files[0];
-    this.fileNameArr[index] = row.value.fileFormData.name;
+    this.fileNameArr[index] = this.dataShare.getCustomizeName(row.value.fileFormData.name, 32);
+    this.fileNameArrToolTip[index] = row.value.fileFormData.name;
     this.fileFormDataArr[index] = row.value.fileFormData;
     //row.value.fileFormData.fileName = this.selectedFile.name;
     row.value.fileName = this.selectedFile.name;

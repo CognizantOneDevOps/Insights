@@ -48,6 +48,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.constants.ReportChartCollection;
+import com.cognizant.devops.platformcommons.constants.ReportStatusConstants;
 import com.cognizant.devops.platformcommons.core.enums.ContentConfigEnum;
 import com.cognizant.devops.platformcommons.core.enums.FileDetailsEnum;
 import com.cognizant.devops.platformcommons.core.enums.KpiConfigEnum;
@@ -613,7 +614,7 @@ public class AssesmentReportServiceImpl {
 		reportTemplateJsonObject.addProperty("reportId", reporttemplate.getReportId());
 		reportTemplateJsonObject.addProperty("templateName", reporttemplate.getTemplateName());
 		jsonobject.add("template", reportTemplateJsonObject);
-		jsonobject.addProperty("milestoneId", (assessmentReport.getMilestoneId()!= null ?assessmentReport.getMilestoneId():null));
+		jsonobject.addProperty(ReportStatusConstants.MILESTONE_ID, (assessmentReport.getMilestoneId()!= null ?assessmentReport.getMilestoneId():null));
 
 		InsightsWorkflowConfiguration workflowConfig = assessmentReport.getWorkflowConfig();
 		long lastRun = workflowConfig.getLastRun();
@@ -752,7 +753,7 @@ public class AssesmentReportServiceImpl {
 			throws InsightsCustomException {
 		int reportId = -1;
 		JsonObject emailDetails = null;
-		JsonObject responseJson = new JsonObject();
+		//JsonObject responseJson = new JsonObject();
 		try {
 			log.debug(" Assessment Json to be saved {} ", assessmentReportJson);
 			reportId = assessmentReportJson.get("reportTemplate").getAsInt();
@@ -774,7 +775,7 @@ public class AssesmentReportServiceImpl {
 			}
 			String emailList = assessmentReportJson.get("emailList").getAsString();
 			boolean isActive = false;
-			int milestoneId = assessmentReportJson.has("milestoneId")?assessmentReportJson.get("milestoneId").getAsInt():0;
+			int milestoneId = assessmentReportJson.has(ReportStatusConstants.MILESTONE_ID)?assessmentReportJson.get(ReportStatusConstants.MILESTONE_ID).getAsInt():0;
 			String schedule = assessmentReportJson.get("schedule").getAsString();
 			String datasource = assessmentReportJson.get(AssessmentReportAndWorkflowConstants.DATASOURCE).getAsString();
 			boolean reoccurence = assessmentReportJson.get(AssessmentReportAndWorkflowConstants.ISREOCCURING)
@@ -786,27 +787,9 @@ public class AssesmentReportServiceImpl {
 						.getAsJsonObject();
 			}
 			JsonElement startDateJsonObject = assessmentReportJson.get(AssessmentReportAndWorkflowConstants.STARTDATE);
-			if (startDateJsonObject.isJsonNull()) {
-				epochStartDate = 0;
-			} else {
-				epochStartDate = InsightsUtils.getEpochTime(startDateJsonObject.getAsString()) / 1000;
-				epochStartDate = InsightsUtils.getStartOfTheDay(epochStartDate) + 1;
-
-			}
-			if (schedule.equals(WorkflowTaskEnum.WorkflowSchedule.ONETIME.toString())) {
-				JsonElement endDateJsonObject = assessmentReportJson.get("enddate");
-				if (endDateJsonObject.isJsonNull()) {
-					epochEndDate = 0;
-				} else {
-					epochEndDate = InsightsUtils.getEpochTime(endDateJsonObject.getAsString()) / 1000;
-					epochEndDate = InsightsUtils.getStartOfTheDay(epochEndDate) - 1;
-				}
-				if (epochStartDate > epochEndDate) {
-					throw new InsightsCustomException("Start Date cannot be greater than End date");
-				}
-			} else {
-				epochEndDate = 0;
-			}
+			epochStartDate = setEpochStartDate(startDateJsonObject);		
+			JsonElement endDateJsonObject = assessmentReportJson.get("enddate");
+			epochEndDate = setEpochEndDate(endDateJsonObject,epochStartDate,schedule);			
 			String reportStatus = WorkflowTaskEnum.WorkflowStatus.NOT_STARTED.toString();
 			JsonArray taskList = assessmentReportJson.get("tasklist").getAsJsonArray();
 			String username = assessmentReportJson.get("userName").getAsString();
@@ -816,10 +799,8 @@ public class AssesmentReportServiceImpl {
 			InsightsAssessmentConfiguration assessmentConfig = new InsightsAssessmentConfiguration();
 			InsightsWorkflowConfiguration workflowConfig = workflowService.saveWorkflowConfig(workflowId, isActive,
 					reoccurence, schedule, reportStatus, workflowType, taskList, epochStartDate, emailDetails,
-					runImmediate);
+					runImmediate);			
 			
-			
-			JsonObject dashboardPdfObj = new JsonObject();
 		
 			// Entity Setters
 			assessmentConfig.setActive(isActive);
@@ -842,46 +823,9 @@ public class AssesmentReportServiceImpl {
 				if(taskConfig.getCompnentName().contains("PDFExecutionSubscriber")) {
 					reportHasPDFTask = true;
 				}
-			}
+			} 
+			return getResponseJson(assessmentConfig,username, reportName, reportTemplate,reportHasPDFTask,schedule,epochStartDate,epochEndDate);
 			
-			String vUtil = assessmentConfig.getReportTemplateEntity().getVisualizationutil();
-			if (vUtil.equalsIgnoreCase(AssessmentReportAndWorkflowConstants.GRAFANAPDF) && reportHasPDFTask){
-				String response = saveDashbaordInGrafana(username, reportName, reportTemplate  );
-				if(response !=  null) {
-					JsonObject responseObj = JsonUtils.parseStringAsJsonObject(response);
-					String dashboardUrlStr = responseObj.get("url").getAsString();
-					String orgId = responseObj.get("orgId").getAsString();
-					String dateParam  = "";
-					if (schedule.equals(WorkflowTaskEnum.WorkflowSchedule.ONETIME.toString())) {
-						dateParam = "&from="+epochStartDate*1000+"&to="+epochEndDate*1000;
-					}else {
-						dateParam = "&from="+WorkflowTaskEnum.GrafanaPDFScheduleMapping.valueOf(schedule).getValue()+"&to=now";
-					}
-					dashboardUrlStr = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint().concat(dashboardUrlStr.substring(dashboardUrlStr.indexOf("/d"))) +"?orgId="+ orgId+dateParam;
-					log.debug(" dashboardUrlStr {} ",dashboardUrlStr);
-					dashboardPdfObj.addProperty("dashUrl", dashboardUrlStr);
-					dashboardPdfObj.addProperty("workflowId", assessmentConfig.getWorkflowConfig().getWorkflowId());
-					dashboardPdfObj.addProperty("variables", "");
-					dashboardPdfObj.addProperty(AssessmentReportAndWorkflowConstants.DASHBOARD, responseObj.get("uid").getAsString());
-					dashboardPdfObj.addProperty("theme", "dark");
-					dashboardPdfObj.addProperty("pdfType", "Dashboard");
-					dashboardPdfObj.addProperty(AssessmentReportAndWorkflowConstants.TITLE, assessmentConfig.getAsseementReportDisplayName());
-					dashboardPdfObj.addProperty("source", "PLATFORM");
-					dashboardPdfObj.addProperty("loadTime", "90");
-					dashboardPdfObj.addProperty("organisation", orgId);
-					responseJson.addProperty("dashboardUrl", dashboardUrlStr);
-				} else {
-					responseJson.addProperty("dashboardResponse", "unable to save dashboard in Grafana.");
-				}
-			}
-			
-			log.debug(" dashboardPdfObj {} ",dashboardPdfObj);
-			
-			assessmentConfig.setAdditionalDetail(dashboardPdfObj.toString());
-			int assessmentReportId = reportConfigDAL.saveInsightsAssessmentConfig(assessmentConfig);
-			responseJson.addProperty("assessmentReportId", assessmentReportId);
-			
-			return responseJson;
 		} catch (NoResultException e) {
 			log.error(e);
 			throw new InsightsCustomException("Report Template not found for report id : " + reportId);
@@ -889,6 +833,88 @@ public class AssesmentReportServiceImpl {
 			log.error(e);
 			throw new InsightsCustomException(e.getMessage());
 		}
+	}
+	
+	private long setEpochStartDate(JsonElement startDateJsonObject) {
+		long epochStartDate;
+		if (startDateJsonObject.isJsonNull()) {
+			epochStartDate = 0;
+		} else {
+			epochStartDate = InsightsUtils.getEpochTime(startDateJsonObject.getAsString()) / 1000;
+			epochStartDate = InsightsUtils.getStartOfTheDay(epochStartDate) + 1;
+
+		}
+		return epochStartDate;
+	}
+	
+	private long setEpochEndDate(JsonElement endDateJsonObject, long epochStartDate, String schedule) throws InsightsCustomException {
+		
+		long epochEndDate;
+		
+		if (schedule.equals(WorkflowTaskEnum.WorkflowSchedule.ONETIME.toString())) { 
+		
+			if (endDateJsonObject.isJsonNull()) {
+				epochEndDate = 0;
+			} else {
+				epochEndDate = InsightsUtils.getEpochTime(endDateJsonObject.getAsString()) / 1000;
+				epochEndDate = InsightsUtils.getStartOfTheDay(epochEndDate) - 1;
+			}
+			if (epochStartDate > epochEndDate) {
+				throw new InsightsCustomException("Start Date cannot be greater than End date");
+			}
+		} else {
+			epochEndDate = 0;
+		}
+		
+		return epochEndDate;
+	}
+	
+	private JsonObject getResponseJson(InsightsAssessmentConfiguration assessmentConfig, String username,
+			String reportName, InsightsAssessmentReportTemplate reportTemplate, boolean reportHasPDFTask, String schedule, long epochStartDate, long epochEndDate) throws InsightsCustomException {
+		
+		JsonObject responseJson = new JsonObject();
+		JsonObject dashboardPdfObj = new JsonObject();
+		
+		String vUtil = assessmentConfig.getReportTemplateEntity().getVisualizationutil();
+		if (vUtil.equalsIgnoreCase(AssessmentReportAndWorkflowConstants.GRAFANAPDF) && reportHasPDFTask){
+			String response = saveDashbaordInGrafana(username, reportName, reportTemplate  );
+			if(response !=  null) {
+				JsonObject responseObj = JsonUtils.parseStringAsJsonObject(response);
+				String dashboardUrlStr = responseObj.get("url").getAsString();
+				String orgId = responseObj.get("orgId").getAsString();
+				String dateParam  = "";
+				if (schedule.equals(WorkflowTaskEnum.WorkflowSchedule.ONETIME.toString())) {
+					dateParam = "&from="+epochStartDate*1000+"&to="+epochEndDate*1000;
+				}else {
+					dateParam = "&from="+WorkflowTaskEnum.GrafanaPDFScheduleMapping.valueOf(schedule).getValue()+"&to=now";
+				}
+				dashboardUrlStr = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint().concat(dashboardUrlStr.substring(dashboardUrlStr.indexOf("/d"))) +"?orgId="+ orgId+dateParam;
+				log.debug(" dashboardUrlStr {} ",dashboardUrlStr);
+				dashboardPdfObj.addProperty("dashUrl", dashboardUrlStr);
+				dashboardPdfObj.addProperty("workflowId", assessmentConfig.getWorkflowConfig().getWorkflowId());
+				dashboardPdfObj.addProperty("variables", "");
+				dashboardPdfObj.addProperty(AssessmentReportAndWorkflowConstants.DASHBOARD, responseObj.get("uid").getAsString());
+				dashboardPdfObj.addProperty("theme", "dark");
+				dashboardPdfObj.addProperty("pdfType", "Dashboard");
+				dashboardPdfObj.addProperty(AssessmentReportAndWorkflowConstants.TITLE, assessmentConfig.getAsseementReportDisplayName());
+				dashboardPdfObj.addProperty("source", "PLATFORM");
+				dashboardPdfObj.addProperty("loadTime", "90");
+				dashboardPdfObj.addProperty("organisation", orgId);
+				responseJson.addProperty("dashboardUrl", dashboardUrlStr);
+			} else {
+				responseJson.addProperty("dashboardResponse", "unable to save dashboard in Grafana.");
+			}
+		}
+		
+		log.debug(" dashboardPdfObj {} ",dashboardPdfObj);
+		
+		assessmentConfig.setAdditionalDetail(dashboardPdfObj.toString());
+		int assessmentReportId = reportConfigDAL.saveInsightsAssessmentConfig(assessmentConfig);
+		responseJson.addProperty("assessmentReportId", assessmentReportId);
+		
+		return responseJson;
+		
+		
 	}
 
 	private String saveDashbaordInGrafana(String userName, String reportName, InsightsAssessmentReportTemplate reportTemplate) throws InsightsCustomException {
@@ -1038,34 +1064,7 @@ public class AssesmentReportServiceImpl {
 				throw new InsightsCustomException(" Report template not exists in database " + reportId);
 			} else {
 
-				for (MultipartFile multipartfile : Arrays.asList(files)) {
-					String fileName = multipartfile.getOriginalFilename();
-					String fileExt = FilenameUtils.getExtension(fileName);
-					if (AssessmentReportAndWorkflowConstants.validReportTemplateFileExtention
-							.contains(fileExt.toLowerCase())) {
-						boolean fileCheck = PlatformServiceUtil.validateFile(fileName);
-						if (fileCheck) {
-							String fileType = PlatformServiceUtil.getFileType(multipartfile.getOriginalFilename());
-							InputStream is = multipartfile.getInputStream();
-							ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-						    int nRead;
-						    byte[] data = new byte[4];
-						    while ((nRead = is.read(data, 0, data.length)) != -1) {
-						        buffer.write(data, 0, nRead);
-						    }
-						    buffer.flush();
-							uploadReportTemplateFile(reportId, reportEntity, fileType, multipartfile.getOriginalFilename(), buffer.toByteArray());
-						} else {
-							log.error("File validation failed {}", multipartfile.getOriginalFilename());
-							throw new InsightsCustomException(
-									"File validation failed " + multipartfile.getOriginalFilename());
-						}
-					} else {
-						log.error("Wrong file format for {}", multipartfile.getOriginalFilename());
-						throw new InsightsCustomException(
-								"Wrong file format for" + multipartfile.getOriginalFilename());
-					}
-				}
+				validateAndUploadReportTemplate(files,reportEntity,reportId);				
 				returnMessage = "File uploaded";
 			}
 		} catch (Exception ex) {
@@ -1075,6 +1074,40 @@ public class AssesmentReportServiceImpl {
 		return returnMessage;
 	}
 
+	private void validateAndUploadReportTemplate(MultipartFile[] files, 
+			InsightsAssessmentReportTemplate reportEntity, int reportId) throws IOException, InsightsCustomException {
+		
+		for (MultipartFile multipartfile : Arrays.asList(files)) {
+			String fileName = multipartfile.getOriginalFilename();
+			String fileExt = FilenameUtils.getExtension(fileName);
+			if (AssessmentReportAndWorkflowConstants.validReportTemplateFileExtention
+					.contains(fileExt.toLowerCase())) {
+				boolean fileCheck = PlatformServiceUtil.validateFile(fileName);
+				if (fileCheck) {
+					String fileType = PlatformServiceUtil.getFileType(multipartfile.getOriginalFilename());
+					InputStream is = multipartfile.getInputStream();
+					ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+				    int nRead;
+				    byte[] data = new byte[4];
+				    while ((nRead = is.read(data, 0, data.length)) != -1) {
+				        buffer.write(data, 0, nRead);
+				    }
+				    buffer.flush();
+					uploadReportTemplateFile(reportId, reportEntity, fileType, multipartfile.getOriginalFilename(), buffer.toByteArray());
+				} else {
+					log.error("File validation failed {}", multipartfile.getOriginalFilename());
+					throw new InsightsCustomException(
+							"File validation failed " + multipartfile.getOriginalFilename());
+				}
+			} else {
+				log.error("Wrong file format for {}", multipartfile.getOriginalFilename());
+				throw new InsightsCustomException(
+						"Wrong file format for" + multipartfile.getOriginalFilename());
+			}
+		}
+		
+	}
+	
 	/**
 	 * Method to upload Report Template file
 	 * 
@@ -1175,7 +1208,7 @@ public class AssesmentReportServiceImpl {
 			boolean isActive = templateReportJson.get(AssessmentReportAndWorkflowConstants.ISACTIVE).getAsBoolean();
 			String description = templateReportJson.get("description").getAsString();
 			String visualizationutil = templateReportJson.get("visualizationutil").getAsString();
-			String templateType = (templateReportJson.has("templateType"))?templateReportJson.get("templateType").getAsString():"Others";
+			String templateType = (templateReportJson.has(ReportStatusConstants.TEMPLATE_TYPE))?templateReportJson.get(ReportStatusConstants.TEMPLATE_TYPE).getAsString():"Others";
 			reportEntity.setReportId(reportId);
 			reportEntity.setActive(isActive);
 			reportEntity.setDescription(description);
@@ -1346,7 +1379,7 @@ public class AssesmentReportServiceImpl {
 		boolean isActive = templateReportJson.get(AssessmentReportAndWorkflowConstants.ISACTIVE).getAsBoolean();
 		String description = templateReportJson.get("description").getAsString();
 		String visualizationutil = templateReportJson.get("visualizationutil").getAsString();
-		String templateType = (templateReportJson.has("templateType"))?templateReportJson.get("templateType").getAsString():"Others";
+		String templateType = (templateReportJson.has(ReportStatusConstants.TEMPLATE_TYPE))?templateReportJson.get(ReportStatusConstants.TEMPLATE_TYPE).getAsString():"Others";
 		
 		reportEntity.setReportId(reportId);
 		reportEntity.setActive(isActive);

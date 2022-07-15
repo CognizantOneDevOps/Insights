@@ -137,18 +137,7 @@ public class TrainModelsServiceImpl implements ITrainModelsService {
         }
         if (data.size() == prediction.getAsJsonArray("predict").size()) {
          
-            for (int i = 0; i < data.size(); i++) {
-           
-                for (Map.Entry<String, JsonElement> entry : prediction.entrySet()) {
-                    String key = entry.getKey();
-                    if (i == 0)
-                        fields.add(key);
-                    String val = entry.getValue().getAsJsonArray().get(i).getAsString();
-                    int max = val.length() < 5 ? val.length() : 5;
-                    data.get(i).getAsJsonObject().addProperty(key, val.substring(0, max));
-                 
-                }
-            }	           
+            prepareData(prediction, data, fields);	           
             response.add("Fields", fields);	           
             response.add("Data", data);
             return response;
@@ -157,6 +146,22 @@ public class TrainModelsServiceImpl implements ITrainModelsService {
             throw new InsightsCustomException("Mismatch in test data and prediction: ");
         }
     }
+
+	private void prepareData(JsonObject prediction, JsonArray data, JsonArray fields) {
+		for (int i = 0; i < data.size(); i++) {
+         
+		    for (Map.Entry<String, JsonElement> entry : prediction.entrySet()) {
+		        String key = entry.getKey();
+		        if (i == 0)
+		            fields.add(key);
+		        String val = entry.getValue().getAsJsonArray().get(i).getAsString();
+		        int max = val.length() < 5 ? val.length() : 5;
+		        data.get(i).getAsJsonObject().addProperty(key, val.substring(0, max));
+		     
+		    }
+		}
+	}
+    
 
     /**
      * Download the selected model and store the zip in file directory. Update the selected modelname in Postgres

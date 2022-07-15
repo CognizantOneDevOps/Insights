@@ -657,8 +657,8 @@ export class DashboardPdfDownloadComponent implements OnInit {
     this.getUrlArray();
     const dialogRef = self.dialog.open(DashboardPreviewConfigDialog, {
       panelClass: "custom-dialog-container",
-      height: "550px",
-      width: "1170px",
+      height: "70%",
+      width: "86%",
       disableClose: true,
       data: {
         route: this.dashUrl,

@@ -32,16 +32,15 @@
     <div layout layout-align="right" class="rightAlignStyle">
       <a>
         <button mat-icon-button (click)="exportToExcel()">
-          <mat-icon title="Export To Excel" style="margin-bottom: -10%; margin-left: 4px"
-            class="mat-icon material-icons">
-            play_for_work
+          <mat-icon matTooltip="Export To Excel" 
+            svgIcon="download">
           </mat-icon>
         </button>
       </a>
     </div>
   </div>
 
-  <mat-dialog-content>
+  <div class="scrollDiv" style="padding:0 3%">
     <table mat-table [dataSource]="predictionDetailedDatasource">
       <ng-container *ngFor="let header of finalHeaderToShow | keyvalue" matColumnDef="{{header.key}}">
         <th mat-header-cell *matHeaderCellDef [ngClass]="{'tableHeader': header.key}">
@@ -55,41 +54,34 @@
       <tr mat-header-row *matHeaderRowDef="headerArrayDisplay" class="tableHeader"></tr>
       <tr mat-row *matRowDef="let row; columns: headerArrayDisplay;"></tr>
     </table>
-  </mat-dialog-content>
-  <div class="container">
-    <div class="row">
-      <div class="col-md-6">
-        <div class="footer">
-          <div class="paginator" style="margin-left: 41%">
-            <mat-paginator style="visibility: hidden" #paginator [pageSize]="MAX_ROWS_PER_TABLE">
-            </mat-paginator>
-            <div class="paginatorElement" (click)="goToPrevPage()" [attr.disabled]="!this.paginator.hasPreviousPage()"
-              [ngStyle]="!this.paginator.hasPreviousPage() ? {'cursor':
+  </div>
+  <div class="footer">
+    <div class="paginator" style="margin-left: 77%">
+      <mat-paginator style="visibility: hidden" #paginator [pageSize]="MAX_ROWS_PER_TABLE">
+      </mat-paginator>
+      <div class="paginatorElement" (click)="goToPrevPage()" [attr.disabled]="!this.paginator.hasPreviousPage()"
+        [ngStyle]="!this.paginator.hasPreviousPage() ? {'cursor':
                         'not-allowed'} : ''">
-              <mat-icon svgIcon="prev-page" class="pageIcons" style="cursor: pointer"
-                *ngIf="this.paginator.hasPreviousPage()" style="height: 24px !important; width: 24px !important">
-              </mat-icon>
-              <mat-icon svgIcon="prev-page" class="pageIcons disabled-icon" *ngIf="!this.paginator.hasPreviousPage()"
-                style="height: 24px !important; width: 24px !important">
-              </mat-icon>
-            </div>
-            <div class="paginatorElement paginatorIndexElement">
-              {{currentPageIndex}}
-            </div>
-            <div class="paginatorElement" (click)="goToNextPage()" [attr.disabled]="!this.paginator.hasNextPage()"
-              [ngStyle]="!this.paginator.hasNextPage() ? {'cursor': 'not-allowed'}
-                        : ''">
-              <mat-icon svgIcon="next-page" style="cursor: pointer" class="pageIcons"
-                *ngIf="this.paginator.hasNextPage()" style="height: 24px !important; width: 24px !important">
-              </mat-icon>
-              <mat-icon svgIcon="next-page" class="pageIcons disabled-icon" *ngIf="!this.paginator.hasNextPage()"
-                style="height: 24px !important; width: 24px !important">
-              </mat-icon>
-            </div>
-            <div>of {{totalPages}}</div>
-          </div>
-        </div>
+        <mat-icon svgIcon="prev-page" class="pageIcons" style="cursor: pointer" *ngIf="this.paginator.hasPreviousPage()"
+          style="height: 24px !important; width: 24px !important">
+        </mat-icon>
+        <mat-icon svgIcon="prev-page" class="pageIcons disabled-icon" *ngIf="!this.paginator.hasPreviousPage()"
+          style="height: 24px !important; width: 24px !important">
+        </mat-icon>
       </div>
+      <div class="paginatorElement paginatorIndexElement">
+        {{currentPageIndex}}
+      </div>
+      <div class="paginatorElement" (click)="goToNextPage()" [attr.disabled]="!this.paginator.hasNextPage()" [ngStyle]="!this.paginator.hasNextPage() ? {'cursor': 'not-allowed'}
+                        : ''">
+        <mat-icon svgIcon="next-page" style="cursor: pointer" class="pageIcons" *ngIf="this.paginator.hasNextPage()"
+          style="height: 24px !important; width: 24px !important">
+        </mat-icon>
+        <mat-icon svgIcon="next-page" class="pageIcons disabled-icon" *ngIf="!this.paginator.hasNextPage()"
+          style="height: 24px !important; width: 24px !important">
+        </mat-icon>
+      </div>
+      <div>of {{totalPages}}</div>
     </div>
   </div>
 </div>

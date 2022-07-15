@@ -43,6 +43,8 @@ export class ReportTemplateConfig implements OnInit {
   kpiId: string;
   vType: string;
   vQuery: string;
+  inputvType: string;
+  inputvQuery: string;
   reportId: string;
   templateName: string;
   description: string;
@@ -64,6 +66,7 @@ export class ReportTemplateConfig implements OnInit {
   currentPageIndex: number = 1;
   totalPages: number = -1;
   currentPageValue: number;
+  inputDataJson:any;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   constructor(
@@ -82,6 +85,7 @@ export class ReportTemplateConfig implements OnInit {
     this.route.queryParams.subscribe((params) => {
       console.log("params:", params);
       this.receivedParam = JSON.parse(params.templateParam);
+      this.inputDataJson=this.receivedParam ;
       this.visualizationUtilList = JSON.parse(params.visualizaionUtil);
       this.templateTypeList = JSON.parse(params.templateType);
       this.chartTypes = JSON.parse(params.vType);
@@ -199,6 +203,8 @@ export class ReportTemplateConfig implements OnInit {
     this.kpiId = listData.kpiId;
     this.vType = listData.vType.substring(0, listData.vType.lastIndexOf("_"));
     this.vQuery = listData.vQuery;
+    this.inputvType = this.vType
+    this.inputvQuery = this.vQuery; 
   }
 
   deleteKpi(id: string) {
@@ -382,6 +388,14 @@ export class ReportTemplateConfig implements OnInit {
         }
       });
     }
+  }
+  resetData(){    
+    console.log(this.inputDataJson.data.kpiDetails);
+    this.description = this.inputDataJson.data.description;
+    this.visualizationUtil = this.inputDataJson.data.visualizationutil;
+    this.templateType = this.inputDataJson.data.templateType;
+    this.vType = this.inputvType
+    this.vQuery = this.inputvQuery;
   }
 
   reset() {

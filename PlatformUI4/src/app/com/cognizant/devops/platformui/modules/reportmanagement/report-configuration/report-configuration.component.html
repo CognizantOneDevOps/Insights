@@ -55,7 +55,7 @@
       <span class="btnAlignHeader">
         <button mat-icon-button (click)="validateAndSaveReportData()">
           <mat-icon
-            matTooltip="Preview And Save"
+            matTooltip="Save"
             style="margin-top: 12%"
             svgIcon="save"
             class="mat-icon material-icons"
@@ -110,6 +110,7 @@
             type="text"
             [(ngModel)]="reportName"
             name="reportName"
+            style="background: none;"
           />
         </mat-form-field>
       </div>
@@ -126,6 +127,7 @@
             type="text"
             [(ngModel)]="reportdisplayName"
             name="reportdisplayName"
+            style="background: none;"
           />
         </mat-form-field>
       </div>
@@ -145,11 +147,9 @@
           <mat-select
             [disabled]="disableInputFields"
             [(ngModel)]="selectedReport.reportId"
-            style="background: none"
             (ngModelChange)="getTemplateName()"
             required
             placeholder="Select a report template to be configured."
-            color="primary"
             [style.width.%]="100"
           >
             <mat-option
@@ -170,7 +170,7 @@
       </div>
       <div *ngIf="isROITemplate" class="columnName">
             <div class="lblCss">Milestone
-            <span style="color:#ff0000;">*</span></div>
+            <span class="asteriskText">*</span></div>
             <mat-form-field appearance="fill" class="columnComponent">
                 <mat-select [disabled]="disableInputFields" [(ngModel)]="selectedMilestone.id"
                 (ngModelChange)="getMilestoneName()" class="form-control" required placeholder="Select milestone"
@@ -233,11 +233,11 @@
       </div>
 
       <div *ngIf="showStartDate" style="margin-bottom: 6%">
-        <div class="lblCss">
+        <div class="lblText">
           Start Date (MM/DD/YYYY)<span class="asteriskText">*</span>
         </div>
         <mat-form-field
-          style="width: 93%; padding-top: 10px"
+          style="width: 93%;"
           appearance="fill"
           class="formfield-custom select-formField"
         >
@@ -245,11 +245,12 @@
             matInput
             #startDateMatInput
             [matDatepicker]="startDatePicker"
+            [(ngModel)]="startDateInput"
             required
             [max]="today"
-            [(ngModel)]="startDateInput"
             readonly
             (dateChange)="getstartDate('change', $event)"
+            placeholder="Start Date (MM/DD/YYYY)"
           />
           <mat-datepicker-toggle matSuffix [for]="startDatePicker">
             <mat-icon
@@ -268,12 +269,12 @@
       </div>
 
       <div *ngIf="customeScheduleSelected" style="margin-bottom: 6%">
-        <div class="lblCss">
+        <div class="lblText">
           End Date (MM/DD/YYYY)<span class="asteriskText">*</span>
         </div>
         <mat-form-field
           appearance="fill"
-          style="width: 93%; padding-top: 10px"
+          style="width: 93%;"
           class="formfield-custom select-formField"
         >
           <input
@@ -285,6 +286,7 @@
             [(ngModel)]="endDateInput"
             readonly
             (dateChange)="getendDate('change', $event)"
+            placeholder="End Date (MM/DD/YYYY)"
           />
           <mat-datepicker-toggle matSuffix [for]="endDatePicker">
             <mat-icon
@@ -298,7 +300,7 @@
       </div>
 
       <div class="columnName">
-        <div class="lblCss">
+        <div class="lblText">
           Add Task<span class="asteriskText">*</span>
           <span style="color: #77777b; font-size: 12px"
             >(Add tasks associated to workflow.)</span

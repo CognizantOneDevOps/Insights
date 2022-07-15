@@ -202,7 +202,7 @@ public class H2oApiCommunicator {
 	 * @param responseColumn
 	 * @return
 	 */
-	public String runAutoML(String modelName, String trainingFrame, String validationFrame, String responseColumn,
+	public String runAutoML(String modelName, String trainingFrame, String responseColumn,
 			String numOfModels) throws InsightsCustomException {
 		try {
 			log.debug("Building AutoML:{} ", modelName);
@@ -368,40 +368,7 @@ public class H2oApiCommunicator {
 					log.debug("In getDataFrame ==== parameter count exceeds max limit {}",rowprocesscount);
 					break;
 				}
-				for (JsonElement c : columns) {
-					JsonObject column = c.getAsJsonObject();
-					String label = column.get("label").getAsString();
-					if (label.equals("C1"))
-						break;
-					JsonArray columnData = new JsonArray();
-					if (column.get("type").getAsString().equals("string")
-							|| column.get("type").getAsString().equals("uuid"))
-						columnData = column.getAsJsonArray("string_data");
-					else if (column.get("type").getAsString().equals("enum")) {
-						JsonArray domain = column.getAsJsonArray("domain");
-						JsonArray encodedData = column.getAsJsonArray("data");
-						for (JsonElement e : encodedData) {
-							if (e.getAsString().equals("NaN"))
-								columnData.add("NaN");
-							else {
-								columnData.add(domain.get(e.getAsInt()));
-							}
-						}
-					} else if (column.get("type").getAsString().equals("time")) {
-						for (JsonElement e : column.getAsJsonArray("data")) {
-							if (e.getAsString().equals("NaN"))
-								columnData.add("NaN");
-							else {
-								columnData.add(
-										new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(e.getAsLong())));
-							}
-						}
-					} else
-					{
-						columnData = column.getAsJsonArray("data");
-					}
-					row.add(label, columnData.get(i));
-				}
+				row = prepareRowData(columns,i);
 				data.add(row);
 				rowprocesscount++;
 			}
@@ -409,6 +376,60 @@ public class H2oApiCommunicator {
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
+		}
+	}
+
+private JsonObject prepareRowData(JsonArray columns, int i) {
+	
+	JsonObject rowdata = new JsonObject();
+	
+	for (JsonElement c : columns) {
+		JsonObject column = c.getAsJsonObject();
+		String label = column.get("label").getAsString();
+		if (label.equals("C1"))
+			break;
+		JsonArray columnData = new JsonArray();
+		if (column.get("type").getAsString().equals("string")
+				|| column.get("type").getAsString().equals("uuid"))
+			columnData = column.getAsJsonArray("string_data");
+		else if (column.get("type").getAsString().equals("enum")) {
+			JsonArray domain = column.getAsJsonArray("domain");
+			JsonArray encodedData = column.getAsJsonArray("data");
+			
+			addColumnDataForEnum(columnData, domain, encodedData);
+			
+		} else if (column.get("type").getAsString().equals("time")) {
+			
+			addColumnDataForTime(column, columnData);
+			
+		} else
+		{
+			columnData = column.getAsJsonArray("data");
+		}
+		rowdata.add(label, columnData.get(i));
+	}
+	return rowdata;
+}
+	
+	private void addColumnDataForTime(JsonObject column, JsonArray columnData) {
+		for (JsonElement e : column.getAsJsonArray("data")) {
+			if (e.getAsString().equals("NaN"))
+				columnData.add("NaN");
+			else {
+				columnData.add(
+						new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(e.getAsLong())));
+			}
+		}
+	}
+
+
+	private void addColumnDataForEnum(JsonArray columnData, JsonArray domain, JsonArray encodedData) {
+		for (JsonElement e : encodedData) {
+			if (e.getAsString().equals("NaN"))
+				columnData.add("NaN");
+			else {
+				columnData.add(domain.get(e.getAsInt()));
+			}
 		}
 	}
 

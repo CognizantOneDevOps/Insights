@@ -16,15 +16,15 @@
 
 package com.cognizant.devops.platformservice.rest.datadictionary.service;
 
-public interface DataDictionaryConstants {
+public final class DataDictionaryConstants {
 
-	String GET_TOOL_PROPERTIES_QUERY = "MATCH(n:__CategoryName__:__labelName__:DATA) with n limit 10000 with keys(n) as keys "
+	public static final String GET_TOOL_PROPERTIES_QUERY = "MATCH(n:__CategoryName__:__labelName__:DATA) with n limit 10000 with keys(n) as keys "
 			+ "unwind keys as key with key return collect(distinct key) as keys";
-	String GET_TOOLS_RELATIONSHIP_QUERY = "MATCH (n:__StartToolCategory__:__StartLabelName__)-[r]->"
+	public static final String GET_TOOLS_RELATIONSHIP_QUERY = "MATCH (n:__StartToolCategory__:__StartLabelName__)-[r]->"
 			+ "(m:__EndToolCategory__:__EndLabelName__) return distinct type(r)";
-	String UUID = "uuid";
-	String EXEC_ID = "execId";
-	String TOOLNAME="toolName";
-	String CATEGORYNAME= "categoryName";
-	String LABELNAME ="labelName";
+	public static final String UUID = "uuid";
+	public static final String EXEC_ID = "execId";
+	public static final String TOOLNAME="toolName";
+	public static final String CATEGORYNAME= "categoryName";
+	public static final String LABELNAME ="labelName";
 }

@@ -453,7 +453,7 @@ export class MenuItem {
       {
         displayName: 'About',
         iconName: 'info',
-        isToolbarDisplay: false,
+        isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
         showIcon: false,
         title: "About",
         showMenu: true,
@@ -461,7 +461,7 @@ export class MenuItem {
       }, {
         displayName: 'Help',
         iconName: 'help',
-        isToolbarDisplay: false,
+        isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
         showIcon: false,
         title: "Help",
         showMenu: true,
@@ -470,7 +470,7 @@ export class MenuItem {
         displayName: 'Logout',
         iconName: 'logout',
         route: 'login',
-        isToolbarDisplay: false,
+        isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
         showIcon: this.dataShare.getlogoutDisplay(),
         title: "Logout",
         showMenu: this.dataShare.getlogoutDisplay(),

@@ -15,17 +15,16 @@
 ******************************************************************************/
 package com.cognizant.devops.platformcommons.constants;
 
-public interface EngineConstants {
+public final class EngineConstants {
 
-	String EXECID = "execId";
-	String ROUTING_KEY = "routingKey";
-	String SET = " set ";
-	String SUBSCRIBED = " subscribed successfully ";
-	String SOURCE_TOOL = "sourceTool";
-	String DESTINATION_TOOL = "destinationTool";
-	String CORRELATION_NAME = "correlationName";
-	//SonarQube_Fixes
-	String FILENAME="fileName";
-	String QUERYNAME="queryName";
+	public static final String EXECID = "execId";
+	public static final String ROUTING_KEY = "routingKey";
+	public static final String SET = " set ";
+	public static final String SUBSCRIBED = " subscribed successfully ";
+	public static final String SOURCE_TOOL = "sourceTool";
+	public static final String DESTINATION_TOOL = "destinationTool";
+	public static final String CORRELATION_NAME = "correlationName";
+	public static final String FILENAME="fileName";
+	public static final String QUERYNAME="queryName";
 
 }

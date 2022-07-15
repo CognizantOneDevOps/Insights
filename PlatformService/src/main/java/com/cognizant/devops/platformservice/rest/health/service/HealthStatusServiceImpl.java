@@ -66,7 +66,7 @@ public class HealthStatusServiceImpl  {
 		JsonObject servicesAgentsHealthStatus = new JsonObject();
 		try {
 			JsonObject jsonAgentStatus = healthUtil.getAgentsStatus();
-			servicesAgentsHealthStatus.add(ServiceStatusConstants.Agents, jsonAgentStatus);
+			servicesAgentsHealthStatus.add(ServiceStatusConstants.AGENTS, jsonAgentStatus);
 		} catch (Exception e) {
 			log.error("Error occured while fetching agent health status {}", e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
@@ -88,12 +88,12 @@ public class HealthStatusServiceImpl  {
 			final int MAX_RECORD = 10;
 			log.debug(" message tool name {}  {}  {} ", category, tool, agentId);
 			StringBuilder label = new StringBuilder("HEALTH");
-			if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformService)) {
+			if (category.equalsIgnoreCase(ServiceStatusConstants.PLATFORM_SERVICE)) {
 				label.append(":").append("INSIGHTS_PLATFORMSERVICE");
-			} else if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformEngine)) {
+			} else if (category.equalsIgnoreCase(ServiceStatusConstants.PLATFORM_ENGINE)) {
 				label.append(":").append("ENGINE");
 			} 
-			else if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformWorkflow)) {
+			else if (category.equalsIgnoreCase(ServiceStatusConstants.PLATFORM_WORKFLOW)) {
 					label.append(":").append("INSIGHTS_WORKFLOW");
 			} 
 			else {

@@ -21,6 +21,8 @@ import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,15 +59,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class RestApiHandler {
-	
+
 	private static Logger log = LogManager.getLogger(RestApiHandler.class);
-	
+
 	static Client client ;
 	static Client multipartClient;
 	static {
 		try {
-			
-		
+
+
 			initializeClient();
 		} catch (Exception e) {
 			log.error(e);
@@ -84,9 +86,9 @@ public class RestApiHandler {
 		try {
 			TrustManager[] trustManager = new X509TrustManager[] { new X509TrustManager() {
 
-			    @Override
-			    public X509Certificate[] getAcceptedIssuers() {
-			    	X509Certificate[] myTrustedAnchors = new X509Certificate[0];
+				@Override
+				public X509Certificate[] getAcceptedIssuers() {
+					X509Certificate[] myTrustedAnchors = new X509Certificate[0];
 					for (X509Certificate cert : myTrustedAnchors) {
 						try {
 							cert.checkValidity();
@@ -95,29 +97,32 @@ public class RestApiHandler {
 						}
 					}
 					return myTrustedAnchors;
-			    }
+				}
 
-			    @Override
-			    public void checkClientTrusted(X509Certificate[] certs, String authType) throws CertificateException {
-						try {
-							for (X509Certificate cert : certs) {
-								cert.checkValidity();
-							}
-						} catch (Exception e) {
-							log.error(e);
-						}
-			    }
+				@Override
+				public void checkClientTrusted(X509Certificate[] certs, String authType) throws CertificateException {
+					try {
+						checkCertValidity(certs);
+					} catch (Exception e) {
+						log.error(e);
+					}
+				}
 
-			    @Override
-			    public void checkServerTrusted(X509Certificate[] certs, String authType) throws CertificateException {
-						try {
-							for (X509Certificate cert : certs) {
-								cert.checkValidity();
-							}
-						} catch (Exception e) {
-							log.error(e);
-						}
-			    }
+				private void checkCertValidity(X509Certificate[] certs)
+						throws CertificateExpiredException, CertificateNotYetValidException {
+					for (X509Certificate cert : certs) {
+						cert.checkValidity();
+					}
+				}
+
+				@Override
+				public void checkServerTrusted(X509Certificate[] certs, String authType) throws CertificateException {
+					try {
+						checkCertValidity(certs);
+					} catch (Exception e) {
+						log.error(e);
+					}
+				}
 			}};
 			sslContext = SSLContext.getInstance("TLS");
 			sslContext.init(null, trustManager, null);
@@ -187,6 +192,19 @@ public class RestApiHandler {
 		return getRequestBuilder(url, requestJson, headers, HttpMethod.PATCH);
 	}
 
+
+	/**
+	 * @param url
+	 * @param requestJson
+	 * @param headers
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	public static String doPut(String url, JsonObject requestJson, Map<String, String> headers)
+			throws InsightsCustomException {
+		return getRequestBuilder(url, requestJson, headers, HttpMethod.PUT);
+	}
+
 	/**
 	 * @param url
 	 * @param requestJson
@@ -204,21 +222,8 @@ public class RestApiHandler {
 		try {
 			webTarget = client.target(url);
 			invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
-			if (headers != null && headers.size() > 0) {
-				for (Map.Entry<String, String> entry : headers.entrySet()) {
-					invocationBuilder = invocationBuilder.header(entry.getKey(), entry.getValue());
-				}
-			}
-			if (HttpMethod.POST.equalsIgnoreCase(action)) {
-				response = invocationBuilder.post(Entity.json(requestJson.toString()), Response.class);
-			} else if (HttpMethod.GET.equalsIgnoreCase(action)) {
-				response = invocationBuilder.get(Response.class);
-			} else if (HttpMethod.DELETE.equalsIgnoreCase(action)) {
-				response = invocationBuilder.delete();
-			} else if (HttpMethod.PATCH.equalsIgnoreCase(action)) {
-				response = invocationBuilder.property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
-						.method("PATCH", Entity.json(requestJson.toString()));
-			}
+			invocationBuilder = invocationBuilderSetter(headers, invocationBuilder);
+			response = responseSetter(requestJson, action, invocationBuilder, response);
 
 			if (response != null) {
 				returnStr = response.readEntity(String.class);
@@ -253,6 +258,24 @@ public class RestApiHandler {
 		return returnStr;
 	}
 
+	private static Response responseSetter(JsonObject requestJson, String action, Builder invocationBuilder,
+			Response response) {
+		if (HttpMethod.POST.equalsIgnoreCase(action)) {
+			response = invocationBuilder.post(Entity.json(requestJson.toString()), Response.class);
+		} else if (HttpMethod.GET.equalsIgnoreCase(action)) {
+			response = invocationBuilder.get(Response.class);
+		} else if (HttpMethod.DELETE.equalsIgnoreCase(action)) {
+			response = invocationBuilder.delete();
+		} else if (HttpMethod.PATCH.equalsIgnoreCase(action)) {
+			response = invocationBuilder.property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
+					.method("PATCH", Entity.json(requestJson.toString()));
+		}else if (HttpMethod.PUT.equalsIgnoreCase(action)) {
+			response = invocationBuilder.property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
+					.method("PUT", Entity.json(requestJson.toString()));
+		}
+		return response;
+	}
+
 	
 	public static String httpQueryParamRequest(String url, JsonObject queryParams, Map<String, String> headers,String action) throws InsightsCustomException {
 		String data = null;
@@ -269,11 +292,7 @@ public class RestApiHandler {
 				}
 			}
 			invocationBuilder = webTarget.request();
-			if (headers != null && !headers.isEmpty()) {
-				for (Map.Entry<String, String> entry : headers.entrySet()) {
-					invocationBuilder = invocationBuilder.header(entry.getKey(), entry.getValue());
-				}
-			}
+			invocationBuilder = setInvocationBuilder(headers, invocationBuilder);
 			if (HttpMethod.POST.equalsIgnoreCase(action)) {
 				response = invocationBuilder.post(null, Response.class);
 			} else if (HttpMethod.GET.equalsIgnoreCase(action)) {
@@ -308,8 +327,17 @@ public class RestApiHandler {
 		}
 		return data;
 	}
-	
-	
+
+	private static Builder setInvocationBuilder(Map<String, String> headers, Builder invocationBuilder) {
+		if (headers != null && !headers.isEmpty()) {
+			for (Map.Entry<String, String> entry : headers.entrySet()) {
+				invocationBuilder = invocationBuilder.header(entry.getKey(), entry.getValue());
+			}
+		}
+		return invocationBuilder;
+	}
+
+
 	/**
 	 * @param url
 	 * @param requestJson
@@ -326,11 +354,7 @@ public class RestApiHandler {
 		try {
 			webTarget = client.target(url);
 			invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
-			if (headers != null && headers.size() > 0) {
-				for (Map.Entry<String, String> entry : headers.entrySet()) {
-					invocationBuilder = invocationBuilder.header(entry.getKey(), entry.getValue());
-				}
-			}
+			invocationBuilder = invocationBuilderSetter(headers, invocationBuilder);
 
 			response = invocationBuilder.post(Entity.json(requestJson.toString()), Response.class);
 
@@ -359,18 +383,19 @@ public class RestApiHandler {
 	 * @param headers
 	 * @return
 	 * @throws InsightsCustomException
+	 * @throws IOException 
 	 */
 	public static InputStream uploadMultipartFile(String url, Map<String, String> multipartFiles,
 			Map<String, String> multipartFileData,
 			Map<String, String> headers, String returnMediaType)
-			throws InsightsCustomException {
+					throws InsightsCustomException, IOException {
 		InputStream retunInputStream = null;
 		Builder invocationBuilder = null;
 		Response response = null;
 		WebTarget webTarget = null;
 		FileDataBodyPart filePart = null;
-		FormDataMultiPart formDataMultiPart = new FormDataMultiPart();
-		try {
+		//FormDataMultiPart formDataMultiPart = new FormDataMultiPart();
+		try(FormDataMultiPart formDataMultiPart = new FormDataMultiPart();) {
 
 			if (multipartFiles != null && multipartFiles.size() > 0) {
 				for (Map.Entry<String, String> entry : multipartFiles.entrySet()) {
@@ -378,23 +403,14 @@ public class RestApiHandler {
 				}
 			}
 
-
-			if (multipartFileData != null && multipartFileData.size() > 0) {
-				for (Map.Entry<String, String> entry : multipartFileData.entrySet()) {
-					formDataMultiPart = formDataMultiPart.field(entry.getKey(), entry.getValue());
-				}
-			}
+			processFormDataMultiPart(multipartFileData,formDataMultiPart);
 
 			formDataMultiPart.bodyPart(filePart);
 
 			webTarget = multipartClient.target(url);
 			invocationBuilder = webTarget.request().accept(returnMediaType);
 
-			if (headers != null && headers.size() > 0) {
-				for (Map.Entry<String, String> entry : headers.entrySet()) {
-					invocationBuilder = invocationBuilder.header(entry.getKey(), entry.getValue());
-				}
-			}
+			invocationBuilder = invocationBuilderSetter(headers, invocationBuilder); 
 
 			response = invocationBuilder.post(Entity.entity(formDataMultiPart, formDataMultiPart.getMediaType()));
 
@@ -409,16 +425,26 @@ public class RestApiHandler {
 		} catch (Exception e) {
 			log.error("Error while connecting to server..", e);
 			throw new InsightsCustomException(e.getMessage());
-		} finally {
-			if (formDataMultiPart != null) {
-				try {
-					formDataMultiPart.close();
-				} catch (IOException e) {
-					log.error("Issue closing formdatamultipart ",e);
-				}
-			}
 		}
 		return retunInputStream;
+	}
+
+	private static void processFormDataMultiPart(Map<String, String> multipartFileData, FormDataMultiPart formDataMultiPart) {
+
+		if (multipartFileData != null && multipartFileData.size() > 0) {
+			for (Map.Entry<String, String> entry : multipartFileData.entrySet()) {
+				formDataMultiPart = formDataMultiPart.field(entry.getKey(), entry.getValue());
+			}
+		}
+	}
+
+	private static Builder invocationBuilderSetter(Map<String, String> headers, Builder invocationBuilder) {
+		if (headers != null && headers.size() > 0) {
+			for (Map.Entry<String, String> entry : headers.entrySet()) {
+				invocationBuilder = invocationBuilder.header(entry.getKey(), entry.getValue());
+			}
+		}
+		return invocationBuilder;
 	}
 
 	/**
@@ -439,11 +465,7 @@ public class RestApiHandler {
 		try {
 			webTarget = multipartClient.target(url);
 			invocationBuilder = webTarget.request();
-			if (headers != null && headers.size() > 0) {
-				for (Map.Entry<String, String> entry : headers.entrySet()) {
-					invocationBuilder = invocationBuilder.header(entry.getKey(), entry.getValue());
-				}
-			}
+			invocationBuilder = invocationBuilderSetter(headers, invocationBuilder);
 			response =invocationBuilder.get();
 			if (response.getStatus() != 200) {
 				throw new InsightsCustomException(
@@ -460,19 +482,19 @@ public class RestApiHandler {
 		return retunInputStream;
 	}
 
-	
-	
+
+
 	public static String uploadMultipartFileWithData(String url, Map<String, String> multipartFiles,
 			Map<String, String> multipartFileData,
 			Map<String, String> headers, String returnMediaType)
-			throws InsightsCustomException {
+					throws InsightsCustomException, IOException {
 		String returnData = null;
 		Builder invocationBuilder = null;
 		Response response = null;
 		WebTarget webTarget = null;
 		FileDataBodyPart filePart = null;
-		FormDataMultiPart formDataMultiPart = new FormDataMultiPart();
-		try {
+		//FormDataMultiPart formDataMultiPart = new FormDataMultiPart();
+		try(FormDataMultiPart formDataMultiPart = new FormDataMultiPart();) {
 
 			if (multipartFiles != null && multipartFiles.size() > 0) {
 				for (Map.Entry<String, String> entry : multipartFiles.entrySet()) {
@@ -481,21 +503,13 @@ public class RestApiHandler {
 				}
 			}
 
+			getUploadMulipartWithData(multipartFileData,formDataMultiPart);	
 
-			if (multipartFileData != null && multipartFileData.size() > 0) {
-				for (Map.Entry<String, String> entry : multipartFileData.entrySet()) {
-					formDataMultiPart = formDataMultiPart.field(entry.getKey(), entry.getValue());
-				}
-			}		
 			formDataMultiPart.setMediaType(MediaType.MULTIPART_FORM_DATA_TYPE);
 			webTarget = multipartClient.target(url);
 			invocationBuilder = webTarget.request().accept(returnMediaType);
 
-			if (headers != null && headers.size() > 0) {
-				for (Map.Entry<String, String> entry : headers.entrySet()) {
-					invocationBuilder = invocationBuilder.header(entry.getKey(), entry.getValue());
-				}
-			}
+			invocationBuilder = invocationBuilderSetter(headers, invocationBuilder);
 
 			response = invocationBuilder.post(Entity.entity(formDataMultiPart, formDataMultiPart.getMediaType()));
 
@@ -509,17 +523,17 @@ public class RestApiHandler {
 		} catch (Exception e) {
 			log.error("Error while connecting to server : ", e);
 			throw new InsightsCustomException(e.getMessage());
-		} finally {
-			if (formDataMultiPart != null) {
-				try {
-					formDataMultiPart.close();
-				} catch (IOException e) {
-					log.error(e);
-				}
-			}
 		}
 		return returnData;
 	}
 
-	
+	private static void getUploadMulipartWithData(Map<String, String> multipartFileData, FormDataMultiPart formDataMultiPart) {
+
+		if (multipartFileData != null && multipartFileData.size() > 0) {
+			for (Map.Entry<String, String> entry : multipartFileData.entrySet()) {
+				formDataMultiPart = formDataMultiPart.field(entry.getKey(), entry.getValue());
+			}
+		}	
+
+	}
 }

@@ -28,7 +28,13 @@
           <mat-form-field appearance="fill" class="formfield-custom">
             <input matInput #startDateMatInput [matDatepicker]="startDatePicker" required [max]="today"
               (dateChange)="getStartDate($event)" placeholder="Start Date (MM/DD/YYYY)" disabled>
-            <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker-toggle matSuffix [for]="startDatePicker">
+              <mat-icon
+                matDatepickerToggleIcon
+                svgIcon="calendar"
+                class="iconClr"
+              ></mat-icon>
+            </mat-datepicker-toggle>
             <mat-datepicker #startDatePicker startView="month" [startAt]="startDate" [disabled]="false">
             </mat-datepicker>
           </mat-form-field>
@@ -39,7 +45,13 @@
           <mat-form-field appearance="fill" class="formfield-custom">
             <input matInput #endDateMatInput [matDatepicker]="endDatePicker" required [max]="today"
               (dateChange)="getEndDate($event)" placeholder="End Date (MM/DD/YYYY)" disabled>
-            <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker-toggle matSuffix [for]="endDatePicker">
+              <mat-icon
+                matDatepickerToggleIcon
+                svgIcon="calendar"
+                class="iconClr"
+              ></mat-icon>
+              </mat-datepicker-toggle>
             <mat-datepicker #endDatePicker [disabled]="false"></mat-datepicker>
           </mat-form-field>
         </div>

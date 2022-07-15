@@ -1,0 +1,167 @@
+#-------------------------------------------------------------------------------
+# Copyright 2017 Cognizant Technology Solutions
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License.  You may obtain a copy
+# of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+# License for the specific language governing permissions and limitations under
+# the License.
+#-------------------------------------------------------------------------------
+
+version: '3.8'
+
+services:
+  postgres:
+    build:
+      context: ./postgres
+      dockerfile: Dockerfile
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "postgres" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+    restart: always
+    env_file:
+      - ./postgres/config.env
+    volumes:
+      - $VOL_PATH/InsightsData/postgres/data:/var/lib/postgresql/data
+      - ./postgres/postgresql.conf:/etc/postgresql.conf
+      - ./postgres/pg_hba.conf:/etc/pg_hba.conf
+    ports:
+      - 35432:5432
+    command: postgres -c config_file=/etc/postgresql.conf -c hba_file=/etc/pg_hba.conf
+
+  neo4j:
+    image: neo4j:4.4.4-community
+    volumes:
+      - $VOL_PATH/InsightsData/neo4j/data:/data
+      - $VOL_PATH/InsightsData/neo4j/logs:/logs
+      - $VOL_PATH/InsightsData/neo4j/conf:/conf
+    env_file:
+      - ./neo4j/config.env
+    healthcheck:
+      test: ["CMD", "cypher-shell", "match (n) return count(n)"]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+      start_period: 40s
+    ports:
+      - 7474:7474
+      - 7687:7687
+
+  grafana:
+    build:
+      context: ./grafana
+      dockerfile: Dockerfile
+    env_file:
+      - ./grafana/config.env
+    healthcheck:
+      test: curl --fail -s http://localhost:30000/api/healthy || exit 1
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+    volumes:
+       - ./grafana/ldap.toml:/opt/grafana/conf/ldap.toml
+       - $VOL_PATH/InsightsData/grafana/logs:/usr/INSIGHTS_HOME/logs
+    depends_on:
+      - postgres
+    ports:
+      - 30000:3000
+      - 31000:3100
+
+  rabbitmq:
+    build:
+      context: ./rabbitmq
+      dockerfile: Dockerfile
+    volumes:
+      - $VOL_PATH/InsightsData/rabbitmq/data:/var/lib/rabbitmq
+      - $VOL_PATH/InsightsData/rabbitmq/log:/var/log/rabbitmq
+    env_file:
+      - ./rabbitmq/config.env
+    hostname: rabbitmqtest
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 10
+    ports:
+      - 5672:5672
+      - 15672:15672
+      - 25672:25672
+      - 5671:5671
+
+
+  serviceui:
+    build:
+      context: ./servicenui
+      dockerfile: Dockerfile
+    env_file:
+      - ./servicenui/config.env
+    depends_on:
+      - grafana
+      - neo4j
+      - rabbitmq
+    volumes:
+      -  $VOL_PATH/InsightsData/servicenui/logs:/usr/INSIGHTS_HOME/logs
+      -  serverconfig:/usr/INSIGHTS_HOME/.InSights
+    ports:
+      - 38080:8080
+
+  engine:
+    build:
+      context: ./engine
+      dockerfile: Dockerfile
+    depends_on:
+      - neo4j
+      - rabbitmq
+    volumes:
+      -  $VOL_PATH/InsightsData/engine/logs:/usr/INSIGHTS_HOME/logs
+      -  serverconfig:/usr/INSIGHTS_HOME/.InSights
+    env_file:
+      - ./engine/config.env
+
+  agentwebhook:
+    build:
+      context: ./agentswebhooks
+      dockerfile: Dockerfile
+    volumes:
+      - $VOL_PATH/InsightsData/agentswebhook/data:/opt/insightsagents/PlatformAgents
+      - $VOL_PATH/InsightsData/agentswebhook/logs:/usr/INSIGHTS_HOME/logs
+      - agentinitscripts:/etc/init.d
+    env_file:
+      - ./agentswebhooks/config.env
+    depends_on:
+      - rabbitmq
+    ports:
+      - 8981:8981
+
+  h2o:
+    build:
+      context: ./h2o
+      dockerfile: Dockerfile
+    volumes:
+      - $VOL_PATH/InsightsData/h2o/logs:/usr/INSIGHTS_HOME/logs
+    ports:
+      - 54321:54321
+
+  elasticsearch:
+    build:
+      context: ./elasticsearch
+      dockerfile: Dockerfile
+    volumes:
+      - $VOL_PATH/InsightsData/elasticsearch/logs:/usr/share/elasticsearch/logs
+      - ./elasticsearch/log4j2.properties:/usr/share/elasticsearch/config/log4j2.properties
+      - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    ports:
+      - 9200:9200
+
+
+volumes:
+  serverconfig:
+  agentinitscripts:

@@ -22,6 +22,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowExecutionHistory;
 
@@ -152,6 +153,22 @@ public class GrafanaDashboardPdfConfigDAL extends BaseDAL {
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
+		}
+	}
+	
+	public String getWorkflowIdByTitle(String title) throws InsightsCustomException
+	{
+		try {
+			log.debug(title);
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("title", title);
+			GrafanaDashboardPdfConfig result = getUniqueResult( "FROM GrafanaDashboardPdfConfig a WHERE a.title = :title",
+					GrafanaDashboardPdfConfig.class,
+					parameters);
+			return result.getWorkflowConfig().getWorkflowId();
+		} catch (Exception e) {
+			log.error(e);
+			throw new InsightsCustomException("Error, Unable to find Workflow by title = "  + title + " at getWorkflowIdByTitle");
 		}
 	}
 	

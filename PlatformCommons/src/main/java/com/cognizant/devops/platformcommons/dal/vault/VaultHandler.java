@@ -71,7 +71,7 @@ public class VaultHandler {
 			response = RestApiHandler.doPost(url, requestJson, headers);
 
 		} catch (Exception e) {
-			log.error("Error while Storing data to vault  {} ", e);
+			log.error("Error while Storing data to vault  {} ", e.getMessage()); 
 			throw new InsightsCustomException(e.getMessage());
 		}
 		return response;
@@ -90,7 +90,7 @@ public class VaultHandler {
 			response = RestApiHandler.doPost(url, requestJson, headers);
 
 		} catch (Exception e) {
-			log.error("Error while Storing date to vault with database  {} ", e);
+			log.error("Error while Storing date to vault with database  {} ", e .getMessage());  
 			throw new InsightsCustomException(e.getMessage());
 		}
 		return response;
@@ -113,7 +113,8 @@ public class VaultHandler {
 				throw new InsightsCustomException("Vault_sealed : Vault is not ready, make sure vault is unsealed ");
 			}
 		} catch (Exception e) {
-			log.error("Error while Storing date to vault with database  {} ", e);
+			//log.error("Error while Storing date to vault with database  {} ", e); 
+			log.error("Error while Storing date to vault with database  {} ", e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
 		}
 		return response;
@@ -162,7 +163,7 @@ public class VaultHandler {
 			headers.put(PlatformServiceConstants.VAULT_TOKEN, vaultToken);
 			data = RestApiHandler.doGet(url, headers);
 		} catch (RestAPI404Exception e) {
-			log.error(" Data not present in vault {}-- ", e);
+			log.error(" Data not present in vault {}-- ", e.getMessage());
 			throw new InsightsCustomException("Data not present in vault");
 		}catch (Exception e) {
 			log.error("Error while fetching secret from vault -- ", e);
@@ -185,9 +186,9 @@ public class VaultHandler {
 			}
 			vaultStatusRet = Boolean.TRUE;
 		} catch (RestAPI404Exception e) {
-			log.error(" Data not present in vault {}-- ", e);
+			log.error(" Data not present in vault {}-- ", e.getMessage());
 		}catch (ProcessingException |InsightsCustomException e) {
-			log.error("Error while fetching secret from vault {}-- ", e);
+			log.error("Error while fetching secret from vault {}-- ", e.getMessage());
 			throw e;
 		}
 		return vaultStatusRet;
@@ -209,7 +210,7 @@ public class VaultHandler {
 			String url = VAULT_URL + vaultId;
 			data = RestApiHandler.doGet(url, headers);
 		} catch (Exception e) {
-			log.error("Error while fetching secret from vault {}-- ", e);
+			log.error("Error while fetching secret from vault {}-- ", e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
 		}
 		return data;
@@ -225,7 +226,7 @@ public class VaultHandler {
 			requestJson.add("data", dataJson);
 			response = RestApiHandler.doPost(url, requestJson, headers);
 		} catch (Exception e) {
-			log.error("Error while Storing to vault agent {} ", e);
+			log.error("Error while Storing to vault agent {} ", e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
 		}
 		return response;

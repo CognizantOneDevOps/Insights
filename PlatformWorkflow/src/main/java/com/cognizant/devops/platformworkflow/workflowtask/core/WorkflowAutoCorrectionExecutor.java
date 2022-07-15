@@ -58,118 +58,8 @@ public class WorkflowAutoCorrectionExecutor implements Job, ApplicationConfigInt
 			List<InsightsWorkflowConfiguration> activeWorkflowList = workflowDAL.getAllActiveWorkflowConfiguration();
 
 			for (InsightsWorkflowConfiguration eachWorkflow : activeWorkflowList) {
-
-				long currentTime = InsightsUtils.getCurrentTimeInSeconds();
-				long nextRunTime = eachWorkflow.getNextRun();
-				workflowId = eachWorkflow.getWorkflowId();
-				status = eachWorkflow.getStatus();
-				schedule = eachWorkflow.getScheduleType();
-				workflowType =eachWorkflow.getWorkflowType();
-				lastruntime = eachWorkflow.getLastRun();				
-
-				/*
-				 * First check if current time is greater than nextruntime if yes then calculate
-				 * correction based on diff between current date and nextruntime based on diff
-				 * add specific days based on schedule and update nextruntime
-				 */
-				if (eachWorkflow.getScheduleType().equalsIgnoreCase(WorkflowTaskEnum.WorkflowSchedule.DAILY.name())) {
-					if (currentTime > nextRunTime) {
-						long diff = InsightsUtils.getDurationInDays(nextRunTime);
-						if (diff >= 1) {
-							adjustedNextRunTime = InsightsUtils.addDaysInGivenTime(nextRunTime, diff + 1);
-						}
-
-					}
-				} else if (eachWorkflow.getScheduleType()
-						.equalsIgnoreCase(WorkflowTaskEnum.WorkflowSchedule.WEEKLY.name())) {
-
-					long diff = InsightsUtils.getDurationInDays(nextRunTime);
-					if (diff >= 7) {
-						long noOfWeeks = InsightsUtils.getScheduleWiseDuration(nextRunTime, currentTime,
-								WorkflowTaskEnum.WorkflowSchedule.WEEKLY.name());
-						adjustedNextRunTime = InsightsUtils.addTimeInCurrentTime(nextRunTime, WEEKS, noOfWeeks);
-
-					}
-				}
-
-				else if (eachWorkflow.getScheduleType()
-						.equalsIgnoreCase(WorkflowTaskEnum.WorkflowSchedule.BI_WEEKLY_SPRINT.name())) {
-
-					long diff = InsightsUtils.getDurationInDays(nextRunTime);
-					if (diff >= 14) {
-						long noOfSprints = InsightsUtils.getScheduleWiseDuration(nextRunTime, currentTime,
-								WorkflowTaskEnum.WorkflowSchedule.BI_WEEKLY_SPRINT.name()) / 2;
-						adjustedNextRunTime = InsightsUtils.addTimeInCurrentTime(nextRunTime, WEEKS, noOfSprints * 2);
-
-					}
-				} else if (eachWorkflow.getScheduleType()
-						.equalsIgnoreCase(WorkflowTaskEnum.WorkflowSchedule.TRI_WEEKLY_SPRINT.name())) {
-
-					long diff = InsightsUtils.getDurationInDays(nextRunTime);
-					if (diff >= 21) {
-						long noOfSprints = InsightsUtils.getScheduleWiseDuration(nextRunTime, currentTime,
-								"TRI_WEEKLY_SPRINT") / 3;
-						adjustedNextRunTime = InsightsUtils.addTimeInCurrentTime(nextRunTime, WEEKS, noOfSprints * 3);
-
-					}
-				} else if (eachWorkflow.getScheduleType()
-						.equalsIgnoreCase(WorkflowTaskEnum.WorkflowSchedule.MONTHLY.name())) {
-
-					long lenghtOfMonth = InsightsUtils.getMonthDays(nextRunTime);
-					long diff = InsightsUtils.getDurationInDays(nextRunTime);
-					if (diff >= lenghtOfMonth) {
-						long noOfMonths = InsightsUtils.getScheduleWiseDuration(nextRunTime, currentTime,
-								WorkflowTaskEnum.WorkflowSchedule.MONTHLY.name());
-						adjustedNextRunTime = InsightsUtils.addTimeInCurrentTime(nextRunTime, MONTHS, noOfMonths);
-
-					}
-				} else if (eachWorkflow.getScheduleType()
-						.equalsIgnoreCase(WorkflowTaskEnum.WorkflowSchedule.QUARTERLY.name())) {
-
-					long lenghtOfQuarter = InsightsUtils.getDaysInQuarter(nextRunTime);
-					long diff = InsightsUtils.getDurationInDays(nextRunTime);
-					if (diff >= lenghtOfQuarter) {
-						long noOfQuarters = InsightsUtils.getScheduleWiseDuration(nextRunTime, currentTime,
-								WorkflowTaskEnum.WorkflowSchedule.QUARTERLY.name()) / 3;
-						adjustedNextRunTime = InsightsUtils.addTimeInCurrentTime(nextRunTime, MONTHS, noOfQuarters * 3);
-					}
-				} else if (eachWorkflow.getScheduleType()
-						.equalsIgnoreCase(WorkflowTaskEnum.WorkflowSchedule.YEARLY.name())) {
-
-					long lenghtOfYear = InsightsUtils.getLengthOfYear(nextRunTime);
-					long diff = InsightsUtils.getDurationInDays(nextRunTime);
-					if (diff >= lenghtOfYear) {
-						long noOfYears = InsightsUtils.getScheduleWiseDuration(nextRunTime, currentTime,
-								WorkflowTaskEnum.WorkflowSchedule.YEARLY.name());
-						adjustedNextRunTime = InsightsUtils.addTimeInCurrentTime(nextRunTime, YEARS, noOfYears);
-					}
-				}
-
-				if (adjustedNextRunTime != 0) {
-					eachWorkflow.setNextRun(adjustedNextRunTime);
-					try {
-						log.debug(LOGMESSAGE, eachWorkflow.getWorkflowId(), eachWorkflow.getScheduleType(), nextRunTime,
-								adjustedNextRunTime);
-						adjustedNextRunTime = 0;
-						workflowDAL.updateWorkflowConfig(eachWorkflow);
-						log.debug("WorkflowAutoCorrection executor === correction performed on workflow : {} ",
-								eachWorkflow.getWorkflowId());
-						adjustedNextRunTime = 0;
-						log.debug(StringExpressionConstants.STR_EXP_WORKFLOW,"-",workflowId,workflowType,"-","-",status,lastruntime ,nextRunTime,schedule,"-","-",0,"-");
-					} catch (Exception e) {
-						log.error(
-								"WorkflowAutoCorrection executor === correction failed to update on workflow : {} due to {}",
-								eachWorkflow.getWorkflowId(), e.getMessage());
-						InsightsStatusProvider.getInstance().createInsightStatusNode(
-								"In WorkflowAutoCorrectionExecutor,correction failed to update on workflow: "
-										+ eachWorkflow.getWorkflowId() + "due to " + e.getMessage(),
-								PlatformServiceConstants.FAILURE);
-						log.error(StringExpressionConstants.STR_EXP_WORKFLOW	,"-",workflowId,workflowType,"-","-",status,lastruntime ,nextRunTime,schedule,"-","-",0,"-");
-					}
-				} else {
-					log.debug("WorkflowAutoCorrection executor === no workflows found for correction");
-					log.debug(StringExpressionConstants.STR_EXP_WORKFLOW,"-",workflowId,workflowType,"-","-",status,lastruntime ,nextRunTime,schedule,"-","-",0,"-");
-					}
+				
+				calculateCorrection(eachWorkflow);		
 
 				}
 		} catch (InsightsCustomException e1) {
@@ -180,4 +70,181 @@ public class WorkflowAutoCorrectionExecutor implements Job, ApplicationConfigInt
 		}
 	}
 
+	private void calculateCorrection(InsightsWorkflowConfiguration eachWorkflow) {
+		
+		String workflowId = "-";
+		String status = "-";
+		String schedule = "-";
+		String workflowType ="-";
+		Long lastruntime =null;  
+
+		long currentTime = InsightsUtils.getCurrentTimeInSeconds();
+		long nextRunTime = eachWorkflow.getNextRun();
+		workflowId = eachWorkflow.getWorkflowId();
+		status = eachWorkflow.getStatus();
+		schedule = eachWorkflow.getScheduleType();
+		workflowType =eachWorkflow.getWorkflowType();
+		lastruntime = eachWorkflow.getLastRun();				
+
+		/*
+		 * First check if current time is greater than nextruntime if yes then calculate
+		 * correction based on diff between current date and nextruntime based on diff
+		 * add specific days based on schedule and update nextruntime
+		 */
+		if (eachWorkflow.getScheduleType().equalsIgnoreCase(WorkflowTaskEnum.WorkflowSchedule.DAILY.name())) {
+			
+			adjustedNextRunTime = nextRunTimeDaily(nextRunTime,currentTime);
+
+		} else if (eachWorkflow.getScheduleType()
+				.equalsIgnoreCase(WorkflowTaskEnum.WorkflowSchedule.WEEKLY.name())) {			
+
+			adjustedNextRunTime =nextRunTimeWeekly(nextRunTime,currentTime);
+	
+		}
+
+		else if (eachWorkflow.getScheduleType()
+				.equalsIgnoreCase(WorkflowTaskEnum.WorkflowSchedule.BI_WEEKLY_SPRINT.name())) {			
+
+			adjustedNextRunTime =nextRunTimeBiWeekly(nextRunTime,currentTime);
+		
+		} else if (eachWorkflow.getScheduleType()
+				.equalsIgnoreCase(WorkflowTaskEnum.WorkflowSchedule.TRI_WEEKLY_SPRINT.name())) {
+		
+			adjustedNextRunTime = nextRunTimeTriWeekly(nextRunTime,currentTime);
+
+		} else if (eachWorkflow.getScheduleType()
+				.equalsIgnoreCase(WorkflowTaskEnum.WorkflowSchedule.MONTHLY.name())) {
+
+			adjustedNextRunTime = nextRunTimeMonthly(nextRunTime,currentTime);
+			
+		} else if (eachWorkflow.getScheduleType()
+				.equalsIgnoreCase(WorkflowTaskEnum.WorkflowSchedule.QUARTERLY.name())) {
+
+			adjustedNextRunTime = nextRunTimeQuarterly(nextRunTime,currentTime) ;
+	
+		} else if (eachWorkflow.getScheduleType()
+				.equalsIgnoreCase(WorkflowTaskEnum.WorkflowSchedule.YEARLY.name())) {
+		
+			adjustedNextRunTime = nextRunTimeYearly(nextRunTime,currentTime);
+	
+		}		
+		
+		if (adjustedNextRunTime != 0) {
+			eachWorkflow.setNextRun(adjustedNextRunTime);
+			try {
+				log.debug(LOGMESSAGE, eachWorkflow.getWorkflowId(), eachWorkflow.getScheduleType(), nextRunTime,
+						adjustedNextRunTime);
+				adjustedNextRunTime = 0;
+				workflowDAL.updateWorkflowConfig(eachWorkflow);
+				log.debug("WorkflowAutoCorrection executor === correction performed on workflow : {} ",
+						eachWorkflow.getWorkflowId());
+				adjustedNextRunTime = 0;
+				log.debug(StringExpressionConstants.STR_EXP_WORKFLOW,"-",workflowId,workflowType,"-","-",status,lastruntime ,nextRunTime,schedule,"-","-",0,"-");
+			} catch (Exception e) {
+				log.error(
+						"WorkflowAutoCorrection executor === correction failed to update on workflow : {} due to {}",
+						eachWorkflow.getWorkflowId(), e.getMessage());
+				InsightsStatusProvider.getInstance().createInsightStatusNode(
+						"In WorkflowAutoCorrectionExecutor,correction failed to update on workflow: "
+								+ eachWorkflow.getWorkflowId() + "due to " + e.getMessage(),
+						PlatformServiceConstants.FAILURE);
+				log.error(StringExpressionConstants.STR_EXP_WORKFLOW	,"-",workflowId,workflowType,"-","-",status,lastruntime ,nextRunTime,schedule,"-","-",0,"-");
+			}
+		} else {
+			log.debug("WorkflowAutoCorrection executor === no workflows found for correction");
+			log.debug(StringExpressionConstants.STR_EXP_WORKFLOW,"-",workflowId,workflowType,"-","-",status,lastruntime ,nextRunTime,schedule,"-","-",0,"-");
+			}
+		
+	}
+	private long nextRunTimeDaily(long nextRunTime, long currentTime) {
+		
+		if (currentTime > nextRunTime) {			
+			
+			long diff = InsightsUtils.getDurationInDays(nextRunTime);
+			if (diff >= 1) {
+				adjustedNextRunTime = InsightsUtils.addDaysInGivenTime(nextRunTime, diff + 1);
+			}
+
+		} 
+      return adjustedNextRunTime;
+	} 
+
+
+	private long nextRunTimeWeekly(long nextRunTime, long currentTime) {
+
+		long diff = InsightsUtils.getDurationInDays(nextRunTime);
+		if (diff >= 7) {
+			long noOfWeeks = InsightsUtils.getScheduleWiseDuration(nextRunTime, currentTime,
+					WorkflowTaskEnum.WorkflowSchedule.WEEKLY.name());
+			adjustedNextRunTime = InsightsUtils.addTimeInCurrentTime(nextRunTime, WEEKS, noOfWeeks);
+
+		}	
+		return adjustedNextRunTime;
+	}
+
+	private long nextRunTimeBiWeekly(long nextRunTime, long currentTime) {
+		
+		long diff = InsightsUtils.getDurationInDays(nextRunTime);
+		if (diff >= 14) {
+			long noOfSprints = InsightsUtils.getScheduleWiseDuration(nextRunTime, currentTime,
+					WorkflowTaskEnum.WorkflowSchedule.BI_WEEKLY_SPRINT.name()) / 2;
+			adjustedNextRunTime = InsightsUtils.addTimeInCurrentTime(nextRunTime, WEEKS, noOfSprints * 2);
+
+		}
+		return adjustedNextRunTime;
+	}
+	
+
+	private long nextRunTimeTriWeekly(long nextRunTime, long currentTime) {
+		
+		long diff = InsightsUtils.getDurationInDays(nextRunTime);
+		if (diff >= 21) {
+			long noOfSprints = InsightsUtils.getScheduleWiseDuration(nextRunTime, currentTime,
+					"TRI_WEEKLY_SPRINT") / 3;
+			adjustedNextRunTime = InsightsUtils.addTimeInCurrentTime(nextRunTime, WEEKS, noOfSprints * 3);
+
+		}
+		
+		return adjustedNextRunTime;
+		
+	}
+
+	
+	private long nextRunTimeMonthly(long nextRunTime, long currentTime) {
+		long lenghtOfMonth = InsightsUtils.getMonthDays(nextRunTime);
+		long diff = InsightsUtils.getDurationInDays(nextRunTime);
+		if (diff >= lenghtOfMonth) {
+			long noOfMonths = InsightsUtils.getScheduleWiseDuration(nextRunTime, currentTime,
+					WorkflowTaskEnum.WorkflowSchedule.MONTHLY.name());
+			adjustedNextRunTime = InsightsUtils.addTimeInCurrentTime(nextRunTime, MONTHS, noOfMonths);
+
+		}
+		
+		return adjustedNextRunTime;
+		
+	}
+
+	private long nextRunTimeQuarterly(long nextRunTime, long currentTime) {
+		
+		long lenghtOfQuarter = InsightsUtils.getDaysInQuarter(nextRunTime);
+		long diff = InsightsUtils.getDurationInDays(nextRunTime);
+		if (diff >= lenghtOfQuarter) {
+			long noOfQuarters = InsightsUtils.getScheduleWiseDuration(nextRunTime, currentTime,
+					WorkflowTaskEnum.WorkflowSchedule.QUARTERLY.name()) / 3;
+			adjustedNextRunTime = InsightsUtils.addTimeInCurrentTime(nextRunTime, MONTHS, noOfQuarters * 3);
+		}
+		return adjustedNextRunTime;
+	}
+
+	private long nextRunTimeYearly(long nextRunTime, long currentTime) {
+
+		long lenghtOfYear = InsightsUtils.getLengthOfYear(nextRunTime);
+		long diff = InsightsUtils.getDurationInDays(nextRunTime);
+		if (diff >= lenghtOfYear) {
+			long noOfYears = InsightsUtils.getScheduleWiseDuration(nextRunTime, currentTime,
+					WorkflowTaskEnum.WorkflowSchedule.YEARLY.name());
+			adjustedNextRunTime = InsightsUtils.addTimeInCurrentTime(nextRunTime, YEARS, noOfYears);
+		}
+		return adjustedNextRunTime;
+	}
 }

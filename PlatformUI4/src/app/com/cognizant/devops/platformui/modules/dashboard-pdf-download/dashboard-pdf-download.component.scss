@@ -77,10 +77,6 @@ tr.mat-row-kpi {
   padding-left: 0px;
 }
 
-.asteriskText {
-  color: #ff0000;
-}
-
 .mainHeaderText {
   font-size: 15px;
   color: #ffffff;
@@ -153,3 +149,7 @@ tr.mat-row-kpi {
 .mailCss > svg {
   vertical-align: super !important;
 }
+
+::ng-deep .mat-radio-label-content {
+  margin-left: 10px;
+ }

@@ -17,6 +17,7 @@ package com.cognizant.devops.platformcommons.core.enums;
 
 public class ReportTemplateTypeEnum{
 	public enum ReportTemplateType{
-		ROITemplate, Others
+		ROITemplate, Others	
+		
 	}
 }

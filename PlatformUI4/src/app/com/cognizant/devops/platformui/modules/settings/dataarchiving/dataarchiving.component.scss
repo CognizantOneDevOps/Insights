@@ -49,23 +49,25 @@
     }
   }
 }
+
 .section-body {
   display: flex;
   flex-direction: column;
 }
-.asteriskText {
-  color: #ff0000;
-}
+
 .iconClr {
   color: var(--text-clr);
 }
+
 .labelTxt {
   color: var(--backgnd-clr5);
   font-size: 85%;
 }
+
 .footer {
   justify-content: flex-end;
 }
+
 .select-label {
   display: flex;
 }

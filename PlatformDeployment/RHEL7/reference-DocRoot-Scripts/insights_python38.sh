@@ -19,7 +19,7 @@ source /etc/profile
 cd $INSIGHTS_APP_ROOT_DIRECTORY
 sudo mkdir python3 && cd python3 && sudo wget https://www.python.org/ftp/python/3.8.13/Python-3.8.13.tgz
 sudo mv Python-3.8.13.tgz Python.tgz
-sudo tar -zxf Python.tar.gz
+sudo tar -zxf Python.tgz
 sudo mv Python-3.8.13 Python
 cd Python
 sudo yum install gcc -y

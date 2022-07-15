@@ -202,7 +202,13 @@
             <mat-option value="270">270</mat-option>
             <mat-option value="300">300</mat-option>
           </mat-select>
-          <mat-select
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+          <!-- <mat-select
             *ngIf="pdfType === 'Printable'"
             [(ngModel)]="loadTime"
             required
@@ -221,9 +227,37 @@
             svgIcon="arrow-down"
             class="arrow-icon"
             style="width: 12px !important; height: 12px !important"
+          ></mat-icon> -->
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item" *ngIf="pdfType === 'Printable'">
+        <div class="lblCss">
+          Load Time For Dashboard(in Sec)<span class="asteriskText">*</span>
+        </div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            [(ngModel)]="loadTime"
+            required
+            placeholder="Select loadTime"
+            color="primary"
+          >
+          <mat-option value="3">3</mat-option>
+            <mat-option value="5">5</mat-option>
+            <mat-option value="8">8</mat-option>
+            <mat-option value="10">10</mat-option>
+            <mat-option value="15">15</mat-option>
+            <mat-option value="20">20</mat-option>
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
           ></mat-icon>
         </mat-form-field>
       </div>
+
       <div class="grid-item">
         <div class="lblCss">Frequency<span class="asteriskText">*</span></div>
         <mat-form-field appearance="fill" class="columnComponent">
@@ -373,6 +407,7 @@
                       required
                       color="primary"
                       multiple
+                      placeholder="Select values"
                     >
                       <div *ngIf="list.includeAll">
                         <mat-option #allSelected value="All"> All </mat-option>
@@ -441,6 +476,7 @@
                       color="primary"
                       multiple
                       [(value)]="list.selectedValue"
+                      placeholder="Select values"
                     >
                       <mat-option
                         *ngFor="let option of list.options"

@@ -26,7 +26,7 @@ sudo echo INSIGHTS_ENGINE=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" INSIGHTS_ENGINE=`pwd` | sudo tee -a /etc/profile
 source /etc/environment
 source /etc/profile
-echo -n "Enter Release Version: " 
+echo -n "Enter the Release Version (ex 9.5): " 
 read releaseVersion
 sudo wget  https://github.com/CognizantOneDevOps/Insights/releases/download/v${releaseVersion}/PlatformEngine-${releaseVersion}.jar -O PlatformEngine.jar
 sleep 2

@@ -15,14 +15,16 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.insights.service;
 
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+
 public enum KPIEnum {
 		
 	
 	
-	    KPI1("110","Average Build Time",InsightsInferenceService.BUILD,"daily"),
-	    KPI2("111","Average Build Time",InsightsInferenceService.BUILD,"weekly"),
-	    KPI3("120","Number of builds",InsightsInferenceService.BUILD,"daily"),
-	    KPI4("121","Number of builds",InsightsInferenceService.BUILD,"weekly");
+	    KPI1("110","Average Build Time",PlatformServiceConstants.BUILD,"daily"),
+	    KPI2("111","Average Build Time",PlatformServiceConstants.BUILD,"weekly"),
+	    KPI3("120","Number of builds",PlatformServiceConstants.BUILD,"daily"),
+	    KPI4("121","Number of builds",PlatformServiceConstants.BUILD,"weekly");
 
 	    private final String kpiId;
 	    private final String kpiName;

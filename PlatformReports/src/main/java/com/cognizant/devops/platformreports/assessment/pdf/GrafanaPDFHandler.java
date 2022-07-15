@@ -256,17 +256,19 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 		log.debug("Worlflow Detail ==== grafanadashboard Url ===== {} ",grafanaUrl);
 		Playwright playwright = null;
 		String pageContent = "";
-		try {
-			playwright = Playwright.create();
-			long startTime = System.nanoTime();
-			BrowserType browserType = 	playwright.chromium();
-			LaunchOptions launchOptions = new LaunchOptions();
-			launchOptions.setHeadless(Boolean.TRUE);
-			launchOptions.setDevtools(Boolean.FALSE);
-			
-			Browser browser = browserType.launch(launchOptions);
-			BrowserContext context = browser.newContext();
-			Page page = context.newPage();
+		
+		
+    	playwright = Playwright.create();
+		long startTime = System.nanoTime();
+		BrowserType browserType = 	playwright.chromium();
+		LaunchOptions launchOptions = new LaunchOptions();
+		launchOptions.setHeadless(Boolean.TRUE);
+		launchOptions.setDevtools(Boolean.FALSE);
+		
+		Browser browser = browserType.launch(launchOptions);
+		
+		try(    BrowserContext context = browser.newContext();
+				Page page = context.newPage();) {			
 
 			Map<String, String> headers = getGrafanaHeaders(config);
 
@@ -321,15 +323,12 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			
 			String frontPagePath = assessmentReportDTO.getPdfReportDirPath() + File.separator + MODIFIED_FRONT_PAGE_TEMPLATE;
 			modifyFrontPageTemplate(frontPagePath);
-			page = context.newPage();
 			page.navigate("file:" +new File(frontPagePath).getAbsolutePath());
 			pdfOptions.setHeaderTemplate(updateLogoImgInHeaderTemplate(true));
 			pdfOptions.setFooterTemplate(fetchTemplate("frontPagefooter.html"));
 			pdfOptions.setHeight("1600px");
 			byte[] frontPagePdf = page.pdf(pdfOptions);
-			
-			page.close();
-			context.close();
+		
 			browser.close();
 			
 			byte[] finalPdf = mergePDFFiles(frontPagePdf, dashboardPdf, exportedFilePath);
@@ -364,7 +363,6 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 		}
 	}
 
-
 	/** This method use to prepare Grafana header object 
 	 * @return map of headers 
 	 */
@@ -385,17 +383,17 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 	 */
 	private synchronized void printableDashboardAsPdf(InsightsAssessmentConfigurationDTO assessmentReportDTO, String exportedFilePath) {
 		Playwright playwright = null;
-		try {
-			playwright = Playwright.create();
-			long startTime = System.nanoTime();
-			BrowserType browserType = 	playwright.chromium();
-			LaunchOptions launchOptions = new LaunchOptions();
-			launchOptions.setHeadless(Boolean.TRUE);
-			launchOptions.setDevtools(Boolean.FALSE);
-			
-			Browser browser = browserType.launch(launchOptions);
-			BrowserContext context = browser.newContext();
-			Page page = context.newPage();
+		
+		playwright = Playwright.create();
+		long startTime = System.nanoTime();
+		BrowserType browserType = 	playwright.chromium();
+		LaunchOptions launchOptions = new LaunchOptions();
+		launchOptions.setHeadless(Boolean.TRUE);
+		launchOptions.setDevtools(Boolean.FALSE);
+		Browser browser = browserType.launch(launchOptions);
+		
+		try(BrowserContext context = browser.newContext();
+			Page page = context.newPage();) {
 			JsonElement config = JsonUtils.parseStringAsJsonElement(pdfconfigDto.getDashboardJson());
 			int loadTime = config.getAsJsonObject().get("loadTime").getAsInt() * 1000;
 			log.debug("Worlflow Detail ==== LoadTIme configured for Grafana in milliseconds ===== {} ",loadTime);
@@ -446,7 +444,6 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 					+ assessmentReportDTO.getAsseementreportname() + "." + ReportEngineUtils.HTML_EXTENSION;
 			log.debug("Worlflow Detail ==== Generated DynamicTemplate.html name  ===== {} ",dynamicTemplate);
 			prepareHtml(imageList,dynamicTemplate);
-			page = context.newPage();
 			page.navigate(new File(dynamicTemplate).getAbsolutePath());
 			PdfOptions pdfOptions =  new PdfOptions();
 			pdfOptions.setPrintBackground(Boolean.TRUE);
@@ -458,14 +455,11 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			
 			String frontPagePath = assessmentReportDTO.getPdfReportDirPath() + File.separator + MODIFIED_FRONT_PAGE_TEMPLATE;
 			modifyFrontPageTemplate(frontPagePath);
-			page = context.newPage();
 			page.navigate("file:" +new File(frontPagePath).getAbsolutePath());
 			pdfOptions.setHeaderTemplate(updateLogoImgInHeaderTemplate(true));
 			pdfOptions.setFooterTemplate(fetchTemplate("frontPagefooter.html"));
 			byte[] frontPagePdf = page.pdf(pdfOptions);
 			
-			page.close();
-			context.close();
 			browser.close();
 			
 			byte[] finalPdf = mergePDFFiles(frontPagePdf, dashboardPdf, exportedFilePath);
@@ -629,11 +623,14 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			File file = new File(templateFilePath);
 			StringBuilder render = new StringBuilder();
 			if (file.exists()) {
-				BufferedReader in = new BufferedReader(new FileReader(templateFilePath));
+				try(BufferedReader in = new BufferedReader(new FileReader(templateFilePath))) {				
 				String line;
 				while((line = in.readLine())!=null)
 					render.append(line);
-				in.close();
+				}catch(Exception e){
+					e.getMessage();					
+				}
+								
 			} else {
 				String frontPageTemplate = fetchTemplate("frontPageTemplate.html");
 				render = new StringBuilder(frontPageTemplate);
@@ -661,9 +658,9 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 					tableRow.append(row);
 				});
 				render.insert(render.indexOf("</thead>"), "<tr>\r\n" + 
-						"				<th>Filter Name</th>\r\n" + 
-						"				<th>Values</th>\r\n" + 
-						"			</tr>");
+						"<th>Filter Name</th>\r\n" + 
+						"<th>Values</th>\r\n" + 
+						"</tr>");
 				int index = render.indexOf("</thead>");
 				render.insert(index+8, tableRow);
 			}

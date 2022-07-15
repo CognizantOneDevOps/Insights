@@ -148,5 +148,5 @@ public class InsightsWorkflowExecutionHistory implements Serializable {
 	public void setWorkflowConfig(InsightsWorkflowConfiguration workflowConfig) {
 		this.workflowConfig = workflowConfig;
 	}
-
+	
 }

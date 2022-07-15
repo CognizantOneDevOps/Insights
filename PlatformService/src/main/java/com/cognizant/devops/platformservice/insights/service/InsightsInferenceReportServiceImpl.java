@@ -131,7 +131,7 @@ public class InsightsInferenceReportServiceImpl implements InsightsInferenceServ
 		String cypherQuery = "MATCH (n:CONTENT_RESULT)";
 		cypherQuery = cypherQuery + " where n.assessmentId=" + assessmentId + " ";
 		cypherQuery = cypherQuery + " with distinct max(n.executionId) as latestexecutionId "
-				+ "	Match (b:CONTENT_RESULT) where b.executionId =latestexecutionId";
+				+ " Match (b:CONTENT_RESULT) where b.executionId =latestexecutionId";
 		cypherQuery = cypherQuery + " and b.group='" + group + "' ";
 		cypherQuery = cypherQuery + " RETURN b  order by b.executionId,b.kpiId desc ";
 		return cypherQuery;

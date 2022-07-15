@@ -45,7 +45,8 @@ echo -n "Please enter neo4j default credentials: "
 read -s defneo4jcreds
 echo -n "Please enter new credentials for neo4j user: "
 read -s newneo4jcreds
-curl -X POST -u neo4j:$defneo4jcreds -H "Content-Type: application/json" -d '{"password":"'"$newneo4jcreds"'"}' http://localhost:7474/user/neo4j/password
+#curl -X POST -u neo4j:$defneo4jcreds -H "Content-Type: application/json" -d '{"password":"'"$newneo4jcreds"'"}' http://localhost:7474/user/neo4j/password
+bin/neo4j-admin set-initial-password $newneo4jcreds
 sleep 10
 cd ..
 export NEO4J_INIT_HOME=`pwd`

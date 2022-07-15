@@ -152,7 +152,7 @@ public class ProcessMasterData {
 			log.error("Unable to read master data file.", e);
 		} catch (IllegalStateException | JsonSyntaxException ex) {
 			log.error(ex);
-			log.error("Error while processing string is not as per expected format {}", ex);
+			log.error("Error while processing string is not as per expected format {}", ex.getMessage());
 			return Boolean.FALSE;
 		}catch (Exception ex) {
 			log.error(ex);

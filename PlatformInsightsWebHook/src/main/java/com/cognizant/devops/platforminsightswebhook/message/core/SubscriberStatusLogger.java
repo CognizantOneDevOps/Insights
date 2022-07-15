@@ -85,7 +85,7 @@ public class SubscriberStatusLogger {
 					WebHookConstants.WEBHOOK_SUBSCRIBER_HEALTH_ROUTING_KEY);
 			response = Boolean.TRUE;
 		} catch (Exception e) {
-			log.error("Unable to create Node  createComponentStatusNode {}", e);
+			log.error("Unable to create Node  createComponentStatusNode {}", e.getMessage());
 		}
 		log.debug("  response for publishHealthData {}", response);
 		return response;

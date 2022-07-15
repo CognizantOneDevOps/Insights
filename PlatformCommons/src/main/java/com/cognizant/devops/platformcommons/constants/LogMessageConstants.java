@@ -15,15 +15,15 @@
  ******************************************************************************/
 package com.cognizant.devops.platformcommons.constants;
 
-public interface LogMessageConstants {
+public final class LogMessageConstants {
 
-	String TRACEID = "traceId";
-	String TYPE = "Type";
-	String HTTPMETHOD = "httpMethod";
-	String ENDPOINT = "endpoint";
-	String PROCESSINGTIME = "processingTime";
-	String APILOGSTYPE = "APILogs";
-	String SERVICEINITIALIZATIONTYPE = "ServiceInitialization";
-	String MDCTOKENKEY = "traceId";
-	String TOKENREQUESTHEADER = "X-Header-Token";
+	public static final String TRACEID = "traceId";
+	public static final String TYPE = "Type";
+	public static final String HTTPMETHOD = "httpMethod";
+	public static final String ENDPOINT = "endpoint";
+	public static final String PROCESSINGTIME = "processingTime";
+	public static final String APILOGSTYPE = "APILogs";
+	public static final String SERVICEINITIALIZATIONTYPE = "ServiceInitialization";
+	public static final String MDCTOKENKEY = "traceId";
+	public static final String TOKENREQUESTHEADER = "X-Header-Token";
 }

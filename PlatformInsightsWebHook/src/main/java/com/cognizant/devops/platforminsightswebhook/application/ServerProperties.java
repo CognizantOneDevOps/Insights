@@ -39,16 +39,15 @@ public class ServerProperties {
 	public int getPort() {
 		return port;
 	}
-
 	public void setPort(int port) {
-		this.port = port;
+		ServerProperties.port = port;
 	}
 
 	public String getContextPath() {
 		return contextPath;
 	}
 
-	public void setContextPath(String contextPath) {
-		this.contextPath = contextPath;
+	public static void setContextPath(String contextPath) {
+		ServerProperties.contextPath = contextPath;
 	}
 }

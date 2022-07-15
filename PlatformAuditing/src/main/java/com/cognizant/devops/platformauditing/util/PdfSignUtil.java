@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.cos.COSName;
@@ -69,7 +68,6 @@ import org.bouncycastle.asn1.x500.style.IETFUtils;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.google.gson.JsonObject;
 
 public class PdfSignUtil extends PdfCreateSignatureBase {
@@ -79,7 +77,6 @@ public class PdfSignUtil extends PdfCreateSignatureBase {
 	private File imageFile;
 	private static final String PDF_PATH = System.getenv().get("INSIGHTS_HOME") + File.separator
 			+ ConfigOptions.CONFIG_DIR + File.separator + "Pdf" + File.separator;
-	private static final String TARGET_PDF = "target/Traceability_report.pdf";
 	private static final String PDF_NAME_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.pdf)$";
 
 	private static final String KEYSTORE_P12 = "KEYSTORE_P12";
@@ -181,16 +178,18 @@ public class PdfSignUtil extends PdfCreateSignatureBase {
 		signature.setReason("Asset Audit Report");
 		signature.setSignDate(Calendar.getInstance());
 		SignatureInterface signatureInterface = isExternalSigning() ? null : this;
-		SignatureOptions signatureOptions = new SignatureOptions();
-		signatureOptions
-				.setVisualSignature(createVisualSignatureTemplate(doc, doc.getNumberOfPages() - 1, rect, signature));
-		signatureOptions.setPage(doc.getNumberOfPages() - 1);
-		doc.addSignature(signature, signatureInterface, signatureOptions);
+		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		doc.saveIncremental(baos);
-		IOUtils.closeQuietly(signatureOptions);
-		doc.close();
-		protectDoc.close();
+		try (SignatureOptions signatureOptions = new SignatureOptions();) {
+			signatureOptions.setVisualSignature(
+					createVisualSignatureTemplate(doc, doc.getNumberOfPages() - 1, rect, signature));
+			signatureOptions.setPage(doc.getNumberOfPages() - 1);
+			doc.addSignature(signature, signatureInterface, signatureOptions);
+			doc.saveIncremental(baos);
+		  } finally {
+		    doc.close();
+			protectDoc.close();
+		  }
 		return baos.toByteArray();
 	}
 
@@ -287,46 +286,49 @@ public class PdfSignUtil extends PdfCreateSignatureBase {
 		widget.setAppearance(appearance);
 
 		PDPageContentStream cs = new PDPageContentStream(doc, appearanceStream);
-		if (initialScale != null) {
-			cs.transform(initialScale);
-		}
-
-		cs.setNonStrokingColor(Color.WHITE);
-		cs.addRect(-5000, -5000, 10000, 10000);
-		cs.fill();
-
-		cs.saveGraphicsState();
-		cs.transform(Matrix.getScaleInstance(0.25f, 0.25f));
-		PDImageXObject img = PDImageXObject.createFromFileByExtension(imageFile, doc);
-		cs.drawImage(img, 0, 0);
-		cs.restoreGraphicsState();
-
-		float fontSize = 6;
-		float leading = fontSize * 1.5f;
-		cs.beginText();
-		cs.setFont(font, fontSize);
-		cs.setNonStrokingColor(Color.black);
-		cs.newLineAtOffset(fontSize, height - leading);
-		cs.setLeading(leading);
-		X509Certificate cert = (X509Certificate) getCertificates()[0];
-		X500Name x500Name = new X500Name(cert.getSubjectX500Principal().getName());
-		RDN cn = x500Name.getRDNs(BCStyle.CN)[0];
-		String name = IETFUtils.valueToString(cn.getFirst().getValue());
-		log.info("Digitally Signed by -  {}", name);
-		String date = signature.getSignDate().getTime().toString();
-		log.info("Date - {}", date);
-		String reason = signature.getReason();
-		log.info("Reason - {}", reason);
-		cs.showText("Digitally Signed by " + name);
-		cs.newLine();
-		cs.showText("Reason:" + reason);
-		cs.newLine();
-		cs.showText("Date :" + date);
-		cs.endText();
-
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		cs.close();
-		doc.save(baos);
+		try {
+			if (initialScale != null) {
+				cs.transform(initialScale);
+			}
+
+			cs.setNonStrokingColor(Color.WHITE);
+			cs.addRect(-5000, -5000, 10000, 10000);
+			cs.fill();
+
+			cs.saveGraphicsState();
+			cs.transform(Matrix.getScaleInstance(0.25f, 0.25f));
+			PDImageXObject img = PDImageXObject.createFromFileByExtension(imageFile, doc);
+			cs.drawImage(img, 0, 0);
+			cs.restoreGraphicsState();
+
+			float fontSize = 6;
+			float leading = fontSize * 1.5f;
+			cs.beginText();
+			cs.setFont(font, fontSize);
+			cs.setNonStrokingColor(Color.black);
+			cs.newLineAtOffset(fontSize, height - leading);
+			cs.setLeading(leading);
+			X509Certificate cert = (X509Certificate) getCertificates()[0];
+			X500Name x500Name = new X500Name(cert.getSubjectX500Principal().getName());
+			RDN cn = x500Name.getRDNs(BCStyle.CN)[0];
+			String name = IETFUtils.valueToString(cn.getFirst().getValue());
+			log.info("Digitally Signed by -  {}", name);
+			String date = signature.getSignDate().getTime().toString();
+			log.info("Date - {}", date);
+			String reason = signature.getReason();
+			log.info("Reason - {}", reason);
+			cs.showText("Digitally Signed by " + name);
+			cs.newLine();
+			cs.showText("Reason:" + reason);
+			cs.newLine();
+			cs.showText("Date :" + date);
+			cs.endText();
+			
+		} finally {
+			cs.close();
+			doc.save(baos);
+		}
 		return new ByteArrayInputStream(baos.toByteArray());
 	}
 
@@ -369,7 +371,7 @@ public class PdfSignUtil extends PdfCreateSignatureBase {
 			String tsaUrl = null;
 			boolean externalSig = false;
 			JsonObject config = LoadFile.getInstance().getConfig();
-			String ksFilePath = new File(PDF_PATH+config.get(KEYSTORE_P12).getAsString()).getCanonicalPath();
+			String ksFilePath = new File(PDF_PATH + config.get(KEYSTORE_P12).getAsString()).getCanonicalPath();
 			File ksFile = new File(ksFilePath);
 			KeyStore keystore = KeyStore.getInstance(PKCS12);
 			char[] pin = config.get(PIN_PROTECT).getAsString().toCharArray();
@@ -412,7 +414,7 @@ public class PdfSignUtil extends PdfCreateSignatureBase {
 		final Matcher matcher = pattern.matcher(pdfName);
 
 		if (matcher.find()) {
-			log.debug("File name is Valid for regex -- ",PDF_NAME_VALIDATOR);
+			log.debug("File name is Valid for regex -- {}", PDF_NAME_VALIDATOR);
 			return true;
 		}
 

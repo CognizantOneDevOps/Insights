@@ -18,6 +18,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { FileSystemService } from '../file-system.service';
+import { DataSharedService } from "@insights/common/data-shared-service";
 
 @Component({
   selector: 'app-filesystem-config',
@@ -26,7 +27,8 @@ import { FileSystemService } from '../file-system.service';
 })
 export class FileSystemConfigComponent implements OnInit {
   fileName: string;
-  fileName2: string;
+  fileName2: String;
+  fileName2Tooltip: string;
   fileType: string = 'JSON';
   fileTypeList = [];
   module: string;
@@ -43,13 +45,15 @@ export class FileSystemConfigComponent implements OnInit {
   isEdit : boolean = false;
 
   constructor(public fileSystemService: FileSystemService, public router: Router, private route: ActivatedRoute,
-    public messageDialog: MessageDialogService) {
+    public messageDialog: MessageDialogService,
+    private dataShare: DataSharedService) {
 
   }
 
   cancelUpload() {
     (<HTMLInputElement>document.getElementById("file")).value = '';
     this.fileName2 = null;
+    this.fileName2Tooltip = null;
   }
 
   ngOnInit() {
@@ -126,12 +130,14 @@ export class FileSystemConfigComponent implements OnInit {
   reset() {
     if (this.configData.type == 'edit') {
       this.fileName2 = null;
+      this.fileName2Tooltip = null;
       (<HTMLInputElement>document.getElementById("file")).value = '';
     } else {
       this.fileName = "";
       this.fileType = "";
       this.module = "";
       this.fileName2 = null;
+      this.fileName2Tooltip = null;
       (<HTMLInputElement>document.getElementById("file")).value = '';
     }
 
@@ -148,7 +154,8 @@ export class FileSystemConfigComponent implements OnInit {
 
   onFileChanged(event) {
     const file: File = event.target.files[0];
-    this.fileName2 = file.name;
+    this.fileName2 = this.dataShare.getCustomizeName(file.name, 32);
+    this.fileName2Tooltip = file.name;
     if (event.target.files && event.target.files[0]) {
       this.file = event.target.files.item(0);
       console.log(this.file);

@@ -14,7 +14,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ****************************************************************************** -->
-<div class="titleContainer">
+<div class="{{ data.sessionCheck ? 'titleContainerSession' : 'titleContainer' }}">
     <h1> {{dialogTitle}}</h1>
     <a (click)="closeShowDetailsDialog()" mat-dialog-close>
         <mat-icon svgIcon="close_dialog" class="closeIcon" style="height: 11px !important; width: 11px !important;">
@@ -31,5 +31,5 @@
 </div>
 
 <div *ngIf="isRedirect" style="position: fixed; bottom: 10px !important; right: 10px !important;">
-    <button mat-button class="button" style="min-width: 120px !important;" (click)="onOkClick()">Okay</button>
+    <button mat-button class="{{ data.sessionCheck ? 'buttonSession' : 'button' }}" style="min-width: 120px !important;" (click)="onOkClick()">Okay</button>
 </div>

@@ -64,7 +64,6 @@ public class RabbitMQConnectionProvider {
 			throw new InsightsCustomException(CommonsAndDALConstants.RABBIT_MQ_EXCEPTION + e);
 		}
 	}
-
 	private static void declareDeadLetterExchange(Connection connection) throws InsightsCustomException {
 		try (Channel channel = connection.createChannel()){
 			channel.exchangeDeclare(MQMessageConstants.RECOVER_EXCHANGE_NAME, MQMessageConstants.RECOVER_EXCHANGE_TYPE, true);
@@ -83,7 +82,7 @@ public class RabbitMQConnectionProvider {
 		}
 		return args;
 	}
-	
+
 	public static Channel getChannel(String routingKey, String queueName,String exchangeName,String exchangeType) throws IOException, InsightsCustomException {
 		Channel channel = RabbitMQConnectionProvider.getConnection().createChannel();
 		channel.exchangeDeclare(exchangeName,exchangeType , true);

@@ -63,17 +63,17 @@
       </mat-nav-list>
     </mat-sidenav>
     <mat-sidenav-content class="mat-drawer-content backgnd">
-      <mat-toolbar *ngIf="isToolbarDisplay">
+       <mat-toolbar *ngIf="isToolbarDisplay">
         <div class="app-toolbar">
           <div class="toolbar-left">
             <img mat-icon src='icons/png/insights.png' />
           </div>
           <div class="toolbar-right">
             <div title="Toggle Theme" class="theme-toggler">
-              <button *ngIf="toggleDark=='Dark'" mat-icon-button (click)="onTogglingTheme()" class="toggler-icon">
+              <button *ngIf="themePreference=='dark'" mat-icon-button (click)="onTogglingTheme()" class="toggler-icon">
                 <img mat-icon style="height:24px;width:59px" src='icons/png/darkToggle.png' />
               </button>
-              <button *ngIf="toggleDark=='Light'" mat-icon-button (click)="onTogglingTheme()" class="toggler-icon">
+              <button *ngIf="themePreference=='light'" mat-icon-button (click)="onTogglingTheme()" class="toggler-icon">
                 <img mat-icon style="height:24px;width:59px" src='icons/png/lightToggle.png' />
               </button>
             </div>

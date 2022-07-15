@@ -72,36 +72,29 @@ public class HealthUtil {
 		JsonObject json = null;
 		String version = "";
 		String serviceResponse;
-		ElasticSearchDBHandler apiCallElasticsearch = new ElasticSearchDBHandler();
+		//ElasticSearchDBHandler apiCallElasticsearch = new ElasticSearchDBHandler();
 		try {
-			if (isRequiredAuthentication) {
-				serviceResponse = SystemStatus.jerseyGetClientWithAuthentication(apiUrl, username, password, authToken);
-			} else {
-				serviceResponse = apiCallElasticsearch.search(apiUrl);
-			}
-
+			
+			serviceResponse = getServiceResponse(isRequiredAuthentication,apiUrl,username, password, authToken);
+			
 			if (serviceResponse != null && !("").equalsIgnoreCase(serviceResponse)) {
 				strResponse = "Response successfully recieved from " + apiUrl;
 				log.info("response: {} ",serviceResponse);
-				if (serviceType.equalsIgnoreCase(ServiceStatusConstants.Neo4j)) {
+				if (serviceType.equalsIgnoreCase(ServiceStatusConstants.NEO4J)) {
 					json = JsonUtils.parseStringAsJsonObject(serviceResponse);
 					version = json.get("neo4j_version").getAsString();
 					String totalDBSize = getNeo4jDBSize(hostEndPoint, username, password, authToken);
 					returnResponse = buildSuccessResponse(strResponse, hostEndPoint, displayType, version);
 					returnResponse.addProperty("totalDBSize", totalDBSize);
-				} else if (serviceType.equalsIgnoreCase(ServiceStatusConstants.RabbitMq)) {
+				} else if (serviceType.equalsIgnoreCase(ServiceStatusConstants.RABBITMQ)) {
 					json = JsonUtils.parseStringAsJsonObject(serviceResponse);
 					version = "RabbitMq version " + json.get("rabbitmq_version").getAsString() + "\n Erlang version "
 							+ json.get("erlang_version").getAsString();
 					returnResponse = buildSuccessResponse(strResponse, hostEndPoint, displayType, version);
 				} else if (serviceType.equalsIgnoreCase(ServiceStatusConstants.ES)) {
-					json = JsonUtils.parseStringAsJsonObject(serviceResponse);
-					JsonObject versionElasticsearch = (JsonObject) json.get(VERSION);
-					if (versionElasticsearch != null) {
-						version = versionElasticsearch.get("number").getAsString();
-					}
-					returnResponse = buildSuccessResponse(strResponse, hostEndPoint, displayType, version);
-				} else if (serviceType.equalsIgnoreCase(ServiceStatusConstants.PgSQL)) {
+					returnResponse = getESResponse(json,serviceResponse,strResponse, hostEndPoint, displayType);
+			
+				} else if (serviceType.equalsIgnoreCase(ServiceStatusConstants.PGSQL)) {
 					hostEndPoint = ApplicationConfigProvider.getInstance().getPostgre().getInsightsDBUrl();
 					PostgresMetadataHandler pgdbHandler = new PostgresMetadataHandler();
 					version = pgdbHandler.getPostgresDBVersion();
@@ -117,17 +110,8 @@ public class HealthUtil {
 					version = "";
 					returnResponse = buildSuccessResponse(strResponse, hostEndPoint, displayType, version);
 				} else if (serviceType.equalsIgnoreCase(ServiceStatusConstants.H2O)) {
-					json = JsonUtils.parseStringAsJsonObject(serviceResponse);
-					JsonArray entries = json.getAsJsonArray("entries");
-					for (JsonElement entry : entries) {
-						JsonObject entryJson = entry.getAsJsonObject();
-						String entryName = entryJson.get("name").getAsString();
-						if(entryName.equalsIgnoreCase("Build project version")) {
-							version = entryJson.get("value").getAsString();
-						}
-					}
-					
-					returnResponse = buildSuccessResponse(strResponse, hostEndPoint, displayType, version);
+					returnResponse = getH2oResponse(json,serviceResponse,strResponse, hostEndPoint, displayType);
+			
 				}
 			} else {
 				strResponse = "Response not received from service " + apiUrl;
@@ -140,6 +124,55 @@ public class HealthUtil {
 			returnResponse = buildFailureResponse(strResponse, hostEndPoint, displayType, version);
 		}
 		return returnResponse;
+	}
+	
+	private JsonObject getESResponse(JsonObject json, String serviceResponse,
+			String strResponse, String hostEndPoint, String displayType) {
+		
+		String version = "";
+		JsonObject response = null;
+		
+		json = JsonUtils.parseStringAsJsonObject(serviceResponse);
+		JsonObject versionElasticsearch = (JsonObject) json.get(VERSION);
+		if (versionElasticsearch != null) {
+			version = versionElasticsearch.get("number").getAsString();
+		}
+		response = buildSuccessResponse(strResponse, hostEndPoint, displayType, version);
+		
+		return response;
+		
+	}
+	private JsonObject getH2oResponse(JsonObject json, String serviceResponse,
+			String strResponse, String hostEndPoint, String displayType) {
+		String version = "";
+		JsonObject response = null;
+		
+		json = JsonUtils.parseStringAsJsonObject(serviceResponse);
+		JsonArray entries = json.getAsJsonArray("entries");
+		for (JsonElement entry : entries) {
+			JsonObject entryJson = entry.getAsJsonObject();
+			String entryName = entryJson.get("name").getAsString();
+			if(entryName.equalsIgnoreCase("Build project version")) {
+				version = entryJson.get("value").getAsString();
+			}
+		}
+		
+		response = buildSuccessResponse(strResponse, hostEndPoint, displayType, version);
+		return response;
+	}
+	
+	private String getServiceResponse(boolean isRequiredAuthentication, String apiUrl, String username, String password, String authToken) throws InsightsCustomException {
+		
+		String response;
+		ElasticSearchDBHandler apiCallElasticsearch = new ElasticSearchDBHandler();
+		
+		if (isRequiredAuthentication) {
+			response = SystemStatus.jerseyGetClientWithAuthentication(apiUrl, username, password, authToken);
+		} else {
+			response = apiCallElasticsearch.search(apiUrl);
+		}
+		
+		return response;
 	}
 
 
@@ -157,7 +190,7 @@ public class HealthUtil {
 		jsonResponse.addProperty(PlatformServiceConstants.STATUS, PlatformServiceConstants.SUCCESS);
 		jsonResponse.addProperty(PlatformServiceConstants.MESSAGE, message);
 		jsonResponse.addProperty(HOST_ENDPOINT, apiUrl);
-		jsonResponse.addProperty(ServiceStatusConstants.type, type);
+		jsonResponse.addProperty(ServiceStatusConstants.TYPE, type);
 		jsonResponse.addProperty(VERSION, version);
 		return jsonResponse;
 	}
@@ -176,7 +209,7 @@ public class HealthUtil {
 		jsonResponse.addProperty(PlatformServiceConstants.STATUS, PlatformServiceConstants.FAILURE);
 		jsonResponse.addProperty(PlatformServiceConstants.MESSAGE, message);
 		jsonResponse.addProperty(HOST_ENDPOINT, apiUrl);
-		jsonResponse.addProperty(ServiceStatusConstants.type, type);
+		jsonResponse.addProperty(ServiceStatusConstants.TYPE, type);
 		jsonResponse.addProperty(VERSION, version);
 		return jsonResponse;
 	}
@@ -269,7 +302,7 @@ public class HealthUtil {
 		JsonArray agentNode = new JsonArray();
 		if (status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
 
-			jsonResponse.addProperty(ServiceStatusConstants.type, ServiceStatusConstants.Agents);
+			jsonResponse.addProperty(ServiceStatusConstants.TYPE, ServiceStatusConstants.AGENTS);
 
 			Iterator<NodeData> agentnodeIterator = graphResponse.getNodes().iterator();
 			while (agentnodeIterator.hasNext()) {
@@ -297,7 +330,7 @@ public class HealthUtil {
 			jsonResponse.addProperty(PlatformServiceConstants.STATUS, PlatformServiceConstants.FAILURE);
 			jsonResponse.addProperty(PlatformServiceConstants.MESSAGE, message);
 			jsonResponse.addProperty(AgentCommonConstant.CATEGORY, toolcategory);
-			jsonResponse.addProperty(ServiceStatusConstants.type, ServiceStatusConstants.Agents);
+			jsonResponse.addProperty(ServiceStatusConstants.TYPE, ServiceStatusConstants.AGENTS);
 			jsonResponse.addProperty(AgentCommonConstant.TOOLNAME, toolName);
 			jsonResponse.addProperty(PlatformServiceConstants.INSIGHTSTIMEX, insightTimeX);
 			jsonResponse.addProperty(VERSION, "");
@@ -335,17 +368,8 @@ public class HealthUtil {
 				log.debug("serviceNeo4jResponse ====== {} ",serviceNeo4jResponse);
 
 				JsonElement object = JsonUtils.parseString(serviceNeo4jResponse);
-				if (object.isJsonArray()) {
-					if (object.getAsJsonArray().get(0).getAsJsonObject().get("attributes").isJsonArray()) {
-						JsonArray beans = object.getAsJsonArray().get(0).getAsJsonObject().get("attributes")
-								.getAsJsonArray();
-						for (JsonElement jsonElement : beans) {
-							if (jsonElement.getAsJsonObject().get("name").getAsString()
-									.equalsIgnoreCase("TotalStoreSize")) {
-								totalStoreSize = jsonElement.getAsJsonObject().get("value").getAsLong();
-							}
-						}
-					}
+				if (object.isJsonArray()) {					
+					totalStoreSize = getTotalStoreSize(object);					
 				}
 			}
 			
@@ -360,6 +384,20 @@ public class HealthUtil {
 		return returnSize;
 	}
 
+	private long getTotalStoreSize(JsonElement object) {
+		long totalStoreSize = 0L;
+		if (object.getAsJsonArray().get(0).getAsJsonObject().get("attributes").isJsonArray()) {
+			JsonArray beans = object.getAsJsonArray().get(0).getAsJsonObject().get("attributes")
+					.getAsJsonArray();
+			for (JsonElement jsonElement : beans) {
+				if (jsonElement.getAsJsonObject().get("name").getAsString()
+						.equalsIgnoreCase("TotalStoreSize")) {
+					totalStoreSize = jsonElement.getAsJsonObject().get("value").getAsLong();
+				}
+			}
+		}
+		return totalStoreSize;
+	}
 	/**
 	 * Method to generate Human Readable byte count
 	 * 
@@ -416,19 +454,19 @@ public class HealthUtil {
 				status = graphResponse.getNodes().get(0).getPropertyMap().get("status");
 				if (status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
 					returnObject = buildSuccessResponse(successResponse, "-",
-							ServiceStatusConstants.Service, version);
+							ServiceStatusConstants.SERVICE, version);
 				} else {
 					returnObject = buildFailureResponse(successResponse, "-",
-							ServiceStatusConstants.Service, version);
+							ServiceStatusConstants.SERVICE, version);
 				}
 			} else {
 				successResponse = "Node list is empty in response not received from Neo4j";
 				returnObject = buildFailureResponse(successResponse, "-",
-						ServiceStatusConstants.Service, version);
+						ServiceStatusConstants.SERVICE, version);
 			}
 		} else {
 			successResponse = "Response not received from Neo4j";
-			returnObject = buildFailureResponse(successResponse, "-", ServiceStatusConstants.Service,
+			returnObject = buildFailureResponse(successResponse, "-", ServiceStatusConstants.SERVICE,
 					version);
 		}
 		return returnObject;
@@ -470,12 +508,12 @@ public class HealthUtil {
 		try {
 			JsonObject grafanaStatus = getComponentStatusResponse(ServiceStatusConstants.GRAFANA);
 			dataComponentStatus.add(ServiceStatusConstants.GRAFANA, grafanaStatus);
-			JsonObject postgreStatus = getComponentStatusResponse(ServiceStatusConstants.PgSQL);
-			dataComponentStatus.add(ServiceStatusConstants.PgSQL, postgreStatus);
-			JsonObject neo4jStatus = getComponentStatusResponse(ServiceStatusConstants.Neo4j);
-			dataComponentStatus.add(ServiceStatusConstants.Neo4j, neo4jStatus);
-			JsonObject rabbitMqStatus = getComponentStatusResponse(ServiceStatusConstants.RabbitMq);
-			dataComponentStatus.add(ServiceStatusConstants.RabbitMq, rabbitMqStatus);
+			JsonObject postgreStatus = getComponentStatusResponse(ServiceStatusConstants.PGSQL);
+			dataComponentStatus.add(ServiceStatusConstants.PGSQL, postgreStatus);
+			JsonObject neo4jStatus = getComponentStatusResponse(ServiceStatusConstants.NEO4J);
+			dataComponentStatus.add(ServiceStatusConstants.NEO4J, neo4jStatus);
+			JsonObject rabbitMqStatus = getComponentStatusResponse(ServiceStatusConstants.RABBITMQ);
+			dataComponentStatus.add(ServiceStatusConstants.RABBITMQ, rabbitMqStatus);
 			String pythonVersion = getPythonVersion();
 			if(pythonVersion != null && pythonVersion.length() != 0) {
 				JsonObject pythonStatus= new JsonObject();
@@ -525,11 +563,11 @@ public class HealthUtil {
 		try {
 
 			JsonObject jsonPlatformServiceStatus = getComponentStatus("PlatformService");
-			serviceStatus.add(ServiceStatusConstants.PlatformService, jsonPlatformServiceStatus);
+			serviceStatus.add(ServiceStatusConstants.PLATFORM_SERVICE, jsonPlatformServiceStatus);
 			JsonObject jsonPlatformEngineStatus = getComponentStatus("PlatformEngine");
-			serviceStatus.add(ServiceStatusConstants.PlatformEngine, jsonPlatformEngineStatus);
+			serviceStatus.add(ServiceStatusConstants.PLATFORM_ENGINE, jsonPlatformEngineStatus);
 			JsonObject jsonPlatformWorkflowStatus = getComponentStatus("PlatformWorkflow");
-			serviceStatus.add(ServiceStatusConstants.PlatformWorkflow, jsonPlatformWorkflowStatus);
+			serviceStatus.add(ServiceStatusConstants.PLATFORM_WORKFLOW, jsonPlatformWorkflowStatus);
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== Error creating HTML body for services");
 		}
@@ -625,22 +663,24 @@ public class HealthUtil {
 		Boolean isAuthRequired = false;
 		
 		switch (componentName) {
-		case ServiceStatusConstants.PgSQL:
+		case ServiceStatusConstants.PGSQL:
 			hostEndPoint = ServiceStatusConstants.POSTGRESQL_HOST;
 			apiUrl = hostEndPoint;
 			componentType = ServiceStatusConstants.DB;
 			break;
-		case ServiceStatusConstants.Neo4j:
+		case ServiceStatusConstants.NEO4J:
 			hostEndPoint = ServiceStatusConstants.NEO4J_HOST;
 			if(ApplicationConfigProvider.getInstance().getGraph().getVersion().contains("3.5")) {
-			apiUrl = hostEndPoint + "/db/data/";
+				apiUrl = hostEndPoint + "/db/data/";
+			}else {
+				apiUrl = hostEndPoint; 
 			}
 			componentType = ServiceStatusConstants.DB;
 			isAuthRequired = true;
 			authToken = ApplicationConfigProvider.getInstance().getGraph().getAuthToken();
 			break;
-		case ServiceStatusConstants.RabbitMq:
-			hostEndPoint = ServiceStatusConstants.RABBIT_MQ_HOST;
+		case ServiceStatusConstants.RABBITMQ:
+			hostEndPoint = ServiceStatusConstants.RABBIT_MQ;
 			apiUrl = hostEndPoint + "/api/overview";
 			componentType = ServiceStatusConstants.DB;
 			isAuthRequired = true;

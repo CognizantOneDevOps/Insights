@@ -47,7 +47,7 @@
                     <mat-icon class="iconColor" matTooltip="Delete WebHook" svgIcon="trash">
                     </mat-icon>
                 </button>
-                <button *ngIf = "isEdit" [disabled]="!showAddWebHook" mat-icon-button (click)="validateWebhookData()">
+                <button [disabled]="!showAddWebHook" mat-icon-button (click)="validateWebhookData()">
                     <mat-icon class="iconColor" matTooltip="Save WebHook" svgIcon="save">
                     </mat-icon>
                 </button>
@@ -74,10 +74,14 @@
                         matTooltip="Copy the Webhook Url to Clipboard" svgIcon="linkHook">
                     </mat-icon>
                 </button>
-                <button (click)="Refresh()" [disabled]="!enableRefresh" mat-icon-button>
+                <button *ngIf = "!isEdit" (click)="Refresh()" [disabled]="!enableRefresh" mat-icon-button>
                     <mat-icon class="iconColor" matTooltip="Refresh" svgIcon="retry">
                     </mat-icon>
                 </button>
+                <button mat-icon-button  *ngIf = "isEdit" (click)="editWebhook()">
+                    <mat-icon matTooltip="Reset" style="margin-top: -6%" svgIcon="exit" class="mat-icon material-icons">
+                    </mat-icon>
+                  </button>
             </span>
         </div>
         <div *ngIf="showWebhook">
@@ -163,7 +167,7 @@
                 <div *ngIf="!isEdit" class="mainHeaderText">Add details to Configure a Webhook</div>
                 <div *ngIf="isEdit" class="mainHeaderText">Edit details to Configure a Webhook</div>
                 <div class="infoHeaderText">(Please provide accurate details to Configure a Webhook.
-                    Fields marked "<span style="color:#ff0000;">*</span>" are mandatory)
+                    Fields marked "<span class="asteriskText">*</span>" are mandatory)
                 </div>
             </div>
             <div class="add-agent-section-body add-agent-section-body-dimensions"
@@ -171,7 +175,7 @@
                 <div class="agent-categories-grid">
                     <div class="agent-category-grid-item">
                         <span class="lbltext" style="margin-bottom: 12px;">Webhook Name<span
-                                style="color:#ff0000;">*</span></span>
+                                class="asteriskText">*</span></span>
                         <div class="input">
                             <mat-form-field appearance="fill" class="formfield-custom">
                                 <input matInput maxlength="40" type="text" [(ngModel)]="webhookName" name="webhookName"
@@ -183,7 +187,7 @@
                     </div>
                     <div class="agent-category-grid-item">
                         <span class="lbltext" style="margin-bottom: 12px;">Select Tool<span
-                                style="color:#ff0000;">*</span></span>
+                                class="asteriskText">*</span></span>
                         <div class="input">
                             <mat-form-field appearance="fill" class="formfield-custom">
                                 <mat-select [(ngModel)]="selectedTool" required name="selectedTool"
@@ -200,7 +204,7 @@
                     </div>
                     <div class="agent-category-grid-item">
                         <span class="lbltext" style="margin-bottom: 12px;">Label Name<span
-                                style="color:#ff0000;">*</span></span>
+                                class="asteriskText">*</span></span>
                         <div class="input">
                             <mat-form-field appearance="fill" class="formfield-custom">
                                 <input matInput (focusout)="onLabelFocusOut()" [disabled]="isEventProcessing"
@@ -254,7 +258,7 @@
                     </div>
                     <div class="agent-category-grid-item">
                         <span class="lbltext" style="margin-bottom: 12px;">MQ Channel<span
-                                style="color:#ff0000;">*</span></span>
+                                class="asteriskText">*</span></span>
                         <div class="input">
                             <mat-form-field appearance="fill" class="formfield-custom">
                                 <input matInput disabled type="text" [(ngModel)]="mqchannel" name="mqchannel"
@@ -301,7 +305,7 @@
                             <div class="containerDiv"
                                 *ngFor="let item of getderivedOperationItems('insightsTimex'); let i=index">
                                 <label class=" lblText divDataLabels" style="margin-top: 4%;">Time Field<span
-                                        style="color:#ff0000;">*</span></label>
+                                    class="asteriskText">*</span></label>
                                 <mat-form-field appearance="fill" class="formfield-custom">
                                     <input matInput type="text" [(ngModel)]="item.operationFields.timeField"
                                         name={{item.operationFields.timeField}} placeholder="Time Field">

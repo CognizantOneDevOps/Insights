@@ -55,6 +55,7 @@ $blue6: #296dfa;
 $blue7: #303239;
 $blue8: #2C6DF5;
 $blue9: #2562F9;
+$blue10: #add1ff;
 
 $grey1: #F2F2F2;
 $grey2: #666666;
@@ -120,6 +121,7 @@ $theme-dark: mat-dark-theme((color: (primary: $primary,
   --backgnd-clr17: #{$black};
   --backgnd-clr18: #{$blue6};
   --backgnd-clr19: #{$black5};
+  --backgnd-clr20: #{$blue10};
   --btn-hover-bg: #{$blue3};
   --btn-bg: #{$blue7};
   --nobtn-bg: #{$blue7};

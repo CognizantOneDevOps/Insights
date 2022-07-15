@@ -41,7 +41,7 @@ public final class DatataggingConstants {
 	public static final String RESPONSE = "response";
 	public static final String ERRORS = "errors";
 	public static final String ACTION = "Action";
-	public static final String EQUALS = " = ";
+	public static final String VALIDATE_ALLHEADERS_EQUALS = " = ";
 	public static final String COMMA = " , ";
 	
 }

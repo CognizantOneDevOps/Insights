@@ -1,0 +1,295 @@
+#-------------------------------------------------------------------------------
+# Copyright 2017 Cognizant Technology Solutions
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License.  You may obtain a copy
+# of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+# License for the specific language governing permissions and limitations under
+# the License.
+#-------------------------------------------------------------------------------
+
+clients:
+  - url: http://${LOKI_HOST}:${LOKI_PORT}/loki/api/v1/push
+    tenant_id: "machine1"
+positions:
+  filename: "./positions.yaml"
+scrape_configs:         
+  - job_name: platformEngine
+    pipeline_stages:
+      - match:
+          selector: '{job="platformEngine"} |= "Type=AgentEngine"'
+          stages:
+            - regex:
+                expression: 't=(?P<timeStamp>\\S+ \\S+).*lvl=(?P<lvl>\\S+).*\\[(?P<thread>\\S+)\\]\\:(?P<filename>\\S+)\\.(?P<funcName>\\S+)\\(\\)(?P<lineno>\\d+).*message=.*Type=(?P<Type>\\S+).*toolName=(?P<toolName>\\S+).*category=(?P<category>\\S+).*agentId=(?P<agentId>\\S+).*routingKey=(?P<routingKey>\\S+).*dataSize=(?P<dataSize>-?\\d+).*execId=(?P<execId>\\S+).*ProcessingTime=(?P<ProcessingTime>-?\\d+)(?P<message>.*)'
+            - labels:
+                ProcessingTime:
+                Type:
+                agentId:
+                category:
+                dataSize:
+                execId:
+                filename:
+                funcName:
+                lineno:
+                lvl:
+                message:
+                routingKey:
+                thread:
+                timeStamp:
+                toolName:
+      - match:
+          selector: '{job="platformEngine"} |= "Type=WebhookEngine"'
+          stages:
+            - regex:
+                expression: 't=(?P<timeStamp>\\S+ \\S+).*lvl=(?P<lvl>\\S+).*\\[(?P<thread>\\S+)\\]\\:(?P<filename>\\S+)\\.(?P<funcName>\\S+)\\(\\)(?P<lineno>\\d+).*message=.*Type=(?P<Type>\\S+).*toolName=(?P<toolName>\\S+).*category=(?P<category>\\S+).*WebHookName=(?P<WebHookName>\\S+).*routingKey=(?P<routingKey>\\S+).*dataSize=(?P<dataSize>\\S+).*execId=(?P<execId>\\S+).*ProcessingTime=(?P<ProcessingTime>\\d+).(?P<msg>.*)'
+            - labels:
+                timeStamp:
+                lvl:
+                thread:
+                filename:
+                funcName:
+                lineno:
+                message:
+                toolName:
+                category:
+                webhookName:
+                routingKey:
+                dataSize:
+                execId:
+                ProcessingTime:
+                msg:
+      - match:
+          selector: '{job="platformEngine"} |= "Type=DataArchival"'
+          stages:
+            - regex:
+                expression: 't=(?P<timeStamp>\\S+ \\S+).*lvl=(?P<lvl>\\S+).*\\[(?P<thread>\\S+)\\]\\:(?P<filename>\\S+)\\.(?P<funcName>\\S+)\\(\\)(?P<lineno>\\d+).*message=.*Type=(?P<Type>\\S+).*toolName=(?P<toolName>\\S+).*category=(?P<category>\\S+).*agentId=(?P<agentId>\\S+).*routingKey=(?P<routingKey>\\S+).*execId=(?P<execId>\\S+)(?P<message>.*)'
+            - labels:
+                agentId:
+                category:
+                execId:
+                filename:
+                funcName:
+                lineno:
+                lvl:
+                message:
+                routingKey:
+                thread:
+                timeStamp:
+                toolName:
+      - match:
+          selector: '{job="platformEngine"} |= "Type=OfflineDataProcessing"'
+          stages:
+            - regex:
+                expression: 't=(?P<timeStamp>\\S+ \\S+).*lvl=(?P<lvl>\\S+).*\\[(?P<thread>\\S+)\\]\\:(?P<filename>\\S+)\\.(?P<funcName>\\S+)\\(\\)(?P<lineno>\\d+).*message=.*Type=(?P<Type>\\S+).*execId=(?P<execId>\\S+).*offlineProcessingFileName=(?P<offlineProcessingFileName>\\S+).*queryName=(?P<queryName>\\S+).*ProcessingTime=(?P<ProcessingTime>\\d+).*processedRecords=(?P<processedRecords>\\d+)(?P<message>.*)'
+            - labels:
+                ProcessingTime:
+                Type:
+                execId:
+                filename:
+                funcName:
+                lineno:
+                lvl:
+                message:
+                offlineProcessingFileName:
+                processedRecords:
+                queryName:
+                thread:
+                timeStamp:
+      - match:
+          selector: '{job="platformEngine"} |= "Type=Correlator"'
+          stages:
+            - regex:
+                expression: 't=(?P<timeStamp>\\S+ \\S+).*lvl=(?P<lvl>\\S+).*\\[(?P<thread>\\S+)\\]\\:(?P<filename>\\S+)\\.(?P<funcName>\\S+)\\(\\)(?P<lineno>\\d+).*message=.*Type=(?P<Type>\\S+).*execId=(?P<execId>\\d+).*correlationName=(?P<correlationName>\\S+).*sourceTool=(?P<sourceTool>\\S+).*destinationTool=(?P<destinationTool>\\S+).*ProcessingTime=(?P<ProcessingTime>\\d+).*processedRecords=(?P<processedRecords>\\d+)(?P<message>.*)'
+            - labels:
+                ProcessingTime:
+                Type:
+                execId:
+                filename:
+                funcName:
+                lineno:
+                lvl:
+                message:
+                offlineProcessingFileName:
+                processedRecords:
+                queryName:
+                thread:
+                timeStamp:
+      - match:
+          selector: '{job="platformEngine"} |= "printHibernateStatistics"'
+          stages:
+            - regex:
+                expression: 't=(?P<timeStamp>\\S+ \\S+).*lvl=(?P<lvl>\\S+).*\\[(?P<thread>\\S+)\\]\\:(?P<filename>\\S+)\\.(?P<funcName>\\S+)\\(\\)(?P<lineno>\\d+).*message=.*startTime\\s(?P<startTime>\\d+).*endTime\\s(?P<endTime>\\d+)'
+            - labels:
+                endTime:
+                filename:
+                funcName:
+                lineno:
+                lvl:
+                startTime:
+                thread:
+                timeStamp:
+      - match:
+          selector: '{job="platformEngine"} |= "Type=HibernateStatistics" |= "printHibernateStatistics"'
+          stages:
+            - regex:
+                expression: 't=(?P<timeStamp>\\S+ \\S+).*lvl=(?P<lvl>\\S+).*\\[(?P<thread>\\S+)\\]\\:(?P<filename>\\S+)\\.(?P<funcName>\\S+)\\(\\)(?P<lineno>\\d+).*message=Type=(?P<Type>\\S+).*className=(?P<className>\\S+).*methodName=(?P<methodName>\\S+).*lineNo=(?P<lineNo>\\d+).*serviceFileName=(?P<serviceFileName>\\S+).*serviceFileLineNo=(?P<serviceFileLineNo>\\d+).*processingTime=(?P<processingTime>\\d+).*sourceProperty=(?P<sourceProperty>[\\S\\s]+).*rows=(?P<rows>\\d+)'
+            - labels:
+                Type:
+                className:
+                filename:
+                funcName:
+                lineNo:
+                lineno:
+                lvl:
+                methodName:
+                processingTime:
+                rows:
+                serviceFileLineNo:
+                serviceFileName:
+                sourceProperty:
+                thread:
+                timeStamp:
+      - match:
+          selector: '{job="platformEngine"} |= "neo4jCommunication"'
+          stages:
+            - regex:
+                expression: 't=(?P<timeStamp>\\S+ \\S+).*lvl=(?P<lvl>\\S+).*\\[(?P<thread>\\S+)\\]\\:(?P<filename>\\S+)\\.(?P<funcName>\\S+)\\(\\)(?P<lineno>\\d+).*message=Type=(?P<Type>\\S+).*className=(?P<className>\\S+).*methodName=(?P<methodName>\\S+).*lineNo=(?P<lineNo>\\d+).*Datasource=(?P<Datasource>\\S+).*ProcessingTime=(?P<ProcessingTime>\\d+).*rowCount=(?P<rowCount>\\d+).*queryList=(?P<queryList>[\\S\\s]+)'
+            - labels:
+                Datasource:
+                ProcessingTime:
+                Type:
+                className:
+                filename:
+                funcName:
+                lineNo:
+                lineno:
+                lvl:
+                methodName:
+                queryList:
+                rowCount:
+                thread:
+                timeStamp:
+      - match:
+          selector: '{job="platformEngine"} |= "WebhookHealth"'
+          stages:
+            - regex:
+                expression: 't=(?P<timeStamp>\\S+ \\S+).*lvl=(?P<lvl>\\S+).*\\[(?P<thread>\\S+)\\]\\:(?P<filename>\\S+)\\.(?P<funcName>\\S+)\\(\\)(?P<lineno>\\d+).*message=(?P<message>.*).*routingKey=(?P<routingKey>\\S+).*status=(?P<status>.*).*serverPort=(?P<serverPort>\\d+)'
+            - labels:
+                filename:
+                funcName:
+                lineno:
+                lvl:
+                message:
+                routingKey:
+                serverPort:
+                status:
+                thread:
+                timeStamp:
+      - match:
+          selector: '{job="platformEngine"} |= "Webhook"'
+          stages:
+            - regex:
+                expression: 't=(?P<timeStamp>\\S+ \\S+).*lvl=(?P<lvl>\\S+).*\\[(?P<thread>\\S+)\\]\\:(?P<filename>\\S+)\\.(?P<funcName>\\S+)\\(\\)(?P<lineno>\\d+).*message=(?P<message>.*).*WebhookName=(?P<WebhookName>\\S+).*MqChannel=(?P<MqChannel>\\S+).*status=(?P<status>.*).*Size=(?P<Size>\\d+).*ProcessingTime=(?P<ProcessingTime>-?\\d+)'
+            - labels:
+                filename:
+                funcName:
+                lineno:
+                lvl:
+                message:
+                WebhookName:
+                MqChannel:
+                Size:
+                ProcessingTime:
+                thread:
+                timeStamp:
+    static_configs:
+      - labels:
+          __path__: '${INSIGHTS_HOME}/logs/PlatformEngine/platformEngine.log'
+          job: platformEngine
+          tenant_id: machine1
+        targets:
+          - localhost
+  - job_name: platformWorkflow
+    pipeline_stages:      
+      - match:
+          selector: '{job="platformWorkflow"} |= "WorkFlowInitializer"'
+          stages:
+            - regex:
+                expression: 't=(?P<timeStamp>\\S+ \\S+).*lvl=(?P<lvl>\\S+).*\\[(?P<thread>\\S+)\\]\\:(?P<filename>\\S+)\\.(?P<funcName>\\S+)\\(\\)(?P<lineno>\\d+).*message=(?P<message>.*).*taskDescription=(?P<taskDescription>\\S+).*TaskMQChannel=(?P<TaskMQChannel>\\S+).*ComponentName=(?P<ComponentName>\\S+).*WorkflowType=(?P<WorkflowType>\\S+).*taskDescription=(?P<taskDescription>\\S+).*TaskMQChannel=(?P<TaskMQChannel>\\S+).*WorkflowType=(?P<WorkflowType>\\S+).*processingTime=(?P<processingTime>-?\\d+).*status=(?P<status>.*)'
+            - labels:
+                filename:
+                funcName:
+                lineno:
+                lvl:
+                message:
+                taskDescription:
+                TaskMQChannel:
+                ComponentName:
+                WorkflowType:
+                processingTime:
+                status:
+                thread:
+                timeStamp:  
+      - match:
+          selector: '{job="platformWorkflow"} |= "WorkFlow"'
+          stages:
+            - regex:
+                expression: 't=(?P<timeStamp>\\S+ \\S+).*lvl=(?P<lvl>\\S+).*\\[(?P<thread>\\S+)\\]\\:(?P<filename>\\S+)\\.(?P<funcName>\\S+)\\(\\)(?P<lineno>\\d+).*message=.*Type=(?P<Type>\\S+).*executionId=(?P<executionId>\\S+).*WorkflowId=(?P<WorkflowId>\\S+).*LastRunTime=(?P<LastRunTime>\\S+).*NextRunTime=(?P<NextRunTime>\\S+).*schedule=(?P<schedule>\\S+).*isTaskRetry=(?P<isTaskRetry>\\S+).*TaskRetryCount=(?P<TaskRetryCount>\\S+).*TaskDescription=(?P<TaskDescription>\\S+).*TaskMQChannel=(?P<TaskMQChannel>\\S+).*WorkflowType=(?P<WorkflowType>\\S+).*processingTime=(?P<processingTime>\\d+).*status(?P<status>).(?P<msg>.*)'
+            - labels:
+                timeStamp:
+                lvl:
+                thread:
+                filename:
+                funcName:
+                lineno:
+                message:
+                executionId:
+                WorkflowId:
+                LastRunTime:
+                NextRunTime:
+                schedule:
+                isTaskRetry:
+                TaskRetryCount:
+                TaskDescription:
+                TaskMQChannel:
+                processingTime:
+                status:
+                msg:
+      - match:
+          selector: '{job="platformWorkflow"} |= "EmailProcesser"'
+          stages:
+            - regex:
+                expression: 't=(?P<timeStamp>\\S+ \\S+).*lvl=(?P<lvl>\\S+).*\\[(?P<thread>\\S+)\\]\\:(?P<filename>\\S+)\\.(?P<funcName>\\S+)\\(\\)(?P<lineno>\\d+).*message=(?P<message>.*).*mailTo=(?P<mailTo>\\S+).*mailCC=(?P<mailCC>\\S+).*mailBCC=(?P<mailBCC>\\S+).*emailAttachmentName=(?P<emailAttachmentName>\\S+).*reportFilePath=(?P<reportFilePath>\\S+).*ProcessingTime=(?P<ProcessingTime>-?\\d+).*status=(?P<status>.*)'
+            - labels:
+                filename:
+                funcName:
+                lineno:
+                lvl:
+                message:
+                mailTo:
+                mailCC:
+                mailBCC:
+                emailAttachmentName:
+                reportFilePath:
+                processingTime:
+                thread:
+                timeStamp:      
+    static_configs:
+      - labels:
+          __path__: '${INSIGHTS_HOME}/logs/PlatformWorkflow/platformWorkflow.log'
+          job: platformWorkflow
+          tenant_id: machine1
+        targets:
+          - localhost                 
+server:
+  grpc_listen_port: 0
+  http_listen_port: ${PROMTAIL_LISTEN_PORT}
+target_config:
+  sync_period: 10s
+

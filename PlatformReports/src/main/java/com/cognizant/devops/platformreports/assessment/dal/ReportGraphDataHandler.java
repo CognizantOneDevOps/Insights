@@ -71,7 +71,7 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 		try {
 			String query = "UNWIND $props AS properties " + "CREATE (n:" + ReportEngineUtils.NEO4J_RESULT_LABEL + ") "
 					+ "SET n = properties";
-			JsonObject graphResponse = graphDBHandler.bulkCreateNodes(resultList, null, query);
+			JsonObject graphResponse = graphDBHandler.bulkCreateNodes(resultList,query);
 			parseGraphResponseForError(graphResponse);
 		} catch (InsightsCustomException e) {
 			log.error("Error while saving neo4j record {} ", e.getMessage());

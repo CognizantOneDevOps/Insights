@@ -309,7 +309,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 	@Test(priority = 19)
 	public void testUpdateAgent() throws InsightsCustomException {
 		
-		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
+		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
 		AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
 		agentManagementServiceImpl.updateAgent(agentId, configDetails, gitTool, 
 																version, osversion, false,false);
@@ -319,7 +319,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 	public void testUpdateAgentVersion() throws InsightsCustomException {
 		String expectedOutcome = "SUCCESS";
 		//String version = "v8.0";
-		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
+		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
 		AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
 		String response = agentManagementServiceImpl.updateAgent(agentId, configDetails, gitTool, version, osversion, false,false);
 		Assert.assertEquals(expectedOutcome, response);
@@ -391,7 +391,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 	@Test(priority = 28, expectedExceptions = InsightsCustomException.class)
 	public void testUpdateAgentWithEmptyAgentId() throws InsightsCustomException {
 		
-		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
+		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
 		AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
 		agentManagementServiceImpl.updateAgent("", configDetails, gitTool, version, osversion, false,false);
 	}

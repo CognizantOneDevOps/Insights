@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2019 Cognizant Technology Solutions
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -132,6 +132,41 @@ export class RestCallHandlerService {
     }
   }
 
+  public putWithParameter(url: string, requestParams?: Object, additionalheaders?: Object): Observable<any> {
+    var isSessionExpired = this.dataShare.validateSession();
+    if (!isSessionExpired) {
+      var restCallUrl = this.restAPIUrlService.getRestCallUrl(url);
+      var dataresponse;
+      let headers;
+      var authToken = this.dataShare.getAuthorizationToken();
+      var webAuthToken = this.dataShare.getWebAuthToken();
+      let params = new HttpParams();
+      for (var key in requestParams) {
+        if (requestParams.hasOwnProperty(key)) {
+          params = params.set(key, requestParams[key]);
+        }
+      }
+      headers = new HttpHeaders();
+      headers = headers.set(RequestHeader.AUTH_TOKEN, authToken);
+      headers = headers.set(RequestHeader.WEBAUTHUSER, webAuthToken);
+
+      for (var key in additionalheaders) {
+        if (headers.hasOwnProperty(key)) {
+          headers = headers.set(key, additionalheaders[key]);
+        }
+      }
+      var httpOptions = {
+        headers: headers,
+        params: params
+      }
+      dataresponse = this.http.put(restCallUrl, {}, httpOptions).pipe(catchError((e: any) => throwError(this.handleTokenError(e))));
+      return dataresponse;
+    } else {
+      console.log("Session Expire")
+    }
+  }
+
+
   public postWithParameter(url: string, requestParams?: Object, additionalheaders?: Object): Observable<any> {
     var isSessionExpired = this.dataShare.validateSession();
     if (!isSessionExpired) {
@@ -189,6 +224,8 @@ export class RestCallHandlerService {
   public postFormData(url: string, fd: any): Observable<any> {
     var isSessionExpired = this.dataShare.validateSession();
     if (!isSessionExpired) {
+      console.log("Inside postFormData")
+      console.log(url,fd);
       var restCallUrl = this.restAPIUrlService.getRestCallUrl(url);
       var authToken = this.dataShare.getAuthorizationToken();
       var webAuthToken = this.dataShare.getWebAuthToken();
@@ -198,7 +235,9 @@ export class RestCallHandlerService {
           'user': webAuthToken
         },
       }).pipe(catchError((e: any) => throwError(this.handleTokenError(e))))
+      console.log("dataRespone:",dataresponse);
       return dataresponse;
+
     } else {
       console.log("Session Expire")
     }

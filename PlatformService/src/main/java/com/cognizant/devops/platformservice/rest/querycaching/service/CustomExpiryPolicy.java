@@ -24,8 +24,7 @@ import org.ehcache.expiry.ExpiryPolicy;
 
 public class CustomExpiryPolicy<K, V extends EhcacheValue<?>> implements ExpiryPolicy<K, V> {
 
-    public CustomExpiryPolicy() {
-
+    public CustomExpiryPolicy() {    	
     }
 
     @Override

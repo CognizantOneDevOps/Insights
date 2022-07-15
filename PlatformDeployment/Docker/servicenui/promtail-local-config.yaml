@@ -1,0 +1,60 @@
+#-------------------------------------------------------------------------------
+# Copyright 2017 Cognizant Technology Solutions
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License.  You may obtain a copy
+# of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+# License for the specific language governing permissions and limitations under
+# the License.
+#-------------------------------------------------------------------------------
+
+server:
+  http_listen_port: ${PROMTAIL_LISTEN_PORT}
+  grpc_listen_port: 0
+
+positions:
+  filename: ./positions.yaml
+
+clients:
+  - url: http://${LOKI_HOST}:${LOKI_PORT}/loki/api/v1/push
+    tenant_id: "machine1"
+
+scrape_configs:
+
+  - job_name: PlatformService
+    static_configs:
+      - targets:
+          - localhost
+      - labels:
+          __path__: "${INSIGHTS_HOME}/logs/PlatformService/platformService.log"
+          job: PlatformService
+          tenant_id: machine1
+
+    pipeline_stages:
+      - match:
+          selector: '{job="PlatformService"}'
+          stages:
+            - regex:
+                expression: '^(?s)t=(?P<time>\\S+\\s\\S+)\\slvl=(?P<level>\\S+)\\sfileName=(?P<fileName>\\S+)\\smethodName=(?P<methodName>\\S+)\\slineno=(?P<lineno>\\S+)\\s(?:(Type)=(?P<Type>(.\\S+))\\s)?(?:(traceId)=(?P<traceId>(.\\S*))\\s)?(?:(method)=(?P<method>(.\\S*))\\s)?(?:(endpoint)=(?P<endpoint>(.\\S*))\\s)?(?:(processingTime)=(?P<processingTime>(.\\S*))\\s)?(?:(message)=(?P<message>(.*)))?'
+            - labels:
+                time:
+                level:
+                fileName:
+                methodName:
+                lineno:
+                Type:
+                traceId:
+                method:
+                endpoint:
+                processingTime:
+                message:
+
+target_config:
+    sync_period: "10s"
+

@@ -218,35 +218,44 @@ public class FusionChartHandler implements BasePDFProcessor {
 		if (eachKpiResult.has("contentResult")) {
 			JsonArray kpiContentArray = eachKpiResult.get("contentResult").getAsJsonArray();
 			log.debug("Worlflow Detail ==== generateChartsConfig for kpi {} kpiContentArray  {} ", kpiId,
-					kpiContentArray);
-			if (kpiContentArray.size() > 0) {
-				JsonObject content = kpiContentArray.get(0).getAsJsonObject();
-				JsonArray dataArray = content.get("data").getAsJsonArray();
-				List<String> observationList = new ArrayList<>();
-				for (JsonElement eachData : dataArray) {
-					JsonObject eachRowObject = eachData.getAsJsonObject();
-					JsonArray eachRowArray = eachRowObject.get("row").getAsJsonArray();
-					// Assuming First Array Item as content Text
-					if (!eachRowArray.get(0).isJsonNull()) {
-						String contentText = eachRowArray.get(0).getAsString();
-						// Assuming Second Array Item as content Id
-						String contentId = eachRowArray.get(1).getAsString();
-						if (!isTable) {
-							contentMap.put(contentId, contentText);
-						}
-						observationList.add(contentText);
-					} else {
-						log.debug(
-								"Worlflow Detail ==== generateChartsConfig for Content {} value is null in kpiContentArray  {} ",
-								eachRowArray.get(1).getAsString(), eachData);
-					}
-				}
-				kpiContentMap.put(kpiId, observationList);
-			}
-
+					kpiContentArray);			
+			
+			prepareKpiContentMap(kpiContentArray,isTable,contentMap,kpiId,kpiContentMap);
+			
 		}
 	}
 
+	private void prepareKpiContentMap(JsonArray kpiContentArray, boolean isTable, Map<String, String> contentMap,
+			            String kpiId, Map<String, List<String>> kpiContentMap) {
+		
+		if (kpiContentArray.size() > 0) {
+			JsonObject content = kpiContentArray.get(0).getAsJsonObject();
+			JsonArray dataArray = content.get("data").getAsJsonArray();
+			List<String> observationList = new ArrayList<>();
+			
+			for (JsonElement eachData : dataArray) {
+				JsonObject eachRowObject = eachData.getAsJsonObject();
+				JsonArray eachRowArray = eachRowObject.get("row").getAsJsonArray();
+				// Assuming First Array Item as content Text
+				if (!eachRowArray.get(0).isJsonNull()) {
+					String contentText = eachRowArray.get(0).getAsString();
+					// Assuming Second Array Item as content Id
+					String contentId = eachRowArray.get(1).getAsString();
+					if (!isTable) {
+						contentMap.put(contentId, contentText);
+					}
+					observationList.add(contentText);
+				} else {
+					log.debug(
+							"Worlflow Detail ==== generateChartsConfig for Content {} value is null in kpiContentArray  {} ",
+							eachRowArray.get(1).getAsString(), eachData);
+				}
+			}
+			kpiContentMap.put(kpiId, observationList);
+		}
+		
+	}
+	
 	private void modifyHtmlTemplate(InsightsAssessmentConfigurationDTO assessmentReportDTO) {
 		String templateHtmlPath = assessmentReportDTO.getPdfReportDirPath() + File.separator
 				+ assessmentReportDTO.getReportFilePath() + AssessmentReportAndWorkflowConstants.HTMLEXTENSION;

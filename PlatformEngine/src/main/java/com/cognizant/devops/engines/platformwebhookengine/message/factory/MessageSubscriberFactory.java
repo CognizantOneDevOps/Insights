@@ -43,7 +43,7 @@ public class MessageSubscriberFactory {
 	private static MessageSubscriberFactory instance = new MessageSubscriberFactory();
 
 	private void initConnectionFactory() throws InsightsCustomException {
-		try {
+		try{
 			connection = RabbitMQConnectionProvider.getConnection();
 			Channel channel = connection.createChannel();
 			channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE, true);
@@ -66,9 +66,9 @@ public class MessageSubscriberFactory {
 	public static MessageSubscriberFactory getInstance() {
 		return instance;
 	}
-
-	public void registerSubscriber(String routingKey, final EngineSubscriberResponseHandler responseHandler)
-			throws Exception {
+	public void registerSubscriber(String routingKey,
+			final EngineSubscriberResponseHandler responseHandler) {
+		try { 
 		Channel channel = connection.createChannel();
 		String queueName = routingKey.replace(".", "_");
 		channel.queueDeclare(queueName, true, false, false, RabbitMQConnectionProvider.getQueueArguments());
@@ -84,6 +84,9 @@ public class MessageSubscriberFactory {
 			}
 		};
 		channel.basicConsume(queueName, false, routingKey, consumer);
+		} catch (IOException e) {
+			log.error("Unable to create MQ connection", e);
+		}
 	}
 
 	public void unregisterSubscriber(String routingKey, final EngineSubscriberResponseHandler responseHandler)

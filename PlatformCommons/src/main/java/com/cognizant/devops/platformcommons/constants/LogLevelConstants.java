@@ -21,15 +21,15 @@ import java.util.List;
 
 import org.apache.logging.log4j.util.Strings;
 
-public interface LogLevelConstants {
+public final class LogLevelConstants {
 
-	String ROLLING_FILE_APPENDER = "RollingFile";
-	String CONSOLE_APPENDER = "Console";
-	String PLATFORMWEBHOOKSUBSCRIBER = "PlatformWebhookSubscriber";
-	String PLATFORMENGINE = "PlatformEngine";
-	String PLATFORMSERVICE = "PlatformService";
-	String PLATFORMREPORT = "PlatformReport";
-	String PLATFORMREGRESSIONTEST = "PlatformRegressionTest";
+	public static final String ROLLING_FILE_APPENDER = "RollingFile";
+	public static final String CONSOLE_APPENDER = "Console";
+	public static final String PLATFORMWEBHOOKSUBSCRIBER = "PlatformWebhookSubscriber";
+	public static final String PLATFORMENGINE = "PlatformEngine";
+	public static final String PLATFORMSERVICE = "PlatformService";
+	public static final String PLATFORMREPORT = "PlatformReport";
+	public static final String PLATFORMREGRESSIONTEST = "PlatformRegressionTest";
 	public static final List<String> UPDATED_LOGGER_LIST = Collections
 			.unmodifiableList(Arrays.asList("com.cognizant", Strings.EMPTY));
 }

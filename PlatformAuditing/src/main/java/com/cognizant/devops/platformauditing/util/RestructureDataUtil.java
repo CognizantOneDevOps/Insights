@@ -58,24 +58,6 @@ public class RestructureDataUtil {
 
     			//Read datamodel        
     			datamodel = datamodel.getAsJsonObject(input.getAsJsonPrimitive("toolName").getAsString().toUpperCase());
-    			for (Map.Entry<String, JsonElement> property : datamodel.entrySet()) {
-    				if (!property.getKey().equals(InsightsAuditConstants.UPLINK) && !property.getKey().equals(InsightsAuditConstants.DOWNLINK)) {
-    					if (property.getValue().isJsonObject()) {
-    						output.addProperty(property.getKey(), property.getValue().getAsJsonObject().getAsJsonPrimitive(property.getKey()).getAsString());
-    					} else if (property.getValue().isJsonArray()) {
-    						if (input.has(property.getValue().getAsJsonArray().get(0).getAsString())) {
-    							JsonArray inputValue = input.getAsJsonArray(property.getValue().getAsJsonArray().get(0).getAsString());
-    							output.add(property.getKey(), inputValue);
-    						} else                     	
-    							output.addProperty(property.getKey(), "N/A");
-    					} else {
-    						if (input.has(property.getValue().getAsString()))
-    							output.add(property.getKey(), input.getAsJsonPrimitive(property.getValue().getAsString()));
-    						else
-    							output.addProperty(property.getKey(), "N/A");
-    					}
-    				}
-    			}
     			output.add("date", humanDateFromTimestamp(output.get(InsightsAuditConstants.TIMESTAMP).getAsLong()));
     			output = addLinks(output, datamodel);        
     		}
@@ -84,6 +66,42 @@ public class RestructureDataUtil {
     		LOG.info("Neo4j input fields has NO assetId for the tool before insert into ledger:--{}", input);
     	}
     	return output;
+    }
+    
+    private JsonObject readDataModel(JsonObject datamodel, JsonObject input) {
+    	
+    	JsonObject output = new JsonObject();
+    	
+    	for (Map.Entry<String, JsonElement> property : datamodel.entrySet()) {
+			if (!property.getKey().equals(InsightsAuditConstants.UPLINK) && !property.getKey().equals(InsightsAuditConstants.DOWNLINK)) {
+				if (property.getValue().isJsonObject()) {
+					output.addProperty(property.getKey(), property.getValue().getAsJsonObject().getAsJsonPrimitive(property.getKey()).getAsString());
+				} else if (property.getValue().isJsonArray()) {
+					
+					output = dataIsJsonArray(property,input);            	
+						
+				} else {
+					if (input.has(property.getValue().getAsString()))
+						output.add(property.getKey(), input.getAsJsonPrimitive(property.getValue().getAsString()));
+					else
+						output.addProperty(property.getKey(), "N/A");
+				}
+			}
+		}
+    	
+    	return output;
+    }
+    
+    private JsonObject dataIsJsonArray(Entry<String, JsonElement> property, JsonObject input) {
+    	JsonObject jsonArrayOutput = new JsonObject();
+    	
+    	if (input.has(property.getValue().getAsJsonArray().get(0).getAsString())) {
+			JsonArray inputValue = input.getAsJsonArray(property.getValue().getAsJsonArray().get(0).getAsString());
+			jsonArrayOutput.add(property.getKey(), inputValue);
+		} else {
+			jsonArrayOutput.addProperty(property.getKey(), "N/A");
+			}  
+    	return jsonArrayOutput;
     }
 
     //convert the epoch timestamp to human date for consumption by chaincode
@@ -102,29 +120,9 @@ public class RestructureDataUtil {
             for (JsonElement tool : process) {
                 if (input.getAsJsonPrimitive(InsightsAuditConstants.TOOLNAME).getAsString().equalsIgnoreCase(tool.getAsJsonObject().getAsJsonPrimitive("Tool").getAsString())) {
                     if (tool.getAsJsonObject().get(InsightsAuditConstants.TYPES).isJsonArray()) {
-                        for (JsonElement type : tool.getAsJsonObject().get(InsightsAuditConstants.TYPES).getAsJsonArray()) {
-                            for (Map.Entry<String, JsonElement> property : type.getAsJsonObject().getAsJsonObject(InsightsAuditConstants.ENTITY).entrySet()) {
-                                if (input.getAsJsonPrimitive(property.getKey()).equals(property.getValue())) {
-                                    if (type.getAsJsonObject().getAsJsonPrimitive("SubworkflowFlag").getAsBoolean()) {
-                                        String inputEntity = input.getAsJsonPrimitive(type.getAsJsonObject().getAsJsonObject(InsightsAuditConstants.SUBWORKFLOW).getAsJsonPrimitive(InsightsAuditConstants.ENTITY).getAsString()).getAsString();
-                                        for (JsonElement step : type.getAsJsonObject().getAsJsonObject(InsightsAuditConstants.SUBWORKFLOW).getAsJsonArray("Steps")) {
-                                            if (inputEntity.equals(step.getAsJsonObject().getAsJsonPrimitive(InsightsAuditConstants.ENTITY).getAsString())) {
-                                                return step.getAsJsonObject().getAsJsonPrimitive(InsightsAuditConstants.INSERTINTOLEDGER).getAsBoolean();
-                                            }
-                                        }
-                                    } else {
-                                        return type.getAsJsonObject().getAsJsonPrimitive(InsightsAuditConstants.INSERTINTOLEDGER).getAsBoolean();
-                                    }
-                                }
-                            }
-                        }
+                    	return	toolInsertionIsJsonArray(tool,input);                  
                     } else if (tool.getAsJsonObject().getAsJsonPrimitive("SubworkflowFlag").getAsBoolean()) {
-                        String inputEntity = input.getAsJsonPrimitive(tool.getAsJsonObject().getAsJsonObject(InsightsAuditConstants.SUBWORKFLOW).getAsJsonPrimitive(InsightsAuditConstants.ENTITY).getAsString()).getAsString();
-                        for (JsonElement step : tool.getAsJsonObject().getAsJsonObject(InsightsAuditConstants.SUBWORKFLOW).getAsJsonArray("Steps")) {
-                            if (inputEntity.equals(step.getAsJsonObject().getAsJsonPrimitive(InsightsAuditConstants.ENTITY).getAsString())) {
-                                return step.getAsJsonObject().getAsJsonPrimitive(InsightsAuditConstants.INSERTINTOLEDGER).getAsBoolean();
-                            }
-                        }
+                    	return toolInsertion(input,tool);                       
                     } else {
                         return tool.getAsJsonObject().getAsJsonPrimitive(InsightsAuditConstants.INSERTINTOLEDGER).getAsBoolean();
                     }
@@ -137,7 +135,45 @@ public class RestructureDataUtil {
         LOG.error("No process rules defined for the given input:-%n", input);
         return false;
     }
+    
+    private boolean toolInsertion(JsonObject input, JsonElement tool) {
+    	boolean toolInsertionFlag = false;
+    	 String inputEntity = input.getAsJsonPrimitive(tool.getAsJsonObject().getAsJsonObject(InsightsAuditConstants.SUBWORKFLOW).getAsJsonPrimitive(InsightsAuditConstants.ENTITY).getAsString()).getAsString();
+         for (JsonElement step : tool.getAsJsonObject().getAsJsonObject(InsightsAuditConstants.SUBWORKFLOW).getAsJsonArray("Steps")) {
+             if (inputEntity.equals(step.getAsJsonObject().getAsJsonPrimitive(InsightsAuditConstants.ENTITY).getAsString())) {
+                 toolInsertionFlag = step.getAsJsonObject().getAsJsonPrimitive(InsightsAuditConstants.INSERTINTOLEDGER).getAsBoolean();
+             }
+         }
+    	return toolInsertionFlag;
+    }
 
+    private boolean toolInsertionIsJsonArray(JsonElement tool, JsonObject input) {
+    	boolean isInsertJsonArray = false;
+    	
+    	for (JsonElement type : tool.getAsJsonObject().get(InsightsAuditConstants.TYPES).getAsJsonArray()) {
+            for (Map.Entry<String, JsonElement> property : type.getAsJsonObject().getAsJsonObject(InsightsAuditConstants.ENTITY).entrySet()) {
+                if (input.getAsJsonPrimitive(property.getKey()).equals(property.getValue())) {
+                    if (type.getAsJsonObject().getAsJsonPrimitive("SubworkflowFlag").getAsBoolean()) {
+                    	isInsertJsonArray = typeInsertion(input,type);                    	
+                    } else {
+                    	isInsertJsonArray = type.getAsJsonObject().getAsJsonPrimitive(InsightsAuditConstants.INSERTINTOLEDGER).getAsBoolean();
+                    }
+                }
+            }
+        }
+    	return isInsertJsonArray;
+    }
+
+    private boolean typeInsertion(JsonObject input, JsonElement type) {
+    	boolean typeInsertionFlag = false;
+    	String inputEntity = input.getAsJsonPrimitive(type.getAsJsonObject().getAsJsonObject(InsightsAuditConstants.SUBWORKFLOW).getAsJsonPrimitive(InsightsAuditConstants.ENTITY).getAsString()).getAsString();
+        for (JsonElement step : type.getAsJsonObject().getAsJsonObject(InsightsAuditConstants.SUBWORKFLOW).getAsJsonArray("Steps")) {
+            if (inputEntity.equals(step.getAsJsonObject().getAsJsonPrimitive(InsightsAuditConstants.ENTITY).getAsString())) {
+            	typeInsertionFlag =  step.getAsJsonObject().getAsJsonPrimitive(InsightsAuditConstants.INSERTINTOLEDGER).getAsBoolean();
+            }
+        }
+        return typeInsertionFlag;
+    }
 
     //add the uplink and downlink fields
     public JsonObject addLinks(JsonObject input, JsonObject datamodel) {
@@ -177,10 +213,7 @@ public class RestructureDataUtil {
                     fieldnamesetFlag = false;
                     JsonObject jiraDataModel = LoadFile.getInstance().getDataModel().getAsJsonObject("JIRA");
                     for (Map.Entry<String, JsonElement> jiraProperty : jiraDataModel.entrySet()) {
-                        if (jiraProperty.getValue().isJsonArray() ? jiraProperty.getValue().getAsJsonArray().get(0).equals(input.getAsJsonPrimitive(property.getValue().getAsString())) : jiraProperty.getValue().equals(input.getAsJsonPrimitive(property.getValue().getAsString()))) {
-                            output.addProperty(property.getKey(), jiraProperty.getKey());
-                            fieldnamesetFlag = true;
-                        }
+                        fieldnamesetFlag = fieldNameFlagSetter(input, output, fieldnamesetFlag, property, jiraProperty);
                     }
                 } else
                     output.add(property.getKey(), input.getAsJsonPrimitive(property.getValue().getAsString()));
@@ -192,6 +225,15 @@ public class RestructureDataUtil {
         else
             return null;
     }
+
+	private boolean fieldNameFlagSetter(JsonObject input, JsonObject output, boolean fieldnamesetFlag,
+			Map.Entry<String, JsonElement> property, Map.Entry<String, JsonElement> jiraProperty) {
+		if (jiraProperty.getValue().isJsonArray() ? jiraProperty.getValue().getAsJsonArray().get(0).equals(input.getAsJsonPrimitive(property.getValue().getAsString())) : jiraProperty.getValue().equals(input.getAsJsonPrimitive(property.getValue().getAsString()))) {
+		    output.addProperty(property.getKey(), jiraProperty.getKey());
+		    fieldnamesetFlag = true;
+		}
+		return fieldnamesetFlag;
+	}
 
     //Construct a new jira node using the old jira node read from ledger and the changes obtained from neo4j
     public JsonObject constructJiraFromChangelog(JsonObject jiraNode, JsonObject changelog) {

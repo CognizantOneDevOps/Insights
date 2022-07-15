@@ -47,26 +47,37 @@ public class SignatureUtils {
 				COSDictionary signatureDict = (COSDictionary) base;
 				base = signatureDict.getDictionaryObject("Reference");
 				if (base instanceof COSArray) {
-					COSArray refArray = (COSArray) base;
-					for (int i = 0; i < refArray.size(); ++i) {
-						base = refArray.getObject(i);
-						if (base instanceof COSDictionary) {
-							COSDictionary sigRefDict = (COSDictionary) base;
-							if (COSName.DOC.equals(sigRefDict.getDictionaryObject(TRANSFORMPARAMS))) {
-								base = sigRefDict.getDictionaryObject(TRANSFORMPARAMS);
-								if (base instanceof COSDictionary) {
-									COSDictionary transformDict = (COSDictionary) base;
-									int accessPermissions = transformDict.getInt(COSName.P, 2);
-									if (accessPermissions < 1 || accessPermissions > 3) {
-										accessPermissions = 2;
-									}
-									return accessPermissions;
-								}
-							}
-						}
-					}
-
+					COSArray refArray = (COSArray) base;				
+					return accessPermissions(refArray,base);				
 				}
+			}
+		}
+		return 0;
+	}
+	
+	private static int accessPermissions(COSArray refArray, COSBase base) {
+		
+		for (int i = 0; i < refArray.size(); ++i) {
+			base = refArray.getObject(i);
+			if (base instanceof COSDictionary) {
+				COSDictionary sigRefDict = (COSDictionary) base;			
+			    return validateAccess(sigRefDict,base);			
+			}
+		}
+		return 0;
+	}
+	
+	private static int validateAccess(COSDictionary sigRefDict, COSBase base) {
+		
+		if (COSName.DOC.equals(sigRefDict.getDictionaryObject(TRANSFORMPARAMS))) {
+			base = sigRefDict.getDictionaryObject(TRANSFORMPARAMS);
+			if (base instanceof COSDictionary) {
+				COSDictionary transformDict = (COSDictionary) base;
+				int accessPermissions = transformDict.getInt(COSName.P, 2);
+				if (accessPermissions < 1 || accessPermissions > 3) {
+					accessPermissions = 2;
+				}
+				return accessPermissions;
 			}
 		}
 		return 0;

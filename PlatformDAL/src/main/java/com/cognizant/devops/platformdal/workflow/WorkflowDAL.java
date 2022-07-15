@@ -53,7 +53,7 @@ public class WorkflowDAL extends BaseDAL {
 		try {
 			Validator validate = getESAPIValidator() ;
 			String validatedworkflowId = validate.getValidInput("DAL_workflowId_parameter_checking", workflowId,
-					"SafeString", 600, false);
+					AssessmentReportAndWorkflowConstants.SAFESTRING, 600, false);
 			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, validatedworkflowId);
 			List<InsightsWorkflowTaskSequence> asssessmentList = getResultList(
@@ -582,7 +582,7 @@ public class WorkflowDAL extends BaseDAL {
 		try {
 			Validator validate = getESAPIValidator() ;
 			String validatedworkflowId = validate.getValidInput("DAL_workflowId_parameter_checking_while_retrieving_task", workflowId,
-					"SafeString", 600, false);
+					AssessmentReportAndWorkflowConstants.SAFESTRING, 600, false);
 			String validatedlatestExecutionId = validate.getValidInput("DAL_workflow_executionId_parameter_checking", String.valueOf(latestExecutionId),
 					"ExecutionId", 600, false);
 			Map<String, Object> parameters = new HashMap<>();
@@ -882,7 +882,7 @@ public class WorkflowDAL extends BaseDAL {
 		try {
 			Validator validate = getESAPIValidator() ;
 			String validatedworkflowId = validate.getValidInput("DAL_workflowId_parameter_checking_For_Email_deletion", workflowId,
-								"SafeString", 600, false);
+					AssessmentReportAndWorkflowConstants.SAFESTRING, 600, false);
 			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, validatedworkflowId);
 			List<InsightsReportVisualizationContainer> executionRecords = getResultList(
@@ -910,7 +910,7 @@ public class WorkflowDAL extends BaseDAL {
 		try {
 			Validator validate = getESAPIValidator() ;
 			String validatedworkflowId = validate.getValidInput("DAL_workflowId_parameter_checking_while_deleting_email_template", workflowId,
-								"SafeString", 600, false);
+					AssessmentReportAndWorkflowConstants.SAFESTRING, 600, false);
 			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, validatedworkflowId);
 			List<InsightsEmailTemplates> executionRecords = getResultList(

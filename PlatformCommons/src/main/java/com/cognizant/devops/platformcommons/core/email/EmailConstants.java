@@ -16,35 +16,35 @@
 
 package com.cognizant.devops.platformcommons.core.email;
 
-public interface EmailConstants {
+public final class EmailConstants {
 	
-	  String BASIC="Basic  ";
-	  String DATA = "data";
-	  String INFERENCEDETAILS = "inferenceDetails";
-	  String SENTIMENT = "sentiment";
-	  String NEUTRAL = "NEUTRAL";
-	  String POSITIVE = "POSITIVE";
-	  String NEGATIVE = "NEGATIVE";
-	  String CLASSPATH ="classpath";
-	  String LOADER ="classpath.resource.loader.class";
-	  String NOOFNEUTRAL	 ="noOfNeutral";
-	  String NOOFPOSITIVE ="noOfPositives";
-	  String NOOFNEGATIVE ="noOfNegatives";
-	  String ACCORDIANDATA ="accordianData";	
-	  String ACCEPT ="Accept";
-	  String AUTHORIZATION ="Authorization";	
-	  String FORMAT ="format";
-	  String FLOWED ="flowed";
-	  String CONTENTTYPE ="Content-type";
-	  String CHARSET ="text/HTML; charset=UTF-8";
-	  String BIT ="8bit";
-	  String ENCODING ="Content-Transfer-Encoding";
-	  String NOREPLY ="NoReply-OneDevops";
-	  String SMTPHOST ="mail.smtp.host";
-	  String SMTPPORT = "mail.smtp.port";
-	  String SMTPUSER = "mail.smtp.user";
-	  String UTF ="UTF-8";
-	  String HTML ="text/html";
-	  String SUBJECT ="Insights inference details";
+	  public static final String BASIC="Basic  ";
+	  public static final String DATA = "data";
+	  public static final String INFERENCEDETAILS = "inferenceDetails";
+	  public static final String SENTIMENT = "sentiment";
+	  public static final String NEUTRAL = "NEUTRAL";
+	  public static final String POSITIVE = "POSITIVE";
+	  public static final String NEGATIVE = "NEGATIVE";
+	  public static final String CLASSPATH ="classpath";
+	  public static final String LOADER ="classpath.resource.loader.class";
+	  public static final String NOOFNEUTRAL	 ="noOfNeutral";
+	  public static final String NOOFPOSITIVE ="noOfPositives";
+	  public static final String NOOFNEGATIVE ="noOfNegatives";
+	  public static final String ACCORDIANDATA ="accordianData";	
+	  public static final String ACCEPT ="Accept";
+	  public static final String AUTHORIZATION ="Authorization";	
+	  public static final String FORMAT ="format";
+	  public static final String FLOWED ="flowed";
+	  public static final String CONTENTTYPE ="Content-type";
+	  public static final String CHARSET ="text/HTML; charset=UTF-8";
+	  public static final String BIT ="8bit";
+	  public static final String ENCODING ="Content-Transfer-Encoding";
+	  public static final String NOREPLY ="NoReply-OneDevops";
+	  public static final String SMTPHOST ="mail.smtp.host";
+	  public static final String SMTPPORT = "mail.smtp.port";
+	  public static final String SMTPUSER = "mail.smtp.user";
+	  public static final String UTF ="UTF-8";
+	  public static final String HTML ="text/html";
+	  public static final String SUBJECT ="Insights inference details";
 
 }

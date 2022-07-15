@@ -51,64 +51,47 @@ public class AppProperties {
 	
 	@Value("${app.enableDeadLetterExchange}")
 	public static boolean enableDeadLetterExchange = false;
-	
-	
-	
 
 	public static String getMqHost() {
 		return mqHost;
 	}
-
 	public  void setMqHost(String mqHost) {
 		this.mqHost = mqHost;
 	}
-
 	public  String getMqUser() {
 		return mqUser;
 	}
-
 	public  void setMqUser(String mqUser) {
 		this.mqUser = mqUser;
 	}
-
 	public  String getMqPassword() {
 		return mqPassword;
 	}
-
 	public  void setMqPassword(String mqPassword) {
 		this.mqPassword = mqPassword;
 	}
-
 	public String getMqExchangeName() {
 		return mqExchangeName;
 	}
-
 	public void setMqExchangeName(String mqExchangeName) {
 		this.mqExchangeName = mqExchangeName;
 	}
-
 	public String getInstanceName() {
 		return instanceName;
 	}
-
 	public void setInstanceName(String instanceName) {
 		this.instanceName = instanceName;
 	}
-
 	public static int getPort() {
 		return port;
 	}
-
 	public void setPort(int port) {
 		this.port = port;
 	}
-
 	public  boolean isEnableDeadLetterExchange() {
 		return enableDeadLetterExchange;
 	}
-
 	public  void setEnableDeadLetterExchange(boolean enableDeadLetterExchange) {
 		this.enableDeadLetterExchange = enableDeadLetterExchange;
 	}
-
 }

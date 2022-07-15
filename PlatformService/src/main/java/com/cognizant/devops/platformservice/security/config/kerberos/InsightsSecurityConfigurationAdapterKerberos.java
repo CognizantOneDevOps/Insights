@@ -271,6 +271,7 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 	@Bean
 	@Conditional(InsightsKerberosBeanInitializationCondition.class)
 	public SunJaasKerberosTicketValidator sunJaasKerberosTicketValidator() {
+		
 		Resource storeFile = resourceLoaderService
 				.getResource("file:" + singleSignOnConfig.getKeyTabLocationKerberos());
 		SunJaasKerberosTicketValidator ticketValidator = new SunJaasKerberosTicketValidator();

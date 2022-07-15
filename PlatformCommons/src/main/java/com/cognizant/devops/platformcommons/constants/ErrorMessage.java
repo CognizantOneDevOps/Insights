@@ -15,16 +15,17 @@
  ******************************************************************************/
 package com.cognizant.devops.platformcommons.constants;
 
-public interface ErrorMessage {
-	 String CATEGORY_AND_TOOL_NAME_NOT_SPECIFIED = "Category name and tool name is not specified";
-	 String DB_INSERTION_FAILED = "Failed to insert record in Databse";
-	 String UNEXPECTED_ERROR = "Unexpected error occured";
-	 String USERNAME_MISSING = "Missing Username";
-	 String ROLES_MISSING = "Missing Roles";
-	 String LAYOUT_SETTINGS_MISSING = "Layout settings are not specified";
-	String ERRORLOG="errorLog";
-	String PDFEXECUTION_ERROR="PDFExecutionSubscriber Completed with error ";
-	String WORKFLOW_ERROR="Worlflow Detail ==== Error setting PDF details in Email History table";
-	String FETCH_ERROR_MESSAGE="Error while fetching execution ids";
+
+public final class ErrorMessage {
+	 public static final String CATEGORY_AND_TOOL_NAME_NOT_SPECIFIED = "Category name and tool name is not specified";
+	 public static final String DB_INSERTION_FAILED = "Failed to insert record in Databse";
+	 public static final String UNEXPECTED_ERROR = "Unexpected error occured";
+	 public static final String USERNAME_MISSING = "Missing Username";
+	 public static final String ROLES_MISSING = "Missing Roles";
+	 public static final String LAYOUT_SETTINGS_MISSING = "Layout settings are not specified";
+	public static final String ERRORLOG="errorLog";
+	public static final String PDFEXECUTION_ERROR="PDFExecutionSubscriber Completed with error ";
+	public static final String WORKFLOW_ERROR="Worlflow Detail ==== Error setting PDF details in Email History table";
+	public static final String FETCH_ERROR_MESSAGE="Error while fetching execution ids";
 	 						
 }

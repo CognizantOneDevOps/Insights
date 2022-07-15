@@ -148,6 +148,7 @@
 }
 
 .eyeCss {
+  color: var(--text-clr9);
   height: 35px !important;
 }
 
@@ -314,10 +315,6 @@ input:focus {
   grid-template-columns: 50% 50%;
   overflow-y: auto;
   overflow-x: hidden;
-}
-
-.asteriskText {
-  color: #ff0000;
 }
 
 th :first-child {

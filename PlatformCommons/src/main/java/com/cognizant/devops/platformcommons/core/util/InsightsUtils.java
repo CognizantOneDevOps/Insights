@@ -476,7 +476,7 @@ public class InsightsUtils {
 		return dtf.format(now);
 	}
 
-	public static String getUtcTime(String timezone) {
+	public static String getUtcTimeComponentStatus(String timezone) {
 		SimpleDateFormat dtf = new SimpleDateFormat(DATE_TIME_FORMAT);
 		dtf.setTimeZone(TimeZone.getTimeZone(timezone));
 		return dtf.format(new Date());

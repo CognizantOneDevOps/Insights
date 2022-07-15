@@ -59,7 +59,7 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 			JsonObject json = JsonUtils.parseStringAsJsonObject(validatedResponse);
 			log.debug("arg0 {} ", json);
 			nodeProperties.add(json);
-			JsonObject graphResponse = dbHandler.bulkCreateNodes(nodeProperties, null, query);
+			JsonObject graphResponse = dbHandler.bulkCreateNodes(nodeProperties, query);
 			if (graphResponse.get(DatataggingConstants.RESPONSE).getAsJsonObject().get(DatataggingConstants.ERRORS)
 					.getAsJsonArray().size() > 0) {
 				log.error(graphResponse);

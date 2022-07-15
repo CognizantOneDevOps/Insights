@@ -96,6 +96,11 @@ export class MenuListItemComponent implements OnInit {
     if (item.iconName === "grafanaOrg"){
       this.dataShare.setCurrOrg(item.displayName);
     }
+    if((this.item.iconName === 'grafanaOrg' || this.item.menuId==='Playlist')){
+      this.homeController.grafanaCheck = true;
+    }else{
+      this.homeController.grafanaCheck = false;
+    }
   }
 
   depthCal(depth,item: NavItem){

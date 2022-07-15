@@ -24,9 +24,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.Authenticator;
 import java.net.InetSocketAddress;
-import java.net.PasswordAuthentication;
 import java.net.Proxy;
 import java.net.SocketAddress;
 import java.net.URL;
@@ -37,10 +35,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -53,27 +49,29 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.util.FileCopyUtils;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.AgentCommonConstant;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
-import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
+import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class AgentManagementUtil {
+	
 
 	private static final AgentManagementUtil agentManagementUtil = new AgentManagementUtil();
 	private static Logger log = LogManager.getLogger(AgentManagementUtil.class);
-	private static final Set<String> validFileExtention = new HashSet<String>(
-			Arrays.asList(new String[] { "py", "json", "bat", "sh" ,"service"}));
+	private static final Set<String> validFileExtention = Sets.newHashSet("py", "json", "bat", "sh" ,"service");
+	private static final String BASIC = "Basic ";
+	
 	private AgentManagementUtil() {
 	}
 	public static AgentManagementUtil getInstance() {
 		return agentManagementUtil;
 	}
 
-	public  JsonObject getAgentConfigfile(URL filePath, File targetDir) throws IOException, InsightsCustomException  {
+	public  JsonObject getAgentConfigfile(URL filePath, File targetDir) throws IOException  {
 		String login = ApplicationConfigProvider.getInstance().getAgentDetails().getNexusUserName() 
 				+ ":" +ApplicationConfigProvider.getInstance().getAgentDetails().getNexusPassword();
 		String base64login = Base64.getEncoder().encodeToString(login.getBytes());
@@ -90,7 +88,8 @@ public class AgentManagementUtil {
 		}else{
 			conn = filePath.openConnection();
 		}
-		conn.setRequestProperty (AuthenticationUtils.AUTH_HEADER_KEY, "Basic "+base64login);
+		String basicAuth =BASIC+base64login;
+		conn.setRequestProperty(AuthenticationUtils.AUTH_HEADER_KEY,basicAuth);
 		try(InputStream in = new BufferedInputStream(conn.getInputStream(), 1024);
 				OutputStream out = new BufferedOutputStream(new FileOutputStream(zip))){
 			copyInputStream(in, out);
@@ -121,15 +120,27 @@ public class AgentManagementUtil {
 			throw new IOException("Could not create directory" + targetDir);
 		}
 		String filePath=null;
+		filePath = getAgentConfigFilePath(zip, targetDir, filePath);
+		log.debug("config file filePath ============ {} ",filePath);
+		if(zip.exists()){
+			Path path = Paths.get(zip.getPath());
+			Files.delete(path);
+		}
+		
+		return readJsonFile(targetDir, filePath);
+	}
+	
+	private String getAgentConfigFilePath(File zip, File targetDir, String filePath)
+			throws IOException {
+		
 		try(ZipFile zipFile = new ZipFile(zip);){
 			for (Enumeration entries = zipFile.entries(); entries.hasMoreElements();) {
 				ZipEntry entry = (ZipEntry) entries.nextElement();
 				String extentation = FilenameUtils.getExtension(entry.getName());
+				log.debug(" extentation  {} ", extentation);
 				if (validFileExtention.contains(extentation)) {
 					File file = new File(targetDir, File.separator + entry.getName());
-					if (!buildDirectory(file.getParentFile())) {
-						throw new IOException("Could not create directory: " + file.getParentFile());
-					}
+					checkParentDirectory(file);
 					if (!entry.isDirectory()) {
 						copyInputStream(zipFile.getInputStream(entry),
 								new BufferedOutputStream(new FileOutputStream(file)));
@@ -144,12 +155,15 @@ public class AgentManagementUtil {
 				}
 			}
 		}
-		if(zip.exists()){
-			Path path = Paths.get(zip.getPath());
-			Files.delete(path);
-		}
-		return readJsonFile(targetDir, filePath);
+		return filePath;
 	}
+	private void checkParentDirectory(File file) throws IOException {
+		if (!buildDirectory(file.getParentFile())) {
+			throw new IOException("Could not create directory: " + file.getParentFile());
+		}
+	}
+
+	
 
 	private JsonObject readJsonFile(File targetDir, String filePath) throws IOException {
 		File file = new File(targetDir+File.separator+filePath);
@@ -210,7 +224,7 @@ public class AgentManagementUtil {
 			
 			String result = unzipAgentsPackage(zip, targetDir);
 			if(result.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
-				message = "Downloaded agents package - " + version + " at " + targetDir.toString();
+				message = "Downloaded agents package - " + version;
 			}
 		}
 		return message;
@@ -219,7 +233,7 @@ public class AgentManagementUtil {
 	private String unzipAgentsPackage(File zip, File targetDir) throws IOException {
 		String message =  "";
 		if (!zip.exists()) {
-			throw new IOException(zip.getAbsolutePath() + " does not exist");
+			throw new IOException(zip.getAbsolutePath() + AgentCommonConstant.DOES_NOT_EXIST);
 		}
 		if (!buildDirectory(targetDir)) {
 			throw new IOException("Could not create directory" + targetDir);
@@ -231,7 +245,7 @@ public class AgentManagementUtil {
 				entryName = entryName.replaceFirst("agents/", "");
 					File file = new File(targetDir, File.separator + entryName);
 					if (!buildDirectory(file.getParentFile())) {
-						throw new IOException("Could not create directory: " + file.getParentFile());
+						throw new IOException(AgentCommonConstant.COULD_NOT_CREATE_DIR + file.getParentFile());
 					}
 					if (!entry.isDirectory()) {
 						copyInputStream(zipFile.getInputStream(entry),
@@ -239,7 +253,7 @@ public class AgentManagementUtil {
 
 					} else {
 						if (!buildDirectory(file)) {
-							throw new IOException("Could not create directory: " + file);
+							throw new IOException(AgentCommonConstant.COULD_NOT_CREATE_DIR + file);
 						}
 					}
 				

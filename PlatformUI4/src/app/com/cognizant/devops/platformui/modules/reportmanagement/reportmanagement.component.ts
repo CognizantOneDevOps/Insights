@@ -274,6 +274,7 @@ export class ReportManagementComponent implements OnInit {
     );
     const param = paramCheck.length > 0 ? paramCheck[0] : {};
     this.configParams = JSON.stringify({ type: "edit", data: param });
+    console.log("Inside ReportManagement:",this.configParams);
     this.naivagate();
   }
 
@@ -355,8 +356,8 @@ export class ReportManagementComponent implements OnInit {
       this.dialog.open(WorkflowHistoryDetailsDialog, {
         disableClose: true,
         panelClass: "custom-dialog-container",
-        height: "75%",
-        width: "75%",
+        height: "1170px",
+        width: "550px",
         data: {
           reportName: reportName,
           workflowId: workflowId,

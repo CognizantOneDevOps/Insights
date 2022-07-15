@@ -243,7 +243,7 @@ export class WebHookComponent implements OnInit {
   }
 
   addWebHook() {
-    this.isEdit = true;
+    this.isEdit = false;
     this.showAddWebHook = true;
     this.enableWebhookicon = true;
     this.showWebhook = false;

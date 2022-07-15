@@ -17,41 +17,41 @@ package com.cognizant.devops.platformcommons.constants;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 
-public interface ServiceStatusConstants {
-	String PLATFORM_SERVICE_HOST = ApplicationConfigProvider.getInstance().getInsightsServiceURL();
-	String INSIGHTS_INFERENCE_MASTER_HOST = ApplicationConfigProvider.getInstance().getSparkConfigurations()
-			.getSparkMasterExecutionEndPoint();
-	String ES_HOST = ApplicationConfigProvider.getInstance().getEndpointData().getElasticSearchEndpoint();
-	String PlatformService = "Platform Service";
-	String InsightsInference = "Insights Inference Engine";
-	String ES = "Elasticsearch";
-	String type = "type";
-	String DB = "Database";
-	String OTHERS = "Others";
-	String Service = "Service";
-	String DemonAgent = "Demon Agent";
-	String PlatformWebhookSubscriber = "Platform WebhookSubscriber";
-	String PlatformWebhookEngine = "Platform WebhookEngine";
-	String PlatformAuditEngine = "Platform AuditEngine";
-	String PlatformEngine = "Platform Engine";
-	String PlatformDataArchivalEngine = "Platform DataArchivalEngine";
-	String PgSQL = "PostgreSQL";
-	String POSTGRESQL_HOST = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint();
-	String Neo4j = "Neo4j";
-	String NEO4J_HOST = ApplicationConfigProvider.getInstance().getGraph().getEndpoint();
-	String RabbitMq = "RabbitMQ";
-	String RABBIT_MQ_HOST = "http://" + ApplicationConfigProvider.getInstance().getMessageQueue().getHost() + ":15672";
-	String Agents = "Agents";
-	String PlatformWorkflow = "Platform Workflow";
-	String LOKI_HOST = "http://localhost:3100";
-	String PROMTAIL_HOST = "http://localhost:9080";
-	String LOKI = "Loki";
-	String PROMTAIL = "Promtail";
-	String GRAFANA_HOST = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint();
-	String GRAFANA = "Grafana";
-	String VAULT_HOST = ApplicationConfigProvider.getInstance().getVault().getVaultEndPoint();
-	String VAULT = "Vault";
-	String H2O_HOST = ApplicationConfigProvider.getInstance().getMlConfiguration().getH2oEndpoint();
-	String H2O = "H2O";
-	String PYTHON = "Python";
+public final class ServiceStatusConstants {
+	public static final String POSTGRESQL_HOST = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint();
+	public static final String PLATFORM_SERVICE_HOST = ApplicationConfigProvider.getInstance().getInsightsServiceURL();
+	public static final String INSIGHTS_INFERENCE_MASTER_HOST = ApplicationConfigProvider.getInstance().getSparkConfigurations().getSparkMasterExecutionEndPoint();
+	public static final String NEO4J_HOST = ApplicationConfigProvider.getInstance().getGraph().getEndpoint();
+	public static final String ES_HOST = ApplicationConfigProvider.getInstance().getEndpointData().getElasticSearchEndpoint();
+	public static final String RABBIT_MQ = "http://" + ApplicationConfigProvider.getInstance().getMessageQueue().getHost() + ":15672";
+	public static final String NEO4J = "Neo4j";
+	public static final String PGSQL = "PostgreSQL";
+	public static final String PLATFORM_SERVICE = "Platform Service";
+	public static final String INSIGHTSINFERENCE = "Insights Inference Engine";
+	public static final String ES = "Elasticsearch";
+	public static final String TYPE = "type";
+	public static final String DB = "Database";
+	public static final String SERVICE = "Service";
+	public static final String DEMON_AGENT = "Demon Agent";
+	public static final String PLATFORM_WEBHOOK_SUBSCRIBER = "Platform WebhookSubscriber";
+	public static final String PLATFORM_WEBHOOKENGINE = "Platform WebhookEngine";
+	public static final String PLATFORM_AUDIT_ENGINE = "Platform AuditEngine";
+	public static final String PLATFORM_ENGINE = "Platform Engine";
+	public static final String PLATFORM_DATA_ARCHIVAL_ENGINE = "Platform DataArchivalEngine";
+	public static final String RABBITMQ = "RabbitMQ";
+	public static final String AGENTS = "Agents";
+	public static final String PLATFORM_WORKFLOW = "Platform Workflow";
+	public static final String OTHERS = "Others";
+	public static final String LOKI_HOST = "http://localhost:3100";
+	public static final String PROMTAIL_HOST = "http://localhost:9080";
+	public static final String LOKI = "Loki";
+	public static final String PROMTAIL = "Promtail";
+	public static final String GRAFANA_HOST = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint();
+	public static final String GRAFANA = "Grafana";
+	public static final String VAULT_HOST = ApplicationConfigProvider.getInstance().getVault().getVaultEndPoint();
+	public static final String VAULT = "Vault";
+	public static final String H2O_HOST = ApplicationConfigProvider.getInstance().getMlConfiguration().getH2oEndpoint();
+	public static final String H2O = "H2O";
+	public static final String PYTHON = "Python";
+
 }

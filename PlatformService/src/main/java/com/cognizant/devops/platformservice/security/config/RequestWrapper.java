@@ -107,7 +107,7 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
 			for (int i =0; i < headersCount; i++ ) {
 				String headerName = headerNameslist.get(i);
 				String headersValue = request.getHeader(headerName);
-				headerInfo.append(headerName.concat(DatataggingConstants.EQUALS).concat(headersValue).concat(DatataggingConstants.COMMA));
+				headerInfo.append(headerName.concat(DatataggingConstants.VALIDATE_ALLHEADERS_EQUALS).concat(headersValue).concat(DatataggingConstants.COMMA));
 				ValidationUtils.cleanXSS(headerName,headersValue);				
 			}
 			log.debug("In validatedAllHeaders  ==== {} ",headerInfo);

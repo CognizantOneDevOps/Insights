@@ -49,10 +49,10 @@ public class CleanUpJobExecutor implements Job , ApplicationConfigInterface{
 
 	private void cleanUpTimerTaskStatusRecord() {
 		try {
-			String query= "	WITH limitStatusRecord AS " + 
+			String query= " WITH limitStatusRecord AS " + 
 					"  (SELECT STSDEL.taskstatusid " + 
 					"   FROM public.\"INSIGHTS_SCHEDULER_TASK_STATUS\" STSDEL, " + 
-					"	(SELECT min(STS.recordtimestamp) AS minRecordTimeSatus, " + 
+					" (SELECT min(STS.recordtimestamp) AS minRecordTimeSatus,  " + 
 					"             STS.timertaskmapping " + 
 					"      FROM public.\"INSIGHTS_SCHEDULER_TASK_STATUS\" STS " + 
 					"      INNER JOIN public.\"INSIGHTS_SCHEDULER_TASK_DEFINITION\" STD ON STS.timertaskmapping = STD.componentname " + 

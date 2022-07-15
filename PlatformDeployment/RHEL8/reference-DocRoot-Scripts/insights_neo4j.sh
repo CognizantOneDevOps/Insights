@@ -43,7 +43,7 @@ echo -n "Please enter neo4j default credentials: "
 read -s defneo4jcreds
 echo -n "Please enter new credentials for neo4j user: "
 read -s newneo4jcreds
-curl -X POST -u neo4j:$defneo4jcreds -H "Content-Type: application/json" -d '{"password":"'"$newneo4jcreds"'"}' http://localhost:7474/user/neo4j/password
+bin/neo4j-admin set-initial-password $newneo4jcreds
 sleep 10
 cd ..
 export NEO4J_INIT_HOME=`pwd`
@@ -55,7 +55,6 @@ sleep 10
 sudo chmod -R 777 /opt/NEO4J_HOME
 cd /etc/init.d/
 sudo wget -O Neo4j https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL8/initscripts/Neo4j.sh
-sudo mv Neo4j.sh Neo4j
 sudo chmod +x Neo4j
 sudo chkconfig Neo4j on
 sleep 10

@@ -115,19 +115,20 @@ public class ValidationUtils {
 
 		if (data instanceof JsonObject) {
 			jsonString = data.toString();
-			if (jsonString != null) {
+			if (null != jsonString) {
 				jsonString = jsonString.replaceAll(StringExpressionConstants.STR_REGEX, "");
 				// replace &nbsp; with space
 				jsonString = jsonString.replace(ConfigOptions.NBSP, " ");
 				// replace &amp; with &
 				jsonString = jsonString.replace(ConfigOptions.AMP, "&");
+				if (!jsonString.equalsIgnoreCase(data.toString())) {
+					log.error(" Invilid response data ");
+					json = null;
+				} else {
+					json = new Gson().fromJson(jsonString, JsonObject.class);
+				}
 			}
-			if (!jsonString.equalsIgnoreCase(data.toString())) {
-				log.error(" Invilid response data ");
-				json = null;
-			} else {
-				json = new Gson().fromJson(jsonString, JsonObject.class);
-			}
+			
 		}
 		return json;
 	}
@@ -138,7 +139,7 @@ public class ValidationUtils {
 
 		if (data instanceof String) {
 			modifiedString = data;
-			if (modifiedString != null) {
+			if (modifiedString != "") {
 				modifiedString = modifiedString.replaceAll(StringExpressionConstants.STR_REGEX, "");
 				// replace &nbsp; with space
 				modifiedString = modifiedString.replace(ConfigOptions.NBSP, " ");
@@ -184,33 +185,44 @@ public class ValidationUtils {
 		boolean isXSSPattern = Boolean.FALSE;
 		String valueWithXSSPattern = "";
 		if (value != null || !("").equals(value)) {
-			try {
-				boolean hasHTML = validateStringForHTMLContent(value);
-				if (hasHTML) {
-					isXSSPattern = true;
-				} else {
-					// match sections that match a pattern
-					for (Pattern scriptPattern : patterns) {
-						Matcher m = scriptPattern.matcher(value);
-						if (m.find()) {
-							isXSSPattern = true;
-							valueWithXSSPattern = value;
-							break;
-						}
-					}
-				}
-				if (isXSSPattern) {
-					log.error("Invalid pattern found in data value ******  ");
-					throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
-				}
-			} catch (RuntimeException e) {
-				log.error("Invalid pattern found in data value ==== ");
-				throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
-			}
+	
+			validateCleanXss(value);			
+		
 		} else {
 			log.debug("In cleanXSS , value is empty ");
 		}
 		return value;
+	}
+	
+	private static void validateCleanXss(String value) {
+		
+		boolean isXSSPattern = Boolean.FALSE;
+		String valueWithXSSPattern = "";
+		
+		try {
+			boolean hasHTML = validateStringForHTMLContent(value);
+			if (hasHTML) {
+				isXSSPattern = true;
+			} else {
+				// match sections that match a pattern
+				for (Pattern scriptPattern : patterns) {
+					Matcher m = scriptPattern.matcher(value);
+					if (m.find()) {
+						isXSSPattern = true;
+						valueWithXSSPattern = value;
+						break;
+					}
+				}
+			}
+			if (isXSSPattern) {
+				log.error("Invalid pattern found in data value ******  ");
+				throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
+			}
+		} catch (RuntimeException e) {
+			log.error("Invalid pattern found in data value ==== ");
+			throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
+		}
+		
 	}
 	
 	/**
@@ -231,14 +243,7 @@ public class ValidationUtils {
 					isXSSPattern = true;
 				} else {
 					// match sections that match a pattern
-					for (Pattern scriptPattern : patterns) {
-						Matcher m = scriptPattern.matcher(value);
-						if (m.find()) {
-							isXSSPattern = true;
-							valueWithXSSPattern = value;
-							break;
-						}
-					}
+					getValidatedString(value,isXSSPattern, valueWithXSSPattern);
 				}
 				if (isXSSPattern) {
 					log.error("Invalid pattern found in data value for key {}  ******  {} ",key , valueWithXSSPattern);
@@ -254,28 +259,22 @@ public class ValidationUtils {
 		return value;
 	}
 
+	public static void getValidatedString (String value, boolean isXSSPattern,String valueWithXSSPattern) {
+		for (Pattern scriptPattern : patterns) {
+			Matcher m = scriptPattern.matcher(value);
+			if (m.find()) {
+				isXSSPattern = true;
+				valueWithXSSPattern = value;
+				break;
+			}
+		}
+	}
+	
 	public static String cleanXSSWithHTMLCheck(String value) {
-		boolean isXSSPattern = Boolean.FALSE;
 		String valueWithXSSPattern = "";
 		if (value != null) {
 			try {
-				boolean hasHTML = validateStringForHTMLContent(value);
-				if (hasHTML) {
-					isXSSPattern = true;
-				} else {
-					// match sections that match a pattern
-					for (Pattern scriptPattern : patterns) {
-						Matcher m = scriptPattern.matcher(value);
-						if (m.find()) {
-							isXSSPattern = true;
-							valueWithXSSPattern = value;
-							break;
-						}
-					}
-				}
-				if (isXSSPattern) {
-					throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
-				}
+				valueWithXSSPattern = checkValidateString(value);
 			} catch (RuntimeException e) {
 				log.error("Invalid pattern found in data value ==== {} ", valueWithXSSPattern);
 				throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
@@ -284,6 +283,30 @@ public class ValidationUtils {
 			log.debug("In cleanXSSWithHTMLCheck , value is empty  ");
 		}
 		return value;
+	}
+
+	private static String checkValidateString(String value) {
+		boolean isXSSPattern = Boolean.FALSE;
+		String valueWithXSSPattern = "";
+		boolean hasHTML = validateStringForHTMLContent(value);
+		if (hasHTML) {
+			isXSSPattern = true;
+		} else {
+			// match sections that match a pattern
+			for (Pattern scriptPattern : patterns) {
+				Matcher m = scriptPattern.matcher(value);
+				if (m.find()) {
+					isXSSPattern = true;
+					valueWithXSSPattern = value;
+					break;
+				}
+			}
+		}
+		
+		if (isXSSPattern) {
+			throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
+		}
+		return valueWithXSSPattern;
 	}
 	
 	/** Method use to validate pdf files 

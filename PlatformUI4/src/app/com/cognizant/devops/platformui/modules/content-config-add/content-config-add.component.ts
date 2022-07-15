@@ -49,6 +49,7 @@ export class ContentConfigAddition implements OnInit, OnChanges {
   thresholds: any;
   category: any;
   action: any;
+  inputDataJson:any;
   trend = ["UPWARDS", "DOWNWARDS"];
   thresholdDir = ["ABOVE", "BELOW"];
   actionDetail: any[];
@@ -74,6 +75,7 @@ export class ContentConfigAddition implements OnInit, OnChanges {
       this.category = res.category;
     });
     this.route.queryParams.subscribe((params) => {
+      this.inputDataJson=params;
       if (params) {
         (this.contentId = params.contentId),
           (this.contentName = params.contentName),
@@ -444,6 +446,14 @@ export class ContentConfigAddition implements OnInit, OnChanges {
       skipLocationChange: true,
     };
     this.router.navigate(["InSights/Home/contentConfig"], navigationExtras);
+  }
+
+  reset(){
+    this.contentName = this.inputDataJson.contentName;
+    this.message = this.inputDataJson.message;
+    this.expectedTrend = this.inputDataJson.expectedTrend;
+    this.directionThreshold = this.inputDataJson.directionThreshold ;
+    this.resultField = this.inputDataJson.resultField;
   }
 
   refreshData() {

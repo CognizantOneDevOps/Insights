@@ -24,11 +24,9 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.platformcommons.constants.AgentCommonConstant;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
-import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -59,8 +57,6 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 			List<JsonObject> failedDataList = new ArrayList<>();
 			JsonElement json = JsonUtils.parseString(message);
 			String agentId = "";
-			String toolName = "";
-			String categoryName = "";
 			Boolean isFailure = false;
 			if (json.isJsonArray()) {
 				JsonArray asJsonArray = json.getAsJsonArray();
@@ -70,33 +66,9 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 						if (jsonObject.has(AgentCommonConstant.AGENTID)) {
 							agentId = jsonObject.get(AgentCommonConstant.AGENTID).getAsString();
 						}
-						if (jsonObject.has(AgentCommonConstant.TOOLNAME)) {
-							toolName = jsonObject.get(AgentCommonConstant.TOOLNAME).getAsString();
-							jsonObject.addProperty(AgentCommonConstant.TOOLNAME, toolName);
-							categoryName = jsonObject.get("categoryName").getAsString();
-							jsonObject.addProperty("category", categoryName);
-						}
-
-						else {
-							if (labels.size() > 1) {
-								jsonObject.addProperty("category", labels.get(0));
-								jsonObject.addProperty(AgentCommonConstant.TOOLNAME, labels.get(1));
-							}
-						}
-						/**
-						 * If health message status is failure, create a separate node for
-						 * HEALTH_FAILURE HEALTH_FAILURE node will contain latest 20 error messages
-						 */
-						String healthStatus = "";
-						if (jsonObject.has("status")) {
-							healthStatus = jsonObject.get("status").getAsString();
-							if (healthStatus.equalsIgnoreCase("failure")) {
-								isFailure = true;
-								failedDataList.add(jsonObject);
-							}
-						}
-						dataList.add(jsonObject);
-						log.debug(" Type=AgentEngine toolName={} category={} agentId={} routingKey={} dataSize={} execId={} ProcessingTime={} Agent Health message processed.",jsonObject.get("toolName"),jsonObject.get("categoryName"),jsonObject.get(AgentCommonConstant.AGENTID),"-",0,jsonObject.get("execId"),0);
+						isFailure = processHealthRecordAndPrepareLists(labels, dataList, failedDataList, isFailure,
+								jsonObject);
+					
 					}
 				}
 				String healthLabels = ":LATEST:" + routingKey.replace(".", ":");
@@ -117,6 +89,40 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 			log.error(e);
 			getChannel().basicReject(envelope.getDeliveryTag(), false);
 		}
+	}
+
+	private Boolean processHealthRecordAndPrepareLists(List<String> labels, List<JsonObject> dataList,
+			List<JsonObject> failedDataList, Boolean isFailure, JsonObject jsonObject) {
+		String toolName = "";
+		String categoryName = "";
+		if (jsonObject.has(AgentCommonConstant.TOOLNAME)) {
+			toolName = jsonObject.get(AgentCommonConstant.TOOLNAME).getAsString();
+			jsonObject.addProperty(AgentCommonConstant.TOOLNAME, toolName);
+			categoryName = jsonObject.get("categoryName").getAsString();
+			jsonObject.addProperty("category", categoryName);
+		}
+
+		else {
+			if (labels.size() > 1) {
+				jsonObject.addProperty("category", labels.get(0));
+				jsonObject.addProperty(AgentCommonConstant.TOOLNAME, labels.get(1));
+			}
+		}
+		/**
+		 * If health message status is failure, create a separate node for
+		 * HEALTH_FAILURE HEALTH_FAILURE node will contain latest 20 error messages
+		 */
+		String healthStatus = "";
+		if (jsonObject.has("status")) {
+			healthStatus = jsonObject.get("status").getAsString();
+			if (healthStatus.equalsIgnoreCase("failure")) {
+				isFailure = true;
+				failedDataList.add(jsonObject);
+			}
+		}
+		dataList.add(jsonObject);
+		log.debug(" Type=AgentEngine toolName={} category={} agentId={} routingKey={} dataSize={} execId={} ProcessingTime={} Agent Health message processed.",jsonObject.get("toolName"),jsonObject.get("categoryName"),jsonObject.get(AgentCommonConstant.AGENTID),"-",0,jsonObject.get("execId"),0);
+		return isFailure;
 	}
 
 	/**
@@ -171,7 +177,7 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 		JsonArray errorMessage = graphResponse.getAsJsonArray("errors");
 		if (errorMessage != null && errorMessage.size() >= 0) {
 			String errorMessageText = errorMessage.get(0).getAsJsonObject().get("message").getAsString();
-			log.error(errorMessageText);
+			log.error(" Error occur for Rounting Key {} and message is {} ",routingKey,errorMessageText);
 		}
 	}
 }

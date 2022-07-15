@@ -40,7 +40,7 @@ export class FileUploadDialog implements OnInit {
   validJson: boolean = true;
   validHtml: boolean = true;
   index: number = 0;
-  fileNameArr = [];
+  fileNameArr = "";
 
   constructor(
     public router: Router,
@@ -56,6 +56,7 @@ export class FileUploadDialog implements OnInit {
     this.dialogHeader = data.header;
     if (data.type != null && data.type != undefined) {
       this.fileUploadType = data.type;
+      console.log(this.fileUploadType);
     }
     if (data.multipleFileAllowed != undefined) {
       this.multipleFileAllowed = data.multipleFileAllowed;
@@ -101,6 +102,7 @@ export class FileUploadDialog implements OnInit {
       };
       fileReader.readAsText(event.target.files[0]);
     }
+    this.fileNameArr = event.target.files[0].name;
   }
 
   validateJson(message) {
@@ -122,6 +124,7 @@ export class FileUploadDialog implements OnInit {
   }
 
   upload() {
+    console.log("Inside Upload")
     if (this.validJson === false) {
       this.messageDialog.openSnackBar(
         "Uploaded file is not a valid JSON. " + this.jsonError,
@@ -146,11 +149,14 @@ export class FileUploadDialog implements OnInit {
   }
   uploadFileKpi() {
     var self = this;
+    console.log(this.formDataFiles)
     if (this.formDataFiles.has("file")) {
+      console.log("Inside Upload KPI");
       this.restCallHandlerService
         .postFormData("UPLOAD_BULK_KPI", this.formDataFiles)
         .toPromise()
         .then(function (response) {
+          console.log(response);
           if (response.status === "success") {
             self.messageDialog.openSnackBar(response.data, "success");
             self.dialogRef.close();
@@ -173,10 +179,11 @@ export class FileUploadDialog implements OnInit {
         .postFormData("UPLOAD_BULK_CONTENT", this.formDataFiles)
         .toPromise()
         .then(function (response) {
+          console.log(response);
           if (response.status === "success") {
-            self.messageDialog.showApplicationsMessage(
+            self.messageDialog.openSnackBar(
               response.data,
-              "SUCCESS"
+              "success"
             );
             self.dialogRef.close(true);
           } else {
@@ -209,9 +216,9 @@ export class FileUploadDialog implements OnInit {
         .toPromise()
         .then(function (response) {
           if (response.status === "success") {
-            self.messageDialog.showApplicationsMessage(
+            self.messageDialog.openSnackBar(
               response.data,
-              "SUCCESS"
+              "success"
             );
             self.dialogRef.close(true);
           } else {
@@ -237,10 +244,11 @@ export class FileUploadDialog implements OnInit {
         .postFormData("UPLOAD_REPORT_TEMPLATE", this.formDataFiles)
         .toPromise()
         .then(function (response) {
+          console.log(response);
           if (response.status === "success") {
-            self.messageDialog.showApplicationsMessage(
+            self.messageDialog.openSnackBar(
               response.data,
-              "SUCCESS"
+              "success"
             );
             self.dialogRef.close(true);
           } else {
@@ -281,14 +289,14 @@ export class FileUploadDialog implements OnInit {
   cancelUpload(index) {
     this.cancelFileUpload(); //Enters the cancelFile upload to remove image url and change if directive
     console.log("Inside cancelUpload");
-    this.fileNameArr[index] = null;
+    this.fileNameArr = null;
   }
 
   onFileChangedUpload(event, index) {
     console.log("Inside onFileChanged");
     this.selectedFile = <File>event.target.files[0];
     console.log(this.selectedFile);
-    this.fileNameArr[index] = this.selectedFile.name;
+    this.fileNameArr = this.selectedFile.name;
     this.onSelectFile(event);
   }
 

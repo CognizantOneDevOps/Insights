@@ -201,7 +201,9 @@ public class AuthenticationUtils {
 		} catch (Exception e) {
 			log.error("Unable to find grafana role in Spring Authority. {}", e.getMessage());
 		}
-		return SpringAuthority.valueOf("Viewer");
+		
+		return SpringAuthority.valueOf("Viewer");	
+		
 	}
 	
 	/**

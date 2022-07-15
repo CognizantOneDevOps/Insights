@@ -119,7 +119,7 @@
               style="background: #f2f2f2"
             >
               <mat-panel-title>
-                <mat-icon svgIcon="star" class="iconColor"> </mat-icon>
+                <mat-icon svgIcon="star" > </mat-icon>
                 <label class="mainText" style="margin-top: 1%">
                   Favorite Dashboards</label
                 >
@@ -233,7 +233,6 @@
                 <mat-icon
                   svgIcon="star"
                   class="iconColor"
-                  style="margin-bottom: 8px !important"
                 >
                 </mat-icon>
                 <label class="mainText" style="margin-top: 1%">
@@ -346,23 +345,22 @@
             <thead>
               <tr>
                 <td>
-                  <!-- <button mat-icon-button>
-                      <mat-icon svgIcon="admin" >
+                  <button mat-icon-button>
+                      <mat-icon svgIcon="admin" 
+                        style="height: 35px !important; width: 42px !important;color: var(--text-clr4);">
                       </mat-icon>
-                  </button> -->
-                  <img
-                    src="icons/svg/welcomePage/admin.svg"
-                    style="margin-left: 61px;color:var(--text-clr4);"
-                  />
-                  <b style="color:var(--text-clr4); font-size: 16px; margin-left: 11px"
+                  </button>
+                  <b style="color:var(--text-clr4); font-size: 16px; margin-left: 17px"
                     >For Admin and Powerusers</b
                   >
                 </td>
-                <td>
-                  <img
-                    src="icons/svg/welcomePage/users.svg"
-                    style="color:var(--text-clr4);margin-left: -21px"
-                  />
+                <td style="padding-left: 0 !important;">
+                  <button mat-icon-button
+                    style="margin-left: 0 !important;padding-left: 0 !important;">
+                    <mat-icon svgIcon="users" 
+                      style="height: 35px !important; width: 42px !important;color: var(--text-clr4);">
+                    </mat-icon>
+                  </button>
                   <b style="color:var(--text-clr4);font-size: 16px; margin-left: 7px">
                     For Users and Editors</b
                   >

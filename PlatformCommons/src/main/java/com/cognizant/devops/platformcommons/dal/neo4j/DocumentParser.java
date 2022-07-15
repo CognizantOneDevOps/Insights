@@ -35,7 +35,6 @@ import com.google.gson.JsonObject;
  *
  */
 public class DocumentParser {
-	private static Logger log = LogManager.getLogger(DocumentParser.class);
 
 	/**
 	 * Method not used anymore
@@ -61,16 +60,7 @@ public class DocumentParser {
 					nodeData = new NodeData();
 					nodeDataList.add(nodeData);
 					boolean graph = jsonObject.has(ConfigOptions.GRAPH);
-					if (graph) {
-						JsonArray graphNodes = jsonObject.get(ConfigOptions.GRAPH).getAsJsonObject().get("nodes")
-								.getAsJsonArray();
-						if (graphNodes.size() > 0) {
-							JsonArray labels = graphNodes.get(0).getAsJsonObject().get("labels").getAsJsonArray();
-							for (JsonElement label : labels) {
-								nodeData.getLabels().add(label.getAsString());
-							}
-						}
-					}
+					addNodes(nodeData, jsonObject, graph);
 				}
 				if (!entry.getKey().equals(ConfigOptions.GRAPH)) {
 					processGraphDBJson(entry.getValue(), nodeDataList, nodeData, entry.getKey());
@@ -78,6 +68,19 @@ public class DocumentParser {
 			}
 		} else if (jsonElement.isJsonPrimitive() && nodeData != null) {
 			nodeData.setProperty(property, jsonElement.getAsString());
+		}
+	}
+
+	private void addNodes(NodeData nodeData, JsonObject jsonObject, boolean graph) {
+		if (graph) {
+			JsonArray graphNodes = jsonObject.get(ConfigOptions.GRAPH).getAsJsonObject().get("nodes")
+					.getAsJsonArray();
+			if (graphNodes.size() > 0) {
+				JsonArray labels = graphNodes.get(0).getAsJsonObject().get("labels").getAsJsonArray();
+				for (JsonElement label : labels) {
+					nodeData.getLabels().add(label.getAsString());
+				}
+			}
 		}
 	}
 
