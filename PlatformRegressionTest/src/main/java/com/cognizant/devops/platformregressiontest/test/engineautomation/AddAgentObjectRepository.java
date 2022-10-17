@@ -23,10 +23,10 @@ import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectMod
 
 public class AddAgentObjectRepository extends LoginAndSelectModule{
 
-	@FindBy(xpath = "//div[contains(text(),'Agent List ')]")
+	@FindBy(xpath = "//span[contains(text(),'Agent List ')]")
 	WebElement landingPage;
 
-	@FindBy(xpath = "//mat-icon[@title='Add Agent']")
+	@FindBy(xpath = "//button[@id='addAgent']")
 	WebElement clickAddButton;
 
 	@FindBy(xpath = "//mat-select[@name ='selectedOS']")

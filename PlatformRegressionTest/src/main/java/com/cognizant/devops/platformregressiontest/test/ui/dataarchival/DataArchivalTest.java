@@ -28,12 +28,17 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.By;
+
 import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
 import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectModule;
+import com.cognizant.devops.platformregressiontest.test.ui.testdata.ReportManagementDataProvider;
+import com.cognizant.devops.platformregressiontest.test.ui.testdata.WorkflowDataProvider;
 
 public class DataArchivalTest extends LoginAndSelectModule {
 
@@ -53,22 +58,22 @@ public class DataArchivalTest extends LoginAndSelectModule {
 	public void setUp() throws InterruptedException {
 		log.info(line);
 		initialization();
-		getData(ConfigOptionsTest.ARCHIVAL_JSON_FILE);
-		selectModuleOnClickingConfig(LoginAndSelectModule.testData.get("dataArchival"));
+		selectMenuOption("Data Archival");
 		clickAllActionButton = new DataArchivalConfiguration();
 	}
 
 	/**
 	 * This method will be executed just before any function/method with @Test
 	 * annotation starts.
+	 * @throws InterruptedException 
 	 */
 	@BeforeMethod
-	public void beforeMethod() {
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+	public void beforeMethod() throws InterruptedException {
+		Thread.sleep(1000);
 	}
 
 	@Test(priority = 1)
-	public void navigateToCorrelationBuilderLandingPage() {
+	public void navigateToArchivalLandingPage() {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.navigateToArchivalLandingPage(),
 				"Adding details to Archive data unsuccessful");
@@ -79,10 +84,11 @@ public class DataArchivalTest extends LoginAndSelectModule {
 	 * 
 	 * @throws InterruptedException
 	 */
-	@Test(priority = 2)
-	public void addNewArchiveData() throws InterruptedException {
+	@Test(priority = 2,enabled = true, dataProvider = "dataArchivalProvider", dataProviderClass = ReportManagementDataProvider.class)
+	public void addNewArchiveData(String archivalName,String stDate,String stMonth,String stYear,
+			String edDate,String edMonth,String edYear,String daysToRetain) throws InterruptedException {
 		log.info(line);
-		Assert.assertTrue(clickAllActionButton.addArchiveData(), "archive data created");
+		Assert.assertTrue(clickAllActionButton.addArchiveData(archivalName,stDate,stMonth,stYear,edDate,edMonth,edYear,daysToRetain), "archive data created");
 	}
 
 	/**
@@ -91,10 +97,11 @@ public class DataArchivalTest extends LoginAndSelectModule {
 	 * 
 	 * @throws InterruptedException
 	 */
-	@Test(priority = 3)
-	public void addSameArchiveData() throws InterruptedException {
+	@Test(priority = 3,enabled = true, dataProvider = "dataArchivalProvider", dataProviderClass = ReportManagementDataProvider.class)
+	public void addSameArchiveData(String archivalName,String stDate,String stMonth,String stYear,
+			String edDate,String edMonth,String edYear,String daysToRetain) throws InterruptedException {
 		log.info(line);
-		Assert.assertTrue(clickAllActionButton.addSameArchiveData(), "archive data created with existing archive name");
+		Assert.assertTrue(clickAllActionButton.addSameArchiveData(archivalName,stDate,stMonth,stYear,edDate,edMonth,edYear,daysToRetain), "archive data created with existing archive name");
 	}
 
 	/**
@@ -102,10 +109,11 @@ public class DataArchivalTest extends LoginAndSelectModule {
 	 * 
 	 * @throws InterruptedException
 	 */
-	@Test(priority = 4)
-	public void checkResetAndRedirectFunctionality() {
+	@Test(priority = 4,enabled = true, dataProvider = "dataArchivalProvider", dataProviderClass = ReportManagementDataProvider.class)
+	public void checkResetAndRedirectFunctionality(String archivalName,String stDate,String stMonth,String stYear,
+			String edDate,String edMonth,String edYear,String daysToRetain) throws InterruptedException {
 		log.info(line);
-		Assert.assertTrue(clickAllActionButton.resetAndRedirectFunctionality(), "Reset and redirect functionality successful");
+		Assert.assertTrue(clickAllActionButton.resetAndRedirectFunctionality(archivalName,stDate,stMonth,stYear,edDate,edMonth,edYear,daysToRetain), "Reset and redirect functionality successful");
 	}
 
 	/**

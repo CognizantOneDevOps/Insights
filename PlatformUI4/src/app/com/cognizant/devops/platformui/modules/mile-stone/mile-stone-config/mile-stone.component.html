@@ -42,6 +42,7 @@
         [disabled]="!mileStoneForm.valid"
         (click)="onSubmit()"
         class="btnHeight"
+        id="savebtn"
       >
         <mat-icon matTooltip="Save Configuration" svgIcon="save"> </mat-icon>
       </button>
@@ -124,6 +125,7 @@
                 matDatepickerToggleIcon
                 svgIcon="calendar"
                 class="iconClr"
+                id="startDate"
               ></mat-icon>
             </mat-datepicker-toggle>
             <mat-datepicker #startpicker [disabled]="false"> </mat-datepicker>
@@ -152,6 +154,7 @@
                 matDatepickerToggleIcon
                 svgIcon="calendar"
                 class="iconClr"
+                id="endDate"
               ></mat-icon>
             </mat-datepicker-toggle>
             <mat-datepicker #endpicker [disabled]="false"></mat-datepicker>

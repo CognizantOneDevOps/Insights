@@ -16,7 +16,6 @@
 package com.cognizant.devops.platformregressiontest.test.engineautomation;
 
 import java.io.File;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -54,11 +53,12 @@ public class AddConfigurationFileTest extends LoginAndSelectModule {
 	/**
 	 * This method will be executed just before any function/method with @Test
 	 * annotation starts.
+	 * @throws InterruptedException 
 	 */
 	@BeforeMethod
-	public void beforeMethod() {
-		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-	}
+	public void beforeMethod() throws InterruptedException {
+                  Thread.sleep(1000);
+     }
 
 	/**
 	 * Assert true if landing page is displayed else false

@@ -737,7 +737,6 @@ public class WorkflowServiceImpl {
 			pdfDetailsJson.addProperty("pdfName", reportTitle);
 		} catch (InsightsCustomException e) {
 			log.error(e.getMessage());
-			throw new InsightsCustomException("Error while generating the PDF: Report Not Found!");
 		}
 		return pdfDetailsJson;
 		

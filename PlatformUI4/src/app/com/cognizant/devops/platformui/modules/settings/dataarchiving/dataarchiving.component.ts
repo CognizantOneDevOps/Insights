@@ -149,6 +149,9 @@ export class DataArchivingComponent implements OnInit {
   }
 
   radioChange(event: MatRadioChange, index) {
+    console.log("edit"+this.enableEdit);
+    this.enableEdit = true;
+    this.enableBrowse = true;
     this.selectedIndex = index + this.currentPageValue;
     this.currentPageIndex = this.paginator.pageIndex + 1;
     if (event.value.status == "ERROR" || event.value.status == "TERMINATED") {
@@ -156,8 +159,6 @@ export class DataArchivingComponent implements OnInit {
     } else {
       this.enableDelete = false;
     }
-    this.enableBrowse = true;
-    this.enableEdit = true;
     if (
       this.previousActiveIndex == -1 &&
       (event.value.status == "ACTIVE" || event.value.status == "INACTIVE")

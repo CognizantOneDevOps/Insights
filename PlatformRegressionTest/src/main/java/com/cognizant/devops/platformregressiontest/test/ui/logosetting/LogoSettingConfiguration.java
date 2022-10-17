@@ -19,11 +19,13 @@ import java.time.Duration;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectModule;
+import com.google.auto.common.Visibility;
 
 /**
  * @author NivethethaS
@@ -51,19 +53,21 @@ public class LogoSettingConfiguration extends LogoSettingObjectRepository {
 		return landingPage.isDisplayed();
 	}
 	
-	public boolean addLargeFileSize() {
+	public boolean addLargeFileSize() throws InterruptedException {
 		chooseFileButton.sendKeys(LoginAndSelectModule.testData.get("largeFile"));
-		uploadImage.click();
-		wait.until(ExpectedConditions.elementToBeClickable(okButton));
+		Thread.sleep(2000);
+		visibilityOf(uploadImage,2);
+		clickOn(uploadImage,3);
+		wait.until(ExpectedConditions.elementToBeClickable(crossClose));
 		try {
 			if (errorMessage.isDisplayed()) {
 				log.info("Error message is displayed while trying to add image size greater than 1 MB");
-				okButton.click();
+				crossClose.click();
 				return true;
 			}
 		} catch (Exception e) {
 			log.info("Error message is not displayed");
-			okButton.click();
+			crossClose.click();
 			return false;
 		}
 		return false;
@@ -73,16 +77,16 @@ public class LogoSettingConfiguration extends LogoSettingObjectRepository {
 		chooseFileButton.sendKeys(LoginAndSelectModule.testData.get("insights_logo"));
 		previewLogo.isDisplayed();
 		uploadImage.click();
-		wait.until(ExpectedConditions.elementToBeClickable(okButton));
+		wait.until(ExpectedConditions.elementToBeClickable(crossClose));
 		try {
 			if (successMessage.isDisplayed()) {
 				log.info("successfully added logo");
-				okButton.click();
+				crossClose.click();
 				return true;
 			}
 		} catch (Exception e) {
 			log.info("Error while adding logo");
-			okButton.click();
+			crossClose.click();
 			return false;
 		}
 		return false;
@@ -121,4 +125,27 @@ public class LogoSettingConfiguration extends LogoSettingObjectRepository {
 		}
 		return false;
 	}
+	/**
+	 * wait until the visibility of web element
+	 * 
+	 * @param element
+	 * @param timeout
+	 * @return true if element is displayed else false
+	 */
+	public static boolean visibilityOf(WebElement element, int timeout) {
+		new WebDriverWait(driver, Duration.ofSeconds(timeout)).until(ExpectedConditions.visibilityOf(element));
+		return element.isDisplayed();
+	}
+
+	/**
+	 * wait until the visibility of web element then click on the web element
+	 * 
+	 * @param element
+	 * @param timeout
+	 */
+	public static void clickOn(WebElement element, int timeout) {
+		new WebDriverWait(driver, Duration.ofSeconds(timeout)).until(ExpectedConditions.elementToBeClickable(element));
+		element.click();
+	}
+
 }

@@ -40,7 +40,7 @@ then
         #sudo mv esl-erlang_23.0-1~centos~7_amd64.rpm erlang.rpm
         #sudo rpm -ivh erlang.rpm
         #sudo yum install erlang.rpm
-elif [ $version_number == "3.8"]]
+elif [ $version_number == "3.8" ]
 then
   echo "installing version 3.8"
   sudo wget https://github.com/rabbitmq/erlang-rpm/releases/download/v23.0.1/erlang-23.0.1-1.el8.x86_64.rpm
@@ -60,7 +60,7 @@ then
   sudo rpm --import https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc
   sudo wget https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.9.13/rabbitmq-server-3.9.13-1.el8.noarch.rpm
   sudo rpm -Uvh rabbitmq-server-3.9.13-1.el8.noarch.rpm
-elif [ $version_number == "3.8"]
+elif [ $version_number == "3.8" ]
 then
   echo "installing version 3.8"
   sudo rpm --import https://www.rabbitmq.com/rabbitmq-signing-key-public.asc

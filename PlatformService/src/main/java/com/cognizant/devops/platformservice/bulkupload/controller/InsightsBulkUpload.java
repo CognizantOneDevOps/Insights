@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.cognizant.devops.platformservice.bulkupload.controller;
 
+import java.io.IOException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +41,6 @@ public class InsightsBulkUpload {
 
 	@Autowired
 	BulkUploadService bulkUploadService;
-
 	/**
 	 * entry point to upload Bulk Data
 	 *
@@ -49,6 +50,7 @@ public class InsightsBulkUpload {
 	 * @param insightsTimeField
 	 * @param insightsTimeFormat
 	 * @return ResponseBody
+	 * @throws IOException
 	 */
 	@PostMapping(value = "/uploadToolData", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody JsonObject uploadToolData(@RequestParam("file") MultipartFile file,
@@ -58,7 +60,7 @@ public class InsightsBulkUpload {
 		try {
 			status = bulkUploadService.uploadDataInDatabase(file, toolName, label, insightsTimeField,
 					insightsTimeFormat);
-			log.debug(" Upload tool data done {} successfully for tool  {} ",status,toolName);
+			log.debug(" Upload tool data done {} successfully for tool  {} ", status, toolName);
 			return PlatformServiceUtil.buildSuccessResponse();
 		} catch (InsightsCustomException e) {
 			log.error(e.getMessage());
@@ -71,7 +73,7 @@ public class InsightsBulkUpload {
 	 *
 	 * @return ResponseBody
 	 */
-	@GetMapping(value = "/getToolJson",  produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/getToolJson", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getToolJson() {
 		Object details = null;
 		try {

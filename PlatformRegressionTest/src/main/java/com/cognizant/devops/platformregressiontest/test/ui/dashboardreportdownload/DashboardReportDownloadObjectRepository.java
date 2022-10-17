@@ -24,34 +24,37 @@ import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectMod
 
 public class DashboardReportDownloadObjectRepository extends LoginAndSelectModule {
 
-	@FindBy(xpath = "//div[contains(text(),'Dashboard Report Configuration')]")
+	@FindBy(xpath = "//div[contains(text(),'Dashboard Report Configuration')]")   //
 	WebElement landingPage;
 
-	@FindBy(xpath = "//mat-icon[@title='Configure a dashboard']")
+	@FindBy(xpath = "//mat-icon[@svgicon='add']")  //
 	WebElement clickAddButton;
+	
+	@FindBy(xpath = "//mat-icon[@svgicon='edit']")  //
+	WebElement clickEditButton;
 
-	@FindBy(xpath = "//span[@class='mainHeaderText']")
+	@FindBy(xpath = "//span[@class='mainHeaderText']")  //
 	WebElement mainHeader;
 
-	@FindBy(xpath = "//mat-select[@placeholder='Select Organisation']")
+	@FindBy(xpath = "//mat-select[@id='organisation']")  //
 	WebElement selectOrg;
 
-	@FindBy(xpath = "//mat-select[@placeholder='Select Dashboard']")
+	@FindBy(xpath = "//mat-select[@id='dashboard']")  //
 	WebElement selectDashboard;
 
-	@FindBy(xpath = "//input[@placeholder='Enter Title']")
+	@FindBy(xpath = "//input[@id='Enter Title']")  //
 	WebElement title;
 
-	@FindBy(xpath = "//mat-select[@placeholder='Select Dashboard Theme']")
+	@FindBy(xpath = "//mat-select[@placeholder='Select Dashboard Theme']")  //
 	WebElement selectTheme;
 
-	@FindBy(xpath = "//mat-select[@placeholder='Select PdfType']")
+	@FindBy(xpath = "//mat-select[@placeholder='Select PdfType']")  //
 	WebElement selectPdfType;
 
-	@FindBy(xpath = "//mat-select[@name='schedule']")
+	@FindBy(xpath = "//mat-select[@id='Select frequency']")  //
 	WebElement selectFrequency;
 
-	@FindBy(xpath = "//mat-select[@placeholder='Select loadTime']")
+	@FindBy(xpath = "//mat-select[@id='Select loadTime']")  //
 	WebElement selectLoadTime;
 
 	@FindBy(xpath = "//mat-select[@id='toolName']")
@@ -60,90 +63,93 @@ public class DashboardReportDownloadObjectRepository extends LoginAndSelectModul
 	@FindBy(xpath = "//mat-select[@id='AgentId']")
 	WebElement agentId;
 
-	@FindBy(xpath = "//mat-radio-button[@value='absolute']")
+	@FindBy(xpath = "//mat-radio-button[@value='absolute']")  //As it is
 	WebElement dataTimeRangeAbsolute;
 
-	@FindBy(xpath = "//mat-radio-button[@value='relative']")
+	@FindBy(xpath = "//mat-radio-button[@value='relative']")  //As it is
 	WebElement dataTimeRangeRelative;
 
-	@FindBy(xpath = "//mat-radio-button[@value='other']")
+	@FindBy(xpath = "//mat-radio-button[@value='other']")  //As it is
 	WebElement dataTimeRangeOther;
 
-	@FindBy(xpath = "//mat-icon[@title='Add Email']")
+	@FindBy(xpath = "//mat-icon[@id='Add Email']")  //
 	WebElement addEmail;
 
-	@FindBy(xpath = "//input[@name='senderEmailAddress']")
+	@FindBy(xpath = "//input[@name='senderEmailAddress']")  //
 	WebElement senderEmailAddress;
 
-	@FindBy(xpath = "//textarea[@name='receiverEmailAddress']")
+	@FindBy(xpath = "//input[@name='receiverEmailAddress']")  //
 	WebElement receiverEmailAddress;
 
-	@FindBy(xpath = "//textarea[@name='receiverCCEmailAddress']")
+	@FindBy(xpath = "//input[@name='receiverCCEmailAddress']")  //
 	WebElement receiverCCEmailAddress;
 
-	@FindBy(xpath = "//textarea[@name='receiverBCCEmailAddress']")
+	@FindBy(xpath = "//input[@name='receiverBCCEmailAddress']")  // 
 	WebElement receiverBCCEmailAddress;
 
-	@FindBy(xpath = "//input[@name='mailSubject']")
+	@FindBy(xpath = "//input[@name='mailSubject']")  //As it is
 	WebElement mailSubject;
 
-	@FindBy(xpath = "//textarea[@name='mailBodyTemplate']")
+	@FindBy(xpath = "//textarea[@name='mailBodyTemplate']")  //As it is
 	WebElement mailBodyTemplate;
 
-	@FindBy(xpath = "//div/button[2][contains(@class,'configureBut')]")
+	@FindBy(xpath = "//div/button[2][contains(@id,'Save Email Config')]")  //
 	WebElement saveMailDetails;
 
-	@FindBy(xpath = "//mat-icon[@title='Preview And Save ']")
+	@FindBy(xpath = "//mat-icon[@svgicon='save']")  //
 	WebElement save;
 
-	@FindBy(xpath = "//mat-select[@id='relative']")
+	@FindBy(xpath = "//mat-select[@id='relative']")  //As it is
 	WebElement selectRelativeTimeRange;
 
-	@FindBy(xpath = "//mat-select[@id='other']")
+	@FindBy(xpath = "//mat-select[@id='other']")  //AS it is
 	WebElement selectOtherTimeRange;
 
-	@FindBy(xpath = "//input[contains(@class,'mat-start-date')]")
+	@FindBy(xpath = "//input[contains(@class,'mat-start-date')]")  // As it is
 	WebElement selectAbsoluteStartDate;
 
-	@FindBy(xpath = "//input[contains(@class,'mat-end-date')]")
+	@FindBy(xpath = "//input[contains(@class,'mat-end-date')]")  //As it is
 	WebElement selectAbsoluteEndDate;
 
-	@FindBy(xpath = "//span[@class='showDialogHeadingCss']")
+	@FindBy(xpath = "//span[@id='dashboardPreview']")  //
 	WebElement dashboardPreview;
 
-	@FindBy(xpath = "//span[contains(text(),'CONFIRM')]")
+	@FindBy(xpath = "//button[contains(@id,'CONFIRM')]")  //
 	WebElement confirm;
 
 	@FindBy(xpath = "//div[contains(text(),'Save Dashboard Configuration'])")
 	WebElement saveDashboardConfiguration;
 
-	@FindBy(xpath = "//span[contains(text(),'YES')]")
+	@FindBy(xpath = "//button[contains(@id,'yesBtn')]")  //
 	WebElement yes;
 
-	@FindBy(xpath = "//div[contains(text(),'Success')]")
+	@FindBy(xpath = "//div[contains(text(),'Success')]")   //to be replaced
 	WebElement success;
+	
+	@FindBy(xpath = "//button[@id='crossClose']")  //newly added
+	WebElement crossClose;
 
-	@FindBy(xpath = "//span[contains(text(),'OKAY')]")
+	@FindBy(xpath = "//span[@id='ok']")  //
 	WebElement OKAY;
 
 	@FindBy(xpath = "//td[contains(@class, 'cdk-column-Title')]")
 	List<WebElement> reportList;
 
-	@FindBy(xpath = "//mat-icon[@title='Delete']")
+	@FindBy(xpath = "//mat-icon[@id='Delete']")
 	WebElement deleteReport;
 
 	@FindBy(xpath = "//mat-icon[@svgicon='healthcheck_show_details']")
 	List<WebElement> detailsList;
 
-	@FindBy(xpath = "//li[contains(text(),'Workflow History Detail')]")
+	@FindBy(xpath = "//h1[contains(text(),'Workflow History Detail')]")
 	WebElement workfloHistoryDetail;
 
 	@FindBy(xpath = "//mat-icon[@svgicon='close_dialog']")
 	WebElement closeDialog;
 
-	@FindBy(xpath = "//mat-icon[@title='Redirect To Landing Page']")
+	@FindBy(xpath = "//mat-icon[@svgicon='backButton']")
 	WebElement redirectButton;
 
-	@FindBy(xpath = "//mat-icon[@title='Refresh']")
+	@FindBy(xpath = "//mat-icon[@id='Reset']")
 	WebElement resetButton;
 }

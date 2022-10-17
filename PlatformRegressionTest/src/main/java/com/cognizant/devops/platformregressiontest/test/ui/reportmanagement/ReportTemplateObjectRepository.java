@@ -27,7 +27,7 @@ public class ReportTemplateObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//div[contains(text(),'Add Report Template')]")
 	WebElement landingPage;
 
-	@FindBy(xpath = "//mat-icon[@title='Add']")
+	@FindBy(xpath = "//mat-icon[@svgicon='add']")
 	WebElement addBtnEl;
 
 	@FindBy(xpath = "//input[contains(@placeholder,'template name')]")
@@ -38,11 +38,14 @@ public class ReportTemplateObjectRepository extends LoginAndSelectModule {
 
 	@FindBy(xpath = "//mat-select[contains(@placeholder,'visualization')]")
 	WebElement visualizationEl;
+	
+	@FindBy(xpath = "//mat-select[contains(@placeholder,'template')]")
+	WebElement templateTypeEl;
 
 	@FindBy(xpath = "//span[contains(@class, 'mat-option-text')]")
 	public List<WebElement> visualizationElList;
 
-	@FindBy(xpath = "//mat-icon[@data-mat-icon-name='search_icon']")
+	@FindBy(xpath = "//mat-icon[@svgicon='search']")
 	WebElement searchKpiEl;
 
 	@FindBy(xpath = "//td[contains(@class, 'mat-column-kpiId')]")
@@ -51,22 +54,22 @@ public class ReportTemplateObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//input[@placeholder='Search']")
 	WebElement kpiInputEl;
 
-	@FindBy(xpath = "//span[text()='OK']/parent::button")
+	@FindBy(xpath = "//span[contains(text(), 'OK')]")
 	WebElement kpiSelectBtnEl;
 
-	@FindBy(xpath = "//div[contains(text(),'Failed to save')]")
+	@FindBy(xpath = "//span[contains(text(),'Failed to save')]")
 	WebElement reportExitsBtnEl;
 
-	@FindBy(xpath = "//div[contains(text(),'mandatory fields')]")
+	@FindBy(xpath = "//span[contains(text(),'mandatory fields')]")
 	WebElement fillMandatoryDialogEl;
 	
 	@FindBy(xpath = "//div[contains(text(), ' Error')]")
 	WebElement errorMessage;
 
-	@FindBy(xpath = "//div[contains(text(),'add kpi details')]")
+	@FindBy(xpath = "//span[contains(text(),'add kpi details')]")
 	WebElement addKPIDialogEl;
 
-	@FindBy(xpath = "//mat-select[contains(@placeholder,'VType')]")
+	@FindBy(xpath = "//mat-select[contains(@placeholder,'Select VType')]")
 	WebElement vTypeEl;
 
 	@FindBy(xpath = "//span[contains(@class, 'mat-option-text')]")
@@ -75,22 +78,25 @@ public class ReportTemplateObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//textarea")
 	WebElement vQueryEl;
 
-	@FindBy(xpath = "//button[contains(@class, 'configureBut')]")
+	@FindBy(xpath = "//span[contains(text(), 'ADD')]")
 	WebElement addKpiBtn;
 
-	@FindBy(xpath = "//mat-icon[@title='Save']")
+	@FindBy(xpath = "//mat-icon[@svgicon='save']")
 	WebElement saveEl;
 
-	@FindBy(xpath = "//span[text()='YES']")
+	@FindBy(xpath = "//span[contains(text(),'Yes')]")
 	WebElement yesBtnEl;
 
 	@FindBy(xpath = "//span[text()= 'OKAY']")
 	WebElement btnOKEl;
+	
+	@FindBy(xpath = "//button[@id='crossClose']")  //
+	WebElement crossClose;
 
-	@FindBy(xpath = "//mat-icon[@title='Upload Report Template JSON']")
+	@FindBy(xpath = "//mat-icon[@svgicon='upload']")
 	WebElement uploadBtnE1;
 
-	@FindBy(xpath = "//mat-icon[@title='Attach Files']")
+	@FindBy(xpath = "//mat-icon[@svgicon='paperclip']")
 	WebElement attachFilesBtnE1;
 
 	@FindBy(xpath = "//input[@type='file']")
@@ -102,15 +108,21 @@ public class ReportTemplateObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//td[contains(@class, 'mat-column-reportTemplateName')]")
 	List<WebElement> reportTemplateListEl;
 
-	@FindBy(xpath = "//mat-icon[@title='Delete']")
+	@FindBy(xpath = "//mat-icon[@svgicon='trash']")
 	public WebElement btnDeleteEl;
 
-	@FindBy(xpath = "//mat-icon[@title='Refresh']")
+	@FindBy(xpath = "//mat-icon[@svgicon='retry']")
 	WebElement refreshBtnE1;
 
-	@FindBy(xpath = "//mat-icon[@title='Edit']")
+	@FindBy(xpath = "//mat-icon[@svgicon='edit']")
 	public WebElement btnEditEl;
 
 	@FindBy(xpath = "//mat-icon[@svgicon='close_dialog']")
 	public WebElement btnCloseEl;
+	
+	@FindBy(xpath = "//div[contains(text(), 'KPI Details')]")
+	WebElement workfloHistoryDetail;
+	
+	@FindBy(xpath="//mat-icon[@svgicon='healthcheck_show_details']")
+	WebElement healthcheckDetails;
 }

@@ -12,19 +12,19 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>9.6</version>
+		<version>9.7</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformEngine</artifactId>
 	<packaging>jar</packaging>
-	<version>9.6</version>
+	<version>9.7</version>
 	<name>PlatformEngine</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<testng.version>7.1.0</testng.version>
+		<testng.version>7.6.1</testng.version>
 	</properties>
 
 	<dependencies>
@@ -36,7 +36,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>9.6</version>
+			<version>9.7</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.wnameless</groupId>
@@ -67,7 +67,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformAuditing</artifactId>
-			<version>9.6</version>
+			<version>9.7</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.apache.logging.log4j</groupId>
@@ -90,7 +90,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>9.6</version>
+			<version>9.7</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.apache.logging.log4j</groupId>
@@ -111,8 +111,13 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.12.1</version>
+			<version>2.12.6.1</version>
 		</dependency>
+		
+		<dependency>
+		     <groupId>com.google.guava</groupId>
+	         <artifactId>guava</artifactId>
+	    </dependency>
 	</dependencies>
 	<build>
 		<finalName>PlatformEngine</finalName>
@@ -263,8 +268,8 @@
 				<version>3.3</version>
 				<inherited>true</inherited>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>11</source>
+					<target>11</target>
 				</configuration>
 			</plugin>
 		</plugins>

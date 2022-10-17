@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -54,20 +55,23 @@ public class ConfigurationFileManagementTest extends LoginAndSelectModule {
 	 * @throws InterruptedException
 	 */
 	@BeforeTest
-	public void setUp() {
+	public void setUp() throws InterruptedException {
 		initialization();
 		getData(ConfigOptionsTest.CONFIGURATION_FILE_DIR + File.separator + ConfigOptionsTest.CONFIGURATION_JSON_FILE);
-		selectModuleUnderConfiguration(LoginAndSelectModule.testData.get("configurationFile"));
+		Thread.sleep(1000);
+		selectMenuOption("Configuration File Management");
 		clickAllActionButton = new ConfigurationFileManagementConfiguration();
 	}
 
 	/**
 	 * This method will be executed just before any function/method with @Test
 	 * annotation starts.
+	 * @throws InterruptedException 
 	 */
 	@BeforeMethod
-	public void beforeMethod() {
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+	public void beforeMethod() throws InterruptedException {
+		Thread.sleep(1000);
+		log.debug(line);
 	}
 
 	/**
@@ -112,7 +116,7 @@ public class ConfigurationFileManagementTest extends LoginAndSelectModule {
 	 */
 
 	@Test(priority = 4)
-	public void editModuleConfiguration() {
+	public void editModuleConfiguration() throws InterruptedException {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.editConfiguration(), "Editting done successfully");
 	}
@@ -137,7 +141,7 @@ public class ConfigurationFileManagementTest extends LoginAndSelectModule {
 	 * @throws InterruptedException
 	 */
 	@Test(priority = 5)
-	public void deleteModuleConfiguration() {
+	public void deleteModuleConfiguration() throws InterruptedException {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.deleteConfiguration(), "Deleting correlations successful");
 	}

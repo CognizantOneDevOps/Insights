@@ -24,7 +24,7 @@ import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectMod
 
 public class CorrelationObjectRepository extends LoginAndSelectModule {
 
-	@FindBy(xpath = "//a[@class='greenTitleTxt']")
+	@FindBy(xpath = "//span[contains(text(),' Co-Relation Builder')]")
 	WebElement landingPage;
 
 	@FindBy(xpath = "//span[contains(text(),'Select Source Tool')]")
@@ -39,10 +39,10 @@ public class CorrelationObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//mat-select[@name='selectedDestinationLabel']")
 	WebElement selectDestinationLabel;
 
-	@FindBy(xpath = "//input[@placeholder='   Please input a Co-Relation name']")
+	@FindBy(xpath = "//input[@placeholder='Please input a Co-Relation name']")
 	WebElement correlationName;
 
-	@FindBy(xpath = "//button[contains(@class,'PopertyButtonCss')]")
+	@FindBy(xpath = "//span[contains(text(),'Add Relationship Properties')]")
 	WebElement addRelationshipProperties;
 
 	@FindBy(xpath = "//pre[@class='headingTextinDiaglog']")
@@ -51,16 +51,19 @@ public class CorrelationObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//div[@formarrayname='property_points']/div[1]/label/input")
 	WebElement propertyName;
 
-	@FindBy(xpath = "//mat-icon[@title='Add New Property']")
+	@FindBy(xpath = "//mat-icon[@svgicon='add']")
 	WebElement addCircle;
 
-	@FindBy(xpath = "//mat-icon[@title='Save ']")
+	@FindBy(xpath = "//mat-icon[@svgicon='save']")
 	WebElement save;
+	
+	@FindBy(xpath = "//mat-icon[@svgicon='cancelBlkUpld']")
+	WebElement cancelUpload;
 
 	@FindBy(xpath = "//span[contains(text(),'Save')]")
 	WebElement savePropertyNames;
 
-	@FindBy(xpath = "//span[text()='YES']")
+	@FindBy(xpath = "//span[contains(text(),'Yes')]")
 	WebElement yes;
 
 	@FindBy(xpath = "//div[@class='textPadding']")
@@ -69,25 +72,25 @@ public class CorrelationObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//span[text()= 'OKAY']")
 	WebElement ok;
 
-	@FindBy(xpath = "//div[@class='textPadding' and contains(text(), 'Relation Name already exists.')]")
+	@FindBy(xpath = "//span[contains(text(), 'Relation Name already exists.')]")
 	WebElement duplicateError;
 
-	@FindBy(xpath = "//mat-icon[contains(@class,'flagTrue') and @title='Disable Correlation']")
+	@FindBy(xpath = "//mat-icon[@svgicon='flag']")
 	WebElement disableCorrelation;
 
-	@FindBy(xpath = "//mat-icon[contains(@class,'flagFalse') and @title='Enable Correlation']")
+	@FindBy(xpath = "//mat-icon[@svgicon='flag']")
 	WebElement enableCorrelation;
 
 	@FindBy(xpath = "//td[contains(@class,'ToolName')]")
 	WebElement webhookToolName;
 
-	@FindBy(xpath = "//mat-icon[@title='Delete ']")
+	@FindBy(xpath = "//mat-icon[@svgicon='trash']")
 	WebElement delete;
 
 	@FindBy(xpath = "//div[contains(text(),' Delete Correlation ')]")
 	WebElement deleteCorrelationMessage;
 
-	@FindBy(xpath = "//mat-icon[@svgicon='view_pipe_line']")
+	@FindBy(xpath = "//mat-icon[@svgicon='correlation']")
 	WebElement viewCorrelation;
 
 	@FindBy(xpath = "//pre[@class='showDialogHeadingCss']")
@@ -96,13 +99,13 @@ public class CorrelationObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//mat-icon[@svgicon='close_dialog']")
 	WebElement close;
 
-	@FindBy(xpath = "//mat-icon[@title='Cancel ']")
+	@FindBy(xpath = "//mat-icon[@svgicon='cancelBlkUpld']")
 	WebElement cancel;
 
-	@FindBy(xpath = "//span[@class='BlueColumnLeft']")
+	@FindBy(xpath = "//b[@id='sourceTool']")
 	WebElement viewCorrelationSourceTool;
 
-	@FindBy(xpath = "//span[@class='BlueColumnRight']")
+	@FindBy(xpath = "//b[@id='destinationTool']")
 	WebElement viewCorrelationDestinationTool;
 
 	@FindBy(xpath = "//td[contains(@class,'cdk-column-ToolName')]")
@@ -123,12 +126,15 @@ public class CorrelationObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//span[contains(@class, 'mat-option-text')]")
 	public List<WebElement> destinationeLabelList;
 
-	@FindBy(xpath = "//div[@class='overflowCSS']/div[1]/table/tbody/tr")
+	@FindBy(xpath = "//div[@class='property_source']/div/div/div[2]/table/tbody/tr")
 	public List<WebElement> sourceToolPropList;
 
-	@FindBy(xpath = "//div[@class='overflowCSS']/div[2]/table/tbody/tr")
+	@FindBy(xpath = "//div[@class='property_destination']/div/div/div[2]/table/tbody/tr")
 	public List<WebElement> destinationToolPropList;
 
 	@FindBy(xpath = "//div[@class='tableText']")
 	public List<WebElement> relationsList;
+	
+	@FindBy(xpath = "//button[@id='crossClose']")  //
+	WebElement crossClose;
 }

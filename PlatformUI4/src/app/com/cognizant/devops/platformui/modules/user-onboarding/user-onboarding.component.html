@@ -57,6 +57,7 @@
         <mat-icon
           matTooltip="Add User to Current/Selected Access Group"
           class="mat-icon material-icons"
+          id="personAdd"
         >
           person_add
         </mat-icon>
@@ -299,6 +300,7 @@
                 [checked]="addRadioSelected"
                 [value]="element1"
                 (click)="adduserenableSave()"
+                id="AddUser"
               >
               </mat-radio-button>
             </mat-radio-group>
@@ -307,7 +309,7 @@
             >
           </div>
         </div>
-        <div class="section-body">
+        <div class="section-body"  id="AddUserBlock">
           <span class="input-label">Current Access Group </span>
           <div class="two-field-grid" style="margin-top: 10px">
             <div class="grid-item">
@@ -477,7 +479,7 @@
           </div>
         </div>
       </div>
-      <div class="main-grid-item" style="margin-right: 1%">
+      <div class="main-grid-item" style="margin-right: 1%" id="AssignUserBlock">
         <div class="headerLbl">
           <div>
             <mat-radio-group style="margin-left: 16px">
@@ -485,6 +487,7 @@
                 [checked]="assignRadioSelected"
                 [value]="element2"
                 (click)="assignuserenableSave()"
+                id="Assignusers"
               >
               </mat-radio-button>
             </mat-radio-group>
@@ -510,6 +513,7 @@
                   required
                   placeholder=" Search by Login ID"
                   (keydown)="trackEvent1($event)"
+                  id="SearchId"
                 />
                 <mat-icon
                   matTooltip="Search"

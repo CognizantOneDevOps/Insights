@@ -22,7 +22,7 @@ source /etc/environment
 cd /opt
 sudo mkdir NEO4J_HOME
 cd NEO4J_HOME
-read -p "Enter neo4j version number you want to install(ex. 3.5.26 or 3.5.28 or 4.4.4): " version_number
+read -p "Enter neo4j version number you want to install(ex. 3.5.28 or 4.4.4): " version_number
 version_number=`echo $version_number | sed -e 's/^[[:space:]]*//'`
 NEO4J_APOCURL=https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.5.0.11/apoc-3.5.0.11-all.jar
 NEO4J_URI=https://dist.neo4j.org/neo4j-community-${version_number}-unix.tar.gz

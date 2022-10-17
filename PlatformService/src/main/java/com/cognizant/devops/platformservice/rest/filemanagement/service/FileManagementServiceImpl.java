@@ -40,7 +40,7 @@ import com.cognizant.devops.platformservice.traceabilitydashboard.service.Tracea
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-@Service("fileManagementService")
+@Service
 public class FileManagementServiceImpl {
 
 	private static final Logger log = LogManager.getLogger(FileManagementServiceImpl.class);

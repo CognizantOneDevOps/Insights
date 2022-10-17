@@ -41,7 +41,7 @@
             <span *ngIf="!sourceText" style="color: var(--text-clr);;font-size: 14px;">{{source}}
             </span>
             <div *ngIf="sourceText" class="BlueColumnLeft">
-                <span style="color: var(--text-clr4);font-size: 14px;"><b>{{source}}</b></span>
+                <span style="color: var(--text-clr4);font-size: 14px;"><b id="sourceTool">{{source}}</b></span>
             </div>
             <div *ngIf="sourceText" class="dialog-model">
                 <h4 style="font-size:14px;background-color: var(--backgnd-clr7);">
@@ -59,7 +59,7 @@
                 <span *ngIf="(!destText && sourceText)"
                     style="color: var(--text-clr);font-size:14px;">{{destination}}</span>
                 <div *ngIf="destText" class="BlueColumnRight">
-                    <span style="color: var(--text-clr4);font-size: 14px;"><b>{{destination}}</b></span>
+                    <span style="color: var(--text-clr4);font-size: 14px;"><b id="destinationTool">{{destination}}</b></span>
                 </div>
                 <div *ngIf="destText" class="dialog-modelDest">
                     <h4 style="font-size:14px;background-color: var(--backgnd-clr7);">

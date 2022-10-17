@@ -39,13 +39,6 @@ public interface AgentManagementService {
 	// for offline processing
 	public Map<String, ArrayList<String>> getOfflineSystemAvailableAgentList() throws InsightsCustomException;
 
-	// This is used during Agent registration, provide list of Agents, with version
-	// for online processing,for docroot
-	public Map<String, ArrayList<String>> getDocrootAvailableAgentList() throws InsightsCustomException;
-
-	// This is used during Agent registration, provide list of Agents, with version
-	// for online processing,for nexus
-	public Map<String, ArrayList<String>> getRepoAvailableAgentList() throws InsightsCustomException;
 
 	// For agent registration, gives you RAW config.json from docroot
 	public String getToolRawConfigFile(String version, String tool, boolean isWebhook) throws InsightsCustomException;

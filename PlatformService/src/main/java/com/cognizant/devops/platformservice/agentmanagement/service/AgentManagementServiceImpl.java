@@ -29,7 +29,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,13 +40,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.owasp.esapi.ESAPI;
 import org.owasp.esapi.Validator;
 import org.springframework.beans.BeanUtils;
@@ -74,7 +68,6 @@ import com.cognizant.devops.platformdal.outcome.InsightsTools;
 import com.cognizant.devops.platformdal.outcome.OutComeConfigDAL;
 import com.cognizant.devops.platformservice.agentmanagement.util.AgentManagementUtil;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
-import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -90,7 +83,6 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	private static Logger log = LogManager.getLogger(AgentManagementServiceImpl.class);
 	private static final String LAST_RUN_TIME = "lastRunTime";
 	private static final String HEALTH_STATUS = "healthStatus";
-	private static final String FORWARD_SLASH = "/";
 	private static final String ACCEPT_TYPE_GITHUB = "application/vnd.github.v3+json";
 		
 	boolean isProxyEnabled = ApplicationConfigProvider.getInstance().getProxyConfiguration().isEnableProxy();
@@ -325,102 +317,14 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	}
 
 	@Override
-	public Map<String, ArrayList<String>> getDocrootAvailableAgentList() throws InsightsCustomException {
-		Map<String, ArrayList<String>> agentDetails = new TreeMap<>();
-		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl();
-		Document doc;
-		try {
-			doc = getDocrootConnection(url);
-			Elements rows = doc.getElementsByTag("a");
-			for (Element element : rows) {
-				if (null != element.text() && element.text().startsWith("v")) {
-					String version = StringUtils.stripEnd(element.text(), "/");
-					ArrayList<String> toolJson = getAgentsFromDocroot(version);
-					agentDetails.put(version, toolJson);
-				}
-			}
-		} catch (IOException e) {
-			log.error("Error while getting system agent list from docroot ", e);
-			throw new InsightsCustomException(e.toString());
-		}
-		return agentDetails;
-	}
-
-	/** This method is use to create docRoot connection based on proxy
-	 * @param url
-	 * @return
-	 * @throws IOException
-	 */
-	private Document getDocrootConnection(String url) throws IOException {
-		
-		String login = ApplicationConfigProvider.getInstance().getAgentDetails().getNexusUserName() 
-						+ ":" +ApplicationConfigProvider.getInstance().getAgentDetails().getNexusPassword();
-		String base64login = Base64.getEncoder().encodeToString(login.getBytes());
-		
-		Document doc;
-		if(isProxyEnabled)
-			doc = Jsoup.connect(url).proxy(ApplicationConfigProvider.getInstance().getProxyConfiguration().getProxyHost(), ApplicationConfigProvider.getInstance().getProxyConfiguration().getProxyPort()).header(AuthenticationUtils.AUTH_HEADER_KEY, "Basic " + base64login).get();
-		else
-			doc = Jsoup.connect(url).header(AuthenticationUtils.AUTH_HEADER_KEY, "Basic " + base64login).get();
-		return doc;
-	}
-
-	@Override
-	public Map<String, ArrayList<String>> getRepoAvailableAgentList() throws InsightsCustomException {
-		Map<String, ArrayList<String>> agentDetails = new TreeMap<>();
-		log.debug("Inside getRepoAvailableAgentList for nexus repo ");
-		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getBrowseRepoUrl();
-		Document doc;
-		try {
-			doc = getDocrootConnection(url);
-			Elements rows = doc.getElementsByTag("a");
-			for (Element element : rows) {
-				if (null != element.text() && element.text().startsWith("v")) {
-					String version = element.text();
-					ArrayList<String> toolJson = getAgentsForRepo(version);
-					agentDetails.put(version, toolJson);
-				}
-			}
-		} catch (IOException e) {
-			log.error("Error while getting system agent list ", e);
-			throw new InsightsCustomException(e.toString());
-		}
-		return agentDetails;
-	}
-
-	@Override
 	public String getToolRawConfigFile(String version, String tool, boolean isWebhook) throws InsightsCustomException {
 		String configJson = null;
-		String toolPath = null;
 		try {
 			if(!version.startsWith("v") ||  ! ValidationUtils.checkAgentVersion(version) ) {
 				throw new InsightsCustomException("Not a valid version ");
 			}
 			if (!ApplicationConfigProvider.getInstance().getAgentDetails().isOnlineRegistration()) {
 				configJson = getOfflineToolRawConfigFile(version, tool, isWebhook);
-			} else {
-
-				if (ApplicationConfigProvider.getInstance().getAgentDetails().getOnlineRegistrationMode()
-						.equalsIgnoreCase(ConfigOptions.ONLINE_REGISTRATION_MODE_DOCROOT)) {
-					toolPath = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl()
-							+ FORWARD_SLASH + version + AgentCommonConstant.AGENTS + tool;
-					toolPath = toolPath.trim() + FORWARD_SLASH + tool.trim() + AgentCommonConstant.ZIPEXTENSION;
-				} else {
-					toolPath = ApplicationConfigProvider.getInstance().getAgentDetails().getDownloadRepoUrl()
-							+ FORWARD_SLASH + version + AgentCommonConstant.AGENTS + tool;
-					toolPath = toolPath.trim() + FORWARD_SLASH + tool.trim() + AgentCommonConstant.ZIPEXTENSION;
-				}
-				String targetDir = PlatformServiceUtil.sanitizePathTraversal(fileUnzipPath + File.separator + tool);
-				File targetDirFile = new File(targetDir);
-				if (targetDirFile.exists()) {
-					FileUtils.deleteDirectory(targetDirFile);
-				}
-				ESAPI.initialize("org.owasp.esapi.reference.DefaultSecurityConfiguration");
-				Validator validate = ESAPI.validator();
-				toolPath = validate.getValidInput("URL checking", toolPath, "URLPattern", 300, true);
-				configJson = AgentManagementUtil.getInstance()
-						.getAgentConfigfile(new URL(toolPath), new File(targetDir)).toString();
-				configJson = addDetailToConfigFile(configJson, targetDir, isWebhook);
 			}
 		} catch (Exception e) {
 			log.error("Error in getting raw config file ", e);
@@ -428,44 +332,6 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 
 		}
 		return configJson;
-	}
-
-	private ArrayList<String> getAgentsForRepo(String version) {
-		Document doc;
-		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getBrowseRepoUrl() + "/" + version
-				+ AgentCommonConstant.AGENTS;
-		ArrayList<String> tools = new ArrayList<>();
-		try {
-			doc = getDocrootConnection(url);
-			Elements rows = doc.getElementsByTag("a");
-			for (Element element : rows) {
-				if (null != element.text() && !(element.text().startsWith("Parent"))) {
-					tools.add(element.text());
-				}
-			}
-		} catch (IOException e) {
-			log.error("Error while fetching agents", e);
-		}
-		return tools;
-	}
-
-	private ArrayList<String> getAgentsFromDocroot(String version) {
-		Document doc;
-		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl() + "/" + version
-				+ AgentCommonConstant.AGENTS;
-		ArrayList<String> tools = new ArrayList<>();
-		try {
-			doc = getDocrootConnection(url);
-			Elements rows = doc.getElementsByTag("a");
-			for (Element element : rows) {
-				if (null != element.text() && element.text().endsWith("/")) {
-					tools.add(StringUtils.stripEnd(element.text(), "/"));
-				}
-			}
-		} catch (IOException e) {
-			log.error("Error while fetching agents", e);
-		}
-		return tools;
 	}
 
 	@Override
@@ -771,8 +637,17 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	private void publishAgentAction(String routingKey, byte[] data, BasicProperties props)
 			throws InsightsCustomException, IOException, TimeoutException {
 		String exchangeName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentExchange();
-		try (Channel channel = RabbitMQConnectionProvider.getChannel(routingKey, routingKey, exchangeName, MQMessageConstants.EXCHANGE_TYPE)) {
+		Channel channel = null;
+		try {
+			
+			channel = RabbitMQConnectionProvider.getConnection().createChannel();
+			channel = RabbitMQConnectionProvider.initilizeChannel(channel, routingKey, routingKey, exchangeName, MQMessageConstants.EXCHANGE_TYPE);
 			channel.basicPublish(exchangeName, routingKey, props, data);
+			
+		}finally {
+			if(channel != null) {
+				channel.close();
+			}
 		}
 	}
 

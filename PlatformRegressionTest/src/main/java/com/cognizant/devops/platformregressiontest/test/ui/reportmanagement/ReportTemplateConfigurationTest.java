@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.ui.reportmanagement;
 
+
+import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -48,13 +50,14 @@ public class ReportTemplateConfigurationTest extends LoginAndSelectModule {
 	 * @param kpiId
 	 * @param vType
 	 * @param vQuery
+	 * @throws InterruptedException 
 	 */
 	@Test(priority = 1, dataProvider = "createReportTemplatedataprovider", dataProviderClass = ReportManagementDataProvider.class, enabled = true)
-	public void createReportTemplate(String reportName, String description, String visualizationutil, String kpiId,
-			String vType, String vQuery) {
+	public void createReportTemplate(String reportName, String description, String visualizationutil,String templateType, String kpiId,
+			String vType, String vQuery) throws InterruptedException {
 
 		Assert.assertEquals(reportTemplateConfigurationPage.createReportTemplate(reportName, description,
-				visualizationutil, kpiId, vType, vQuery), true);
+				visualizationutil,templateType, kpiId, vType, vQuery), true);
 
 	}
 
@@ -70,11 +73,11 @@ public class ReportTemplateConfigurationTest extends LoginAndSelectModule {
 	 * @throws InterruptedException
 	 */
 	@Test(priority = 2, dataProvider = "createValidateReportTemplatedataprovider", dataProviderClass = ReportManagementDataProvider.class, enabled = true)
-	public void createValidateReportTemplate(String reportName, String description, String visualizationutil,
+	public void createValidateReportTemplate(String reportName, String description, String visualizationutil,String templateType,
 			String kpiId, String vType, String vQuery) throws InterruptedException {
 
 		Assert.assertEquals(reportTemplateConfigurationPage.createValidateReportTemplate(reportName, description,
-				visualizationutil, kpiId, vType, vQuery), true);
+				visualizationutil,templateType, kpiId, vType, vQuery), true);
 
 	}
 
@@ -82,9 +85,10 @@ public class ReportTemplateConfigurationTest extends LoginAndSelectModule {
 	 * This method tests upload json functionality
 	 * 
 	 * @param fileName
+	 * @throws InterruptedException 
 	 */
 	@Test(priority = 3, dataProvider = "uploadJsonReportTemplatedataprovider", dataProviderClass = ReportManagementDataProvider.class, enabled = true)
-	public void uploadJsonTest(String fileName) {
+	public void uploadJsonTest(String fileName) throws InterruptedException {
 
 		Assert.assertEquals(reportTemplateConfigurationPage.uploadJson(fileName), true);
 	}
@@ -94,10 +98,11 @@ public class ReportTemplateConfigurationTest extends LoginAndSelectModule {
 	 * 
 	 * @param reportTemplateName
 	 * @param configFileName
+	 * @throws InterruptedException 
 	 */
 	@Test(priority = 4, dependsOnMethods = {
 			"uploadJsonTest" }, dataProvider = "reportConfigFilesdataprovider", dataProviderClass = ReportManagementDataProvider.class, enabled = true)
-	public void attachReportConfigFiles(String reportTemplateName, String configFileName) {
+	public void attachReportConfigFiles(String reportTemplateName, String configFileName) throws InterruptedException {
 
 		Assert.assertEquals(reportTemplateConfigurationPage.attachReportConfigFiles(reportTemplateName, configFileName),
 				true);
@@ -112,9 +117,11 @@ public class ReportTemplateConfigurationTest extends LoginAndSelectModule {
 	 * @param description
 	 * @param vType
 	 * @param vQuery
+	 * @throws InterruptedException 
 	 */
+
 	@Test(priority = 5, dataProvider = "editReportTemplatedataprovider", dataProviderClass = ReportManagementDataProvider.class, enabled = true)
-	public void editReportTemplate(String reportName, String kpiId, String description, String vType, String vQuery) {
+	public void editReportTemplate(String reportName, String kpiId, String description, String vType, String vQuery) throws InterruptedException {
 
 		reportTemplateConfigurationPage.editReportTemplate(reportName, kpiId, description, vType, vQuery);
 	}
@@ -123,9 +130,10 @@ public class ReportTemplateConfigurationTest extends LoginAndSelectModule {
 	 * This method tests refresh button functionality
 	 * 
 	 * @param reportName
+	 * @throws InterruptedException 
 	 */
 	@Test(priority = 6, dataProvider = "deleteReportTemplatedataprovider", dataProviderClass = ReportManagementDataProvider.class, enabled = true)
-	public void refreshReportTemplate(String reportName) {
+	public void refreshReportTemplate(String reportName) throws InterruptedException {
 
 		Assert.assertEquals(reportTemplateConfigurationPage.checkRefreshButton(reportName), true);
 	}
@@ -134,11 +142,16 @@ public class ReportTemplateConfigurationTest extends LoginAndSelectModule {
 	 * This method tests report template delete functionality
 	 * 
 	 * @param reportName
+	 * @throws InterruptedException 
 	 */
 	@Test(priority = 7, dataProvider = "deleteReportTemplatedataprovider", dataProviderClass = ReportManagementDataProvider.class, enabled = true)
-	public void deleteReportTemplate(String reportName) {
+	public void deleteReportTemplate(String reportName) throws InterruptedException {
 
 		reportTemplateConfigurationPage.deleteReportTemplate(reportName);
 	}
 
+	public void checkReportDetails(String reportName) throws InterruptedException {
+		
+		reportTemplateConfigurationPage.checkReportDetails(reportName);
+	}
 }

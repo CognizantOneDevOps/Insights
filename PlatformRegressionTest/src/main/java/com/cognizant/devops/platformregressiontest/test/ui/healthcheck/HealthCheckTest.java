@@ -58,10 +58,11 @@ public class HealthCheckTest extends LoginAndSelectModule {
 	/**
 	 * This method will be executed just before any function/method with @Test
 	 * annotation starts.
+	 * @throws InterruptedException 
 	 */
 	@BeforeMethod
-	public void beforeMethod() {
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+	public void beforeMethod() throws InterruptedException {
+		Thread.sleep(10000);
 	}
 
 	/**
@@ -90,12 +91,12 @@ public class HealthCheckTest extends LoginAndSelectModule {
 	 * database
 	 */
 
-	@Test(priority = 3)
-	public void checkAllRegisteredAgentDisplayed() {
-		log.info(line);
-		Assert.assertTrue(clickAllActionButton.checkAllRegisteredAgentDisplayed(),
-				"Agents data has been loaded successfully");
-	}
+//	@Test(priority = 3)
+//	public void checkAllRegisteredAgentDisplayed() {
+//		log.info(line);
+//		Assert.assertTrue(clickAllActionButton.checkAllRegisteredAgentDisplayed(),
+//				"Agents data has been loaded successfully");
+//	}
 
 	/**
 	 * Assert true if Notification toggle functionality is working successfully.
@@ -125,30 +126,31 @@ public class HealthCheckTest extends LoginAndSelectModule {
 	 * @throws InterruptedException
 	 */
 
-	@Test(priority = 6)
-	public void detailDialogBoxTabUnderAgentsTab() throws InterruptedException {
-		log.info(line);
-		Assert.assertTrue(clickAllActionButton.detailDialogBoxTabUnderAgentsTab(),
-				"Latest Status Details and Latest Failure Details are displayed in detail dialog box under Agents tab");
-	}
-
+	/*
+	 * @Test(priority = 6) public void detailDialogBoxTabUnderAgentsTab() throws
+	 * InterruptedException { log.info(line);
+	 * Assert.assertTrue(clickAllActionButton.detailDialogBoxTabUnderAgentsTab(),
+	 * "Latest Status Details and Latest Failure Details are displayed in detail dialog box under Agents tab"
+	 * ); }
+	 */
 	/**
 	 * Assert true if Select tool functionality is working.
 	 */
 
-	@Test(priority = 7)
-	public void testSelectToolUnderAgentsTab() {
-		log.info(line);
-		Assert.assertTrue(clickAllActionButton.testSelectToolUnderAgentsTab(), "Select tool functionality is working.");
-	}
+	//@Test(priority = 7)
+//	public void testSelectToolUnderAgentsTab() {
+//		log.info(line);
+//		Assert.assertTrue(clickAllActionButton.testSelectToolUnderAgentsTab(), "Select tool functionality is working.");
+//	}
 
 	/**
 	 * Assert true if all components present under Data Components Tab are having
 	 * correct data.
+	 * @throws InterruptedException 
 	 */
 
 	@Test(priority = 8)
-	public void verifyDataComponentsTabData() {
+	public void verifyDataComponentsTabData() throws InterruptedException {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.verifyDataComponentsTabData(),
 				"All components present under Data Components Tab are having correct data.");
@@ -157,10 +159,11 @@ public class HealthCheckTest extends LoginAndSelectModule {
 	/**
 	 * Assert true if for all servers under Data Components tab, health check is
 	 * success.
+	 * @throws InterruptedException 
 	 */
 
 	@Test(priority = 9)
-	public void serverHealthCheckStatus() {
+	public void serverHealthCheckStatus() throws InterruptedException {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.serverHealthCheckStatus(),
 				"For all servers under Data Components tab, health check is success.");
@@ -180,10 +183,11 @@ public class HealthCheckTest extends LoginAndSelectModule {
 
 	/**
 	 * Assert true if for all services under Services tab, health check is success
+	 * @throws InterruptedException 
 	 */
 
 	@Test(priority = 11)
-	public void serviceHealthCheckStatus() {
+	public void serviceHealthCheckStatus() throws InterruptedException {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.serviceHealthCheckStatus(),
 				"For all services under Services tab, health check is success.");

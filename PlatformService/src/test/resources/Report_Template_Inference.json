@@ -1,0 +1,97 @@
+{
+	"reportName": "Inference_Report_Template",
+	"description": "Sample inference template",
+	"isActive": true,
+	"visualizationutil": "FUSION",
+	"templateType": "Others",
+	"kpiConfigs": [
+		{
+			"kpiId": 350 ,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 351 ,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 352 ,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 353 ,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 354 ,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 355 ,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 356 ,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 357 ,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 358 ,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 359 ,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 360 ,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 361 ,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 362 ,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 363 ,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 364 ,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 365 ,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 366 ,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 367 ,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 368 ,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 369 ,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 370 ,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 371 ,
+			"visualizationConfigs": []
+		}
+	]
+}

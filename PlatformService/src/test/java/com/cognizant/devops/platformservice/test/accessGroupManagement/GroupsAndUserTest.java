@@ -19,7 +19,6 @@ package com.cognizant.devops.platformservice.test.accessGroupManagement;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -70,7 +69,7 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 	private static final String AUTHORIZATION = "authorization";
 
 	AccessGroupManagement accessGroupManagement = new AccessGroupManagement();
-	
+
 	Map<String, String> testAuthData = new HashMap<>();
 
 	GroupsAndUserTestData groupsAndUserTestData = new GroupsAndUserTestData();
@@ -85,11 +84,11 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 
 	@Resource
 	private FilterChainProxy springSecurityFilterChain;
-	
+
 	@DataProvider
 	public void getData() {
-		String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + UnitTestConstant.TESTNG_TESTDATA + File.separator
-				+ "grafanaAuth.json";
+		String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator
+				+ UnitTestConstant.TESTNG_TESTDATA + File.separator + "grafanaAuth.json";
 		JsonElement jsonData;
 		try {
 			jsonData = JsonUtils.parseReader(new FileReader(new File(path).getCanonicalPath()));
@@ -149,10 +148,25 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 		} catch (Exception e) {
 			log.error("Error while testing getOrgUsers " + e);
 		}
-		log.debug("Test case getOrgUsers pass successfully ");
+		log.debug("Test case getOrgUsers passed successfully ");
 	}
 
 	@Test(priority = 2)
+	public void testGetOrgUsersV2() {
+		try {
+			this.mockMvc = getMacMvc();
+			log.debug(" cookies " + httpRequest.getCookies());
+			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPostWithRequestParam(
+					"/admin/userMgmt/v2/getOrgUsers?orgId=" + groupsAndUserTestData.orgId, "");
+
+			this.mockMvc.perform(builder.with(csrf().asHeader())).andExpect(ok);
+		} catch (Exception e) {
+			log.error("Error while testing getOrgUsers " + e);
+		}
+		log.debug("Test case getOrgUsers passed successfully ");
+	}
+
+	@Test(priority = 3)
 	public void testCreateOrg() throws InsightsCustomException {
 		try {
 			this.mockMvc = getMacMvc();
@@ -163,124 +177,162 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 		} catch (Exception e) {
 			log.error("Error while testing testCreateOrg " + e);
 		}
-		log.debug("Test case createOrg pass successfully ");
+		log.debug("Test case createOrg passed successfully ");
 	}
 
-	@Test(priority = 3)
+	@Test(priority = 4)
 	public void testAddUser() throws InsightsCustomException {
-	
+
 		try {
 			this.mockMvc = getMacMvc();
 			log.debug(" cookies " + httpRequest.getCookies());
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost("/accessGrpMgmt/addUserInOrg",
 					groupsAndUserTestData.userPropertyListAdmin);
-	
+
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing testAddUser " + e);
 		}
-		log.debug("Test case addUserInOrg pass successfully ");
+		log.debug("Test case addUserInOrg passed successfully ");
 	}
-	
-	@Test(priority = 4)
+
+	@Test(priority = 5)
 	public void testSearchUser() throws InsightsCustomException {
 		try {
 			this.mockMvc = getMacMvc();
 			log.debug(" cookies " + httpRequest.getCookies());
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost("/accessGrpMgmt/searchUser",
 					groupsAndUserTestData.userName);
-	
+
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing searchUser " + e);
 		}
-		log.debug("Test case searchUser pass successfully ");
-	
+		log.debug("Test case searchUser passed successfully ");
+
 	}
-	
-	//@Test(priority = 5)
+
+	// @Test(priority = 5)
 	public void testassignUser() throws InsightsCustomException {
-	
+
 		try {
 			this.mockMvc = getMacMvc();
 			log.debug(" cookies " + httpRequest.getCookies());
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost("/accessGrpMgmt/assignUser",
 					groupsAndUserTestData.assignUserData);
-	
+
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing assignUser " + e);
 		}
-		log.debug("Test case assignUser pass successfully ");
-	
+		log.debug("Test case assignUser passed successfully ");
+
 	}
-	
-	@Test(priority = 6)
+
+	@Test(priority = 7)
 	public void testAddUserEditor() throws InsightsCustomException {
-	
+
 		try {
 			this.mockMvc = getMacMvc();
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost("/accessGrpMgmt/addUserInOrg",
 					groupsAndUserTestData.userPropertyListEditor);
-	
+
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing assignUser " + e);
 		}
-		log.debug("Test case addUserInOrg pass successfully ");
-	
+		log.debug("Test case addUserInOrg passed successfully ");
+
 	}
-	
-	@Test(priority = 7)
+
+	@Test(priority = 8)
 	public void testAddUserViewer() throws InsightsCustomException {
-	
+
 		try {
 			this.mockMvc = getMacMvc();
 			log.debug(" cookies " + httpRequest.getCookies());
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost("/accessGrpMgmt/addUserInOrg",
 					groupsAndUserTestData.userPropertyListViewer);
-	
+
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing assignUser " + e);
 		}
-		log.debug("Test case pass successfully ");
+		log.debug("Test case passed successfully ");
 	}
-	
-	//@Test(priority = 8)
+
+	// @Test(priority = 8)
 	public void testEditOrganizationUser() throws InsightsCustomException {
-	
+
 		try {
 			this.mockMvc = getMacMvc();
 			log.debug(" cookies " + httpRequest.getCookies());
 			String url = "/admin/userMgmt/editOrganizationUser?orgId=" + groupsAndUserTestData.orgId + "&userId="
 					+ groupsAndUserTestData.userId + "&role=" + groupsAndUserTestData.role;
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPostWithRequestParam(url, "");
-	
+
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing getOrgUsers " + e);
 		}
-		log.debug("Test case pass successfully ");
-	
+		log.debug("Test case passed successfully ");
+
 	}
-	
-	@Test(priority = 9)
+
+	@Test(priority = 10)
 	public void testDeleteOrganizationUser() throws InsightsCustomException {
-	
+
 		try {
 			this.mockMvc = getMacMvc();
 			log.debug(" cookies " + httpRequest.getCookies());
 			String url = "/admin/userMgmt/deleteOrganizationUser?orgId=" + groupsAndUserTestData.orgId + "&userId="
 					+ groupsAndUserTestData.userId + "&role=" + groupsAndUserTestData.role;
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPostWithRequestParam(url, "");
-	
+
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing getOrgUsers " + e);
 		}
-		log.debug("Test case pass successfully ");
-	
+		log.debug("Test case passed successfully ");
+
+	}
+
+	@Test(priority = 11)
+	public void testGetThemePreference() throws InsightsCustomException {
+
+		try {
+			this.mockMvc = getMacMvc();
+			log.debug(" cookies " + httpRequest.getCookies());
+			String url = "/admin/userMgmt/getThemePreference";
+			MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get(url)
+					.header("Authorization", testAuthData.get(AUTHORIZATION)).header("Cookie", cookiesString);
+
+			this.mockMvc.perform(builder).andExpect(ok);
+		} catch (Exception e) {
+			log.error("Error while testing getGetThemePreference " + e);
+		}
+		log.debug("Test case passed successfully ");
+
+	}
+
+	@Test(priority = 12)
+	public void testUpdateThemePreference() throws InsightsCustomException {
+
+		try {
+			this.mockMvc = getMacMvc();
+			String content = "";
+			log.debug(" cookies " + httpRequest.getCookies());
+			String url = "/admin/userMgmt/updateThemePreference?themePreference="
+					+ groupsAndUserTestData.themePreference;
+			MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.put(url).cookie(httpRequest.getCookies())
+					.content(content).header("Authorization", testAuthData.get(AUTHORIZATION))
+					.header("Cookie", cookiesString).accept(MediaType.APPLICATION_JSON);
+			this.mockMvc.perform(builder).andExpect(ok);
+		} catch (Exception e) {
+			log.error("Error while testing updateGetThemePreference " + e);
+		}
+		log.debug("Test case passed successfully ");
+
 	}
 
 }

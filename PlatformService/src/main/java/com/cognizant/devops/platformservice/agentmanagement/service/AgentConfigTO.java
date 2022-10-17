@@ -26,8 +26,6 @@ public class AgentConfigTO implements Serializable {
 
 	private int id;
 
-	private int agentId;
-
 	private String toolName;
 
 	private String toolCategory;
@@ -62,14 +60,6 @@ public class AgentConfigTO implements Serializable {
 
 	public void setId(int id) {
 		this.id = id;
-	}
-
-	public int getAgentId() {
-		return agentId;
-	}
-
-	public void setAgentId(int agentId) {
-		this.agentId = agentId;
 	}
 
 	public String getToolName() {

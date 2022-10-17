@@ -34,7 +34,7 @@ public class GroupsAndUserObjectRepository extends LoginAndSelectModule {
 
 	Map<String, String> testData = new HashMap<>();
 
-	@FindBy(xpath = "//div[contains(text(),'Add Access Group / Edit User Role / Add User / Assign User to Various Access Group ')]")
+	@FindBy(xpath =  "//div[contains(text(),'Group & Users Management')]")
 	WebElement landingPage;
 
 	@FindBy(xpath = "//mat-select[@name ='selectedAdminOrg']")
@@ -43,91 +43,109 @@ public class GroupsAndUserObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//span[contains(@class, 'mat-option-text')]")
 	List<WebElement> accessGroupList;
 
-	@FindBy(xpath = "//mat-icon[@title='Add New Access Group']")
-	WebElement clickAddButton;
+	@FindBy(xpath = "//span[contains(@class, 'mat-option-text')]")
+	List<WebElement> accessGroupList1;
 
-	@FindBy(xpath = "//mat-icon[@title='Add User to Current/Selected Access Group']")
+	@FindBy(xpath = "//mat-icon[@svgicon='add']")
+	WebElement clickAddButton;
+	
+	@FindBy(xpath = "//mat-icon[@svgicon='retry']")
+	WebElement refresh;
+
+	@FindBy(xpath = "//mat-icon[@id='personAdd']")
 	WebElement addUserButton;
 
 	@FindBy(xpath = "//input[@placeholder='Please input an Access Group Name']")
 	WebElement accessGroupName;
 
-	@FindBy(xpath = "//span[text()= 'YES']")
+	@FindBy(xpath = "//button[contains(text(),'YES')]")
 	WebElement yesButton;
-
+	
+	@FindBy(xpath = "//button[@id='yesBtn']")
+	WebElement yes;
+	
 	@FindBy(xpath = "//span[text()= 'NO']")
 	WebElement noButton;
+	
+	@FindBy(xpath = "//button[@id='crossClose']")
+	WebElement crossClose;
 
-	@FindBy(xpath = "//span[text()= 'OKAY']")
-	WebElement okButton;
-
-	@FindBy(xpath = "//div[contains(text(), ' Success')]")
+	@FindBy(xpath = "//span[contains(text(),'Organization created')]")
 	WebElement successMessage;
+	
+	@FindBy(xpath = "//span[contains(text(),'User added to organization')]")
+	WebElement assignSuccessMessage;
+	
+	@FindBy(xpath = "//span[contains(text(),'User has been added.')]")
+	WebElement userSuccessMessage;	
 
-	@FindBy(xpath = "//div[contains(text(), ' Error')]")
+	@FindBy(xpath = "//span[contains(text(), 'User is already member of this organization')]")
 	WebElement errorMessage;
 
-	@FindBy(xpath = "//div[@class='adduserCol']//span[@class='mat-radio-container']")
+	@FindBy(xpath = "//mat-radio-button[@id='AddUser']")
 	WebElement addUserRadioButton;
 
-	@FindBy(xpath = "//div[contains(text(),'Add User (Please note: You are adding the user to Main Org.')]")
+	@FindBy(xpath = "//span[contains(text(), 'Assign users to various access groups')]")
 	WebElement addUserDisplayPage;
 
-	@FindBy(xpath = "//div[@class='assignUserCol']//span[@class='mat-radio-container']")
+	@FindBy(xpath = "//mat-radio-button[@id='Assignusers']")
 	WebElement assignUserRadioButton;
+	
+	@FindBy(xpath = "//mat-icon[@svgicon='backButton']")
+	WebElement backButton;
 
-	@FindBy(xpath = "//div[contains(text(),'Assign users to various access groups ')]")
+	@FindBy(xpath = "//div[@id='AssignUserBlock']")
 	WebElement assignUserLandingPage;
 
-	@FindBy(xpath = "//td/input[@placeholder=' Input a Name']")
+	@FindBy(xpath = "//input[@placeholder=' Input a Name']")
 	WebElement nameRequired;
 
-	@FindBy(xpath = "//td/input[@placeholder=' Provide a valid E-mail Address']")
+	@FindBy(xpath = "//input[@placeholder=' Provide a valid E-mail Address']")
 	WebElement emailAddress;
 
-	@FindBy(xpath = "//td/input[@placeholder=' Input a Username']")
+	@FindBy(xpath = "//input[@placeholder=' Input a Username']")
 	WebElement userName;
 
-	@FindBy(xpath = "//td/input[@placeholder=' Input a Password']")
+	@FindBy(xpath = "//input[@placeholder=' Input a Password']")
 	WebElement password;
 
 	@FindBy(xpath = "//mat-select[@placeholder=' Select a Role']")
 	WebElement selectRole;
 
-	@FindBy(xpath = "//td[contains(text(),'Please enter a valid Name.')]")
+	@FindBy(xpath = "//div[contains(text(),'Please enter a valid Name.')]")
 	WebElement errName;
 
-	@FindBy(xpath = "//td[contains(text(),'Please enter a valid Email.')]")
+	@FindBy(xpath = "//div[contains(text(),'Please enter a valid Email.')]")
 	WebElement erremailAddress;
 
-	@FindBy(xpath = "//td[contains(text(),'Please enter a valid Username.')]")
+	@FindBy(xpath = "//div[contains(text(),'Please enter a valid Username.')]")
 	WebElement erruserName;
 
-	@FindBy(xpath = "//td[contains(text(),'Please enter a valid Password.')]")
+	@FindBy(xpath = "//div[contains(text(),'Please enter a valid Password.')]")
 	WebElement errPassword;
 
-	@FindBy(xpath = "//td[contains(text(),'Please select a Role.')]")
+	@FindBy(xpath = "//div[contains(text(),'Please select a Role.')]")
 	WebElement errRole;
 
 	@FindBy(xpath = "//span[contains(@class, 'mat-option-text')]")
 	List<WebElement> selectRoleList;
 
-	@FindBy(xpath = "//mat-icon[@title='Save ']")
+	@FindBy(xpath = "//mat-icon[@svgicon='saveHook']")
 	WebElement saveButton;
 
-	@FindBy(xpath = "//table[@class='tableMainCss']//input[@placeholder=' Search by Login ID']")
+	@FindBy(xpath = "//input[@id='SearchId']")
 	WebElement searchBox;
 
-	@FindBy(xpath = "//table[@class='tableMainCss']//tr[1]//span[contains(text(),'Select Access Group')]")
+	@FindBy(xpath = "//span[contains(text(),'Select Access Group')]")
 	WebElement accessGroup1;
 
-	@FindBy(xpath = "//table[@class='tableMainCss']//tr[2]//span[contains(text(),'Select Access Group')]")
+	@FindBy(xpath = "//span[contains(text(),'Select Access Group')]")
 	WebElement accessGroup2;
 
-	@FindBy(xpath = "//table[@class='tableMainCss']//tr[1]//span[contains(text(),'Select Role')]")
+	@FindBy(xpath = "//span[contains(text(),'Select Role')]")
 	WebElement selectRole1;
 
-	@FindBy(xpath = "//table[@class='tableMainCss']//tr[2]//span[contains(text(),'Select Role')]")
+	@FindBy(xpath = "//span[contains(text(),'Select Role')]")
 	WebElement selectRole2;
 
 	@FindBy(xpath = "//td[contains(text(),'admin1@Cognizant.com')]")
@@ -136,10 +154,10 @@ public class GroupsAndUserObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//mat-icon[@title='Redirect To Landing Page']")
 	WebElement redirectButton;
 
-	@FindBy(xpath = "//mat-icon[@title='Edit ']")
+	@FindBy(xpath = "//mat-icon[@svgicon='edit']")
 	WebElement editButton;
 
-	@FindBy(xpath = "//mat-icon[@title='Delete Organization User ']")
+	@FindBy(xpath = "//mat-icon[@svgicon='trash']")
 	WebElement deleteButton;
 
 	@FindBy(xpath = "//table//tbody[@role='rowgroup']")
@@ -151,7 +169,16 @@ public class GroupsAndUserObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//input[@placeholder='Search by Login ID or Email Address']")
 	WebElement searchBoxInLandingPage;
 
-	@FindBy(xpath = "//div[@class='adduserCol']//td[1]")
+	@FindBy(xpath = "//div[@id='AddUserBlock']/span[@class='input-label']")
 	List<WebElement> addUserFields;
+	
+	@FindBy(xpath = "//span[contains(text(),'Name')]")
+	WebElement addUsername;
+	
+	@FindBy(xpath = "//span[contains(text(),'Email')]")
+	WebElement addUserEmail;
+	
+	@FindBy(xpath = "//span[contains(text(),'Login ID')]")
+	WebElement addUserLoginID;
 	
 }

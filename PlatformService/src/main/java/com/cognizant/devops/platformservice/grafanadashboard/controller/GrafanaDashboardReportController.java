@@ -49,11 +49,10 @@ public class GrafanaDashboardReportController {
 
 	@Autowired
 	GrafanaPdfService grafanaPdfServiceImpl;
-	
+
 	@Autowired
 	AccessGroupManagement accessGroupManagement;
 
-	
 	@PostMapping(value = "/exportPDF/saveDashboardAsPDF", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject publishGrafanaDashboardDetails(@RequestBody String dashboardDetails) {
 		log.debug("Dashboard details to generate pdf == {}", dashboardDetails);
@@ -66,18 +65,18 @@ public class GrafanaDashboardReportController {
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
-	
+
 	@GetMapping(value = "/exportPDF/fetchGrafanaDashboardConfigs", produces = MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody JsonObject fetchGrafanaDashboardConfigs(){
+	public @ResponseBody JsonObject fetchGrafanaDashboardConfigs() {
 		List<GrafanaDashboardPdfConfig> result = null;
 		JsonArray jsonarray = new JsonArray();
 		JsonObject currentUserWithOrgs = new JsonObject();
 		Map<String, String> userOrgsMap = new HashMap<>();
-		try{
+		try {
 			currentUserWithOrgs = accessGroupManagement.getCurrentUserWithOrgs();
 			JsonObject currentUserWithOrgsData = (JsonObject) currentUserWithOrgs.get("data");
 			JsonArray orgArray = (JsonArray) currentUserWithOrgsData.get("orgArray");
-			for(int i = 0; i < orgArray.size(); i++) {
+			for (int i = 0; i < orgArray.size(); i++) {
 				JsonObject jsonObject = orgArray.get(i).getAsJsonObject();
 				userOrgsMap.put(jsonObject.get("orgId").toString(), jsonObject.get("name").getAsString());
 			}
@@ -85,7 +84,7 @@ public class GrafanaDashboardReportController {
 			for (GrafanaDashboardPdfConfig dashboardConfig : result) {
 				JsonObject dashJson = JsonUtils.parseStringAsJsonObject(dashboardConfig.getDashboardJson());
 				String orgId = dashJson.get("organisation").getAsString();
-				if(!userOrgsMap.containsKey(orgId)) {
+				if (!userOrgsMap.containsKey(orgId)) {
 					continue;
 				}
 				JsonObject jsonobject = new JsonObject();
@@ -102,13 +101,13 @@ public class GrafanaDashboardReportController {
 				jsonobject.addProperty("isActive", dashboardConfig.getWorkflowConfig().isActive());
 				jsonarray.add(jsonobject);
 			}
-			
+
 			return PlatformServiceUtil.buildSuccessResponseWithData(jsonarray);
 		} catch (Exception e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
 	}
-	
+
 	@PostMapping(value = "/exportPDF/updateDashboardConfig", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject updateGrafanaDashboardDetails(@RequestBody String dashboardDetails) {
 		log.debug("Updating Dashboard details to generate pdf == {}", dashboardDetails);
@@ -121,7 +120,7 @@ public class GrafanaDashboardReportController {
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
-	
+
 	@PostMapping(value = "/exportPDF/deleteDashboardConfig", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject deleteGrafanaDashboardDetails(@RequestParam int id) {
 		log.debug("Deleting Dashboard details for == {}", id);
@@ -139,21 +138,22 @@ public class GrafanaDashboardReportController {
 		String message = null;
 		try {
 			JsonObject dashboardIdJson = JsonUtils.parseStringAsJsonObject(dashboardIdJsonString);
-			message = grafanaPdfServiceImpl.updateDashboardPdfConfigStatus(dashboardIdJson);		
+			message = grafanaPdfServiceImpl.updateDashboardPdfConfigStatus(dashboardIdJson);
 			return PlatformServiceUtil.buildSuccessResponseWithData(message);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
 	}
-	
+
 	@GetMapping(value = "/getEmailConfigurationStatus", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getEmailConfigurationStatus() {
-		Boolean isEmailConfigured = ApplicationConfigProvider.getInstance().getEmailConfiguration().getSendEmailEnabled();		
+		Boolean isEmailConfigured = ApplicationConfigProvider.getInstance().getEmailConfiguration()
+				.getSendEmailEnabled();
 		return PlatformServiceUtil.buildSuccessResponseWithData(isEmailConfigured);
 	}
-	
-	@PostMapping(value = "/setDashboardActiveState", produces = MediaType.APPLICATION_JSON_VALUE) 
-	public @ResponseBody  JsonObject setDashboardActiveState(@RequestBody String dashboardUpdateJsonString) {
+
+	@PostMapping(value = "/setDashboardActiveState", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject setDashboardActiveState(@RequestBody String dashboardUpdateJsonString) {
 		String message = null;
 		try {
 			JsonObject dashboardUpdateJson = JsonUtils.parseStringAsJsonObject(dashboardUpdateJsonString);
@@ -163,5 +163,5 @@ public class GrafanaDashboardReportController {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
 	}
-	
+
 }

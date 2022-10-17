@@ -32,6 +32,7 @@ import com.google.gson.JsonObject;
 public class AgentConfigDAL extends BaseDAL {
 
 	private static Logger log = LogManager.getLogger(AgentConfigDAL.class);
+
 	/**
 	 * New method for updating the existing agent info in database.
 	 * 
@@ -46,18 +47,17 @@ public class AgentConfigDAL extends BaseDAL {
 	 * @return
 	 */
 	public boolean updateAgentConfigFromUI(String agentId, String toolCategory, String labelName, String toolName,
-			JsonObject agentJson, String agentVersion, String osversion, Date updateDate, boolean vault,boolean isWebhook) {
+			JsonObject agentJson, String agentVersion, String osversion, Date updateDate, boolean vault,
+			boolean isWebhook) {
 		try {
-			Map<String,Object> parameters = new HashMap<>();
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AgentCommonConstant.AGENTID, agentId);
-			AgentConfig agentConfig = getUniqueResult(
-					"FROM AgentConfig a WHERE a.agentKey = :agentId",
-					AgentConfig.class,
-					parameters);
+			AgentConfig agentConfig = getUniqueResult("FROM AgentConfig a WHERE a.agentKey = :agentId",
+					AgentConfig.class, parameters);
 
 			if (agentConfig != null) {
 				setAgentConfigValues(agentConfig, toolCategory, labelName, agentId, toolName, agentJson, agentVersion,
-						osversion, updateDate, vault,isWebhook);
+						osversion, updateDate, vault, isWebhook);
 				update(agentConfig);
 				return Boolean.TRUE;
 			} else {
@@ -77,12 +77,10 @@ public class AgentConfigDAL extends BaseDAL {
 	 */
 	public boolean isAgentIdExisting(String agentId) {
 		try {
-			Map<String,Object> parameters = new HashMap<>();
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AgentCommonConstant.AGENTID, agentId);
-			List<AgentConfig> agentList= getResultList(
-					"FROM AgentConfig a WHERE a.agentKey = :agentId  ",
-					AgentConfig.class,
-					parameters);
+			List<AgentConfig> agentList = getResultList("FROM AgentConfig a WHERE a.agentKey = :agentId  ",
+					AgentConfig.class, parameters);
 			if (agentList.isEmpty()) {
 				return Boolean.FALSE;
 			} else {
@@ -109,13 +107,14 @@ public class AgentConfigDAL extends BaseDAL {
 	 * @return
 	 */
 	public boolean saveAgentConfigFromUI(String agentId, String toolCategory, String labelName, String toolName,
-		JsonObject agentJson, String agentVersion, String osversion, Date updateDate, boolean vault,boolean isWebhook) {
+			JsonObject agentJson, String agentVersion, String osversion, Date updateDate, boolean vault,
+			boolean isWebhook) {
 		AgentConfig agentConfig = new AgentConfig();
 		try {
-		setAgentConfigValues(agentConfig, toolCategory, labelName, agentId, toolName, agentJson, agentVersion,
-				osversion, updateDate, vault,isWebhook);
-		save(agentConfig);
-		}catch(Exception e) {
+			setAgentConfigValues(agentConfig, toolCategory, labelName, agentId, toolName, agentJson, agentVersion,
+					osversion, updateDate, vault, isWebhook);
+			save(agentConfig);
+		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
 		}
@@ -124,7 +123,7 @@ public class AgentConfigDAL extends BaseDAL {
 
 	private void setAgentConfigValues(AgentConfig agentConfig, String toolCategory, String labelName, String agentId,
 			String toolName, JsonObject agentJson, String agentVersion, String osversion, Date updateDate,
-			boolean vault,boolean isWebhook) {
+			boolean vault, boolean isWebhook) {
 
 		agentConfig.setToolCategory(toolCategory.toUpperCase());
 		agentConfig.setToolName(toolName);
@@ -147,14 +146,13 @@ public class AgentConfigDAL extends BaseDAL {
 	 * @return
 	 */
 	public List<AgentConfig> getAgentConfigurations(String toolName, String toolCategory) {
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AgentCommonConstant.TOOLNAME, toolName);
 			parameters.put(AgentCommonConstant.TOOLCATEGORY, toolCategory);
 			return getResultList(
 					"FROM AgentConfig AC WHERE AC.toolName = :toolName AND AC.toolCategory = :toolCategory ",
-					AgentConfig.class,
-					parameters);
+					AgentConfig.class, parameters);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
@@ -163,12 +161,10 @@ public class AgentConfigDAL extends BaseDAL {
 
 	public AgentConfig updateAgentRunningStatus(String agentId, AGENTACTION action) {
 		try {
-			Map<String,Object> parameters = new HashMap<>();
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AgentCommonConstant.AGENTKEY, agentId);
-			AgentConfig agentConfig = getSingleResult(
-					"FROM AgentConfig AC WHERE AC.agentKey = :agentKey",
-					AgentConfig.class,
-					parameters);
+			AgentConfig agentConfig = getSingleResult("FROM AgentConfig AC WHERE AC.agentKey = :agentKey",
+					AgentConfig.class, parameters);
 			if (agentConfig != null) {
 				agentConfig.setAgentStatus(action.name());
 				update(agentConfig);
@@ -181,13 +177,11 @@ public class AgentConfigDAL extends BaseDAL {
 	}
 
 	public List<AgentConfig> deleteAgentConfigurations(String agentKey) {
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AgentCommonConstant.AGENTKEY, agentKey);
-			AgentConfig agentConfig = getSingleResult(
-					"FROM AgentConfig a WHERE a.agentKey = :agentKey",
-					AgentConfig.class,
-					parameters);
+			AgentConfig agentConfig = getSingleResult("FROM AgentConfig a WHERE a.agentKey = :agentKey",
+					AgentConfig.class, parameters);
 			delete(agentConfig);
 			return getAllDataAgentConfigurations();
 		} catch (Exception e) {
@@ -197,14 +191,11 @@ public class AgentConfigDAL extends BaseDAL {
 	}
 
 	public AgentConfig getAgentConfigurations(String agentId) {
-		
+
 		try {
-			Map<String,Object> parameters = new HashMap<>();
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AgentCommonConstant.AGENTKEY, agentId);
-			return getSingleResult(
-					"FROM AgentConfig AC WHERE AC.agentKey = :agentKey",
-					AgentConfig.class,
-					parameters);
+			return getSingleResult("FROM AgentConfig AC WHERE AC.agentKey = :agentKey", AgentConfig.class, parameters);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
@@ -213,11 +204,8 @@ public class AgentConfigDAL extends BaseDAL {
 
 	public List<AgentConfig> getAllAgentConfigurations() {
 		try {
-			Map<String,Object> parameters = new HashMap<>();
-			return getResultList(
-					"FROM AgentConfig AC",
-					AgentConfig.class,
-					parameters);
+			Map<String, Object> parameters = new HashMap<>();
+			return getResultList("FROM AgentConfig AC", AgentConfig.class, parameters);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
@@ -226,11 +214,10 @@ public class AgentConfigDAL extends BaseDAL {
 
 	public List<AgentConfig> getAllEngineAggregatorAgentConfigurations() {
 		try {
-			Map<String,Object> parameters = new HashMap<>();
+			Map<String, Object> parameters = new HashMap<>();
 			return getResultList(
 					"FROM AgentConfig AC WHERE AC.toolCategory != '" + DataArchivalConstants.TOOLCATEGORY + "'",
-					AgentConfig.class,
-					parameters);
+					AgentConfig.class, parameters);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
@@ -239,24 +226,10 @@ public class AgentConfigDAL extends BaseDAL {
 
 	public List<AgentConfig> getAllDataAgentConfigurations() {
 		try {
-			Map<String,Object> parameters = new HashMap<>();
+			Map<String, Object> parameters = new HashMap<>();
 			return getResultList(
 					"FROM AgentConfig AC WHERE AC.toolCategory != 'DAEMONAGENT' AND AC.toolName != 'AGENTDAEMON' ORDER By AC.toolName, AC.agentKey",
-					AgentConfig.class,
-					parameters);
-		} catch (Exception e) {
-			log.error(e.getMessage());
-			throw e;
-		}
-	}
-	
-	@Deprecated
-	public boolean updateAgentSubscriberConfigurations(List<AgentConfig> agentConfigs) {
-		try {
-			for (AgentConfig agentConfig : agentConfigs) {
-				update(agentConfig);
-			}
-			return true;
+					AgentConfig.class, parameters);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
@@ -272,34 +245,16 @@ public class AgentConfigDAL extends BaseDAL {
 	 * @return
 	 */
 	public boolean deleteAgentConfigurations(String toolName, String toolCategory, int agentId) {
-		try  {
-			Map<String,Object> parameters = new HashMap<>();
+		try {
+			Map<String, Object> parameters = new HashMap<>();
 			parameters.put("toolName", toolName);
 			parameters.put("toolCategory", toolCategory);
 			parameters.put("agentId", agentId);
 			AgentConfig agentConfig = getSingleResult(
 					"FROM AgentConfig a WHERE a.toolName = :toolName AND a.toolCategory = :toolCategory AND a.agentId = :agentId",
-					AgentConfig.class,
-					parameters);
+					AgentConfig.class, parameters);
 			delete(agentConfig);
 			return true;
-		} catch (Exception e) {
-			log.error(e.getMessage());
-			throw e;
-		}
-	}
-	
-	@Deprecated
-	public AgentConfig downloadAgentConfigurations(String toolName, String toolCategory, int agentId) {
-		try {
-			Map<String,Object> parameters = new HashMap<>();
-			parameters.put("toolName", toolName);
-			parameters.put("toolCategory", toolCategory);
-			parameters.put("agentId", agentId);
-			return getSingleResult(
-					"FROM AgentConfig a WHERE a.toolName = :toolName AND a.toolCategory = :toolCategory AND a.agentId = :agentId",
-					AgentConfig.class,
-					parameters);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;

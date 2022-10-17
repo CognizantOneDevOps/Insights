@@ -60,17 +60,18 @@ public class LogoSettingTest extends LoginAndSelectModule {
 	/**
 	 * This method will be executed just before any function/method with @Test
 	 * annotation starts.
+	 * @throws InterruptedException 
 	 */
 	@BeforeMethod
-	public void beforeMethod() {
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+	public void beforeMethod() throws InterruptedException {
+		Thread.sleep(1000);
 	}
 
 	/**
 	 * Assert true if landing page is displayed else false
 	 */
 	@Test(priority = 1)
-	public void navigateToServerConfigurationLandingPage() {
+	public void navigateToLogoSettingLandingPage() {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.navigateToLogoSettingLandingPage(),
 				"Logo setting Landing page is displayed");
@@ -87,9 +88,10 @@ public class LogoSettingTest extends LoginAndSelectModule {
 
 	/**
 	 * Assert true if error message is displayed else false
+	 * @throws InterruptedException 
 	 */
 	@Test(priority = 3)
-	public void addLargeFileSize() {
+	public void addLargeFileSize() throws InterruptedException {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.addLargeFileSize(), "cannot add file size greater than 1 MB");
 	}

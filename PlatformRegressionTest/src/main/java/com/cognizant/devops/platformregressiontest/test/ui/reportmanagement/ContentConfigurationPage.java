@@ -18,7 +18,6 @@ package com.cognizant.devops.platformregressiontest.test.ui.reportmanagement;
 import java.io.File;
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,14 +27,13 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.SkipException;
 
 import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
-import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectModule;
+import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.ReportConfigurationDataModel;
 
 /**
  * @author Ankita
@@ -60,14 +58,14 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 		PageFactory.initElements(driver, this);
 	}
 
-	public void selectTableRow(String value, List<WebElement> table) {
+	public void selectTableRow(String value, List<WebElement> table) throws InterruptedException {
 
 		kpiInputEl.sendKeys(value);
 		for (int i = 0; i < table.size(); i++) {
 			if (table.get(i).getText().equals(value)) {
 				List<WebElement> radioButtons = table.get(i)
 						.findElements(By.xpath(".//preceding::span[contains(@class, 'mat-radio-container')]"));
-				driver.manage().timeouts().implicitlyWait(6, TimeUnit.SECONDS);
+				Thread.sleep(6000);
 				radioButtons.get(i).click();
 				break;
 			}
@@ -106,72 +104,71 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 	 * @param message
 	 * @param isActive
 	 * @return
+	 * @throws InterruptedException 
 	 */
-	public String saveContent(String contentId, String expectedTrend, String directionOfThreshold, String contentName,
-			String action, String kpiId, String noOfResult, String threshold, String resultField, String message,
-			String isActive) {
+	public boolean saveContent(ReportConfigurationDataModel data) throws InterruptedException {
 		clickAddButton();
-		contentIdEl.sendKeys(contentId);
-		contentNameEl.sendKeys(contentName);
+		contentIdEl.sendKeys(data.getContentId());
+		contentNameEl.sendKeys(data.getContentName());
 		wait.until(ExpectedConditions.elementToBeClickable(searchKpiEl));
 		searchKpiEl.click();
-		selectTableRow(kpiId, kpiListEl);
+		selectTableRow(data.getKpiId(), kpiListEl);
 		wait.until(ExpectedConditions.elementToBeClickable(kpiSelectBtnEl));
 		kpiSelectBtnEl.click();
-		expectedTrendEl.sendKeys(expectedTrend);
-		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
+		expectedTrendEl.sendKeys(data.getExpectedTrend());
+		Thread.sleep(3000);
 		try {
 			if (directionThresholdEl.isDisplayed()) {
-				directionThresholdEl.sendKeys(directionOfThreshold);
+				directionThresholdEl.sendKeys(data.getDirectionOfThreshold());
 			}
 		} catch (NoSuchElementException e) {
-			log.info("Direction of threshold not applicable for the KPI :{} ", kpiId);
+			log.info("Direction of threshold not applicable for the KPI :{} ", data.getKpiId());
 		}
-		resultFieldEl.sendKeys(resultField);
+		resultFieldEl.sendKeys(data.getResultField());
 		try {
 			if (actionEl.isDisplayed()) {
-				actionEl.sendKeys(action);
+				actionEl.sendKeys(data.getAction());
 			}
 		} catch (NoSuchElementException e) {
-			log.info("Action not applicable for the KPI :{} ", kpiId);
+			log.info("Action not applicable for the KPI :{} ", data.getKpiId());
 		}
-		wait.until(ExpectedConditions.elementToBeClickable(isActiveEl));
-		isActiveEl.click();
-		messageEl.sendKeys(message);
+		messageEl.sendKeys(data.getMessage());
 		try {
 			if (thresholdEl.isDisplayed()) {
-				thresholdEl.sendKeys(threshold);
+				thresholdEl.sendKeys(data.getThreshold());
 			}
 		} catch (NoSuchElementException e) {
-			log.info("threshold not applicable for the KPI :{} ", kpiId);
+			log.info("threshold not applicable for the KPI :{} ", data.getKpiId());
 		}
 
 		try {
 			if (thresholdsEl.isDisplayed()) {
-				thresholdsEl.sendKeys(threshold);
+				thresholdsEl.sendKeys(data.getThreshold());
 			}
 		} catch (NoSuchElementException e) {
-			log.info("thresholds not applicable for the KPI :{} ", kpiId);
+			log.info("thresholds not applicable for the KPI :{} ", data.getKpiId());
 		}
 
 		wait.until(ExpectedConditions.elementToBeClickable(saveBtnEl));
 		saveBtnEl.click();
 		wait.until(ExpectedConditions.elementToBeClickable(yesBtnEl));
 		yesBtnEl.click();
-		wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
+		wait.until(ExpectedConditions.elementToBeClickable(crossClose));
 		try {
 			if (contentIdExistsEl.isDisplayed()) {
-				btnOKEl.click();
+				crossClose.click();
 				navigateToContentLandingPage();
-				log.debug("Skipping test case as content : {} already exists", contentId);
-				throw new SkipException("Skipping test case as content : " + contentId + " already exists");
+				log.debug("Skipping test case as content : {} already exists", data.getContentId());
+				throw new SkipException("Skipping test case as content : " + data.getContentId() + " already exists");
 			}
 		} catch (NoSuchElementException e) {
-			log.info("Something went wring while saving content : {} exception : {}", contentId, e.getMessage());
+			crossClose.click();
+			navigateToContentLandingPage();
+			return true;
 		}
-		wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
-		btnOKEl.click();
-		return contentId;
+		wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+		crossClose.click();
+		return false;
 	}
 
 	/**
@@ -190,10 +187,11 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 	 * @param isActive
 	 * @param category
 	 * @return
+	 * @throws InterruptedException 
 	 */
 	public boolean saveValidateContent(String contentId, String expectedTrend, String directionOfThreshold,
 			String contentName, String action, String kpiId, String noOfResult, String threshold, String resultField,
-			String message, String isActive, String category) {
+			String message, String isActive, String category) throws InterruptedException {
 
 		boolean result = true;
 		clickAddButton();
@@ -205,7 +203,7 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 		wait.until(ExpectedConditions.elementToBeClickable(kpiSelectBtnEl));
 		kpiSelectBtnEl.click();
 		expectedTrendEl.sendKeys(expectedTrend);
-		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
+		Thread.sleep(3000);
 		try {
 			if (directionThresholdEl.isDisplayed()) {
 				directionThresholdEl.sendKeys(directionOfThreshold);
@@ -221,10 +219,8 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 		} catch (NoSuchElementException e) {
 			log.info("Action not applicable for the KPI :{} ", kpiId);
 		}
-		wait.until(ExpectedConditions.elementToBeClickable(isActiveEl));
-		isActiveEl.click();
 		messageEl.sendKeys(message);
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		Thread.sleep(5000);
 		if (category.equals(THRESHOLD_RANGE)) {
 			result = validateThresholdRange(threshold);
 
@@ -238,12 +234,12 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 		} else if (category.equals(COMPARISON)) {
 			result = validateComparison();
 		}
-
+		navigateToContentLandingPage();
 		return result;
 	}
 
-	private boolean validateThreshold(String threshold) {
-		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
+	private boolean validateThreshold(String threshold) throws InterruptedException {
+		Thread.sleep(3000);
 		wait.until(ExpectedConditions.visibilityOf(thresholdEl));
 		thresholdEl.sendKeys(threshold);
 		wait.until(ExpectedConditions.elementToBeClickable(saveBtnEl));
@@ -253,7 +249,7 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 			if (contentAddedEl.isDisplayed()) {
 				wait.until(ExpectedConditions.elementToBeClickable(yesBtnEl));
 				yesBtnEl.click();
-				btnOKEl.click();
+				crossClose.click();
 				navigateToContentLandingPage();
 				return false;
 			}
@@ -264,25 +260,26 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 
 		try {
 			if (thresholdActionValidatorEl.isDisplayed()) {
-				wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
-				btnOKEl.click();
+				wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+				crossClose.click();
 				navigateToContentLandingPage();
 				return true;
 			}
 		} catch (NoSuchElementException e) {
+			log.info("Threshold Validation unsuccessful");
 
 		}
 		try {
 			Integer.parseInt(thresholdEl.getText());
-			wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
-			btnOKEl.click();
+			wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+			crossClose.click();
 			navigateToContentLandingPage();
 			return true;
 
 		} catch (NumberFormatException nf) {
 			log.info("Threshold can take only integer values");
-			wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
-			btnOKEl.click();
+			wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+			crossClose.click();
 			navigateToContentLandingPage();
 			return true;
 
@@ -294,26 +291,26 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 		return false;
 	}
 
-	private boolean validateMinMax() {
-		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
+	private boolean validateMinMax() throws InterruptedException {
+		Thread.sleep(3000);
 		wait.until(ExpectedConditions.elementToBeClickable(saveBtnEl));
 		saveBtnEl.click();
-		wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
+		wait.until(ExpectedConditions.elementToBeClickable(crossClose));
 		try {
 			if (minmaxActionValidatorEl.isDisplayed()) {
 
-				btnOKEl.click();
+				crossClose.click();
 				navigateToContentLandingPage();
 				return true;
 			}
 		} catch (NoSuchElementException e) {
-
+			log.info("Error occured in MinMax");
 		}
 		try {
 			if (contentAddedEl.isDisplayed()) {
 				wait.until(ExpectedConditions.elementToBeClickable(yBtnEl));
 				yBtnEl.click();
-				btnOKEl.click();
+				crossClose.click();
 				navigateToContentLandingPage();
 				return false;
 			}
@@ -325,54 +322,53 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 		return false;
 	}
 
-	private boolean validateComparison() {
-		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
+	private boolean validateComparison() throws InterruptedException {
+		Thread.sleep(3000);
 		wait.until(ExpectedConditions.elementToBeClickable(saveBtnEl));
 		saveBtnEl.click();
-		wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
+		wait.until(ExpectedConditions.elementToBeClickable(crossClose));
 		try {
 			if (comparisonMsgValidationEl.isDisplayed()) {
-				btnOKEl.click();
+				crossClose.click();
 				navigateToContentLandingPage();
 				return true;
 
 			}
 		} catch (NoSuchElementException e) {
 			log.info("Something went wrong while validating comparision category");
-			btnOKEl.click();
+			crossClose.click();
 			navigateToContentLandingPage();
 			return false;
 		}
 		return false;
 	}
 
-	private boolean validateThresholdRange(String threshold) {
-
-		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
+	private boolean validateThresholdRange(String threshold) throws InterruptedException {
+		Thread.sleep(3000);
 		wait.until(ExpectedConditions.visibilityOf(thresholdsEl));
 		thresholdsEl.sendKeys(threshold);
 		wait.until(ExpectedConditions.elementToBeClickable(saveBtnEl));
 		saveBtnEl.click();
-		wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
+		wait.until(ExpectedConditions.elementToBeClickable(crossClose));
 		try {
 			if (thresholdRangeActionValidatorEl.isDisplayed()) {
-				btnOKEl.click();
+				crossClose.click();
 				navigateToContentLandingPage();
 				return true;
 
 			}
 		} catch (NoSuchElementException e) {
-
+			log.info("Error occured in Threshold RangeAction Validator");
 		}
 		try {
 			if (thresholdRangeValidatorEl.isDisplayed()) {
-				btnOKEl.click();
+				crossClose.click();
 				navigateToContentLandingPage();
 				return true;
 
 			}
 		} catch (NoSuchElementException e) {
-
+			log.info("Threshold Range validation unsuccessful");
 		}
 
 		return false;
@@ -392,13 +388,13 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 
 	}
 
-	public void selectContent(String contentId) {
+	public void selectContent(String contentId) throws InterruptedException {
 
 		for (int i = 0; i < contentListEl.size(); i++) {
 			if (contentListEl.get(i).getText().equals(contentId)) {
 				List<WebElement> radioButtons = contentListEl.get(i)
 						.findElements(By.xpath(".//preceding::span[contains(@class, 'mat-radio-container')]"));
-				driver.manage().timeouts().implicitlyWait(6, TimeUnit.SECONDS);
+				Thread.sleep(6000);
 				radioButtons.get(i).click();
 				break;
 			}
@@ -411,8 +407,9 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 	 * @param contentId
 	 * @param expectedTrend
 	 * @return
+	 * @throws InterruptedException 
 	 */
-	public boolean editContent(String contentId, String expectedTrend) {
+	public boolean editContent(String contentId, String expectedTrend) throws InterruptedException {
 		selectTableRow(contentId, contentListEl);
 		wait.until(ExpectedConditions.visibilityOf(btnEditEl));
 		btnEditEl.click();
@@ -421,11 +418,11 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 		saveBtnEl.click();
 		wait.until(ExpectedConditions.elementToBeClickable(yesBtnEl));
 		yesBtnEl.click();
-		wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+		wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+		Thread.sleep(2000);
 		try {
 			if (contentUpdatedEl.isDisplayed()) {
-				btnOKEl.click();
+				crossClose.click();
 				log.info(" contentId {} updated successfully ", contentId);
 				return true;
 			}
@@ -433,7 +430,7 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 			log.error("Unable to edit contentId {} ", contentId);
 			return true;
 		}
-		btnOKEl.click();
+		crossClose.click();
 
 		return false;
 	}
@@ -443,20 +440,21 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 	 * 
 	 * @param contentId
 	 * @return
+	 * @throws InterruptedException 
 	 */
-	public boolean deleteContent(String contentId) {
+	public boolean deleteContent(String contentId) throws InterruptedException {
 
 		selectContent(contentId);
 		wait.until(ExpectedConditions.visibilityOf(delBtnEl));
 		delBtnEl.click();
 		wait.until(ExpectedConditions.elementToBeClickable(yesBtnEl));
 		yesBtnEl.click();
-		wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+		wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+		Thread.sleep(2000);
 		try {
 			wait.until(ExpectedConditions.visibilityOf(contentDeletedEl));
 			if (contentDeletedEl.isDisplayed()) {
-				btnOKEl.click();
+				crossClose.click();
 				log.info("ContentId {} deleted successfully ", contentId);
 				return true;
 			}
@@ -465,7 +463,7 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 			return false;
 		}
 
-		btnOKEl.click();
+		crossClose.click();
 		return false;
 	}
 
@@ -473,35 +471,37 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 	 * This method handles the bulkupload functionality
 	 * 
 	 * @param fileName
+	 * @throws InterruptedException 
 	 */
-	public boolean uploadJson(String fileName) {
+	public boolean uploadJson(String fileName) throws InterruptedException {
 		String path = uploadFilePath + fileName;
 		uploadBtnE1.click();
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		Thread.sleep(5000);
 		chooseFileBtnE1.sendKeys(path);
 		wait.until(ExpectedConditions.elementToBeClickable(uploadJsonBtnE1));
 		uploadJsonBtnE1.click();
-		wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
-		btnOKEl.click();
+		wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+		crossClose.click();
 		log.info("upload json successful");
 		return true;
 	}
 
-	public boolean validateUploadJson(String fileName) {
+	public boolean validateUploadJson(String fileName) throws InterruptedException {
 		String path = uploadFilePath + fileName;
-		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
+		Thread.sleep(3000);
 		wait.until(ExpectedConditions.elementToBeClickable(uploadBtnE1));
 		uploadBtnE1.click();
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		Thread.sleep(5000);
 		chooseFileBtnE1.sendKeys(path);
-		wait.until(ExpectedConditions.elementToBeClickable(uploadJsonBtnE1));
-		uploadJsonBtnE1.click();
-		driver.manage().timeouts().implicitlyWait(12, TimeUnit.SECONDS);
+        Thread.sleep(1000);
+        uploadJsonBtnE1.click();
+        Thread.sleep(12000);
 		try {
 			if (uploadJsonValidatorEl.isDisplayed()) {
-				driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
-				wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
-				btnOKEl.click();
+				Thread.sleep(3000);
+				wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+				crossClose.click();
+				Thread.sleep(1000);
 				wait.until(ExpectedConditions.elementToBeClickable(uploadJsonCancelBtnE1));
 				uploadJsonCancelBtnE1.click();
 				navigateToContentLandingPage();
@@ -512,8 +512,8 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 			log.error("Unable to validate upload json  {} ", e.getMessage());
 			return true;
 		}
-		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
-		btnOKEl.click();
+		Thread.sleep(3000);
+		crossClose.click();
 		log.info("upload json successful");
 		return true;
 	}
@@ -523,14 +523,15 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 	 * 
 	 * @param contentId
 	 * @return
+	 * @throws InterruptedException 
 	 */
-	public boolean searchContent(String contentId) {
+	public boolean searchContent(String contentId) throws InterruptedException {
 		Actions actions = new Actions(driver);
 		actions.moveToElement(searchContentEl).click();
 		actions.sendKeys(contentId);
 		Action action = actions.build();
 		action.perform();
-		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
+		Thread.sleep(3000);
 		if (contentListEl.size() == 1) {
 			searchContentEl.sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE));
 			navigateToContentLandingPage();
@@ -538,17 +539,17 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 			return true;
 		}
 		log.info("Content search box test unsuccessful");
-		return true;
+		return false;
 
 	}
 
 	public boolean checkRefreshButton(String contentId) {
 		try {
 			selectContent(contentId);
-			driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
+			Thread.sleep(3000);
 			wait.until(ExpectedConditions.elementToBeClickable(refreshBtnE1));
 			refreshBtnE1.click();
-			driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+			Thread.sleep(5000);
 			for (int i = 0; i < contentListEl.size(); i++) {
 				WebElement radioButton = contentListEl.get(i).findElement(By.xpath(".//preceding::mat-radio-button"));
 				if (radioButton.isSelected()) {
@@ -562,7 +563,7 @@ public class ContentConfigurationPage extends ContentConfigurationObjectReposito
 		}
 
 		catch (Exception e) {
-
+			log.info("Error while checking Refresh button");
 		}
 		return true;
 

@@ -57,9 +57,10 @@ public class ReleaseTest extends AgentObjectRepository {
 	 * 
 	 *             Replace agent block fields in server config with release related
 	 *             details
+	 * @throws InterruptedException 
 	 */
 	@Test(priority = 1, enabled = true, dataProvider = "agentreleasedataprovider", dataProviderClass = AgentDataProvider.class)
-	public void verifyServerConfigAgentDetailBlock(AgentManagementDataModel data) {
+	public void verifyServerConfigAgentDetailBlock(AgentManagementDataModel data) throws InterruptedException {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.verifyServerConfigAgentDetailBlock(data),
 				"Server config having on demand details.");

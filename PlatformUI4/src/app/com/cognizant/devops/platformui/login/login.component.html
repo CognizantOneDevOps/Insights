@@ -14,147 +14,87 @@
  * the License.
  ******************************************************************************
  -->
-<div
-  class="container"
-  style="background-color: #0033a0"
-  *ngIf="displayLoginPage"
->
+<div class="container" style="background-color: #0033a0" *ngIf="displayLoginPage">
   <div class="row">
     <div class="col-lg-3 col-md-2"></div>
     <div class="col-6 login-box">
       <form [formGroup]="loginForm">
         <div class="col-6 clientLogo">
-          <img
-            id="logoimg"
-            mat-card-image
-            height="54px"
-            width="181px"
-            src="imageSrc"
-          />
+          <img id="logoimg" mat-card-image height="54px" width="181px" src="imageSrc" />
         </div>
         <div class="col-lg-16 welcome">
           Welcome to
-          <span
-            style="font-weight: bolder"
-            [innerHTML]="productName.name"
-          ></span>
+          <span style="font-weight: bolder" [innerHTML]="productName.name"></span>
         </div>
         <div class="col-lg-10 sign">Sign in with valid credentials</div>
         <div class="col-11">
           <div class="col-11">
             <div class="inputCss">
               <div class="loginPadd">
-                <mat-icon svgIcon="userName" class="inputIcons"></mat-icon
-                >&nbsp;&nbsp;
-                <mat-form-field
-                  appearance="fill"
-                  [ngClass]="{
+                <mat-icon svgIcon="userName" class="inputIcons"></mat-icon>&nbsp;&nbsp;
+                <mat-form-field appearance="fill" [ngClass]="{
                     wrnTxt:
                       loginForm.controls['username'].errors &&
                       !loginForm.controls['username'].pristine
-                  }"
-                  class="loginFormField"
-                >
+                  }" class="loginFormField">
                   <mat-label>User Name</mat-label>
-                  <input
-                    matInput
-                    type="text"
-                    formControlName="username"
-                    (keyup)="clearLog()"
-                    style="
+                  <input matInput type="text" name="username" formControlName="username" (keyup)="clearLog()" style="
                       padding-top: 5px;
                       padding-bottom: 4px;
                       caret-color: #0033a0;
-                    "
-                  />
-                  <mat-icon
-                    matSuffix
-                    style="width: 24px; height: 24px"
-                  ></mat-icon>
+                    " />
+                  <mat-icon matSuffix style="width: 24px; height: 24px"></mat-icon>
                 </mat-form-field>
               </div>
-              <div
-                *ngIf="
+              <div *ngIf="
                   loginForm.controls['username'].errors &&
                   !loginForm.controls['username'].pristine
-                "
-                [ngStyle]="{ width: '100%', 'padding-right': '62px' }"
-              >
+                " [ngStyle]="{ width: '100%', 'padding-right': '62px' }">
                 <div class="wrnTxt">Please enter a valid user name</div>
               </div>
             </div>
             <div class="inputCss">
               <div class="loginPadd">
-                <mat-icon svgIcon="password" class="inputIcons"></mat-icon
-                >&nbsp;&nbsp;
-                <mat-form-field
-                  appearance="fill"
-                  [ngClass]="{
+                <mat-icon svgIcon="password" class="inputIcons"></mat-icon>&nbsp;&nbsp;
+                <mat-form-field appearance="fill" [ngClass]="{
                     wrnTxt:
                       loginForm.controls['password'].errors &&
                       !loginForm.controls['password'].pristine
-                  }"
-                  class="loginFormField"
-                >
+                  }" class="loginFormField">
                   <mat-label>Password</mat-label>
-                  <input
-                    matInput
-                    formControlName="password"
-                    [type]="hide ? 'text' : 'password'"
-                    required
-                    style="
+                  <input matInput name="password" formControlName="password" [type]="hide ? 'text' : 'password'" required style="
                       padding-top: 5px;
                       padding-bottom: 4px;
                       caret-color: #0033a0;
-                    "
-                  />
+                    " />
                   <mat-icon matSuffix class="eyeCss" (click)="hide = !hide">{{
                     hide ? "visibility" : "visibility_off"
-                  }}</mat-icon>
+                    }}</mat-icon>
                 </mat-form-field>
               </div>
-              <div
-                *ngIf="
+              <div *ngIf="
                   loginForm.controls['password'].errors &&
                   !loginForm.controls['password'].pristine
-                "
-                [ngStyle]="{ width: '100%', 'padding-right': '62px' }"
-              >
-                <div
-                  class="wrnTxt"
-                  [hidden]="!loginForm.controls['password'].errors.required"
-                >
+                " [ngStyle]="{ width: '100%', 'padding-right': '62px' }">
+                <div class="wrnTxt" [hidden]="!loginForm.controls['password'].errors.required">
                   Please enter a valid password
                 </div>
               </div>
             </div>
             <div class="col-12 loginCss">
               <mat-card-actions layout="row" layout-align="center center">
-                <button
-                  mat-button
-                  class="button"
-                  [disabled]="loginForm.invalid || loginRequestSent"
-                  (click)="userAuthentication()"
-                >
+                <button mat-button class="button sigBtn" [disabled]="loginForm.invalid || loginRequestSent"
+                  (click)="userAuthentication()">
                   LOG ON
                 </button>
               </mat-card-actions>
             </div>
-            <div
-              id="invalidMsg"
-              class="errTxt"
-              ng-if="loginController.isLoginError"
-            >
+            <div id="invalidMsg" class="errTxt" ng-if="loginController.isLoginError">
               {{ logMsg }}
             </div>
             <div *ngIf="showThrobber">
               <div class="loading-indicator">
-                <mat-progress-spinner
-                  [diameter]="50"
-                  style="margin: 0 auto"
-                  color="primary"
-                  mode="indeterminate"
-                >
+                <mat-progress-spinner [diameter]="50" style="margin: 0 auto" color="primary" mode="indeterminate">
                 </mat-progress-spinner>
               </div>
             </div>

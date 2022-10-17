@@ -27,7 +27,7 @@ public class DataDictionaryobjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//a[contains(text(),'Data Dictionary')]")
 	WebElement landingPage;
 
-	@FindBy(xpath = "//span[contains(text(),'Select Source Tool')]")
+	@FindBy(xpath = "//mat-select[@name='selectedSourceTool']")
 	WebElement selectSourceTool;
 
 	@FindBy(xpath = "//mat-select[@name='selectedLabels']")
@@ -48,7 +48,13 @@ public class DataDictionaryobjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//td[contains(@class,'cdk-column-ToolName')]")
 	public List<WebElement> toolNameList;
 	
-	@FindBy(xpath = "//div//button[contains(text(),'Click to show Correlation')]")
+	@FindBy(xpath = "//mat-select[@name='selectTool']")
+	WebElement toolList;
+	
+	@FindBy(xpath = "//span[contains(@class, 'mat-option-text')]")
+	public List<WebElement> toolListOption;
+
+	@FindBy(xpath = "//span[contains(text(),'Click to show Correlation')]")
 	WebElement showCorrelation;
 	
 	@FindBy(xpath = "//b[contains(text(),'Relationship Name')]")

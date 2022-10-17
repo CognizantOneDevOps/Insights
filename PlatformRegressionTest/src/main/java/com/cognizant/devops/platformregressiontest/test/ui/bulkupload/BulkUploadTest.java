@@ -51,20 +51,22 @@ public class BulkUploadTest extends LoginAndSelectModule {
 	 * @throws InterruptedException
 	 */
 	@BeforeTest
-	public void setUp() {
+	public void setUp() throws InterruptedException {
 		initialization();
 		getData(ConfigOptionsTest.BULKUPLOAD_DIR + File.separator + ConfigOptionsTest.BULKUPLOAD_JSON_FILE);
-		selectModuleUnderConfiguration(LoginAndSelectModule.testData.get("bulkupload"));
+		selectMenuOption(LoginAndSelectModule.testData.get("bulkupload"));
 		clickAllActionButton = new BulkUploadConfiguration();
 	}
 
 	/**
 	 * This method will be executed just before any function/method with @Test
 	 * annotation starts.
+	 * @throws InterruptedException 
 	 */
 	@BeforeMethod
-	public void beforeMethod() {
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+	public void beforeMethod() throws InterruptedException {
+		Thread.sleep(10000);
+		log.debug(line);
 	}
 
 	/**
@@ -119,7 +121,6 @@ public class BulkUploadTest extends LoginAndSelectModule {
 	 * 
 	 * @throws InterruptedException
 	 */
-	@Test(priority = 5)
 	public void uploadDataWithCorrectTimeZoneFormat() throws InterruptedException {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.uploadDataWithTimeZoneFormat(),
@@ -132,7 +133,6 @@ public class BulkUploadTest extends LoginAndSelectModule {
 	 * 
 	 * @throws InterruptedException
 	 */
-	@Test(priority = 6)
 	public void uploadMultipleFilesWithOneIncorrectData() throws InterruptedException {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.uploadMultipleFiles(),

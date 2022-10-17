@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -52,7 +53,7 @@ public class CorrelationBuilderTest extends LoginAndSelectModule {
 	public void setUp() throws InterruptedException {
 		initialization();
 		getData(ConfigOptionsTest.CORRELATION_BUILDER_DIR + File.separator + ConfigOptionsTest.CORRELATION_JSON_FILE);
-		selectModuleUnderConfiguration(LoginAndSelectModule.testData.get("correlationBuiler"));
+		selectMenuOption(LoginAndSelectModule.testData.get("correlationBuiler"));
 		clickAllActionButton = new CorrelationBuilderConfiguration();
 		clickAllActionButton.getAgentWebhookLabels();
 	}
@@ -60,10 +61,11 @@ public class CorrelationBuilderTest extends LoginAndSelectModule {
 	/**
 	 * This method will be executed just before any function/method with @Test
 	 * annotation starts.
+	 * @throws InterruptedException 
 	 */
 	@BeforeMethod
-	public void beforeMethod() {
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+	public void beforeMethod() throws InterruptedException {
+		Thread.sleep(1000);
 	}
 
 	/**
@@ -79,13 +81,16 @@ public class CorrelationBuilderTest extends LoginAndSelectModule {
 	/**
 	 * Assert true if existing correlations present in database is displayed else
 	 * false
+	 * @throws InterruptedException 
 	 */
 	@Test(priority = 2)
-	public void checkIfExistingRecordsDisplayed() {
+	public void checkIfExistingRecordsDisplayed() throws InterruptedException {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.checkIfExistingRecordsDisplayed(),
 				"Existing record in database is displayed on UI");
 	}
+	
+	
 
 	/**
 	 * Assert true if successfully able to save the correlation with the naming

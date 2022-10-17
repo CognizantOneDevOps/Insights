@@ -15,7 +15,7 @@
  * the License.
  ****************************************************************************** -->
 <div class="titleContainer">
-  <span>Dashboard Preview Test</span>
+  <span class="showDialogHeadingCss" id="dashboardPreview">Dashboard Preview Test</span>
   <a class="closeIconCss" (click)="closeDialog()">
     <mat-icon
       svgIcon="close_dialog"
@@ -48,6 +48,7 @@
     (click)="closeDialog()"
     class="whiteButton1"
     *ngIf="!isAssessmentReport"
+    id="CANCEL"
   >
     CANCEL
   </button>
@@ -57,6 +58,7 @@
     class="button"
     style="margin-right: 2%"
     *ngIf="!isAssessmentReport"
+    id="CONFIRM"
   >
     CONFIRM
   </button>

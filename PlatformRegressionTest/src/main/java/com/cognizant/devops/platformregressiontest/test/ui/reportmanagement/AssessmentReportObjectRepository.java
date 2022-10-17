@@ -24,7 +24,7 @@ import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectMod
 
 public class AssessmentReportObjectRepository extends LoginAndSelectModule {
 
-	@FindBy(xpath = "//mat-icon[@title='Add']")
+	@FindBy(xpath = "//mat-icon[@svgicon='add']")
 	WebElement addButton;
 
 	@FindBy(xpath = "//div[contains(text(),'Add Report')]")
@@ -48,7 +48,7 @@ public class AssessmentReportObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//span[contains(@class, 'mat-option-text')]")
 	public List<WebElement> frequencyNameList;
 
-	@FindBy(xpath = "//div[@class='mat-calendar-arrow']")
+	@FindBy(xpath = "//button[contains(@class,'mat-calendar-period-button')]")
 	WebElement selectYearArrowButton;
 
 	@FindBy(xpath = "//div[contains(@class, 'mat-calendar-body-cell')]")
@@ -75,7 +75,7 @@ public class AssessmentReportObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "(//div[@id='fromAllTaskList'])[2]")
 	WebElement pdfTask;
 
-	@FindBy(xpath = "//mat-icon[@title='Add Email']")
+	@FindBy(xpath = "//mat-icon[@mattooltip='Add Email']")
 	WebElement clickMailingDetails;
 
 	@FindBy(xpath = "//input[@name='senderEmailAddress']")
@@ -96,28 +96,28 @@ public class AssessmentReportObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//textarea[@name='mailBodyTemplate']")
 	WebElement mailBodyTemplateEl;
 
-	@FindBy(xpath = "//input[@placeholder='Enter a report name']")
+	@FindBy(xpath = "//input[@name='reportName']")
 	WebElement reportName;
 
-	@FindBy(xpath = "//input[@placeholder='Enter a Report Title']")
+	@FindBy(xpath = "//input[@name='reportdisplayName']")
 	WebElement titleName;
 
-	@FindBy(xpath = "//mat-select[@placeholder='Select report template']")
+	@FindBy(xpath = "//mat-select[@id='reportTemplate']")
 	public WebElement reportTemplateDropDown;
 
-	@FindBy(xpath = "//mat-select[@name='schedule']")
+	@FindBy(xpath = "//mat-select[@id='frequency']")
 	WebElement frequencyDropDown;
 
 	@FindBy(xpath = "//input[@name='senderEmailAddress']")
 	WebElement mailFrom;
 
-	@FindBy(xpath = "//textarea[@name='receiverEmailAddress']")
+	@FindBy(xpath = "//input[@name='receiverEmailAddress']")
 	WebElement mailTo;
 
-	@FindBy(xpath = "//textarea[@name='receiverCCEmailAddress']")
+	@FindBy(xpath = "//input[@name='receiverCCEmailAddress']")
 	WebElement ccReceiverMailAddress;
 
-	@FindBy(xpath = "//textarea[@name='receiverBCCEmailAddress']")
+	@FindBy(xpath = "//input[@name='receiverBCCEmailAddress']")
 	WebElement bccReceiverMailAddress;
 
 	@FindBy(xpath = "//input[@name='mailSubject']")
@@ -126,22 +126,22 @@ public class AssessmentReportObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//textarea[@name='mailBodyTemplate']")
 	WebElement mailBodyTemplate;
 
-	@FindBy(xpath = "(//button[contains(@class,'configureBut mat-raised-button')])[2]")
+	@FindBy(xpath = "//button[contains(@id,'Save Email Config')]")  //
 	WebElement addMail;
 
-	@FindBy(xpath = "//mat-icon[@title='Save']")
+	@FindBy(xpath = "//mat-icon[@svgicon='save']")
 	WebElement saveButton;
 
-	@FindBy(xpath = "//div[contains(@class, 'gridheadercenter')]")
+	@FindBy(xpath = "//div[contains(@class, 'titleCss')]")
 	WebElement saveReportConfirmationMessage;
 
-	@FindBy(xpath = "//span[text()= 'YES']")
+	@FindBy(xpath = "//button[@id = 'yesBtn']")  //
 	WebElement yesButton;
 
-	@FindBy(xpath = "//div[text()= ' Success ']")
+	@FindBy(xpath = "//span[contains(text(),'successfully')]")
 	WebElement successMessage;
 
-	@FindBy(xpath = "//button[contains(@class,'mat-raised-button')]")
+	@FindBy(xpath = "//span[@id='ok']") 
 	WebElement okButton;
 
 	@FindBy(xpath = "//div[@class = 'sectionHeadingStyle']")
@@ -153,7 +153,7 @@ public class AssessmentReportObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//div[contains(@class, 'mat-radio-ripple mat-ripple')]")
 	public List<WebElement> radioButtonsList;
 
-	@FindBy(xpath = "//mat-icon[@title='Edit ']")
+	@FindBy(xpath = "//mat-icon[@svgicon='edit']")
 	WebElement clickEditButton;
 
 	@FindBy(xpath = "//mat-icon[@title='Activate report and run immediately']")
@@ -174,13 +174,25 @@ public class AssessmentReportObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//div[text()=' Update Active/Inactive State ']")
 	WebElement confirmationMessage;
 
-	@FindBy(xpath = "//span[text()='YES']")
+	@FindBy(xpath = "//button[@id='yesBtn']")
 	WebElement clickYes;
 
-	@FindBy(xpath = "//mat-icon[@title='Delete ']")
+	@FindBy(xpath = "//mat-icon[@svgicon='trash']")
 	WebElement clickDelete;
 
 	@FindBy(xpath = "//span[text()= 'OKAY']")
 	WebElement clickOk;
+	
+	@FindBy(xpath = "//mat-icon[@svgicon= 'close_dialog']")
+	WebElement clickClose;
+	
+	@FindBy(xpath = "//button[@id='crossClose']") 
+	WebElement crossClose;
+
+	@FindBy(xpath = "//span[contains(text(),'Assessment Report with the given Report name already exists.')]")
+	WebElement alreadyExists;
+	
+	@FindBy(xpath = "//mat-icon[@svgicon='backButton']")
+	WebElement backButton;
 
 }

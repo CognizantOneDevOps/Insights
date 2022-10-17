@@ -49,9 +49,14 @@ public class ReportManagementDataProvider {
 	public static final String REPORT_DELETE = "REPORT_SCREEN_DELETE_DATA";
 	public static final String REPORT_TEMPLATE_CREATE_VALIDATE = "REPORT_CREATE_VALIDATE";
 	public static final String REPORT_UPLOAD_CONFIGS = "REPORT_UPLOAD_CONFIG_FILES";
+	public static final String REPORT_DETAILS = "REPORT_DETAILS";
 
 	// Assessment Report
 	public static final String ASSESSMENT_REPORT_CREATE = "ASSESSMENT_REPORT_CREATE";
+	
+	//Data Archival
+	public static final String DATA_ARCHIVAL="ADD_DATAARCHIVAL";
+ 
 
 	// KPI Data Provider
 	@DataProvider(name = "createKPIdataprovider")
@@ -184,6 +189,12 @@ public class ReportManagementDataProvider {
 
 		return (ReadExcelData.readExelData(REPORT_UPLOAD_CONFIGS));
 	}
+	
+	@DataProvider(name = "reportDetailsChecking")
+	String[][] getReportDetails() throws IOException {
+
+		return (ReadExcelData.readExelData(REPORT_DETAILS));
+	}
 
 	// AssessmentReport Data Provider
 	@DataProvider(name = "assessmentReportCreatedataprovider")
@@ -191,4 +202,9 @@ public class ReportManagementDataProvider {
 
 		return (ReadExcelData.readExelData(ASSESSMENT_REPORT_CREATE));
 	}
+	@DataProvider(name = "dataArchivalProvider")
+	String[][] addDataArchival() throws IOException {
+		return (ReadExcelData.readExelData(DATA_ARCHIVAL));
+	}
+
 }

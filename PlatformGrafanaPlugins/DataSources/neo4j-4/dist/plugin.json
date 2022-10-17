@@ -1,0 +1,38 @@
+{
+  "$schema": "https://raw.githubusercontent.com/grafana/grafana/master/docs/sources/developers/plugins/plugin.schema.json",
+  "type": "datasource",
+  "name": "Neo4j 4.0 Datasource",
+  "id": "cts-neo-4-j-4-0",
+  "metrics": true,
+  "info": {
+    "description": "Neo4j 4.0 Datasource",
+    "author": {
+      "name": "Insights Development Team",
+      "url": ""
+    },
+    "keywords": [
+      "neo4j"
+    ],
+    "logos": {
+      "small": "img/neo4j.svg",
+      "large": "img/neo4j.svg"
+    },
+    "links": [
+      {
+        "name": "Website",
+        "url": "https://github.com/grafana/grafana-starter-datasource"
+      },
+      {
+        "name": "License",
+        "url": "https://github.com/grafana/grafana-starter-datasource/blob/master/LICENSE"
+      }
+    ],
+    "screenshots": [],
+    "version": "1.0.0",
+    "updated": "2022-07-20"
+  },
+  "dependencies": {
+    "grafanaDependency": ">=8.4.5",
+    "plugins": []
+  }
+}

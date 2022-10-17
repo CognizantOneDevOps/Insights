@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -30,11 +29,11 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.path.json.JsonPath;
@@ -61,20 +60,29 @@ public class CommonUtils {
 	}
 
 	public static void loadProperties() {
+		FileReader reader = null;
 		try {
 			String path = new File(System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator + ConfigOptionsTest.AUTO_DIR
 					+ File.separator + ConfigOptionsTest.PROP_FILE).getCanonicalPath();
 	
-			FileReader reader = new FileReader(path);
+			reader = new FileReader(path);
 	
 			props = new Properties();
 	
 			props.load(reader);
 
 		} catch (FileNotFoundException e) {
-			log.error("Property File is not found {}", e);
+			log.error("Property File is not found ", e);
 		} catch (IOException e) {
 			log.error(e);
+		} finally {
+			if(reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					log.error(e);
+				}
+			}
 		}
 	}
 

@@ -1,0 +1,376 @@
+{
+	"vault": {
+		"getFromVault": false,
+		"secretEngine": "insights-kv",
+		"readToken": "vault_secret_token",
+		"vaultUrl": "http://Vault_Host:port/v1/"
+	},
+	"mqConfig": {
+		"user": "",
+		"password": "",
+		"host": "127.0.0.1",
+		"exchange": "iSight",
+		"agentControlXchg": "iAgent"
+	},
+	"subscribe": {
+		"config": "FINOPS.AZUREFINOPS.config",
+		"agentCtrlQueue": "insights_finops_azure_agent"
+	},
+	"publish": {
+		"data": "FINOPS.AZUREFINOPS.DATA",
+		"health": "FINOPS.AZUREFINOPS.HEALTH"
+	},
+	"enrichData": {
+		"isEnrichmentRequired": false,
+		"sourceProperty": "message",
+		"keyPattern": "-",
+		"targetProperty": "key"
+	},
+	"communication": {
+		"type": "REST",
+		"sslVerify": false,
+		"responseType": "JSON"
+	},
+	"dynamicTemplate": {
+		"timeFieldMapping": {
+			"usagedate": "%Y-%m-%d"
+		},
+		"costManagement": {
+			"insightsTimeXFieldMapping": {
+				"timefield": "usagedate",
+				"isEpoch": false,
+				"timeformat": "%Y-%m-%d"
+			},
+			"request": {
+				"type": "ActualCost",
+				"timeframe": "Custom",
+				"timePeriod": {
+					"from": "startFrom",
+					"to": "endTo"
+				},
+				"billingCurrency": "USD",
+				"Currency": "USD",
+				"dataset": {
+					"granularity": "Daily",
+					"aggregation": {
+						"totalCostUSD": {
+							"name": "CostUSD",
+							"function": "Sum"
+						}
+					},
+					"grouping": [
+						{
+							"type": "Dimension",
+							"name": "BillingPeriod"
+						},
+						{
+							"type": "Dimension",
+							"name": "ResourceId"
+						},
+						{
+							"type": "Dimension",
+							"name": "ResourceType"
+						},
+						{
+							"type": "Dimension",
+							"name": "MeterCategory"
+						},
+						{
+							"type": "Dimension",
+							"name": "MeterSubCategory"
+						},
+						{
+							"type": "Dimension",
+							"name": "Meter"
+						},
+						{
+							"type": "Dimension",
+							"name": "ServiceName"
+						}
+					]
+				}
+			},
+			"costMetadata": {
+				"labels": [
+					"COST_MANAGEMENT"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"resourceid",
+					"usagedate",
+					"metersubcategory",
+					"metercategory",
+					"meter"
+				]
+			}
+		},
+		"forecast": {
+			"forcastDataCollectionInDays": 30,
+			"insightsTimeXFieldMapping": {
+				"timefield": "usagedate",
+				"isEpoch": false,
+				"timeformat": "%Y-%m-%d"
+			},
+			"forecastrequest": {
+				"type": "ActualCost",
+				"dataSet": {
+					"granularity": "Daily",
+					"aggregation": {
+						"totalCostUSD": {
+							"name": "CostUSD",
+							"function": "Sum"
+						}
+					},
+					"sorting": [
+						{
+							"direction": "ascending",
+							"name": "UsageDate"
+						}
+					]
+				},
+				"timeframe": "Custom",
+				"timePeriod": {
+					"from": "startFrom",
+					"to": "endTo"
+				}
+			},
+			"forecastMetadata": {
+				"labels": [
+					"FORECAST"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"usagedate",
+					"subscriptionid",
+					"subscriptionname",
+					"resourcegroup"
+				]
+			}
+		},
+		"resourceDetails": {
+			"resourceDetailsMetadata": {
+				"labels": [
+					"RESOURCE_DETAILS"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"resourceid"
+				]
+			},
+			"relationCostMetadata": {
+				"relation": {
+					"name": "RESOURCE_HAS_COST",
+					"source": {
+						"labels": [
+							"RESOURCE_DETAILS"
+						],
+						"constraints": [
+							"resourceid"
+						]
+					},
+					"destination": {
+						"labels": [
+							"COST_MANAGEMENT"
+						],
+						"constraints": [
+							"resourceid"
+						]
+					}
+				}
+			},
+			"relationTagsMetadata": {
+				"relation": {
+					"name": "TAGS_HAS_RESOURCE",
+					"source": {
+						"labels": [
+							"RESOURCE_TAGS"
+						],
+						"constraints": [
+							"resourceid"
+						]
+					},
+					"destination": {
+						"labels": [
+							"RESOURCE_DETAILS",
+							"LATEST"
+						],
+						"constraints": [
+							"resourceid"
+						]
+					}
+				}
+			}
+		},
+		"resourceTagsIndividual": {
+			"resourceMetadata": {
+				"labels": [
+					"RESOURCE_TAGS"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"resourceid",
+					"tagkey"
+				]
+			}
+		},
+		"budget":{
+			"insightsTimeXFieldMapping": {
+				"timefield": "startDate",
+				"isEpoch": false,
+				"timeformat": "%Y-%m-%dT%H:%M:%S"
+			},
+			"budgetMetadata": {
+				"labels": [
+					"BUDGET"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"id"
+				]
+			}
+
+		},
+		"resourceMetricsdDetails": {
+			"insightsTimeXFieldMapping": {
+				"timefield": "timeStamp",
+				"isEpoch": false,
+				"timeformat": "%Y-%m-%dT%H:%M:%S"
+			},
+			"resourceMetricsMetadata": {
+				"labels": [
+					"RESOURCE_METRICS"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"resourceid",
+					"timeStamp",
+					"name"
+				]
+			},
+			"resourceMetricsRelationMetadata": {
+				"relation": {
+					"name": "RESOURCE_HAS_METRICS",
+					"source": {
+						"labels": [
+							"RESOURCE_DETAILS"
+						],
+						"constraints": [
+							"resourceid"
+						]
+					},
+					"destination": {
+						"labels": [
+							"RESOURCE_METRICS"
+						],
+						"constraints": [
+							"resourceid"
+						]
+					}
+				}
+			}
+		},
+		"additionalResourceDetails": {
+			"Microsoft.Compute/virtualMachines": {
+				"ObjectProperties": {
+					"properties": {
+						"vmId": "vmId",
+						"hardwareProfile": {
+							"vmSize": "vmSize"
+						},
+						"storageProfile": {
+							"osDisk": {
+								"osType": "osType",
+								"name": "osDiskName"
+							}
+						},
+						"provisioningState": "provisioningState",
+						"timeCreated": "timeCreated"
+					}
+				},
+				"availablemetrics": {
+					"Percentage CPU": "average",
+					"Available Memory Bytes": "average"
+				}
+			},
+			"Microsoft.Compute/disks": {
+				"ObjectProperties": {
+					"managedBy": "managedBy",
+					"properties": {
+						"creationData": {
+							"createOption": "Import",
+							"storageAccountId": "storageAccountId",
+							"sourceUri": "sourceUri"
+						},
+						"diskSizeGB": "diskSizeGB",
+						"diskIOPSReadWrite": "diskIOPSReadWrite",
+						"diskMBpsReadWrite": "diskMBpsReadWrite",
+						"encryption": {
+							"type": "encryptionType"
+						},
+						"networkAccessPolicy": "networkAccessPolicy",
+						"publicNetworkAccess": "publicNetworkAccess",
+						"timeCreated": "timeCreated",
+						"provisioningState": "provisioningState",
+						"diskState": "diskState",
+						"diskSizeBytes": "diskSizeBytes"
+					}
+				},
+				"availablemetrics": {
+					"Composite Disk Read Bytes/sec": "average",
+					"Composite Disk Read Operations/sec": "average",
+					"Composite Disk Write Bytes/sec": "average",
+					"Composite Disk Write Operations/sec": "average",
+					"DiskPaidBurstIOPS": "average"
+				}
+			}
+		},
+		"extensions": {
+			"apiVersions": {
+				"runSchedule": 1400,
+				"enableApiVersions": false
+			}
+		}
+	},
+	"agentId": "",
+	"enableDataValidation": true,
+	"toolCategory": "FINOPS",
+	"toolName": "AZUREFINOPS",
+	"toolsTimeZone": "GMT",
+	"insightsTimeZone": "Asia/Kolkata",
+	"enableValueArray": false,
+	"useResponseTemplate": true,
+	"collectForecastData": true,
+	"collectBudgetData": true,
+	"auth": "base64",
+	"runSchedule": 0,
+	"runCron": "0 * * * *",
+	"timeStampField": "usagedate",
+	"timeStampFormat": "%Y-%m-%dT%H:%M:%S",
+	"azureSubscriptionId": "",
+	"azureTenantId": "",
+	"azureClientId": "",
+	"azureSecretkey": "",
+    "baseURL": "https://login.microsoftonline.com",
+	"apiURL": "https://management.azure.com",
+	"isEpochTimeFormat": false,
+	"agentSecretDetails": [
+		"azureSubscriptionId",
+		"azureTenantId",
+		"azureClientId",
+		"azureSecretkey"
+	],
+	"startFrom": "2022-03-01T00:00:00",
+	"isDebugAllowed": false,
+	"loggingSetting": {
+		"logLevel": "INFO",
+		"maxBytes": 5000000,
+		"backupCount": 10
+	},
+	"webhookEnabled": false,
+	"auditing": false,
+	"enableProxy": false,
+	"proxies": {
+		"http": "",
+		"https": ""
+	}
+}

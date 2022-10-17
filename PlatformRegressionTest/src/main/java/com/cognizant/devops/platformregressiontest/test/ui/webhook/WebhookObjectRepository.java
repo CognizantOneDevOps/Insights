@@ -33,7 +33,7 @@ public class WebhookObjectRepository extends LoginAndSelectModule{
 
 	Map<String, String> testData = new HashMap<>();
 
-	@FindBy(xpath = "//mat-icon[@title='Add New WebHook']")
+	@FindBy(xpath = "//mat-icon[@svgicon='add']")
 	WebElement addWebhook;
 
 	@FindBy(xpath = "//input[@name ='webhookName']")
@@ -42,7 +42,7 @@ public class WebhookObjectRepository extends LoginAndSelectModule{
 	@FindBy(xpath = "//span[contains(@class, 'mat-option-text')]")
 	List<WebElement> toolNameList;
 
-	@FindBy(xpath = "//div/span[contains(text(),'Select Tool')]")
+	@FindBy(xpath = "//mat-select[@placeholder='Select Tool']")
 	WebElement selectTool;
 
 	@FindBy(xpath = "//span[contains(text(),'Select Data Format')]")
@@ -60,7 +60,7 @@ public class WebhookObjectRepository extends LoginAndSelectModule{
 	@FindBy(xpath = "//textarea[@name ='responseTemplate']")
 	WebElement responseTemplate;
 
-	@FindBy(xpath = "//input[@placeholder=' Time Field']")
+	@FindBy(xpath = "//input[@placeholder='Time Field']")
 	WebElement timeField;
 
 	@FindBy(xpath = "//input[@placeholder='Time Format']")
@@ -69,10 +69,10 @@ public class WebhookObjectRepository extends LoginAndSelectModule{
 	@FindBy(xpath = "//textarea[@name ='eventConfig']")
 	WebElement eventConfig;
 
-	@FindBy(xpath = "//tr[9]//div[@class='mat-slide-toggle-thumb']")
+	@FindBy(xpath = "//mat-slide-toggle[@id='nodeUpdation']")
 	WebElement nodeToggleButton;
 
-	@FindBy(xpath = "//tr[3]//div[@class='mat-slide-toggle-thumb']")
+	@FindBy(xpath = "//mat-slide-toggle[@id='eventProcessing']")
 	WebElement eventToggleButton;
 
 	@FindBy(xpath = "//input[@placeholder='Field required for updation']")
@@ -81,13 +81,13 @@ public class WebhookObjectRepository extends LoginAndSelectModule{
 	@FindBy(xpath = "//table//tbody[@role='rowgroup']")
 	WebElement webhookDetailsTable;
 
-	@FindBy(xpath = "//mat-icon[@title='Edit']")
+	@FindBy(xpath = "//mat-icon[@svgicon='edit']")
 	WebElement editButton;
 
-	@FindBy(xpath = "//mat-icon[@title='Save']")
+	@FindBy(xpath = "//mat-icon[@svgicon='save']")
 	WebElement saveButton;
 
-	@FindBy(xpath = "//span[text()= 'YES']")
+	@FindBy(xpath = "//button[@id='yesBtn']")
 	WebElement yesButton;
 
 	@FindBy(xpath = "//span[text()= 'NO']")
@@ -96,16 +96,28 @@ public class WebhookObjectRepository extends LoginAndSelectModule{
 	@FindBy(xpath = "//span[text()= 'OKAY']")
 	WebElement okButton;
 
-	@FindBy(xpath = "//div[contains(text(), ' Success')]")
+	@FindBy(xpath =  "//span[contains(text(),'successfully.')]")
 	WebElement successMessage;
-
-	@FindBy(xpath = "//div[contains(text(), ' Error')]")
+	
+	@FindBy(xpath =  "//span[contains(text(),'Changes made to')]")
+	WebElement editSuccessMessage;
+	
+	@FindBy(xpath = "//span[contains(text(),'already exists.')]")
 	WebElement errorMessage;
+	
+	@FindBy(xpath = "//span[contains(text(),'Invalid label Name.')]")
+	WebElement invalidMessage;
+	
+	@FindBy(xpath = "//span[contains(text(),'Incorrect Dynamic Template')]")
+	WebElement incorrectMessage;
+	
+	@FindBy(xpath = "//button[@id='crossClose']")
+	WebElement crossClose;
 
 	@FindBy(xpath = "//div[@class='closeIconCss']//mat-icon")
 	WebElement closeIcon;
 
-	@FindBy(xpath = "//mat-icon[@title='Redirect To Landing Page']")
+	@FindBy(xpath = "//mat-icon[@svgicon='backButton']")
 	WebElement redirectButton;
 	
 	@FindBy(xpath = "//td[contains(@class, 'mat-column-WebHookName')]")

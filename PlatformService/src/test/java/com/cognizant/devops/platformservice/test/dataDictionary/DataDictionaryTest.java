@@ -18,6 +18,9 @@ package com.cognizant.devops.platformservice.test.dataDictionary;
 import java.util.List;
 
 import org.junit.Assert;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -30,20 +33,28 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformservice.agentmanagement.service.AgentConfigTO;
 import com.cognizant.devops.platformservice.agentmanagement.service.AgentManagementServiceImpl;
+import com.cognizant.devops.platformservice.rest.datadictionary.controller.DataDictionaryController;
 import com.cognizant.devops.platformservice.rest.datadictionary.service.DataDictionaryServiceImpl;
 import com.cognizant.devops.platformservice.webhook.service.WebHookServiceImpl;
 import com.google.gson.JsonObject;
 
+@Test
+@ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
+@WebAppConfiguration
 public class DataDictionaryTest extends DataDictionaryTestData {
 	public static final DataDictionaryTestData dataDictionaryTestData = new DataDictionaryTestData();
+	
+	@Autowired
 	DataDictionaryServiceImpl dataDictionaryImpl;
+
+	@Autowired
+	DataDictionaryController dataDictionaryController;
 	
 	@BeforeClass
 	public void beforeMethod() throws InsightsCustomException {
 		ApplicationConfigCache.loadConfigCache();
 		WebHookServiceImpl webhookServiceImp = new WebHookServiceImpl();
 		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
-		dataDictionaryImpl = new DataDictionaryServiceImpl();
 		graphDBHandler = new GraphDBHandler();
 		
 		insertAgentDataInNeo4j(destCat, destLabel, gitAgentData);
@@ -70,7 +81,7 @@ public class DataDictionaryTest extends DataDictionaryTestData {
 
 	@Test(priority = 1)
 	public void getToolsAndCategoriesTest() throws InsightsCustomException {
-		JsonObject response = dataDictionaryImpl.getToolsAndCategories();
+		JsonObject response = dataDictionaryController.getToolsAndCategories();
 		int sizeOfresponse = response.get("data").getAsJsonArray().size();
 		Assert.assertTrue(sizeOfresponse >= 0);
 
@@ -78,7 +89,7 @@ public class DataDictionaryTest extends DataDictionaryTestData {
 
 	@Test(priority = 2)
 	public void getToolPropertiesTest() throws InsightsCustomException {
-		JsonObject response = dataDictionaryImpl.getToolProperties(dataDictionaryTestData.destLabel,
+		JsonObject response = dataDictionaryController.getToolProperties(dataDictionaryTestData.destLabel,
 				dataDictionaryTestData.destCat);
 		if (response.has("data")) {
 			int sizeOfresponse = response.get("data").getAsJsonArray().size();
@@ -90,14 +101,14 @@ public class DataDictionaryTest extends DataDictionaryTestData {
 
 	@Test(priority = 3)
 	public void getToolPropertiesTestWithoutData() throws InsightsCustomException {
-		JsonObject response = dataDictionaryImpl.getToolProperties(dataDictionaryTestData.emptylabel, "NO_CATEGORY");
+		JsonObject response = dataDictionaryController.getToolProperties(dataDictionaryTestData.emptylabel, "NO_CATEGORY");
 		Assert.assertEquals("No Data found.", response.get("message").getAsString());
 
 	}
 
 	@Test(priority = 4)
 	public void getToolsRelationshipAndPropertiesTest() throws InsightsCustomException {
-		JsonObject response = dataDictionaryImpl.getToolsRelationshipAndProperties(dataDictionaryTestData.sourcelabel,
+		JsonObject response = dataDictionaryController.getToolsRelationshipAndProperties(dataDictionaryTestData.sourcelabel,
 				dataDictionaryTestData.sourceCat, dataDictionaryTestData.destLabel, dataDictionaryTestData.destCat);
 		int sizeOfresponse = response.get("data").getAsJsonArray().size();
 		Assert.assertTrue(sizeOfresponse >= 0);

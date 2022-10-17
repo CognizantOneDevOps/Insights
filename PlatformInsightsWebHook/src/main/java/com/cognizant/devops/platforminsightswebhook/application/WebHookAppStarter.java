@@ -38,15 +38,6 @@ public class WebHookAppStarter {
     public static void main(String[] args) {
 		log.debug(" Inside Webhook Message Publisher ... ");
 		String configFile = System.getenv().get("INSIGHTS_HOME") + File.separator + ".InSights" + File.separator ;
-		/*System.setProperty(PROPERTIES_BASEDIR, ".");
-		for (String argCommandLine : args) {
-			LOG.debug(argCommandLine);
-			if (argCommandLine.contains("config.file.location")) {
-				String[] argArray = argCommandLine.split("=");
-				System.setProperty(PROPERTIES_BASEDIR, argArray[1]);
-			}
-		}
-		*/
 		System.setProperty(PROPERTIES_BASEDIR, configFile);
 		log.debug(" Spring properties location  {} " , System.getProperty(PROPERTIES_BASEDIR));
 		ApplicationContext applicationContext = SpringApplication.run(WebHookAppStarter.class, args);

@@ -18,7 +18,6 @@ package com.cognizant.devops.platformregressiontest.test.ui.reportmanagement;
 import java.io.File;
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,14 +27,13 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.SkipException;
 
 import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
-import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectModule;
+import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.ReportConfigurationDataModel;
 
 /**
  * @author Ankita
@@ -83,37 +81,38 @@ public class KpiConfigurationPage extends KPIObjectRepository {
 	 * @param dbQuery
 	 * @param isActive
 	 * @return
+	 * @throws InterruptedException 
 	 */
-	public String saveKPI(String kpiId, String kpiName, String toolName, String category, String resultField,
-			String groupName, String datasource, String dbQuery, String isActive) {
+	public boolean saveKPI(ReportConfigurationDataModel data) throws InterruptedException {
 
 		clickAddButton();
-		kpiIdEl.sendKeys(kpiId);
-		kpiNameEl.sendKeys(kpiName);
-		resultFieldEl.sendKeys(resultField);
-		toolNameEl.sendKeys(toolName);
-		categoryNameEl.sendKeys(category);
-		groupNameEl.sendKeys(groupName);
-		datasourceEl.sendKeys(datasource);
-		dbQueryEl.sendKeys(dbQuery);
-		wait.until(ExpectedConditions.elementToBeClickable(isActiveEl));
-		isActiveEl.click();
+		kpiIdEl.sendKeys(data.getKpiId());
+		kpiNameEl.sendKeys(data.getKpiName());
+		resultFieldEl.sendKeys(data.getResultField());
+		toolNameEl.sendKeys(data.getToolName());
+		categoryNameEl.sendKeys(data.getCategory());
+		groupNameEl.sendKeys(data.getGroupName());
+		datasourceEl.sendKeys(data.getDatasource());
+		dbQueryEl.sendKeys(data.getDbQuery());
+		Thread.sleep(1000);
 		wait.until(ExpectedConditions.elementToBeClickable(saveEl)).click();
 		wait.until(ExpectedConditions.elementToBeClickable(yesBtnEl)).click();
-		wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+		wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+		Thread.sleep(4000);
 		try {
 			if (kpiExistsEl.isDisplayed()) {
-				btnOKEl.click();
+				crossClose.click();
 				navigateToKPILandingPage();
-				log.debug("Skipping test case as KPI : {} already exists", kpiId);
-				throw new SkipException("Skipping test case as KPI : " + kpiId + " already exists");
+				log.debug("Skipping test case as KPI : {} already exists", data.getKpiId());
+				throw new SkipException("Skipping test case as KPI : " + data.getKpiId() + " already exists");
 			}
 		} catch (NoSuchElementException e) {
-			log.info("Something went wrong while saving KPI : {} exception : {}", kpiId, e.getMessage());
+			log.info("Something went wrong while saving KPI : {} exception : {}", data.getKpiId(), e.getMessage());
+			crossClose.click();
+			return true;
 		}
-		btnOKEl.click();
-		return kpiId;
+		crossClose.click();
+		return true;
 
 	}
 
@@ -130,37 +129,44 @@ public class KpiConfigurationPage extends KPIObjectRepository {
 	 * @param dbQuery
 	 * @param isActive
 	 * @return
+	 * @throws InterruptedException 
 	 */
-	public boolean validateKPI(String kpiId, String kpiName, String toolName, String category, String resultField,
-			String groupName, String datasource, String dbQuery, String isActive) {
+	public boolean validateKPI(ReportConfigurationDataModel data) throws InterruptedException {
 
 		clickAddButton();
-		kpiIdEl.sendKeys(kpiId);
-		kpiNameEl.sendKeys(kpiName);
-		resultFieldEl.sendKeys(resultField);
-		toolNameEl.sendKeys(toolName);
-		categoryNameEl.sendKeys(category);
-		groupNameEl.sendKeys(groupName);
-		datasourceEl.sendKeys(datasource);
-		dbQueryEl.sendKeys(dbQuery);
-		wait.until(ExpectedConditions.elementToBeClickable(isActiveEl));
-		isActiveEl.click();
-		wait.until(ExpectedConditions.elementToBeClickable(saveEl));
-		saveEl.click();
-		wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+		kpiIdEl.sendKeys(data.getKpiId());
+		kpiNameEl.sendKeys(data.getKpiName());
+		resultFieldEl.sendKeys(data.getResultField());
+		toolNameEl.sendKeys(data.getToolName());
+		categoryNameEl.sendKeys(data.getCategory());
+		groupNameEl.sendKeys(data.getGroupName());
+		datasourceEl.sendKeys(data.getDatasource());
+		dbQueryEl.sendKeys(data.getDbQuery());
+		wait.until(ExpectedConditions.elementToBeClickable(saveEl)).click();
+		try {
+		wait.until(ExpectedConditions.elementToBeClickable(yesBtnEl)).click();
+		wait.until(ExpectedConditions.elementToBeClickable(crossClose)).click();
+		}
+		catch(Exception e) {
+			crossClose.click();
+			navigateToKPILandingPage();
+			return true;
+		}
+		Thread.sleep(2000);
 		try {
 			if (kpiValidateEl.isDisplayed()) {
-				btnOKEl.click();
+				crossClose.click();
 				navigateToKPILandingPage();
-				log.info("add screen KPI : {} validated successfully", kpiId);
+				log.info("add screen KPI : {} validated successfully", data.getKpiId());
 				return true;
 			}
 		} catch (NoSuchElementException e) {
-			log.error("unable to validate add screen kpi {}", kpiId);
+			crossClose.click();
+			navigateToKPILandingPage();
+			log.error("unable to validate add screen kpi {}", data.getKpiId());
 			return true;
 		}
-		btnOKEl.click();
+		crossClose.click();
 		return false;
 
 	}
@@ -203,21 +209,22 @@ public class KpiConfigurationPage extends KPIObjectRepository {
 	 * @param kpiId
 	 * @param category
 	 * @return
+	 * @throws InterruptedException 
 	 */
-	public boolean editKPI(String kpiId, String category) {
+	public boolean editKPI(String kpiId, String resultField) throws InterruptedException {
 		selectKPI(kpiId);
 		wait.until(ExpectedConditions.visibilityOf(btnEditEl));
 		btnEditEl.click();
-		categoryNameEl.sendKeys(category);
+		resultFieldEl.sendKeys(resultField);
 		wait.until(ExpectedConditions.elementToBeClickable(saveEl));
 		saveEl.click();
 		wait.until(ExpectedConditions.elementToBeClickable(yesBtnEl));
 		yesBtnEl.click();
-		wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+		wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+		Thread.sleep(2000);
 		try {
 			if (kpiUpdateEl.isDisplayed()) {
-				btnOKEl.click();
+				crossClose.click();
 				log.info(" kpiId {} updated successfully ", kpiId);
 				return true;
 			}
@@ -225,7 +232,7 @@ public class KpiConfigurationPage extends KPIObjectRepository {
 			log.error("Unable to edit kpiId {} ", kpiId);
 			return true;
 		}
-		btnOKEl.click();
+		crossClose.click();
 		return false;
 
 	}
@@ -239,24 +246,26 @@ public class KpiConfigurationPage extends KPIObjectRepository {
 	 * @param dbQuery
 	 * @param datasource
 	 * @return
+	 * @throws InterruptedException 
 	 */
 	public boolean editValidateKPI(String kpiId, String category, String resultField, String dbQuery,
-			String datasource) {
+			String datasource) throws InterruptedException {
 		selectKPI(kpiId);
 		wait.until(ExpectedConditions.visibilityOf(btnEditEl));
 		btnEditEl.click();
-		categoryNameEl.sendKeys(category);
 		resultFieldEl.sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE));
 		resultFieldEl.sendKeys(resultField);
 		dbQueryEl.sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE));
 		dbQueryEl.sendKeys(dbQuery);
 		wait.until(ExpectedConditions.elementToBeClickable(saveEl));
 		saveEl.click();
-		wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+		wait.until(ExpectedConditions.elementToBeClickable(yesBtnEl));
+		yesBtnEl.click();
+		wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+		Thread.sleep(2000);
 		try {
-			if (kpiValidateEl.isDisplayed()) {
-				btnOKEl.click();
+			if (kpiUpdateEl.isDisplayed()) {
+				crossClose.click();
 				navigateToKPILandingPage();
 				log.info(" edit screen kpiId {} validated successfully ", kpiId);
 				return true;
@@ -265,7 +274,7 @@ public class KpiConfigurationPage extends KPIObjectRepository {
 			log.error(" edit screen kpiId {} validation unsuccessful ", kpiId);
 			return false;
 		}
-		btnOKEl.click();
+		crossClose.click();
 		return false;
 
 	}
@@ -275,17 +284,17 @@ public class KpiConfigurationPage extends KPIObjectRepository {
 	 * 
 	 * @param kpiId
 	 * @return
+	 * @throws InterruptedException 
 	 */
-	public boolean nonEditableFields(String kpiId) {
+	public boolean nonEditableFields(String kpiId) throws InterruptedException {
 		selectKPI(kpiId);
 		wait.until(ExpectedConditions.elementToBeClickable(btnEditEl));
 		btnEditEl.click();
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		Thread.sleep(3000);
 		try {
-			if (kpiIdEl.getAttribute("ng-reflect-is-disabled").equals("true")
-					&& kpiNameEl.getAttribute("ng-reflect-is-disabled").equals("true")
-					&& groupNameEl.getAttribute("ng-reflect-is-disabled").equals("true")
-					&& toolNameEl.getAttribute("ng-reflect-is-disabled").equals("true")) {
+			if (!kpiIdEl.isEnabled()
+					&& !kpiNameEl.isEnabled()
+					&& !groupNameEl.isEnabled()) {
 				navigateToKPILandingPage();
 				return true;
 			}
@@ -305,20 +314,21 @@ public class KpiConfigurationPage extends KPIObjectRepository {
 	 * 
 	 * @param kpiId
 	 * @return
+	 * @throws InterruptedException 
 	 */
-	public boolean deleteKPI(String kpiId) {
+	public boolean deleteKPI(String kpiId) throws InterruptedException {
 
 		selectKPI(kpiId);
 		wait.until(ExpectedConditions.visibilityOf(btnDeleteEl));
 		btnDeleteEl.click();
 		wait.until(ExpectedConditions.elementToBeClickable(yesBtnEl));
 		yesBtnEl.click();
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+		Thread.sleep(2000);
 		try {
 			wait.until(ExpectedConditions.visibilityOf(kpiDeletedEl));
 			if (kpiDeletedEl.isDisplayed()) {
-				wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
-				btnOKEl.click();
+				wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+				crossClose.click();
 				log.info("kpiId {} deleted successfully ", kpiId);
 				return true;
 			}
@@ -327,7 +337,7 @@ public class KpiConfigurationPage extends KPIObjectRepository {
 			return true;
 		}
 
-		btnOKEl.click();
+		crossClose.click();
 		return false;
 	}
 
@@ -335,14 +345,15 @@ public class KpiConfigurationPage extends KPIObjectRepository {
 	 * This method handles KPI selection.
 	 * 
 	 * @param kpiId
+	 * @throws InterruptedException 
 	 */
-	public void selectKPI(String kpiId) {
+	public void selectKPI(String kpiId) throws InterruptedException {
 
 		for (int i = 0; i < kpiListEl.size(); i++) {
 			if (kpiListEl.get(i).getText().equals(kpiId)) {
 				List<WebElement> radioButtons = kpiListEl.get(i)
 						.findElements(By.xpath(".//preceding::span[contains(@class, 'mat-radio-container')]"));
-				driver.manage().timeouts().implicitlyWait(6, TimeUnit.SECONDS);
+				Thread.sleep(3000);
 				radioButtons.get(i).click();
 				break;
 			}
@@ -358,10 +369,10 @@ public class KpiConfigurationPage extends KPIObjectRepository {
 	public boolean checkRefreshButton(String kpiId) {
 		try {
 			selectKPI(kpiId);
-			driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
+			Thread.sleep(2000);
 			wait.until(ExpectedConditions.elementToBeClickable(refreshBtnE1));
 			refreshBtnE1.click();
-			driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+			Thread.sleep(3000);
 
 			for (int i = 0; i < kpiListEl.size(); i++) {
 				WebElement radioButton = kpiListEl.get(i).findElement(By.xpath(".//preceding::mat-radio-button"));
@@ -376,6 +387,7 @@ public class KpiConfigurationPage extends KPIObjectRepository {
 			}
 			return true;
 		} catch (Exception e) {
+			log.info("Error checking the refresh button");
 		}
 		return true;
 	}
@@ -384,16 +396,17 @@ public class KpiConfigurationPage extends KPIObjectRepository {
 	 * This method handles upload kpi json.
 	 * 
 	 * @param fileName
+	 * @throws InterruptedException 
 	 */
-	public boolean uploadJson(String fileName) {
+	public boolean uploadJson(String fileName) throws InterruptedException {
 		String path = uploadFilePath + fileName;
 		uploadBtnE1.click();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		Thread.sleep(5000);
 		chooseFileBtnE1.sendKeys(path);
 		wait.until(ExpectedConditions.elementToBeClickable(uploadJsonBtnE1));
 		uploadJsonBtnE1.click();
-		wait.until(ExpectedConditions.elementToBeClickable(btnOKEl));
-		btnOKEl.click();
+		wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+		crossClose.click();
 		log.info("upload json successful");
 		return true;
 	}
@@ -406,7 +419,7 @@ public class KpiConfigurationPage extends KPIObjectRepository {
 	 */
 	public boolean searchKPI(String kpiId) {
 		Actions actions = new Actions(driver);
-		actions.moveToElement(searchKPIEl).click();
+		actions.moveToElement(searchKpiElement).click();
 		actions.sendKeys(kpiId);
 		Action action = actions.build();
 		action.perform();

@@ -22,7 +22,7 @@
     <div mat-line [hidden]="!isExpanded" [ngClass]="{'hiddenMenuLabel': !isExpanded}">
       <mat-icon *ngIf="item.showIcon" class="menu-img menu-icon-color" height="35px" svgIcon="{{item.iconName}}">
       </mat-icon>
-      <span id="{{item.menuId}}Name" [ngClass]="{'displayNameMenu': true }">
+      <span id="{{item.menuId}}Name" class="line-child" [ngClass]="{'displayNameMenu': true }">
         {{item.displayName}}</span>
       <span *ngIf="item.iconName =='grafana'"> {{selectedOrg}} </span>
     </div>

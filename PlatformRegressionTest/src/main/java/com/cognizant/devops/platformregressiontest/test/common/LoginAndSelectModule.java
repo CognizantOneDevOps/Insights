@@ -16,33 +16,34 @@
 package com.cognizant.devops.platformregressiontest.test.common;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.SkipException;
 import org.testng.annotations.AfterSuite;
 
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
-import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 
 public class LoginAndSelectModule {
 
 	public static WebDriver driver;
 	public static Map<String, String> testData = new HashMap<>();
 
+	@SuppressWarnings("deprecation")
 	public static void initialization() {
 		if (driver == null) {
 			String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator + File.separator
@@ -53,32 +54,54 @@ public class LoginAndSelectModule {
 			System.setProperty("webdriver.chrome.driver", path);
 			driver = new ChromeDriver(options);
 			driver.manage().window().maximize();
-			//driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
-			//driver.manage().timeouts().pageLoadTimeout(40, TimeUnit.SECONDS);
+			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 			driver.navigate().to(CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("baseURL"));
 		}
 	}
 
 	/* Selects module above Configuration on UI */
 	public static void selectMenuOption(String optionName) {
-		List<WebElement> menuList = driver.findElements(By.xpath("//p[contains(@class,'line-child')]"));
+		List<WebElement> menuList = driver.findElements(By.xpath("//span[contains(@class,'line-child')]"));
 		for (WebElement reuqiredOption : menuList) {
 			if (reuqiredOption.getText().equals(optionName)) {
 				reuqiredOption.click();
 				break;
-
 			}
 
 		}
 	}
+	public static void selectReportConfiguration(String optionName) {
+		driver.findElement(By.xpath("//a[@title='Report Configuration']")).click();
+		List<WebElement> menuList = driver.findElements(By.xpath("//span[contains(@class,'line-child')]"));
+		for (WebElement reuqiredOption : menuList) {
+			if (reuqiredOption.getText().equals(optionName)) {
+				reuqiredOption.click();
+				break;
+			}
+
+		}
+		}
 
 	/* Selects modules under Configuration on UI */
+	@SuppressWarnings("deprecation")
 	public static void selectModuleOnClickingConfig(String moduleName) throws InterruptedException {
 		Thread.sleep(1000);
 		driver.findElement(By.xpath("//a[@title='Configuration']")).click();
-		List<WebElement> menuList = driver.findElements(By.xpath("//p[contains(@class,'line-child')]"));
+		List<WebElement> menuList = driver.findElements(By.xpath("//span[contains(@class,'line-child')]"));
 		for (WebElement reuqiredOption : menuList) {
 			if (reuqiredOption.getText().equals(moduleName)) {
+				reuqiredOption.click();
+				break;
+			}
+
+		}
+	}
+	
+	public static void selectROIModule(String optionName) {
+		driver.findElement(By.xpath("//a[@title='ROI']")).click();
+		List<WebElement> menuList = driver.findElements(By.xpath("//span[contains(@class,'line-child')]"));
+		for (WebElement reuqiredOption : menuList) {
+			if (reuqiredOption.getText().equals(optionName)) {
 				reuqiredOption.click();
 				break;
 			}
@@ -88,8 +111,8 @@ public class LoginAndSelectModule {
 
 	public static void selectModuleOnClickingDashboardgroups(String moduleName) throws InterruptedException {
 		Thread.sleep(1000);
-		driver.findElement(By.xpath("//p[contains(text(),'Dashboard Groups ')]")).click();
-		List<WebElement> menuList = driver.findElements(By.xpath("//p[contains(@class,'line-child')]"));
+		driver.findElement(By.xpath("//span[contains(text(),' Dashboard Groups')]")).click();
+		List<WebElement> menuList = driver.findElements(By.xpath("//span[contains(@class,'line-child')]"));
 		for (WebElement reuqiredOption : menuList) {
 			if (reuqiredOption.getText().equals(moduleName)) {
 				reuqiredOption.click();
@@ -101,7 +124,8 @@ public class LoginAndSelectModule {
 
 	/* Selects modules under Configuration on UI */
 	public static void selectModuleUnderConfiguration(String moduleName) {
-		List<WebElement> menuList = driver.findElements(By.xpath("//p[contains(@class,'line-child')]"));
+		driver.findElement(By.xpath("//a[@title='Configuration']")).click();
+		List<WebElement> menuList = driver.findElements(By.xpath("//span[contains(@class,'line-child')]"));
 		for (WebElement reuqiredOption : menuList) {
 			if (reuqiredOption.getText().equals(moduleName)) {
 				reuqiredOption.click();
@@ -111,8 +135,9 @@ public class LoginAndSelectModule {
 	}
 
 	public static void selectModuleKPIConfiguration(String moduleName) {
-		driver.findElement(By.xpath("//p[text()='Report Configuration ']")).click();
-		List<WebElement> menuList = driver.findElements(By.xpath("//p[contains(@class,'line-child')]"));
+		//driver.findElement(By.xpath("//a[@title='Configuration']")).click();
+		driver.findElement(By.xpath("//a[@title='Report Configuration']")).click();
+		List<WebElement> menuList = driver.findElements(By.xpath("//span[contains(@class,'line-child')]"));
 		for (WebElement reuqiredOption : menuList) {
 			if (reuqiredOption.getText().equals(moduleName)) {
 				reuqiredOption.click();

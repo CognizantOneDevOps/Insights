@@ -19,11 +19,16 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
+import javax.json.Json;
+
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Ignore;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.multipart.MultipartFile;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -35,29 +40,37 @@ import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentRepor
 import com.cognizant.devops.platformdal.assessmentreport.InsightsKPIConfig;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportTemplateConfigFiles;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
+import com.cognizant.devops.platformservice.assessmentreport.controller.InsightsAssessmentReportController;
 import com.cognizant.devops.platformservice.assessmentreport.service.AssesmentReportServiceImpl;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 @Test
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
 @SuppressWarnings("unused")
+@WebAppConfiguration
 public class ReportTemplateKPIContentServiceTest extends AssessmentReportServiceData {
 	private static final Logger log = LogManager.getLogger(ReportTemplateKPIContentServiceTest.class);
 
-	int reportId = 0;
-	int uploadedTemplateId = 0;
+	static int reportId = 0;
+	static int uploadedTemplateId = 0;
+
 	@BeforeClass
 	public void prepareData() throws InsightsCustomException {
 	}
 
-	public static final AssesmentReportServiceImpl assessmentService = new AssesmentReportServiceImpl();
-	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
+	@Autowired
+	InsightsAssessmentReportController insightsAssessmentReportController;
+	@Autowired
+	AssesmentReportServiceImpl assessmentService;
 
+	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
 
 	@Test(priority = 1)
 	public void testVisualizationUtil() throws InsightsCustomException {
 		try {
-			List<String> chartHandlerList = assessmentService.getVisualizationUtil();
+			JsonObject response = insightsAssessmentReportController.getVisualizationUtil();
+			JsonArray chartHandlerList = response.getAsJsonArray("data");
 			Assert.assertNotNull(chartHandlerList);
 			Assert.assertFalse(chartHandlerList.isEmpty());
 		} catch (AssertionError e) {
@@ -68,8 +81,9 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 	@Test(priority = 2)
 	public void testAllChartType() throws InsightsCustomException {
 		try {
-			JsonObject vTypeList = assessmentService.getAllChartType();
-			Assert.assertNotNull(vTypeList);
+			JsonObject response = insightsAssessmentReportController.getChartType();
+			JsonObject vTypeList = response.getAsJsonObject("data");
+			Assert.assertTrue(vTypeList.getAsJsonArray("vTypes").size() > 0);
 			Assert.assertFalse(vTypeList.keySet().isEmpty());
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
@@ -79,7 +93,8 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 	@Test(priority = 3)
 	public void testContentAction() throws InsightsCustomException {
 		try {
-			List<String> listOfCategory = assessmentService.getContentAction();
+			JsonObject response = insightsAssessmentReportController.getContentAction();
+			JsonArray listOfCategory = response.getAsJsonArray("data");
 			Assert.assertNotNull(listOfCategory);
 			Assert.assertFalse(listOfCategory.isEmpty());
 		} catch (AssertionError e) {
@@ -90,7 +105,8 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 	@Test(priority = 4)
 	public void testKpiDataSource() throws InsightsCustomException {
 		try {
-			List<String> listOfDatasource = assessmentService.getKpiDataSource();
+			JsonObject response = insightsAssessmentReportController.getKpiDataSourcelist();
+			JsonArray listOfDatasource = response.getAsJsonArray("data");
 			Assert.assertNotNull(listOfDatasource);
 			Assert.assertFalse(listOfDatasource.isEmpty());
 		} catch (AssertionError e) {
@@ -101,7 +117,8 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 	@Test(priority = 5)
 	public void testKpiCategory() throws InsightsCustomException {
 		try {
-			List<String> listOfCategory = assessmentService.getKpiCategory();
+			JsonObject response = insightsAssessmentReportController.getKpiCategorylist();
+			JsonArray listOfCategory = response.getAsJsonArray("data");
 			Assert.assertNotNull(listOfCategory);
 			Assert.assertFalse(listOfCategory.isEmpty());
 		} catch (AssertionError e) {
@@ -112,7 +129,8 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 	@Test(priority = 6)
 	public void testjobSchedule() throws InsightsCustomException {
 		try {
-			List<String> listOfSchedule = assessmentService.getSchedule();
+			JsonObject response = insightsAssessmentReportController.getScheduleList();
+			JsonArray listOfSchedule = response.getAsJsonArray("data");
 			Assert.assertNotNull(listOfSchedule);
 			Assert.assertFalse(listOfSchedule.isEmpty());
 		} catch (AssertionError e) {
@@ -123,9 +141,14 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 	@Test(priority = 7)
 	public void testSaveReportTemplate() throws InsightsCustomException {
 		try {
-			int response = assessmentService.saveKpiDefinition(convertStringIntoJson(registerkpi));
-			kpiIdList.add(response);
-			reportId = assessmentService.saveTemplateReport(convertStringIntoJson(reportTemplateSave));
+			try {
+	            Thread.sleep(10000);
+	        } catch (InterruptedException e) {
+	            log.debug(e.getMessage());
+	        }
+			JsonObject response = insightsAssessmentReportController.saveReportTemplate(convertStringIntoJson(reportTemplateSave).toString());
+			log.debug(response);
+			reportId = Integer.parseInt(response.get("data").getAsString().replace("\"", "").replaceAll("[^0-9]", ""));
 			InsightsAssessmentReportTemplate report = (InsightsAssessmentReportTemplate) reportConfigDAL
 					.getReportTemplateByReportId(reportId);
 			Assert.assertNotNull(report);
@@ -134,11 +157,12 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 8)
 	public void testActiveKpiList() throws InsightsCustomException {
 		try {
-			List<InsightsKPIConfig> kpiconfigList = assessmentService.getActiveKpiList();
+			JsonObject response = insightsAssessmentReportController.getAllActiveKpiList();
+			JsonArray kpiconfigList = response.getAsJsonArray("data");
 			Assert.assertNotNull(kpiconfigList);
 			Assert.assertFalse(kpiconfigList.isEmpty());
 		} catch (AssertionError e) {
@@ -149,7 +173,9 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 	@Test(priority = 9)
 	public void testGetReportTemplate() throws InsightsCustomException {
 		try {
-			List<InsightsAssessmentReportTemplate> listOfReportTemplate = assessmentService.getReportTemplate();
+			JsonObject response = insightsAssessmentReportController.getReportTemplateList();
+			JsonArray listOfReportTemplate = response.getAsJsonArray("data");
+
 			Assert.assertNotNull(listOfReportTemplate);
 			Assert.assertFalse(listOfReportTemplate.isEmpty());
 		} catch (AssertionError e) {
@@ -158,13 +184,34 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 	}
 
 	@Test(priority = 10)
+	public void testGetAllActiveContentList() {
+		try {
+
+			JsonObject response = insightsAssessmentReportController.getAllActiveContentList();
+			String expectedStatus = "success";
+			String actualStatus = response.get("status").getAsString().replace("\"", "");
+			JsonArray contentArray = response.getAsJsonArray("data");
+
+			Assert.assertEquals(actualStatus, expectedStatus);
+			Assert.assertTrue(contentArray.size() > 0);
+			Assert.assertNotNull(contentArray);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test(priority = 11)
 	public void testEditReportTemplate() throws InsightsCustomException {
 		try {
-			int response = assessmentService.saveKpiDefinition(convertStringIntoJson(registerSecondkpi));
-			kpiIdList.add(response);
-			editReportTemplate = editReportTemplate.replace("reportIdData", String.valueOf(reportId));
+			JsonObject responseFirst = insightsAssessmentReportController.saveKpiDefinition(registerkpi);
+			JsonObject responseSecond = insightsAssessmentReportController.saveKpiDefinition(registerSecondkpi);
+
+			String editReportTemplate = "{\"reportName\":\"report_template_save\",\"reportId\":\"reportIdData\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":100201,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"Query\"}]},{\"kpiId\":100144,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"Query\"}]}]}";
+
 			log.debug(" editReportTemplate  {} ", editReportTemplate);
-			reportId = assessmentService.editReportTemplate(convertStringIntoJson(editReportTemplate));
+			editReportTemplate = editReportTemplate.replace("reportIdData", String.valueOf(reportId));
+
+			JsonObject responseJson = insightsAssessmentReportController.editReportTemplate(editReportTemplate);
 			InsightsAssessmentReportTemplate report = (InsightsAssessmentReportTemplate) reportConfigDAL
 					.getReportTemplateByReportId(reportId);
 			Assert.assertNotNull(report);
@@ -174,24 +221,13 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 		}
 	}
 
-	@Test(priority = 11)
-	public void testUploadReportTemplateDesignFiles() throws InsightsCustomException, IOException {
-		try {
-			String response = assessmentService.uploadReportTemplateDesignFiles(readReportTemplateDesignFiles(), reportId);
-			List<InsightsReportTemplateConfigFiles> fileList = reportConfigDAL.getReportTemplateConfigFileByReportId(reportId);
-			Assert.assertEquals(response, "File uploaded");
-			Assert.assertTrue(fileList.size() > 0);
-		} catch (AssertionError e) {
-			Assert.fail(e.getMessage());
-		}
-	}
-	
 	@Test(priority = 12)
 	public void testDeleteReportTemplate() throws InsightsCustomException {
 		try {
-			JsonObject deleteRequest = new JsonObject();
-			deleteRequest.addProperty("reportId", reportId);
-			String response = assessmentService.deleteReportTemplate(deleteRequest);
+			String templateToDelete = "{\"reportId\":\"reportIdData\"}";
+			templateToDelete = templateToDelete.replace("reportIdData", String.valueOf(reportId));
+
+			JsonObject response = insightsAssessmentReportController.deleteReportTemplate(templateToDelete);
 			InsightsAssessmentReportTemplate report = null;
 			try {
 				report = (InsightsAssessmentReportTemplate) reportConfigDAL.getReportTemplateByReportId(reportId);
@@ -203,33 +239,37 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 13)
 	public void testUploadReportTemplate() throws InsightsCustomException, IOException {
 		try {
-			FileInputStream input = new FileInputStream(templateJsonFile);
-			MultipartFile multipartFile = new MockMultipartFile("file", configFile.getName(), "text/plain",
+			FileInputStream input = new FileInputStream(file);
+			MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "text/plain",
 					IOUtils.toByteArray(input));
-			String response = assessmentService.uploadReportTemplate(multipartFile);
-			uploadedTemplateId = Integer.parseInt(response.replaceAll("[^0-9]", ""));
-			InsightsAssessmentReportTemplate report = (InsightsAssessmentReportTemplate) reportConfigDAL
-					.getReportTemplateByReportId(uploadedTemplateId);
-			Assert.assertNotNull(report);
-			Assert.assertTrue(report.getReportsKPIConfig().size() > 0);
+
+			JsonObject response = insightsAssessmentReportController.uploadReportTemplate(multipartFile);
+			String expectedStatus = "success";
+			String actualStatus = response.get("status").getAsString().replace("\"", "");
+			uploadedTemplateId = Integer
+					.parseInt(response.get("data").getAsString().replace("\"", "").replaceAll("[^0-9]", ""));
+
+			Assert.assertEquals(actualStatus, expectedStatus);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 14)
 	public void testDeleteUploadedReportTemplate() throws InsightsCustomException {
 		try {
-			JsonObject deleteRequest = new JsonObject();
-			deleteRequest.addProperty("reportId", uploadedTemplateId);
-			String response = assessmentService.deleteReportTemplate(deleteRequest);
+			String templateToDelete = "{\"reportId\":\"reportIdData\"}";
+			templateToDelete = templateToDelete.replace("reportIdData", String.valueOf(uploadedTemplateId));
+
+			JsonObject response = insightsAssessmentReportController.deleteReportTemplate(templateToDelete);
 			InsightsAssessmentReportTemplate report = null;
 			try {
-				report = (InsightsAssessmentReportTemplate) reportConfigDAL.getReportTemplateByReportId(uploadedTemplateId);
+				report = (InsightsAssessmentReportTemplate) reportConfigDAL
+						.getReportTemplateByReportId(uploadedTemplateId);
 			} catch (Exception e) {
 				log.error(e);
 			}
@@ -238,26 +278,64 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 			Assert.fail(e.getMessage());
 		}
 	}
-	
-	@Test(priority = 15, expectedExceptions = InsightsCustomException.class)
+
+	@Test(priority = 15)
 	public void testUploadedReportTemplateWithWrongFile() throws InsightsCustomException, IOException {
-		FileInputStream input = new FileInputStream(configFileTxt);
-		MultipartFile multipartFile = new MockMultipartFile("file", configFileTxt.getName(), "text/plain",
-				IOUtils.toByteArray(input));
-		String response = assessmentService.uploadReportTemplate(multipartFile);
+		try {
+			FileInputStream input = new FileInputStream(configFileTxt);
+			MultipartFile multipartFile = new MockMultipartFile("file", configFileTxt.getName(), "text/plain",
+					IOUtils.toByteArray(input));
+			JsonObject response = insightsAssessmentReportController.uploadReportTemplate(multipartFile);
+			String expectedStatus = "failure";
+			String expectedOutcome = "Invalid Report Template file format.";
+
+			String actualStatus = response.get("status").getAsString().replace("\"", "");
+			String actualOutcome = response.get("message").getAsString().replace("\"", "");
+
+			Assert.assertEquals(actualStatus, expectedStatus);
+			Assert.assertEquals(actualOutcome, expectedOutcome);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
 	}
-	
-	@Test(priority = 16, expectedExceptions = InsightsCustomException.class)
+
+	@Test(priority = 16)
 	public void testUploadReportTemplateDesignFilesWithWrongFile() throws InsightsCustomException, IOException {
-		FileInputStream input = new FileInputStream(configFileTxt);
-		MultipartFile multipartFile = new MockMultipartFile("file", configFileTxt.getName(), "text/plain",
-				IOUtils.toByteArray(input));
-		MultipartFile[] files = new MultipartFile[1];
-		files[0] = multipartFile;
-		String response = assessmentService.uploadReportTemplateDesignFiles(files, reportId);
+		try {
+			FileInputStream input = new FileInputStream(configFileTxt);
+			MultipartFile multipartFile = new MockMultipartFile("file", configFileTxt.getName(), "text/plain",
+					IOUtils.toByteArray(input));
+			MultipartFile[] files = new MultipartFile[1];
+			files[0] = multipartFile;
+			JsonObject response = insightsAssessmentReportController.uploadReportTemplateDesignFiles(files, reportId);
+			String expectedStatus = "failure";
+			String id = response.get("message").getAsString().replace("\"", "").replaceAll("[^0-9]", "");
+
+			String expectedOutcome = " Report template not exists in database " + id;
+
+			String actualStatus = response.get("status").getAsString().replace("\"", "");
+			String actualOutcome = response.get("message").getAsString().replace("\"", "");
+
+			Assert.assertEquals(actualStatus, expectedStatus);
+			Assert.assertEquals(actualOutcome, expectedOutcome);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
 
 	}
 
+	@Test(priority = 17)
+	public void testGetTemplateType() throws InsightsCustomException {
+		JsonObject response = insightsAssessmentReportController.getTemplateType();
+		JsonArray remplateTypeList = response.getAsJsonArray("data");
+		String expectedStatus = "success";
+
+		String actualStatus = response.get("status").getAsString().replace("\"", "");
+
+		Assert.assertEquals(actualStatus, expectedStatus);
+		Assert.assertNotNull(remplateTypeList);
+		Assert.assertFalse(remplateTypeList.isEmpty());
+	}
 
 	@AfterClass
 	public void cleanUp() {
@@ -268,7 +346,7 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 				log.error("Error cleaning up at AssessmentReportsServiceTest Bulk KPI record", e);
 			}
 		}
-		
+
 		reportConfigDAL.deleteTemplateDesignFilesByReportTemplateID(reportId);
 
 	}

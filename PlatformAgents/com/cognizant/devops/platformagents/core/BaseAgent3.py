@@ -38,6 +38,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from base64 import b64encode, b64decode
 from apscheduler.schedulers.blocking import BlockingScheduler
+from apscheduler.triggers.cron import CronTrigger
 from pytz import timezone
 from functools import wraps
 import tzlocal
@@ -192,6 +193,7 @@ class BaseAgent(object):
         self.dataRoutingKey = str(self.config.get('publish').get('data'))
         self.healthRoutingKey = str(self.config.get('publish').get('health'))
         self.runSchedule = self.config.get('runSchedule', 30)
+        self.runCron = self.config.get('runCron', '*/30 * * * *')
         self.insightsTimeZone = timezone('UTC')
         self.toolsTimeZone = timezone(self.config.get('toolsTimeZone'))
         self.epochStartDateTime = datetime(1970, 1, 1, tzinfo=self.insightsTimeZone)
@@ -604,7 +606,12 @@ class BaseAgent(object):
         if not hasattr(self, 'scheduler'):
             scheduler = BlockingScheduler(timezone=str(tzlocal.get_localzone()))
             self.scheduler = scheduler
-            self.scheduledJob = scheduler.add_job(self.execute, 'interval', seconds=60 * self.runSchedule)
+            if self.runSchedule > 0:
+                self.scheduledJob = scheduler.add_job(self.execute, 'interval', seconds=60 * self.runSchedule)
+            else:
+                #triggerDetail = CronTrigger(year="*", month="*", day="*", hour="*", minute="10", second="5") #'*/5 * * * *'
+                expression_trigger = CronTrigger.from_crontab(self.runCron)
+                self.scheduledJob = scheduler.add_job(self.execute, trigger=expression_trigger)
             try:
                 scheduler.start()
             except (KeyboardInterrupt, SystemExit):

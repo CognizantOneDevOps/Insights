@@ -39,9 +39,9 @@ public class WebHookMessagePublisher {
 	Channel channel;
 	String exchangeName;
 	String routingKey;
-	Map<String, Channel> mqMappingMap = new HashMap<String, Channel>(0);
+	Map<String, Channel> mqMappingMap = new HashMap<>(0);
 
- static WebHookMessagePublisher webhookmessagepublisher;
+	static WebHookMessagePublisher webhookmessagepublisher;
 
 	public static WebHookMessagePublisher getInstance() {
 		if (webhookmessagepublisher == null) {
@@ -55,10 +55,11 @@ public class WebHookMessagePublisher {
 	}
 
 	public void initilizeMq() throws TimeoutException, IOException {
-		LOG.debug(" In initilizeMq ======== host = {} port = {} user = {} passcode = {} exchangeName= {} enableDeadLetterExchange = {}",
+		LOG.debug(
+				" In initilizeMq ======== host = {} port = {} user = {} passcode = {} exchangeName= {} enableDeadLetterExchange = {}",
 				AppProperties.mqHost, AppProperties.port, AppProperties.mqUser, AppProperties.mqPassword,
-				AppProperties.mqExchangeName,AppProperties.enableDeadLetterExchange);
-		try{
+				AppProperties.mqExchangeName, AppProperties.enableDeadLetterExchange);
+		try {
 			this.exchangeName = AppProperties.mqExchangeName;
 			this.routingKey = WebHookConstants.WEBHOOK_EVENTDATA;
 			factory = new ConnectionFactory();
@@ -67,11 +68,9 @@ public class WebHookMessagePublisher {
 			factory.setPassword(AppProperties.mqPassword);
 			factory.setPort(AppProperties.port);
 			connection = factory.newConnection();
-			Channel channelForDeadLetter = connection.createChannel(); 
-			channelForDeadLetter.exchangeDeclare(WebHookConstants.RECOVER_EXCHANGE_NAME, WebHookConstants.RECOVER_EXCHANGE_TYPE, true);
-			channelForDeadLetter.queueDeclare(WebHookConstants.RECOVER_QUEUE, true, false, false, null);
-			channelForDeadLetter.queueBind(WebHookConstants.RECOVER_QUEUE, WebHookConstants.RECOVER_EXCHANGE_NAME, WebHookConstants.RECOVER_ROUNTINGKEY_QUEUE);
-			channelForDeadLetter.close();
+			if (AppProperties.enableDeadLetterExchange) {
+				declareDeadLetterExchange(connection);
+			}
 			SubscriberStatusLogger.getInstance().createSubsriberStatusNode(
 					" Instance Name " + AppProperties.instanceName + " : Connection with Rabbit Mq for host "
 							+ AppProperties.mqHost + " established successfully. ",
@@ -83,8 +82,23 @@ public class WebHookMessagePublisher {
 					WebHookConstants.FAILURE);
 			throw e;
 
-		} 
+		}
 
+	}
+
+	private static void declareDeadLetterExchange(Connection connection) {
+		try (Channel channelForDeadLetter = connection.createChannel()) {
+			channelForDeadLetter.exchangeDeclare(WebHookConstants.RECOVER_EXCHANGE_NAME,
+					WebHookConstants.RECOVER_EXCHANGE_TYPE, true);
+			channelForDeadLetter.queueDeclare(WebHookConstants.RECOVER_QUEUE, true, false, false, null);
+			channelForDeadLetter.queueBind(WebHookConstants.RECOVER_QUEUE, WebHookConstants.RECOVER_EXCHANGE_NAME,
+					WebHookConstants.RECOVER_ROUNTINGKEY_QUEUE);
+		} catch (Exception e) {
+			LOG.error("Error while initilize mq declareDeadLetterExchange Queue ", e);
+			SubscriberStatusLogger.getInstance().createSubsriberStatusNode(
+					"Error while initilize mq declareDeadLetterExchange Queue " + AppProperties.mqHost,
+					WebHookConstants.FAILURE);
+		}
 	}
 
 	public void publishEventAction(byte[] data, String webHookMqChannelName) throws IOException, TimeoutException {
@@ -92,21 +106,21 @@ public class WebHookMessagePublisher {
 		try {
 
 			if (!connection.isOpen()) {
-				LOG.debug(" Connection is not open " + " connection{} " , connection.isOpen());
+				LOG.debug(" Connection is not open " + " connection{} ", connection.isOpen());
 				initilizeMq();
 			}
 			if (mqMappingMap.containsKey(webHookMqChannelName)) {
 				channel = mqMappingMap.get(webHookMqChannelName);
 				channel.basicPublish(exchangeName, webHookMqChannelName, null, data);
-				LOG.debug(" data published in queue {}" ,webHookMqChannelName);
+				LOG.debug(" data published in queue {}", webHookMqChannelName);
 			} else {
 				channel = connection.createChannel();
 				Map<String, Object> args = new HashMap<>();
-				
-				if(AppProperties.enableDeadLetterExchange) {
+
+				if (AppProperties.enableDeadLetterExchange) {
 					args.put(WebHookConstants.RECOVER_EXCHANGE_PROPERTY, WebHookConstants.RECOVER_EXCHANGE_NAME);
 				}
-				
+
 				channel.exchangeDeclare(exchangeName, WebHookConstants.EXCHANGE_TYPE, true);
 				channel.queueDeclare(webHookMqChannelName, true, false, false, args);
 				channel.queueBind(webHookMqChannelName, exchangeName, webHookMqChannelName);
@@ -115,7 +129,7 @@ public class WebHookMessagePublisher {
 				mqMappingMap.put(webHookMqChannelName, channel);
 			}
 		} catch (Exception e) {
-			LOG.error("Error while publishEventAction " , e);
+			LOG.error("Error while publishEventAction ", e);
 			throw e;
 		}
 	}
@@ -123,14 +137,13 @@ public class WebHookMessagePublisher {
 	public void publishHealthData(byte[] data, String webHookHealthqueueName, String webHookHealthRoutingKey)
 			throws TimeoutException, IOException {
 		LOG.debug(" Inside publishHealthData ==== ");
-		channel = connection.createChannel();
 		try {
 			channel = connection.createChannel();
 			Map<String, Object> args = new HashMap<>();
-			if(AppProperties.enableDeadLetterExchange) {
+			if (AppProperties.enableDeadLetterExchange) {
 				args.put(WebHookConstants.RECOVER_EXCHANGE_PROPERTY, WebHookConstants.RECOVER_EXCHANGE_NAME);
 			}
-			
+
 			channel.exchangeDeclare(exchangeName, WebHookConstants.EXCHANGE_TYPE, true);
 			channel.queueDeclare(webHookHealthqueueName, true, false, false, args);
 			channel.queueBind(webHookHealthqueueName, exchangeName, webHookHealthRoutingKey);
@@ -138,24 +151,21 @@ public class WebHookMessagePublisher {
 			LOG.debug(" Health data published first time in queue {}", webHookHealthRoutingKey);
 		} catch (Exception e) {
 			LOG.error("Error while publishEventAction ", e);
-		}finally {
-						channel.close();
+		} finally {
+			channel.close();
+		}
 	}
-	}	
 
 	public void releaseMqConnetion() {
 		try {
 			LOG.info(" In releaseMqConnetion ");
 			for (Map.Entry<String, Channel> entry : mqMappingMap.entrySet()) {
-				Channel channel = entry.getValue();
-				if (channel != null && connection != null) {
-					channel.close();
+				Channel channelCls = entry.getValue();
+				if (channelCls != null && connection != null) {
+					channelCls.close();
 				}
 			}
-			if (connection != null) {
-				//connection.close();
-			}
-		} catch (IOException |TimeoutException e) {
+		} catch (IOException | TimeoutException e) {
 			LOG.error(e.getMessage());
 		}
 	}
@@ -165,7 +175,7 @@ public class WebHookMessagePublisher {
 			channel = connection.createChannel();
 			channel.queuePurge(queueName);
 		} catch (Exception e) {
-			LOG.error("Error while purgeQueue ",e);
+			LOG.error("Error while purgeQueue ", e);
 		}
 	}
 }

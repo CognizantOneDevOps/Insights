@@ -18,7 +18,9 @@ package com.cognizant.devops.platformservice.test.bulkUpload;
 
 import java.io.File;
 
-public class BulkUploadTestData {
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+
+public class BulkUploadTestData extends AbstractTestNGSpringContextTests{
 
 	ClassLoader classLoader = ClassLoader.getSystemClassLoader();
 
@@ -47,7 +49,7 @@ public class BulkUploadTestData {
 	String insightTimeWithTimeZoneFormat = "yyyy-MM-dd'T'HH:mm:ssXXX";
 	String insightTimeWithoutTimeZoneFormat = "yyyy-MM-dd'T'HH:mm:ss";
 	String fileWithNumericValues_insighstimeField = "completionDateEpochTime";
-	String labelForNumericCheck ="SCM:NUMERIC_CHECK:DATA";
+	String labelForNumericCheck = "SCM:NUMERIC_CHECK:DATA";
 	long filesizeMaxValue = 2097152;
 
 	File fileSize = new File(classLoader.getResource("BulkUploadTest_Size.csv").getFile());

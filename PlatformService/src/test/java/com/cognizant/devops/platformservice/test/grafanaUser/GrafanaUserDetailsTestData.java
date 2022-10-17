@@ -32,4 +32,5 @@ public class GrafanaUserDetailsTestData {
 	String authorizationException = "";
 	String host = "insights.cogdevops.com";
 	String contentTypeException = "application/json";
+	String invalidToken = "asfghjdvshagasdhkajs";
 }

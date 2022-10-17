@@ -69,7 +69,9 @@ public abstract class WorkflowTaskSubscriberHandler {
 
 		try {
 			String queueName = routingKey.replace(".", "_");
-			channel = RabbitMQConnectionProvider.getChannel(routingKey, queueName, MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE);
+			
+			channel = RabbitMQConnectionProvider.getConnection().createChannel();
+			channel = RabbitMQConnectionProvider.initilizeChannel(channel,routingKey, queueName, MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE);
 			setChannel(channel);
 
 			log.debug("prefetchCount {} ",

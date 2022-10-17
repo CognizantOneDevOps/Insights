@@ -25,13 +25,31 @@ public class LoginObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//div[@id='invalidMsg']")
 	WebElement invalidMsg;
 	
-	@FindBy(xpath = "//input[contains(@name,'username')]")
+	@FindBy(xpath = "//input[contains(@formcontrolname,'username')]")
 	WebElement userName;
 	
-	@FindBy(xpath = "//input[contains(@autocomplete,'new-password')]")
+	@FindBy(xpath = "//input[contains(@name,'password')]")
 	WebElement password;
 	
-	@FindBy(xpath = "//button[contains(@class,'sigBtn')]")
+	@FindBy(xpath = "//span[contains(text(),' LOG ON ')]")
 	WebElement sigBtn;
+	
+	@FindBy(xpath = "//img[contains(@class,'toggleMenu')]")//
+	WebElement checkNav;
+	
+	@FindBy(xpath = "//img[contains(@class,'toggleMenuNotExp')]") //
+	WebElement checkNavOpen;
+	
+	@FindBy(xpath = "//span[contains(@id,'DashboardGroupsName')]") //
+	WebElement dashGroup;
+	
+	@FindBy(xpath = "//button[contains(@class,'toggler-icon')]") //
+	WebElement changeTheme;
+	
+	@FindBy(xpath = "//img[contains(@id,'darkTheme')]") //
+	WebElement isLightTheme;
+	
+	@FindBy(xpath = "//img[contains(@id,'lightTheme')]") //
+	WebElement isDarkTheme;
 
 }

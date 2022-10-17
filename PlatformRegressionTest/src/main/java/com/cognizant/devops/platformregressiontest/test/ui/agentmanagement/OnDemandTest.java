@@ -59,9 +59,10 @@ public class OnDemandTest extends LoginAndSelectModule {
 	 * Replace agent block fields in server config with on demand related details
 	 * 
 	 * @param data
+	 * @throws InterruptedException 
 	 */
 	@Test(priority = 1, enabled = true, dataProvider = "agentondemanddataprovider", dataProviderClass = AgentDataProvider.class)
-	public void verifyServerConfigAgentDetailBlock(AgentManagementDataModel data) {
+	public void verifyServerConfigAgentDetailBlock(AgentManagementDataModel data) throws InterruptedException {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.verifyServerConfigAgentDetailBlock(data),
 				"Server config having on demand details.");

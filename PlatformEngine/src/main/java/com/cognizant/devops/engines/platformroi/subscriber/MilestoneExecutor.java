@@ -68,7 +68,7 @@ public class MilestoneExecutor {
 		}
 	}
 	
-	private void createToolBasedJson(MileStoneConfig mileStoneConfig) {
+	private void createToolBasedJson(MileStoneConfig mileStoneConfig) throws IOException, TimeoutException {
 		for(InsightsMileStoneOutcomeConfig outcome: mileStoneConfig.getListOfOutcomes()) {
 			if(outcome.getStatus().equalsIgnoreCase(MilestoneEnum.OutcomeStatus.NOT_STARTED.name()) || outcome.getStatus().equalsIgnoreCase(MilestoneEnum.OutcomeStatus.RESTART.name())) {
 				try {
@@ -98,13 +98,22 @@ public class MilestoneExecutor {
 		log.debug("Milestone data publish successfully  ");
 	}
 
-	public void publishMessageInMQ(String routingKey, String publishDataJson) throws InsightsCustomException
+	public void publishMessageInMQ(String routingKey, String publishDataJson) throws InsightsCustomException, IOException, TimeoutException
 	{
 		String queueName = routingKey.replace(".", "_");
-		try (Channel channel = RabbitMQConnectionProvider.getChannel(routingKey, queueName, MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE)) {
+		Channel channel = null;
+		try {
+			
+			channel = RabbitMQConnectionProvider.getConnection().createChannel();
+			channel = RabbitMQConnectionProvider.initilizeChannel(channel, routingKey, queueName, MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE);
 			channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, publishDataJson.getBytes());
-		} catch (IOException | TimeoutException e) {
+		
+		} catch (IOException e) {
 			log.debug("Error while publishing message in queue");
+		}finally {
+			if(channel != null) {
+				channel.close();
+			}
 		}
 	}
 }

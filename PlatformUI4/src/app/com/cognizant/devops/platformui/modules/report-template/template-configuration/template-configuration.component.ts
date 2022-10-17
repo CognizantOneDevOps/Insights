@@ -52,6 +52,7 @@ export class ReportTemplateConfig implements OnInit {
   templateType: string;
   kpiDetailItems: KpiDetailItem[] = [];
   isEdit: boolean = false;
+  isEditKPI : boolean = false;
   disableId: boolean = false;
   regex = new RegExp("^[a-zA-Z0-9_]*$");
   receivedParam: any;
@@ -141,6 +142,8 @@ export class ReportTemplateConfig implements OnInit {
     console.log("Add", this.kpiDetailItems);
   }
   addKpi() {
+    console.log("Inside addKPI");
+    this.isEdit = true;
     if (this.visualizationUtil !== "LEDGERPDF") {
       if (
         this.kpiId == undefined ||
@@ -188,6 +191,7 @@ export class ReportTemplateConfig implements OnInit {
   }
 
   resetKpiDetails() {
+    this.isEditKPI = false;
     this.buttonName = "ADD";
     this.kpiId = "";
     this.vType = "";
@@ -204,7 +208,8 @@ export class ReportTemplateConfig implements OnInit {
     this.vType = listData.vType.substring(0, listData.vType.lastIndexOf("_"));
     this.vQuery = listData.vQuery;
     this.inputvType = this.vType
-    this.inputvQuery = this.vQuery; 
+    this.inputvQuery = this.vQuery;
+    this.isEditKPI = true;
   }
 
   deleteKpi(id: string) {

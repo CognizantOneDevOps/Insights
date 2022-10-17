@@ -17,439 +17,819 @@ package com.cognizant.devops.platformservice.test.agentManagement;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
-import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
-import com.cognizant.devops.platformservice.agentmanagement.service.AgentConfigTO;
+import com.cognizant.devops.platformservice.agentmanagement.controller.InsightsAgentConfiguration;
 import com.cognizant.devops.platformservice.agentmanagement.service.AgentManagementServiceImpl;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+
+import net.minidev.json.JSONObject;
 
 @Test
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
-public class AgentManagementTest extends AgentManagementTestData{
-	
+@WebAppConfiguration
+public class AgentManagementTest extends AgentManagementTestData {
+
 	public static final AgentManagementTestData agentManagementTestData = new AgentManagementTestData();
-	public static final AgentManagementServiceImpl agentManagementServiceImpl =
-												new AgentManagementServiceImpl();
+	public static final AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
 	private static Logger log = LogManager.getLogger(AgentManagementTestData.class);
+	Gson gson = new Gson();
+	@Autowired
+	InsightsAgentConfiguration insightsAgentConfiguration;
 	
+
 	@BeforeClass
 	public void prepareData() throws InsightsCustomException {
 		try {
-			ApplicationConfigCache.loadConfigCache();
-			prepareOfflineAgent(version);			
+			prepareOfflineAgent(version);
 		} catch (Exception e) {
 			log.error("message", e);
 		}
-
 	}
-	
-	/*Method to get the available list of agents in the system. */
-//	@Test(priority = 1)
-//	public void testGetSystemAvailableAgentList() throws InsightsCustomException {
-//		
-//		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
-//		try {
-//			ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
-//			Map<String, ArrayList<String>> availableAgents = agentServiceImpl.getDocrootAvailableAgentList();
-//			Assert.assertNotNull(availableAgents);
-//			Assert.assertTrue(availableAgents.size() > 0);
-//			Assert.assertTrue(availableAgents.containsKey("v5.0"));
-//			Assert.assertTrue(availableAgents.containsKey("v5.2"));
-//			
-//			for (Map.Entry<String, ArrayList<String>> entry : availableAgents.entrySet()) {
-//				
-//			    if(entry.getKey().equals("v5.2") || entry.getKey().equals("v5.0")){
-//				    ArrayList<String> toolNameList = entry.getValue();
-//				    Assert.assertTrue(toolNameList.size() > 0);
-//				    Assert.assertTrue(toolNameList.contains("git"));
-//			    }
-//			}
-//		} catch (InsightsCustomException e) {
-//			if (e.getMessage().contains("java.net.ConnectException")) {
-//				log.debug("Unable to connect to docroot on internet");
-//			}
-//		}
-//	
-//	}
-	
+
 	@Test(priority = 2)
-	public void testGetSystemAvailableAgentListForOfflineRegistration() throws InsightsCustomException {
+	public void testGetSystemAvailableAgentListForOfflineRegistration_C() throws InsightsCustomException {
 
-		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
-		Map<String, ArrayList<String>> availableAgents = agentServiceImpl.getOfflineSystemAvailableAgentList();
-		
-		Assert.assertNotNull(availableAgents);
-		Assert.assertTrue(availableAgents.size() > 0);
-		Assert.assertTrue(availableAgents.containsKey(version));
-		
-		for (Map.Entry<String, ArrayList<String>> entry : availableAgents.entrySet()) {
-			
-		    if(entry.getKey().equals(version)){
-			    ArrayList<String> toolNameList = entry.getValue();
-			    Assert.assertTrue(toolNameList.size()>0);
-			    Assert.assertTrue(toolNameList.contains("git"));
-		    }
-		}
-		
+		JsonObject response = insightsAgentConfiguration.getSystemAvailableAgentList();
+
+		JsonObject dataJson = response.getAsJsonObject("data");
+		JsonArray toolName = response.getAsJsonObject("data").get(version).getAsJsonArray();
+		Assert.assertTrue(dataJson.has(version));
+		Assert.assertTrue(toolName.size() > 0);
+
 	}
-	
-//	@Test(priority = 3)
-//	public void testGetToolRawConfigFile() throws InsightsCustomException {
-//		
-//		try {
-//			ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
-//			AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
-//			String configJson = agentServiceImpl.getToolRawConfigFile(version, gitTool,false);
-//			
-//			Gson gson = new Gson();
-//			JsonElement jsonElement = gson.fromJson(configJson.trim(), JsonElement.class);
-//			JsonObject json = jsonElement.getAsJsonObject();
-//			Assert.assertNotNull(json);
-//			Assert.assertEquals(json.get("toolCategory").getAsString(), "SCM");
-//		} catch (InsightsCustomException e) {
-//			if (e.getMessage().contains("java.net.ConnectException")) {
-//				log.debug("Unable to connect to docroot on internet");
-//			}
-//		}
-//	}
-	
-	@Test(priority = 4)
-	public void testGetToolRawConfigFileForOfflineRegistration() throws InsightsCustomException {
-		
-		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
-		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
-		String configJson = agentServiceImpl.getToolRawConfigFile(version, gitTool,false);
 
+	@Test(priority = 4)
+	public void testGetToolRawConfigFileForOfflineAgentRegistration() throws InsightsCustomException {
+		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
+
+		JsonObject configJson = insightsAgentConfiguration.getToolRawConfigFile(version, gitTool, false, typeAgent);
+
+		String trimJson = configJson.get("data").getAsString();
 		Gson gson = new Gson();
-		JsonElement jsonElement = gson.fromJson(configJson.trim(), JsonElement.class);
+		JsonElement jsonElement = gson.fromJson(trimJson.trim(), JsonElement.class);
 		JsonObject json = jsonElement.getAsJsonObject();
 		Assert.assertNotNull(json);
 		Assert.assertEquals(json.get("toolCategory").getAsString(), "SCM");
 	}
-	
-	@Test(priority = 5) 
+
+	@Test(priority = 5)
 	public void testRegisterAgent() throws InsightsCustomException {
-		
-		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
-		String expectedOutcome = "SUCCESS";
-		String oldVersion = "v9.1";
-		String response = agentServiceImpl.registerAgent(gitTool, oldVersion, osversion, 
-				configDetails, trackingDetails, false,false, "Agent");
-		
-		Assert.assertEquals(expectedOutcome, response);
-			
+		String expectedOutcome = "success";
+
+		JSONObject obj = new JSONObject();
+
+		obj.put("toolName", "git");
+		obj.put("agentVersion", "v9.1");
+		obj.put("osversion", osversion);
+		obj.put("configJson", configDetails);
+		obj.put("trackingDetails", trackingDetails);
+		obj.put("vault", false);
+		obj.put("isWebhook", false);
+		obj.put("type", "Agent");
+
+		String jsonobj = obj.toString();
+		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
+		String actual = response.get("status").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
+
 	}
-	
-	@Test(priority = 6, expectedExceptions = InsightsCustomException.class) 
+
+	@Test(priority = 6)
 	public void testRegisterAgentWithDuplicateId() throws InsightsCustomException {
-		
-		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		String expectedOutcome = "Agent Id already exsits.";
-		
-		String response = agentServiceImpl.registerAgent(gitTool, 
-							version, osversion, configDetails, trackingDetails, false,false, "Agent");
-		
-		Assert.assertEquals(expectedOutcome, response);
-			
+
+		JSONObject obj = new JSONObject();
+
+		obj.put("toolName", "git");
+		obj.put("agentVersion", "v9.1");
+		obj.put("osversion", osversion);
+		obj.put("configJson", configDetails);
+		obj.put("trackingDetails", trackingDetails);
+		obj.put("vault", false);
+		obj.put("isWebhook", false);
+		obj.put("type", "Agent");
+
+		String jsonobj = obj.toString();
+		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
+
+		String actual = response.get("message").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
+
 	}
-	
-	@Test(priority = 7, expectedExceptions = InsightsCustomException.class) 
+
+	@Test(priority = 7)
 	public void testAgentIDandToolNamenotequal() throws InsightsCustomException {
-		
-		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		String expectedOutcome = "Agent Id and Tool name cannot be the same.";
-		
-		String response = agentServiceImpl.registerAgent(gitTool, 
-							version, osversion, configDetailsWithSameIDs, trackingDetails, false,false, "Agent");
-		
-		Assert.assertEquals(expectedOutcome, response);
-			
+
+		JSONObject obj = new JSONObject();
+
+		obj.put("toolName", "git");
+		obj.put("agentVersion", "v9.1");
+		obj.put("osversion", osversion);
+		obj.put("configJson", configDetailsWithSameIDs);
+		obj.put("trackingDetails", trackingDetails);
+		obj.put("vault", false);
+		obj.put("isWebhook", false);
+		obj.put("type", "Agent");
+
+		String jsonobj = obj.toString();
+		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
+
+		String actual = response.get("message").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
+
 	}
-	
-	@Test(priority = 8, expectedExceptions = InsightsCustomException.class) 
+
+	@Test(priority = 8)
 	public void testRegisterAgentWithInvalidDataLabelName() throws InsightsCustomException {
-		
-		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		String expectedOutcome = "Invalid data label Name, it should contain only alphanumeric character,underscore & dot";
-		
-		String response = agentServiceImpl.registerAgent(gitTool, 
-							version, osversion, configDetailsWithInvalidDataLabel, trackingDetails, false,false, "Agent");
-		
-		Assert.assertEquals(expectedOutcome, response);
-			
+
+		JSONObject obj = new JSONObject();
+
+		obj.put("toolName", "git");
+		obj.put("agentVersion", "v9.1");
+		obj.put("osversion", osversion);
+		obj.put("configJson", configDetailsWithInvalidDataLabel);
+		obj.put("trackingDetails", trackingDetails);
+		obj.put("vault", false);
+		obj.put("isWebhook", false);
+		obj.put("type", "Agent");
+
+		String jsonobj = obj.toString();
+		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
+
+		String actual = response.get("message").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
+
 	}
-	
-	@Test(priority = 9, expectedExceptions = InsightsCustomException.class) 
+
+	@Test(priority = 9)
 	public void testRegisterAgentWithInvalidHealthLabelName() throws InsightsCustomException {
-		
-		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		String expectedOutcome = "Invalid health label Name, it should contain only alphanumeric character,underscore & dot";
-		
-		String response = agentServiceImpl.registerAgent(gitTool, 
-							version, osversion, 
-							configDetailsWithInvalidHealthLabel, trackingDetails, false, false, "Agent");
-		
-		Assert.assertEquals(expectedOutcome, response);
-			
+
+		JSONObject obj = new JSONObject();
+
+		obj.put("toolName", "git");
+		obj.put("agentVersion", "v9.1");
+		obj.put("osversion", osversion);
+		obj.put("configJson", configDetailsWithInvalidHealthLabel);
+		obj.put("trackingDetails", trackingDetails);
+		obj.put("vault", false);
+		obj.put("isWebhook", false);
+		obj.put("type", "Agent");
+
+		String jsonobj = obj.toString();
+		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
+
+		String actual = response.get("message").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
+
 	}
-	
-	@Test(priority = 10) 
+
+	@Test(priority = 10)
 	public void testRegisterAgentInDatabase() throws InsightsCustomException {
 
-		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
-		
-		List<AgentConfigTO>  registeredAgents = agentServiceImpl.getRegisteredAgentsAndHealth();
-		 /*for (AgentConfigTO agentConfig : registeredAgents) {
-			Assert.assertTrue(agentConfig.getToolName().equals("git"));
-		} */
-        Assert.assertTrue(registeredAgents.size() > 0);
+		JsonObject registeredAgents = insightsAgentConfiguration.getRegisteredAgentsNew();
+		String expectedOutcome = "success";
+		String actual = registeredAgents.get("status").toString().replaceAll("\"", "");
+
+		if (actual.equalsIgnoreCase(expectedOutcome)) {
+			List<JsonObject> versionList = gson.fromJson(registeredAgents.get("data"),
+					new TypeToken<List<JsonObject>>() {
+					}.getType());
+			for (int i = 0; i < versionList.size(); i++) {
+				JsonObject jsonObj = versionList.get(i);
+				String toolName = jsonObj.get("toolName").getAsString();
+				Assert.assertTrue((toolName.equalsIgnoreCase("git")) || (toolName.equalsIgnoreCase("github2"))
+						|| (toolName.equalsIgnoreCase("newrelic")) || (toolName.equalsIgnoreCase("jira")));
+				break;
+			}
+		}
 	}
-	
+
 	@Test(priority = 11)
 	public void testGetRegisteredAgents() throws InsightsCustomException {
-		
-		Assert.assertFalse(agentManagementServiceImpl.getRegisteredAgentsAndHealth().isEmpty());		
+
+		JsonObject response = insightsAgentConfiguration.getRegisteredAgents();
+		List<JsonObject> versionList = gson.fromJson(response.get("data"), new TypeToken<List<JsonObject>>() {
+		}.getType());
+		for (int i = 0; i < versionList.size(); i++) {
+			JsonObject jsonObj = versionList.get(i);
+			String toolName = jsonObj.get("toolName").getAsString();
+			Assert.assertTrue((toolName.equalsIgnoreCase("git")) || (toolName.equalsIgnoreCase("github2"))
+					|| (toolName.equalsIgnoreCase("newrelic")) || (toolName.equalsIgnoreCase("jira")));
+		}
 	}
-	
+
 	@Test(priority = 12)
 	public void testStartStopAgentForStartAction() throws InsightsCustomException {
 
 		String action = "START";
-		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
-		String expectedOutput = "SUCCESS";
-		String response = agentServiceImpl.startStopAgent(agentId, gitTool,osversion, action);
+		String expectedOutput = "success";
+
+		JsonObject response = insightsAgentConfiguration.startStopAgent(agentId, gitTool, osversion, action);
 		Assert.assertNotNull(response);
-		Assert.assertEquals(response, expectedOutput);
+		String actual = response.get("status").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutput);
 	}
-	
+
 	@Test(priority = 13)
 	public void testStartStopAgentForStopAction() throws InsightsCustomException {
 
 		String action = "STOP";
-		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
-		String expectedOutput = "SUCCESS";
-		String response = agentServiceImpl.startStopAgent(agentId, gitTool, osversion, action);
+		String expectedOutput = "success";
+
+		JsonObject response = insightsAgentConfiguration.startStopAgent(agentId, gitTool, osversion, action);
 		Assert.assertNotNull(response);
-		Assert.assertEquals(response, expectedOutput);
+		String actual = response.get("status").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutput);
 	}
-	
+
 	@Test(priority = 14)
 	public void testStartStopAgentForNoAction() throws InsightsCustomException {
 
 		String action = "REGISTER";
 		String osversion = "WINDOWS";
-		String expectedOutput = "SUCCESS";
-		String response = agentManagementServiceImpl.startStopAgent(agentId, gitTool, osversion, action);
+		String expectedOutput = "success";
+
+		JsonObject response = insightsAgentConfiguration.startStopAgent(agentId, gitTool, osversion, action);
 		Assert.assertNotNull(response);
-		Assert.assertEquals(response, expectedOutput);
+		String actual = response.get("status").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutput);
 	}
-	
+
 	@Test(priority = 15)
 	public void testStartStopAgentForLinux() throws InsightsCustomException {
 
 		String action = "REGISTER";
 		String osversion = "LINUX";
-		String expectedOutput = "SUCCESS";
-		String response = agentManagementServiceImpl.startStopAgent(agentId, gitTool,osversion, action);
+		String expectedOutput = "success";
+
+		JsonObject response = insightsAgentConfiguration.startStopAgent(agentId, gitTool, osversion, action);
 		Assert.assertNotNull(response);
-		Assert.assertEquals(response, expectedOutput);
+		String actual = response.get("status").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutput);
 	}
 
-	@Test(priority = 16, expectedExceptions = InsightsCustomException.class)
+	@Test(priority = 16)
 	public void testStartStopAgentForException() throws InsightsCustomException {
 
 		String action = "REGISTER";
 		String osversion = "WINDOWS";
-		String expectedOutput = "SUCCESS";
-		String response = agentManagementServiceImpl.startStopAgent("123456ASC", gitTool, osversion, action);
+		String expectedOutput = "success";
+
+		JsonObject response = insightsAgentConfiguration.startStopAgent(agentId, gitTool, osversion, action);
 		Assert.assertNotNull(response);
-		Assert.assertEquals(response, expectedOutput);
+		String actual = response.get("status").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutput);
 	}
-	
-	@Test (priority = 17)
+
+	@Test(priority = 17)
 	public void getAgentDetails() throws InsightsCustomException {
-		
-		AgentConfig agentConfig = new AgentConfig();
-		AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-		agentConfig = agentConfigDAL.getAgentConfigurations(agentId);
-		AgentConfigTO agentConfigDetails = new AgentConfigTO();
-		agentConfigDetails = agentManagementServiceImpl.getAgentDetails(agentId);
-		Assert.assertNotNull(agentConfigDetails.getAgentId());
-		Assert.assertEquals(agentConfigDetails.getToolCategory(), "SCM");
-		
+
+		JsonObject agentDetailsJson = insightsAgentConfiguration.getAgentDetails(agentId);// agentKey
+		Assert.assertNotNull(agentDetailsJson.getAsJsonObject("data").get("agentKey").getAsString());
+		Assert.assertNotNull(agentDetailsJson.get("data"));
+		Assert.assertEquals(agentDetailsJson.getAsJsonObject("data").get("toolCategory").getAsString(), "SCM");
+		Assert.assertEquals(agentDetailsJson.getAsJsonObject("data").get("agentKey").getAsString(), agentId);
+
 	}
-	
-	@Test (priority = 18)
+
+	@Test(priority = 18)
 	public void getAgentDetailsForException() throws InsightsCustomException {
 
-		AgentConfig agentConfig = new AgentConfig();
-		AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-		AgentConfigTO agentConfigDetails = agentManagementServiceImpl.getAgentDetails(agentId);
+		String expectedOutput = "failure";
+
+		JsonObject agentDetailsJson = insightsAgentConfiguration.getAgentDetails(agentIdNotExist);
+		String actual = agentDetailsJson.get("status").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutput);
 	}
-	
-	@Test(priority = 19)
-	public void testUpdateAgent() throws InsightsCustomException {
-		
-		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
-		AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
-		agentManagementServiceImpl.updateAgent(agentId, configDetails, gitTool, 
-																version, osversion, false,false);
-	}
-	
+
 	@Test(priority = 20)
-	public void testUpdateAgentVersion() throws InsightsCustomException {
-		String expectedOutcome = "SUCCESS";
-		//String version = "v8.0";
+	public void testUpdateAgent() throws InsightsCustomException {
+
+		String expectedOutcome = "success";
 		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
-		AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
-		String response = agentManagementServiceImpl.updateAgent(agentId, configDetails, gitTool, version, osversion, false,false);
-		Assert.assertEquals(expectedOutcome, response);
+
+		JSONObject obj = new JSONObject();
+
+		obj.put("agentId", agentId);
+		obj.put("toolName", "git");
+		obj.put("agentVersion", "v9.1");
+		obj.put("osversion", osversion);
+		obj.put("configJson", configDetailsToUpdateAgent);
+		obj.put("trackingDetails", trackingDetails);
+		obj.put("vault", false);
+		obj.put("isWebhook", false);
+		obj.put("type", "Agent");
+
+		String jsonobj = obj.toString();
+		JsonObject response = insightsAgentConfiguration.updateAgent(jsonobj);
+		String actual = response.get("status").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
 	}
-	
+
 	@Test(priority = 21)
-	public void testUninstallAgent() throws InsightsCustomException{
+	public void testUpdateAgentVersion() throws InsightsCustomException {
+		String expectedOutcome = "success";
 
-		String expectedOutCome = "SUCCESS"; 
-		String response = agentManagementServiceImpl.uninstallAgent(agentId, gitTool, osversion);
-		Assert.assertEquals(expectedOutCome, response);
-		
-	}
-	
-	@Test(priority = 22, expectedExceptions = InsightsCustomException.class)
-	public void testUninstallAgentForException() throws InsightsCustomException{
+		JSONObject obj = new JSONObject();
 
-		String expectedOutCome =  "No entity found for query";
-		String response = agentManagementServiceImpl.uninstallAgent("12345fghj", gitTool, osversion);
-		Assert.assertEquals(expectedOutCome, response);
+		obj.put("agentId", agentId);
+		obj.put("toolName", "git");
+		obj.put("agentVersion", "v9.1");
+		obj.put("osversion", osversion);
+		obj.put("configJson", configDetailsToUpdateAgent);
+		obj.put("trackingDetails", trackingDetails);
+		obj.put("vault", false);
+		obj.put("isWebhook", false);
+		obj.put("type", "Agent");
+
+		String jsonobj = obj.toString();
+		JsonObject response = insightsAgentConfiguration.updateAgent(jsonobj);
+		String actual = response.get("status").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
+
 	}
-	
-	@Test(priority = 23) 
-	public void testRegisterWebhookAgent() throws InsightsCustomException {
-		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
-		String expectedOutcome = "SUCCESS";
-		String configJson = agentServiceImpl.getToolRawConfigFile(version, gitTool,true);
-		String response = agentServiceImpl.registerAgent(gitTool, version, osversion, 
-				webhookConfigDetails, tracking, false,true,"Webhook");
-		
-		Assert.assertEquals(expectedOutcome, response);
-		
-			
+
+	@Test(priority = 22)
+	public void testUninstallAgent() throws InsightsCustomException {
+
+		String expectedOutcome = "success";
+
+		JsonObject response = insightsAgentConfiguration.uninstallAgent(agentId, gitTool, osversion);
+		String actual = response.get("status").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
+
 	}
-	
-	@Test(priority = 24, expectedExceptions = InsightsCustomException.class) 
+
+	@Test(priority = 23)
+	public void testUninstallAgentForException() throws InsightsCustomException {
+
+		String expectedOutcome = "failure";
+
+		JsonObject response = insightsAgentConfiguration.uninstallAgent("12345fghj", gitTool, osversion);
+		String actual = response.get("status").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
+	}
+
+	// webhook testcases
+
+	@Test(priority = 24)
+	public void testGetToolRawConfigFileForOfflineWebhhokRegistration() throws InsightsCustomException {
+
+		JsonObject configJson = insightsAgentConfiguration.getToolRawConfigFile(version, gitTool, true, "Webhook");
+
+		String trimJson = configJson.get("data").getAsString();
+		Gson gson = new Gson();
+		JsonElement jsonElement = gson.fromJson(trimJson.trim(), JsonElement.class);
+		JsonObject json = jsonElement.getAsJsonObject();
+		Assert.assertNotNull(json);
+		Assert.assertEquals(json.get("toolCategory").getAsString(), "SCM");
+	}
+
+	@Test(priority = 25)
+	public void testRegisterWebhook() throws InsightsCustomException, IOException {
+
+		String expectedOutcome = "success";
+
+		JSONObject obj = new JSONObject();
+
+		obj.put("toolName", "git");
+		obj.put("agentVersion", "v9.1");
+		obj.put("osversion", osversion);
+		obj.put("configJson", webhookConfigDetails);
+		obj.put("trackingDetails", trackingDetails);
+		obj.put("vault", false);
+		obj.put("isWebhook", true);
+		obj.put("type", "Webhook");
+
+		String jsonobj = obj.toString();
+		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
+		String actual = response.get("status").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
+
+	}
+
+	@Test(priority = 26)
+	public void testRegisterWebhookWithDuplicateId() throws InsightsCustomException {
+
+		String expectedOutcome = "Agent Id already exsits.";
+
+		JSONObject obj = new JSONObject();
+
+		obj.put("toolName", "git");
+		obj.put("agentVersion", "v9.1");
+		obj.put("osversion", osversion);
+		obj.put("configJson", webhookConfigDetails);
+		obj.put("trackingDetails", trackingDetails);
+		obj.put("vault", false);
+		obj.put("isWebhook", true);
+		obj.put("type", "Webhook");
+
+		String jsonobj = obj.toString();
+		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
+		String actual = response.get("message").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
+
+	}
+
+	@Test(priority = 27)
+	public void testRegisterWebhookWithInvalidDataLabelName() throws InsightsCustomException {
+
+		String expectedOutcome = "Invalid data label Name, it should contain only alphanumeric character,underscore & dot";
+		JSONObject obj = new JSONObject();
+
+		obj.put("toolName", "git");
+		obj.put("agentVersion", "v9.1");
+		obj.put("osversion", osversion);
+		obj.put("configJson", webhookConfigDetailsWithInvalidDataLabel);
+		obj.put("trackingDetails", trackingDetails);
+		obj.put("vault", false);
+		obj.put("isWebhook", true);
+		obj.put("type", "Webhook");
+
+		String jsonobj = obj.toString();
+		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
+		String actual = response.get("message").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
+
+	}
+
+	@Test(priority = 28)
+	public void testRegisterWebhookWithInvalidHealthLabelName() throws InsightsCustomException {
+
+		String expectedOutcome = "Invalid health label Name, it should contain only alphanumeric character,underscore & dot";
+
+		JSONObject obj = new JSONObject();
+
+		obj.put("toolName", "git");
+		obj.put("agentVersion", "v9.1");
+		obj.put("osversion", osversion);
+		obj.put("configJson", webhookConfigDetailsWithInvalidHealthLabel);
+		obj.put("trackingDetails", trackingDetails);
+		obj.put("vault", false);
+		obj.put("isWebhook", true);
+		obj.put("type", "Webhook");
+
+		String jsonobj = obj.toString();
+		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
+		String actual = response.get("message").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
+	}
+
+	@Test(priority = 29)
 	public void testRegisterIncorrectWebhookAgent() throws InsightsCustomException {
-		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
+
+		String expectedOutcome = "failure";
 		String toolname = "neo4jarchival";
-		String configJson = agentServiceImpl.getToolRawConfigFile(version, toolname,true);
-			
+		JsonObject configJson = insightsAgentConfiguration.getToolRawConfigFile(version, toolname, true, "Webhook");
+		String actual = configJson.get("status").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
 	}
-	
-	@Test(priority = 25, expectedExceptions = InsightsCustomException.class) 
+
+	@Test(priority = 30)
 	public void testRegisterWithInvalidAgentId() throws InsightsCustomException {
 		String expectedOutcome = "Agent Id has to be Alpha numeric with '_' as special character";
-		String response = agentManagementServiceImpl.registerAgent(gitTool, version, osversion, 
-				ConfigDetailsWithInvalidAgentId, trackingDetails, false,true,"Agent");
-		
-		Assert.assertEquals(expectedOutcome, response);
-			
+
+		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
+
+		JSONObject obj = new JSONObject();
+
+		obj.put("toolName", gitTool);
+		obj.put("agentVersion", version);
+		obj.put("osversion", osversion);
+		obj.put("configJson", ConfigDetailsWithInvalidAgentId);
+		obj.put("trackingDetails", trackingDetails);
+		obj.put("vault", false);
+		obj.put("isWebhook", false);
+		obj.put("type", "Agent");
+
+		String jsonobj = obj.toString();
+		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
+		String actual = response.get("message").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
+
 	}
-	
-	@Test(priority = 26)
-	public void testUninstallWebhookAgent() throws InsightsCustomException{
-		String expectedOutCome = "SUCCESS"; 
-		String response = agentManagementServiceImpl.uninstallAgent(webhookAgentId, gitTool, osversion);
-		Assert.assertEquals(expectedOutCome, response);
-		
+
+	@Test(priority = 31)
+	public void testUpdateOfflineWebhook() throws InsightsCustomException {
+
+		String expectedOutcome = "success";
+		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
+		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
+
+		JSONObject obj = new JSONObject();
+
+		obj.put("agentId", webhookAgentId);
+		obj.put("toolName", "git");
+		obj.put("agentVersion", "v9.1");
+		obj.put("osversion", osversion);
+		obj.put("configJson", configDetailsToUpdateWebhook);
+		obj.put("trackingDetails", trackingDetails);
+		obj.put("vault", false);
+		obj.put("isWebhook", true);
+		obj.put("type", "Webhook");
+
+		String jsonobj = obj.toString();
+		JsonObject response = insightsAgentConfiguration.updateAgent(jsonobj);
+		String actual = response.get("status").toString().replaceAll("\"", "");
+		Assert.assertEquals(expectedOutcome, actual);
 	}
-	
-	@Test (priority = 27)
-	public void testgetRepoAvailableAgentList() throws InsightsCustomException {
-		
-		Map<String, ArrayList<String>> agentList = agentManagementServiceImpl.getRepoAvailableAgentList();
-		Assert.assertTrue(agentList.size() > 0);
+
+	@Test(priority = 32)
+	public void testUninstallWebhookAgent() throws InsightsCustomException {
+		String expectedOutcome = "success";
+		JsonObject response = insightsAgentConfiguration.uninstallAgent(webhookAgentId, gitTool, osversion);
+		String actual = response.get("status").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
 	}
-	
-	@Test(priority = 28, expectedExceptions = InsightsCustomException.class)
+
+	// ROI TestCases
+	@Test(priority = 33)
+	public void testGetToolRawConfigFileForOfflineROIRegistration() throws InsightsCustomException {
+		try {
+			log.debug("dbconnection  {}", ApplicationConfigProvider.getInstance().getPostgre().getInsightsDBUrl());
+			prepareROIAgentToolData();
+			Thread.sleep(5000);
+
+			JsonObject configJson = insightsAgentConfiguration.getToolRawConfigFile(version, ROITool, false, typeROI);
+			log.debug(configJson);
+			String trimJson = configJson.get("data").getAsString();
+			Gson gson = new Gson();
+			JsonElement jsonElement = gson.fromJson(trimJson.trim(), JsonElement.class);
+			JsonObject json = jsonElement.getAsJsonObject();
+			Assert.assertNotNull(json);
+			Assert.assertEquals(json.get("toolCategory").getAsString(), "ROI");
+		} catch (InterruptedException e) {
+			log.error(e.getMessage());
+		}
+	}
+
+	@Test(priority = 34)
+	public void testRegisterROIAgent() throws InsightsCustomException {
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			log.error(e.getMessage());
+		}
+		String expectedOutcome = "success";
+
+		JSONObject obj = new JSONObject();
+
+		obj.put("toolName", ROITool);
+		obj.put("agentVersion", "v9.1");
+		obj.put("osversion", osversion);
+		obj.put("configJson", configDetailsForROIAgent);
+		obj.put("trackingDetails", trackingDetails);
+		obj.put("vault", false);
+		obj.put("isWebhook", false);
+		obj.put("type", "ROIAgent");
+
+		String jsonobj = obj.toString();
+		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
+		String actual = response.get("status").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
+	}
+
+	@Test(priority = 35)
+	public void testRegisterROIAgentWithDuplicateID() throws InsightsCustomException {
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			log.error(e.getMessage());
+		}
+		String expectedOutcome = "Agent Id already exsits.";
+
+		JSONObject obj = new JSONObject();
+
+		obj.put("toolName", ROITool);
+		obj.put("agentVersion", "v9.1");
+		obj.put("osversion", osversion);
+		obj.put("configJson", configDetailsForROIAgent);
+		obj.put("trackingDetails", trackingDetails);
+		obj.put("vault", false);
+		obj.put("isWebhook", false);
+		obj.put("type", "ROIAgent");
+
+		String jsonobj = obj.toString();
+		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
+		String actual = response.get("message").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
+
+	}
+
+	@Test(priority = 36)
+	public void testRegisterROIAgentWithInvalidDataLabel() throws InsightsCustomException {
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			log.error(e.getMessage());
+		}
+		String expectedOutcome = "Invalid data label Name, it should contain only alphanumeric character,underscore & dot";
+
+		JSONObject obj = new JSONObject();
+
+		obj.put("toolName", ROITool);
+		obj.put("agentVersion", "v9.1");
+		obj.put("osversion", osversion);
+		obj.put("configJson", configDetailsForROIAgentWithInvalidDataLabel);
+		obj.put("trackingDetails", trackingDetails);
+		obj.put("vault", false);
+		obj.put("isWebhook", false);
+		obj.put("type", "ROIAgent");
+
+		String jsonobj = obj.toString();
+		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
+		String actual = response.get("message").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
+
+	}
+
+	@Test(priority = 37)
+	public void testRegisterROIAgentWithInvalidHealthLabel() throws InsightsCustomException {
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			log.error(e.getMessage());
+		}
+		String expectedOutcome = "Invalid health label Name, it should contain only alphanumeric character,underscore & dot";
+
+		JSONObject obj = new JSONObject();
+
+		obj.put("toolName", ROITool);
+		obj.put("agentVersion", "v9.1");
+		obj.put("osversion", osversion);
+		obj.put("configJson", configDetailsForROIAgentWithInvalidHealthLabel);
+		obj.put("trackingDetails", trackingDetails);
+		obj.put("vault", false);
+		obj.put("isWebhook", false);
+		obj.put("type", "ROIAgent");
+
+		String jsonobj = obj.toString();
+		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
+		String actual = response.get("message").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
+	}
+
+	@Test(priority = 38)
+	public void testUninstallROIAgent() throws InsightsCustomException {
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			log.error(e.getMessage());
+		}
+		String expectedOutcome = "success";
+
+		JsonObject response = insightsAgentConfiguration.uninstallAgent(ROIAgentId, ROITool, osversion);
+		String actual = response.get("status").toString().replaceAll("\"", "");
+		Assert.assertEquals(expectedOutcome, actual);
+	}
+
+	@Test(priority = 39)
 	public void testUpdateAgentWithEmptyAgentId() throws InsightsCustomException {
-		
+		String expectedOutcome = "failure";
 		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
-		AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
-		agentManagementServiceImpl.updateAgent("", configDetails, gitTool, version, osversion, false,false);
+
+		JSONObject obj = new JSONObject();
+
+		obj.put("agentId", "");
+		obj.put("toolName", "git");
+		obj.put("agentVersion", "v9.1");
+		obj.put("osversion", osversion);
+		obj.put("configJson", configDetailsToUpdateAgent);
+		obj.put("trackingDetails", trackingDetails);
+		obj.put("vault", false);
+		obj.put("isWebhook", false);
+		obj.put("type", "Agent");
+
+		String jsonobj = obj.toString();
+		JsonObject response = insightsAgentConfiguration.updateAgent(jsonobj);
+		String actual = response.get("status").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
 	}
-	
-	
-	@Test(priority = 29)
+
+	@Test(priority = 40)
 	public void testGetAvailableAgentTags() throws InsightsCustomException {
-		
-		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
-		try {
-			Map<String, String> availableAgentTags = agentServiceImpl.getAvailableAgentTags();
-			log.debug(availableAgentTags);
-			Assert.assertNotNull(availableAgentTags);
-			Assert.assertTrue(availableAgentTags.size() > 0);
-			Assert.assertTrue(availableAgentTags.containsValue("v9.1"));
-			Assert.assertTrue(availableAgentTags.containsValue("v9.2"));
-			
-		} catch (InsightsCustomException e) {
-			log.error("Unable to fetch agents tags");
-		}
-	
+		String expectedOutcome = "success";
+		JsonObject response = insightsAgentConfiguration.getAvailableAgentTags();
+
+		String dataJson = response.getAsJsonObject("data").toString();
+		String actual = response.get("status").toString().replaceAll("\"", "");
+
+		Assert.assertEquals(actual, expectedOutcome);
+		Assert.assertTrue(dataJson.contains(version));
+		Assert.assertTrue(dataJson.contains("9.2"));
 	}
-	
-	@Test(priority = 30)
+
+	@Test(priority = 41)
 	public void testDownloadAgentPackage() throws InsightsCustomException {
-		
-		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
-		
-		String version = "v9.1";
-		String dirPath = ApplicationConfigProvider.getInstance().getAgentDetails().getOfflineAgentPath() + File.separator + version;
+		String folderPath;
+		String agentVersion = "v9.6";
 		try {
-			FileUtils.deleteDirectory(new File(dirPath));
-			ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
-			String response = agentServiceImpl.downloadAgentPackageFromGithub(version);
-			log.debug(response);
-			File targetDirPath = new File(dirPath);
-			 Assert.assertTrue(targetDirPath.exists());
-		} catch (InsightsCustomException | IOException e) {
-			log.error("Unable to download agent package");
+			folderPath = new File(ApplicationConfigProvider.getInstance().getAgentDetails().getOfflineAgentPath()
+					+ File.separator + agentVersion).getCanonicalPath();
+			File offlineAgentFolder = new File(folderPath);
+			if (offlineAgentFolder.exists()) {
+				FileUtils.deleteDirectory(offlineAgentFolder);
+			}
+		} catch (IOException e) {
+			log.error(e.getMessage());
 		}
-	
+
+		String expectedOutcome = "success";
+		String expectedOutcomeMessage = "Downloaded agents package - " + agentVersion;
+
+		JsonObject response = insightsAgentConfiguration.downloadAgentPackage(agentVersion);
+
+		String actual = response.get("status").toString().replaceAll("\"", "");
+		String actualMessage = response.get("data").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
+		Assert.assertEquals(actualMessage, expectedOutcomeMessage);
 	}
-	
-	@Test(priority = 31, expectedExceptions = InsightsCustomException.class)
+
+	@Test(priority = 42)
 	public void testDownloadAgentPackageException() throws InsightsCustomException {
-		
-		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
-		String version = "v9.1";
-		String dirPath = ApplicationConfigProvider.getInstance().getAgentDetails().getOfflineAgentPath() + File.separator + version;
-		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
-		String response = agentServiceImpl.downloadAgentPackageFromGithub(version);
-		String expectedReponse = version + " - Package already exist!";
-		Assert.assertTrue(response.equalsIgnoreCase(expectedReponse));
+		String agentVersion = "v9.6";
+		String expectedOutcome = "failure";
+		String expectedOutcomeMessage = agentVersion + " - Package already exist!";
+		JsonObject response = insightsAgentConfiguration.downloadAgentPackage(agentVersion);
+
+		String actual = response.get("status").toString().replaceAll("\"", "");
+		String actualMessage = response.get("message").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
+		Assert.assertEquals(actualMessage, expectedOutcomeMessage);
 	}
-	
+
+	@Test(priority = 43)
+	public void testGetToolRawConfigFileForOfflineAgentRegistrationWithTrackingDetails()
+			throws InsightsCustomException {
+		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
+
+		JsonObject configJson = insightsAgentConfiguration.getToolRawConfigFile(version, gitTool, false, typeAgent);
+
+		String trimJson = configJson.get("data").getAsString();
+		Gson gson = new Gson();
+		JsonElement jsonElement = gson.fromJson(trimJson.trim(), JsonElement.class);
+		JsonObject json = jsonElement.getAsJsonObject();
+		Assert.assertNotNull(json);
+		Assert.assertEquals(json.get("toolCategory").getAsString(), "SCM");
+	}
+
+	@Test(priority = 44)
+	public void testRegisterAgentWithTrackingDetails() throws InsightsCustomException {
+		String expectedOutcome = "success";
+		String oldVersion = "v9.1";
+
+		JSONObject obj = new JSONObject();
+
+		obj.put("toolName", gitTool);
+		obj.put("agentVersion", oldVersion);
+		obj.put("osversion", osversion);
+		obj.put("configJson", configDetailsForTracking);
+		obj.put("trackingDetails", tracking);
+		obj.put("vault", false);
+		obj.put("isWebhook", false);
+		obj.put("type", "Agent");
+
+		String jsonobj = obj.toString();
+		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
+
+		String actual = response.get("status").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
+	}
+
+	@Test(priority = 45)
+	public void testUninstallAgentWithTrackingDetails() throws InsightsCustomException {
+		String expectedOutcome = "success";
+
+		JsonObject response = insightsAgentConfiguration.uninstallAgent(agentIdTrackingDetails, gitTool, osversion);
+		String actual = response.get("status").toString().replaceAll("\"", "");
+		Assert.assertEquals(actual, expectedOutcome);
+	}
+
 	@AfterClass
 	public void cleanUp() throws InsightsCustomException, IOException {
-		//FileUtils.deleteDirectory(new File(ApplicationConfigProvider.getInstance().getAgentDetails().getOfflineAgentPath()));
+
 	}
-	
+
 }

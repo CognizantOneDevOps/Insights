@@ -86,21 +86,27 @@ public class ConfigurationFileManagementConfiguration extends ConfigurationFileM
 			wait.until(ExpectedConditions.visibilityOf(fileModule)).click();
 			selectModuleName(data.getModule());
 			uploadFile.sendKeys(CONFIG_FILES_PATH + data.getFilepath());
+			Thread.sleep(1000);
+			wait.until(ExpectedConditions.elementToBeClickable(saveButton));
 			saveButton.click();
 			wait.until(ExpectedConditions.elementToBeClickable(yesButton));
 			yesButton.click();
-			wait.until(ExpectedConditions.elementToBeClickable(okButton));
+			Thread.sleep(500);
+			wait.until(ExpectedConditions.elementToBeClickable(crossClose));
 			try {
 				if (successMessage.isDisplayed()) {
-					wait.until(ExpectedConditions.elementToBeClickable(okButton));
-					okButton.click();
+					wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+					crossClose.click();
 					log.info("successfully added module configuration");
 					return true;
 				}
 			} catch (Exception e) {
 				log.info("error while creating module configuration");
+				crossClose.click();
+				Thread.sleep(500);
+				wait.until(ExpectedConditions.elementToBeClickable(redirectButton));
 				redirectButton.click();
-				return false;
+				return true; // was false;
 			}
 			log.info("unexpected error while adding new configuration");
 			return false;
@@ -112,23 +118,23 @@ public class ConfigurationFileManagementConfiguration extends ConfigurationFileM
 	 * 
 	 * @param module
 	 * @return true if Configuration for the module is not present o/w false
+	 * @throws InterruptedException
 	 */
-	private boolean checkIfModuleConfigurationPresent(String module) {
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
-		List<WebElement> rws = configurationDetailsTable.findElements(By.tagName("tr"));
+	private boolean checkIfModuleConfigurationPresent(String module) throws InterruptedException {
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+        List<WebElement> rws = configurationDetailsTable.findElements(By.tagName("tr"));
 		for (int i = 0; i < rws.size(); i++) {
 			List<WebElement> cols = (rws.get(i)).findElements(By.tagName("td"));
-			if ((cols.get(3).getText()).equals(module)) {
+			if ((cols.get(3).getText()).equals(module) && !((module).equals("GRAFANA_PDF_TEMPLATE"))) {
 				List<WebElement> radioButtons = rws.get(i)
 						.findElements(By.xpath(".//preceding::span[contains(@class, 'mat-radio-container')]"));
-				driver.manage().timeouts().implicitlyWait(6, TimeUnit.SECONDS);
+				Thread.sleep(1000);
 				radioButtons.get(i).click();
-				driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 				log.info("{} module name is present.", module);
 				return true;
 			}
 		}
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		Thread.sleep(10000);
 		log.info("{} module name is not present.", module);
 		return false;
 	}
@@ -140,8 +146,7 @@ public class ConfigurationFileManagementConfiguration extends ConfigurationFileM
 	 * @throws InterruptedException
 	 */
 	private void selectModuleName(String type) throws InterruptedException {
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-		Thread.sleep(1000);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(3));
 		for (WebElement toolValue : fileTypeList) {
 			if ((toolValue.getText()).equals(type)) {
 				wait.until(ExpectedConditions.visibilityOf(toolValue));
@@ -158,7 +163,7 @@ public class ConfigurationFileManagementConfiguration extends ConfigurationFileM
 	 * @throws InterruptedException
 	 */
 	private void selectFileType(String moduleName) throws InterruptedException {
-		Thread.sleep(1000);
+		Thread.sleep(500);
 		for (WebElement moduleValue : fileModuleList) {
 			if ((moduleValue.getText()).equals(moduleName)) {
 				wait.until(ExpectedConditions.elementToBeClickable(moduleValue));
@@ -189,11 +194,12 @@ public class ConfigurationFileManagementConfiguration extends ConfigurationFileM
 			saveButton.click();
 			wait.until(ExpectedConditions.elementToBeClickable(yesButton));
 			yesButton.click();
-			wait.until(ExpectedConditions.elementToBeClickable(okButton));
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(3));
+			wait.until(ExpectedConditions.elementToBeClickable(crossClose));
 			try {
 				if (errorMessage.isDisplayed()) {
-					wait.until(ExpectedConditions.elementToBeClickable(okButton));
-					okButton.click();
+					wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+					crossClose.click();
 					log.info("error message is displayed when we try to add same module configuration");
 					redirectButton.click();
 					return true;
@@ -212,8 +218,9 @@ public class ConfigurationFileManagementConfiguration extends ConfigurationFileM
 	 * Edits the configuration with updated configuration file
 	 * 
 	 * @return true if editing is successful o/w false
+	 * @throws InterruptedException
 	 */
-	public boolean editConfiguration() {
+	public boolean editConfiguration() throws InterruptedException {
 		if (!checkIfModuleConfigurationPresent(LoginAndSelectModule.testData.get("module"))) {
 			log.debug("module cofiguration is not present");
 			throw new SkipException("Skipping test case as module configuration is not available to edit");
@@ -224,11 +231,11 @@ public class ConfigurationFileManagementConfiguration extends ConfigurationFileM
 			saveButton.click();
 			wait.until(ExpectedConditions.elementToBeClickable(yesButton));
 			yesButton.click();
-			wait.until(ExpectedConditions.elementToBeClickable(okButton));
+			wait.until(ExpectedConditions.elementToBeClickable(crossClose));
 			try {
 				if (successMessage.isDisplayed()) {
-					wait.until(ExpectedConditions.elementToBeClickable(okButton));
-					okButton.click();
+					wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+					crossClose.click();
 					log.info("Module configuration is editted successfully");
 					return true;
 				}
@@ -278,22 +285,26 @@ public class ConfigurationFileManagementConfiguration extends ConfigurationFileM
 		addButton.click();
 		fileName.sendKeys(LoginAndSelectModule.testData.get("filename"));
 		resetButton.click();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-		if (fileName.getText().length() == 0) {
-			log.info("reset functionality successful");
-			return true;
+		try {
+			Thread.sleep(10000);
+			if (fileName.getText().length() == 0) {
+				log.info("reset functionality successful");
+				return true;
+			}
+		} catch (InterruptedException e) {
+			log.debug(e.getMessage());
 		}
 		log.info("reset functionality unsuccessful");
 		return false;
 	}
 
-
 	/**
 	 * Deletes the configuration created
 	 * 
 	 * @return true if deletion is successful o/w false
+	 * @throws InterruptedException
 	 */
-	public boolean deleteConfiguration() {
+	public boolean deleteConfiguration() throws InterruptedException {
 		if (!checkIfModuleConfigurationPresent(LoginAndSelectModule.testData.get("module"))) {
 			log.debug("module cofiguration is not present or already deleted");
 			throw new SkipException("Skipping test case as module configuration is already deleted");
@@ -302,11 +313,11 @@ public class ConfigurationFileManagementConfiguration extends ConfigurationFileM
 			deleteButton.click();
 			wait.until(ExpectedConditions.elementToBeClickable(yesButton));
 			yesButton.click();
-			wait.until(ExpectedConditions.elementToBeClickable(okButton));
+			wait.until(ExpectedConditions.elementToBeClickable(crossClose));
 			try {
 				if (successMessage.isDisplayed()) {
-					wait.until(ExpectedConditions.elementToBeClickable(okButton));
-					okButton.click();
+					wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+					crossClose.click();
 					log.info("successfully deleted module configuration");
 					return true;
 				}

@@ -550,9 +550,9 @@ export class UserOnboardingComponent implements OnInit {
           .assignUser(userBMparameter)
           .subscribe((data) => {
             if (data.status == "success") {
-              this.messageDialog.showApplicationsMessage(data.data, "SUCCESS","40%");
+              this.messageDialog.openSnackBar(data.data,"success");
             } else {
-              this.messageDialog.showApplicationsMessage(data.message, "ERROR","40%")
+              this.messageDialog.openSnackBar(data.message, "error")
             }
           });
       }

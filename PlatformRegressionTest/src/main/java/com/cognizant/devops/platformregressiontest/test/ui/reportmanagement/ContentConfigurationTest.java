@@ -17,20 +17,23 @@ package com.cognizant.devops.platformregressiontest.test.ui.reportmanagement;
 
 import java.util.concurrent.TimeUnit;
 
+import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectModule;
+import com.cognizant.devops.platformregressiontest.test.ui.testdata.ReportConfigurationDataProvider;
 import com.cognizant.devops.platformregressiontest.test.ui.testdata.ReportManagementDataProvider;
+import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.ReportConfigurationDataModel;
 
 public class ContentConfigurationTest extends LoginAndSelectModule {
 
 	ContentConfigurationPage contentConfigurationPage;
 
 	@BeforeTest
-	public void setUp() {
+	public void setUp(){
 		initialization();
 		selectMenuOption("Content Configuration");
 		contentConfigurationPage = new ContentConfigurationPage();
@@ -38,7 +41,7 @@ public class ContentConfigurationTest extends LoginAndSelectModule {
 
 	@BeforeMethod
 	public void beforeEachTestCase() {
-		driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -55,22 +58,19 @@ public class ContentConfigurationTest extends LoginAndSelectModule {
 	 * @param action
 	 * @param message
 	 * @param isActive
+	 * @throws InterruptedException 
 	 */
-	@Test(priority = 1, dataProvider = "createContentdataprovider", dataProviderClass = ReportManagementDataProvider.class, enabled = true)
-	public void saveContent(String contentId, String contentName, String expectedTrend, String directionOfThreshold,
-			String kpiId, String noOfResult, String threshold, String resultField, String action, String message,
-			String isActive) {
+	@Test(priority = 1, dataProvider = "saveContent", dataProviderClass = ReportConfigurationDataProvider.class, enabled = true)
+	public void saveContent(ReportConfigurationDataModel data) throws InterruptedException {
 
-		Assert.assertEquals(contentId,
-				contentConfigurationPage.saveContent(contentId, expectedTrend, directionOfThreshold, contentName,
-						action, kpiId, noOfResult, threshold, resultField, message, isActive));
+		Assert.assertTrue(contentConfigurationPage.saveContent(data));
 
 	}
 
 	@Test(priority = 2, dataProvider = "createContentvalidatedataprovider", dataProviderClass = ReportManagementDataProvider.class, enabled = true)
 	public void saveValaidateContent(String contentId, String contentName, String expectedTrend,
 			String directionOfThreshold, String kpiId, String noOfResult, String threshold, String resultField,
-			String action, String message, String isActive, String category) {
+			String action, String message, String isActive, String category) throws InterruptedException {
 
 		Assert.assertEquals(
 				contentConfigurationPage.saveValidateContent(contentId, expectedTrend, directionOfThreshold,
@@ -84,9 +84,10 @@ public class ContentConfigurationTest extends LoginAndSelectModule {
 	 * 
 	 * @param contentId
 	 * @param expectedTrend
+	 * @throws InterruptedException 
 	 */
 	@Test(priority = 3, dataProvider = "editContentdataprovider", dataProviderClass = ReportManagementDataProvider.class, enabled = true)
-	public void editContent(String contentId, String expectedTrend) {
+	public void editContent(String contentId, String expectedTrend) throws InterruptedException {
 
 		Assert.assertEquals(contentConfigurationPage.editContent(contentId, expectedTrend), true);
 
@@ -96,15 +97,16 @@ public class ContentConfigurationTest extends LoginAndSelectModule {
 	 * This method take json file and tests the bulkupload functionality
 	 * 
 	 * @param fileName
+	 * @throws InterruptedException 
 	 */
 	@Test(priority = 4, dataProvider = "uploadJsonContentdataprovider", dataProviderClass = ReportManagementDataProvider.class, enabled = true)
-	public void uploadJsonTest(String validateFile, String invalidFile) {
+	public void uploadJsonTest(String validateFile, String invalidFile) throws InterruptedException {
 
 		Assert.assertEquals(contentConfigurationPage.uploadJson(validateFile), true);
 	}
 
 	@Test(priority = 5, dataProvider = "uploadJsonContentdataprovider", dataProviderClass = ReportManagementDataProvider.class, enabled = true)
-	public void validateUploadJsonTest(String validateFile, String invalidFile) {
+	public void validateUploadJsonTest(String validateFile, String invalidFile) throws InterruptedException {
 
 		Assert.assertEquals(contentConfigurationPage.validateUploadJson(invalidFile), true);
 	}
@@ -113,9 +115,10 @@ public class ContentConfigurationTest extends LoginAndSelectModule {
 	 * This method tests content search functionality
 	 * 
 	 * @param contentId
+	 * @throws InterruptedException 
 	 */
 	@Test(priority = 6, dataProvider = "searchContentdataprovider", dataProviderClass = ReportManagementDataProvider.class, enabled = true)
-	public void searchContent(String contentId) {
+	public void searchContent(String contentId) throws InterruptedException {
 		Assert.assertEquals(contentConfigurationPage.searchContent(contentId), true);
 
 	}
@@ -130,9 +133,11 @@ public class ContentConfigurationTest extends LoginAndSelectModule {
 	 * This method tests content delete functionality
 	 * 
 	 * @param contentId
+	 * @throws InterruptedException 
+	 *  
 	 */
 	@Test(priority = 8, dataProvider = "deleteContentdataprovider", dataProviderClass = ReportManagementDataProvider.class, enabled = true)
-	public void deleteContent(String contentId) {
+	public void deleteContent(String contentId) throws InterruptedException {
 
 		Assert.assertEquals(contentConfigurationPage.deleteContent(contentId), true);
 

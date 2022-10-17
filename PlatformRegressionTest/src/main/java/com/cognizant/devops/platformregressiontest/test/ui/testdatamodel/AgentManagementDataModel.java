@@ -37,7 +37,12 @@ public class AgentManagementDataModel {
 	private String unzipPath;
 	private String agentExchange;
 	private String agentPkgQueue;
-	
+	private String webhookType;
+	private String webhookToolInvalid;
+	private String roiType;
+	private String roiToolInvalid;
+
+
 	public String getOsName() {
 		return osName;
 	}
@@ -158,5 +163,30 @@ public class AgentManagementDataModel {
 	public void setAgentPkgQueue(String agentPkgQueue) {
 		this.agentPkgQueue = agentPkgQueue;
 	}	
+	public String getWebhookType() {
+		return webhookType;
+	}
+	public void setWebhookType(String webhookType) {
+		this.webhookType = webhookType;
+	}	
+	public String getwebhookToolInvalid() {
+		return webhookToolInvalid;
+	}
+	public void setwebhookToolInvalid(String webhookToolInvalid) {
+		this.webhookToolInvalid = webhookToolInvalid;
+	}	
+	public String getRoiType() {
+		return roiType;
+	}
+	public void setRoiType(String roiType) {
+		this.roiType = roiType;
+	}	
+	public String getRoiToolInvalid() {
+		return roiToolInvalid;
+	}
+	public void setRoiToolInvalid(String roiToolInvalid) {
+		this.roiToolInvalid = roiToolInvalid;
+	}	
+
 
 }

@@ -374,6 +374,11 @@ export class ServerConfigurationComponent implements OnInit {
         "Please fill SingleSignOnConfig tokenSigningKey details. ",
         "error"
       );
+    } else if (configDetails.applicationLogLevel.length == 0) {
+      this.messageDialog.openSnackBar(
+        "Please fill Application Log Level details. ",
+        "error"
+      );
     } else {
       return true;
     }

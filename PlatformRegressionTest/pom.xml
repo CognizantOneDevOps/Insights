@@ -12,18 +12,18 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>9.6</version>
+		<version>9.7</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformRegressionTest</artifactId>
 	<packaging>jar</packaging>
-	<version>9.6</version>
+	<version>9.7</version>
 	<name>PlatformRegressionTest</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<testng.version>7.1.0</testng.version>
+		<testng.version>7.6.1</testng.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -38,13 +38,13 @@
 				<exclusion>
 					<groupId>com.google.guava</groupId>
 					<artifactId>guava</artifactId>
-				</exclusion>
+				</exclusion>				
 			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>9.6</version>
+			<version>9.7</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/io.rest-assured/rest-assured -->
 		<dependency>
@@ -84,6 +84,11 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+       <dependency>
+           <groupId>com.google.guava</groupId>
+           <artifactId>guava</artifactId>
+           	<version>31.1-jre</version>
+		</dependency>		
 		<dependency>
 			<groupId>com.relevantcodes</groupId>
 			<artifactId>extentreports</artifactId>
@@ -107,7 +112,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>9.6</version>
+			<version>9.7</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -271,8 +276,8 @@
 				<version>3.3</version>
 				<inherited>true</inherited>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>11</source>
+					<target>11</target>
 				</configuration>
 			</plugin>
 		</plugins>

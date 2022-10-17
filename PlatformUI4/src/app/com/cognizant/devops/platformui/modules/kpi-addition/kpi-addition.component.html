@@ -33,7 +33,7 @@
         (click)="redirectToLandingPage()"
         style="vertical-align: super"
       >
-        <mat-icon svgIcon="backButton" matTooltip="Back"> </mat-icon>
+        <mat-icon svgIcon="backButton" matTooltip="Back" id="backButton"> </mat-icon>
       </button>
     </span>
 
@@ -47,6 +47,7 @@
           svgIcon="save"
           class="mat-icon material-icons"
           style="color: #2d67ff"
+          id="Save KPI"
         >
         </mat-icon>
       </button>
@@ -215,6 +216,7 @@
             [disabled]="isForecast"
             [ngClass]="{ 'input-disabled': isForecast }"
             placeholder="Enter a Result Field"
+            id="resultField"
           />
         </mat-form-field>
       </div>

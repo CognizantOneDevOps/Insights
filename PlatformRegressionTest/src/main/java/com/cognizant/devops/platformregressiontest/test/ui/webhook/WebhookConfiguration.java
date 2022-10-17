@@ -64,7 +64,7 @@ public class WebhookConfiguration extends WebhookObjectRepository {
 			throw new SkipException("Skipping test case as webhook already exists");
 		} else {
 			addWebhook.click();
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+			Thread.sleep(1000);
 			webhookName.sendKeys(LoginAndSelectModule.testData.get("WebHookname"));
 			selectTool(LoginAndSelectModule.testData.get("ToolName"));
 			selectDataFormat(LoginAndSelectModule.testData.get("DataFromat"));
@@ -77,12 +77,11 @@ public class WebhookConfiguration extends WebhookObjectRepository {
 			saveButton.click();
 			wait.until(ExpectedConditions.elementToBeClickable(yesButton));
 			yesButton.click();
-			wait.until(ExpectedConditions.elementToBeClickable(okButton));
-			driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+			wait.until(ExpectedConditions.elementToBeClickable(crossClose));
 			try {
 				if (successMessage.isDisplayed()) {
-					wait.until(ExpectedConditions.elementToBeClickable(okButton));
-					okButton.click();
+					wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+					crossClose.click();
 					log.info("Add new webhook successful");
 					isTrue = true;
 				}
@@ -98,11 +97,12 @@ public class WebhookConfiguration extends WebhookObjectRepository {
 	 * Selects tool from list of tools available
 	 * 
 	 * @param toolName
+	 * @throws InterruptedException 
 	 */
-	public void selectTool(String toolName) {
+	public void selectTool(String toolName) throws InterruptedException {
 		wait.until(ExpectedConditions.elementToBeClickable(selectTool));
 		selectTool.click();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		Thread.sleep(1000);
 		for (WebElement toolValue : toolNameList) {
 			if ((toolValue.getText()).equals(toolName)) {
 				wait.until(ExpectedConditions.elementToBeClickable(toolValue));
@@ -137,19 +137,19 @@ public class WebhookConfiguration extends WebhookObjectRepository {
 	 * @param userName
 	 * @return true if Webhook present in list of Webhook in database list else
 	 *         false
+	 * @throws InterruptedException 
 	 */
-	public boolean verifyWebhookPresent(String userName) {
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+	public boolean verifyWebhookPresent(String userName) throws InterruptedException {
 		List<WebElement> rws = webhookDetailsTable.findElements(By.tagName("tr"));
 		for (int i = 0; i < rws.size(); i++) {
 			List<WebElement> cols = (rws.get(i)).findElements(By.tagName("td"));
 			if ((cols.get(1).getText()).equals(userName)) {
-				driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+				Thread.sleep(1000);
 				log.info("{} user name is present.", userName);
 				return true;
 			}
 		}
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		Thread.sleep(1000);
 		log.info("{} user name is not present.", userName);
 		return false;
 	}
@@ -168,7 +168,7 @@ public class WebhookConfiguration extends WebhookObjectRepository {
 			throw new SkipException("Skipping test case as webhook doesnot exists");
 		} else {
 			addWebhook.click();
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+			Thread.sleep(1000);
 			webhookName.sendKeys(LoginAndSelectModule.testData.get("WebHookname"));
 			selectTool(LoginAndSelectModule.testData.get("ToolName"));
 			selectDataFormat(LoginAndSelectModule.testData.get("DataFromat"));
@@ -181,12 +181,12 @@ public class WebhookConfiguration extends WebhookObjectRepository {
 			saveButton.click();
 			wait.until(ExpectedConditions.elementToBeClickable(yesButton));
 			yesButton.click();
-			wait.until(ExpectedConditions.elementToBeClickable(okButton));
-			driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+			wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+			Thread.sleep(500);
 			try {
 				if (errorMessage.isDisplayed()) {
-					wait.until(ExpectedConditions.elementToBeClickable(okButton));
-					okButton.click();
+					wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+					crossClose.click();
 					log.info("successfully added webhook");
 					isTrue = true;
 					wait.until(ExpectedConditions.elementToBeClickable(redirectButton));
@@ -210,7 +210,7 @@ public class WebhookConfiguration extends WebhookObjectRepository {
 	@SuppressWarnings("all")
 	public boolean errorCheck() throws InterruptedException {
 		addWebhook.click();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		Thread.sleep(1000);
 		webhookName.sendKeys(LoginAndSelectModule.testData.get("WebHookname1"));
 		selectTool(LoginAndSelectModule.testData.get("ToolName"));
 		labelName.clear();
@@ -226,12 +226,12 @@ public class WebhookConfiguration extends WebhookObjectRepository {
 		labelName.sendKeys(LoginAndSelectModule.testData.get("CorrectLabelName"));
 		wait.until(ExpectedConditions.elementToBeClickable(saveButton));
 		saveButton.click();
-		isErrorDisplayed();
+		isIncorrectDisplayed();
 		dynamicTemplate.clear();
 		responseTemplate.sendKeys(LoginAndSelectModule.testData.get("incorrectResponse"));
 		wait.until(ExpectedConditions.elementToBeClickable(saveButton));
 		saveButton.click();
-		boolean result = isErrorDisplayed();
+		boolean result = isIncorrectDisplayed();
 		wait.until(ExpectedConditions.elementToBeClickable(redirectButton));
 		redirectButton.click();
 		if (result) {
@@ -249,29 +249,51 @@ public class WebhookConfiguration extends WebhookObjectRepository {
 	 * Checks whether error pop-up is displayed
 	 * 
 	 * @return true if error pop-up is displayed else false
+	 * @throws InterruptedException 
 	 */
-	public boolean isErrorDisplayed() {
+	public boolean isErrorDisplayed() throws InterruptedException {
 		boolean isDisp = true;
-		wait.until(ExpectedConditions.elementToBeClickable(okButton));
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+		wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+		Thread.sleep(500);
 		try {
-			if (errorMessage.isDisplayed()) {
-				wait.until(ExpectedConditions.elementToBeClickable(okButton));
-				okButton.click();
+			if (invalidMessage.isDisplayed()) {
+				wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+				crossClose.click();
 				log.info("error while creating webhook");
 				isDisp = true;
 			}
 		} catch (Exception e) {
 			wait.until(ExpectedConditions.elementToBeClickable(yesButton));
 			yesButton.click();
-			wait.until(ExpectedConditions.elementToBeClickable(okButton));
-			okButton.click();
+			wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+			crossClose.click();
 			log.info("no error while creating webhook");
 			isDisp = false;
 		}
 		return isDisp;
 	}
-
+	
+	public boolean isIncorrectDisplayed() throws InterruptedException {
+		boolean isDisp = true;
+		wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+		Thread.sleep(500);
+		try {
+			if (incorrectMessage.isDisplayed()) {
+				wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+				crossClose.click();
+				log.info("error while creating webhook");
+				isDisp = true;
+			}
+		} catch (Exception e) {
+			wait.until(ExpectedConditions.elementToBeClickable(yesButton));
+			yesButton.click();
+			wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+			crossClose.click();
+			log.info("no error while creating webhook");
+			isDisp = false;
+		}
+		return isDisp;
+	}
 	/**
 	 * Edits the webhook with node updation
 	 * 
@@ -281,7 +303,6 @@ public class WebhookConfiguration extends WebhookObjectRepository {
 	public boolean updateWebhook() throws InterruptedException {
 		Thread.sleep(1000);
 		boolean editDone = false;
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		for (int i = 0; i < webhooknameList.size(); i++) {
 			if (webhooknameList.get(i).getText().equals(LoginAndSelectModule.testData.get("WebHookname"))) {
 				List<WebElement> radioButtons = webhooknameList.get(i)
@@ -290,23 +311,23 @@ public class WebhookConfiguration extends WebhookObjectRepository {
 				wait.until(ExpectedConditions.elementToBeClickable(editButton));
 				editButton.click();
 				log.info("Edit button clicked successfully");
-				driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+				Thread.sleep(1000);
 				nodeUpdation();
 				wait.until(ExpectedConditions.elementToBeClickable(saveButton));
 				saveButton.click();
 				wait.until(ExpectedConditions.elementToBeClickable(yesButton));
 				yesButton.click();
-				wait.until(ExpectedConditions.elementToBeClickable(okButton));
-				driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+				wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+				Thread.sleep(500);
 				try {
-					wait.until(ExpectedConditions.visibilityOf(successMessage));
-					if (successMessage.isDisplayed()) {
-						okButton.click();
+					wait.until(ExpectedConditions.visibilityOf(editSuccessMessage));
+					if (editSuccessMessage.isDisplayed()) {
+						crossClose.click();
 						log.info("updation successful");
 						editDone = true;
 					}
 				} catch (Exception e) {
-					okButton.click();
+					crossClose.click();
 					log.info("updation unsuccessful");
 					editDone = false;
 				}
@@ -325,7 +346,7 @@ public class WebhookConfiguration extends WebhookObjectRepository {
 	public boolean nodeUpdation() {
 		log.info("In node updation");
 		try {
-			driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+			Thread.sleep(500);
 			if (nodeField.isDisplayed()) {
 				log.info("node updation is already enabled");
 				return true;
@@ -354,7 +375,7 @@ public class WebhookConfiguration extends WebhookObjectRepository {
 			throw new SkipException("Skipping test case as webhook already exists");
 		} else {
 			addWebhook.click();
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+			Thread.sleep(1000);
 			webhookName.sendKeys(LoginAndSelectModule.testData.get("WebHookname1"));
 			selectTool(LoginAndSelectModule.testData.get("ToolName"));
 			eventToggleButton.click();
@@ -369,18 +390,18 @@ public class WebhookConfiguration extends WebhookObjectRepository {
 				saveButton.click();
 				wait.until(ExpectedConditions.elementToBeClickable(yesButton));
 				yesButton.click();
-				wait.until(ExpectedConditions.elementToBeClickable(okButton));
-				driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+				wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+				Thread.sleep(500);
 				try {
 					if (successMessage.isDisplayed()) {
-						wait.until(ExpectedConditions.elementToBeClickable(okButton));
-						okButton.click();
+						wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+						crossClose.click();
 						log.info("successfully added webhook");
 						isTrue = true;
 					}
 				} catch (Exception e) {
-					wait.until(ExpectedConditions.elementToBeClickable(okButton));
-					okButton.click();
+					wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+					crossClose.click();
 					log.info("webhook name already exists");
 					isTrue = false;
 					wait.until(ExpectedConditions.elementToBeClickable(redirectButton));

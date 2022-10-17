@@ -37,6 +37,7 @@
           style="margin-top: 20%"
           svgIcon="save"
           class="iconColor"
+          id="Preview And Save"
         >
         </mat-icon>
       </button>
@@ -46,6 +47,7 @@
           style="margin-top: 20%"
           svgIcon="exit"
           class="iconColor"
+          id="Reset"
         >
         </mat-icon>
       </button>
@@ -82,7 +84,8 @@
           <mat-select
             [(ngModel)]="organisation"
             required
-            placeholder="Select a Organisation"
+            id="organisation"
+            aria-placeholder="Select Organisation"
             color="primary"
             (selectionChange)="getDashboardsByOrg(organisation)"
           >
@@ -107,8 +110,9 @@
           <mat-select
             [(ngModel)]="dashboard"
             required
-            placeholder="Select a Dashboard"
+            id="dashboard"
             color="primary"
+            placeholder="Select Dashboard"
             (selectionChange)="getDashboardJson(dashboard)"
           >
             <mat-option *ngFor="let dash of dashOptions" value="{{ dash.uid }}">
@@ -133,6 +137,7 @@
             type="text"
             autocomplete="off"
             placeholder="Enter the Title"
+            id="Enter Title"
           />
         </mat-form-field>
       </div>
@@ -144,6 +149,7 @@
             required
             placeholder="Select Dashboard Theme"
             color="primary"
+            id="Select Dashboard Theme"
           >
             <mat-option [value]="themes.dark">Dark</mat-option>
             <mat-option [value]="themes.light">Light</mat-option>
@@ -165,6 +171,7 @@
             placeholder="Select PdfType"
             color="primary"
             (ngModelChange)="changePdftype($event)"
+            id="Select PdfType"
           >
             <mat-option value="Dashboard">Dashboard View</mat-option>
             <mat-option value="Printable">Printable View</mat-option>
@@ -188,6 +195,7 @@
             required
             placeholder="Select loadTime"
             color="primary"
+            id="Select loadTime"
           >
             <mat-option value="10">10</mat-option>
             <mat-option value="15">15</mat-option>
@@ -241,6 +249,7 @@
             required
             placeholder="Select loadTime"
             color="primary"
+            id="Select loadTime"
           >
           <mat-option value="3">3</mat-option>
             <mat-option value="5">5</mat-option>
@@ -268,6 +277,7 @@
             placeholder="Select frequency"
             color="primary"
             (ngModelChange)="checkfrequency($event)"
+            id="Select frequency"
           >
             <mat-option
               *ngFor="let schedule of scheduleList"
@@ -652,6 +662,7 @@
             matTooltip="Add Email"
             class="iconColor mailCss"
             svgIcon="add"
+            id="Add Email"
           >
           </mat-icon>
           <mat-icon
@@ -660,6 +671,7 @@
             matTooltip="Edit email"
             class="iconColor"
             svgIcon="edit"
+            id="Edit email"
           >
           </mat-icon>
         </button>

@@ -16,6 +16,8 @@
 
 package com.cognizant.devops.platformservice.workflow.external.controller;
 
+import java.io.ByteArrayOutputStream;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +25,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
@@ -36,25 +40,39 @@ import com.google.gson.JsonObject;
 @RestController
 @RequestMapping("/externalApi/insights")
 public class InsightsWorkflowExternalController {
-	
+
 	private static Logger log = LogManager.getLogger(InsightsWorkflowExternalController.class);
 	private static final String POST = "POST";
 	private static final String CONTENT_TYPE = "Content-Type";
 	private static final String NO_CACHE = "no-cache";
-	
+
 	@Autowired
 	WorkflowServiceImpl workflowService;
-	
-	
-	@PostMapping(value = "/downloadDashboardReportPDF")
+
+	@GetMapping(value = "/getDashboardReportPDF")
 	@ResponseBody
-	public ResponseEntity<Object> getDashboardReportPDF(@RequestBody String reportTitle) {
+	public ResponseEntity<Object> getDashboardReportPDF(@RequestParam String reportTitle) {
 		ResponseEntity<Object> response = null;
 		try {
 			String validatedResponse = ValidationUtils.validateRequestBody(reportTitle);
 			JsonObject pdfDetailsJson = workflowService.preparePdfDetailsJson(validatedResponse);
-			byte[] fileContent = workflowService.getReportPDF(pdfDetailsJson);
-			if(fileContent !=  null) {			
+			
+			if (!pdfDetailsJson.entrySet().isEmpty()) {
+				
+				byte[] fileContent = workflowService.getReportPDF(pdfDetailsJson);
+
+				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+				byteArrayOutputStream.write(fileContent);
+
+				org.apache.pdfbox.pdmodel.PDDocument document = org.apache.pdfbox.pdmodel.PDDocument.load(fileContent);
+
+				if (document == null) {
+					log.error("Invalid PDF file ");
+					response = new ResponseEntity<>("Error while generating the PDF: Invalid PDF File !",
+							HttpStatus.BAD_REQUEST);
+					return response;
+				}
+				
 				String pdfName = pdfDetailsJson.get("pdfName").getAsString() + ".pdf";
 				HttpHeaders headers = new HttpHeaders();
 				headers.setContentType(MediaType.parseMediaType(MediaType.APPLICATION_PDF_VALUE));
@@ -64,13 +82,15 @@ public class InsightsWorkflowExternalController {
 				headers.add(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate,post-check=0, pre-check=0");
 				headers.add(HttpHeaders.PRAGMA, NO_CACHE);
 				headers.add(HttpHeaders.EXPIRES, "0");
-				response = new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+				response = new ResponseEntity<>(byteArrayOutputStream.toByteArray(), headers, HttpStatus.OK);
+
 			} else {
-				response = new ResponseEntity<>("Error while generating the PDF: PDF not found!", HttpStatus.BAD_REQUEST );
+				response = new ResponseEntity<>("Error while generating the PDF: PDF not found!",
+						HttpStatus.BAD_REQUEST);
 			}
-		} catch (InsightsCustomException e) {
+		} catch (Exception e) {
 			log.error("Error, Failed to download pdf -- {} ", e.getMessage());
-			response = new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR );
+			response = new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		return response;
 	}

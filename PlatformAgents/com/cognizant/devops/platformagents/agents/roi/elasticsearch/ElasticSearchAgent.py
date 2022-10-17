@@ -24,6 +24,7 @@ import sys
 import os
 from datetime import datetime, timedelta
 from ....core.BaseAgent3 import BaseAgent
+from ....core.ROIUtilities import ROIUtilities
 import json
 import threading
 
@@ -82,6 +83,7 @@ class ElasticSearchAgent(BaseAgent):
     @BaseAgent.timed 
     def process(self):
         print("===INSIDE==")
+        roiUtilities = ROIUtilities(self.messageFactory, self.tracking, self.trackingFilePath, self.config)
         with self.lock:
             self.timeStampNow = lambda: datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
             self.runSchedule = self.config.get("runSchedule", 30)
@@ -101,19 +103,19 @@ class ElasticSearchAgent(BaseAgent):
                                 continue
                         if self.timeStampNow() > itemDetails["startDate"] and self.timeStampNow() > itemDetails["endDate"]:
                             self.fetchOutcomeData(itemDetails)
-                            self.publishROIAgentstatus(itemDetails, "SUCCESS", "completed")
-                            self.updateStatusInTracking("COMPLETED", trackId)
+                            roiUtilities.publishROIAgentstatus(self.messageFactory, itemDetails, "SUCCESS", "completed")
+                            roiUtilities.updateStatusInTracking("COMPLETED", trackId)
                         elif self.timeStampNow() > itemDetails["startDate"] and self.timeStampNow() < itemDetails["endDate"]:
                             self.fetchOutcomeData(itemDetails)
-                            self.publishROIAgentstatus(itemDetails, "INPROGRESS", "inprogress")
-                            self.updateStatusInTracking("INPROGRESS", trackId)     
+                            roiUtilities.publishROIAgentstatus(self.messageFactory, itemDetails, "INPROGRESS", "inprogress")
+                            roiUtilities.updateStatusInTracking("INPROGRESS", trackId)     
                     except Exception as ex:
                         print(" process exception: ",ex)
                         self.baseLogger.error(" error occurred while fetching outcome data: "+str(ex))
-                        self.updateStatusInTracking("ERROR", trackId)
+                        roiUtilities.updateStatusInTracking("ERROR", trackId)
                         retry_count = milestoneTrackingDetails.get(trackId, {}).get("retryCount", 0)
                         if retry_count >= 3:
-                            self.publishROIAgentstatus(itemDetails, "ERROR", str(ex))
+                            roiUtilities.publishROIAgentstatus(self.messageFactory, itemDetails, "ERROR", str(ex))
         
         
     

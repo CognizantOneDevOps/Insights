@@ -17,7 +17,6 @@ package com.cognizant.devops.platformregressiontest.test.engineautomation;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -56,15 +55,15 @@ public class DataCleanup extends DataCleanupObjectrepository {
 	public boolean selectAgent(String agentName) {
 		boolean agentPresent = false;
 		try {
-			driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(3));
 			wait.until(ExpectedConditions.visibilityOfAllElements(agentsList));
 			for (int i = 0; i < agentsList.size(); i++) {
 				if (agentsList.get(i).getText().equals(agentName)) {
-					driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+					driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(3));
 					agentPresent = true;
 					List<WebElement> radioButtons = agentsList.get(i)
 							.findElements(By.xpath(".//preceding::span[contains(@class, 'mat-radio-container')]"));
-					driver.manage().timeouts().implicitlyWait(3600, TimeUnit.SECONDS);
+					driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(3));
 					radioButtons.get(i).click();
 					break;
 				}
@@ -72,7 +71,7 @@ public class DataCleanup extends DataCleanupObjectrepository {
 		} catch (Exception e) {
 			log.info("Agents list is empty!!");
 		}
-		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(3));
 		return agentPresent;
 	}
 }

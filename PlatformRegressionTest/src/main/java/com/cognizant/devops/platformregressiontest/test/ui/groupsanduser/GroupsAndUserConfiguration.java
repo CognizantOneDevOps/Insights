@@ -65,19 +65,18 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 	 * @return true if new Access Group is created o/w false
 	 * @throws InterruptedException
 	 */
-	public boolean addNewAccessGroup() {
+	public boolean addNewAccessGroup() throws InterruptedException {
 		boolean userAdded = true;
 		for (int i = 0; i < 3; i++) {
 			if (addAccessGroup(i)) {
-				driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+				Thread.sleep(10000);
 				yesButton.click();
-				wait.until(ExpectedConditions.elementToBeClickable(okButton));
-				driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+				wait.until(ExpectedConditions.elementToBeClickable(crossClose));
 				try {
 					if (successMessage.isDisplayed()) {
 						log.info("successfully added Access Group");
 						userAdded = true;
-						okButton.click();
+						crossClose.click();
 					}
 				} catch (Exception e) {
 					log.info("something went wrong when adding access group");
@@ -85,15 +84,15 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 					break;
 				} finally {
 					log.info("finally block- Redirect to Groups & User");
-					wait.until(ExpectedConditions.elementToBeClickable(redirectButton));
-					redirectButton.click();
+					wait.until(ExpectedConditions.elementToBeClickable(refresh));
+					refresh.click();
 				}
 			} else {
 				log.debug("Access group already exists");
 				throw new SkipException("Skipping test case as access group already exists");
 			}
 		}
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		Thread.sleep(5000);
 		return userAdded;
 	}
 
@@ -102,9 +101,10 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 	 * 
 	 * @param count
 	 * @return true if sending keys successful o/w false
+	 * @throws InterruptedException 
 	 */
 	@SuppressWarnings("all")
-	public boolean addAccessGroup(int count) {
+	public boolean addAccessGroup(int count) throws InterruptedException {
 		if (count == 0) {
 			if (!verifyAccessGroupName(LoginAndSelectModule.testData.get("accessGroup1"))) {
 				wait.until(ExpectedConditions.elementToBeClickable(clickAddButton));
@@ -155,10 +155,12 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 	 * @param accessName
 	 * @return true if access group name present in list of access group in database
 	 *         list else false
+	 * @throws InterruptedException 
 	 */
-	public boolean verifyAccessGroupName(String accessName) {
+	public boolean verifyAccessGroupName(String accessName) throws InterruptedException {
 		if (accessName != null) {
 			accessGroup.click();
+			Thread.sleep(10000);
 			for (WebElement access : accessGroupList) {
 				if (access.getText().equals(accessName)) {
 					log.info("{} Access Group is clicked successfully.", accessName);
@@ -203,13 +205,13 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 	public boolean verifyUI() {
 		wait.until(ExpectedConditions.elementToBeClickable(addUserButton));
 		addUserButton.click();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		try {
-			if (addUserDisplayPage.isDisplayed() && assignUserLandingPage.isDisplayed() && verifyAddUserForm()) {
+			Thread.sleep(5000);
+			if (addUserDisplayPage.isDisplayed() && assignUserLandingPage.isDisplayed() && verifyAddUser()) {
 				log.info("Add user form,Assign user form and Add User form fields is displayed correctly");
 				return true;
 			}
-		} catch (NoSuchElementException e) {
+		} catch (Exception e) {
 			log.info("Add user form or Assign user form or Add User form fields is not loaded");
 			return false;
 		}
@@ -238,6 +240,21 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 			return false;
 		}
 	}
+	private boolean verifyAddUser() {
+		try {
+			if(addUsername.isDisplayed()) {
+				if(addUsername.isDisplayed()) 
+					if(addUsername.isDisplayed())
+						return true;				
+			}		
+			else
+				return false;
+		}
+		catch(Exception e) {
+		return false;
+		}
+		return false;
+	}
 
 	/**
 	 * Verifies UI & Creates new user with all the mandatory details and saves it in
@@ -250,7 +267,7 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 	@SuppressWarnings("all")
 	public boolean addUser() throws InterruptedException {
 		boolean userAdded = false;
-		redirectButton.click();
+		//redirectButton.click();
 		if (verifyAccessGroupName("Main Org.") && !verifyUserPresent(LoginAndSelectModule.testData.get("userName"))) {
 			if (!verifyUI()) {
 				log.info("Elements of add user are not loaded properly");
@@ -263,28 +280,29 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 			userName.sendKeys(LoginAndSelectModule.testData.get("userName"));
 			password.sendKeys(LoginAndSelectModule.testData.get("password"));
 			selectRole.click();
-			Thread.sleep(1000);
+			Thread.sleep(5000);
 			selectRole(LoginAndSelectModule.testData.get("roleAdmin"));
 			wait.until(ExpectedConditions.elementToBeClickable(saveButton));
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+			Thread.sleep(5000);
 			saveButton.click();
-			wait.until(ExpectedConditions.elementToBeClickable(okButton));
-			driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+			wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+			Thread.sleep(5000);
 			try {
-				if (successMessage.isDisplayed()) {
+				if (userSuccessMessage.isDisplayed()) {
 					log.info("successfully added user");
 					userAdded = true;
-					wait.until(ExpectedConditions.elementToBeClickable(okButton));
-					okButton.click();
+					wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+					crossClose.click();
+					backButton.click();
 				}
 			} catch (Exception e) {
 				log.info("Error while adding user");
 				userAdded = false;
-				wait.until(ExpectedConditions.elementToBeClickable(okButton));
-				okButton.click();
+				wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+				crossClose.click();
+				backButton.click();
 			}
 		} else {
-			redirectButton.click();
 			log.debug("user already exists in Main Org.");
 			throw new SkipException("Skipping test case as already exists in Main Org.");
 		}
@@ -298,12 +316,11 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 	 * @return true if all the error message is displayed correctly o/w false
 	 * @throws InterruptedException
 	 */
-	public boolean addIncorrectUser() {
+	public boolean addIncorrectUser() throws InterruptedException {
 		boolean userAdded = false;
-		redirectButton.click();
 		wait.until(ExpectedConditions.elementToBeClickable(addUserButton));
 		addUserButton.click();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		Thread.sleep(10000);
 		addUserRadioButton.click();
 		nameRequired.sendKeys(LoginAndSelectModule.testData.get("err_name"));
 		emailAddress.sendKeys(LoginAndSelectModule.testData.get("err_email"));
@@ -311,18 +328,18 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 		password.sendKeys(LoginAndSelectModule.testData.get("err_password"));
 		wait.until(ExpectedConditions.elementToBeClickable(saveButton));
 		saveButton.click();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		try {
 			if (errName.isDisplayed() && erremailAddress.isDisplayed() && erruserName.isDisplayed()
-					&& errPassword.isDisplayed() && errRole.isDisplayed()) {
+					&& errRole.isDisplayed()) {
 				log.info("Error message for each field is displayed correctly");
 				userAdded = true;
+				backButton.click();
 			}
 		} catch (NoSuchElementException e) {
 			log.info("1 or more field validation has failed");
 			userAdded = false;
+			backButton.click();
 		}
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		return userAdded;
 	}
 
@@ -337,8 +354,6 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 	 */
 	public boolean assignUser() throws InterruptedException {
 		boolean userAssigned = false;
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
-		redirectButton.click();
 		if (verifyAccessGroupName(LoginAndSelectModule.testData.get("accessGroup3"))
 				&& !verifyUserPresent(LoginAndSelectModule.testData.get("userName"))) {
 			wait.until(ExpectedConditions.elementToBeClickable(addUserButton));
@@ -352,30 +367,31 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 			searchBox.sendKeys(LoginAndSelectModule.testData.get("userName"));
 			wait.until(ExpectedConditions.elementToBeClickable(accessGroup1));
 			accessGroup1.click();
+			Thread.sleep(10000);
 			selectAccessGroup(LoginAndSelectModule.testData.get("accessGroup3"));
 			selectRole1.click();
-			Thread.sleep(1000);
+			Thread.sleep(10000);
 			selectRole(LoginAndSelectModule.testData.get("roleUpdate"));
 			wait.until(ExpectedConditions.elementToBeClickable(saveButton));
 			saveButton.click();
-			wait.until(ExpectedConditions.elementToBeClickable(okButton));
-			driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+			wait.until(ExpectedConditions.elementToBeClickable(crossClose));
 			try {
-				if (successMessage.isDisplayed()) {
+				if (assignSuccessMessage.isDisplayed()) {
 					log.info("User is added successfully to access group 1");
 					userAssigned = true;
-					okButton.click();
+					crossClose.click();
+					backButton.click();
 				}
 			} catch (Exception e) {
 				log.info("error while adding user to access group 1");
 				userAssigned = false;
-				okButton.click();
+				crossClose.click();
+				backButton.click();
 			}
 		} else {
 			log.debug("user already exists in the access group");
 			throw new SkipException("Skipping test case as user already exists in the access group");
 		}
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		return userAssigned;
 	}
 	
@@ -419,7 +435,6 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 	 */
 	public boolean assignUserToMultipleAccessGroup() throws InterruptedException {
 		boolean userAssign = true;
-		redirectButton.click();
 		if (verifyAccessGroupName(LoginAndSelectModule.testData.get("accessGroup2"))
 				&& !verifyUserPresent(LoginAndSelectModule.testData.get("userName"))) {
 			wait.until(ExpectedConditions.elementToBeClickable(addUserButton));
@@ -428,38 +443,47 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 			assignUserRadioButton.click();
 			searchBox.sendKeys(LoginAndSelectModule.testData.get("userName"));
 			wait.until(ExpectedConditions.elementToBeClickable(accessGroup1));
+			try {
 			accessGroup1.click();
+			Thread.sleep(10000);
 			selectAccessGroup(LoginAndSelectModule.testData.get("accessGroup2"));
 			selectRole1.click();
-			Thread.sleep(2000);
+			Thread.sleep(5000);
 			selectRole(LoginAndSelectModule.testData.get("roleUpdate"));
 			wait.until(ExpectedConditions.elementToBeClickable(accessGroup2));
+			Thread.sleep(1000);
 			accessGroup2.click();
-			Thread.sleep(2000);
+			Thread.sleep(10000);
 			selectAccessGroup(LoginAndSelectModule.testData.get("accessGroup1"));
 			selectRole2.click();
-			Thread.sleep(2000);
+			Thread.sleep(5000);
 			selectRole(LoginAndSelectModule.testData.get("role1"));
+			}
+			catch(Exception e){
+				throw new SkipException("Skipping test case as user already exists in the access group");
+			}
 			wait.until(ExpectedConditions.elementToBeClickable(saveButton));
 			saveButton.click();
-			wait.until(ExpectedConditions.elementToBeClickable(okButton));
-			driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+			wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+			Thread.sleep(2000);
 			try {
-				if (successMessage.isDisplayed()) {
+				if (assignSuccessMessage.isDisplayed()) {
 					log.info("User is added to multiple access groups");
 					userAssign = true;
-					okButton.click();
+					crossClose.click();
+					backButton.click();
 				}
 			} catch (Exception e) {
 				log.info("error while adding user to access group");
 				userAssign = false;
-				okButton.click();
+				crossClose.click();
+				backButton.click();
 			}
 		} else {
 			log.debug("user already exists in the access group");
 			throw new SkipException("Skipping test case as user already exists in the access group");
 		}
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		Thread.sleep(5000);
 		return userAssign;
 	}
 
@@ -472,10 +496,7 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 	 */
 	public boolean assignSameUser() throws InterruptedException {
 		boolean userAssigned = true;
-		redirectButton.click();
-		wait.until(ExpectedConditions.elementToBeClickable(saveButton));
 		addUserButton.click();
-		wait.until(ExpectedConditions.elementToBeClickable(saveButton));
 		assignUserRadioButton.click();
 		if (!isSearchBoxEnabled()) {
 			return false;
@@ -483,11 +504,11 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 		searchBox.sendKeys(LoginAndSelectModule.testData.get("userName"));
 		wait.until(ExpectedConditions.elementToBeClickable(saveButton));
 		accessGroup1.click();
+		Thread.sleep(10000);
 		for (WebElement group : accessGroupList) {
 			if ((group.getText()).equals(LoginAndSelectModule.testData.get("accessGroup2"))) {
 				wait.until(ExpectedConditions.elementToBeClickable(saveButton));
 				group.click();
-				driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 				break;
 			}
 		}
@@ -501,23 +522,22 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 		}
 		wait.until(ExpectedConditions.elementToBeClickable(saveButton));
 		saveButton.click();
-		wait.until(ExpectedConditions.elementToBeClickable(okButton));
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+		wait.until(ExpectedConditions.elementToBeClickable(crossClose));
 		try {
 			if (errorMessage.isDisplayed()) {
 				log.info("error message is displayed when we try to add existing user to the access group");
 				userAssigned = true;
-				wait.until(ExpectedConditions.elementToBeClickable(okButton));
-				okButton.click();
+				wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+				crossClose.click();
 			}
 		} catch (Exception e) {
 			log.info("error message is not displayed");
 			userAssigned = false;
-			wait.until(ExpectedConditions.elementToBeClickable(okButton));
-			okButton.click();
+			wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+			crossClose.click();
 		}
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-		redirectButton.click();
+		Thread.sleep(5000);
+		backButton.click();
 		return userAssigned;
 	}
 
@@ -543,8 +563,6 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 	 * @throws InterruptedException
 	 */
 	public boolean checkUserIsPresent() {
-		redirectButton.click();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		if (searchLoginID(LoginAndSelectModule.testData.get("userName"))) {
 			log.info("Created user is present in the users list");
 			searchBoxInLandingPage.clear();
@@ -560,10 +578,8 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 	 * @return true if editing is successful o/w false
 	 * @throws InterruptedException
 	 */
-	public boolean editUser() {
+	public boolean editUser() throws InterruptedException {
 		boolean editDone = false;
-		redirectButton.click();
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 		verifyAccessGroupName(LoginAndSelectModule.testData.get("accessGroup2"));
 		if (searchLoginID(LoginAndSelectModule.testData.get("userName"))) {
 			WebElement rws = userDetailsTable.findElement(By.tagName("tr"));
@@ -572,10 +588,10 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 				cols.get(0).findElement(By.xpath("//span[@class='mat-radio-container']")).click();
 				wait.until(ExpectedConditions.elementToBeClickable(editButton));
 				editButton.click();
-				driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+				Thread.sleep(5000);
 				userDetailsTable.findElement(By.xpath("//mat-select[@placeholder='Select number of records ']"))
 						.click();
-				driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+				Thread.sleep(10000);
 				for (WebElement role : selectRoleList) {
 					if ((role.getText()).equals(LoginAndSelectModule.testData.get("roleChange"))) {
 						role.click();
@@ -589,8 +605,8 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 		}
 		wait.until(ExpectedConditions.elementToBeClickable(saveButton));
 		saveButton.click();
-		wait.until(ExpectedConditions.elementToBeClickable(okButton));
-		okButton.click();
+		wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+		crossClose.click();
 		if ((userDetailsTable.findElement(By.xpath("//mat-select[@placeholder='Select number of records ']")).getText())
 				.equals(LoginAndSelectModule.testData.get("roleChange"))) {
 			log.info("Editing done successfully");
@@ -601,7 +617,6 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 		}
 		searchBoxInLandingPage.sendKeys(Keys.CONTROL + "a");
 		searchBoxInLandingPage.sendKeys(Keys.DELETE);
-		redirectButton.click();
 		return editDone;
 	}
 
@@ -611,9 +626,9 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 	 * @return true if deletion is successful o/w false
 	 * @throws InterruptedException
 	 */
-	public boolean deleteUser() {
+	public boolean deleteUser() throws InterruptedException {
 		boolean deleteDone = true;
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+		Thread.sleep(5000);
 		verifyAccessGroupName(LoginAndSelectModule.testData.get("accessGroup3"));
 		if (searchLoginID(LoginAndSelectModule.testData.get("userName"))) {
 			WebElement rws = userDetailsTable.findElement(By.tagName("tr"));
@@ -622,18 +637,15 @@ public class GroupsAndUserConfiguration extends GroupsAndUserObjectRepository {
 				cols.get(0).findElement(By.xpath("//span[@class='mat-radio-container']")).click();
 				wait.until(ExpectedConditions.elementToBeClickable(deleteButton));
 				deleteButton.click();
-				driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 			}
-			wait.until(ExpectedConditions.elementToBeClickable(yesButton));
-			yesButton.click();
-			wait.until(ExpectedConditions.elementToBeClickable(okButton));
-			okButton.click();
-			driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+			wait.until(ExpectedConditions.elementToBeClickable(yes));
+			yes.click();
+			wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+			crossClose.click();
 		} else {
 			log.debug("user does not exist to be deleted");
 			throw new SkipException("Skipping test case as user does not exist");
 		}
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 		if (!(driver.findElement(By.xpath("//tr//td[2]")).getText())
 				.contains(LoginAndSelectModule.testData.get("name"))) {
 			log.info("User is deleted");

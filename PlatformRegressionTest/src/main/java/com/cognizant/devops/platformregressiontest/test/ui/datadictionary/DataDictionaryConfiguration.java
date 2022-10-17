@@ -63,8 +63,9 @@ public class DataDictionaryConfiguration extends DataDictionaryobjectRepository 
 	public boolean checkDataDictionaryFunctionality() throws InterruptedException {
 		fillData();
 		Thread.sleep(1000);
-		showCorrelation.click();
-		try {
+		visibilityOf(showCorrelation, 3);
+         clickOn(showCorrelation, 0);		
+      try {
 			Thread.sleep(1000);
 			if (driver.getPageSource().contains("Relationship Name")) {
 				log.info("Relationship between source and destination tool is displayed");
@@ -86,11 +87,13 @@ public class DataDictionaryConfiguration extends DataDictionaryobjectRepository 
 	private boolean fillData() throws InterruptedException {
 		if (!selectSourceTool(LoginAndSelectModule.testData.get("sourceTool")))
 			return false;
+		visibilityOf(selectSourceLabel, 2);
 		selectSourceLabel.sendKeys(LoginAndSelectModule.testData.get("sourceLabel"));
 		Thread.sleep(1000);
 		if (!selectDestinationTool(LoginAndSelectModule.testData.get("destinationTool")))
 			return false;
 		selectDestinationLabel.sendKeys(LoginAndSelectModule.testData.get("destinationLabel"));
+		visibilityOf(selectDestinationLabel, 2);
 		return true;
 	}
 
@@ -105,6 +108,7 @@ public class DataDictionaryConfiguration extends DataDictionaryobjectRepository 
 	 * @throws InterruptedException
 	 */
 	private boolean selectSourceTool(String sourceTool) throws InterruptedException {
+		visibilityOf(selectSourceTool, 2);
 		clickOn(selectSourceTool, 2);
 		visibilityOfAllElements(sourceToolList, 2);
 		log.info("UniqueToolSize : {}, sourceToolListSize : {}", uniqueToolNames.size(), sourceToolList.size());
@@ -133,6 +137,7 @@ public class DataDictionaryConfiguration extends DataDictionaryobjectRepository 
 	 * @throws InterruptedException
 	 */
 	private boolean selectDestinationTool(String destinationTool) throws InterruptedException {
+        visibilityOf(selectDestinationTool, 2);
 		clickOn(selectDestinationTool, 2);
 		visibilityOfAllElements(destinationToolList, 2);
 		if (destinationToolList.size() == uniqueToolNames.size()) {
@@ -160,7 +165,7 @@ public class DataDictionaryConfiguration extends DataDictionaryobjectRepository 
 	 * @throws InterruptedException
 	 */
 	private void selectModule(String moduleName) throws InterruptedException {
-		List<WebElement> menuList = driver.findElements(By.xpath("//p[contains(@class,'line-child')]"));
+		List<WebElement> menuList = driver.findElements(By.xpath("//span[contains(@class,'line-child')]"));
 		for (WebElement requiredOption : menuList) {
 			if (requiredOption.getText().equals(moduleName)) {
 				requiredOption.click();
@@ -173,7 +178,6 @@ public class DataDictionaryConfiguration extends DataDictionaryobjectRepository 
 
 	public void getAgentWebhookLabels() throws InterruptedException {
 		selectModule(LoginAndSelectModule.testData.get("agentManagement"));
-		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 		try {
 			visibilityOfAllElements(toolNameList, 1);
 			for (WebElement toolName : toolNameList) {
@@ -193,7 +197,7 @@ public class DataDictionaryConfiguration extends DataDictionaryobjectRepository 
 		} catch (Exception ex) {
 			log.info("No webhook found under Webhook Configuration module.");
 		}
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		Thread.sleep(1000);
 		selectModule(LoginAndSelectModule.testData.get("dataDictionary"));
 	}
 

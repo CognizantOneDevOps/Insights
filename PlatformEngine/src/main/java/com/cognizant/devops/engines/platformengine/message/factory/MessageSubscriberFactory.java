@@ -49,9 +49,10 @@ public class MessageSubscriberFactory {
 	}
 
 	public void registerSubscriber(String routingKey, final EngineSubscriberResponseHandler responseHandler)
-			throws IOException, InsightsCustomException, TimeoutException {
+			throws IOException, InsightsCustomException {
 		String queueName = routingKey.replace(".", "_");
-		Channel channel = RabbitMQConnectionProvider.getChannel(routingKey, queueName,MQMessageConstants.EXCHANGE_NAME,MQMessageConstants.EXCHANGE_TYPE);
+		Channel channel = RabbitMQConnectionProvider.getConnection().createChannel();
+		channel = RabbitMQConnectionProvider.initilizeChannel(channel,routingKey, queueName,MQMessageConstants.EXCHANGE_NAME,MQMessageConstants.EXCHANGE_TYPE);
 		responseHandler.setChannel(channel);
 		log.debug("prefetchCount {} for routingKey {} ",
 				ApplicationConfigProvider.getInstance().getMessageQueue().getPrefetchCount(), routingKey);

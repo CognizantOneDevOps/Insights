@@ -27,7 +27,7 @@
 </mat-dialog-content>
 
 <div *ngIf="!isRedirect" style="position: fixed; bottom: 10px !important; right: 10px !important;">
-    <button mat-button class="button" style="min-width: 120px !important;" (click)="onCloseClick()">Okay</button>
+    <button mat-button id="onOkClose" class="button" style="min-width: 120px !important;" (click)="onCloseClick()">Okay</button>
 </div>
 
 <div *ngIf="isRedirect" style="position: fixed; bottom: 10px !important; right: 10px !important;">

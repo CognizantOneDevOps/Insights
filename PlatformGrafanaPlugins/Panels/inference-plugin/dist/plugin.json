@@ -1,11 +1,11 @@
 {
   "type": "panel",
-  "name": "inference-plugin",
+  "name": "Inference panel plugin",
   "id": "cde-inference-plugin",
   "info": {
     "description": "Inference panel plugin",
     "author": {
-      "name": "Murugesan, Vijay Raghunath",
+      "name": "Insights Development Team",
       "url": ""
     },
     "keywords": [],
@@ -25,10 +25,10 @@
     ],
     "screenshots": [],
     "version": "1.0.0",
-    "updated": "2021-01-19"
+    "updated": "2022-07-28"
   },
   "dependencies": {
-    "grafanaVersion": "6.3.x",
+    "grafanaVersion": "8.4.5",
     "plugins": []
   }
 }

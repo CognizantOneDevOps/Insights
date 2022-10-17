@@ -57,9 +57,9 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 	 */
 	public boolean navigateToHealthCheckLandingPage() {
 		if (visibilityOf(landingPage, 3) && visibilityOf(notificationLabel, 3) && visibilityOf(servicesTab, 3)
-				&& visibilityOf(dataComponentsTab, 3) && visibilityOf(agentsTab, 3)) {
+				&& visibilityOf(dataComponentsTab, 3)) {
 			log.info(
-					"landingPage, notificationToggle, servicesTab, dataComponentsTab, agentsTab is displayed successfully.");
+					"landingPage, notificationToggle, servicesTab, dataComponentsTab is displayed successfully.");
 			return true;
 		}
 		return false;
@@ -71,12 +71,13 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 	 * 
 	 * @return true if Agents data loaded successfully from database o/w if no
 	 *         agents present then return false
+	 * @throws InterruptedException 
 	 */
-	public boolean checkAllRegisteredAgentDisplayed() {
-		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+	public boolean checkAllRegisteredAgentDisplayed() throws InterruptedException {
+		Thread.sleep(1000);
 		try {
 			if (visibilityOfAllElements(toolNameList, 1) > 0) {
-				driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+				Thread.sleep(10000);
 				log.info("Agents data has been loaded successfully from database.");
 				return true;
 			}
@@ -96,12 +97,11 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 	 */
 	public boolean testNotificationToggle() {
 		try {
-			driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+			Thread.sleep(2000);
 			if (visibilityOf(notificationToggleFalse, 1)) {
 				return enableThenDisableNotificationToggle();
 			}
 		} catch (Exception ex) {
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 			if (visibilityOf(notificationToggleTrue, 2)) {
 				return disableThenEnableNotificationToggle();
 			}
@@ -118,19 +118,19 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 	 */
 	public boolean checkHealthCheckStatusIcon() {
 		try {
-			driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+			Thread.sleep(1000);
 			if (visibilityOf(driver.findElement(By.xpath(
-					"//tbody[@role='rowgroup']/tr[1]/td[5]/mat-icon[@data-mat-icon-name='healthcheck_success_status']")),
-					1)) {
+					"//tbody[@role='rowgroup']/tr[1]/td[3]/mat-icon[@svgicon='success_status']")),
+					3)) {
 				log.info("Health Check Icon Visible. Status : Success");
 				return true;
 			}
 		} catch (Exception ex) {
 			if (visibilityOf(driver.findElement(By.xpath(
-					"//tbody[@role='rowgroup']/tr[1]/td[5]/mat-icon[@data-mat-icon-name='healthcheck_failure_status']")),
-					1)) {
+					"//tbody[@role='rowgroup']/tr[1]/td[3]/mat-icon[@svgicon='failure_status']")),
+					3)) {
 				log.info("Health Check Icon Visible. Status : Fail");
-				return true;
+				return false;
 			}
 		}
 		throw new SkipException("Skipping test case as something went wrong.");
@@ -153,7 +153,7 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 			for (WebElement detail : detailsList) {
 				clickOn(detail, 10);
 				try {
-					driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+					Thread.sleep(1000);
 					if (visibilityOf(latestStatusDetails, 1) && visibilityOf(latestFailureDetails, 1)) {
 						visibilityOf(additionalDetailsHeading, 1);
 						clickOn(closeDialog, 3);
@@ -172,7 +172,7 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 			clickOn(closeDialog, 3);
 			log.info(e.getMessage());
 		}
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		Thread.sleep(5000);
 		if (agentCount != 0) {
 			log.info("For {} agents out of {}, not able to found latest status details or latest failure details",
 					agentCount, agentsPresent);
@@ -226,18 +226,20 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 	 * Additional Information is displayed as expected or not
 	 * 
 	 * @return true if all headings and server related data is correct else false
+	 * @throws InterruptedException 
 	 */
-	public boolean verifyDataComponentsTabData() {
+	public boolean verifyDataComponentsTabData() throws InterruptedException {
 		boolean verifyPostgreSqlData = false;
 		boolean verifyNeo4jlData = false;
 		boolean verifyElasticSearchData = false;
 		boolean verifyRabbitMQData = false;
+		boolean verifyPython=false;
+		boolean verifyGrafana=false;
 		try {
 			clickOn(dataComponentsTab, 5);
 			Thread.sleep(5000);
 			checkServersHeadingComponent();
 			int i = 0;
-			driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 			Thread.sleep(3000);
 			while (i != visibilityOfAllElements(serverNameList, 5)) {
 				++i;
@@ -245,10 +247,10 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 						.getText();
 				String ipAddress = driver.findElement(By.xpath("//tbody[@role='rowgroup']/tr[" + i + "]/td[2]"))
 						.getText();
-				String version = driver.findElement(By.xpath("//tbody[@role='rowgroup']/tr[" + i + "]/td[3]"))
+				String version = driver.findElement(By.xpath("//tbody[@role='rowgroup']/tr[" + i + "]/td[4]"))
 						.getText();
 				String additionalInformation = driver
-						.findElement(By.xpath("//tbody[@role='rowgroup']/tr[" + i + "]/td[4]")).getText();
+						.findElement(By.xpath("//tbody[@role='rowgroup']/tr[" + i + "]/td[5]")).getText();
 				switch (serverName) {
 				case "PostgreSQL":
 					verifyPostgreSqlData = checkPostgreSqlData(serverName, ipAddress, version);
@@ -262,6 +264,12 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 				case "RabbitMQ":
 					verifyRabbitMQData = checkRabbitMQData(serverName, ipAddress, version);
 					break;
+				case "Grafana":
+					verifyGrafana=checkGrafanaData(serverName, ipAddress, version);
+					break;
+				case "Python":
+					verifyPython=checkPythonData(serverName, version);
+					break;
 				default:
 					log.info("No servers found!!");
 					break;
@@ -270,8 +278,9 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 		} catch (Exception ex) {
 			log.info(ex.getMessage());
 		}
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-		if (verifyPostgreSqlData && verifyNeo4jlData && verifyElasticSearchData && verifyRabbitMQData) {
+		Thread.sleep(5000);
+		if (verifyPostgreSqlData && verifyNeo4jlData && verifyElasticSearchData && 
+				verifyRabbitMQData&& verifyGrafana &&verifyPython) {
 			log.info("Under data components tab, all servers are having correct data.");
 			return true;
 		}
@@ -287,10 +296,13 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 	 * @throws InterruptedException
 	 */
 	public boolean verifyServerConfigEmailBlock() throws InterruptedException {
-		selectModuleOnClickingConfig("Server Configuration");
+		Thread.sleep(1000);
+		selectMenuOption("Server Configuration");
 		try {
+			Thread.sleep(1000);
 			JavascriptExecutor js = (JavascriptExecutor) driver;
 			js.executeScript("arguments[0].scrollIntoView();", emailConfigurationBlock);
+			Thread.sleep(1000);
 			sendEmailEnabled.clear();
 			sendEmailEnabled.sendKeys(LoginAndSelectModule.testData.get("sendEmailEnabled"));
 			smtpHostServer.clear();
@@ -307,8 +319,8 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 			smtpStarttlsEnable.sendKeys(LoginAndSelectModule.testData.get("smtpStarttlsEnable"));
 			mailFrom.clear();
 			mailFrom.sendKeys(LoginAndSelectModule.testData.get("mailFrom"));
-			mailTo.clear();
-			mailTo.sendKeys(LoginAndSelectModule.testData.get("mailTo"));
+//			mailTo.clear();
+//			mailTo.sendKeys(LoginAndSelectModule.testData.get("mailTo"));
 			subject.clear();
 			subject.sendKeys(LoginAndSelectModule.testData.get("subject"));
 			emailBody.clear();
@@ -318,7 +330,7 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 			selectMenuOption(LoginAndSelectModule.testData.get("healthCheck"));
 			return true;
 		} catch (Exception e) {
-			log.info("Something went wrong while updating email configuration block.");
+			log.info("Something went wrong while updating email configuration block."+e.getMessage());
 			return false;
 		}
 	}
@@ -345,8 +357,9 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 	 * Under Data Components tab check the status of all servers
 	 * 
 	 * @return true if the health check status for each server is success else false
+	 * @throws InterruptedException 
 	 */
-	public boolean serverHealthCheckStatus() {
+	public boolean serverHealthCheckStatus() throws InterruptedException {
 		int failureCount = 0;
 		int i = 0;
 		clickOn(dataComponentsTab, 5);
@@ -354,19 +367,19 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 		while (i != visibilityOfAllElements(dataComponentsTabData, 5)) {
 			++i;
 			String serverName = driver.findElement(By.xpath("//tbody[@role='rowgroup']/tr[" + i + "]/td[1]")).getText();
-			driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+			Thread.sleep(1000);
 			try {
 				if (visibilityOf(driver.findElement(By.xpath("//tbody[@role='rowgroup']/tr[" + i
-						+ "]/td[5]/mat-icon[@data-mat-icon-name='healthcheck_success_status']")), 1))
+						+ "]/td[3]/mat-icon[@svgicon='success_status']")), 1))
 					log.info("{} Health Check Status : Success", serverName);
 			} catch (Exception ex) {
 				++failureCount;
 				if (visibilityOf(driver.findElement(By.xpath("//tbody[@role='rowgroup']/tr[" + i
-						+ "]/td[5]/mat-icon[@data-mat-icon-name='healthcheck_failure_status']")), 1))
+						+ "]/td[3]/mat-icon[@svgicon='failure_status']")), 1))
 					log.info("{} Health Check Status : Fail", serverName);
 			}
 		}
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		Thread.sleep(5000);
 		if (failureCount != 0) {
 			log.info("Skipping test cases as health Check Failure for some server");
 		}
@@ -396,7 +409,7 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 			int servicesCount = visibilityOfAllElements(servicesTabData, 5);
 			while (i != servicesCount) {
 				++i;
-				driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+				Thread.sleep(1000);
 				String serviceName = driver.findElement(By.xpath("//tbody[@role='rowgroup']/tr[" + i + "]/td[1]"))
 						.getText();
 				String ipAddress = driver.findElement(By.xpath("//tbody[@role='rowgroup']/tr[" + i + "]/td[2]"))
@@ -415,15 +428,6 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 				case "Platform Workflow":
 					verifyPlatformWorkflow = verifyPlatformWorkflowData(serviceName, ipAddress, version);
 					break;
-				case "Platform WebhookEngine":
-					verifyWebhookEngine = verifyWebhookEngineData(serviceName, ipAddress, version);
-					break;
-				case "Platform WebhookSubscriber":
-					verifyWebhookSubscriber = verifyWebhookSubscriberData(serviceName, ipAddress, version);
-					break;
-				case "Platform AuditEngine":
-					verifyPlatformAuditEngine = verifyPlatformAuditEngineData(serviceName, ipAddress, version);
-					break;
 				default:
 					log.info("No servers found!!");
 					break;
@@ -432,8 +436,8 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 		} catch (Exception ex) {
 			log.info(ex.getMessage());
 		}
-		if (verifyWebhookSubscriber && verifyWebhookEngine && verifyPlatformWorkflow && verifyPlatformEngine
-				&& verifyPlatformService && verifyPlatformAuditEngine) {
+		if ( verifyPlatformWorkflow && verifyPlatformEngine
+				&& verifyPlatformService) {
 			log.info("Under Services tab, all services are having correct data.");
 			return true;
 		}
@@ -446,8 +450,9 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 	 * 
 	 * @return true if the health check status for each service is success else
 	 *         false
+	 * @throws InterruptedException 
 	 */
-	public boolean serviceHealthCheckStatus() {
+	public boolean serviceHealthCheckStatus() throws InterruptedException {
 		int failureCount = 0;
 		int i = 0;
 		clickOn(servicesTab, 5);
@@ -456,19 +461,19 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 			++i;
 			String serviceName = driver.findElement(By.xpath("//tbody[@role='rowgroup']/tr[" + i + "]/td[1]"))
 					.getText();
-			driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+			Thread.sleep(1000);
 			try {
 				if (visibilityOf(driver.findElement(By.xpath("//tbody[@role='rowgroup']/tr[" + i
-						+ "]/td[4]/mat-icon[@data-mat-icon-name='healthcheck_success_status']")), 1))
+						+ "]/td[4]/mat-icon[@data-mat-icon-name='success_status']")), 1))
 					log.info("{} Health Check Status : Success", serviceName);
 			} catch (Exception ex) {
 				++failureCount;
 				if (visibilityOf(driver.findElement(By.xpath("//tbody[@role='rowgroup']/tr[" + i
-						+ "]/td[4]/mat-icon[@data-mat-icon-name='healthcheck_failure_status']")), 1))
+						+ "]/td[4]/mat-icon[@data-mat-icon-name='failure_status']")), 1))
 					log.info("{} Health Check Status : Fail", serviceName);
 			}
 		}
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		Thread.sleep(1000);
 		if (failureCount != 0) {
 			log.info("Skipping test cases as health Check Failure for some service");
 		}
@@ -492,7 +497,7 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 			for (WebElement detail : detailsList) {
 				clickOn(detail, 10);
 				try {
-					driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+					Thread.sleep(1000);
 					if (visibilityOf(latestStatusDetailsService, 2)) {
 						visibilityOf(additionalDetailsHeading, 2);
 						clickOn(closeDialog, 3);
@@ -531,19 +536,19 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 		log.info("Notification Toggle is in enable mode");
 		clickOn(notificationToggleTrue, 10);
 		visibilityOf(disableNotificationHeading, 10);
-		clickOn(yes, 10);
-		visibilityOf(success, 10);
-		visibilityOf(notificationDisabledMsg, 10);
-		log.info(notificationDisabledMsg.getText());
-		clickOn(ok, 10);
+		clickOn(yes, 2);
+		visibilityOf(successDisable, 2);
+//		visibilityOf(notificationDisabledMsg, 10);
+		log.info(successDisable.getText());
+		clickOn(crossClose, 2);
 		if (visibilityOf(notificationToggleFalse, 10) && visibilityOf(notificationLabel, 10)) {
 			clickOn(notificationToggleFalse, 10);
 			visibilityOf(enableNotificationHeading, 10);
 			clickOn(yes, 10);
-			visibilityOf(success, 10);
-			visibilityOf(notificationEnabledMsg, 10);
-			log.info(notificationEnabledMsg.getText());
-			clickOn(ok, 10);
+			visibilityOf(successEnable, 10);
+//			visibilityOf(notificationEnabledMsg, 10);
+			log.info(successEnable.getText());
+			clickOn(crossClose, 10);
 			if (visibilityOf(notificationToggleTrue, 10) && visibilityOf(notificationHistory, 10)
 					&& visibilityOf(notificationHistoryDetails, 10) && visibilityOf(notificationLabel, 10)) {
 				clickOn(notificationHistoryDetails, 10);
@@ -560,16 +565,18 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 	 * @return if notification toggle is disabled then make it enable, again make it
 	 *         disable and check if required state is displayed then return true
 	 *         else false
+	 * @throws InterruptedException 
 	 */
-	private boolean enableThenDisableNotificationToggle() {
+	private boolean enableThenDisableNotificationToggle() throws InterruptedException {
 		log.info("Notification Toggle is in disable mode");
 		clickOn(notificationToggleFalse, 10);
 		visibilityOf(enableNotificationHeading, 10);
 		clickOn(yes, 10);
-		visibilityOf(success, 10);
-		visibilityOf(notificationEnabledMsg, 10);
-		log.info(notificationEnabledMsg.getText());
-		clickOn(ok, 10);
+		Thread.sleep(500);
+		visibilityOf(successEnable, 4);
+		log.info(successEnable.getText());
+		clickOn(crossClose, 10);
+		Thread.sleep(1000);
 		if (visibilityOf(notificationToggleTrue, 10) && visibilityOf(notificationHistory, 10)
 				&& visibilityOf(notificationHistoryDetails, 10) && visibilityOf(notificationLabel, 10)) {
 			clickOn(notificationHistoryDetails, 10);
@@ -580,10 +587,9 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 				clickOn(notificationToggleTrue, 10);
 				visibilityOf(disableNotificationHeading, 10);
 				clickOn(yes, 10);
-				visibilityOf(success, 10);
-				visibilityOf(notificationDisabledMsg, 10);
-				log.info(notificationDisabledMsg.getText());
-				clickOn(ok, 10);
+				visibilityOf(successDisable, 10);
+				log.info(successDisable.getText());
+				clickOn(crossClose, 10);
 				if (visibilityOf(notificationToggleFalse, 10) && visibilityOf(notificationLabel, 10)) {
 					return true;
 				}
@@ -793,6 +799,50 @@ public class HealthCheckConfiguration extends HealthCheckObjectRepository {
 			log.info("{} data is not correct.", serverName);
 			log.info("{} data on UI - IP Address:Port: {}, Version: {}", serverName, ipAddress, version);
 			log.info("{} test data - IP Address:Port: {}, Version: {}", serverName, rabbitMQPort, rabbitMQVersion);
+			return false;
+		}
+	}
+	/**
+	 * Under Data Components tab, check Grafana data i.e Ip address and version
+	 * 
+	 * @param serverName
+	 * @param ipAddress
+	 * @param version
+	 * @return true if server data is correct else false
+	 */
+	private boolean checkGrafanaData(String serverName, String ipAddress, String version) {
+		String grafanaMQPort = LoginAndSelectModule.testData.get("GrafanaPort");
+		String grafanaVersion = LoginAndSelectModule.testData.get("GrafanaVersion");
+		if (serverName.contains("Grafana") && ipAddress.contains(grafanaMQPort) && version.contains(grafanaVersion)) {
+			log.info("{} data on UI - IP Address:Port: {}, Version: {}", serverName, ipAddress, version);
+			log.info("{} test data - IP Address:Port: {}, Version: {}", serverName, grafanaMQPort, grafanaVersion);
+			return true;
+		} else {
+			log.info("{} data is not correct.", serverName);
+			log.info("{} data on UI - IP Address:Port: {}, Version: {}", serverName, ipAddress, version);
+			log.info("{} test data - IP Address:Port: {}, Version: {}", serverName, grafanaMQPort, grafanaVersion);
+			return false;
+		}
+	}
+
+	/**
+	 * Under Data Components tab, check Python data i.e Ip address and version
+	 * 
+	 * @param serverName
+	 * @param ipAddress
+	 * @param version
+	 * @return true if server data is correct else false
+	 */
+	private boolean checkPythonData(String serverName,String version) {
+		String pythonVersion = LoginAndSelectModule.testData.get("PythonVersion");
+		if (serverName.contains("Python")&& version.contains(pythonVersion)) {
+			log.info("{} data on UI - IP Address:Port: {}, Version: {}", serverName, version);
+			log.info("{} test data - IP Address:Port: {}, Version: {}", serverName, pythonVersion);
+			return true;
+		} else {
+			log.info("{} data is not correct.", serverName);
+			log.info("{} data on UI - IP Address:Port: {}, Version: {}", serverName, version);
+			log.info("{} test data - IP Address:Port: {}, Version: {}", serverName, pythonVersion);
 			return false;
 		}
 	}

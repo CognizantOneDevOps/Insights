@@ -30,7 +30,7 @@ public class ContentConfigurationObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//td[contains(@class, 'mat-column-ContentId')]")
 	List<WebElement> contentListEl;
 
-	@FindBy(xpath = "//mat-icon[@title='Add New Content']")
+	@FindBy(xpath = "//mat-icon[@svgicon='add']")
 	WebElement addNewContentButtonEl;
 
 	// mat-icon[@title="Add New KPI"]
@@ -50,14 +50,17 @@ public class ContentConfigurationObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//div[contains(text(),'red,amber and green values')]")
 	WebElement thresholdRangeValidatorEl;
 
-	@FindBy(xpath = "//div[contains(text(),'Positive,Negative and Neutral')]")
+	@FindBy(xpath = "//span[contains(text(),'Message should contain Positive,Negative and Neutral Messages')]")
 	WebElement comparisonMsgValidationEl;
 
 	@FindBy(xpath = "//input[@name='contentId']")
 	WebElement contentIdEl;
 
-	@FindBy(xpath = "//b[contains(text(),'already exists')]")
+	@FindBy(xpath = "//b[contains(text(),'Content Definition already exists')]")
 	WebElement contentIdExistsEl;
+	
+	@FindBy(xpath = "//button[@id='crossClose']")
+	WebElement crossClose;
 
 	@FindBy(xpath = "//input[@name='contentName']")
 	WebElement contentNameEl;
@@ -65,7 +68,7 @@ public class ContentConfigurationObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//b[contains(text(),'Content definition updated')]")
 	WebElement contentUpdatedEl;
 
-	@FindBy(xpath = "//mat-icon[@data-mat-icon-name='search_icon']")
+	@FindBy(xpath = "//mat-icon[@svgicon='search']")
 	WebElement searchKpiEl;
 
 	@FindBy(xpath = "//td[contains(@class, 'mat-column-kpiId ')]")
@@ -74,7 +77,7 @@ public class ContentConfigurationObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//input[@placeholder='Search']")
 	WebElement kpiInputEl;
 
-	@FindBy(xpath = "//span[text()='OK']/parent::button")
+	@FindBy(xpath = "//span[contains(text(),' OK ')]")
 	WebElement kpiSelectBtnEl;
 
 	@FindBy(xpath = "//mat-select[@name='expectedTrend']")
@@ -110,13 +113,13 @@ public class ContentConfigurationObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//textarea[@name='message']")
 	WebElement messageEl;
 
-	@FindBy(xpath = "//mat-icon[@title='Save']")
+	@FindBy(xpath = "//mat-icon[@svgicon='save']")
 	WebElement saveBtnEl;
 
-	@FindBy(xpath = "//span[text()='YES']")
+	@FindBy(xpath = "//button[@id='yesBtn']")
 	WebElement yesBtnEl;
 
-	@FindBy(xpath = "//div[contains(text(),'file is not a valid JSON')]")
+	@FindBy(xpath = "//span[contains(text(),'file is not a valid JSON')]")
 	WebElement uploadJsonValidatorEl;
 
 	@FindBy(xpath = "//span[text()='YES']/parent::button")
@@ -125,13 +128,13 @@ public class ContentConfigurationObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//span[text()= 'OKAY']")
 	WebElement btnOKEl;
 
-	@FindBy(xpath = "//mat-icon[@title='Delete']")
+	@FindBy(xpath = "//mat-icon[@svgicon='trash']")
 	WebElement delBtnEl;
 
-	@FindBy(xpath = "//mat-icon[@title='Edit']")
+	@FindBy(xpath = "//mat-icon[@svgicon='edit']")
 	WebElement btnEditEl;
 
-	@FindBy(xpath = "//mat-icon[@title='Upload JSON']")
+	@FindBy(xpath = "//mat-icon[@svgicon='upload']")
 	WebElement uploadBtnE1;
 
 	@FindBy(xpath = "//input[@type='file']")
@@ -140,14 +143,14 @@ public class ContentConfigurationObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//mat-icon[@title='Upload ']")
 	WebElement uploadJsonBtnE1;
 
-	@FindBy(xpath = "//mat-icon[contains(@title,'Cancel Upload')]")
+	@FindBy(xpath = "//mat-icon[@svgicon='close_dialog']")
 	WebElement uploadJsonCancelBtnE1;
 
 	@FindBy(xpath = "//span[text()='OK']")
 	WebElement okBtnE1;
 
 	//// mat-icon[@title="Refresh"]
-	@FindBy(xpath = "//mat-icon[@title='Refresh']")
+	@FindBy(xpath = "//mat-icon[@svgicon='retry']")
 	WebElement refreshBtnE1;
 
 	@FindBy(xpath = "//input[@placeholder='Search']")

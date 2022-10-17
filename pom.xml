@@ -14,7 +14,7 @@
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformParent</artifactId>
 	<packaging>pom</packaging>
-	<version>9.6</version>
+	<version>9.7</version>
 	<name>PlatformParent</name>
 
 	<dependencies>
@@ -67,7 +67,7 @@
 		<module>PlatformUI3</module>
 		<module>PlatformUI4</module>
 		<module>PlatformRegressionTest</module>
-
+		<module>PlatformTestReport</module>
 	</modules>
 	<build>		
 		<plugins>
@@ -77,8 +77,8 @@
 				<version>3.3</version>
 				<inherited>true</inherited>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>11</source>
+					<target>11</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -94,6 +94,19 @@
 				<configuration>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.8</version>
+				<executions>
+				<execution>
+					<id>prepare-agent</id>
+					<goals>
+					<goal>prepare-agent</goal>
+					</goals>
+				</execution>
+				</executions>
 			</plugin>			
 		</plugins>
 	</build>

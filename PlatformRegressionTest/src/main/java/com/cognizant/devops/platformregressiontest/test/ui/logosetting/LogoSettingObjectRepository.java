@@ -28,7 +28,7 @@ import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectMod
  */
 public class LogoSettingObjectRepository  extends LoginAndSelectModule{
 
-	@FindBy(xpath = "//div//a[contains(text(),'Logo Setting')]")
+	@FindBy(xpath = "//b[contains(text(),'Logo Setting')]")
 	WebElement landingPage;
 
 	@FindBy(xpath = "//input[@id='file']")
@@ -37,18 +37,21 @@ public class LogoSettingObjectRepository  extends LoginAndSelectModule{
 	@FindBy(xpath = "//b[contains(text(), 'Preview')]")
 	WebElement previewLogo;
 	
-	@FindBy(xpath = "//div[contains(text(), ' Success')]")
+	@FindBy(xpath = "//span[contains(text(),' uploaded successfully. Please LOGOUT and LOGIN again in to the Insights Application to see the uploaded logo.')]")
 	WebElement successMessage;
 	
-	@FindBy(xpath = "//div[contains(text(), ' Error')]")
+	@FindBy(xpath = "//span[text()='Please select a of file size less than 1Mb']")
 	WebElement errorMessage;
 	
 	@FindBy(xpath = "//span[text()= 'OKAY']")
 	WebElement okButton;
 	
-	@FindBy(xpath = "//mat-icon[@title='Upload Image ']")
+	@FindBy(xpath = "//button[@id='crossClose']")
+	WebElement crossClose;
+	
+	@FindBy(xpath = "//mat-icon[@svgicon='upload']")
 	WebElement uploadImage;
 	
-	@FindBy(xpath = "//mat-icon[@title='Cancel Upload ']")
+	@FindBy(xpath = "//mat-icon[@svgicon='cross']")
 	WebElement cancelUpload;
 }

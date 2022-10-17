@@ -193,12 +193,12 @@
             type="text"
             disabled
             placeholder="Search for a KPI Id"
-            style="padding-bottom: 23px"
+            style="padding-bottom: 10px"
           />
-
-          <button
+        </mat-form-field>
+        <button
             mat-icon-button
-            [disabled]="isEdit"
+            [disabled]="isEditKPI"
             (click)="kpiSelectDialog()"
             style="margin-left: -45px"
           >
@@ -208,7 +208,6 @@
             >
             </mat-icon>
           </button>
-        </mat-form-field>
       </div>
 
       <div style="margin-left: 23px; margin-top: 15px">

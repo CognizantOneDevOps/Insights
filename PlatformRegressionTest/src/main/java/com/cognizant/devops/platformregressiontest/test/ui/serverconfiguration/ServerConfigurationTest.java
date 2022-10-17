@@ -51,20 +51,21 @@ public class ServerConfigurationTest extends LoginAndSelectModule {
 	 * @throws InterruptedException
 	 */
 	@BeforeTest
-	public void setUp() {
+	public void setUp() throws InterruptedException {
 		initialization();
 		getData(ConfigOptionsTest.SERVERCONFIGURATION_DIR + File.separator + ConfigOptionsTest.SERVERCONFIGURATION_JSON_FILE);
-		selectModuleUnderConfiguration(LoginAndSelectModule.testData.get("serverconf"));
+		selectMenuOption(LoginAndSelectModule.testData.get("serverconf"));
 		clickAllActionButton = new ServerConfiguration();
 	}
 
 	/**
 	 * This method will be executed just before any function/method with @Test
 	 * annotation starts.
+	 * @throws InterruptedException 
 	 */
 	@BeforeMethod
-	public void beforeMethod() {
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+	public void beforeMethod() throws InterruptedException {
+		Thread.sleep(1000);
 	}
 
 	/**
@@ -74,19 +75,7 @@ public class ServerConfigurationTest extends LoginAndSelectModule {
 	public void navigateToServerConfigurationLandingPage() {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.navigateToServerConfigurationLandingPage(),
-				"Bulk upload Landing page is displayed");
-	}
-	
-	/**
-	 * Assert true if redirect functionality successful else false
-	 * 
-	 * @throws InterruptedException
-	 */
-	@Test(priority = 2)
-	public void checkRedirectFunctionality() {
-		log.info(line);
-		Assert.assertTrue(clickAllActionButton.redirectFunctionality(),
-				"redirect functionality successful");
+				"Server Configuration Landing page is displayed");
 	}
 	
 	/**
@@ -94,13 +83,41 @@ public class ServerConfigurationTest extends LoginAndSelectModule {
 	 * 
 	 * @throws InterruptedException
 	 */
-	@Test(priority = 3)
-	public void chackSaveButton() {
+	@Test(priority = 2)
+	public void chackSaveButton() throws InterruptedException {
 		log.info(line);
-		selectModuleUnderConfiguration(LoginAndSelectModule.testData.get("serverconf"));
+        selectModuleUnderConfiguration(LoginAndSelectModule.testData.get("serverconf"));
 		Assert.assertTrue(clickAllActionButton.saveConfiguration(),
 				"save button functionality successful");
 	}
+	/**
+	 * Assert true if save button functionality successful else false
+	 * 
+	 * @throws InterruptedException
+	 */
+	@Test(priority = 3)
+	public void checkAllMandatoryFields() {
+		log.info(line);
+		Assert.assertTrue(clickAllActionButton.checkAllMandatoryFields(),
+				"Error messaged displayed");
+	}
+
+
+	/**
+	 * Assert true if redirect functionality successful else false
+	 * 
+	 * @throws InterruptedException
+	 */
+	@Test(priority = 4)
+	public void checkRedirectFunctionality() throws InterruptedException {
+		log.info(line);
+        selectModuleOnClickingConfig(LoginAndSelectModule.testData.get("serverconf"));
+
+		Assert.assertTrue(clickAllActionButton.redirectFunctionality(),
+				"redirect functionality successful");
+	}
+	
+	
 
 	/**
 	 * This method will be executed just after any function/method with @Test

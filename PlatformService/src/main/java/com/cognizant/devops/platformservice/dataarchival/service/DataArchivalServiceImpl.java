@@ -269,8 +269,16 @@ public class DataArchivalServiceImpl implements DataArchivalService {
 	public void publishDataArchivalDetails(String routingKey, String publishDataJson)
 			throws IOException, TimeoutException, InsightsCustomException {
 		String queueName = routingKey.replace(".", "_");
-		try (Channel channel = RabbitMQConnectionProvider.getChannel(routingKey, queueName, MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE)) {
+		Channel channel = null;
+		try {
+			
+			channel = RabbitMQConnectionProvider.getConnection().createChannel();
+			channel = RabbitMQConnectionProvider.initilizeChannel(channel, routingKey, queueName, MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE);
 			channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, publishDataJson.getBytes());
+		}finally {
+			if(channel != null) {
+				channel.close();
+			}
 		}
 	}
 }

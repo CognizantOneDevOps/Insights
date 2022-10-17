@@ -19,7 +19,7 @@ source /etc/profile
 cd /opt
 #sudo mkdir grafana
 #cd grafana
-read -p "Please enter Grafana version number you want to install(ex. 7.5.10 or 8.4.5): " version_number
+read -p "Please enter Grafana version number you want to install(ex. 7.5.10 or 8.4.5 or 9.0.6): " version_number
 version_number=`echo $version_number | sed -e 's/^[[:space:]]*//'`
 sudo wget https://dl.grafana.com/oss/release/grafana-${version_number}.linux-amd64.tar.gz
 sudo tar -zxvf grafana-${version_number}.linux-amd64.tar.gz

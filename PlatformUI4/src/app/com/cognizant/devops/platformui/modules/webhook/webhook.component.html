@@ -237,7 +237,7 @@
                         <div class="input">
                             <mat-slide-toggle (toggleChange)="onEventChange()"
                                 [disabled]="isUpdateRequired || !isToolSelected " [(ngModel)]="isEventProcessing"
-                                [checked]="isEventProcessing" style="margin-right: 15%;margin-left: 5%;">
+                                [checked]="isEventProcessing" style="margin-right: 15%;margin-left: 5%;" id="eventProcessing">
                             </mat-slide-toggle>
                         </div>
                         <span class="comments">Select this field if you want to use webhook for event processing.</span>
@@ -246,7 +246,7 @@
                         <span class="lbltext" style="margin-bottom: 12px;">Is Node updation required?</span>
                         <div class="input">
                             <mat-slide-toggle [disabled]="isEventProcessing" [(ngModel)]="isUpdateRequired"
-                                [checked]="isUpdateRequired" style="margin-right: 5%;margin-left: 5%;">
+                                [checked]="isUpdateRequired" style="margin-right: 5%;margin-left: 5%;" id="nodeUpdation">
                             </mat-slide-toggle>
                             <mat-form-field *ngIf="isUpdateRequired" appearance="fill" class="formfield-custom2">
                                 <input matInput type="text" [(ngModel)]="fieldUsedForUpdate"

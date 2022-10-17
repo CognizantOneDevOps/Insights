@@ -1,0 +1,267 @@
+{
+	"vault": {
+		"getFromVault": false,
+		"secretEngine": "insights-kv",
+		"readToken": "vault_secret_token",
+		"vaultUrl": "http://Vault_Host:port/v1/"
+	},
+	"mqConfig": {
+		"user": "",
+		"password": "",
+		"host": "127.0.0.1",
+		"exchange": "iSight",
+		"agentControlXchg": "iAgent"
+	},
+	"subscribe": {
+		"config": "FINOPS.AZURECSVPARSEREFINOPS.config",
+		"agentCtrlQueue": "insights_finops_azure_csv_parser_agent"
+	},
+	"publish": {
+		"data": "FINOPS.AZURECSVPARSERFINOPS.DATA",
+		"health": "FINOPS.AZURECSVPARSERFINOPS.HEALTH"
+	},
+	"enrichData": {
+		"isEnrichmentRequired": false,
+		"sourceProperty": "message",
+		"keyPattern": "-",
+		"targetProperty": "key"
+	},
+	"communication": {
+		"type": "REST",
+		"sslVerify": false,
+		"responseType": "JSON"
+	},
+	"dynamicTemplate": {
+		"timeFieldMapping": {
+			"usagedate": "%Y-%m-%d"
+		},
+		"costManagement": {
+			"insightsTimeXFieldMapping": {
+				"timefield": "usagedate",
+				"isEpoch": false,
+				"timeformat": "%Y-%m-%d"
+			},
+			"costMetadata": {
+				"labels": [
+					"COST_MANAGEMENT_CSV"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"resourceid",
+					"usagedate",
+					"metersubcategory",
+					"metercategory",
+					"meter"
+				]
+			}
+		},
+		"forecast": {
+			"forcastDataCollectionInDays": 30,
+			"insightsTimeXFieldMapping": {
+				"timefield": "usagedate",
+				"isEpoch": false,
+				"timeformat": "%Y-%m-%d"
+			},
+			"forecastrequest": {
+				"type": "ActualCost",
+				"dataSet": {
+					"granularity": "Daily",
+					"aggregation": {
+						"totalCostUSD": {
+							"name": "CostUSD",
+							"function": "Sum"
+						}
+					},
+					"sorting": [
+						{
+							"direction": "ascending",
+							"name": "UsageDate"
+						}
+					]
+				},
+				"timeframe": "Custom",
+				"timePeriod": {
+					"from": "startFrom",
+					"to": "endTo"
+				}
+			},
+			"forecastMetadata": {
+				"labels": [
+					"FORECAST_CSV"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"usagedate",
+					"subscriptionid",
+					"subscriptionname",
+					"resourcegroup"
+				]
+			}
+		},
+		"resourceDetails": {
+			"resourceDetailsMetadata": {
+				"labels": [
+					"RESOURCE_DETAILS_CSV"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"resourceid"
+				]
+			},
+			"relationCostMetadata": {
+				"relation": {
+					"name": "RESOURCE_HAS_COST_CSV",
+					"source": {
+						"labels": [
+							"RESOURCE_DETAILS_CSV"
+						],
+						"constraints": [
+							"resourceid"
+						]
+					},
+					"destination": {
+						"labels": [
+							"COST_MANAGEMENT_CSV"
+						],
+						"constraints": [
+							"resourceid"
+						]
+					}
+				}
+			},
+			"relationTagsMetadata": {
+				"relation": {
+					"name": "TAGS_HAS_RESOURCE_CSV",
+					"source": {
+						"labels": [
+							"RESOURCE_TAGS_CSV"
+						],
+						"constraints": [
+							"resourceid"
+						]
+					},
+					"destination": {
+						"labels": [
+							"RESOURCE_DETAILS_CSV",
+							"LATEST"
+						],
+						"constraints": [
+							"resourceid"
+						]
+					}
+				}
+			}
+		},
+		"resourceTagsIndividual": {
+			"resourceMetadata": {
+				"labels": [
+					"RESOURCE_TAGS_CSV"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"resourceid",
+					"tagkey"
+				]
+			}
+		},
+		"resourceMetricsdDetails": {
+			"insightsTimeXFieldMapping": {
+				"timefield": "timeStamp",
+				"isEpoch": false,
+				"timeformat": "%Y-%m-%dT%H:%M:%S"
+			},
+			"resourceMetricsMetadata": {
+				"labels": [
+					"RESOURCE_METRICS_CSV"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"resourceid",
+					"timeStamp",
+					"name"
+				]
+			},
+			"resourceMetricsRelationMetadata": {
+				"relation": {
+					"name": "RESOURCE_HAS_METRICS_CSV",
+					"source": {
+						"labels": [
+							"RESOURCE_DETAILS_CSV"
+						],
+						"constraints": [
+							"resourceid"
+						]
+					},
+					"destination": {
+						"labels": [
+							"RESOURCE_METRICS_CSV"
+						],
+						"constraints": [
+							"resourceid"
+						]
+					}
+				}
+			}
+		},
+		"additionalResourceDetails": {
+			"Microsoft.Compute/virtualMachines": {
+				"ObjectProperties": {
+				},
+				"availablemetrics": {
+					"Percentage CPU": "average",
+					"Available Memory Bytes": "average"
+				}
+			},
+			"Microsoft.Compute/disks": {
+				"ObjectProperties": {
+				},
+				"availablemetrics": {
+					"Composite Disk Read Bytes/sec": "average",
+					"Composite Disk Read Operations/sec": "average",
+					"Composite Disk Write Bytes/sec": "average",
+					"Composite Disk Write Operations/sec": "average",
+					"DiskPaidBurstIOPS": "average"
+				}
+			}
+		}
+	},
+	"agentId": "",
+	"enableDataValidation": true,
+	"toolCategory": "FINOPS",
+	"toolName": "AZURECSVPARSERFINOPS",
+	"toolsTimeZone": "GMT",
+	"insightsTimeZone": "Asia/Kolkata",
+	"enableValueArray": false,
+	"useResponseTemplate": true,
+	"collectForecastData": false,
+	"auth": "base64",
+	"runSchedule": 0,
+	"runCron": "5 15 * * *",
+	"timeStampField": "usagedate",
+	"timeStampFormat": "%Y-%m-%dT%H:%M:%S",
+	"storageAccountUrl": "",
+    "storageAccountKey": "",
+    "containerName": "",
+    "storageConnectionString": "",
+	"isEpochTimeFormat": false,
+	"agentSecretDetails": [
+		"storageAccountUrl",
+		"storageAccountKey",
+		"containerName",
+		"storageConnectionString"
+	],
+	"startFrom": "2022-08-01T00:00:00",
+	"isDebugAllowed": false,
+	"loggingSetting": {
+		"logLevel": "INFO",
+		"maxBytes": 5000000,
+		"backupCount": 10
+	},
+	"webhookEnabled": false,
+	"auditing": false,
+	"enableProxy": false,
+	"proxies": {
+		"http": "",
+		"https": ""
+	}
+}

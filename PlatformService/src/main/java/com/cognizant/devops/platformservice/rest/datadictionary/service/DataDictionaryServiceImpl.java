@@ -36,10 +36,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-@Service("dataDictionaryService")
+@Service
 public class DataDictionaryServiceImpl implements DataDictionaryService {
 	
-	GraphDBHandler GraphDBHandler = new GraphDBHandler();
+	GraphDBHandler graphDBHandler = new GraphDBHandler();
 	private static Logger log = LogManager.getLogger(DataDictionaryServiceImpl.class);
 
 	@Override
@@ -92,7 +92,7 @@ public class DataDictionaryServiceImpl implements DataDictionaryService {
 		JsonArray keysArrayJson = new JsonArray();
 		try {
 			String toolPropertiesQuery = DataDictionaryConstants.GET_TOOL_PROPERTIES_QUERY;
-			GraphResponse graphResponse = GraphDBHandler.executeCypherQuery(
+			GraphResponse graphResponse = graphDBHandler.executeCypherQuery(
 					toolPropertiesQuery.replace("__labelName__", labelName).replace("__CategoryName__", categoryName));
 			JsonObject jsonResponse = graphResponse.getJson();
 			Iterator<JsonElement> iterator = jsonResponse.get("results").getAsJsonArray().iterator().next()
@@ -122,7 +122,7 @@ public class DataDictionaryServiceImpl implements DataDictionaryService {
 		JsonArray toolsRealtionJson = new JsonArray();
 		try {
 			String toolsRelationshipQuery = DataDictionaryConstants.GET_TOOLS_RELATIONSHIP_QUERY;
-			GraphResponse graphResponse = GraphDBHandler.executeCypherQuery(toolsRelationshipQuery
+			GraphResponse graphResponse = graphDBHandler.executeCypherQuery(toolsRelationshipQuery
 					.replace("__StartToolCategory__", startToolCategory).replace("__StartLabelName__", startLabelName)
 					.replace("__EndToolCategory__", endToolCatergory).replace("__EndLabelName__", endLabelName));
 			JsonObject jsonResponse = graphResponse.getJson();

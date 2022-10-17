@@ -60,7 +60,7 @@ public class WebConfig {
 		try {
 			WebHookMessagePublisher.getInstance().initilizeMq();
 		} catch (Exception e) {
-			LOG.error("Unable to connect to RabbitMQ, Please check RabbitMQ service ");
+			LOG.error("Unable to connect to RabbitMQ, Please check RabbitMQ service ", e );
 			throw new RuntimeException("Unable to connect to RabbitMQ, Please check RabbitMQ service ");
 		}
 		LOG.debug(" start servelet registration in webhookServlet ");

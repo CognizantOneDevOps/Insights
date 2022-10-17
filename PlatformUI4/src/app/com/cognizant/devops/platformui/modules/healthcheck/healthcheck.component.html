@@ -167,6 +167,9 @@
       </div>
     </mat-tab>
     <mat-tab label="Services" class="tab-style">
+      <div
+      id="servicesTable"
+    >
       <table mat-table [dataSource]="servicesDataSource" class="matTableBorder">
         <!-- Server Column -->
         <ng-container matColumnDef="serverName">
@@ -248,6 +251,7 @@
         ></tr>
         <tr mat-row *matRowDef="let row; columns: servicesColumns"></tr>
       </table>
+      </div>
       <!-- Displays Progress spinner and Error message for service failure-->
       <div
         *ngIf="showThrobber"

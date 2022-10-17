@@ -1,0 +1,249 @@
+{
+  "vault": {
+    "getFromVault": false,
+    "secretEngine":"insights-kv",
+    "readToken":"vault_secret_token",
+    "vaultUrl":"http://Vault_Host:port/v1/"
+  },
+  "mqConfig": {
+    "user": "",
+    "password": "",
+    "host": "127.0.0.1",
+    "exchange": "",
+    "agentControlXchg": "iAgent"
+  },
+  "subscribe": {
+    "config": "FINOPS.AWSFINOPS.config",
+    "agentCtrlQueue": "aws_finops_agent"
+  }, 
+  "publish": {
+    "data": "FINOPS.AWSFINOPS.DATA",
+    "health": "FINOPS.AWSFINOPS.HEALTH"
+  },
+  "enrichData":{ 
+      "isEnrichmentRequired":false,
+      "sourceProperty":"message",
+      "keyPattern":"-",
+      "targetProperty":"key"
+   },
+  "communication": {
+    "type": "REST",
+    "sslVerify": false,
+    "responseType": "JSON"
+  },
+  "dynamicTemplate": {
+    "responseTemplate": {
+    	
+        },
+        "timeFieldMapping": {
+			"usagedate": "%Y-%m-%d",
+			"usagedatestart": "%Y-%m-%dT%H:%M:%SZ"
+		},
+		"costManagement": {
+			"insightsTimeXFieldMapping": {
+		        "timefield": "usagedate",
+		        "isEpoch": false,
+		        "timeformat": "%Y-%m-%d"
+		      },
+			"request": {
+				"type": "ActualCost",
+				"timeframe": "Custom",
+				"timePeriod": {
+					"from": "2022-06-01",
+					"to": "2022-06-30"
+				}
+			},
+			"costMetadata": {
+				"labels": [
+					"COST_MANAGEMENT"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"usagetype",
+					"servicename",
+					"operation",
+					"usagedatestart",
+					"lineitemtype",
+					"resourceid"
+				]
+			}
+		},
+		"resourceTags": {
+			"resourceMetadata": {
+				"labels": [
+					"RESOURCE_TAGS"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"resourceid",
+					"tagkey",
+					"tagvalue"
+				]
+			}
+		},
+		"resourceDetails": {
+			"resourceDetailsMetadata": {
+				"labels": [
+					"RESOURCE_DETAILS"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"resourceid",
+					"servicename"
+				]
+			},
+			"relationCostMetadata": {
+				"relation": {
+					"name": "RESOURCE_HAS_COST",
+					"source": {
+						"labels": [
+							"RESOURCE_DETAILS"
+						],
+						"constraints": [
+							"resourceid",
+							"cloudtype",
+							"servicename"
+						]
+					},
+					"destination": {
+						"labels": [
+							"COST_MANAGEMENT"
+						],
+						"constraints": [
+							"resourceid",
+							"cloudtype",
+							"servicename"
+						]
+					}
+				}
+			},
+			"relationTagsMetadata": {
+				"relation": {
+					"name": "TAGS_HAS_RESOURCE",
+					"source": {
+						"labels": [
+							"RESOURCE_TAGS"
+						],
+						"constraints": [
+							"resourceid"
+						]
+					},
+					"destination": {
+						"labels": [
+							"RESOURCE_DETAILS",
+							"LATEST"
+						],
+						"constraints": [
+							"resourceid"
+						]
+					}
+				}
+			}
+		},
+		"metrics": {
+			"metricsMetadata": {
+				"labels": [
+					"RESOURCE_METRICS"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"instanceid",
+					"metricname",
+					"startdate",
+					"enddate"
+				]
+			}
+		},
+		"forecast": {
+			"forcastDataCollectionInDays": 30,
+			"isForecastNeeded": true,
+		   	"forecastMetrics": "UNBLENDED_COST",
+		   	"forecastGranularity": "DAILY",
+		   	"forecastRegions": ["us-east-1", "us-west-1"],
+			"insightsTimeXFieldMapping": {
+				"timefield": "usagedate",
+				"isEpoch": false,
+				"timeformat": "%Y-%m-%d"
+			},
+			"forecastrequest": {
+				"Filter": {
+					  "Dimensions": {
+						"Key": "REGION",
+						"Values": ["allregions"]
+					  }
+					}
+			},
+			"forecastMetadata": {
+				"labels": [
+					"FORECAST"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"usagedate"					
+				]
+			}
+		},
+		"additionalResourceDetails": {
+			"period": "86400",
+			"isMetricsNeeded": false,
+			"resourceMetrics": {
+				"AWS/EC2": {
+					"resourceName": "InstanceId",
+					"ObjectProperties": "Amazon Elastic Compute Cloud",
+					"availablemetrics": {
+						"CPUUtilization": "Average",
+						"DiskReadOps": "Average"
+					}
+				},
+				"AWS/ELB": {
+					"resourceName": "InstanceId",
+					"ObjectProperties": "Amazon Elastic Compute Cloud",
+					"availablemetrics": {
+						"CPUUtilization": "Average",
+						"DiskReadOps": "Average"
+					}
+				},
+				"AWS/S3": {
+					"resourceName": "BucketName",
+					"ObjectProperties": "Amazon Simple Storage Service",
+					"availablemetrics": {
+						
+					}
+				}
+			}		
+		}
+  },
+  "agentId": "",
+  "enableDataValidation": true,
+  "toolCategory": "FINOPS",
+  "toolName":"AWSFINOPS",
+  "toolsTimeZone": "GMT",
+  "insightsTimeZone": "Asia/Kolkata",
+  "enableValueArray": false,
+  "useResponseTemplate": false,
+  "auth": "base64",
+  "runSchedule": 0,
+  "runCron": "0 */2 * * *",
+  "timeStampField": "usagedatestart",
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
+  "awsAccesskey": "",
+  "awsSecretkey": "",
+  "s3FilePath": "",
+  "startFrom": "2022-10-01T00:00:00",
+  "awsRegion": "us-east-1",
+  "isEpochTimeFormat": false,
+  "agentSecretDetails": ["awsAccesskey","awsSecretkey","s3FilePath"],
+  "isDebugAllowed": false,
+  "loggingSetting": {
+    "logLevel": "INFO",
+    "maxBytes": 5000000,
+    "backupCount": 10
+  },
+  "webhookEnabled": false,
+  "auditing": false,
+  "enableProxy":false,
+  "proxies":{
+    	"http":"",
+    	"https":""
+    }
+}

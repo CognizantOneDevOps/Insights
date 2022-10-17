@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -37,6 +38,7 @@ public class DashboardReportDownloadTest extends LoginAndSelectModule {
 	DashboardReportDownloadConfiguration dashboardReport;
 
 	String line = "============================================================================================================================================================";
+	String title="Platform Webhook Report(DAILY)";
 
 	/**
 	 * This method will be run before any test method belonging to the classes
@@ -56,10 +58,11 @@ public class DashboardReportDownloadTest extends LoginAndSelectModule {
 	/**
 	 * This method will be executed just before any function/method with @Test
 	 * annotation starts.
+	 * @throws InterruptedException 
 	 */
 	@BeforeMethod
-	public void beforeMethod() {
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+	public void beforeMethod() throws InterruptedException {
+		Thread.sleep(10000);
 	}
 
 	/**
@@ -95,16 +98,23 @@ public class DashboardReportDownloadTest extends LoginAndSelectModule {
 		Assert.assertTrue(dashboardReport.createReportWithoutMailingDetails(data),
 				"Created report without mailing details.");
 	}
+	
+	@Test(priority = 4, enabled = true, dataProvider = "editDashboardReport", dataProviderClass = DashboardReportDataProvider.class)
+	public void editDashboardReport(DashboardReportDataModel data) {
+		log.info(line);
+		Assert.assertTrue(dashboardReport.editDashboardReport(data),
+				"Successfully edited the Dashboard report.");
+	}
 
 	/**
 	 * Assert true if details functionality working successfully
 	 * 
 	 * @param data
 	 */
-	@Test(priority = 4, enabled = true, dataProvider = "reportWithMailingDetails", dataProviderClass = DashboardReportDataProvider.class)
-	public void checkDetailsFunctionality(DashboardReportDataModel data) {
+	@Test(priority = 5)
+	public void checkDetailsFunctionality() {
 		log.info(line);
-		Assert.assertTrue(dashboardReport.checkDetailsFunctionality(data), "Details functionality working.");
+		Assert.assertTrue(dashboardReport.checkDetailsFunctionality(title), "Details functionality working.");
 	}
 
 	/**
@@ -113,7 +123,7 @@ public class DashboardReportDownloadTest extends LoginAndSelectModule {
 	 * 
 	 * @param data
 	 */
-	@Test(priority = 5, enabled = true, dataProvider = "reportWithMailingDetails", dataProviderClass = DashboardReportDataProvider.class)
+	@Test(priority = 6, enabled = true, dataProvider = "reportWithMailingDetails", dataProviderClass = DashboardReportDataProvider.class)
 	public void deleteReport(DashboardReportDataModel data) {
 		log.info(line);
 		Assert.assertTrue(dashboardReport.deleteReport(data), "Report deleted successfully.");
@@ -124,7 +134,7 @@ public class DashboardReportDownloadTest extends LoginAndSelectModule {
 	 * 
 	 * @param data
 	 */
-	@Test(priority = 6, enabled = true, dataProvider = "reportWithoutMailingDetails", dataProviderClass = DashboardReportDataProvider.class)
+	@Test(priority = 7, enabled = true, dataProvider = "reportWithoutMailingDetails", dataProviderClass = DashboardReportDataProvider.class)
 	public void checkRefreshAndRedirectFunctionality(DashboardReportDataModel data) {
 		log.info(line);
 		Assert.assertTrue(dashboardReport.checkRefreshAndRedirectFunctionality(data),

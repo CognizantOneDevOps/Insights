@@ -29,46 +29,37 @@ import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectMod
  */
 public class DataArchivalObjectRepository extends LoginAndSelectModule{
 	
-	@FindBy(xpath = "//mat-icon[@title='Add']")
+	@FindBy(xpath = "//mat-icon[@svgicon='add']")
 	WebElement addDetails;
 
-	@FindBy(xpath = "//tbody//tr[1]//td[2]//input")
+	@FindBy(xpath = "//mat-icon[@svgicon='edit']")
+	WebElement editDetails;
+	
+	@FindBy(xpath = "//mat-icon[@svgicon='trash']")
+	WebElement deleteDetails;
+
+	@FindBy(xpath = "//mat-icon[@svgicon='view']")
+	WebElement viewDetails;
+
+	@FindBy(xpath = "//input[@name='archivalName']")
 	WebElement archivalName;
-
-	@FindBy(xpath = "//tbody//tr[2]//td[2]//span/*[name()='svg']")
-	WebElement startDate;
-
-	@FindBy(xpath = "//tbody//tr[3]//td[2]//span/*[name()='svg']")
-	WebElement stopDate;
-
-	@FindBy(xpath = "//tbody//tr[4]//td[2]//input")
+	
+	@FindBy(xpath = "//input[@name='DaysToRetain']")
 	WebElement noofdaystoRetain;
 
-	@FindBy(xpath = "//mat-icon[@title='Save']")
+	@FindBy(xpath = "//mat-icon[@svgicon='saveHook']")
 	WebElement saveButton;
 
-	@FindBy(xpath = "//mat-icon[@title='Redirect To Landing Page']")
-	WebElement redirectToLandingPage;
+	@FindBy(xpath = "//mat-icon[@svgicon='backButton']")
+	WebElement backButton;
 
-	@FindBy(xpath = "//mat-icon[@title='Delete']")
-	WebElement deleteButton;
+	@FindBy(xpath = "//button[@id='yesBtn']")
+	WebElement yesBtn;
 
-	@FindBy(xpath = "//mat-icon[@title='View Details']")
-	WebElement viewDetailsButton;
-
-	@FindBy(xpath = "//table[@role='presentation']//tbody//tr//td")
-	List<WebElement> listOfDate;
-
-	@FindBy(xpath = "//span[text()= 'OKAY']")
-	WebElement okButton;
-
-	@FindBy(xpath = "//span[text()= 'YES']")
-	WebElement yesButton;
-
-	@FindBy(xpath = "//div[contains(text(), ' Success')]")
+	@FindBy(xpath = "//span[contains(text(),'successfully')]")
 	WebElement successMessage;
 
-	@FindBy(xpath = "//div[contains(text(), ' Error')]")
+	@FindBy(xpath = "//span[contains(text(), ' already exists. Please try again with a new name.')]")
 	WebElement errorMessage;
 
 	@FindBy(xpath = "//div[@class='mat-calendar-arrow']")
@@ -80,10 +71,36 @@ public class DataArchivalObjectRepository extends LoginAndSelectModule{
 	@FindBy(xpath = "//mat-icon[@title='Redirect To Landing Page']")
 	WebElement redirectButton;
 
-	@FindBy(xpath = "//mat-icon[@title='Reset']")
+	@FindBy(xpath = "//mat-icon[@svgicon='exit']")
 	WebElement resetButton;
 
 	@FindBy(xpath = "//div[contains(text(),'Data Archival')]")
 	WebElement landingPage;
+	
+	@FindBy(xpath = "//mat-icon[@id='stDate']")
+	WebElement openStartDateCl;
+
+	@FindBy(xpath = "//mat-icon[@id='endDate']")
+	WebElement openEndDateCl;
+
+	
+	@FindBy(xpath = "//button[contains(@class,'mat-calendar-period-button')]")
+	WebElement selectYearArrowButton;
+
+	@FindBy(xpath = "//div[contains(@class, 'mat-calendar-body-cell')]")
+	public List<WebElement> yearList;
+
+	@FindBy(xpath = "//div[contains(@class, 'mat-calendar-invert')]")
+	WebElement selectMonthArrowButton;
+
+	@FindBy(xpath = "//div[contains(@class, 'mat-calendar-body-cell-content')]")
+	public List<WebElement> monthList;
+
+	@FindBy(xpath = "//div[contains(@class, 'mat-calendar-body-cell-content')]")
+	public List<WebElement> dateList;
+
+	@FindBy(xpath = "//button[@id='crossClose']")
+	WebElement crossClose;
+
 
 }

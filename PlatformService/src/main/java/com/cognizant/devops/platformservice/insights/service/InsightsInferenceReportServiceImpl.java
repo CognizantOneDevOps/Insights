@@ -101,7 +101,7 @@ public class InsightsInferenceReportServiceImpl implements InsightsInferenceServ
 	private List<InsightsInferenceDetail> getContentResults(int assessmentId, String group) {
 		List<InsightsInferenceDetail> contentResults = new ArrayList<>();
 		try {
-			String graphQuery = getQueryForContentResult(assessmentId, group);
+			String graphQuery = getQueryForContentResult(group);
 			log.debug(" graphQuery {} ", graphQuery);
 			GraphResponse graphResp = graphDBHandler.executeCypherQuery(graphQuery);
 			JsonArray errorMessage = graphResp.getJson().getAsJsonArray("errors");
@@ -127,9 +127,9 @@ public class InsightsInferenceReportServiceImpl implements InsightsInferenceServ
 	 * @param group
 	 * @return String
 	 */
-	private String getQueryForContentResult(int assessmentId, String group) {
+	private String getQueryForContentResult(String group) {
 		String cypherQuery = "MATCH (n:CONTENT_RESULT)";
-		cypherQuery = cypherQuery + " where n.assessmentId=" + assessmentId + " ";
+		cypherQuery = cypherQuery + " where n.assessmentReportName='Report_Grafana_Inference' ";
 		cypherQuery = cypherQuery + " with distinct max(n.executionId) as latestexecutionId "
 				+ " Match (b:CONTENT_RESULT) where b.executionId =latestexecutionId";
 		cypherQuery = cypherQuery + " and b.group='" + group + "' ";
@@ -181,7 +181,7 @@ public class InsightsInferenceReportServiceImpl implements InsightsInferenceServ
 				.getReportsKPIConfig();
 		reportsKPIConfigSet.forEach(reportKpi -> kpiIds.add(reportKpi.getKpiConfig().getKpiId()));
 
-		String graphQuery = getQueryForKPIResults(kpiIds, group, assessmentReport.getId());
+		String graphQuery = getQueryForKPIResults(kpiIds, group);
 		log.debug(" graphQuery for KPI in InsightsInferenceReport {} ", graphQuery);
 		JsonObject kpiResultsJson = getKpiQueryResults(graphQuery);
 		return creatingKpiResultDetailList(kpiResultsJson);
@@ -196,16 +196,16 @@ public class InsightsInferenceReportServiceImpl implements InsightsInferenceServ
 	 * @param assessmentId
 	 * @return String
 	 */
-	private String getQueryForKPIResults(List<Integer> kpiIds, String group, int assessmentId) {
+	private String getQueryForKPIResults(List<Integer> kpiIds, String group) {
 		String cypherQuery = "MATCH (n:KPI:RESULTS) where n.kpiId in " + kpiIds;
 		cypherQuery = cypherQuery + " and n.groupName='" + group + "'";
-		cypherQuery = cypherQuery + " and  n.assessmentId=" + assessmentId + " ";
+		cypherQuery = cypherQuery + " and n.assessmentReportName='Report_Grafana_Inference' ";
 		cypherQuery = cypherQuery + " RETURN n order by n.executionId desc ";
 		return cypherQuery;
 	}
 
 	/**
-	 * Method to get KPI Results 
+	 * Method to get KPI Results
 	 * 
 	 * @param graphQuery
 	 * @return JsonObject

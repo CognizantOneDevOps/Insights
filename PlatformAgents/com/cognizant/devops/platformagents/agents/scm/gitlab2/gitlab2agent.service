@@ -1,0 +1,9 @@
+[Unit]
+Description=Ubuntu GitLab2Agent Service
+
+[Service]
+Type=forking
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/gitlab2/__AGENT_KEY__/__AGENT_KEY__.sh
+
+[Install]
+WantedBy=multi-user.target

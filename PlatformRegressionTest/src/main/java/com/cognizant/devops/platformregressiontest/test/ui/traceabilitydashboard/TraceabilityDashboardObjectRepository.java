@@ -24,7 +24,7 @@ import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectMod
 
 public class TraceabilityDashboardObjectRepository extends LoginAndSelectModule{
 
-	@FindBy(xpath = "//div//a[contains(text(),'Traceability Dashboard')]")
+	@FindBy(xpath = "//div//span[contains(text(),'Traceability Dashboard')]")
 	WebElement landingPage;
 
 	@FindBy(xpath = "//div//span[contains(text(),'Select Tool')]")
@@ -39,10 +39,10 @@ public class TraceabilityDashboardObjectRepository extends LoginAndSelectModule{
 	@FindBy(xpath = "//input[@name='toolFieldValue']")
 	WebElement toolFieldValue;
 	
-	@FindBy(xpath = "//button//span[contains(text(),'Search')]")
+	@FindBy(xpath = "//button[contains(text(),'Search')]")
 	WebElement searchButton;
 	
-	@FindBy(xpath = "//button//span[contains(text(),'Clear')]")
+	@FindBy(xpath = "//button[contains(text(),'Clear')]")
 	WebElement clearButton;
 	
 	@FindBy(xpath = "//div[@role='tab']//div[contains(text(),'Summary')]")
@@ -51,16 +51,22 @@ public class TraceabilityDashboardObjectRepository extends LoginAndSelectModule{
 	@FindBy(xpath = "//div[@role='tab']//div[contains(text(),'Pipeline')]")
 	WebElement pipelineTab;
 	
-	@FindBy(xpath = "//div[@class='column2 ng-star-inserted'][1]//span[contains(text(),'more info')]")
+	@FindBy(xpath = "//label//u[contains(text(),' more info ')]")
 	WebElement moreInfo;
 	
-	@FindBy(xpath = "//div[contains(text(),'Additional Details')]")
+	@FindBy(xpath = "//*[@id=\"mat-tab-content-0-1\"]//div//div//div[2]//div[1]//div[1]//label//u")
+	WebElement viewJiraTool;
+	
+	@FindBy(xpath = "//u[contains(text(),'GIT')]")
+	WebElement viewGitTool;
+	
+	@FindBy(xpath = "//div//h1[contains(text(),' Additional Details')]")
 	WebElement additionalDetails;
 	
 	@FindBy(xpath = "//mat-icon[@svgicon='close_dialog']")
 	WebElement closeDialog;
 	
-	@FindBy(xpath = "//div[contains(text(), ' Error')]")
+	@FindBy(xpath = "//*[@id=\"cdk-overlay-10\"]/snack-bar-container/div/div/app-snackbar-message/div/div[1]/span[contains(text(),'No data found')]")
 	WebElement errorMessage;
 	
 	@FindBy(xpath = "//span[text()= 'OKAY']")
@@ -68,4 +74,47 @@ public class TraceabilityDashboardObjectRepository extends LoginAndSelectModule{
 	
 	@FindBy(xpath = "//span[contains(@class, 'mat-option-text')]")
 	List<WebElement> dropdownList;
+	
+	@FindBy(xpath = "//div[contains(text(), 'This search has fetched : ')]")
+	WebElement checkSummaryTab;
+	
+	@FindBy(xpath = "//div[contains(@class, 'parentCard')]")
+	WebElement checkPipelineTab;
+	
+	@FindBy(xpath = "//mat-icon[@svgicon='cross']") 
+	WebElement crossClose;
+	
+	@FindBy(xpath = "//tbody//tr//td//div[contains(text(), ' root ')]")
+	WebElement checkUserRoot;
+	
+	@FindBy(xpath = "//input[@placeholder='Search']")
+	WebElement searchUser;
+	
+	@FindBy(xpath = "//label[contains(@class, 'totalSummaryPropCount')]")
+	List<WebElement> count;
+
+	@FindBy(xpath = "//label[contains(text(),'Builds']")
+	WebElement Builds;
+	
+	@FindBy(xpath = "//label[contains(text(),'Code Quality Executions']")
+	List<WebElement> sonarCount;
+	
+	@FindBy(xpath = "//u[contains(text(),'GIT']")
+	WebElement gitDetails;
+	
+	@FindBy(xpath = "//div//div//div[2]//div[2]//div//mat-card//label//u")
+	WebElement jiraInfo;
+	
+	@FindBy(xpath = "//div[2]//table//tbody//tr//td[1]//div")
+	WebElement searchResult;
+	
+	@FindBy(xpath = "//img[@src='icons/svg/traceability/JIRA.svg']")
+	WebElement imgJira;
+	
+	@FindBy(xpath = "//img[@src='icons/svg/traceability/GIT.svg']")
+	WebElement imgGit;
+	
+	@FindBy(xpath = "//span[contains(text(), 'Milestone already in progress, you cannot delete this Milestone. ')]")
+	WebElement milestoneDeleteIssue;
+	
 }

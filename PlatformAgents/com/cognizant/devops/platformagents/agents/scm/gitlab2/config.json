@@ -1,0 +1,141 @@
+{
+  "vault": {
+    "getFromVault": false,
+    "secretEngine": "insights-kv",
+    "readToken": "vault_secret_token",
+    "vaultUrl": "http://Vault_Host:port/v1/"
+  },
+  "mqConfig": {
+    "user": "username for RabbitMq",
+    "password": "",
+    "host": "127.0.0.1",
+    "exchange": "iSight",
+    "agentControlXchg": "iAgent",
+    "port": 5672,
+    "enableDeadLetterExchange": false,
+    "prefetchCount": 5
+  },
+  "subscribe": {
+    "config": "SCM.GITLAB.config"
+  },
+  "publish": {
+    "data": "SCM.GITLAB.DATA",
+    "health": "SCM.GITLAB.HEALTH"
+  },
+  "enrichData": {
+    "isEnrichmentRequired": false,
+    "sourceProperty": "message",
+    "keyPattern": "-",
+    "targetProperty": "key"
+  },
+  "communication": {
+    "type": "REST",
+    "sslVerify": false,
+    "responseType": "JSON"
+  },
+  "dynamicTemplate": {
+    "timeFieldMapping": {
+      "startDate": "%Y-%m-%d",
+      "createdAt": "%Y-%m-%dT%H:%M:%S.%fZ",
+      "updatedAt": "%Y-%m-%dT%H:%M:%S.%fZ",
+      "closedAt": "%Y-%m-%dT%H:%M:%S.%fZ",
+      "mergedAt": "%Y-%m-%dT%H:%M:%S.%fZ",
+      "commitTime": "%Y-%m-%dT%H:%M:%S.",
+      "since": "%Y-%m-%dT%H:%M:%S.%fZ",
+      "until": "%Y-%m-%dT%H:%M:%S.%fZ",
+      "consumptionTime": "%Y-%m-%dT%H:%M:%SZ"
+    },
+    "restrictedProjects": [],
+    "commitResponseTemplate": {
+      "id": "commitId",
+      "message": "message",
+      "author_name": "authorName",
+      "title": "title",
+      "created_at": "commitTime",
+      "committer_name": "committerName",
+      "committer_email": "committerEmail",
+      "author_email": "authorEmail"
+    },
+    "mergeReqResponseTemplate": {
+      "id": "mergeReqId",
+      "state": "mergeReqState",
+      "source_branch": "originBranch",
+      "sha": "headSHA",
+      "target_branch": "baseBranch",
+      "isForked": "isForked",
+      "originBranchJiraKeys": "originBranchJiraKeys",
+      "merge_commit_sha": "mergedSHA",
+      "commit": "commit",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "closed_at": "closedAt",
+      "merged_at": "mergedAt",
+      "author": {
+        "username": "author",
+        "id": "authorId"
+      },
+      "assignee": {
+        "username": "assignee"
+      }
+    },
+    "branch": {
+      "insightsTimeXFieldMapping": {
+        "timefield": "consumptionTime",
+        "isEpoch": false,
+        "timeformat": "%Y-%m-%dT%H:%M:%SZ"
+      }
+    },
+    "mergeRequest": {
+      "insightsTimeXFieldMapping": {
+        "timefield": "updatedAt",
+        "isEpoch": false,
+        "timeformat": "%Y-%m-%dT%H:%M:%S."
+      }
+    },
+    "metaData": {
+      "branch": {
+        "labels": ["GITLAB_BRANCH"],
+        "dataUpdateSupported": true,
+        "uniqueKey": ["projectName", "branchName"]
+      },
+      "mergeRequest": {
+        "dataUpdateSupported": true,
+        "uniqueKey": ["projectPath", "mergeReqId", "gitType"]
+      },
+      "commit": {
+        "dataUpdateSupported": true,
+        "uniqueKey": ["projectPath", "commitId", "gitType"]
+      }
+    }
+  },
+  "agentId": "",
+  "enableBranches": true,
+  "enableDataValidation": true,
+  "toolCategory": "SCM",
+  "toolsTimeZone": "UTC",
+  "insightsTimeZone": "Asia/Kolkata",
+  "enableValueArray": false,
+  "useResponseTemplate": true,
+  "auth": "base64",
+  "runSchedule": 30,
+  "timeStampField": "commitTime",
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%S.",
+  "isEpochTimeFormat": false,
+  "startFrom": "2022-08-01 00:00:33",
+  "accessToken": "",
+  "getRepos": "getRepos",
+  "commitsBaseEndPoint": "commitsBaseEndPoint",
+  "isDebugAllowed": false,
+  "toolName": "GITLAB",
+  "loggingSetting": {
+    "logLevel": "INFO",
+    "maxBytes": 5000000,
+    "backupCount": 10
+  },
+  "auditing": false,
+  "enableProxy": false,
+  "proxies": {
+    "http": "",
+    "https": ""
+  }
+}

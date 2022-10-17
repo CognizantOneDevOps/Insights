@@ -22,7 +22,8 @@ public class GroupsAndUserTestData {
 
 	String accept = "application/json, text/plain, */*";
 	String authorization = "token";
-
+	
+	String themePreference = "dark";
 	String orgName = "Insights285";
 	int orgId = 14;
 	String userName = "user";
@@ -34,9 +35,9 @@ public class GroupsAndUserTestData {
 	int userIdDelete = 26;
 
 	// AddUser
-	String userPropertyListAdmin = "{\"name\":\"userAdmin\",\"email\":\"useradmin@cognizant.com\",\"userName\":\"userAdmin\",\"password\":\"userTest\",\"role\":\"Admin\",\"orgName\":\"Insights285\",\"orgId\":14}";
-	String userPropertyListEditor = "{\"name\":\"userEditor\",\"email\":\"userEditor@cognizant.com\",\"userName\":\"userEditor\",\"password\":\"userTest1\",\"role\":\"Editor\",\"orgName\":\"Insights285\",\"orgId\":14}";
-	String userPropertyListViewer = "{\"name\":\"userViewer\",\"email\":\"userViewer@cognizant.com\",\"userName\":\"userViewer\",\"password\":\"userTest2\",\"role\":\"Viewer\",\"orgName\":\"Insights285\",\"orgId\":14}";
+	String userPropertyListAdmin = "{\"name\":\"userAdmin\",\"email\":\"demo123@gmail.com\",\"userName\":\"userAdmin\",\"password\":\"userTest\",\"role\":\"Admin\",\"orgName\":\"Insights285\",\"orgId\":14}";
+	String userPropertyListEditor = "{\"name\":\"userEditor\",\"email\":\"demo123@gmail.com\",\"userName\":\"userEditor\",\"password\":\"userTest1\",\"role\":\"Editor\",\"orgName\":\"Insights285\",\"orgId\":14}";
+	String userPropertyListViewer = "{\"name\":\"userViewer\",\"email\":\"demo123@gmail.com\",\"userName\":\"userViewer\",\"password\":\"userTest2\",\"role\":\"Viewer\",\"orgName\":\"Insights285\",\"orgId\":14}";
 
 	// AssignUser
 	String assignUserData = "[{\"orgName\":\"Insight_Org\",\"orgId\":2,\"roleName\":\"Viewer\",\"userName\":\"userTest\"}]";

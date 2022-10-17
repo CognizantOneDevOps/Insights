@@ -28,6 +28,10 @@ import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.AgentManagementDataModel;
 import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.ConfigurationFileManagementDataModel;
 import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.DashboardReportDataModel;
+import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.OutcomeConfigDataModel;
+import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.ReportConfigurationDataModel;
+import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.TraceabilityDataModel;
+import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.WorkflowTakDataModel;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
@@ -92,5 +96,86 @@ public class ReadJsonData {
 		}
 		return returnValue;
 	}
+	
+	public static Object[][] readTraceabilityData(String jsonFile)
+			throws JsonIOException, JsonSyntaxException, FileNotFoundException {
+		JsonElement jsonData = null;
+		try {
+			jsonData = new JsonParser().parse(new FileReader(new File(jsonFile).getCanonicalPath()));
+		} catch (JsonIOException | JsonSyntaxException | IOException e) {
+			log.error(e);
+		}
+		JsonElement dataSet = jsonData.getAsJsonObject().get("dataset");
+		List<TraceabilityDataModel> testData = new Gson().fromJson(dataSet,
+				new TypeToken<List<TraceabilityDataModel>>() {
+				}.getType());
+		Object[][] returnValue = new Object[testData.size()][1];
+		int index = 0;
+		for (Object[] each : returnValue) {
+			each[0] = testData.get(index++);
+		}
+		return returnValue;
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static Object[][] readWorkflowData(String jsonFile)
+			throws JsonIOException, JsonSyntaxException, FileNotFoundException {
+		JsonElement jsonData = null;
+		try {
+			jsonData = new JsonParser().parse(new FileReader(new File(jsonFile).getCanonicalPath()));
+		} catch (JsonIOException | JsonSyntaxException | IOException e) {
+			log.error(e);
+		}
+		JsonElement dataSet = jsonData.getAsJsonObject().get("data");
+		List<WorkflowTakDataModel> testData = new Gson().fromJson(dataSet,
+				new TypeToken<List<WorkflowTakDataModel>>() {
+				}.getType());
+		Object[][] returnValue = new Object[testData.size()][1];
+		int index = 0;
+		for (Object[] each : returnValue) {
+			each[0] = testData.get(index++);
+		}
+		return returnValue;
+	}
 
+	
+	public static Object[][] readOutcomeConfigData(String jsonFile)
+			throws JsonIOException, JsonSyntaxException, FileNotFoundException {
+		JsonElement jsonData = null;
+		try {
+			jsonData = new JsonParser().parse(new FileReader(new File(jsonFile).getCanonicalPath()));
+		} catch (JsonIOException | JsonSyntaxException | IOException e) {
+			log.error(e);
+		}
+		JsonElement dataSet = jsonData.getAsJsonObject().get("dataset");
+		List<OutcomeConfigDataModel> testData = new Gson().fromJson(dataSet,
+				new TypeToken<List<OutcomeConfigDataModel>>() {
+				}.getType());
+		Object[][] returnValue = new Object[testData.size()][1];
+		int index = 0;
+		for (Object[] each : returnValue) {
+			each[0] = testData.get(index++);
+		}
+		return returnValue;
+	}
+	
+	public static Object[][] readReportConfigData(String jsonFile)
+			throws JsonIOException, JsonSyntaxException, FileNotFoundException {
+		JsonElement jsonData = null;
+		try {
+			jsonData = new JsonParser().parse(new FileReader(new File(jsonFile).getCanonicalPath()));
+		} catch (JsonIOException | JsonSyntaxException | IOException e) {
+			log.error(e);
+		}
+		JsonElement dataSet = jsonData.getAsJsonObject().get("dataset");
+		List<ReportConfigurationDataModel> testData = new Gson().fromJson(dataSet,
+				new TypeToken<List<ReportConfigurationDataModel>>() {
+				}.getType());
+		Object[][] returnValue = new Object[testData.size()][1];
+		int index = 0;
+		for (Object[] each : returnValue) {
+			each[0] = testData.get(index++);
+		}
+		return returnValue;
+	}
 }

@@ -22,56 +22,34 @@
     </div>
   </div>
 
-  <div class="sectionHeadingStyle">
-    <span class="alignSub"
-      ><b>Agent List</b> (Add / Change Status / Edit / Delete Agents)
+  <div class="sectionHeadingStyle" id="agentList">
+    <span class="alignSub"><b>Agent List</b> (Add / Change Status / Edit / Delete Agents)
     </span>
 
     <span class="btnAlign">
       <button mat-icon-button (click)="showAgentDownloadDialog()">
-        <mat-icon matTooltip="Download agent package" svgIcon="download">
+        <mat-icon matTooltip="Download agent package" id="downloadAgent" svgIcon="download">
         </mat-icon>
       </button>
-      <button mat-icon-button (click)="addAgentData()">
-        <mat-icon matTooltip="Add Agent" svgIcon="add"> </mat-icon>
+      <button mat-icon-button (click)="addAgentData()" id="addAgent">
+        <mat-icon matTooltip="Add Agent"  svgIcon="add"> </mat-icon>
       </button>
-      <button
-        mat-icon-button
-        [disabled]="buttonDisableStatus"
-        (click)="editAgent()"
-      >
+      <button mat-icon-button id="editAgent" [disabled]="buttonDisableStatus" (click)="editAgent()">
         <mat-icon matTooltip="Edit " svgIcon="edit"> </mat-icon>
       </button>
-      <button
-        mat-icon-button
-        (click)="agentStartStopAction('START')"
-        [disabled]="runDisableStatus == 'START' || runDisableStatus == ''"
-      >
+      <button mat-icon-button  id="startAgent" (click)="agentStartStopAction('START')"
+        [disabled]="runDisableStatus == 'START' || runDisableStatus == ''">
         <mat-icon matTooltip=" Start " svgIcon="play"> </mat-icon>
       </button>
-      <button
-        mat-icon-button
-        (click)="agentStartStopAction('STOP')"
-        [disabled]="runDisableStatus == 'STOP' || runDisableStatus == ''"
-      >
-        <mat-icon matTooltip="Stop " svgIcon="stop"> </mat-icon>
+      <button mat-icon-button id="stopAgent" (click)="agentStartStopAction('STOP')"
+        [disabled]="runDisableStatus == 'STOP' || runDisableStatus == ''">
+        <mat-icon matTooltip="Stop "  svgIcon="stop"> </mat-icon>
       </button>
-      <button
-        mat-icon-button
-        [disabled]="isCopyLinkDisabled"
-        (click)="copyInputMessage(selectedAgent)"
-      >
-        <mat-icon
-          matTooltip="Copy the Webhook Url to Clipboard"
-          svgIcon="webhookCopyClipboard"
-        >
+      <button mat-icon-button id="copyAgent" [disabled]="isCopyLinkDisabled" (click)="copyInputMessage(selectedAgent)">
+        <mat-icon matTooltip="Copy the Webhook Url to Clipboard" svgIcon="webhookCopyClipboard">
         </mat-icon>
       </button>
-      <button
-        mat-icon-button
-        [disabled]="runDisableStatus != 'STOP'"
-        (click)="uninstallAgent()"
-      >
+      <button mat-icon-button id="deleteAgent" [disabled]="runDisableStatus != 'STOP'" (click)="uninstallAgent()">
         <mat-icon matTooltip="Delete " svgIcon="trash"> </mat-icon>
       </button>
     </span>
@@ -80,27 +58,14 @@
   <div class="select-tool">
     <h4 class="input-label">Tool</h4>
     <mat-form-field appearance="fill" class="formfield-custom">
-      <mat-select
-        [(ngModel)]="selectTool"
-        (ngModelChange)="selectToolAgent(selectTool)"
-        name="selectTool"
-        [style.width.%]="100"
-        placeholder="Select Tool"
-      >
-        <mat-option
-          *ngFor="let data of agentNameList"
-          [value]="data"
-          class="optionsBckgnd"
-        >
+      <mat-select [(ngModel)]="selectTool" (ngModelChange)="selectToolAgent(selectTool)" name="selectTool"
+        [style.width.%]="100" placeholder="Select Tool">
+        <mat-option *ngFor="let data of agentNameList" [value]="data" class="optionsBckgnd">
           {{ data }}
         </mat-option>
       </mat-select>
-      <mat-icon
-        matSuffix
-        svgIcon="arrow-down"
-        class="arrow-icon"
-        style="width: 12px !important; height: 12px !important"
-      ></mat-icon>
+      <mat-icon matSuffix svgIcon="arrow-down" class="arrow-icon"
+        style="width: 12px !important; height: 12px !important"></mat-icon>
     </mat-form-field>
   </div>
 
@@ -180,12 +145,7 @@
         </ng-container>
 
         <ng-container matColumnDef="Time">
-          <th
-            mat-header-cell
-            *matHeaderCellDef
-            class="tableHeader"
-            style="white-space: pre-wrap !important"
-          >
+          <th mat-header-cell *matHeaderCellDef class="tableHeader" style="white-space: pre-wrap !important">
             Last run time ({{ timeZoneAbbr }})
           </th>
           <td mat-cell *matCellDef="let element">
@@ -195,31 +155,14 @@
         </ng-container>
 
         <ng-container matColumnDef="CurrentStatus">
-          <th
-            mat-header-cell
-            *matHeaderCellDef
-            class="tableHeader"
-            style="white-space: pre-wrap !important"
-          >
+          <th mat-header-cell *matHeaderCellDef class="tableHeader" style="white-space: pre-wrap !important">
             Current State
           </th>
-          <td
-            mat-cell
-            *matCellDef="let element"
-            style="text-align: center; padding: 0 10px"
-          >
-            <mat-icon
-              svgIcon="success_status"
-              *ngIf="element.healthStatus == 'success'"
-              matTooltip="Success"
-            >
+          <td mat-cell *matCellDef="let element" style="text-align: center; padding: 0 10px">
+            <mat-icon svgIcon="success_status" *ngIf="element.healthStatus == 'success'" matTooltip="Success">
             </mat-icon>
-            <mat-icon
-              svgIcon="failure_status"
-              *ngIf="element.healthStatus == 'failure'"
-              matTooltip="Failure"
-              class="failure-icon"
-            >
+            <mat-icon svgIcon="failure_status" *ngIf="element.healthStatus == 'failure'" matTooltip="Failure"
+              class="failure-icon">
             </mat-icon>
           </td>
         </ng-container>
@@ -227,22 +170,15 @@
         <ng-container matColumnDef="Details">
           <th mat-header-cell *matHeaderCellDef class="tableHeader">Details</th>
           <td mat-cell *matCellDef="let element; let i = index">
-            <button
-              mat-icon-button
-              (click)="
+            <button mat-icon-button (click)="
                 showDetailsDialog(
                   element.toolName,
                   element.toolCategory,
                   element.agentKey
                 )
-              "
-              [disabled]="selectedIndex != i + currentPageValue"
-            >
-              <mat-icon
-                svgIcon="healthcheck_show_details"
-                matTooltip="View Details"
-                style="margin-bottom: 10px !important"
-              >
+              " [disabled]="selectedIndex != i + currentPageValue">
+              <mat-icon svgIcon="healthcheck_show_details" matTooltip="View Details"
+                style="margin-bottom: 10px !important">
               </mat-icon>
             </button>
           </td>
@@ -258,63 +194,30 @@
       class="">
     </mat-paginator> -->
     <div class="paginator">
-      <mat-paginator
-        style="visibility: hidden"
-        #paginator
-        [pageSize]="MAX_ROWS_PER_TABLE"
-      >
+      <mat-paginator style="visibility: hidden" #paginator [pageSize]="MAX_ROWS_PER_TABLE">
       </mat-paginator>
-      <div
-        class="paginatorElement"
-        (click)="goToPrevPage()"
-        [attr.disabled]="!this.paginator.hasPreviousPage()"
+      <div class="paginatorElement" (click)="goToPrevPage()" [attr.disabled]="!this.paginator.hasPreviousPage()"
         [ngStyle]="
           !this.paginator.hasPreviousPage() ? { cursor: 'not-allowed' } : ''
-        "
-      >
-        <mat-icon
-          svgIcon="prev-page"
-          matTooltip="Previous Page"
-          class="pageIcons"
-          *ngIf="this.paginator.hasPreviousPage()"
-          style="height: 24px !important; width: 24px !important"
-        >
+        ">
+        <mat-icon svgIcon="prev-page" matTooltip="Previous Page" class="pageIcons"
+          *ngIf="this.paginator.hasPreviousPage()" style="height: 24px !important; width: 24px !important">
         </mat-icon>
-        <mat-icon
-          svgIcon="prev-page"
-          matTooltip="Previous Page"
-          class="pageIcons disabled-icon"
-          *ngIf="!this.paginator.hasPreviousPage()"
-          style="height: 24px !important; width: 24px !important"
-        >
+        <mat-icon svgIcon="prev-page" matTooltip="Previous Page" class="pageIcons disabled-icon"
+          *ngIf="!this.paginator.hasPreviousPage()" style="height: 24px !important; width: 24px !important">
         </mat-icon>
       </div>
       <div class="paginatorElement paginatorIndexElement">
         {{ currentPageIndex }}
       </div>
-      <div
-        class="paginatorElement"
-        (click)="goToNextPage()"
-        [attr.disabled]="!this.paginator.hasNextPage()"
-        [ngStyle]="
+      <div class="paginatorElement" (click)="goToNextPage()" [attr.disabled]="!this.paginator.hasNextPage()" [ngStyle]="
           !this.paginator.hasNextPage() ? { cursor: 'not-allowed' } : ''
-        "
-      >
-        <mat-icon
-          svgIcon="next-page"
-          matTooltip="Next Page"
-          class="pageIcons"
-          *ngIf="this.paginator.hasNextPage()"
-          style="height: 24px !important; width: 24px !important"
-        >
+        ">
+        <mat-icon svgIcon="next-page" matTooltip="Next Page" class="pageIcons" *ngIf="this.paginator.hasNextPage()"
+          style="height: 24px !important; width: 24px !important">
         </mat-icon>
-        <mat-icon
-          svgIcon="next-page"
-          matTooltip="Next Page"
-          class="pageIcons disabled-icon"
-          *ngIf="!this.paginator.hasNextPage()"
-          style="height: 24px !important; width: 24px !important"
-        >
+        <mat-icon svgIcon="next-page" matTooltip="Next Page" class="pageIcons disabled-icon"
+          *ngIf="!this.paginator.hasNextPage()" style="height: 24px !important; width: 24px !important">
         </mat-icon>
       </div>
       <div>of {{ totalPages }}</div>

@@ -11,8 +11,9 @@
   "annotations": false,
 
   "info": {
+   "description": "Inference DS 3.1 Data Source",
     "author": {
-      "name": "Vishal Ganjare",
+      "name": "Insights Development Team",
       "url": ""
     },
     "logos": {

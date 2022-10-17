@@ -19,7 +19,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -71,13 +70,13 @@ import com.google.gson.JsonSyntaxException;
 @Test
 @WebAppConfiguration
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
-public class GrafanaDashboardReportTest extends AbstractTestNGSpringContextTests  {
+public class GrafanaDashboardReportTest extends AbstractTestNGSpringContextTests {
 
 	private static final Logger log = LogManager.getLogger(GrafanaDashboardReportTest.class);
 	private static final String AUTHORIZATION = "authorization";
 
 	Map<String, String> testAuthData = new HashMap<>();
-	
+
 	GrafanaDashboardReportData grafanaDashboard = new GrafanaDashboardReportData();
 
 	MockHttpServletRequest httpRequest = new MockHttpServletRequest();
@@ -141,7 +140,7 @@ public class GrafanaDashboardReportTest extends AbstractTestNGSpringContextTests
 		return MockMvcRequestBuilders.post(url).cookie(httpRequest.getCookies())
 				.header("Authorization", testAuthData.get(AUTHORIZATION)).header("Cookie", cookiesString);
 	}
-	
+
 	private void deleteApiKeys() {
 		try {
 			GrafanaHandler grafanaHandler = new GrafanaHandler();
@@ -252,12 +251,12 @@ public class GrafanaDashboardReportTest extends AbstractTestNGSpringContextTests
 				}
 			}
 			String dashboardString = "{\"id\":" + id + ",\"status\":\"RESTART\"}";
-			JsonObject detailsJson =JsonUtils.parseStringAsJsonObject(dashboardString);
+			JsonObject detailsJson = JsonUtils.parseStringAsJsonObject(dashboardString);
 			this.mockMvc = getMacMvc();
 			log.debug(" cookies " + httpRequest.getCookies());
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost(
 					"/dashboardReport/updateDasboardStatus", detailsJson.toString());
-			String status = grafanaPdfServiceImpl.updateDashboardPdfConfigStatus(detailsJson);
+			grafanaPdfServiceImpl.updateDashboardPdfConfigStatus(detailsJson);
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing Update Dashboard Status" + e);
@@ -276,10 +275,9 @@ public class GrafanaDashboardReportTest extends AbstractTestNGSpringContextTests
 		}
 	}
 
-	
 	@Test(priority = 7, expectedExceptions = InsightsCustomException.class)
 	public void saveGrafanaDashboardConfigExceptionTest() throws Exception {
-		JsonObject dashboardJsonObject = new JsonObject();		
+		JsonObject dashboardJsonObject = new JsonObject();
 		grafanaPdfServiceImpl.saveGrafanaDashboardConfig(dashboardJsonObject);
 	}
 
@@ -289,7 +287,7 @@ public class GrafanaDashboardReportTest extends AbstractTestNGSpringContextTests
 				.getAllGrafanaDashboardConfigs();
 		assertTrue(allGrafanaDashboardConfigs.size() > 0);
 	}
-	
+
 	@Test(priority = 9)
 	public void updateGrafanaDashboardDetailsTest() throws InsightsCustomException {
 		List<GrafanaDashboardPdfConfig> allGrafanaDashboardConfigs = grafanaPdfServiceImpl
@@ -300,7 +298,7 @@ public class GrafanaDashboardReportTest extends AbstractTestNGSpringContextTests
 				id = grafanaDashboardPdfConfig.getId();
 			}
 		}
-		
+
 		JsonObject dashObject = JsonUtils.parseStringAsJsonObject(grafanaDashboard.updateJson);
 		dashObject.addProperty("id", id);
 		grafanaPdfServiceImpl.updateGrafanaDashboardDetails(dashObject);
@@ -309,16 +307,15 @@ public class GrafanaDashboardReportTest extends AbstractTestNGSpringContextTests
 		assertEquals("5-sprint-score-card-updated", updateDashboardPdfConfigs.get(0).getTitle());
 
 	}
-	
+
 	@Test(priority = 10, expectedExceptions = InsightsCustomException.class)
 	public void updateGrafanaDashboardDetailsExceptionTest() throws InsightsCustomException {
-		
+
 		int id = 0;
 		JsonObject dashObject = JsonUtils.parseStringAsJsonObject(grafanaDashboard.updateJson);
 		dashObject.addProperty("id", id);
 		grafanaPdfServiceImpl.updateGrafanaDashboardDetails(dashObject);
 	}
-	
 
 	@Test(priority = 11)
 	public void updateDashboardPdfConfigStatusTest() throws InsightsCustomException {
@@ -331,21 +328,21 @@ public class GrafanaDashboardReportTest extends AbstractTestNGSpringContextTests
 		}
 		String dashboardString = "{\"id\":" + id + ",\"status\":\"RESTART\"}";
 		JsonObject detailsJson = JsonUtils.parseStringAsJsonObject(dashboardString);
-		
+
 		String status = grafanaPdfServiceImpl.updateDashboardPdfConfigStatus(detailsJson);
-		
+
 		assertEquals(status, PlatformServiceConstants.SUCCESS);
-		
+
 	}
-	
+
 	@Test(priority = 12, expectedExceptions = InsightsCustomException.class)
 	public void updateDashboardPdfConfigStatusExceptionTest() throws InsightsCustomException {
 		int id = 0;
 		String dashboardString = "{\"id\":" + id + ",\"status\":\"RESTART\"}";
-		JsonObject detailsJson =JsonUtils.parseStringAsJsonObject(dashboardString);
+		JsonObject detailsJson = JsonUtils.parseStringAsJsonObject(dashboardString);
 		grafanaPdfServiceImpl.updateDashboardPdfConfigStatus(detailsJson);
 	}
-	
+
 	@Test(priority = 13)
 	public void setDashboardActiveStatusTest() throws InsightsCustomException {
 		int id = 0;
@@ -355,40 +352,32 @@ public class GrafanaDashboardReportTest extends AbstractTestNGSpringContextTests
 				id = g.getId();
 			}
 		}
-		String dashboardJsonString = "{\"id\":" + id  + ", \"isActive\": \"false\"}";
-		JsonObject dashboardJson =JsonUtils.parseStringAsJsonObject(dashboardJsonString);
-		String status = grafanaPdfServiceImpl.setDashboardActiveState(dashboardJson);
-		assertEquals(status, PlatformServiceConstants.SUCCESS);
+		String dashboardJsonString = "{\"id\":" + id + ", \"isActive\": \"false\"}";
+		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post("/dashboardReport/setDashboardActiveState")
+				.content(dashboardJsonString).cookie(httpRequest.getCookies()).contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", testAuthData.get(AUTHORIZATION)).header("Cookie", cookiesString)
+				.accept(MediaType.APPLICATION_JSON_VALUE);
+		try {
+			this.mockMvc.perform(builder).andExpect(ok);
+		} catch (Exception e) {
+			log.error("Error white setting dashbaord as active");
+		}
+		log.debug("Test case Set Dashboard Active State passed successfully ");
 	}
-	
+
 	@Test(priority = 14, expectedExceptions = InsightsCustomException.class)
 	public void setDashboardActiveStatusExceptionTest() throws InsightsCustomException {
 		int id = 0;
-		String dashboardJsonString = "{\"id\":" + id  + ", \"isActive\": \"false\"}";
+		String dashboardJsonString = "{\"id\":" + id + ", \"isActive\": \"false\"}";
 		JsonObject dashboardJson = JsonUtils.parseStringAsJsonObject(dashboardJsonString);
-		String status = grafanaPdfServiceImpl.setDashboardActiveState(dashboardJson);
+		grafanaPdfServiceImpl.setDashboardActiveState(dashboardJson);
 	}
-	
+
 	@Test(priority = 15)
-	public void deleteGrafanaDashboardDetailsTest() throws InsightsCustomException {
-		int id = 0;
-		List<GrafanaDashboardPdfConfig> list = grafanaPdfServiceImpl.getAllGrafanaDashboardConfigs();
-		for (GrafanaDashboardPdfConfig g : list) {
-			if (g.getTitle().equalsIgnoreCase("5-sprint-score-card-updated")) {
-				id = g.getId();
-			}
-		}
-		grafanaPdfServiceImpl.deleteGrafanaDashboardDetails(id);
-		
-		List<GrafanaDashboardPdfConfig> allGrafanaDashboardConfigs = grafanaPdfServiceImpl.getAllGrafanaDashboardConfigs();
-		assertEquals(allGrafanaDashboardConfigs.size(), 0);
-	}
-	
-	@Test(priority = 16)
 	public void deleteGrafanaDashboardDetails() throws InsightsCustomException {
 		try {
 			deleteApiKeys();
-			
+
 			this.mockMvc = getMacMvc();
 
 			log.debug(" cookies " + httpRequest.getCookies());
@@ -409,7 +398,22 @@ public class GrafanaDashboardReportTest extends AbstractTestNGSpringContextTests
 		} catch (Exception e) {
 			log.error("Error while testing Delete Dashboard " + e);
 		}
-		log.debug("Test case Deleted Dashboard successfully ");
+		log.debug("Test case Deleted Dashboard passed successfully ");
 
+	}
+
+	@Test(priority = 16)
+	public void testDeleteGrafanaDashboardDetailswithInvalidId() throws InsightsCustomException {
+		try {
+			int id = 5566;
+			String url = "/dashboardReport/exportPDF/deleteDashboardConfig?id=" + id;
+
+			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPostWithRequestParam(url, "");
+
+			this.mockMvc.perform(builder).andExpect(ok);
+		} catch (Exception e) {
+			log.error("Error while testing Delete Dashboard Details with Invalid Id!");
+		}
+		log.debug("Delete Dashboard Details with Invalid id TestCase passed successfully!");
 	}
 }

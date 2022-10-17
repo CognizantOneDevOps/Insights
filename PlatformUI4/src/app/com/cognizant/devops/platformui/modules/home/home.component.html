@@ -71,10 +71,10 @@
           <div class="toolbar-right">
             <div title="Toggle Theme" class="theme-toggler">
               <button *ngIf="themePreference=='dark'" mat-icon-button (click)="onTogglingTheme()" class="toggler-icon">
-                <img mat-icon style="height:24px;width:59px" src='icons/png/darkToggle.png' />
+                <img mat-icon style="height:24px;width:59px" src='icons/png/darkToggle.png' id="darkTheme" />
               </button>
               <button *ngIf="themePreference=='light'" mat-icon-button (click)="onTogglingTheme()" class="toggler-icon">
-                <img mat-icon style="height:24px;width:59px" src='icons/png/lightToggle.png' />
+                <img mat-icon style="height:24px;width:59px" src='icons/png/lightToggle.png' id="lightTheme"/>
               </button>
             </div>
             <div class="user-details">

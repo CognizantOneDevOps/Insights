@@ -26,6 +26,9 @@ import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
 import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectModule;
+import com.cognizant.devops.platformregressiontest.test.ui.testdata.DashboardReportDataProvider;
+import com.cognizant.devops.platformregressiontest.test.ui.testdata.TraceabilityDataProvider;
+import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.TraceabilityDataModel;
 
 public class TraceabilityDashboardTest extends LoginAndSelectModule {
 
@@ -73,16 +76,28 @@ public class TraceabilityDashboardTest extends LoginAndSelectModule {
 	 * 
 	 * @throws InterruptedException
 	 */
-	@Test(priority = 2)
-	public void validateTraceabilityMatrix() throws InterruptedException {
-		Assert.assertTrue(clickAllActionButton.validateTraceabilityMatrix(), "Traceability functionality successful");
+	@Test(priority = 2, enabled = true, dataProvider = "traceabilityjsondataprovider", dataProviderClass = TraceabilityDataProvider.class)
+	public void validateTraceabilityMatrix(TraceabilityDataModel data) throws InterruptedException {
+		Assert.assertTrue(clickAllActionButton.validateTraceabilityMatrix(data), "Traceability functionality successful");
 	}
-
+	
 	/**
-	 * Assert true if the page contents are cleared after clicking on clear button else false
+	 * Assert true if more info and issue details are displayed else
+	 * false
+	 * 
+	 * @throws InterruptedException
 	 */
 	@Test(priority = 3)
-	public void clearButtonFunctionality() {
+	public void checkCount() throws InterruptedException {
+		Assert.assertTrue(clickAllActionButton.checkCount(), "Check count functionality successful");
+	}
+	
+	/**
+	 * Assert true if the page contents are cleared after clicking on clear button else false
+	 * @throws InterruptedException 
+	 */
+	@Test(priority = 4)
+	public void clearButtonFunctionality() throws InterruptedException {
 		Assert.assertTrue(clickAllActionButton.clearFunctionality(), "clear functionality successful");
 	}
 
@@ -91,7 +106,7 @@ public class TraceabilityDashboardTest extends LoginAndSelectModule {
 	 * 
 	 * @throws InterruptedException
 	 */
-	@Test(priority = 4)
+	@Test(priority = 5)
 	public void incorrectSearch() throws InterruptedException {
 		Assert.assertTrue(clickAllActionButton.incorrectSearch(), "Error is displayed for incorrect search");
 	}

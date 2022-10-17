@@ -11,14 +11,14 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>9.6</version>
+		<version>9.7</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>PlatformService</artifactId>
 	<groupId>com.cognizant.devops</groupId>
 	<packaging>war</packaging>
-	<version>9.6</version>
+	<version>9.7</version>
 	<name>PlatformService</name>
 
 	<properties>
@@ -27,7 +27,7 @@
 		<spring.version>5.3.20</spring.version>
 		<spring.security.version>5.7.1</spring.security.version>
 		<junit.version>4.13.1</junit.version>
-		<testng.version>7.1.0</testng.version>
+		<testng.version>7.6.1</testng.version>
 		<spring-security-kerberos.version>1.0.1.RELEASE</spring-security-kerberos.version>
 	</properties>
 
@@ -302,19 +302,19 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>9.6</version>
+			<version>9.7</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformAuditing</artifactId>
-			<version>9.6</version>
+			<version>9.7</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>9.6</version>
+			<version>9.7</version>
 		</dependency>
 
 		<dependency>

@@ -16,12 +16,15 @@
 package com.cognizant.devops.platformregressiontest.test.ui.bulkupload;
 
 import java.time.Duration;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectModule;
@@ -115,22 +118,20 @@ public class BulkUploadConfiguration extends BulkUploadObjectRepository {
 	public boolean uploadDataWithNullEpochTime() throws InterruptedException {
 		selectData(selectTool1, toolName, timeField1, timeField, file1,
 				LoginAndSelectModule.testData.get("fileWithNullEpochTime"));
-		saveButton.click();
+		clickOn(saveButton,8);
 		try {
 			wait.until(ExpectedConditions.elementToBeClickable(yesButton));
 			if (uploadMessage.isDisplayed()) {
-				yesButton.click();
-				wait.until(ExpectedConditions.elementToBeClickable(okButton));
-				okButton.click();
+				clickOn(yesButton, 2);
 				wait.until(ExpectedConditions.visibilityOf(failureStatus));
 				if (failureStatus.isDisplayed()) {
 					log.info("null value in column - error message is displayed");
-					resetButton.click();
+					clickOn(resetButton, 3);
 					return true;
 				}
 			}
 		} catch (Exception e) {
-			resetButton.click();
+			clickOn(resetButton, 3);
 			log.info("something went wrong- null value error message is not displayed {}", e.getMessage());
 			return false;
 		}
@@ -146,21 +147,19 @@ public class BulkUploadConfiguration extends BulkUploadObjectRepository {
 	public boolean uploadDataWithTimeZoneFormat() throws InterruptedException {
 		timeFormatfield.sendKeys(LoginAndSelectModule.testData.get("correctTimezoneFormat"));
 		selectData(selectTool1, toolName, timeField1, timeField, file1, gitFile);
-		saveButton.click();
+		clickOn(saveButton, 4);
 		wait.until(ExpectedConditions.elementToBeClickable(yesButton));
 		try {
 			if (uploadMessage.isDisplayed()) {
-				yesButton.click();
-				wait.until(ExpectedConditions.elementToBeClickable(okButton));
-				if (successMessage.isDisplayed()) {
-					okButton.click();
-					resetButton.click();
+				clickOn(yesButton,3);
+				if (successTickrow1.isDisplayed()) {
+					clickOn(resetButton,2);
 					log.info("Uploaded one file");
 					return true;
-				}
+			}	
 			}
 		} catch (Exception e) {
-			resetButton.click();
+			clickOn(resetButton,2);
 			log.info("something went wrong {}", e.getMessage());
 			return false;
 		}
@@ -178,21 +177,21 @@ public class BulkUploadConfiguration extends BulkUploadObjectRepository {
 	public boolean uploadMultipleFiles() throws InterruptedException {
 		selectData(selectTool1, toolName, timeField1, timeField, file1,
 				LoginAndSelectModule.testData.get("fileWithNumericValues"));
-		selectData(selectTool2, toolName, timeField2, timeField, file2, gitFile);
-		selectData(selectTool3, toolName, timeField3, LoginAndSelectModule.testData.get("incorrecttimefield"), file3,
+		selectData1(selectTool2, toolName, timeField2, timeField, file2, gitFile);
+		selectData2(selectTool3, toolName, timeField3, LoginAndSelectModule.testData.get("incorrecttimefield"), file3,
 				gitFile);
-		selectData(selectTool4, toolName, timeField4, LoginAndSelectModule.testData.get("timefieldforNumericData"),
+		selectData3(selectTool4, toolName, timeField4, LoginAndSelectModule.testData.get("timefieldforNumericData"),
 				file4, LoginAndSelectModule.testData.get("fileWithNumericValues"));
-		saveButton.click();
+		Thread.sleep(2000);
+		clickOn(saveButton, 3);
 		wait.until(ExpectedConditions.elementToBeClickable(yesButton));
-		yesButton.click();
-		wait.until(ExpectedConditions.elementToBeClickable(okButton));
-		okButton.click();
+		clickOn(yesButton, 3);
 		if (successInRows(successTickrow4, successTickrow2) && incorrectTimefieldError(failureStatusRow1)
 				&& incorrectTimefieldError(failureStatusRow3)) {
 			resetButton.click();
 			return true;
 		}
+		resetButton.click();
 		return false;
 	}
 
@@ -248,17 +247,73 @@ public class BulkUploadConfiguration extends BulkUploadObjectRepository {
 	 * @throws InterruptedException
 	 */
 	private void selectData(WebElement selectTool, String toolname, WebElement timeField, String timeFieldname,
-			WebElement file, String filepath) throws InterruptedException {
+		WebElement file, String filepath) throws InterruptedException {
 		Thread.sleep(1000);
-		selectTool.click();
+		clickOn(clickTool1,2);
 		for (WebElement toolValue : toolnameList) {
 			if ((toolValue.getText()).equals(toolname)) {
 				wait.until(ExpectedConditions.elementToBeClickable(toolValue));
-				toolValue.click();
+				clickOn(toolValue, 4);
 				break;
 			}
 		}
+		timeField.clear();
 		timeField.sendKeys(timeFieldname);
 		file.sendKeys(filepath);
+	}
+	private void selectData1(WebElement selectTool, String toolname, WebElement timeField, String timeFieldname,
+			WebElement file, String filepath) throws InterruptedException {
+			Thread.sleep(1000);
+			clickOn(clickTool2,2);
+			for (WebElement toolValue : toolnameList) {
+				if ((toolValue.getText()).equals(toolname)) {
+					wait.until(ExpectedConditions.elementToBeClickable(toolValue));
+					clickOn(toolValue, 4);
+					break;
+				}
+			}
+			timeField.clear();
+			timeField.sendKeys(timeFieldname);
+			file.sendKeys(filepath);
+		}
+	private void selectData2(WebElement selectTool, String toolname, WebElement timeField, String timeFieldname,
+			WebElement file, String filepath) throws InterruptedException {
+			Thread.sleep(1000);
+			clickOn(clickTool3,2);
+			for (WebElement toolValue : toolnameList) {
+				if ((toolValue.getText()).equals(toolname)) {
+					wait.until(ExpectedConditions.elementToBeClickable(toolValue));
+					clickOn(toolValue, 4);
+					break;
+				}
+			}
+			timeField.clear();
+			timeField.sendKeys(timeFieldname);
+			file.sendKeys(filepath);
+		}
+	private void selectData3(WebElement selectTool, String toolname, WebElement timeField, String timeFieldname,
+			WebElement file, String filepath) throws InterruptedException {
+			Thread.sleep(1000);
+			clickOn(clickTool4,2);
+			for (WebElement toolValue : toolnameList) {
+				if ((toolValue.getText()).equals(toolname)) {
+					wait.until(ExpectedConditions.elementToBeClickable(toolValue));
+					clickOn(toolValue, 4);
+					break;
+				}
+			}
+			timeField.clear();
+			timeField.sendKeys(timeFieldname);
+			file.sendKeys(filepath);
+		}
+
+	/**
+	 * wait until the visibility of web element then click on the web element
+	 * 
+	 * @param element
+	 * @param timeout
+	 */
+	public static void clickOn(WebElement element, int timeout) {
+		new WebDriverWait(driver, Duration.ofSeconds(timeout)).until(ExpectedConditions.elementToBeClickable(element)).click();
 	}
 }

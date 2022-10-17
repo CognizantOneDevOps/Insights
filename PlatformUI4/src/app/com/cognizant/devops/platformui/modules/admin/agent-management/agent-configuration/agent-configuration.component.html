@@ -25,30 +25,16 @@
   <div class="add-agent-section add-agent-section-dimensions">
     <div class="add-agent-section-title add-agent-section-title-dimensions">
       <span style="margin-left: -25px; margin-top: -5px">
-        <button
-          mat-icon-button
-          (click)="redirectToLandingPage()"
-          style="vertical-align: super"
-        >
-          <mat-icon
-            svgIcon="backButton"
-            matTooltip="Back"
-            style="color: #ffffff !important"
-          >
+        <button mat-icon-button (click)="redirectToLandingPage()" style="vertical-align: super">
+          <mat-icon svgIcon="backButton" matTooltip="Back" style="color: #ffffff !important">
           </mat-icon>
         </button>
       </span>
 
-      <div
-        *ngIf="!isEdit"
-        style="font-weight: 600; color: #ffff; margin-left: -380px"
-      >
+      <div *ngIf="!isEdit" style="font-weight: 600; color: #ffff; margin-left: -380px">
         Add an Agent
       </div>
-      <div
-        *ngIf="isEdit"
-        style="font-weight: 600; color: #ffff; margin-right: 765px"
-      >
+      <div *ngIf="isEdit" style="font-weight: 600; color: #ffff; margin-right: 765px">
         Edit an Agent
       </div>
       <div *ngIf="!isEdit" style="font-size: 12px; color: #ffff">
@@ -61,160 +47,84 @@
           <div class="agent-category">
             <span class="select-label">Operating System</span>
             <mat-form-field appearance="fill" class="formfield-custom">
-              <mat-select
-                required
-                [(ngModel)]="selectedOS"
-                name="selectedOS"
-                [disabled]="btnValue == 'Update'"
-                [style.width.%]="100"
-                placeholder="Operating System"
-                (ngModelChange)="versionOnChange(selectedVersion, 'validate')"
-              >
-                <mat-option
-                  *ngFor="let os of osLists | keyvalue"
-                  value="{{ os.value }}"
-                  class="optionsBckgnd"
-                  >{{ os.key }}
+              <mat-select required [(ngModel)]="selectedOS" name="selectedOS" [disabled]="btnValue == 'Update'"
+                [style.width.%]="100" placeholder="Operating System"
+                (ngModelChange)="versionOnChange(selectedVersion, 'validate')">
+                <mat-option *ngFor="let os of osLists | keyvalue" value="{{ os.value }}" class="optionsBckgnd">{{ os.key
+                  }}
                 </mat-option>
               </mat-select>
-              <mat-icon
-                matSuffix
-                svgIcon="arrow-down"
-                class="arrow-icon"
-                style="width: 12px !important; height: 12px !important"
-              ></mat-icon>
+              <mat-icon matSuffix svgIcon="arrow-down" class="arrow-icon"
+                style="width: 12px !important; height: 12px !important"></mat-icon>
             </mat-form-field>
           </div>
 
           <div class="agent-category">
             <span class="select-label">Type</span>
             <mat-form-field appearance="fill" class="formfield-custom">
-              <mat-select
-                required
-                [(ngModel)]="selectedType"
-                name="selectedType"
-                [disabled]="btnValue == 'Update'"
-                placeholder="Select Type"
-                (ngModelChange)="checkType()"
-                [style.width.%]="100"
-              >
-                <mat-option
-                  *ngFor="let type of agentType"
-                  value="{{ type }}"
-                  class="optionsBckgnd"
-                >
-                  {{ type }}</mat-option
-                >
+              <mat-select required [(ngModel)]="selectedType" name="selectedType" [disabled]="btnValue == 'Update'"
+                placeholder="Select Type" (ngModelChange)="checkType()" [style.width.%]="100">
+                <mat-option *ngFor="let type of agentType" value="{{ type }}" class="optionsBckgnd">
+                  {{ type }}</mat-option>
               </mat-select>
-              <mat-icon
-                matSuffix
-                svgIcon="arrow-down"
-                class="arrow-icon"
-                style="width: 12px !important; height: 12px !important"
-              ></mat-icon>
+              <mat-icon matSuffix svgIcon="arrow-down" class="arrow-icon"
+                style="width: 12px !important; height: 12px !important"></mat-icon>
             </mat-form-field>
           </div>
 
           <div class="agent-category">
             <span class="select-label">Version</span>
             <mat-form-field appearance="fill" class="formfield-custom">
-              <mat-select
-                required
-                [(ngModel)]="selectedVersion"
-                name="selectedVersion"
-                [style.width.%]="100"
-                placeholder="Version"
-                (ngModelChange)="versionOnChange(selectedVersion, btnValue)"
-              >
-                <mat-option
-                  *ngFor="let key of versionList"
-                  value="{{ key }}"
-                  class="optionsBckgnd"
-                >
-                  {{ key }}</mat-option
-                >
+              <mat-select required [(ngModel)]="selectedVersion" name="selectedVersion" [style.width.%]="100"
+                placeholder="Version" (ngModelChange)="versionOnChange(selectedVersion, btnValue)">
+                <mat-option *ngFor="let key of versionList" value="{{ key }}" class="optionsBckgnd">
+                  {{ key }}</mat-option>
               </mat-select>
-              <mat-icon
-                matSuffix
-                svgIcon="arrow-down"
-                class="arrow-icon"
-                style="width: 12px !important; height: 12px !important"
-              ></mat-icon>
+              <mat-icon matSuffix svgIcon="arrow-down" class="arrow-icon"
+                style="width: 12px !important; height: 12px !important"></mat-icon>
             </mat-form-field>
           </div>
 
           <div class="agent-category">
             <span class="select-label">Tool</span>
             <mat-form-field appearance="fill" class="formfield-custom">
-              <mat-select
-                required
-                [(ngModel)]="selectedTool"
-                name="selectedTool"
-                [style.width.%]="100"
-                placeholder="Tool"
-                (ngModelChange)="getAgentConfig(selectedVersion, selectedTool)"
-                [disabled]="btnValue == 'Update'"
-              >
-                <mat-option
-                  *ngFor="let tool of toolsArr | keyvalue"
-                  value="{{ tool.value }}"
-                  class="optionsBckgnd"
-                >
-                  {{ tool.value }}</mat-option
-                >
+              <mat-select required [(ngModel)]="selectedTool" name="selectedTool" [style.width.%]="100"
+                placeholder="Tool" (ngModelChange)="getAgentConfig(selectedVersion, selectedTool)"
+                [disabled]="btnValue == 'Update'">
+                <mat-option *ngFor="let tool of toolsArr | keyvalue" value="{{ tool.value }}" class="optionsBckgnd">
+                  {{ tool.value }}</mat-option>
               </mat-select>
-              <mat-icon
-                matSuffix
-                svgIcon="arrow-down"
-                class="arrow-icon"
-                style="width: 12px !important; height: 12px !important"
-              ></mat-icon>
+              <mat-icon matSuffix svgIcon="arrow-down" class="arrow-icon"
+                style="width: 12px !important; height: 12px !important"></mat-icon>
             </mat-form-field>
           </div>
         </div>
       </div>
       <div style="display: flex; justify-content: center; align-items: center">
         <div class="loading-indicator">
-          <mat-progress-spinner
-            [diameter]="70"
-            *ngIf="showThrobber"
-            color="primary"
-            mode="indeterminate"
-          >
+          <mat-progress-spinner [diameter]="70" *ngIf="showThrobber" color="primary" mode="indeterminate">
           </mat-progress-spinner>
         </div>
       </div>
 
-      <div
-        class="add-agent-section add-agent-section-dimensions"
-        *ngFor="let configData of getAgentConfigItems('object')"
-      >
-        <div
-          style="font-weight: 600; text-transform: capitalize; color: #ffff"
-          class="add-agent-section-title add-agent-section-title-dimensions"
-        >
+      <div class="add-agent-section add-agent-section-dimensions"
+        *ngFor="let configData of getAgentConfigItems('object')">
+        <div style="font-weight: 600; text-transform: capitalize; color: #ffff"
+          class="add-agent-section-title add-agent-section-title-dimensions">
           {{ configAbbr[configData.key] }}
         </div>
         <div class="add-agent-section-body add-agent-section-body-dimensions">
           <div class="agent-categories-grid">
-            <div
-              *ngFor="let configDataChild of configData.children"
-              class="agent-category-grid-item"
-            >
+            <div *ngFor="let configDataChild of configData.children" class="agent-category-grid-item">
               <span class="input-label">{{
                 configDataChild.key.length > 21
-                  ? configDataChild.key.slice(0, 21).concat("..")
-                  : configDataChild.key
-              }}</span>
+                ? configDataChild.key.slice(0, 21).concat("..")
+                : configDataChild.key
+                }}</span>
               <div class="input">
                 <mat-form-field appearance="fill" class="formfield-custom">
-                  <input
-                    matInput
-                    type="{{ configDataChild.inputType }}"
-                    [(ngModel)]="configDataChild.value"
-                    name="{{ configDataChild.key }}"
-                    id="{{ configDataChild.id }}"
-                  />
+                  <input matInput type="{{ configDataChild.inputType }}" [(ngModel)]="configDataChild.value"
+                    name="{{ configDataChild.key }}" id="{{ configDataChild.id }}" />
                 </mat-form-field>
               </div>
             </div>
@@ -222,45 +132,26 @@
         </div>
       </div>
 
-      <div
-        class="add-agent-section add-agent-section-dimensions"
-        *ngIf="showConfig"
-      >
+      <div class="add-agent-section add-agent-section-dimensions" *ngIf="showConfig">
         <div class="add-agent-section-title add-agent-section-title-dimensions">
-          <span
-            style="font-weight: 600; text-transform: capitalize; color: #ffff"
-            >Others</span
-          >
-          <mat-slide-toggle
-            [(ngModel)]="vault"
-            class="vault-toggle"
-            name="vault"
-          >
-            <span style="font-family: 'Open Sans'; color: #ffff"
-              >Store credentials to Vault</span
-            >
+          <span style="font-weight: 600; text-transform: capitalize; color: #ffff">Others</span>
+          <mat-slide-toggle [(ngModel)]="vault" class="vault-toggle" name="vault">
+            <span style="font-family: 'Open Sans'; color: #ffff">Store credentials to Vault</span>
           </mat-slide-toggle>
         </div>
         <div class="add-agent-section-body add-agent-section-body-dimensions">
           <div class="agent-categories-grid">
-            <div
-              *ngFor="let configData of getAgentConfigItems('all')"
-              class="agent-category-grid-item"
-            >
+            <div *ngFor="let configData of getAgentConfigItems('all')" class="agent-category-grid-item">
               <span class="input-label">{{
                 configData.key.length > 21
-                  ? configData.key.slice(0, 21).concat("..")
-                  : configData.key
-              }}</span>
+                ? configData.key.slice(0, 21).concat("..")
+                : configData.key
+                }}</span
+                >
               <div class="input">
                 <mat-form-field appearance="fill" class="formfield-custom">
-                  <input
-                    matInput
-                    type="{{ configData.inputType }}"
-                    [(ngModel)]="configData.value"
-                    name="{{ configData.key }}"
-                    id="{{ configData.id }}"
-                  />
+                  <input matInput type="{{ configData.inputType }}" [(ngModel)]="configData.value"
+                    name="{{ configData.key }}" id="{{ configData.id }}" />
                 </mat-form-field>
               </div>
             </div>
@@ -268,30 +159,18 @@
         </div>
       </div>
 
-      <div
-        class="add-agent-section add-agent-section-dimensions"
-        *ngIf="showConfig"
-      >
-        <div
-          style="font-weight: 600; text-transform: capitalize; color: #ffff"
-          class="add-agent-section-title add-agent-section-title-dimensions"
-        >
+      <div class="add-agent-section add-agent-section-dimensions" *ngIf="showConfig">
+        <div style="font-weight: 600; text-transform: capitalize; color: #ffff"
+          class="add-agent-section-title add-agent-section-title-dimensions">
           Dynamic Data
         </div>
         <div class="add-agent-section-body add-agent-section-body-dimensions">
           <div class="agent-categories-grid-textarea">
-            <div
-              *ngFor="let configData of getAgentConfigItems('dynamicTemplate')"
-              class="agent-category-grid-item-textarea"
-            >
+            <div *ngFor="let configData of getAgentConfigItems('dynamicTemplate')"
+              class="agent-category-grid-item-textarea">
               <div class="textarea">
                 <mat-form-field appearance="fill" class="formfield-custom">
-                  <textarea
-                    matInput
-                    [(ngModel)]="configData.value"
-                    name="{{ configData.value }}"
-                    rows="10"
-                  ></textarea>
+                  <textarea matInput [(ngModel)]="configData.value" name="{{ configData.value }}" rows="10"></textarea>
                 </mat-form-field>
               </div>
             </div>
@@ -299,14 +178,9 @@
         </div>
       </div>
 
-      <div
-        class="add-agent-section add-agent-section-dimensions"
-        *ngIf="showConfig && showTrackingJsonUploadButton"
-      >
-        <div
-          style="font-weight: 600; text-transform: capitalize; color: #ffff"
-          class="add-agent-section-title add-agent-section-title-dimensions"
-        >
+      <div class="add-agent-section add-agent-section-dimensions" *ngIf="showConfig && showTrackingJsonUploadButton">
+        <div style="font-weight: 600; text-transform: capitalize; color: #ffff"
+          class="add-agent-section-title add-agent-section-title-dimensions">
           Upload Tracking File
         </div>
         <div class="add-agent-section-body add-agent-section-body-dimensions">
@@ -318,15 +192,8 @@
                 </button>
               </div>
               <div class="input">
-                <input
-                  hidden
-                  #fileInput
-                  type="file"
-                  accept=".json"
-                  id="file-upload"
-                  style="padding: 0 !important"
-                  (change)="onFileChanged($event)"
-                />
+                <input hidden #fileInput type="file" accept=".json" id="file-upload" style="padding: 0 !important"
+                  (change)="onFileChanged($event)" />
               </div>
             </div>
             <div class="agent-category-grid-item-textarea">
@@ -341,35 +208,20 @@
             <div class="agent-category-grid-item" style="padding: 0 !important">
               <div class="file-name-container" matTooltip="{{ fileNameTooltip }}">
                 <span>{{ fileName || "No file uploaded yet." }}</span>
-                <mat-icon
-                  matTooltip="Cancel upload"
-                  svgIcon="cross"
-                  class="iconColor"
-                  style="
+                <mat-icon matTooltip="Cancel upload" svgIcon="cross" class="iconColor" style="
                     width: 13px !important;
                     height: 13px !important;
                     margin-bottom: 12px;
                     cursor: pointer;
                     color: #2d67ff;
-                  "
-                  (click)="cancelFileUpload()"
-                >
+                  " (click)="cancelFileUpload()">
                 </mat-icon>
               </div>
             </div>
             <div class="agent-category-grid-item" style="padding: 0 !important">
               <div class="file-upload-actions">
-                <button
-                  class="upload-action"
-                  mat-icon-button
-                  (click)="uploadFile()"
-                  matTooltip="Upload File"
-                >
-                  <mat-icon
-                    matTooltip="Upload File "
-                    svgIcon="upload"
-                    style="margin-bottom: 10px !important"
-                  >
+                <button class="upload-action" mat-icon-button (click)="uploadFile()" matTooltip="Upload File">
+                  <mat-icon matTooltip="Upload File " svgIcon="upload" style="margin-bottom: 10px !important">
                   </mat-icon>
                 </button>
               </div>
@@ -380,19 +232,12 @@
     </form>
 
     <div class="add-agent-section-actions" style="margin-bottom: 16px">
-      <button
-        (click)="saveData(btnValue)"
-        [disabled]="frmagentconfig.invalid"
-        class="button-save button-save-dimensions"
-        style="margin-bottom: 15px; width: 105px"
-      >
+      <button (click)="saveData(btnValue)" [disabled]="frmagentconfig.invalid"
+        class="button-save button-save-dimensions" id="addAgent"style="margin-bottom: 15px; width: 105px">
         {{ btnValue }}
       </button>
-      <button
-        (click)="cancelChange(btnValue)"
-        class="button-cancel button-cancel-dimensions"
-        style="margin-bottom: 15px; width: 105px"
-      >
+      <button (click)="cancelChange(btnValue)" id="cancelAgent" class="button-cancel button-cancel-dimensions"
+        style="margin-bottom: 15px; width: 105px">
         cancel
       </button>
     </div>

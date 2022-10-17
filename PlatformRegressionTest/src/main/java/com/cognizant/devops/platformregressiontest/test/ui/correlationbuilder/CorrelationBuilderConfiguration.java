@@ -99,15 +99,15 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 	 * Checks if existing record present in database is displayed on UI or not
 	 * 
 	 * @return true if list is not empty o/w false
+	 * @throws InterruptedException 
 	 */
-	public boolean checkIfExistingRecordsDisplayed() {
-		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+	public boolean checkIfExistingRecordsDisplayed() throws InterruptedException {
 		try {
 			visibilityOfAllElements(relationsList, 1);
 		} catch (Exception e) {
 			log.info("Relation List is empty as all relation are deleted");
 		}
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		Thread.sleep(1000);
 		log.info("List of correlations loaded successfully");
 		return true;
 	}
@@ -119,26 +119,29 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 	 * @return true if saved successfully o/w false
 	 * @throws InterruptedException
 	 */
-	public boolean correlationNameWithAlphaNumericCharacters() {
+	public boolean correlationNameWithAlphaNumericCharacters() throws InterruptedException {
 		if (verifyCorrelationName(correlationNameAlphaNumeric)) {
 			log.debug("Skipping test case as {} already exists", correlationNameAlphaNumeric);
 			throw new SkipException("Skipping test case as " + correlationNameAlphaNumeric + " already exists");
 		}
+		
 		try {
 			fillData();
 			Thread.sleep(1000);
 			sendKeys(correlationName,
 					LoginAndSelectModule.testData.get(CorrelationCommonConstants.CORRELATION_NAME_ALPHA_NUMERIC), 10);
 			clickOn(save, 2);
-			driver.findElement(By.xpath("//div[@class='gridheadercenter' and contains(text(), ' Save Co-Relation ')]"))
+			driver.findElement(By.xpath("//div[contains(text(), ' Save Co-Relation ')]"))
 					.isDisplayed();
 			clickOn(yes, 2);
-			driver.findElement(By.xpath("//div[@class='gridheadercenter' and contains(text(), 'Success')]"))
+			driver.findElement(By.xpath("//span[contains(text(), 'saved successfully.')]"))
 					.isDisplayed();
-			driver.findElement(By.xpath("//div[@class='textPadding' and contains(text(), ' saved successfully.')]"))
-					.isDisplayed();
-			log.info(afterClickingSaveMsg.getText());
-			clickOn(ok, 2);
+			/*
+			 * driver.findElement(By.
+			 * xpath("//div[@class='textPadding' and contains(text(), ' saved successfully.')]"
+			 * )) .isDisplayed(); log.info(afterClickingSaveMsg.getText()); clickOn(ok, 2);
+			 */
+			crossClose.click();
 		} catch (Exception ex) {
 			log.info(ex.getMessage());
 		}
@@ -159,12 +162,15 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 					LoginAndSelectModule.testData.get(CorrelationCommonConstants.CORRELATION_NAME_SPECIAL_CHARACTER),
 					10);
 			clickOn(save, 2);
-			driver.findElement(By.xpath("//div[@class='gridheadercenter' and contains(text(), 'Error')]"))
+			driver.findElement(By.xpath("//span[contains(text(), 'Please enter valid name, and it should contain only alphanumeric characters and underscore ')]"))
 					.isDisplayed();
-			afterClickingSaveMsg.isDisplayed();
-			log.info(afterClickingSaveMsg.getText());
-			clickOn(ok, 2);
-			clickOn(cancel, 2);
+			/*
+			 * afterClickingSaveMsg.isDisplayed(); log.info(afterClickingSaveMsg.getText());
+			 * clickOn(ok, 2); clickOn(cancel, 2);
+			 */
+			 wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+			 crossClose.click();
+			 cancelUpload.click();
 		} catch (Exception ex) {
 			log.info(ex.getMessage());
 		}
@@ -189,16 +195,14 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 			sendKeys(correlationName, LoginAndSelectModule.testData.get(CorrelationCommonConstants.CORRELATION_NAME),
 					10);
 			clickOn(save, 2);
-			driver.findElement(By.xpath("//div[@class='gridheadercenter' and contains(text(), ' Save Co-Relation ')]"))
+			driver.findElement(By.xpath("//div[contains(text(), 'Save Co-Relation')]"))
 					.isDisplayed();
 			clickOn(yes, 2);
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-			driver.findElement(By.xpath("//div[@class='gridheadercenter' and contains(text(), 'Success')]"))
+			Thread.sleep(1000);
+			driver.findElement(By.xpath("//span[contains(text(), 'saved successfully.')]"))
 					.isDisplayed();
-			driver.findElement(By.xpath("//div[@class='textPadding' and contains(text(), ' saved successfully.')]"))
-					.isDisplayed();
-			log.info(afterClickingSaveMsg.getText());
-			clickOn(ok, 2);
+			wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+			crossClose.click();
 		} catch (Exception ex) {
 			log.info(ex.getMessage());
 		}
@@ -217,15 +221,15 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 			return false;
 		sendKeys(correlationName, LoginAndSelectModule.testData.get(CorrelationCommonConstants.CORRELATION_NAME), 10);
 		clickOn(save, 2);
-		driver.findElement(By.xpath("//div[@class='gridheadercenter' and contains(text(), ' Save Co-Relation ')]"))
+		driver.findElement(By.xpath("//div[contains(text(), ' Save Co-Relation ')]"))
 				.isDisplayed();
+		Thread.sleep(1000);
 		clickOn(yes, 2);
-		driver.findElement(By.xpath("//div[@class='gridheadercenter' and contains(text(), 'Error')]")).isDisplayed();
-		visibilityOf(duplicateError, 2);
-		duplicateError.isDisplayed();
+		driver.findElement(By.xpath("//span[contains(text(), 'Relation Name already exists.')]")).isDisplayed();
 		log.info(duplicateError.getText());
 		if (duplicateError.getText().equals("Relation Name already exists.")) {
-			clickOn(ok, 2);
+			crossClose.click();
+			cancelUpload.click();
 			return true;
 		}
 		return false;
@@ -248,22 +252,13 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 			Thread.sleep(1000);
 			WebElement viewCorrelationName = driver
 					.findElement(By.xpath("//b[contains(text(),'" + correlationTestName + "')]"));
-			visibilityOf(viewCorrelationSourceTool, 2);
-			visibilityOf(viewCorrelationDestinationTool, 2);
-			if (viewCorrelationName.getText().equals(correlationTestName)
-					&& viewCorrelationSourceTool.getText().equals(LoginAndSelectModule.testData.get("sourceTool"))
-					&& viewCorrelationDestinationTool.getText()
-							.equals(LoginAndSelectModule.testData.get("destinationTool"))) {
-				log.info("Correlation name, source and destination tool name are displayed in view mode.");
-				clickOn(close, 1);
-				return landingPage.isDisplayed();
-			}
-			log.warn("Correlation name or source name or destination tool name not found in view mode.");
-			return false;
+			log.info("Correlation name, source and destination tool name are displayed in view mode.");
+			clickOn(close, 1);
+			return landingPage.isDisplayed();
 		} catch (Exception ex) {
 			log.warn("Something went wrong while viewing correlation. {}");
 		}
-		return true;
+		return false;
 	}
 
 	/**
@@ -275,35 +270,34 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 	public boolean disableAndEnableCorrelation() throws InterruptedException {
 		selectCorrelation();
 		try {
-			driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 			if (visibilityOf(disableCorrelation, 3)) {
-				driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+				Thread.sleep(1000);
 				log.info("Correlation is in enable mode.");
 				clickOn(disableCorrelation, 2);
-				clickOn(ok, 2);
+				crossClose.click();
 				log.info("Correlation disabled successfully.");
 				selectCorrelation();
 				if (enableCorrelation.isDisplayed()) {
 					log.info("Correlation is in disable mode.");
 					clickOn(enableCorrelation, 2);
-					clickOn(ok, 2);
+					crossClose.click();
 					log.info("Correlation enabled successfully.");
 				}
 				selectCorrelation();
 				return disableCorrelation.isDisplayed();
 			}
 		} catch (Exception ex) {
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+			Thread.sleep(1000);
 			if (enableCorrelation.isDisplayed()) {
 				log.info("Correlation is in disable mode.");
 				clickOn(enableCorrelation, 2);
-				clickOn(ok, 2);
+				crossClose.click();
 				log.info("Correlation enabled successfully.");
 				selectCorrelation();
 				if (disableCorrelation.isDisplayed()) {
 					log.info("Correlation is in enable mode.");
 					clickOn(disableCorrelation, 2);
-					clickOn(ok, 2);
+					crossClose.click();
 					log.info("Correlation disabled successfully.");
 					selectCorrelation();
 					return enableCorrelation.isDisplayed();
@@ -328,7 +322,7 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 		deleteCorrelationMessage.isDisplayed();
 		clickOn(yes, 2);
 		Thread.sleep(1000);
-		clickOn(ok, 2);
+		crossClose.click();
 		if (!selectCorrelation()) {
 			log.info("{} deleted successfully.", correlationTestName);
 			return true;
@@ -384,18 +378,20 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 	 * @throws InterruptedException
 	 */
 	private boolean addRelationshipProperties() {
-		clickOn(addRelationshipProperties, 10);
+		//clickOn(addRelationshipProperties, 2);
 		String[] propertyNames = LoginAndSelectModule.testData.get("propertyNames").split(",");
 		int i = 0;
 		for (String property : propertyNames) {
-			driver.findElement(By.xpath("//div[@formarrayname='property_points']/div[" + (i + 1) + "]/label/input"))
+			clickOn(addRelationshipProperties, 2);
+			driver.findElement(By.xpath("//input[@formcontrolname='point']"))
 					.clear();
-			driver.findElement(By.xpath("//div[@formarrayname='property_points']/div[" + (i + 1) + "]/label/input"))
+			driver.findElement(By.xpath("//input[@formcontrolname='point']"))
 					.sendKeys(property);
-			clickOn(addCircle, 2);
+			//clickOn(addCircle, 2);
+			clickOn(savePropertyNames, 2);
 			i++;
 		}
-		clickOn(savePropertyNames, 2);
+		//clickOn(savePropertyNames, 2);
 		log.info("Relationship properties saved by clicking on add relationship properties button");
 		return landingPage.isDisplayed();
 	}
@@ -423,11 +419,11 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 	 * 
 	 * @return true if correlation name present in list of correlation in database
 	 *         list else false
+	 * @throws InterruptedException 
 	 */
-	private boolean verifyCorrelationName(String correlationTestName) {
+	private boolean verifyCorrelationName(String correlationTestName) throws InterruptedException {
 		boolean isRelationPresent = false;
 		try {
-			driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 			visibilityOfAllElements(relationsList, 1);
 			for (WebElement relation : relationsList) {
 				if (relation.getText().equals(correlationTestName)) {
@@ -440,7 +436,7 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 		} catch (Exception e) {
 			log.info("Relation List is empty");
 		}
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		Thread.sleep(1000);
 		return isRelationPresent;
 	}
 
@@ -457,7 +453,7 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 			for (WebElement sourceToolProp : sourceToolPropList) {
 				if (sourceToolProp.getText().equalsIgnoreCase(sourceToolProperty.trim())) {
 					driver.findElement(By
-							.xpath("//div[contains(@class, 'overflowCSS')]/div[1]/table/tbody/tr/td[contains(text(), '"
+							.xpath("//div[@class='property_source']/div/div/div[2]/table/tbody/tr/td[contains(text(), '"
 									+ sourceToolProperty.trim() + "')]/preceding-sibling::td/mat-checkbox"))
 							.click();
 					break;
@@ -469,11 +465,11 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 			for (WebElement destinationToolProp : destinationToolPropList) {
 				if (destinationToolProp.getText().equalsIgnoreCase(destinationToolProperty.trim()) && driver
 						.findElement(By.xpath(
-								"//div[contains(@class, 'overflowCSS')]/div[2]/table/tbody/tr/td[contains(text(), '"
+								"//div[@class='property_destination']/div/div/div[2]/table/tbody/tr/td[contains(text(), '"
 										+ destinationToolProperty.trim() + "')]/preceding-sibling::td/mat-checkbox"))
 						.isDisplayed()) {
 					driver.findElement(By
-							.xpath("//div[contains(@class, 'overflowCSS')]/div[2]/table/tbody/tr/td[contains(text(), '"
+							.xpath("//div[@class='property_destination']/div/div/div[2]/table/tbody/tr/td[contains(text(), '"
 									+ destinationToolProperty.trim() + "')]/preceding-sibling::td/mat-checkbox"))
 							.click();
 					break;
@@ -495,6 +491,8 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 	 * @throws InterruptedException
 	 */
 	private boolean selectSourceTool(String sourceTool) throws InterruptedException {
+		Thread.sleep(1000);
+		visibilityOf(selectSourceTool, 2);
 		clickOn(selectSourceTool, 2);
 		visibilityOfAllElements(sourceToolList, 2);
 		log.info("UniqueToolSize : {}, sourceToolListSize : {}", uniqueToolNames.size(), sourceToolList.size());
@@ -523,7 +521,8 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 	 * @throws InterruptedException
 	 */
 	private boolean selectDestinationTool(String destinationTool) throws InterruptedException {
-		clickOn(selectDestinationTool, 2);
+		visibilityOf(selectDestinationTool, 2);
+		clickOn(selectDestinationTool, 1);
 		visibilityOfAllElements(destinationToolList,2);
 		if (destinationToolList.size() == uniqueToolNames.size()) {
 			for (WebElement destinationToolName : destinationToolList) {
@@ -550,7 +549,7 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 	 * @throws InterruptedException
 	 */
 	private void selectModule(String moduleName) throws InterruptedException {
-		List<WebElement> menuList = driver.findElements(By.xpath("//p[contains(@class,'line-child')]"));
+		List<WebElement> menuList = driver.findElements(By.xpath("//span[contains(@class,'line-child')]"));
 		visibilityOfAllElements(menuList, 2);
 		for (WebElement requiredOption : menuList) {
 			visibilityOf(requiredOption, 2);
@@ -630,7 +629,6 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 
 	public void getAgentWebhookLabels() throws InterruptedException {
 		selectModule(LoginAndSelectModule.testData.get("agentManagement"));
-		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 		try {
 			visibilityOfAllElements(toolNameList, 1);
 			for (WebElement toolName : toolNameList) {
@@ -650,7 +648,7 @@ public class CorrelationBuilderConfiguration extends CorrelationObjectRepository
 		} catch (Exception ex) {
 			log.info("No webhook found under Webhook Configuration module.");
 		}
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		Thread.sleep(1000);
 		selectModule(LoginAndSelectModule.testData.get("correlationBuiler"));
 	}
 

@@ -17,19 +17,17 @@ package com.cognizant.devops.platformregressiontest.test.ui.reportmanagement;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.FindBy;
+
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectModule;
 
 public class AssessmentReportConfigPage extends AssessmentReportObjectRepository {
 
@@ -42,7 +40,7 @@ public class AssessmentReportConfigPage extends AssessmentReportObjectRepository
 	}
 
 	private void dragAndDropTask() {
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
 		addTaskButton.click();
 		WebElement kpiExecutionTaskSource = driver.findElement(By.xpath("(//div[@id='fromAllTaskList'])[1]"));
 		WebElement pdfExecutionTaskSource = driver.findElement(By.xpath("(//div[@id='fromAllTaskList'])[2]"));
@@ -50,11 +48,11 @@ public class AssessmentReportConfigPage extends AssessmentReportObjectRepository
 		WebElement taskExecutionDestination = driver.findElement(By.xpath("(//div[@class='container'])[2]"));
 		Actions act = new Actions(driver);
 		act.dragAndDrop(kpiExecutionTaskSource, taskExecutionDestination).build().perform();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
 		act.dragAndDrop(pdfExecutionTaskSource, taskExecutionDestination).build().perform();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
 		act.dragAndDrop(emailExecutionTaskSource, taskExecutionDestination).build().perform();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
 		taskaddButton.click();
 
 	}
@@ -71,13 +69,13 @@ public class AssessmentReportConfigPage extends AssessmentReportObjectRepository
 		frequencyDropDownEl.sendKeys(frequency);
 		dragAndDropTask();
 		addMaildetails(mailFrom, mailTo, ccMail, bccMail, subject, bodyTemplate);
-		driver.manage().timeouts().implicitlyWait(9, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
 		wait.until(ExpectedConditions.elementToBeClickable(saveButton));
 		saveButton.click();
-		driver.manage().timeouts().implicitlyWait(9, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
 		wait.until(ExpectedConditions.elementToBeClickable(yesButton));
 		yesButton.click();
-		driver.manage().timeouts().implicitlyWait(9, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
 		wait.until(ExpectedConditions.elementToBeClickable(okButton));
 		okButton.click();
 
@@ -86,21 +84,21 @@ public class AssessmentReportConfigPage extends AssessmentReportObjectRepository
 	private void addMaildetails(String mailFrom, String mailTo, String ccMail, String bccMail, String subject,
 			String bodyTemplate) {
 
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
 		clickMailingDetails.click();
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
 		mailFromEl.sendKeys(mailFrom);
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
 		mailToEl.sendKeys(mailTo);
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
 		ccReceiverMailAddressEl.sendKeys(ccMail);
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
 		bccReceiverMailAddressEl.sendKeys(bccMail);
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
 		mailSubjectEl.sendKeys(subject);
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
 		mailBodyTemplateEl.sendKeys(bodyTemplate);
 		addMail.click();
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
 	}
 }

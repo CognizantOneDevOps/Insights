@@ -36,6 +36,11 @@ public class DashboardReportDataProvider {
 			+ File.separator + ConfigOptionsTest.AUTO_DIR + File.separator
 			+ ConfigOptionsTest.DASHBOARD_REPORT_DOWNLOAD_DIR + File.separator
 			+ ConfigOptionsTest.REPORT_WITHOUT_MAILING_DETAILS;
+	
+	public static final String EDIT_DASHBOARD_REPORT = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME)
+			+ File.separator + ConfigOptionsTest.AUTO_DIR + File.separator
+			+ ConfigOptionsTest.DASHBOARD_REPORT_DOWNLOAD_DIR + File.separator
+			+ ConfigOptionsTest.EDIT_DASHBOARD_REPORT;
 
 	@DataProvider(name = "reportWithMailingDetails")
 	Object[][] reportWithMailingDetails() throws IOException {
@@ -45,5 +50,10 @@ public class DashboardReportDataProvider {
 	@DataProvider(name = "reportWithoutMailingDetails")
 	Object[][] reportWithoutMailingDetails() throws IOException {
 		return (ReadJsonData.readReportData(REPORT_WITHOUT_MAILING_DETAILS));
+	}
+	
+	@DataProvider(name = "editDashboardReport")
+	Object[][] editDashboardReport() throws IOException {
+		return (ReadJsonData.readReportData(EDIT_DASHBOARD_REPORT));
 	}
 }

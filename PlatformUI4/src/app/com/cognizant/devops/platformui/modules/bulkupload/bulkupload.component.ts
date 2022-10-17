@@ -82,17 +82,19 @@ export class BulkUploadComponent implements OnInit {
     this.getLabelTools();
   }
   cancelUpload(index) {
+    console.log("InsideCancelUpload")
     this.fileNameArr[index] = null;
-    this.fileNameArrToolTip = null;
-    (<HTMLInputElement>document.getElementById("file" + index)).value = '';
+    //this.fileNameArrToolTip = null;
+    (<HTMLInputElement>document.getElementById("file")).value = "";
   }
 
   cancelAllUpload() {
-    for (let index of [0, 1, 2, 3, 4]) {
-      this.fileNameArr[index] = null;
-      this.fileNameArrToolTip = null;
-      (<HTMLInputElement>document.getElementById("file" + index)).value = '';
-    }
+    console.log("Inside CancelAllUpload");
+     for (let index of [0, 1, 2, 3, 4]) {
+        this.fileNameArr[index] = null;
+        //this.fileNameArrToolTip = null;
+     (<HTMLInputElement>document.getElementById("file" + index)).value="";
+ }
   }
 
   userForm() {
@@ -166,7 +168,6 @@ export class BulkUploadComponent implements OnInit {
     this.userForm();
     this.cancelAllUpload();
     this.refresh = false;
-    var index = 0;
   }
   uploadFile() {
     this.toolNameSaveEnable = true;

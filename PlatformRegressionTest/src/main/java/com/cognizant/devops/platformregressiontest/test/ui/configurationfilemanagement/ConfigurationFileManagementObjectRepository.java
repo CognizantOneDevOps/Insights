@@ -35,16 +35,16 @@ public class ConfigurationFileManagementObjectRepository extends LoginAndSelectM
 
 	Map<String, String> testData = new HashMap<>();
 
-	@FindBy(xpath = "//div[contains(text(),'Configuration ')]")
+	@FindBy(xpath = "//span[contains(text(),'Configuration ')]")
 	WebElement configurationLandingPage;
 
-	@FindBy(xpath = "//mat-icon[@title='Add']")
+	@FindBy(xpath = "//mat-icon[@svgicon='add']")
 	WebElement addButton;
 
 	@FindBy(xpath = "//input[@placeholder='Enter file name']")
 	WebElement fileName;
 
-	@FindBy(xpath = "//tr[2]//div/div")
+	@FindBy(xpath = "//mat-select[@placeholder='Select file type']")
 	WebElement fileType;
 
 	@FindBy(xpath = "//span[contains(@class, 'mat-option-text')]")
@@ -53,7 +53,7 @@ public class ConfigurationFileManagementObjectRepository extends LoginAndSelectM
 	@FindBy(xpath = "//td[contains(@class, 'mat-column-fileName')]")
 	List<WebElement> fileNameList;
 	
-	@FindBy(xpath = "//tr[3]//div/div")
+	@FindBy(xpath = "//mat-select[@placeholder='Select file module']")
 	WebElement fileModule;
 
 	@FindBy(xpath = "//span[contains(@class, 'mat-option-text')]")
@@ -65,34 +65,34 @@ public class ConfigurationFileManagementObjectRepository extends LoginAndSelectM
 	@FindBy(xpath = "//input[@id='file']")
 	WebElement uploadFile;
 
-	@FindBy(xpath = "//mat-icon[@title='Edit']")
+	@FindBy(xpath = "//mat-icon[@svgicon='edit']")
 	WebElement editButton;
 
-	@FindBy(xpath = "//mat-icon[@title='Delete']")
+	@FindBy(xpath = "//mat-icon[@svgicon='trash']")
 	WebElement deleteButton;
 
-	@FindBy(xpath = "//mat-icon[@title='Refresh']")
+	@FindBy(xpath ="//mat-icon[@svgicon='retry']")
 	WebElement refreshButton;
 
-	@FindBy(xpath = "//mat-icon[@title='Reset']")
+	@FindBy(xpath ="//mat-icon[@svgicon='exit']")
 	WebElement resetButton;
 
-	@FindBy(xpath = "//span[text()= 'YES']")
+	@FindBy(xpath = "//button[@id='yesBtn']")
 	WebElement yesButton;
 
-	@FindBy(xpath = "//span[text()= 'OKAY']")
-	WebElement okButton;
+	@FindBy(xpath = "//button[@id='crossClose']")
+	WebElement crossClose;
 
-	@FindBy(xpath = "//mat-icon[@title='Save']")
+	@FindBy(xpath = "//mat-icon[@svgicon='save']")
 	WebElement saveButton;
-
-	@FindBy(xpath = "//div[contains(text(), ' Success')]")
+	
+	@FindBy(xpath = "//span[contains(text(),'successfully.')]")
 	WebElement successMessage;
-
-	@FindBy(xpath = "//div[contains(text(), ' Error')]")
+	
+	@FindBy(xpath = "//span[text()='File already exists in database.']")
 	WebElement errorMessage;
-
-	@FindBy(xpath = "//mat-icon[@title='Redirect To Landing Page']")
+	
+	@FindBy(xpath = "//mat-icon[@svgicon='backButton']")
 	WebElement redirectButton;
 
 	@FindBy(xpath = "//div[contains(text(),'File Management')]")

@@ -4,10 +4,12 @@
 
 <suite thread-count="1" name="suite" verbose="10">
 
-	<test name="platformapitest">
+	  <test name="platformapitest">
 		<classes>
 			<class
 				name="com.cognizant.devops.platformregressiontest.test.testnginitializer.TestNGInitializer" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.TaskManagement.ScheduleTaskManagementAPI" />
 			<class
 				name="com.cognizant.devops.platformregressiontest.test.agentmanagement.RegisterAgentAPITest" />
 			<class
@@ -40,13 +42,54 @@
 				name="com.cognizant.devops.platformregressiontest.test.webhookconfiguration.UpdateStatusWebhookAPITest" />
 			<class
 				name="com.cognizant.devops.platformregressiontest.test.webhookconfiguration.DeleteWebhookAPITest" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.traceabilitydashboard.TraceabilityAPITest" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.roi.OutcomeApiTestCases" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.roi.MileStoneApiTestCases" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.TaskManagement.ScheduleTaskManagementAPI" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.TaskManagement.WorkflowTaskManagementAPI" />
 		</classes>
 	</test>
-
 	<test name="logintest">
 		<classes>
 			<class
 				name="com.cognizant.devops.platformregressiontest.test.login.LoginTest" />
+		</classes>
+	</test>
+	 <test name="groupsandusertest">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.groupsanduser.GroupsAndUserTest" />
+		</classes>
+	</test>
+
+	<test name="loginwithcreatedcredentials">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.loginwithdifferentroles.LoginWithRolesTest" />
+		</classes>
+	</test>
+
+	<test name="healthchecktest">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.healthcheck.HealthCheckTest" />
+		</classes>
+	</test>
+	<test name="traceability">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.traceabilitydashboard.TraceabilityDashboardTest" />
+		</classes>
+	</test> 
+ 	<test name="agentmanagementtest">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.agentmanagement.OfflineAgentTest" />
 		</classes>
 	</test>
 
@@ -56,53 +99,26 @@
 				name="com.cognizant.devops.platformregressiontest.test.ui.dashboardreportdownload.DashboardReportDownloadTest" />
 		</classes>
 	</test>
-	<test name="healthchecktest">
-		<classes>
-			<class
-				name="com.cognizant.devops.platformregressiontest.test.ui.healthcheck.HealthCheckTest" />
-		</classes>
-	</test>
 
-	<test name="agentmanagementtest">
-		<classes>
-			<class
-				name="com.cognizant.devops.platformregressiontest.test.ui.agentmanagement.OnDemandTest" />
-			<class
-				name="com.cognizant.devops.platformregressiontest.test.ui.agentmanagement.ReleaseTest" />
-			<class
-				name="com.cognizant.devops.platformregressiontest.test.ui.agentmanagement.OfflineAgentTest" />
-		</classes>
-	</test>
 	<test name="configurationtestfilemanagement">
 		<classes>
 			<class
 				name="com.cognizant.devops.platformregressiontest.test.ui.configurationfilemanagement.ConfigurationFileManagementTest" />
 		</classes>
 	</test>
-	<test name="groupsandusertest">
+	<test name="workflow">
 		<classes>
 			<class
-				name="com.cognizant.devops.platformregressiontest.test.ui.groupsanduser.GroupsAndUserTest" />
+				name="com.cognizant.devops.platformregressiontest.test.ui.workflow.WorkflowTaskTest" />
 		</classes>
 	</test>
-	<test name="webhooktest">
+	<test name="scheduleTask">
 		<classes>
 			<class
-				name="com.cognizant.devops.platformregressiontest.test.ui.webhook.WebhookTest" />
+				name="com.cognizant.devops.platformregressiontest.test.ui.scheduletask.ScheduleTaskTest" />
 		</classes>
 	</test>
-	<test name="bulkupload">
-		<classes>
-			<class
-				name="com.cognizant.devops.platformregressiontest.test.ui.bulkupload.BulkUploadTest" />
-		</classes>
-	</test>
-	<test name="correlationbuildertest">
-		<classes>
-			<class
-				name="com.cognizant.devops.platformregressiontest.test.ui.correlationbuilder.CorrelationBuilderTest" />
-		</classes>
-	</test>
+
 	<test name="serverconfiguration">
 		<classes>
 			<class
@@ -115,16 +131,17 @@
 				name="com.cognizant.devops.platformregressiontest.test.ui.logosetting.LogoSettingTest" />
 		</classes>
 	</test>
-	<test name="datadictionary">
+
+	<test name="correlationbuildertest">
 		<classes>
 			<class
-				name="com.cognizant.devops.platformregressiontest.test.ui.datadictionary.DataDictionaryTest" />
+				name="com.cognizant.devops.platformregressiontest.test.ui.correlationbuilder.CorrelationBuilderTest" />
 		</classes>
 	</test>
-	<test name="loginwithcreatedcredentials">
+	<test name="webhooktest">
 		<classes>
 			<class
-				name="com.cognizant.devops.platformregressiontest.test.ui.loginwithdifferentroles.LoginWithRolesTest" />
+				name="com.cognizant.devops.platformregressiontest.test.ui.webhook.WebhookTest" />
 		</classes>
 	</test>
 	<test name="kpitest">
@@ -147,6 +164,35 @@
 				name="com.cognizant.devops.platformregressiontest.test.ui.reportmanagement.ReportTemplateConfigurationTest" />
 		</classes>
 	</test>
-
+	<test name="datadictionary">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.datadictionary.DataDictionaryTest" />
+		</classes>
+	</test>
+	<test name="bulkupload">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.bulkupload.BulkUploadTest" />
+		</classes>
+	</test>
+ 	<test name="outcome">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.ROI.OutcomeTest" />
+		</classes>
+	</test>
+	<test name="milestone">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.ROI.MileStoneTest" />
+		</classes>
+	</test>
+	 <test name="archival">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.dataarchival.DataArchivalTest" />
+		</classes>
+	</test> 
 
 </suite>

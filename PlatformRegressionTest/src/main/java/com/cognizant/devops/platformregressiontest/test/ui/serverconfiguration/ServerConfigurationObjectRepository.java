@@ -28,7 +28,7 @@ import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectMod
  */
 public class ServerConfigurationObjectRepository extends LoginAndSelectModule{
 
-	@FindBy(xpath = "//div//a[contains(text(),'Server Configuration')]")
+	@FindBy(xpath = "//span//b[contains(text(),'Server Configuration')]")
 	WebElement landingPage;
 	
 	@FindBy(xpath = "((//td[@title='isOnlineRegistration']//span[text()='isOnlineRegistration'])//following::input)[1]")
@@ -37,19 +37,108 @@ public class ServerConfigurationObjectRepository extends LoginAndSelectModule{
 	@FindBy(xpath = "((//td[contains(@title,'offlineAgentPath')]//span[text()='offlineAgentPath'])//following::input)[1]")
 	WebElement offlineAgentPathValue;
 
-	@FindBy(xpath = "//mat-icon[@title='Save']")
+	@FindBy(xpath = "//mat-icon[@svgicon='save']")
 	WebElement saveButton;
 	
-	@FindBy(xpath = "//span[text()= 'YES']")
+	@FindBy(xpath = "//button[@id= 'yesBtn']")
 	WebElement yesButton;
 	
-	@FindBy(xpath = "//div[contains(text(), ' Success')]")
+	@FindBy(xpath = "//div//h1[contains(text(), 'Success')]")
 	WebElement successMessage;
 	
-	@FindBy(xpath = "//span[text()= 'OKAY']")
-	WebElement okButton;
+	@FindBy(xpath = "//button[@id= 'onOkClose']")
+	WebElement okClose;
 	
-	@FindBy(xpath = "//mat-icon[@title='Redirect To Landing Page']")
+	@FindBy(xpath = "//mat-icon[@svgicon='homeBck']")
 	WebElement redirectButton;
+	
+	@FindBy(xpath = "//input[@placeholder='Search']")
+	WebElement mainLandingPage;
+	
+	@FindBy(xpath = "//input[@name='grafana_grafanaEndpoint']")
+	WebElement grafanaInput;
+
+	@FindBy(xpath = "//input[@name='grafana_grafanaDBEndpoint']")
+	WebElement grafanaDBEndpoint;
+	
+	@FindBy(xpath = "//input[@name='grafana_adminUserName']")
+	WebElement grafanaadminUserName;
+
+	@FindBy(xpath = "//input[@name='grafana_adminUserPassword']")
+	WebElement grafanaadminUserPassword;
+
+	@FindBy(xpath = "//span[contains(text(),'Please fill Grafana details.')]")
+	WebElement grafanaErrorMsg;
+	
+	@FindBy(xpath = "//input[@name='graph_endpoint']")
+	WebElement graphendpoint;
+
+	@FindBy(xpath = "//input[@name='graph_authToken']")
+	WebElement graphauthToken;
+	
+	@FindBy(xpath = "//input[@name='graph_boltEndPoint']")
+	WebElement graphboltEndPoint;
+
+	@FindBy(xpath = "//span[contains(text(),'Please fill Neo4j details.')]")
+	WebElement neo4jErrorMsg;
+	
+	@FindBy(xpath = "//input[@name='postgre_userName']")
+	WebElement postgreUserName;
+
+	@FindBy(xpath = "//input[@name='postgre_password']")
+	WebElement postgrePassword;
+
+	@FindBy(xpath = "//input[@name='postgre_insightsDBUrl']")
+	WebElement postgreInsightsDBUrl;
+
+	@FindBy(xpath = "//input[@name='postgre_grafanaDBUrl']")
+	WebElement postgreGrafanaDBUrl;
+
+	@FindBy(xpath = "//span[contains(text(),'Please fill Postgre details.')]")
+	WebElement postgreErrorMsg;
+
+	@FindBy(xpath = "//input[@name='messageQueue_host']")
+	WebElement messageQueueHost;
+	
+	@FindBy(xpath = "//input[@name='messageQueue_user']")
+	WebElement messageQueueUser;
+
+	@FindBy(xpath = "//input[@name='messageQueue_password']")
+	WebElement messageQueuePassword;
+
+	@FindBy(xpath = "//span[contains(text(),'Please fill Message Queue Config details.')]")
+	WebElement msgQueueErrorMsg;
+
+	@FindBy(xpath = "//input[@name='insightsServiceURL']")
+	WebElement insightsServiceURL;
+	
+	@FindBy(xpath = "//span[contains(text(),'Please fill insightsServiceURL, it cannot be empty.')]")
+	WebElement serviceUrlErrorMsg;
+
+	@FindBy(xpath = "//input[@name='trustedHosts']")
+	WebElement trustedHosts;
+
+	@FindBy(xpath = "//span[contains(text(),'Please fill trusted hosts details, it cannot be empty.')]")
+	WebElement trustedHostsErrorMsg;
+	
+	@FindBy(xpath = "//input[@name='singleSignOnConfig_tokenSigningKey']")
+	WebElement singleSignOnConfig;
+
+	@FindBy(xpath = "//span[contains(text(),'Please fill SingleSignOnConfig tokenSigningKey details.')]")
+	WebElement signOnErrorMsg;
+
+	@FindBy(xpath = "//input[@name='applicationLogLevel']")
+	WebElement applicationLogLevel;
+
+	@FindBy(xpath = "//span[contains(text(),'Please fill authentication protocol.')]")
+	WebElement applicationLogErrorMsg;
+
+	@FindBy(xpath = "//button[@id='crossClose']")
+	WebElement crossClose;
+	
+	@FindBy(xpath = "//input[@name='endpointData_elasticSearchEndpoint']")
+	WebElement elasticSearchEndpoint;
+
+	
 
 }

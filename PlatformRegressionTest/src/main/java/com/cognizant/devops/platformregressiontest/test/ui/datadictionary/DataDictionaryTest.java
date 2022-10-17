@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -52,7 +53,7 @@ public class DataDictionaryTest  extends LoginAndSelectModule{
 	public void setUp() throws InterruptedException {
 		initialization();
 		getData(ConfigOptionsTest.DATADICTIONARY_DIR + File.separator + ConfigOptionsTest.DATADICTIONARY_JSON_FILE);
-		selectModuleUnderConfiguration(LoginAndSelectModule.testData.get("dataDictionary"));
+		selectMenuOption(LoginAndSelectModule.testData.get("dataDictionary"));
 		clickAllActionButton = new DataDictionaryConfiguration();
 		clickAllActionButton.getAgentWebhookLabels();
 	}
@@ -60,10 +61,11 @@ public class DataDictionaryTest  extends LoginAndSelectModule{
 	/**
 	 * This method will be executed just before any function/method with @Test
 	 * annotation starts.
+	 * @throws InterruptedException 
 	 */
 	@BeforeMethod
-	public void beforeMethod() {
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+	public void beforeMethod() throws InterruptedException {
+		Thread.sleep(1000);
 	}
 
 	/**

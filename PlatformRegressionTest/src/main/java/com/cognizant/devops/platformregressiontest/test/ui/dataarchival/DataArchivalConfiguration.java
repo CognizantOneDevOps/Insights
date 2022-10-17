@@ -57,37 +57,46 @@ public class DataArchivalConfiguration extends DataArchivalObjectRepository{
 	 * @throws InterruptedException
 	 */
 	@SuppressWarnings("all")                            
-	public boolean addArchiveData() throws InterruptedException {
-		if (checkArchive(LoginAndSelectModule.testData.get("archiveName"))) {
+	public boolean addArchiveData(String archivalNme,String stDate,String stMonth,String stYear,
+			String edDate,String edMonth,String edYear,String daysToRetain) throws InterruptedException {
+		if (checkArchive(archivalNme)) {
 			log.debug("archive name already exists");
 			throw new SkipException("Skipping test case as archive already exists");
 		} else {
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-			addDetails.click();
-			archivalName.sendKeys(LoginAndSelectModule.testData.get("archiveName"));
-			startDate.click();
-			calenderArrow.click();
-			selectDate(LoginAndSelectModule.testData.get("startYear"));
-			selectDate(LoginAndSelectModule.testData.get("startMonth"));
-			selectDate(LoginAndSelectModule.testData.get("startDate"));
-			stopDate.click();
-			calenderArrow.click();
-			selectDate(LoginAndSelectModule.testData.get("endYear"));
-			selectDate(LoginAndSelectModule.testData.get("endMonth"));
-			selectDate(LoginAndSelectModule.testData.get("endDate"));
-			noofdaystoRetain.sendKeys(LoginAndSelectModule.testData.get("daysToRetain"));
-			saveButton.click();
-			yesButton.click();
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
+			clickOn(addDetails,2);
+			archivalName.sendKeys(archivalNme);
+			noofdaystoRetain.sendKeys(daysToRetain);
+			Thread.sleep(500);
+			clickOn(openStartDateCl,2);
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
+			selectYear(stYear);
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
+			selectMonth(stMonth);
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
+			selectDate(stDate);
+			Thread.sleep(1000);
+			clickOn(openEndDateCl,2);
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
+			selectYear(edYear);
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
+			selectMonth(edMonth);
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
+			selectDate(edDate);
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
+			visibilityOf(saveButton, 2);
+			clickOn(saveButton,2);
+			clickOn(yesBtn,2);
 			try {
 				if (successMessage.isDisplayed()) {
-					wait.until(ExpectedConditions.elementToBeClickable(okButton));
-					okButton.click();
+					wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+					crossClose.click();
 					log.info("successfully added archive date");
 					return true;
 				}
 			} catch (Exception e) {
 				log.info("error while creating archive date");
-				redirectToLandingPage.click();
+				backButton.click();
 				return false;
 			}
 		}
@@ -102,7 +111,6 @@ public class DataArchivalConfiguration extends DataArchivalObjectRepository{
 	 * @return True if archive is present o/w false
 	 */
 	private boolean checkArchive(String archive) {
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 		List<WebElement> rws = archiveDetailsTable.findElements(By.tagName("tr"));
 		for (int i = 0; i < rws.size(); i++) {
 			List<WebElement> cols = (rws.get(i)).findElements(By.tagName("td"));
@@ -111,27 +119,11 @@ public class DataArchivalConfiguration extends DataArchivalObjectRepository{
 				return true;
 			}
 		}
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 		log.info("{} archive name is not present.", archive);
 		return false;
 	}
 
-	/**
-	 * Selects the particular date value from list of values available
-	 * 
-	 * @param startInput
-	 * @throws InterruptedException
-	 */
-	public void selectDate(String dateValue) throws InterruptedException {
-		Thread.sleep(5);
-		for (WebElement d : listOfDate) {
-			if (d.getText().equals(dateValue)) {
-				d.click();
-				break;
-			}
-		}
-	}
-
+	
 	/**
 	 * Checks if error message is popped up when we try to add data archive existing
 	 * archive name
@@ -139,39 +131,49 @@ public class DataArchivalConfiguration extends DataArchivalObjectRepository{
 	 * @return True if error message is popped up o/w false
 	 * @throws InterruptedException
 	 */
-	public boolean addSameArchiveData() throws InterruptedException {
-		if (!checkArchive(LoginAndSelectModule.testData.get("archiveName"))) {
+	public boolean addSameArchiveData(String archivalNme,String stDate,String stMonth,String stYear,
+			String edDate,String edMonth,String edYear,String daysToRetain) throws InterruptedException {
+		if (!checkArchive(archivalNme)) {
 			log.debug("archive name does not exist to check error");
 			throw new SkipException("Skipping test case as archive does not exist");
 		} else {
-			driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-			addDetails.click();
-			driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-			archivalName.sendKeys(LoginAndSelectModule.testData.get("archiveName"));
-			startDate.click();
-			calenderArrow.click();
-			selectDate(LoginAndSelectModule.testData.get("startYear"));
-			selectDate(LoginAndSelectModule.testData.get("startMonth"));
-			selectDate(LoginAndSelectModule.testData.get("startDate"));
-			stopDate.click();
-			calenderArrow.click();
-			selectDate(LoginAndSelectModule.testData.get("endYear"));
-			selectDate(LoginAndSelectModule.testData.get("endMonth"));
-			selectDate(LoginAndSelectModule.testData.get("endDate"));
-			noofdaystoRetain.sendKeys(LoginAndSelectModule.testData.get("daysToRetain"));
-			saveButton.click();
-			yesButton.click();
-			wait.until(ExpectedConditions.elementToBeClickable(okButton));
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
+			visibilityOf(addDetails, 2);
+			clickOn(addDetails,2);
+			archivalName.sendKeys(archivalNme);
+			noofdaystoRetain.sendKeys(daysToRetain);
+			clickOn(openStartDateCl,2);
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
+			selectYear(stYear);
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
+			selectMonth(stMonth);
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
+			selectDate(stDate);
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
+			clickOn(openEndDateCl,2);
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
+			selectYear(edYear);
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
+			selectMonth(edMonth);
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
+			selectDate(edDate);
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
+			visibilityOf(saveButton, 2);
+			clickOn(saveButton,2);
+			visibilityOf(yesBtn, 2);
+			clickOn(yesBtn,2);
 			try {
 				if (errorMessage.isDisplayed()) {
-					okButton.click();
+					clickOn(crossClose,2);
 					log.info("successfully got an error message while adding archive with existing name");
-					redirectToLandingPage.click();
+					visibilityOf(backButton, 2);
+					clickOn(backButton, 3);
 					return true;
 				}
 			} catch (Exception e) {
 				log.info("error while creating archive with existing name");
-				redirectToLandingPage.click();
+				visibilityOf(backButton, 2);
+				clickOn(backButton, 3);
 				return false;
 			}
 		}
@@ -183,10 +185,12 @@ public class DataArchivalConfiguration extends DataArchivalObjectRepository{
 	 * Checks if reset and redirect functionality are successful
 	 * 
 	 * @return True if reset and redirect functionality are successful o/w false
+	 * @throws InterruptedException 
 	 */
-	public boolean resetAndRedirectFunctionality() {
-		if (resetFunctionalityCheck()) {
-			redirectButton.click();
+	public boolean resetAndRedirectFunctionality(String archivalNme,String stDate,String stMonth,String stYear,
+			String edDate,String edMonth,String edYear,String daysToRetain) throws InterruptedException {
+		if (resetFunctionalityCheck(archivalNme)) {
+			clickOn(backButton,4);
 			wait.until(ExpectedConditions.elementToBeClickable(addDetails));
 			try {
 				if (addDetails.isDisplayed()) {
@@ -207,12 +211,13 @@ public class DataArchivalConfiguration extends DataArchivalObjectRepository{
 	 * checks if reset functionality is successful
 	 * 
 	 * @return true if reset functionality is successful o/w false
+	 * @throws InterruptedException 
 	 */
-	private boolean resetFunctionalityCheck() {
+	private boolean resetFunctionalityCheck(String archivalNme) throws InterruptedException {
 		addDetails.click();
-		archivalName.sendKeys(LoginAndSelectModule.testData.get("archiveName"));
+		archivalName.sendKeys(archivalNme);
 		resetButton.click();
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
 		if (archivalName.getText().length() == 0) {
 			log.info("reset functionality successful");
 			return true;
@@ -220,4 +225,75 @@ public class DataArchivalConfiguration extends DataArchivalObjectRepository{
 		log.info("reset functionality unsuccessful");
 		return false;
 	}
+	public void clickCalender() {
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
+		driver.findElement(By.xpath("//button[contains(@aria-label,'Open calendar')]")).click();
+
+	}
+
+	public void selectYear(String year) {
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
+		selectYearArrowButton.click();
+		List<WebElement> requiredYear = yearList;
+		for (WebElement yearSelected : requiredYear) {
+			if (yearSelected.getText().equals(year)) {
+				yearSelected.click();
+				break;
+			}
+		}
+
+	}
+
+	public void selectMonth(String month) {
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
+		List<WebElement> requiredMonth = monthList;
+		for (WebElement selectedMonth : requiredMonth) {
+			if (selectedMonth.getText().equals(month)) {
+				selectedMonth.click();
+				break;
+			}
+		}
+
+	}
+	/**
+	 * Selects the particular date value from list of values available
+	 * 
+	 * @param startInput
+	 * @throws InterruptedException
+	 */
+	public void selectDate(String date) {
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
+		List<WebElement> requiredDate = dateList;
+		for (WebElement selectedDate : requiredDate) {
+			if (selectedDate.getText().equals(date)) {
+				selectedDate.click();
+				break;
+			}
+		}
+	}
+
+	/**
+	 * wait until the visibility of web element
+	 * 
+	 * @param element
+	 * @param timeout
+	 * @return true if element is displayed else false
+	 */
+	public static boolean visibilityOf(WebElement element, int timeout) {
+		new WebDriverWait(driver, Duration.ofSeconds(timeout)).until(ExpectedConditions.visibilityOf(element));
+		return element.isDisplayed();
+	}
+
+	/**
+	 * wait until the visibility of web element then click on the web element
+	 * 
+	 * @param element
+	 * @param timeout
+	 */
+	public static void clickOn(WebElement element, int timeout) {
+		new WebDriverWait(driver, Duration.ofSeconds(timeout)).until(ExpectedConditions.elementToBeClickable(element));
+		element.click();
+	}
+
+
 }

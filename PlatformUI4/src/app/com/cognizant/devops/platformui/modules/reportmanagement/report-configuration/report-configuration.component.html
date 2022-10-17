@@ -151,6 +151,7 @@
             required
             placeholder="Select a report template to be configured."
             [style.width.%]="100"
+            id="reportTemplate"
           >
             <mat-option
               *ngFor="let report of listOfReports"
@@ -173,8 +174,8 @@
             <span class="asteriskText">*</span></div>
             <mat-form-field appearance="fill" class="columnComponent">
                 <mat-select [disabled]="disableInputFields" [(ngModel)]="selectedMilestone.id"
-                (ngModelChange)="getMilestoneName()" class="form-control" required placeholder="Select milestone"
-                color="primary">
+                (ngModelChange)="getMilestoneName()"  required placeholder="Select milestone"
+                color="primary" id="milestone">
                 <mat-option *ngFor="let milestone of listOfMilestones" [value]="milestone.id" style="color:#0033A0">
                     {{milestone.mileStoneName}} </mat-option>
             </mat-select>
@@ -198,6 +199,7 @@
             name="schedule"
             placeholder="Select a frequency"
             [style.width.%]="100"
+            id="frequency"
           >
             <mat-option
               *ngFor="let schedule of receivedScheduleList"

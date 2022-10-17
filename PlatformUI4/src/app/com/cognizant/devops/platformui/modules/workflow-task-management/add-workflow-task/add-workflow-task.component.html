@@ -76,6 +76,7 @@
               required
               placeholder="Select workflow type"
               panelClass="custom-select-class"
+              id="workflowType"
             >
               <mat-option
                 *ngFor="let wType of workflowTypeList"
@@ -106,6 +107,7 @@
               type="text"
               autocomplete="off"
               placeholder="Enter MqChannel"
+              id="mqChannel"
             />
           </mat-form-field>
         </div>
@@ -121,6 +123,7 @@
               type="text"
               autocomplete="off"
               placeholder="Enter description"
+              id="description"
             />
           </mat-form-field>
         </div>
@@ -136,6 +139,7 @@
               type="text"
               autocomplete="off"
               placeholder="Enter dependency"
+              id="dependency"
             />
           </mat-form-field>
         </div>
@@ -153,6 +157,7 @@
               autocomplete="off"
               placeholder="Enter Component Class Detail"
               rows="5"
+              id="classDetail"
             ></textarea>
           </mat-form-field>
         </div>

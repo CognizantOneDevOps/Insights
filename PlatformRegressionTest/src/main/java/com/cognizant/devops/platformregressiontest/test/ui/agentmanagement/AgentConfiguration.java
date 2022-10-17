@@ -43,8 +43,9 @@ public class AgentConfiguration extends AgentObjectRepository {
 		PageFactory.initElements(driver, this);
 	}
 
-	public boolean verifyServerConfigAgentDetailBlock(AgentManagementDataModel data) {
-		selectModuleUnderConfiguration("Server Configuration");
+	public boolean verifyServerConfigAgentDetailBlock(AgentManagementDataModel data) throws InterruptedException {
+		selectMenuOption("Server Configuration");
+		Thread.sleep(1000);
 		try {
 			JavascriptExecutor js = (JavascriptExecutor) driver;
 			js.executeScript("arguments[0].scrollIntoView();", agentConfigurationHeading);
@@ -89,10 +90,11 @@ public class AgentConfiguration extends AgentObjectRepository {
 		Thread.sleep(10000);
 		selectVersion.sendKeys(data.getVersion());
 		selectTools.sendKeys(data.getToolName());
-		visibilityOf(mqUser, 1);
+		Thread.sleep(1000);
+		visibilityOf(mqUser, 3);
 		mqUser.clear();
 		mqUser.sendKeys(data.getMqUser());
-		visibilityOf(mqPassword, 1);
+		visibilityOf(mqPassword, 3);
 		mqPassword.clear();
 		mqPassword.sendKeys(data.getMqPassword());
 		JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -105,11 +107,56 @@ public class AgentConfiguration extends AgentObjectRepository {
 		commitsBaseEndPoint.clear();
 		commitsBaseEndPoint.sendKeys(data.getCommitsBaseEndPoint());
 		wait.until(ExpectedConditions.visibilityOf(addAgent)).click();
-		success.isDisplayed();
-		log.info(successMsg.getText());
-		wait.until(ExpectedConditions.visibilityOf(ok)).click();
+		Thread.sleep(1000);
+		regSuccessMsg.isDisplayed();
+		log.info(regSuccessMsg.getText());
+		wait.until(ExpectedConditions.visibilityOf(crossClose)).click();
 		return verifyAgentId(data.getAgentId());
 	}
+    public boolean registerWebhookInvalidTool(AgentManagementDataModel data) throws InterruptedException {
+		try{
+		clickOn(clickAddButton, 10);
+        visibilityOf(selectOs, 1);
+		selectOs.sendKeys(data.getOsName());
+        visibilityOf(selectAgentType, 1);
+		selectAgentType.sendKeys(data.getWebhookType());
+		Thread.sleep(10000);
+        visibilityOf(selectVersion, 1);
+		selectVersion.sendKeys(data.getVersion());
+        visibilityOf(selectTools, 1);
+		selectTools.sendKeys(data.getwebhookToolInvalid());
+		notWebhookMsg.isDisplayed();
+		log.info(notWebhookMsg.getText());
+		wait.until(ExpectedConditions.visibilityOf(crossClose)).click();
+		return true;
+		}
+		catch (Exception e) {
+			log.info("Exception occured");
+			return false;
+		}
+    }
+    public boolean registerROIInvalidTool(AgentManagementDataModel data) throws InterruptedException {
+		try{
+		clickOn(clickAddButton, 10);
+        visibilityOf(selectOs, 1);
+		selectOs.sendKeys(data.getOsName());
+        visibilityOf(selectAgentType, 1);
+		selectAgentType.sendKeys(data.getRoiType());
+		Thread.sleep(10000);
+        visibilityOf(selectVersion, 1);
+		selectVersion.sendKeys(data.getVersion());
+        visibilityOf(selectTools, 1);
+		selectTools.sendKeys(data.getRoiToolInvalid());
+		notROIMsg.isDisplayed();
+		log.info(notROIMsg.getText());
+		wait.until(ExpectedConditions.visibilityOf(crossClose)).click();
+		return true;
+		}
+		catch (Exception e) {
+			log.info("Exception occured");
+			return false;
+		}
+    }
 
 	public boolean registerAgentWithSameAgentId(AgentManagementDataModel data) throws InterruptedException {
 		wait.until(ExpectedConditions.visibilityOf(clickAddButton)).click();
@@ -133,10 +180,9 @@ public class AgentConfiguration extends AgentObjectRepository {
 		commitsBaseEndPoint.clear();
 		commitsBaseEndPoint.sendKeys(data.getCommitsBaseEndPoint());
 		wait.until(ExpectedConditions.visibilityOf(addAgent)).click();
-		duplicateError.isDisplayed();
 		wait.until(ExpectedConditions.visibilityOf(errorMsg));
 		log.info(errorMsg.getText());
-		wait.until(ExpectedConditions.visibilityOf(ok)).click();
+		wait.until(ExpectedConditions.visibilityOf(crossClose)).click();
 		wait.until(ExpectedConditions.visibilityOf(cancelButton)).click();
 		cancelAgentMessage.isDisplayed();
 		wait.until(ExpectedConditions.visibilityOf(yes)).click();
@@ -144,8 +190,8 @@ public class AgentConfiguration extends AgentObjectRepository {
 
 	}
 
-	public boolean verifyAgentId(String agentId) {
-		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+	public boolean verifyAgentId(String agentId) throws InterruptedException {
+		Thread.sleep(1000);
 		boolean isInstanceId = false;
 		try {
 			hold.until(ExpectedConditions.visibilityOfAllElements(agentsList));
@@ -160,25 +206,24 @@ public class AgentConfiguration extends AgentObjectRepository {
 		} catch (Exception e) {
 			log.info("Agent List is empty.");
 		}
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		Thread.sleep(5000);
 		return isInstanceId;
 	}
 
 	public boolean startAgent(AgentManagementDataModel data) throws InterruptedException {
 		selectAgent(data);
 		try {
-			driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 			if (visibilityOf(stopAgent, 2)) {
 				driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 				log.info("Agent is in start mode");
 				clickOn(stopAgent, 2);
-				clickOn(ok, 3);
+				clickOn(crossClose, 3);
 				log.info("Agent stopped successfully.");
 				selectAgent(data);
 				if (startAgent.isDisplayed()) {
 					log.info("Agent is in stop mode.");
 					clickOn(startAgent, 3);
-					clickOn(ok, 3);
+					clickOn(crossClose, 3);
 					log.info("Agent started successfully.");
 				}
 				selectAgent(data);
@@ -189,13 +234,13 @@ public class AgentConfiguration extends AgentObjectRepository {
 			if (startAgent.isDisplayed()) {
 				log.info("Agent is in stop mode.");
 				clickOn(startAgent, 2);
-				clickOn(ok, 2);
+				clickOn(crossClose, 2);
 				log.info("Agent started successfully.");
 				selectAgent(data);
 				if (stopAgent.isDisplayed()) {
 					log.info("Agent is in start mode");
 					clickOn(stopAgent, 2);
-					clickOn(ok, 2);
+					clickOn(crossClose, 2);
 					log.info("Agent stopped successfully.");
 					selectAgent(data);
 					return startAgent.isDisplayed();
@@ -213,10 +258,10 @@ public class AgentConfiguration extends AgentObjectRepository {
 		dataLabelName.sendKeys(data.getDataLabelName());
 		wait.until(ExpectedConditions.visibilityOf(healthLabelName)).clear();
 		healthLabelName.sendKeys(data.getHealthLabelName());
-		wait.until(ExpectedConditions.visibilityOf(update)).click();
-		wait.until(ExpectedConditions.visibilityOf(success));
-		success.isDisplayed();
-		wait.until(ExpectedConditions.visibilityOf(ok)).click();
+		wait.until(ExpectedConditions.visibilityOf(addAgent)).click();
+		wait.until(ExpectedConditions.visibilityOf(updateSuccess));
+		updateSuccess.isDisplayed();
+		wait.until(ExpectedConditions.visibilityOf(crossClose)).click();
 		log.info("{} updated successfully.", data.getAgentId());
 		return landingPage.isDisplayed();
 	}
@@ -224,14 +269,15 @@ public class AgentConfiguration extends AgentObjectRepository {
 	public boolean deleteAgent(AgentManagementDataModel data) throws InterruptedException {
 		selectAgent(data);
 		wait.until(ExpectedConditions.visibilityOf(stopAgent)).click();
-		wait.until(ExpectedConditions.visibilityOf(ok)).click();
+		wait.until(ExpectedConditions.visibilityOf(crossClose)).click();
 		selectAgent(data);
 		wait.until(ExpectedConditions.visibilityOf(deleteAgent)).click();
 		wait.until(ExpectedConditions.elementToBeClickable(yes)).click();
-		Thread.sleep(1000);
+		wait.until(ExpectedConditions.visibilityOf(crossClose)).click();
 		if (!selectAgent(data)) {
 			log.info("{} deleted successfully.", data.getAgentId());
 			return true;
+			
 		}
 		return false;
 	}
@@ -254,7 +300,6 @@ public class AgentConfiguration extends AgentObjectRepository {
 	public boolean selectAgent(AgentManagementDataModel data) {
 		boolean agentPresent = false;
 		try {
-			driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 			hold.until(ExpectedConditions.visibilityOfAllElements(agentsList));
 			for (int i = 0; i < agentsList.size(); i++) {
 				if (agentsList.get(i).getText().equals(data.getAgentId())) {
@@ -276,10 +321,10 @@ public class AgentConfiguration extends AgentObjectRepository {
 
 	private boolean checkDownloadRepoUrl(String downloadRepoUrlData) {
 		if (visibilityOf(downloadRepoUrl, 2)) {
-			downloadRepoUrlValue.clear();
-			downloadRepoUrlValue.sendKeys(downloadRepoUrlData);
-			log.info("downloadRepoUrl : {}", downloadRepoUrlValue.getAttribute("value"));
-			if (downloadRepoUrlValue.getAttribute("value").equals(downloadRepoUrlData))
+			downloadRepoUrl.clear();
+			downloadRepoUrl.sendKeys(downloadRepoUrlData);
+			log.info("downloadRepoUrl : {}", downloadRepoUrl.getAttribute("value"));
+			if (downloadRepoUrl.getAttribute("value").equals(downloadRepoUrlData))
 				return true;
 		}
 		return false;
@@ -287,10 +332,10 @@ public class AgentConfiguration extends AgentObjectRepository {
 
 	private boolean checkBrowseRepoUrl(String browseRepoUrlData) {
 		if (visibilityOf(browseRepoUrl, 2)) {
-			browseRepoUrlValue.clear();
-			browseRepoUrlValue.sendKeys(browseRepoUrlData);
-			log.info("browseRepoUrl : {}", browseRepoUrlValue.getAttribute("value"));
-			if (browseRepoUrlValue.getAttribute("value").equals(browseRepoUrlData))
+			browseRepoUrl.clear();
+			browseRepoUrl.sendKeys(browseRepoUrlData);
+			log.info("browseRepoUrl : {}", browseRepoUrl.getAttribute("value"));
+			if (browseRepoUrl.getAttribute("value").equals(browseRepoUrlData))
 				return true;
 		}
 		return false;
@@ -298,10 +343,10 @@ public class AgentConfiguration extends AgentObjectRepository {
 
 	private boolean checkIsOnlineRegistration(String isOnlineRegistrationData) {
 		if (visibilityOf(isOnlineRegistration, 2)) {
-			isOnlineRegistrationValue.clear();
-			isOnlineRegistrationValue.sendKeys(isOnlineRegistrationData);
-			log.info("isOnlineRegistration : {}", isOnlineRegistrationValue.getAttribute("value"));
-			if (isOnlineRegistrationValue.getAttribute("value").equals(isOnlineRegistrationData))
+			isOnlineRegistration.clear();
+			isOnlineRegistration.sendKeys(isOnlineRegistrationData);
+			log.info("isOnlineRegistration : {}", isOnlineRegistration.getAttribute("a"));
+			if (isOnlineRegistration.getAttribute("value").equals(isOnlineRegistrationData))
 				return true;
 		}
 		return false;
@@ -309,10 +354,10 @@ public class AgentConfiguration extends AgentObjectRepository {
 
 	private boolean checkOnlineRegistrationMode(String onlineRegistrationModeData) {
 		if (visibilityOf(onlineRegistrationMode, 2)) {
-			onlineRegistrationModeValue.clear();
-			onlineRegistrationModeValue.sendKeys(onlineRegistrationModeData);
-			log.info("onlineRegistrationMode : {}", onlineRegistrationModeValue.getAttribute("value"));
-			if (onlineRegistrationModeValue.getAttribute("value").contains(onlineRegistrationModeData))
+			onlineRegistrationMode.clear();
+			onlineRegistrationMode.sendKeys(onlineRegistrationModeData);
+			log.info("onlineRegistrationMode : {}", onlineRegistrationMode.getAttribute("value"));
+			if (onlineRegistrationMode.getAttribute("value").contains(onlineRegistrationModeData))
 				return true;
 		}
 		return false;
@@ -320,10 +365,10 @@ public class AgentConfiguration extends AgentObjectRepository {
 
 	private boolean checkOfflineAgentPath(String offlineAgentPathData) {
 		if (visibilityOf(offlineAgentPath, 2)) {
-			offlineAgentPathValue.clear();
-			offlineAgentPathValue.sendKeys(offlineAgentPathData);
-			log.info("offlineAgentPath : {}", offlineAgentPathValue.getAttribute("value"));
-			if (offlineAgentPathValue.getAttribute("value").contains(offlineAgentPathData))
+			offlineAgentPath.clear();
+			offlineAgentPath.sendKeys(offlineAgentPathData);
+			log.info("offlineAgentPath : {}", offlineAgentPath.getAttribute("value"));
+			if (offlineAgentPath.getAttribute("value").contains(offlineAgentPathData))
 				return true;
 		}
 		return false;
@@ -331,10 +376,10 @@ public class AgentConfiguration extends AgentObjectRepository {
 
 	private boolean checkUnzipPath(String unzipPathData) {
 		if (visibilityOf(unzipPath, 2)) {
-			unzipPathValue.clear();
-			unzipPathValue.sendKeys(unzipPathData);
-			log.info("unzipPath : {}", unzipPathValue.getAttribute("value"));
-			if (unzipPathValue.getAttribute("value").contains(unzipPathData))
+			unzipPath.clear();
+			unzipPath.sendKeys(unzipPathData);
+			log.info("unzipPath : {}", unzipPath.getAttribute("value"));
+			if (unzipPath.getAttribute("value").contains(unzipPathData))
 				return true;
 		}
 		return false;
@@ -342,10 +387,10 @@ public class AgentConfiguration extends AgentObjectRepository {
 
 	private boolean checkAgentExchange(String agentExchangeData) {
 		if (visibilityOf(agentExchange, 2)) {
-			agentExchangeValue.clear();
-			agentExchangeValue.sendKeys(agentExchangeData);
-			log.info("agentExchange : {}", agentExchangeValue.getAttribute("value"));
-			if (agentExchangeValue.getAttribute("value").contains(agentExchangeData))
+			agentExchange.clear();
+			agentExchange.sendKeys(agentExchangeData);
+			log.info("agentExchange : {}", agentExchange.getAttribute("value"));
+			if (agentExchange.getAttribute("value").contains(agentExchangeData))
 				return true;
 		}
 		return false;
@@ -353,10 +398,10 @@ public class AgentConfiguration extends AgentObjectRepository {
 
 	private boolean checkAgentPkgQueue(String agentPkgQueueData) {
 		if (visibilityOf(agentPkgQueue, 2)) {
-			agentPkgQueueValue.clear();
-			agentPkgQueueValue.sendKeys(agentPkgQueueData);
-			log.info("agentPkgQueue : {}", agentPkgQueueValue.getAttribute("value"));
-			if (agentPkgQueueValue.getAttribute("value").contains(agentPkgQueueData))
+			agentPkgQueue.clear();
+			agentPkgQueue.sendKeys(agentPkgQueueData);
+			log.info("agentPkgQueue : {}", agentPkgQueue.getAttribute("value"));
+			if (agentPkgQueue.getAttribute("value").contains(agentPkgQueueData))
 				return true;
 		}
 		return false;

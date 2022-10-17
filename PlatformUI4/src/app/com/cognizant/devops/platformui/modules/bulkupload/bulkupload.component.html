@@ -54,7 +54,7 @@
   </div>
   <div style="border: 1px solid var(--brdr-clr);background-color: var(--backgnd-clr10);">
     <div *ngFor="let row of rows.controls; let index = index"
-      class="add-agent-section-body add-agent-section-body-dimensions" style="padding-bottom: 0px;">
+      class="add-agent-section-body add-agent-section-body-dimensions" id={{index}} style="padding-bottom: 0px;">
       <div *ngIf="index!=0" style="width: 100%;display: flex; justify-content: center;margin: -15px 0 20px 0px; height: 1px;
         background-color: var(--brdr-clr);">
       </div>

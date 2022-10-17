@@ -19,6 +19,7 @@ import java.io.File;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeTest;
@@ -45,7 +46,7 @@ public class OfflineAgentTest extends AgentObjectRepository {
 	public void setUp() throws InterruptedException {
 		initialization();
 		getData(ConfigOptionsTest.AGENT_DIR + File.separator + ConfigOptionsTest.AGENT_ONDEMAND_JSON_FILE);
-		selectModuleOnClickingConfig("Agent Management");
+		selectMenuOption("Agent Management");
 		clickAllActionButton = new AgentConfiguration();
 	}
 
@@ -54,9 +55,10 @@ public class OfflineAgentTest extends AgentObjectRepository {
 	 * Replace agent block fields in server config with offline related details
 	 * 
 	 * @param data
+	 * @throws InterruptedException 
 	 */
 	@Test(priority = 1, enabled = true, dataProvider = "agentofflinedataprovider", dataProviderClass = AgentDataProvider.class)
-	public void verifyServerConfigOfflineAgentDetailBlock(AgentManagementDataModel data) {
+	public void verifyServerConfigOfflineAgentDetailBlock(AgentManagementDataModel data) throws InterruptedException {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.verifyServerConfigAgentDetailBlock(data),
 				"Server config having on demand details.");
@@ -74,7 +76,6 @@ public class OfflineAgentTest extends AgentObjectRepository {
 		Assert.assertTrue(clickAllActionButton.navigateToAgentManagementLandingPage(data),
 				"Landing page is displayed.");
 	}
-
 	/**
 	 * Register agent using offline path
 	 * 
@@ -85,6 +86,7 @@ public class OfflineAgentTest extends AgentObjectRepository {
 	public void registerAgent(AgentManagementDataModel data) throws InterruptedException {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.registerAgent(data), "AgentId has been created");
+		
 	}
 
 	/**
@@ -136,6 +138,26 @@ public class OfflineAgentTest extends AgentObjectRepository {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.deleteAgent(data), "Agent has been deleted");
 	}
+	
+	@Test(priority = 9, enabled = true, dataProvider = "agentofflinedataprovider", dataProviderClass = AgentDataProvider.class)
+	public void registerWebhookInvalidTool(AgentManagementDataModel data) throws InterruptedException {
+		log.info(line);
+		Assert.assertTrue(clickAllActionButton.registerWebhookInvalidTool(data), "This is not a webhook Agent");
+	}
+	/**
+	 * Register agent for corelation 
+	 * 
+	 * @param data
+	 * @throws InterruptedException
+	 */
+	@Test(priority = 10, enabled = true, dataProvider = "agentofflinedataprovider", dataProviderClass = AgentDataProvider.class)
+	public void reRegisterAgent(AgentManagementDataModel data) throws InterruptedException {
+		log.info(line);
+		selectMenuOption("Agent Management");
+		Assert.assertTrue(clickAllActionButton.registerAgent(data), "AgentId has been created");
+		
+	}
+
 
 	/**
 	 * This method will be executed just after any function/method with @Test

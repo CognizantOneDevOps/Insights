@@ -20,6 +20,7 @@ import java.io.File;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeTest;
@@ -53,7 +54,7 @@ public class WebhookTest extends LoginAndSelectModule {
 	public void setUp() throws InterruptedException {
 		initialization();
 		getData(ConfigOptionsTest.WEBHOOK_CONFIG_DIR + File.separator + ConfigOptionsTest.WEBHOOK_JSON_FILE);
-		selectModuleUnderConfiguration(LoginAndSelectModule.testData.get("webhookConfiguration"));
+		selectMenuOption(LoginAndSelectModule.testData.get("webhookConfiguration"));
 		clickAllActionButton = new WebhookConfiguration();
 	}
 

@@ -37,16 +37,16 @@ public class HealthCheckObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//div[@id='healthCheckTitle']")
 	WebElement landingPage;
 
-	@FindBy(xpath = "//label[@class='mainText' and contains(text(),' Notification ')]")
+	@FindBy(xpath = "//label[@class='main-text' and contains(text(),' Notification ')]")
 	WebElement notificationLabel;
 
-	@FindBy(xpath = "//label[contains(text(),'Notification History ')]")
+	@FindBy(xpath = "//span[contains(text(),'Notification History')]")
 	WebElement notificationHistory;
-
-	@FindBy(xpath = "//div[@class='arrange-notification-horizontally']/a/mat-icon")
+	
+	@FindBy(xpath = "//mat-icon[@svgicon='healthcheck_show_details']")
 	WebElement notificationHistoryDetails;
 
-	@FindBy(xpath = "//li[contains(text(),'Workflow History Detail - Health Notification')]")
+	@FindBy(xpath = "//h1[contains(text(),'Workflow History Detail - Health Notification')]")
 	WebElement healthNotificationHeading;
 
 	@FindBy(xpath = "//div[@role='tab'] //div[contains(text(),'Services')]")
@@ -82,94 +82,98 @@ public class HealthCheckObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//tr[contains(@class,'tableHeaderCss')]")
 	WebElement dataComponentHeaderRowData;
 
-	@FindBy(xpath = "//div[@id='dataComponentTable']/table/thead/tr/th[contains(@class,'serverName')]")
+	@FindBy(xpath = "//div[@id='dataComponentTable']/table/thead/tr/th[contains(@class,'mat-column-serverName')]")
 	WebElement serverNameHeading;
 
-	@FindBy(xpath = "//div[@id='servicesTable']/table/thead/tr/th[contains(@class,'serverName')]")
+	@FindBy(xpath = "//div[@id='servicesTable']/table/thead/tr/th[contains(@class,'mat-column-serverName')]")
 	WebElement serviceNameHeading;
 
-	@FindBy(xpath = "//div[@id='servicesTable']/table/thead/tr/th[contains(@class,'ipAddress')]")
+	@FindBy(xpath = "//div[@id='servicesTable']/table/thead/tr/th[contains(@class,'mat-column-ipAddress')]")
 	WebElement serviceIpHeading;
 
-	@FindBy(xpath = "//div[@id='servicesTable']/table/thead/tr/th[contains(@class,'version')]")
+	@FindBy(xpath = "//div[@id='servicesTable']/table/thead/tr/th[contains(@class,'mat-column-version')]")
 	WebElement servicVersionHeading;
 
-	@FindBy(xpath = "//div[@id='servicesTable']/table/thead/tr/th[contains(@class,'status')]")
+	@FindBy(xpath = "//div[@id='servicesTable']/table/thead/tr/th[contains(@class,'mat-column-status')]")
 	WebElement serviceStatusHeading;
 
-	@FindBy(xpath = "//div[@id='servicesTable']/table/thead/tr/th[contains(@class,'details')]")
+	@FindBy(xpath = "//div[@id='servicesTable']/table/thead/tr/th[contains(@class,'mat-column-details')]")
 	WebElement serviceDetailsHeading;
 
-	@FindBy(xpath = "//div[@id='dataComponentTable']/table/thead/tr/th[contains(@class,'ipAddress')]")
+	@FindBy(xpath = "//div[@id='dataComponentTable']/table/thead/tr/th[contains(@class,'mat-column-ipAddress')]")
 	WebElement ipAddressHeading;
 
-	@FindBy(xpath = "//div[@id='dataComponentTable']/table/thead/tr/th[contains(@class,'version')]")
+	@FindBy(xpath = "//div[@id='dataComponentTable']/table/thead/tr/th[contains(@class,'mat-column-version')]")
 	WebElement versionHeading;
 
-	@FindBy(xpath = "//div[@id='dataComponentTable']/table/thead/tr/th[contains(@class,'info')]")
+	@FindBy(xpath = "//div[@id='dataComponentTable']/table/thead/tr/th[contains(@class,'mat-column-info')]")
 	WebElement infoHeading;
 
-	@FindBy(xpath = "//div[@id='dataComponentTable']/table/thead/tr/th[contains(@class,'status')]")
+	@FindBy(xpath = "//div[@id='dataComponentTable']/table/thead/tr/th[contains(@class,'mat-column-status')]")
 	WebElement statusHeading;
 
-	@FindBy(xpath = "//div[@class='gridheadercenter' and contains(text(),'Enable Notification')]")
+	@FindBy(xpath = "//div[contains(text(),'Enable Notification')]")
 	WebElement enableNotificationHeading;
 
-	@FindBy(xpath = "//div[@class='gridheadercenter' and contains(text(),'Disable Notification')]")
+	@FindBy(xpath = "//div[contains(text(),'Disable Notification')]")
 	WebElement disableNotificationHeading;
 
 	@FindBy(xpath = "//div[@class='mat-tab-label-content' and contains(text(),'Latest Status Details')]")
 	WebElement latestStatusDetailsService;
 
-	@FindBy(xpath = "//mat-slide-toggle/label/div/input[contains(@aria-checked,'false')]/following-sibling::div")
+	@FindBy(xpath = "//mat-slide-toggle/label/span/input[contains(@aria-checked,'false')]/following-sibling::span")
 	WebElement notificationToggleFalse;
 
-	@FindBy(xpath = "//mat-slide-toggle/label/div/input[contains(@aria-checked,'true')]/following-sibling::div")
+	@FindBy(xpath = "//mat-slide-toggle/label/span/input[contains(@aria-checked,'true')]/following-sibling::span")
 	WebElement notificationToggleTrue;
 
-	@FindBy(xpath = "//span[contains(text(),'YES')]")
+	@FindBy(xpath = "//button[@id='yesBtn']")
 	WebElement yes;
 
-	@FindBy(xpath = "//span[text()= 'OKAY']")
+	@FindBy(xpath = "//button[@id= 'Okay']")
 	WebElement ok;
+	
+	@FindBy(xpath = "//button[@id='crossClose']")
+	WebElement crossClose;
 
-	@FindBy(xpath = "//span[contains(text(),'Email Configuration')]")
+
+	@FindBy(xpath = "//div[contains(text(),'Email Configuration')]")
 	WebElement emailConfigurationBlock;
 
-	@FindBy(xpath = "((//td[@title='sendEmailEnabled']//span[text()='sendEmailEnabled'])//following::input)[1]")
+	@FindBy(xpath = "//input[@name='emailConfiguration_sendEmailEnabled']")
 	WebElement sendEmailEnabled;
 
-	@FindBy(xpath = "((//td[@title='smtpHostServer']//span[text()='smtpHostServer'])//following::input)[1]")
+	@FindBy(xpath = "//input[@name='emailConfiguration_smtpHostServer']")
 	WebElement smtpHostServer;
 
-	@FindBy(xpath = "((//td[@title='smtpPort']//span[text()='smtpPort'])//following::input)[1]")
+	@FindBy(xpath = "//input[@name='emailConfiguration_smtpPort']")
 	WebElement smtpPort;
 
-	@FindBy(xpath = "((//td[@title='smtpUserName']//span[text()='smtpUserName'])//following::input)[1]")
+	@FindBy(xpath = "//input[@name='emailConfiguration_smtpUserName']")
 	WebElement smtpUserName;
 
-	@FindBy(xpath = "((//td[@title='smtpPassword']//span[text()='smtpPassword'])//following::input)[1]")
+	@FindBy(xpath = "//input[@name='emailConfiguration_smtpPassword']")
 	WebElement smtpPassword;
 
-	@FindBy(xpath = "((//td[@title='isAuthRequired']//span[text()='isAuthRequired'])//following::input)[1]")
+	@FindBy(xpath = "//input[@name='emailConfiguration_isAuthRequired']")
 	WebElement isAuthRequired;
 
-	@FindBy(xpath = "((//td[@title='smtpStarttlsEnable']//span[text()='smtpStarttlsEnable'])//following::input)[1]")
+	@FindBy(xpath = "//input[@name='emailConfiguration_smtpStarttlsEnable']")
 	WebElement smtpStarttlsEnable;
 
-	@FindBy(xpath = "((//td[@title='mailFrom']//span[text()='mailFrom'])//following::input)[1]")
+	@FindBy(xpath = "//input[@name='emailConfiguration_mailFrom']")
 	WebElement mailFrom;
 
-	@FindBy(xpath = "((//td[@title='mailTo']//span[text()='mailTo'])//following::input)[1]")
+	@FindBy(xpath = "//input[@name='emailConfiguration_mailTo']")
 	WebElement mailTo;
 
-	@FindBy(xpath = "((//td[@title='subject']//span[text()='subject'])//following::input)[1]")
+	@FindBy(xpath = "//input[@name='emailConfiguration_subject']")
 	WebElement subject;
 
-	@FindBy(xpath = "((//td[@title='emailBody']//span[text()='emailBody'])//following::input)[1]")
+	@FindBy(xpath = "//input[@name='emailConfiguration_emailBody']")
 	WebElement emailBody;
 
-	@FindBy(xpath = "((//td[@title='systemNotificationSubscriber']//span//following::input)[1])")
+	@FindBy(xpath = "//input[@name='emailConfiguration_systemNotificationSubscriber']")
 	WebElement systemNotificationSubscriber;
 
 	@FindBy(xpath = "//td[contains(@class,'agentKey')]")
@@ -181,8 +185,11 @@ public class HealthCheckObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//td[contains(@class,'toolName')]")
 	List<WebElement> toolNameList;
 
-	@FindBy(xpath = "//div[@class='gridheadercenter' and contains(text(), 'Success')]")
-	WebElement success;
+	@FindBy(xpath = "//span[contains(text(), 'Notification enabled successfully!')]")
+	WebElement successEnable;
+	
+	@FindBy(xpath = "//span[contains(text(), 'Notification disabled successfully!')]")
+	WebElement successDisable;
 
 	@FindBy(xpath = "//div[@class='textPadding' and contains(text(), 'Notification enabled')]")
 	WebElement notificationEnabledMsg;

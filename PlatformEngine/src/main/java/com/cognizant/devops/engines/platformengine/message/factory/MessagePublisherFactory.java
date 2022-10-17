@@ -32,10 +32,17 @@ public class MessagePublisherFactory {
 
 	public static void publish(String routingKey, String data) throws IOException, TimeoutException, InsightsCustomException {
 		String queueName = routingKey.replace(".", "_");
-		try (Connection connection = RabbitMQConnectionProvider.getConnection();
-				Channel channel = RabbitMQConnectionProvider.getChannel(routingKey, queueName, MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE)) {
-			String message = new GsonBuilder().disableHtmlEscaping().create().toJson(data);
+		Channel channel = null;
+		try (Connection connection = RabbitMQConnectionProvider.getConnection();) {
+			channel = RabbitMQConnectionProvider.getConnection().createChannel();
+			channel = RabbitMQConnectionProvider.initilizeChannel(channel, routingKey, queueName, MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE);
+   		    String message = new GsonBuilder().disableHtmlEscaping().create().toJson(data);
 			channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, message.getBytes());
+		
+		} finally {
+			if(channel != null) {
+				channel.close();
+			}
 		}
 	}
 }

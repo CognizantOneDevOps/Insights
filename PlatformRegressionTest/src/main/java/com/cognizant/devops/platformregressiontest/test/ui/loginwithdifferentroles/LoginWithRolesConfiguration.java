@@ -83,12 +83,11 @@ public class LoginWithRolesConfiguration extends LoginWithRolesObjectRepository 
 	 */
 	public boolean checkAdminrole() throws InterruptedException {
 		Thread.sleep(1000);
-		wait.until(ExpectedConditions.elementToBeClickable(dashboardGroups));
-		dashboardGroups.click();
-		if (clickDashboard("Main Org.")) {
+		selectMenuOption("Dashboard Groups");
+		if (clickDashboard("testgroup")) {
 			wait.until(ExpectedConditions.visibilityOf(roleinWelcome));
 			Thread.sleep(2000);
-			if ((roleinWelcome.getText()).contains("Role: Admin") && checkAdminMenu() && checkadmindashboardAccess()) {
+			if (role.isDisplayed() && checkAdminMenu() && checkadmindashboardAccess()) {
 				return true;
 			} else {
 				log.debug("User does not have admin access");
@@ -107,9 +106,9 @@ public class LoginWithRolesConfiguration extends LoginWithRolesObjectRepository 
 	 */
 	private boolean checkAdminMenu() {
 		try {
-			if (dashboardGroups.isDisplayed() && auditReporting.isDisplayed() && playlist.isDisplayed()
-					&& reportManagement.isDisplayed() && dataDictionary.isDisplayed() && healthCheck.isDisplayed()
-					&& dashboardReport.isDisplayed() && configuration.isDisplayed()) {
+			if(isPresent("Dashboard Groups") && isPresent("Audit Reporting") && isPresent("Playlist") &&
+					isPresent("Data Dictionary") && isPresent("Health Check") && isPresent("Configuration") &&
+					isPresent("Report Management") && isPresent("Dashboard Report Download")) {
 				log.info("All the admin's side menu are displayed");
 				return true;
 			}
@@ -119,7 +118,16 @@ public class LoginWithRolesConfiguration extends LoginWithRolesObjectRepository 
 		}
 		return false;
 	}
-
+	
+	public static boolean isPresent(String optionName) {
+		List<WebElement> menuList = driver.findElements(By.xpath("//span[contains(@class,'line-child')]"));
+		for (WebElement reuqiredOption : menuList) {
+			if (reuqiredOption.getText().equals(optionName)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	/**
 	 * Checks whether admin has permission to create, edit and view grafana panel
 	 * 
@@ -133,9 +141,7 @@ public class LoginWithRolesConfiguration extends LoginWithRolesObjectRepository 
 		wait.until(ExpectedConditions.elementToBeClickable(lokiDashboard));
 		lokiDashboard.click();
 		driver.switchTo().frame(driver.findElement(By.xpath(iframePath)));
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 		driver.switchTo().frame(0);
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 		panelTitle.click();
 		try {
 			if (exploreMenu.isDisplayed() && editMenu.isDisplayed() && viewMenu.isDisplayed()) {
@@ -159,11 +165,11 @@ public class LoginWithRolesConfiguration extends LoginWithRolesObjectRepository 
 	 * @throws InterruptedException
 	 */
 	public boolean checkEditorRole() throws InterruptedException {
+		selectMenuOption("Dashboard Groups");
 		if (clickDashboard(LoginAndSelectModule.testData.get("accessGroup1"))) {
 			wait.until(ExpectedConditions.visibilityOf(roleinWelcome));
 			Thread.sleep(2000);
-			if ((roleinWelcome.getText()).contains("Role: Editor") && editorAndviewermenu()
-					&& checkeditordashboardAccess()) {
+			if (roleEditor.isDisplayed()&& editormenu()) {
 				return true;
 			}
 		} else {
@@ -184,7 +190,6 @@ public class LoginWithRolesConfiguration extends LoginWithRolesObjectRepository 
 	private boolean checkeditordashboardAccess() {
 		clickHere.click();
 		driver.switchTo().frame(driver.findElement(By.xpath(iframePath)));
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 		driver.switchTo().frame(driver.findElement(By.xpath("//iframe[contains(@id,'iSightIframe')]")));
 		wait.until(ExpectedConditions.elementToBeClickable(dashboards));
 		dashboards.click();
@@ -212,11 +217,11 @@ public class LoginWithRolesConfiguration extends LoginWithRolesObjectRepository 
 	 * @throws InterruptedException
 	 */
 	public boolean checkViewerRole() throws InterruptedException {
+		selectMenuOption("Dashboard Groups");
 		if (clickDashboard(LoginAndSelectModule.testData.get("accessGroup2"))) {
 			wait.until(ExpectedConditions.visibilityOf(roleinWelcome));
 			Thread.sleep(2000);
-			if ((roleinWelcome.getText()).contains("Role: Viewer") && editorAndviewermenu()
-					&& checkviewerdashboardAccess()) {
+			if (roleViewer.isDisplayed() && viewermenu()) {
 				return true;
 			}
 		} else {
@@ -235,10 +240,10 @@ public class LoginWithRolesConfiguration extends LoginWithRolesObjectRepository 
 	 * @throws InterruptedException
 	 */
 	private boolean checkviewerdashboardAccess() throws InterruptedException {
-		Thread.sleep(500);
+		Thread.sleep(5000);
 		clickHere.click();
 		driver.switchTo().frame(driver.findElement(By.xpath(iframePath)));
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		Thread.sleep(5000);
 		driver.switchTo().frame(driver.findElement(By.xpath("//iframe[contains(@id,'iSightIframe')]")));
 		wait.until(ExpectedConditions.elementToBeClickable(dashboards));
 		dashboards.click();
@@ -268,8 +273,9 @@ public class LoginWithRolesConfiguration extends LoginWithRolesObjectRepository 
 	 * @throws InterruptedException
 	 */
 	private boolean clickDashboard(String accessGroupname) throws InterruptedException {
-		Thread.sleep(500);
-		for (WebElement group : accessGroups) {
+		Thread.sleep(5000);
+		List<WebElement> accessGroup = driver.findElements(By.xpath("//span[contains(@class,'line-child')]"));
+		for (WebElement group : accessGroup) {
 			if ((group.getText()).equals(accessGroupname)) {
 				group.click();
 				log.info("{} dashboard is clicked", accessGroupname);
@@ -285,11 +291,12 @@ public class LoginWithRolesConfiguration extends LoginWithRolesObjectRepository 
 	 * 
 	 * @return true if displayed successfully o/w false
 	 */
-	private boolean editorAndviewermenu() {
+	private boolean editormenu() {
 		wait.until(ExpectedConditions.elementToBeClickable(dashboardGroups));
 		try {
-			if (dashboardGroups.isDisplayed() && playlist.isDisplayed() && reportManagement.isDisplayed()
-					&& dataDictionary.isDisplayed()) {
+			if(isPresent("Dashboard Groups") && isPresent("Playlist") &&
+					isPresent("Data Dictionary") && isPresent("Configuration") &&
+					isPresent("Report Management") && isPresent("Dashboard Report Download")) {
 				log.info("All the Editor/Viewer side menu are displayed");
 				return true;
 			}
@@ -300,6 +307,19 @@ public class LoginWithRolesConfiguration extends LoginWithRolesObjectRepository 
 		return false;
 	}
 
+	private boolean viewermenu() {
+		wait.until(ExpectedConditions.elementToBeClickable(dashboardGroups));
+		try {
+			if(isPresent("Dashboard Groups") && isPresent("Playlist")) {
+				log.info("All the Viewer side menu are displayed");
+				return true;
+			}
+		} catch (Exception e) {
+			log.info("All the Viewer side menu are not displayed {}", e);
+			return false;
+		}
+		return false;
+	}
 	/**
 	 * logs out and logs in as default user
 	 * 
@@ -340,8 +360,8 @@ public class LoginWithRolesConfiguration extends LoginWithRolesObjectRepository 
 	 * @return true if deletion is successful o/w false
 	 * @throws InterruptedException
 	 */
-	public void deleteUser(String accessGroupName) {
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+	public void deleteUser(String accessGroupName) throws InterruptedException {
+		Thread.sleep(5000);
 		verifyAccessGroupName(accessGroupName);
 		if (searchLoginID(LoginAndSelectModule.testData.get("userName"))) {
 			WebElement rws = userDetailsTable.findElement(By.tagName("tr"));
@@ -350,13 +370,13 @@ public class LoginWithRolesConfiguration extends LoginWithRolesObjectRepository 
 				cols.get(0).findElement(By.xpath("//span[@class='mat-radio-container']")).click();
 				wait.until(ExpectedConditions.elementToBeClickable(deleteButton));
 				deleteButton.click();
-				driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+				Thread.sleep(5000);
 			}
 			wait.until(ExpectedConditions.elementToBeClickable(yesButton));
 			yesButton.click();
-			wait.until(ExpectedConditions.elementToBeClickable(okButton));
-			okButton.click();
-			driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+			wait.until(ExpectedConditions.elementToBeClickable(crossClose));
+			crossClose.click();
+			Thread.sleep(5000);
 		} else {
 			count++;
 		}

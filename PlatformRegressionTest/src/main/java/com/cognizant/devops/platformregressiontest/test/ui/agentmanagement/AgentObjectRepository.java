@@ -24,10 +24,10 @@ import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectMod
 
 public class AgentObjectRepository extends LoginAndSelectModule {
 
-	@FindBy(xpath = "//div[contains(text(),'Agent List ')]")
+	@FindBy(xpath = "//div[@id='agentList']")
 	WebElement landingPage;
 
-	@FindBy(xpath = "//mat-icon[@title='Add Agent']")
+	@FindBy(xpath = "//button[@id='addAgent']")
 	WebElement clickAddButton;
 
 	@FindBy(xpath = "//mat-select[@name ='selectedOS']")
@@ -51,28 +51,29 @@ public class AgentObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//mat-select[@name ='selectedTool']")
 	WebElement selectTools;
 
+
 	@FindBy(xpath = "//div[@role='listbox']//mat-option[contains(@class, 'mat-focus-indicator')]")
 	List<WebElement> toolsList;
 
-	@FindBy(xpath = "((//td[@class='mat-cell-header']//span[text()='user'])//following::input)[1]")
+	@FindBy(xpath = "//input[@name='user']")
 	WebElement mqUser;
 
-	@FindBy(xpath = "((//td[@class='mat-cell-header']//span[text()='password'])//following::input)[1]")
-	WebElement mqPassword;// span[text()=' CANCEL ']
+	@FindBy(xpath = "//input[@name='password']")
+	WebElement mqPassword;// span[text()=' CANCEL ']a
 
-	@FindBy(xpath = "((//td[@class='mat-cell-header']//span[text()='agentId'])//following::input)[1]")
+	@FindBy(xpath = "//input[@name='agentId']")
 	WebElement agentIdValue;
-
-	@FindBy(xpath = "((//td[@class='mat-cell-header']//span[text()='accessToken'])//following::input)[1]")
+	
+	@FindBy(xpath = "//input[@name='accessToken']")
 	WebElement accessToken;
 
-	@FindBy(xpath = "((//td[@class='mat-cell-header']//span[text()='getRepos'])//following::input)[1]")
+	@FindBy(xpath = "//input[@name='getRepos']")
 	WebElement getRepos;
 
-	@FindBy(xpath = "((//td[@class='mat-cell-header']//span[text()='commitsBaseEndPoint'])//following::input)[1]")
+	@FindBy(xpath = "//input[@name='commitsBaseEndPoint']")
 	WebElement commitsBaseEndPoint;
 
-	@FindBy(xpath = "//span[text()=' ADD ']")
+	@FindBy(xpath = "//button[@id='addAgent']")
 	WebElement addAgent;
 
 	@FindBy(xpath = "//span[text()=' CANCEL ']")
@@ -80,11 +81,14 @@ public class AgentObjectRepository extends LoginAndSelectModule {
 
 	@FindBy(xpath = "//div[text()=' Success ']")
 	WebElement success;
+	
+	@FindBy(xpath = "//span[text()='Agent updated Successfully']")
+	WebElement updateSuccess;
 
 	@FindBy(xpath = "//div[text() =  ' Error ']")
 	WebElement duplicateError;
 
-	@FindBy(xpath = "//span[@class='mat-button-wrapper' and contains(text(), 'CANCEL')]")
+	@FindBy(xpath = "//button[@id='cancelAgent']")
 	WebElement cancelButton;
 
 	@FindBy(xpath = "//div[text()=' Cancel Agent ']")
@@ -99,98 +103,113 @@ public class AgentObjectRepository extends LoginAndSelectModule {
 	@FindBy(xpath = "//td[contains(@class, 'mat-column-AgentKey')]")
 	List<WebElement> agentsList;
 
-	@FindBy(xpath = "//mat-icon[@title='Stop ']")
+	@FindBy(xpath = "//button[@id='stopAgent']")
 	WebElement stopAgent;
 
-	@FindBy(xpath = "//mat-icon[@title=' Start ']")
+	@FindBy(xpath = "//button[@id='startAgent']")
 	WebElement startAgent;
 
-	@FindBy(xpath = "//mat-icon[@title='Edit ']")
+	@FindBy(xpath = "//button[@id='editAgent']")
 	WebElement editAgent;
 
-	@FindBy(xpath = "((//td[@class='mat-cell-header']//span[text()='data'])//following::input)[1]")
+	@FindBy(xpath = "//input[@name='data']")
 	WebElement dataLabelName;
 
-	@FindBy(xpath = "((//td[@class='mat-cell-header']//span[text()='health'])//following::input)[1]")
+	@FindBy(xpath = "//input[@name='health']")
 	WebElement healthLabelName;
 
-	@FindBy(xpath = "//span[text()=' UPDATE ']")
+	@FindBy(xpath = "//div[text()='Update']")
 	WebElement update;
 
-	@FindBy(xpath = "//mat-icon[@title='Delete ']")
+	@FindBy(xpath = "//button[@id='deleteAgent']")
 	WebElement deleteAgent;
 
 	@FindBy(xpath = "//span[text()='Select Type']")
 	WebElement selectType;
 
-	@FindBy(xpath = "//span[contains(text(),'Agent Configuration')]")
+	@FindBy(xpath = "//div[contains(text(),'Agent Configuration')]")
 	WebElement agentConfigurationHeading;
 
-	@FindBy(xpath = "//td[@title='isOnlineRegistration']")
+	@FindBy(xpath = "//input[@name='agentDetails_isOnlineRegistration']")
 	WebElement isOnlineRegistration;
 
 	@FindBy(xpath = "((//td[@title='isOnlineRegistration']//span[text()='isOnlineRegistration'])//following::input)[1]")
 	WebElement isOnlineRegistrationValue;
 
-	@FindBy(xpath = "//td[@title='browseRepoUrl']")
+	@FindBy(xpath = "//input[@name='agentDetails_browseRepoUrl']")
 	WebElement browseRepoUrl;
 
 	@FindBy(xpath = "((//td[@title='browseRepoUrl']//span[text()='browseRepoUrl'])//following::input)[1]")
 	WebElement browseRepoUrlValue;
 
-	@FindBy(xpath = "//td[@title='downloadRepoUrl']")
+	@FindBy(xpath = "//input[@name='agentDetails_downloadRepoUrl']")
 	WebElement downloadRepoUrl;
 
 	@FindBy(xpath = "((//td[@title='downloadRepoUrl']//span[text()='downloadRepoUrl'])//following::input)[1]")
 	WebElement downloadRepoUrlValue;
 	
-	@FindBy(xpath = "//td[contains(@title,'onlineRegistrationMod')]")
+	@FindBy(xpath = "//input[contains(@name,'agentDetails_onlineRegistrationMode')]")
 	WebElement onlineRegistrationMode;
 	
 	@FindBy(xpath = "((//td[@title='onlineRegistrationMode']//span[contains(text(), 'onlineRegistrationMod')])//following::input)[1]\r\n" + 
 			"")
 	WebElement onlineRegistrationModeValue;
 	
-	@FindBy(xpath = "//td[contains(@title,'offlineAgentPath')]")
+	@FindBy(xpath = "//input[contains(@name,'agentDetails_offlineAgentPath')]")
 	WebElement offlineAgentPath;
 	
 	@FindBy(xpath = "((//td[contains(@title,'offlineAgentPath')]//span[text()='offlineAgentPath'])//following::input)[1]")
 	WebElement offlineAgentPathValue;
 	
-	@FindBy(xpath = "//td[contains(@title,'unzipPath')]")
+	@FindBy(xpath = "//input[contains(@name,'agentDetails_unzipPath')]")
 	WebElement unzipPath;
 	
 	@FindBy(xpath = "((//td[contains(@title,'unzipPath')]//span[text()='unzipPath'])//following::input)[1]")
 	WebElement unzipPathValue;
 	
-	@FindBy(xpath = "//td[contains(@title,'agentExchange')]")
+	@FindBy(xpath = "//input[contains(@name,'agentDetails_agentExchange')]")
 	WebElement agentExchange;
 	
 	@FindBy(xpath = "((//td[contains(@title,'agentExchange')]//span[text()='agentExchange'])//following::input)[1]")
 	WebElement agentExchangeValue;
 	
-	@FindBy(xpath = "//td[contains(@title,'agentPkgQueue')]")
+	@FindBy(xpath = "//input[contains(@name,'agentDetails_agentPkgQueue')]")
 	WebElement agentPkgQueue;
 	
 	@FindBy(xpath = "((//td[contains(@title,'agentPkgQueue')]//span[text()='agentPkgQueue'])//following::input)[1]")
 	WebElement agentPkgQueueValue;
 	
-	@FindBy(xpath = "//mat-icon[@title='Save']")
+	@FindBy(xpath = "//button[@id='saveServerConfig']")
 	WebElement save;
 
-	@FindBy(xpath = "//span[@class='mat-button-wrapper' and contains(text(), 'OKAY')]")
+	@FindBy(xpath = "//button[@id='onOkClose']")
 	WebElement ok;
+	
+	@FindBy(xpath = "//button[@id='crossClose']")
+	WebElement crossClose;
 
-	@FindBy(xpath = "//span[@class='mat-button-wrapper' and contains(text(), 'YES')]")
+	@FindBy(xpath = "//button[@id='yesBtn']")
 	WebElement yes;
 
 	@FindBy(xpath = "//div[contains(@class,'textPadding')]")
 	WebElement successMsg;
 	
-	@FindBy(xpath = "//div[contains(text(), 'Agent Registration Failed. ')]")
+	@FindBy(xpath = "//span[contains(text(),'Agent Registered Successfully')]")
+	WebElement regSuccessMsg;
+	
+	@FindBy(xpath = "//span[contains(text(), 'Agent Registration Failed. ')]")
 	WebElement errorMsg;
 
-	@FindBy(xpath = "//div[contains(text(), 'Success')]")
+	@FindBy(xpath = "//h1[contains(text(), 'Success')]")
 	WebElement successHeading;
+	
+	@FindBy(xpath = "//span[contains(text(), 'This is not a webhook Agent')]")
+	WebElement notWebhookMsg;
+	
+	@FindBy(xpath = "//span[contains(text(), 'This is not a ROI Agent')]")
+	WebElement notROIMsg;
+
+	@FindBy(xpath = "//mat-icon[@svgicon='backButton']")
+	WebElement backBtn;
 
 }

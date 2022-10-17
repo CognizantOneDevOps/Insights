@@ -30,6 +30,7 @@ public interface ConfigOptionsTest {
 	String EVENTCONFIG_JSON_FILE = "eventConfigWebhook.json";
 	String HEALTHCHECK_JSON_FILE = "healthCheckTestData.json";
 	String DASHBOARDREPORTDOWNLOAD_JSON_FILE = "dashboardReportDownload.json";
+	String EDIT_DASHBOARD_REPORT = "editDashboardReport.json";
 	String REPORT_WITHOUT_MAILING_DETAILS = "reportWithoutMailingDetails.json";
 	String SERVERCONFIGURATION_JSON_FILE = "serverConfiguration.json";
 	String DATADICTIONARY_JSON_FILE = "dataDictionary.json";
@@ -38,15 +39,23 @@ public interface ConfigOptionsTest {
 	String ARCHIVAL_JSON_FILE = "dataArchival.json";
 	String LOGO_JSON_FILE = "logoSetting.json";
 	String WEBHOOK_JSON_FILE = "webhook.json";
+	String KPI_TEST_DATA = "kpiTestCases.json";
+	String VALIDATE_KPI_TEST_DATA = "vlidateKPTdata.json";
+	String CONTENT_TEST_DATA = "contentTestCases.json";
 	String CONFIGURATION_JSON_FILE = "configurationFileManagementTestData.json";
+	String SCHEDULETASK_TEST_DATA = "scheduletask_test_cases.json";
+	String MILESTONE_TEST_DATA = "milestone_test_cases.json";
 	String DYNAMICRESPONSE_JSON_FILE = "dynamicTemplateWebhook.json";
 	String TESTDATA_FILE = "Test_Data.xlsx";
+	String TRACEABILITY_JSON = "traceabilityTestData.json";
 	String INSIGHTS_HOME = "INSIGHTS_HOME";
 	String CONFIG_DIR = ".InSights";
 	String AUTO_DIR = "Automation";
 	String ENGINE_AUTO_DIR ="engineAutomation";
 	String AGENT_DIR = "agent_management";
 	String LOGIN_DIR = "login";
+	String ROI_DIR = "ROI";
+	String SCHEDULETASK_DIR = "scheduletask";
 	String TRACEABILITY_DASHBOARD_DIR = "trceability_dashboard";
 	String HEALTH_CHECK_DIR = "health_check";
 	String DASHBOARD_REPORT_DOWNLOAD_DIR = "dashboard_report_download";
@@ -59,6 +68,9 @@ public interface ConfigOptionsTest {
 	String GROUPS_AND_USERS_DIR = "groups_and_user";
 	String CORRELATION_BUILDER_DIR = "correlation_builder";
 	String REPORT_MANAGEMENT_DIR = "report_management";
+	String OUTCOME_TEST_DATA = "outcome_test_cases.json";
+	String OUTCOME_WITH_PARAM_TEST = "outcomeWithReqParams.json";
+	String EDIT_OUTCOME_DETAILS = "editOutcome.json";
 	String CHROME_DIR = "chromedriver_win32";
 	String DRIVER_FILE = "chromedriver.exe";
 	String TESTNG_FILE = "testng.xml";
@@ -70,4 +82,7 @@ public interface ConfigOptionsTest {
 	String CONTENT_HEADER_KEY = "Content-Type";
 	String CONTENT_TYPE_VALUE = "application/json";
 	String REPORT_CONFIG_FOLDER="reportConfig";
+	String WORKFLOW_TASK="workflow_task";
+	String WORKFLOW_TASK_JSON_FILE = "workFlow.json";
+	String UPDATE_WORKFLOW_TASK_JSON_FILE = "updateWorkflow.json";
 }

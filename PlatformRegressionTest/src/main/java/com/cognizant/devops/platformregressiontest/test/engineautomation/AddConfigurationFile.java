@@ -17,7 +17,6 @@ package com.cognizant.devops.platformregressiontest.test.engineautomation;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -111,22 +110,21 @@ public class AddConfigurationFile extends AddConfigurationFileObjectRepository {
 	 * @return true if Configuration for the module is not present o/w false
 	 */
 	private boolean checkIfModuleConfigurationPresent(String module) {
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(3));
 		List<WebElement> rws = configurationDetailsTable.findElements(By.tagName("tr"));
 		for (int i = 0; i < rws.size(); i++) {
 			List<WebElement> cols = (rws.get(i)).findElements(By.tagName("td"));
 			if ((cols.get(3).getText()).equals(module)) {
 				List<WebElement> radioButtons = rws.get(i)
 						.findElements(By.xpath(".//preceding::span[contains(@class, 'mat-radio-container')]"));
-				driver.manage().timeouts().implicitlyWait(6, TimeUnit.SECONDS);
+				driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(3));
 				radioButtons.get(i).click();
-				driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+				driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(3));
 				log.info("{} module name is present.", module);
 				return true;
 			}
 		}
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-		log.info("{} module name is not present.", module);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(3));
 		return false;
 	}
 
@@ -137,7 +135,7 @@ public class AddConfigurationFile extends AddConfigurationFileObjectRepository {
 	 * @throws InterruptedException
 	 */
 	private void selectModuleName(String type) throws InterruptedException {
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(3));
 		Thread.sleep(1000);
 		for (WebElement toolValue : fileTypeList) {
 			if ((toolValue.getText()).equals(type)) {

@@ -15,14 +15,16 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.ui.reportmanagement;
 
-import java.util.concurrent.TimeUnit;
 
+import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectModule;
+import com.cognizant.devops.platformregressiontest.test.ui.testdata.ReportConfigurationDataProvider;
 import com.cognizant.devops.platformregressiontest.test.ui.testdata.ReportManagementDataProvider;
+import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.ReportConfigurationDataModel;
 
 /**
  * @author Ankita
@@ -36,12 +38,11 @@ public class KpiConfigurationTest extends LoginAndSelectModule {
 	@BeforeTest
 	public void setUp() {
 		initialization();
-		selectModuleKPIConfiguration("Kpi Configuration");
+		selectReportConfiguration("Kpi Configuration");
 		kpiConfigurationPage = new KpiConfigurationPage();
 
 	}
 
-	@Test
 	public void testKPILandingPage() {
 		kpiConfigurationPage.navigateToKPIConfigurationLandingPage();
 
@@ -59,13 +60,12 @@ public class KpiConfigurationTest extends LoginAndSelectModule {
 	 * @param datasource
 	 * @param dbQuery
 	 * @param isActive
+	 * @throws InterruptedException 
 	 */
-	@Test(priority = 1, enabled = true, dataProvider = "createKPIdataprovider", dataProviderClass = ReportManagementDataProvider.class)
-	public void saveKpiTest(String kpiId, String kpiName, String toolName, String category, String resultField,
-			String groupName, String datasource, String dbQuery, String isActive) {
+	@Test(priority = 1, enabled = true, dataProvider = "saveKPI", dataProviderClass = ReportConfigurationDataProvider.class)
+	public void saveKPI(ReportConfigurationDataModel data) throws InterruptedException {
 
-		Assert.assertEquals(kpiId, kpiConfigurationPage.saveKPI(kpiId, kpiName, toolName, category, resultField,
-				groupName, datasource, dbQuery, isActive));
+		Assert.assertTrue(kpiConfigurationPage.saveKPI(data),"kpi data saved successfully.");
 
 	}
 
@@ -81,13 +81,12 @@ public class KpiConfigurationTest extends LoginAndSelectModule {
 	 * @param datasource
 	 * @param dbQuery
 	 * @param isActive
+	 * @throws InterruptedException 
 	 */
-	@Test(priority = 2, enabled = true, dataProvider = "validateKPIdataprovider", dataProviderClass = ReportManagementDataProvider.class)
-	public void validateKpiTest(String kpiId, String kpiName, String toolName, String category, String resultField,
-			String groupName, String datasource, String dbQuery, String isActive) {
+	@Test(priority = 2, enabled = true, dataProvider = "validateKPI", dataProviderClass = ReportConfigurationDataProvider.class)
+	public void validateKpiTest(ReportConfigurationDataModel data) throws InterruptedException {
 
-		Assert.assertEquals(kpiConfigurationPage.validateKPI(kpiId, kpiName, toolName, category, resultField, groupName,
-				datasource, dbQuery, isActive), true);
+		Assert.assertTrue(kpiConfigurationPage.validateKPI(data));
 
 	}
 
@@ -96,9 +95,10 @@ public class KpiConfigurationTest extends LoginAndSelectModule {
 	 * 
 	 * @param kpiId
 	 * @param category
+	 * @throws InterruptedException 
 	 */
 	@Test(priority = 3, dataProvider = "editKPIdataprovider", dataProviderClass = ReportManagementDataProvider.class, enabled = true)
-	public void editKpiTest(String kpiId, String category) {
+	public void editKpiTest(String kpiId, String category) throws InterruptedException {
 		Assert.assertEquals(kpiConfigurationPage.editKPI(kpiId, category), true);
 	}
 
@@ -106,9 +106,10 @@ public class KpiConfigurationTest extends LoginAndSelectModule {
 	 * This method tests non-editable kpi fields in kpi edit screen
 	 * 
 	 * @param kpiId
+	 * @throws InterruptedException 
 	 */
 	@Test(priority = 4, dataProvider = "searchKPIdataprovider", dataProviderClass = ReportManagementDataProvider.class, enabled = true)
-	public void testNonEditableKPIFields(String kpiId) {
+	public void testNonEditableKPIFields(String kpiId) throws InterruptedException {
 		Assert.assertEquals(kpiConfigurationPage.nonEditableFields(kpiId), true);
 	}
 
@@ -120,10 +121,11 @@ public class KpiConfigurationTest extends LoginAndSelectModule {
 	 * @param resultField
 	 * @param dbQuery
 	 * @param datasource
+	 * @throws InterruptedException 
 	 */
 	@Test(priority = 5, dataProvider = "editKPIValidatedataprovider", dataProviderClass = ReportManagementDataProvider.class, enabled = true)
 	public void editValidateKpiTest(String kpiId, String category, String resultField, String dbQuery,
-			String datasource) {
+			String datasource) throws InterruptedException {
 		Assert.assertEquals(kpiConfigurationPage.editValidateKPI(kpiId, category, resultField, dbQuery, datasource),
 				true);
 	}
@@ -132,9 +134,10 @@ public class KpiConfigurationTest extends LoginAndSelectModule {
 	 * This method tests upload json functionality
 	 * 
 	 * @param fileName
+	 * @throws InterruptedException 
 	 */
 	@Test(priority = 6, dataProvider = "uploadJsonKPIdataprovider", dataProviderClass = ReportManagementDataProvider.class, enabled = true)
-	public void uploadJsonTest(String fileName) {
+	public void uploadJsonTest(String fileName) throws InterruptedException {
 
 		Assert.assertEquals(kpiConfigurationPage.uploadJson(fileName), true);
 	}
@@ -163,9 +166,10 @@ public class KpiConfigurationTest extends LoginAndSelectModule {
 	 * This method tests delete kpi functionality
 	 * 
 	 * @param kpiId
+	 * @throws InterruptedException 
 	 */
 	@Test(priority = 9, dataProvider = "deleteKPIdataprovider", dataProviderClass = ReportManagementDataProvider.class, enabled = true)
-	public void deleteKpiTest(String kpiId) {
+	public void deleteKpiTest(String kpiId) throws InterruptedException {
 		Assert.assertEquals(kpiConfigurationPage.deleteKPI(kpiId), true);
 	}
 

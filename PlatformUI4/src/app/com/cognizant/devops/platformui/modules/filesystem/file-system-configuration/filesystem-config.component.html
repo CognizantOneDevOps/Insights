@@ -68,7 +68,7 @@
                                 <mat-select placeholder="Select file type" [(ngModel)]="fileType"
                                     [disabled]="disableInputFields">
                                     <mat-option *ngFor="let type of fileTypeList" value="{{type}}"
-                                        class="optionsBckgnd">
+                                        class="optionsBckgnd" id="fileTypeList">
                                         {{type}}</mat-option>
                                 </mat-select>
                                 <mat-icon matSuffix svgIcon="arrow-down" class="arrow-icon iconDimension">
@@ -81,9 +81,9 @@
                         <div class="input">
                             <mat-form-field appearance="fill" class="formfield-custom">
                                 <mat-select [(ngModel)]="module" required placeholder="Select file module"
-                                    [disabled]="disableInputFields">
+                                    [disabled]="disableInputFields" id="fileModule">
                                     <mat-option *ngFor="let module of fileModuleList" value="{{module}}"
-                                        class="optionsBckgnd">
+                                        class="optionsBckgnd" id="fileModuleList">
                                         {{module}}</mat-option>
                                 </mat-select>
                                 <mat-icon matSuffix svgIcon="arrow-down" class="arrow-icon iconDimension">

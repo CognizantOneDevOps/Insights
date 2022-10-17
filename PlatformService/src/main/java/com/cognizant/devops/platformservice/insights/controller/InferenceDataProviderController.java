@@ -25,7 +25,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformservice.insights.service.InsightsInference;
-import com.cognizant.devops.platformservice.insights.service.InsightsInferenceService;
+import com.cognizant.devops.platformservice.insights.service.InsightsInferenceReportServiceImpl;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -41,28 +40,18 @@ import com.google.gson.JsonObject;
 @RestController
 @RequestMapping("/externalApi")
 public class InferenceDataProviderController {
-	
-	public static final String VECTORSCHEDULE ="vectorSchedule";
-	public static final String VECTORTYPE= "vectorType";
-	private static Logger LOG = LogManager.getLogger(InferenceDataProviderController.class);
+
+	public static final String VECTORSCHEDULE = "vectorSchedule";
+	public static final String VECTORTYPE = "vectorType";
+	private static Logger log = LogManager.getLogger(InferenceDataProviderController.class);
 	
 	@Autowired
-	InsightsInferenceService insightsInferenceReportService;
-	
-	
-	@GetMapping(value = "/inference/data/testDataSource", produces = MediaType.APPLICATION_JSON_VALUE)
-	public JsonObject checkInferenceDS() {
-		JsonObject result = new JsonObject();
-
-		result.addProperty(PlatformServiceConstants.RESULT, PlatformServiceConstants.SUCCESS);
-
-		return result;
-	}
+	InsightsInferenceReportServiceImpl insightsInferenceReportService;
 	
 	/** for Grafana 7.1.0 and InferencePanel Report **/
 	@PostMapping(value = "/inference/data/report", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonArray getInferenceReportData(HttpServletRequest request) {
-		LOG.debug(
+		log.debug(
 				" inside getInferenceData call /datasource/inference/data/report/getInferenceReportData ========================== ");
 		String input = null;
 		JsonArray result = new JsonArray();
@@ -73,7 +62,7 @@ public class InferenceDataProviderController {
 			JsonObject jsonInputFromPanel = inferenceInputFromPanel.get(0).getAsJsonObject();
 			String schedule = jsonInputFromPanel.get(VECTORSCHEDULE).getAsString();
 			String vectorType = jsonInputFromPanel.get(VECTORTYPE).getAsString();
-			LOG.debug(" get getInferenceReportData for group {} ", vectorType);
+			log.debug(" get getInferenceReportData for group {} ", vectorType);
 			inferences = insightsInferenceReportService.getInferenceDetailsVectorWise(schedule, vectorType);
 			if (!inferences.isEmpty()) {
 				JsonObject inferenceDetailsJson = new Gson().toJsonTree(inferences).getAsJsonArray().get(0)
@@ -83,24 +72,14 @@ public class InferenceDataProviderController {
 				result.add(inferenceJsonArray);
 			}
 		} catch (Exception e) {
-			LOG.error(e);
+			log.error(e);
 		}
 		return result;
 	}
-	
+
 	/** for Grafana 7.1.0 **/
 	@PostMapping(value = "/inference/data/report/testDataSource", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject checkInferenceDSReport() {
-		JsonObject result = new JsonObject();
-
-		result.addProperty(PlatformServiceConstants.RESULT, PlatformServiceConstants.SUCCESS);
-
-		return result;
-	}
-
-	/** for Grafana 7.1.0 **/
-	@PostMapping(value = "/inference/data/v7/testDataSource", produces = MediaType.APPLICATION_JSON_VALUE)
-	public JsonObject checkInferenceDS7() {
 		JsonObject result = new JsonObject();
 
 		result.addProperty(PlatformServiceConstants.RESULT, PlatformServiceConstants.SUCCESS);

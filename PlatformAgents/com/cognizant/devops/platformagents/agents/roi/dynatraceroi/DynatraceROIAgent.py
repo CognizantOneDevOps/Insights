@@ -107,8 +107,8 @@ class DynatraceROIAgent(BaseAgent):
                             roiUtilities.updateStatusInTracking("COMPLETED", trackId)
                         elif self.timeStampNow() > itemDetails["startDate"] and self.timeStampNow() < itemDetails["endDate"]:
                             self.fetchOutcomeData(itemDetails)
-                            self.publishROIAgentstatus(itemDetails, "INPROGRESS", "inprogress")
-                            self.updateStatusInTracking("INPROGRESS", trackId)     
+                            roiUtilities.publishROIAgentstatus(self.messageFactory, itemDetails, "INPROGRESS", "inprogress")
+                            roiUtilities.updateStatusInTracking("INPROGRESS", trackId)     
                     except Exception as ex:
                         self.baseLogger.error(" error occurred while fetching outcome data: "+str(ex))
                         roiUtilities.updateStatusInTracking("ERROR", trackId)

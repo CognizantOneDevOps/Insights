@@ -16,11 +16,14 @@
     "email": "plugins@grafana.com"
   },
   "devDependencies": {
-    "@grafana/data": "7.0.1",
-    "@grafana/toolkit": "7.0.1",
-    "@grafana/ui": "7.0.1",
-    "@grafana/runtime": "7.0.1",
+    "@grafana/data": "8.5.9",
+    "@grafana/runtime": "8.5.9",
+    "@grafana/toolkit": "8.5.9",
+    "@grafana/ui": "8.5.9",
     "emotion": "10.0.27",
-    "jquery":"3.5.1"
+    "jquery": "3.5.1"
+  },
+  "dependencies": {
+    "yarn": "^1.22.19"
   }
 }

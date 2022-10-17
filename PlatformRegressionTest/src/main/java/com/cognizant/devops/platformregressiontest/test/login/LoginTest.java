@@ -16,6 +16,7 @@
 package com.cognizant.devops.platformregressiontest.test.login;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,9 +44,10 @@ public class LoginTest extends LoginAndSelectModule {
 
 	/**
 	 * Assert true if login was not successful
+	 * @throws InterruptedException 
 	 */
 	@Test(priority = 1)
-	public void loginWithInvalidCredentials() {
+	public void loginWithInvalidCredentials() throws InterruptedException {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.loginWithInvalidCredentials(),
 				"Login failed due to incorrect credentials.");
@@ -54,11 +56,26 @@ public class LoginTest extends LoginAndSelectModule {
 	/**
 	 * Assert true if login was successful
 	 * @throws InterruptedException 
+	 * @throws IOException 
 	 */
 	@Test(priority = 2)
-	public void loginWithValidCredentials() throws InterruptedException {
+	public void loginWithValidCredentials() throws InterruptedException, IOException {
 		log.info(line);
 		Assert.assertTrue(clickAllActionButton.loginWithValidCredentials(), "Login successful.");
+	}
+	
+	/*
+	 *  Checks for the functioning of side NavBar
+	 *  */
+	
+	public void checkNavBar() throws InterruptedException {
+		log.info(line);
+		Assert.assertTrue(clickAllActionButton.checkNavBar(), "Login successful.");
+	}
+	
+	public void checkTheme() throws InterruptedException {
+		log.info(line);
+		Assert.assertTrue(clickAllActionButton.checkTheme(), "Login successful.");
 	}
 
 	/**

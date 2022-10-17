@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2017 Cognizant Technology Solutions Licensed under the Apache 
+	License, Version 2.0 (the "License"); you may not use this file except in 
+	compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>PlatformParent</artifactId>
+		<groupId>com.cognizant.devops</groupId>
+		<version>9.7</version>
+	</parent>
+
+	<groupId>com.cognizant.devops</groupId>
+	<artifactId>PlatformTestReport</artifactId>
+	<name>PlatformTestReport</name>
+	<version>9.7</version>
+	<packaging>jar</packaging>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>com.cognizant.devops</groupId>
+			<artifactId>PlatformDAL</artifactId>
+			<version>9.7</version>
+		</dependency>
+		<dependency>
+			<groupId>com.cognizant.devops</groupId>
+			<artifactId>PlatformAuditing</artifactId>
+			<version>9.7</version>
+		</dependency>
+		<dependency>
+			<groupId>com.cognizant.devops</groupId>
+			<artifactId>PlatformService</artifactId>
+			<version>9.7</version>
+			<type>war</type>
+		</dependency>
+
+		<dependency>
+			<groupId>com.cognizant.devops</groupId>
+			<artifactId>PlatformCommons</artifactId>
+			<version>9.7</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.cognizant.devops</groupId>
+			<artifactId>PlatformEngine</artifactId>
+			<version>9.7</version>
+		</dependency>
+		<dependency>
+			<groupId>com.cognizant.devops</groupId>
+			<artifactId>PlatformWorkflow</artifactId>
+			<version>9.7</version>
+		</dependency>
+		<dependency>
+			<groupId>com.cognizant.devops</groupId>
+			<artifactId>PlatformReports</artifactId>
+			<version>9.7</version>
+		</dependency>
+		<dependency>
+			<groupId>com.cognizant.devops</groupId>
+			<artifactId>PlatformInsightsWebHook</artifactId>
+			<version>9.7</version>
+		</dependency>
+
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.8</version>
+				<executions>
+					<execution>
+						<id>report-aggregate</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report-aggregate</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

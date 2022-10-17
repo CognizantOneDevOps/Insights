@@ -83,8 +83,7 @@ public class RabbitMQConnectionProvider {
 		return args;
 	}
 
-	public static Channel getChannel(String routingKey, String queueName,String exchangeName,String exchangeType) throws IOException, InsightsCustomException {
-		Channel channel = RabbitMQConnectionProvider.getConnection().createChannel();
+	public static Channel initilizeChannel(Channel channel, String routingKey, String queueName, String exchangeName, String exchangeType) throws IOException, InsightsCustomException {
 		channel.exchangeDeclare(exchangeName,exchangeType , true);
 		channel.queueDeclare(queueName, true, false, false, RabbitMQConnectionProvider.getQueueArguments());
 		channel.queueBind(queueName, exchangeName, routingKey);

@@ -39,15 +39,26 @@ public class WorkflowTaskPublisherFactory {
 	 * @param routingKey
 	 * @param data
 	 * @throws InsightsCustomException 
+	 * @throws TimeoutException 
+	 * @throws IOException 
 	 * @throws Exception
 	 */
-	public static void publish(String routingKey, String data) throws InsightsCustomException {
+	public static void publish(String routingKey, String data) throws InsightsCustomException, IOException, TimeoutException {
 		String queueName = routingKey.replace(".", "_");
-		try (Channel channel = RabbitMQConnectionProvider.getChannel(routingKey, queueName, MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE)) {
+		Channel channel = null;
+		try {
+			
+			channel = RabbitMQConnectionProvider.getConnection().createChannel();
+			channel = RabbitMQConnectionProvider.initilizeChannel(channel, routingKey, queueName, MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE);
 			channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, data.getBytes());
 			LOG.debug("Worlflow Detail ==== data published time in queue {}", routingKey);
-		} catch (IOException | TimeoutException e) {
+			
+		} catch (IOException e) {
 			LOG.debug("data not publish in queue");
+		}finally {
+			if(channel != null) {
+				channel.close();
+			}
 		}
 	}
 }

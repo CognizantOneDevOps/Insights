@@ -140,7 +140,7 @@
                     Properties</button>
             </div>
             <div style="height:100%;width:100%;">
-                <div class="property" style="float: left;width: 49%;">
+                <div class="property_source" style="float: left;width: 49%;">
                     <div *ngIf="noShowDetail || showDetail" class="propertyInnerDiv">
                         <div *ngIf="noShowDetail" class="divTablesHeading" style="border: 1px solid var(--brdr-clr);">
                             <div><b>{{startToolNullPropertiesMessage}} for source tool</b></div>
@@ -180,7 +180,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="property" style="float: left;width: 49%;">
+                <div class="property_destination" style="float: left;width: 49%;">
                     <div *ngIf="noShowDetail2 || showDetail2" class="propertyInnerDiv">
                         <div *ngIf="noShowDetail2" class="divTablesHeading" style="border: 1px solid var(--brdr-clr);">
                             <div><b>{{endToolNullPropertiesMessage}} for destination tool</b></div>

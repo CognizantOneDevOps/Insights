@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -110,7 +109,7 @@ public class AddAgent extends AddAgentObjectRepository{
 	}
 	
 	public boolean verifyAgentId(String agentId) {
-		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(3));
 		boolean isInstanceId = false;
 		try {
 			hold.until(ExpectedConditions.visibilityOfAllElements(agentsList));
@@ -125,7 +124,7 @@ public class AddAgent extends AddAgentObjectRepository{
 		} catch (Exception e) {
 			log.info("Agent List is empty.");
 		}
-		driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(3));
 		return isInstanceId;
 	}
 	
@@ -271,6 +270,10 @@ public class AddAgent extends AddAgentObjectRepository{
 		} catch (Exception e) {
 			log.info("{} queue does not exist", queueName);
 			return false;
+		}finally {
+			if(channel != null) {
+				channel.close();
+			}
 		}
 		log.info("{} queue exist", queueName);
 		return true;

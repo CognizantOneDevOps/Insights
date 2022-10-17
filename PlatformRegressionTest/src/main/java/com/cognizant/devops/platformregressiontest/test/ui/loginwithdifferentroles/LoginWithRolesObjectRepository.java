@@ -33,22 +33,31 @@ public class LoginWithRolesObjectRepository extends LoginAndSelectModule{
 	@FindBy(xpath = "//app-landing-page")
 	WebElement landingPage;
 	
-	@FindBy(xpath = "//input[@data-placeholder='User Name']")
+	@FindBy(xpath = "//input[contains(@name,'username')]")
 	WebElement loginUserName;
 
-	@FindBy(xpath = "//input[@data-placeholder='Password']")
+	@FindBy(xpath = "//input[contains(@name,'password')]")
 	WebElement loginPassword;
 
-	@FindBy(xpath = "//div[@class='mat-list-text']//p[contains(text(),'Logout')]")
+	@FindBy(xpath = "//span[contains(text(),'Logout')]")
 	WebElement logout;
 
-	@FindBy(xpath = "//span[contains(text(),'LOG ON')]")
+	@FindBy(xpath = "//button[contains(@class,'sigBtn')]")
 	WebElement logonButton;
 	
-	@FindBy(xpath = "//tr[contains(@class, 'RoleCss')]")
+	@FindBy(xpath = "//div[@class='app-toolbar']")
 	WebElement roleinWelcome;
 	
-	@FindBy(xpath = "//div[@class='mat-list-text']//p[contains(text(),'Dashboard Groups ')]")
+	@FindBy(xpath = "//div[@title='Admin (Main Org.)']")
+	WebElement role;
+	
+	@FindBy(xpath = "//div[@title='Editor (SampleTesting 1)']")
+	WebElement roleEditor;
+	
+	@FindBy(xpath = "//div[@title='Viewer (SampleTesting 2)']")
+	WebElement roleViewer;
+	
+	@FindBy(xpath = "//span[@id='DashboardGroupsName']")
 	WebElement dashboardGroups;
 	
 	@FindBy(xpath = "//div[@class='mat-list-text']//p[contains(text(),'Audit Reporting ')]")
@@ -78,7 +87,7 @@ public class LoginWithRolesObjectRepository extends LoginAndSelectModule{
 	@FindBy(xpath = "//div[contains(@class, 'menu')]//app-menu-list-item")
 	List<WebElement> menuList;
 	
-	@FindBy(xpath = "//mat-icon[contains(text(),'list')]")
+	@FindBy(xpath = "//mat-icon[@svgicon='list']")
 	WebElement listView;
 	
 	@FindBy(xpath = "//mat-panel-title//label[contains(text(),'General Dashboards')]")
@@ -99,7 +108,7 @@ public class LoginWithRolesObjectRepository extends LoginAndSelectModule{
 	@FindBy(xpath = "//ul//li//span[contains(text(),'View')]")
 	WebElement viewMenu;
 	
-	@FindBy(xpath = "//div//span[contains(@class, 'panel-title-text')]")
+	@FindBy(xpath = "//div[contains(@class, 'panel-title')]//h2")
 	WebElement panelTitle;
 	
 	@FindBy(xpath = "//u[contains(text(), 'Click Here')]")
@@ -108,14 +117,14 @@ public class LoginWithRolesObjectRepository extends LoginAndSelectModule{
 	@FindBy(xpath = "//table//tbody[@role='rowgroup']")
 	WebElement userDetailsTable;
 	
-	@FindBy(xpath = "//mat-icon[@title='Delete Organization User ']")
+	@FindBy(xpath = "//mat-icon[@svgicon='trash']")
 	WebElement deleteButton;
 	
-	@FindBy(xpath = "//span[text()= 'YES']")
+	@FindBy(xpath = "//button[@id='yesBtn']")
 	WebElement yesButton;
 	
-	@FindBy(xpath = "//span[text()= 'OKAY']")
-	WebElement okButton;
+	@FindBy(xpath = "//button[@id='crossClose']")
+	WebElement crossClose;
 	
 	@FindBy(xpath = "//mat-select[@name ='selectedAdminOrg']")
 	WebElement accessGroup;
