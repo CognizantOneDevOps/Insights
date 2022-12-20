@@ -33,6 +33,7 @@ import org.owasp.esapi.Validator;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.CommonsAndDALConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsEmailTemplates;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
@@ -1092,5 +1093,39 @@ public class WorkflowDAL extends BaseDAL {
 			throw e;
 		}
 	}
+	
+	
+	/**
+	 * Method to fetch Latest InsightsReportVisualizationContainer  using report IDs
+	 * 
+	 * @param reportIds
+	 * @param source
+	 * @return list of attachmentName and PDF data
+	 */
+	public List<Object[]> getAttachmentDataForReportIds(String reportIds,String source) {
+		try {
+			Map<String, Type> scalarList = new LinkedHashMap<>();
+			Map<String, Object> parameters = new HashMap<>();
+			String query = "select RVC2.mailattachmentname, RVC2.attachmentdata "
+					+ "from public.\"INSIGHTS_REPORT_VISUALIZATION_CONTAINER\" RVC2, ("
+					+ "SELECT max(RVC.executionid) AS maxexecutionid, RVC.workflowid as workflowid "
+					+ "FROM public.\"INSIGHTS_REPORT_VISUALIZATION_CONTAINER\" RVC ";
+			if(source.equalsIgnoreCase(WorkflowTaskEnum.WorkflowType.GRAFANADASHBOARDPDFREPORT.getValue())) {
+				query += "Inner join public.\"INSIGHTS_GRAFANA_DASHBOARD_PDF_CONFIG\" DPC on DPC.workflowid = RVC.workflowid "
+						+ "WHERE  DPC.id IN (" + reportIds+ ") ";
+			} else  if(source.equalsIgnoreCase(WorkflowTaskEnum.WorkflowType.REPORT.getValue())) {
+				query += "Inner join public.\"INSIGHTS_ASSESSMENT_CONFIGURATION\" AC on AC.workflowid = RVC.workflowid "
+						+ "WHERE  AC.configid IN (" + reportIds+ ") ";
+			}
+			query += "group by RVC.workflowid ) as tablea "
+					+ "where tablea.maxexecutionid = RVC2.executionid "
+					+ "and tablea.workflowid = RVC2.workflowid";
+			
+			return executeSQLQueryAndRetunList(query, scalarList, parameters);
 
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
+	}
 }

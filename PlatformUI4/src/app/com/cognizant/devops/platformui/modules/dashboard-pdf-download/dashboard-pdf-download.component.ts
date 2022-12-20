@@ -477,7 +477,7 @@ export class DashboardPdfDownloadComponent implements OnInit {
       dashboard.panels.forEach((x) => {
         if (x.type !== "row" && x.type !== "text") {
           this.urlArray.push(
-            InsightsInitService.grafanaHost +
+            "GRAFANA_URL" +
               "/d/" +
               dashboard.uid +
               "/" +
@@ -495,7 +495,7 @@ export class DashboardPdfDownloadComponent implements OnInit {
             if (x.type !== "text")
               x.panels.forEach((x) => {
                 this.urlArray.push(
-                  InsightsInitService.grafanaHost +
+                  "GRAFANA_URL" +
                     "/d/" +
                     dashboard.uid +
                     "/" +
@@ -643,7 +643,7 @@ export class DashboardPdfDownloadComponent implements OnInit {
           this.theme
       );
     this.saveUrl =
-      InsightsInitService.grafanaHost +
+      "GRAFANA_URL" +
       dashboardUri +
       "?orgId=" +
       this.organisation +
@@ -657,7 +657,7 @@ export class DashboardPdfDownloadComponent implements OnInit {
     this.getUrlArray();
     const dialogRef = self.dialog.open(DashboardPreviewConfigDialog, {
       panelClass: "custom-dialog-container",
-      height: "70%",
+      height: "84%",
       width: "86%",
       disableClose: true,
       data: {

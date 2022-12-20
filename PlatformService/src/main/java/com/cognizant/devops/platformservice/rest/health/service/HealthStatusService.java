@@ -18,19 +18,16 @@ package com.cognizant.devops.platformservice.rest.health.service;
 import java.io.IOException;
 
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonObject;
 
 public interface HealthStatusService {
 
 	GraphResponse loadHealthData(String label, String type, String agentId, int limitOfRow);
-
 	JsonObject getComponentStatus(String serviceType, String apiUrl);
-
 	JsonObject getVersionDetails(String fileName, String hostEndPoint, String type) throws IOException;
-
 	JsonObject getClientResponse(String hostEndPoint, String apiUrl, String displayType, String serviceType,
 			boolean isRequiredAuthentication, String username, String password, String authToken);
-
 	JsonObject createAgentFailureHealthLabel(String category, String tool, String agentId);
 
 }

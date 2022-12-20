@@ -150,7 +150,6 @@ public class MileStoneServiceImpl implements MileStoneService{
 				JsonArray existingOutcomeList = configJson.get("existingOutcomeList").getAsJsonArray();
 				JsonArray outcomeListFromUI = configJson.get("outcomeList").getAsJsonArray();
 				existingOutcomeList.forEach(x-> mileStoneConfigDAL.deleteOutcome(x.getAsInt()));
-				
 				for(JsonElement outcome: outcomeListFromUI) {
 					InsightsOutcomeTools insightsOutcomeTools = outComeConfigDAL.getOutComeConfigByName(outcome.getAsString());
 					InsightsMileStoneOutcomeConfig insightsMileStoneOutcomeConfig = new InsightsMileStoneOutcomeConfig();

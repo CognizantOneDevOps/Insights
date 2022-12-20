@@ -88,7 +88,7 @@ export class DataSharedService {
   public setLoginName(loginName: string) {
     this.storage.set("loginName", loginName);
   }
-  setCurrOrg(currOrg: any){
+  setCurrOrg(currOrg: any) {
     this.currOrg.next(currOrg);
   }
   public getOrgName() {
@@ -152,12 +152,12 @@ export class DataSharedService {
       || InsightsInitService.autheticationProtocol == AutheticationProtocol.JWT.toString()) {
       this.storage.set("Authorization", strAuthorization);
     } else if (InsightsInitService.autheticationProtocol == AutheticationProtocol.NativeGrafana.toString()) {
-      if(strAuthorization.indexOf("Basic")!=-1){
-          var auth_uuid = uuid();
-          auth_uuid = auth_uuid.substring(0, 15);
-          var auth = this.encryptData(auth_uuid, strAuthorization) + auth_uuid;
-          this.storage.set("Authorization", auth);
-      }else{
+      if (strAuthorization.indexOf("Basic") != -1) {
+        var auth_uuid = uuid();
+        auth_uuid = auth_uuid.substring(0, 15);
+        var auth = this.encryptData(auth_uuid, strAuthorization) + auth_uuid;
+        this.storage.set("Authorization", auth);
+      } else {
         this.storage.set("Authorization", strAuthorization)
       }
     }
@@ -178,14 +178,14 @@ export class DataSharedService {
     this.storage.set("orgId", orgId);
   }
 
-  public getUserRole(){
+  public getUserRole() {
     return this.storage.get("userRole")
   }
 
   public getTimeZone() {
     return this.storage.get("timeZone");
   }
-  
+
   public getTimeZoneAbbr() {
     var timezone = this.storage.get("timeZone");
     const tzArr = timezone.split(" ");
@@ -302,9 +302,9 @@ export class DataSharedService {
 
   public decryptedData(keys, value): string {
     const bytes = CryptoJS.AES.decrypt(value, keys);
-      if (bytes.toString()) {
-        return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-      }
+    if (bytes.toString()) {
+      return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    }
   }
 
   public getCurrentYear() {
@@ -314,8 +314,8 @@ export class DataSharedService {
 
   getCustomizeName(name, charlength?): String {
     var returnName: String = "";
-    if(charlength!=null){
-      if(name != undefined && charlength > 16 && name.length > charlength){
+    if (charlength != null) {
+      if (name != undefined && charlength > 16 && name.length > charlength) {
         returnName = (name.substring(0, charlength)) + '..';
       } else {
         returnName = (name);
@@ -327,9 +327,9 @@ export class DataSharedService {
     }
     return returnName;
   }
-  
 
-  validateEmailAddresses(emailAddress):boolean {
+
+  validateEmailAddresses(emailAddress): boolean {
     var emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     var isValidated = true;
     var emails = emailAddress.replace(/\s/g, "").split(",");
@@ -342,7 +342,7 @@ export class DataSharedService {
     return isValidated;
   }
 
-  convertDateToSpecificDateFormat(dateObject,format){
+  convertDateToSpecificDateFormat(dateObject, format) {
     var formattedDate;
     formattedDate = this.datePipe.transform(
       dateObject,
@@ -357,5 +357,15 @@ export class DataSharedService {
   public getTheme() {
     return this.storage.get("theme-color");
   }
+  public formatInsightsTime(inSightsTime: any) {
+    var utcSeconds = inSightsTime;
+    var inSightsTimeX = new Date(0);
+    inSightsTimeX.setUTCSeconds(utcSeconds);
+    return this.datePipe.transform(
+      inSightsTimeX,
+      "yyyy-MM-dd HH:mm:ss"
+    );
+  }
+
 
 }

@@ -29,6 +29,7 @@ import { MessageDialogService } from '@insights/app/modules/application-dialog/m
 import { ServerConfigurationService } from '@insights/app/modules/server-configuration/server-configuration-service';
 import { MenuItem } from '@insights/app/modules/home/menu-item';
 import { OverlayContainer } from '@angular/cdk/overlay';
+import { DomSanitizer } from "@angular/platform-browser";
 
 @Component({
   selector: 'app-home',
@@ -104,7 +105,8 @@ export class HomeComponent implements OnInit {
     public router: Router, private dataShare: DataSharedService,public overlayContainer:OverlayContainer,
     private dialog: MatDialog, private imageHandeler: ImageHandlerService,
     public messageDialog: MessageDialogService, 
-    public serverconfigService: ServerConfigurationService
+    public serverconfigService: ServerConfigurationService,
+    private sanitizer: DomSanitizer
     ) {
     console.log("Home page constructer ");
     if (this.depth === undefined) {
@@ -160,7 +162,11 @@ export class HomeComponent implements OnInit {
     console.log("In Customer logo method");
     this.insightsCustomerLogo = this.dataShare.getCustomerLogo();
     if (this.insightsCustomerLogo == "DefaultLogo") {
-      this.insightsCustomerLogo = "";
+      let imageSrc = this.sanitizer.sanitize(
+        0,
+        "icons/png/insights.png"
+      );
+      this.insightsCustomerLogo = imageSrc;
     }
     if (this.insightsCustomerLogo == undefined) {
       this.getLogoImage();

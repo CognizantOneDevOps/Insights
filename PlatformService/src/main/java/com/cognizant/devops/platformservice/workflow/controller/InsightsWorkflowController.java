@@ -19,7 +19,6 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +33,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -180,11 +177,7 @@ public class InsightsWorkflowController {
 			String validatedResponse = ValidationUtils.validateRequestBody(status);
 			JsonObject statusJson = JsonUtils.parseStringAsJsonObject(validatedResponse);
 			String message = workflowService.updateHealthNotification(statusJson);
-			if (message.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
-				return PlatformServiceUtil.buildSuccessResponse();
-			} else {
-				return PlatformServiceUtil.buildFailureResponse("Unable to update System notification");
-			}
+			return PlatformServiceUtil.buildSuccessResponse();
 		} catch (InsightsCustomException e) {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
@@ -245,7 +238,8 @@ public class InsightsWorkflowController {
 	public @ResponseBody List<String> getWorkflowType() throws InsightsCustomException {
 		try {
 			return workflowService.getAllWorkflowTypes();
-		} catch (InsightsCustomException e) {
+		}
+		catch (InsightsCustomException e) {
 			log.error(e);
 			throw new InsightsCustomException(e.toString());
 		}

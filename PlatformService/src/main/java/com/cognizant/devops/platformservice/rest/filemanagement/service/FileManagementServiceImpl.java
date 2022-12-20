@@ -16,26 +16,18 @@
 package com.cognizant.devops.platformservice.rest.filemanagement.service;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
+
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.cognizant.devops.platformcommons.core.enums.FileDetailsEnum;
-import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFilesDAL;
-import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.traceabilitydashboard.service.TraceabilityDashboardServiceImpl;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -89,6 +81,7 @@ public class FileManagementServiceImpl {
 				configFileJson.addProperty("fileName", configFile.getFileName());
 				configFileJson.addProperty("fileType", configFile.getFileType());
 				configFileJson.addProperty("fileModule", configFile.getFileModule());
+				configFileJson.addProperty("lastUpdatedTime", configFile.getLastUpdatedTime());
 				configFilesArray.add(configFileJson);
 			}
 			return configFilesArray;
@@ -112,10 +105,11 @@ public class FileManagementServiceImpl {
 	public String uploadConfigurationFile(MultipartFile multipartfile, String fileName, String fileType, String module, boolean isEdit)
 			throws InsightsCustomException {
 		try {
+			Long lastUpdatedTime=System.currentTimeMillis()/1000;
 			InsightsConfigFiles configFileRecord = configFilesDAL.getConfigurationFile(fileName);
 			InputStream is = multipartfile.getInputStream();
 			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-		    int nRead;
+		    int nRead = 0;
 		    byte[] data = new byte[4];
 		    while ((nRead = is.read(data, 0, data.length)) != -1) {
 		        buffer.write(data, 0, nRead);
@@ -136,6 +130,7 @@ public class FileManagementServiceImpl {
 					configFile.setFileName(fileName);
 					configFile.setFileType(fileType);
 					configFile.setFileModule(module);
+					configFile.setLastUpdatedTime(lastUpdatedTime);
 					configFile.setFileData(buffer.toByteArray());
 					configFilesDAL.saveConfigurationFile(configFile);
 				} else {
@@ -145,6 +140,7 @@ public class FileManagementServiceImpl {
 				configFileRecord.setFileName(fileName);
 				configFileRecord.setFileType(fileType);
 				configFileRecord.setFileModule(module);
+				configFileRecord.setLastUpdatedTime(lastUpdatedTime);
 				configFileRecord.setFileData(buffer.toByteArray());
 				configFilesDAL.updateConfigurationFile(configFileRecord);
 			} else {

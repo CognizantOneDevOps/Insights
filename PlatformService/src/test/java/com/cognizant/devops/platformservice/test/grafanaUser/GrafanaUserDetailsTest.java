@@ -19,18 +19,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
-
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
@@ -38,24 +36,19 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.cognizant.devops.platformservice.security.config.grafana.GrafanaUserDetailsUtil;
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
 @Test
+@WebAppConfiguration
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
-public class GrafanaUserDetailsTest {
-	private static final String AUTHORIZATION = "authorization";
-
-	GrafanaUserDetailsTestData userDetailsTestData = new GrafanaUserDetailsTestData();
-
-	Map<String, String> testAuthData = new HashMap<>();
-
+public class GrafanaUserDetailsTest extends GrafanaUserDetailsTestData {
+	
 	@DataProvider
 	public void getData() throws FileNotFoundException {
 		String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator
 				+ UnitTestConstant.TESTNG_TESTDATA + File.separator + "grafanaAuth.json";
-		JsonElement jsonData;
+		
 		try {
 			jsonData = JsonUtils.parseReader(new FileReader(new File(path).getCanonicalPath()));
 		} catch (JsonIOException | JsonSyntaxException | IOException e) {
@@ -75,12 +68,12 @@ public class GrafanaUserDetailsTest {
 
 		MockHttpServletRequest request = new MockHttpServletRequest();
 
-		request.setCookies(userDetailsTestData.cookies);
-		request.addHeader("Accept", userDetailsTestData.accept);
+		request.setCookies(cookies);
+		request.addHeader("Accept", accept);
 		request.addHeader("Authorization", testAuthData.get(AUTHORIZATION));
-		request.addHeader("Content-Type", userDetailsTestData.contentType);
-		request.addHeader("Origin", userDetailsTestData.origin);
-		request.addHeader("Referer", userDetailsTestData.referer);
+		request.addHeader("Content-Type", contentType);
+		request.addHeader("Origin", origin);
+		request.addHeader("Referer", referer);
 		request.addHeader("XSRF-TOKEN", testAuthData.get("XSRFTOKEN"));
 
 		UserDetails Actualrespone = GrafanaUserDetailsUtil.getUserDetails(request);
@@ -92,11 +85,11 @@ public class GrafanaUserDetailsTest {
 
 		MockHttpServletRequest request = new MockHttpServletRequest();
 
-		request.addHeader("Accept", userDetailsTestData.accept);
-		request.addHeader("Authorization", userDetailsTestData.authorizationException);
-		request.addHeader("Content-Type", userDetailsTestData.contentTypeException);
-		request.addHeader("Origin", userDetailsTestData.origin);
-		request.addHeader("Referer", userDetailsTestData.referer);
+		request.addHeader("Accept", accept);
+		request.addHeader("Authorization", authorizationException);
+		request.addHeader("Content-Type", contentTypeException);
+		request.addHeader("Origin", origin);
+		request.addHeader("Referer", referer);
 
 		UserDetails ActualresponeExceptions = GrafanaUserDetailsUtil.getUserDetails(request);
 		Assert.assertNull(ActualresponeExceptions);
@@ -108,12 +101,12 @@ public class GrafanaUserDetailsTest {
 
 		MockHttpServletRequest request = new MockHttpServletRequest();
 
-		request.setCookies(userDetailsTestData.cookies);
-		request.addHeader("Accept", userDetailsTestData.accept);
+		request.setCookies(cookies);
+		request.addHeader("Accept", accept);
 		request.addHeader("Authorization", testAuthData.get(AUTHORIZATION));
-		request.addHeader("Content-Type", userDetailsTestData.contentType);
-		request.addHeader("Origin", userDetailsTestData.origin);
-		request.addHeader("Referer", userDetailsTestData.referer);
+		request.addHeader("Content-Type", contentType);
+		request.addHeader("Origin", origin);
+		request.addHeader("Referer", referer);
 		request.addHeader("XSRF-TOKEN", testAuthData.get("XSRFTOKEN"));
 
 		String token = AuthenticationUtils.extractAndValidateAuthToken(request);
@@ -126,7 +119,7 @@ public class GrafanaUserDetailsTest {
 	@Test(priority = 4)
 	public void testGetUserDetailsWithInvalidToken() throws Exception {
 
-		UserDetails actualResponse = GrafanaUserDetailsUtil.getUserDetails(userDetailsTestData.invalidToken);
+		UserDetails actualResponse = GrafanaUserDetailsUtil.getUserDetails(invalidToken);
 		Assert.assertNull(actualResponse);
 	}
 

@@ -1,65 +1,208 @@
 {
-  "vault": {
-    "getFromVault": false,
-    "secretEngine":"insights-kv",
-    "readToken":"vault_secret_token",
-    "vaultUrl":"http://Vault_Host:port/v1/"
-  },
- "mqConfig": {
-    "user": "username for RabbitMq",
-    "password": "",
-    "host": "127.0.0.1",
-    "exchange": "iSight",
-    "agentControlXchg":"iAgent" 
-  },
-  "publish": {
-    "data": "CODEQUALITY.SONAR.DATA",
-    "health": "CODEQUALITY.SONAR.HEALTH"
-  },
-  "subscribe": {
-    "config": "CODEQUALITY.SONAR.config"
-  },
-  "communication": {
-    "type": "REST",
-    "sslVerify": true,
-    "responseType": "JSON"
-  },
-  "dynamicTemplate" : {
-  		"timeFieldMapping" : {
-			"startDate" : "%Y-%m-%d"
-  		},
-  		"metrics" : ["alert_status", "complexity", "coverage", "new_coverage"]
-  },
-  "agentId" : "",
-  "toolCategory" : "CODEQUALITY",  
-  "runSchedule": 30,
-  "enableDataValidation": true,
-  "timeStampField": "metricdate",
-  "userid":"username for Sonar",
-  "passwd":"",
-  "timeMachineapi": "no",
-  "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
-  "startFrom": "2019-01-01T00:01:01",
-  "toolsTimeZone": "Asia/Kolkata",
-  "useResponseTemplate": false,
-  "isDebugAllowed": false,
-  "enableValueArray": false,
-  "isEpochTimeFormat" : false,
-  "baseUrl": "http://127.0.0.1:9000/sonar/",
-  "agentSecretDetails": ["userid","passwd"],
-  "loggingSetting": {
-    	"logLevel": "INFO",
-		"maxBytes" : 5000000,
-		"backupCount" : 10
-  },
-  "osversion": "windows",
-  "agentVersion": "v7.2",
-  "labelName": "SONAR",
-  "toolName": "SONAR",
-  "auditing": false,
-  "enableProxy":false,
-  "proxies":{
-    	"http":"",
-    	"https":""
-    }
+	"vault": {
+		"getFromVault": false,
+		"secretEngine": "insights-kv",
+		"readToken": "vault_secret_token",
+		"vaultUrl": "http://Vault_Host:port/v1/"
+	},
+	"mqConfig": {
+		"exchange": "",
+		"host": "127.0.0.1",
+		"password": "",
+		"user": "",
+		"agentControlXchg": "iAgent"
+	},
+	"publish": {
+		"data": "CODEQUALITY.SONAR.DATA",
+		"health": "CODEQUALITY.SONAR.HEALTH"
+	},
+	"subscribe": {
+		"config": "CODEQUALITY.SONAR.config"
+	},
+	"communication": {
+		"type": "REST",
+		"sslVerify": true,
+		"responseType": "JSON"
+	},
+	"dynamicTemplate": {
+		"timeFieldMapping": {
+			"taskSubmittedDate": "%Y-%m-%dT%H:%M:%S",
+			"taskStartedDate": "%Y-%m-%dT%H:%M:%S",
+			"taskExecutedDate": "%Y-%m-%dT%H:%M:%S",
+			"analysisDate": "%Y-%m-%dT%H:%M:%S"
+		},
+		"insightsTimeXFieldMapping": {
+			"timefield": "metricdate",
+			"isEpoch": false,
+			"timeformat": "%Y-%m-%dT%H:%M:%S"
+		},
+  		"projects": ["all"],
+  		"isActivityNeeded": false,
+		"metrics": [
+			"alert_status",
+			" blocker_violations",
+			" branch_coverage",
+			" bugs",
+			" class_complexity",
+			" classes",
+			" code_smells",
+			" cognitive_complexity",
+			" comment_lines",
+			" comment_lines_data",
+			" comment_lines_density",
+			" complexity",
+			" complexity_in_classes",
+			" complexity_in_functions",
+			" conditions_to_cover",
+			" confirmed_issues",
+			" coverage",
+			" critical_violations",
+			" development_cost",
+			" directories",
+			" duplicated_blocks",
+			" duplicated_files",
+			" duplicated_lines",
+			" duplicated_lines_density",
+			" duplications_data",
+			" effort_to_reach_maintainability_rating_a",
+			" executable_lines_data",
+			" false_positive_issues",
+			" file_complexity",
+			" file_complexity_distribution",
+			" files",
+			" function_complexity",
+			" function_complexity_distribution",
+			" functions",
+			" generated_lines",
+			" generated_ncloc",
+			" info_violations",
+			" last_commit_date",
+			" line_coverage",
+			" lines",
+			" lines_to_cover",
+			" major_violations",
+			" minor_violations",
+			" ncloc",
+			" ncloc_data",
+			" ncloc_language_distribution",
+			" new_blocker_violations",
+			" new_branch_coverage",
+			" new_bugs",
+			" new_code_smells",
+			" new_conditions_to_cover",
+			" new_coverage",
+			" new_critical_violations",
+			" new_development_cost",
+			" new_duplicated_blocks",
+			" new_duplicated_lines",
+			" new_duplicated_lines_density",
+			" new_info_violations",
+			" new_line_coverage",
+			" new_lines",
+			" new_lines_to_cover",
+			" new_maintainability_rating",
+			" new_major_violations",
+			" new_minor_violations",
+			" new_reliability_rating",
+			" new_reliability_remediation_effort",
+			" new_security_hotspots",
+			" new_security_hotspots_reviewed",
+			" new_security_hotspots_reviewed_status",
+			" new_security_hotspots_to_review_status",
+			" new_security_rating",
+			" new_security_remediation_effort",
+			" new_security_review_rating",
+			" new_technical_debt",
+			" new_violations",
+			" new_vulnerabilities",
+			" open_issues",
+			" projects",
+			" public_api",
+			" public_documented_api_density",
+			" public_undocumented_api",
+			" quality_gate_details",
+			" quality_profiles",
+			" reliability_rating",
+			" reliability_remediation_effort",
+			" reopened_issues",
+			" security_hotspots",
+			" security_hotspots_reviewed",
+			" security_hotspots_reviewed_status",
+			" security_hotspots_to_review_status",
+			" security_rating",
+			" security_remediation_effort",
+			" security_review_rating",
+			" skipped_tests",
+			" sqale_rating",
+			" statements",
+			" violations",
+			"vulnerabilities",
+			"sqale_index",
+			"sqale_debt_ratio",
+			"tests",
+			"test_execution_time",
+			"test_errors",
+			"test_success_density",
+			"uncovered_lines",
+			"uncovered_conditions"
+		],
+		"taskRespTemp": {
+			"id": "taskId",
+			"componentId": "projectId",
+			"componentKey": "projectKey",
+			"componentName": "projectName",
+			"analysisId": "analysisId",
+			"status": "taskStatus",
+			"submittedAt": "taskSubmittedDate",
+			"submitterLogin": "taskSubmittedBy",
+			"startedAt": "taskStartedDate",
+			"executedAt": "taskExecutedDate",
+			"executionTimeMs": "taskExecutedDuration"
+		},
+		"metaData": {
+			"taskMetaData": {
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"projectId",
+					"taskId",
+					"dataType"
+				]
+			},
+			"analysisMetaData": {
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"projectId",
+					"analysisId",
+					"dataType"
+				]
+			}
+		}
+	},
+	"agentId": "",
+	"toolCategory": "CODEQUALITY",
+	"toolName": "SONAR",
+	"runSchedule": 30,
+	"enableDataValidation": false,
+	"timeStampField": "taskSubmittedDate",
+	"timeStampFormat": "%Y-%m-%dT%H:%M:%S",
+	"startFrom": "2017-01-01T00:01:01-0000",
+	"toolsTimeZone": "Asia/Kolkata",
+	"useResponseTemplate": true,
+	"isDebugAllowed": false,
+	"enableValueArray": false,
+	"isEpochTimeFormat": false,
+	"baseUrl": "",
+	"userid": "",
+	"passwd": "",
+	"loggingSetting": {
+		"logLevel": "WARN",
+		"maxBytes": 5000000,
+		"backupCount": 1000
+	},
+	"auditing": false,
+	"enableProxy": false,
+	"proxies": {
+		"http": "",
+		"https": ""
+	}
 }

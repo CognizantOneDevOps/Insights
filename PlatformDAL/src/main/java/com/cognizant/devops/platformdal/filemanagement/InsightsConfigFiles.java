@@ -47,6 +47,9 @@ public class InsightsConfigFiles implements Serializable {
 
 	@Column(name = "fileName", unique = true, nullable = false)
 	private String fileName;
+	
+	@Column(name = "lastUpdatedTime")
+	private Long lastUpdatedTime;
 
 	public Integer getId() {
 		return id;
@@ -54,6 +57,14 @@ public class InsightsConfigFiles implements Serializable {
 
 	public byte[] getFileData() {
 		return fileData;
+	}
+
+	public Long getLastUpdatedTime() {
+		return lastUpdatedTime;
+	}
+
+	public void setLastUpdatedTime(Long lastUpdatedTime) {
+		this.lastUpdatedTime = lastUpdatedTime;
 	}
 
 	public void setFileData(byte[] fileData) {

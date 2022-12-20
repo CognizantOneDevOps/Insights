@@ -34,12 +34,12 @@ if [[ ! -z $enablespin ]]
 then
     hostname="insightsdomain.subdomain.com"
 else
-    hostname=$hostInstance
+    hostname=$hostPublicIP
 fi
 
 ServiceEndpoint=http://$hostname:$servicePort
 insightsServiceURL=http://$hostname:$servicePort/app
-grafanaEndpoint=http://$hostname:$grafanaPort
+grafanaEndpoint=http://$hostPrivateIP:$grafanaPort
 
 #UPDATE ServiceEndpoint - uiConfig.json and server-config.json
 configPath='/usr/INSIGHTS_HOME/.InSights/server-config.json'
@@ -48,7 +48,7 @@ dos2unix $configPath
 jq --arg grafanaEndpoint $grafanaEndpoint '(.grafana.grafanaEndpoint) |= $grafanaEndpoint' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
 #cat $configPath
 jq --arg grafanaDBEndpoint $grafanaDBEndpoint '(.grafana.grafanaDBEndpoint) |= $grafanaDBEndpoint' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg postgresIP $postgresIP --arg hostInstance $hostInstance '(.trustedHosts) |= .+ [$postgresIP,$hostInstance]' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
+jq --arg postgresIP $postgresIP --arg hostPublicIP $hostPublicIP '(.trustedHosts) |= .+ [$postgresIP,$hostPublicIP]' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
 jq --arg neo4jEndpoint $neo4jEndpoint '(.graph.endpoint) |= $neo4jEndpoint' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
 jq --arg neo4jToken $neo4jToken '(.graph.authToken) |= $neo4jToken' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
 jq --arg neo4jBoltEndpoint $neo4jBoltEndpoint '(.graph.boltEndPoint) |= $neo4jBoltEndpoint' $configPath > INPUT.tmp && mv INPUT.tmp $configPath

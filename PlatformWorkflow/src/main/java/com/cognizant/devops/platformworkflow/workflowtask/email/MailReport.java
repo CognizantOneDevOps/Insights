@@ -16,7 +16,9 @@
 package com.cognizant.devops.platformworkflow.workflowtask.email;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.mail.internet.InternetAddress;
 
@@ -29,13 +31,12 @@ public class MailReport implements Serializable {
 	private List<InternetAddress> mailTo;
 	private List<InternetAddress> mailCC;
 	private List<InternetAddress> mailBCC;
-	private String emailAttachmentName;
 	private String reportFilePath;
 	private String timeOfReportGeneration;
 	private String mailFrom;
 	private String subject;
 	private String mailBody;
-	private byte[] mailAttachment;
+	private Map<String, byte[]> mailAttachments = new HashMap<>();
 
 
 
@@ -102,20 +103,14 @@ public class MailReport implements Serializable {
 	public void setMailBCC(List<InternetAddress> mailBCC) {
 		this.mailBCC = mailBCC;
 	}
+
+	public Map<String, byte[]> getMailAttachments() {
+		return mailAttachments;
+	}
+
+	public void setMailAttachments(Map<String, byte[]> mailAttachments) {
+		this.mailAttachments = mailAttachments;
+	}
 	
-	public byte[] getMailAttachment() {
-		return mailAttachment;
-	}
-
-	public void setMailAttachment(byte[] mailAttachment) {
-		this.mailAttachment = mailAttachment;
-	}
-
-	public String getEmailAttachmentName() {
-		return emailAttachmentName;
-	}
-
-	public void setEmailAttachmentName(String emailAttachmentName) {
-		this.emailAttachmentName = emailAttachmentName;
-	}
+	
 }

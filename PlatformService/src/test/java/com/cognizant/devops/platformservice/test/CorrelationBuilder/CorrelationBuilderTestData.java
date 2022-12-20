@@ -23,14 +23,22 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 
-public class CorrelationBuilderTestData {
+public class CorrelationBuilderTestData extends AbstractTestNGSpringContextTests{
 
 	String saveDataConfig = "{\"destination\":{\"toolName\":\"PIVOTALTRACKER\",\"toolCategory\":\"ALM\",\"labelName\":\"PIVOTALTRACKER\",\"fields\":[\"projectId\"]},\"source\":{\"toolName\":\"PIVOTALTRACKER\",\"toolCategory\":\"ALM\",\"labelName\":\"PIVOTALTRACKER\",\"fields\":[\"storyId\"]},\"relationName\":\"FROM_PIVOTALTRACKER_TO_PIVOTALTRACKER_Testing\",\"relationship_properties\":[],\"selfRelation\":true}";
+	String saveDataConfigSourceDestinationLabelNull = "{\"destination\":{\"toolName\":\"PIVOTALTRACKER\",\"toolCategory\":\"ALM\",\"labelName\":null,\"fields\":[\"projectId\"]},\"source\":{\"toolName\":\"PIVOTALTRACKER\",\"toolCategory\":\"ALM\",\"labelName\":null,\"fields\":[\"storyId\"]},\"relationName\":\"FROM_PIVOTALTRACKER_TO_PIVOTALTRACKER_Testing123\",\"relationship_properties\":[test1, test2],\"selfRelation\":true}";
+	String saveDataConfigValidationError = "&amp;{<\"destination\":{\"toolName\":\"PIVOTALTRACKER\",\"toolCategory\":\"ALM\",\"labelName\":\"PIVOTALTRACKER\",\"fields\":[\"projectId\"]},\"source\":{\"toolName\":\"PIVOTALTRACKER\",\"toolCategory\":\"ALM\",\"labelName\":\"PIVOTALTRACKER\",\"fields\":[\"storyId\"]},\"relationName\":\"FROM_PIVOTALTRACKER_TO_PIVOTALTRACKER_Testing\",\"relationship_properties\":[],\"selfRelation\":true}";
+	
 	String getConfigDetails = "[{\"destination\":{\"toolName\":\"JIRA\",\"toolCategory\":\"ALM\",\"fields\":[\"jir_priority\"]},\"source\":{\"toolName\":\"BITBUCKET\",\"toolCategory\":\"SCM\",\"fields\":[\"bit_commiTime\"]},\"relationName\":\"FROM_BITBUCKET_TO_JIRA_test\"}]";
 	String UpdateConfigDetails = "{\"relationName\":\"FROM_PIVOTALTRACKER_TO_PIVOTALTRACKER_Testing\",\"correlationFlag\":true}";
+	String UpdateConfigDetailsValidationError = "&amp;{<\"relationName\":\"FROM_PIVOTALTRACKER_TO_PIVOTALTRACKER_Testing\",\"correlationFlag\":true}";
+	
 	String DeleteConfigDetails = "{\"relationName\":\"FROM_PIVOTALTRACKER_TO_PIVOTALTRACKER_Testing\",\"correlationFlag\":false}";
+	String DeleteConfigDetailsValidationError = "&amp;{<\"relationName\":\"FROM_PIVOTALTRACKER_TO_PIVOTALTRACKER_Testing\",\"correlationFlag\":false}";
 
 	public static void resetConfig(String configDetails) throws IOException {
 		// TODO Auto-generated method stub

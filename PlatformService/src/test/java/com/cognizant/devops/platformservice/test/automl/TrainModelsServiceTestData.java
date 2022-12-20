@@ -21,14 +21,14 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.core.enums.AutoMLEnum;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
@@ -38,21 +38,20 @@ import com.cognizant.devops.platformdal.autoML.AutoMLConfig;
 import com.cognizant.devops.platformdal.autoML.AutoMLConfigDAL;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
+import com.cognizant.devops.platformservice.assessmentreport.controller.InsightsAssessmentReportController;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class TrainModelsServiceTestData {
-	
+public class TrainModelsServiceTestData extends AbstractTestNGSpringContextTests {
 	private static final Logger log = LogManager.getLogger(TrainModelsServiceTestData.class);
-
-	
 	WorkflowDAL workflowConfigDAL = new WorkflowDAL();
 	AutoMLConfigDAL autoMLConfigDAL = new AutoMLConfigDAL();
 	H2oApiCommunicator h2oApiCommunicator;
 	ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-	
+	@Autowired
+	InsightsAssessmentReportController insightsAssessmentReportController;
 	String usecase = "automl_usecase_00172";
 	Integer trainingPercent = 80;
 	String predictionColumn = "Commits";
@@ -65,7 +64,9 @@ public class TrainModelsServiceTestData {
 	String mqChannel = "WORKFLOW.TASK.AUTOML.EXCECUTION";
 	String modelName = null;
 	String h2oEndpoint = null;
-
+	String registerkpiwithUsecase = "{\"kpiId\":100201,\"name\":\"Total Successful Deployments\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN count(n.SPKstatus) as totalDeploymentCount\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"totalDeploymentCount\",\"outputDatasource\":\"NEO4J\",\"usecase\":\""+usecase+"\"}";
+	String registerkpiwithUsecaseActiveState = "{\"kpiId\":100202,\"name\":\"Total Successful Upload\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN count(n.SPKstatus) as totalDeploymentCount\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"totalDeploymentCount\",\"outputDatasource\":\"NEO4J\",\"usecase\":\""+usecase+"\"}";
+	String deleteKpiString = "{\"kpiId\":\"100201\"}";
 	
 	public String getTaskList() {
 		List<InsightsWorkflowTask> listofTasks = workflowConfigDAL.getTaskLists("AUTOML");

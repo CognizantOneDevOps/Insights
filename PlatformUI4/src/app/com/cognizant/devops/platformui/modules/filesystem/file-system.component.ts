@@ -22,6 +22,7 @@ import { NavigationExtras, Router } from '@angular/router';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { saveAs as importedSaveAs } from "file-saver";
 import { FileSystemService } from './file-system.service';
+import { DataSharedService } from "@insights/common/data-shared-service";
 
 @Component({
   selector: 'app-filesystem-configuration',
@@ -47,9 +48,11 @@ export class FileSystemComponent implements OnInit {
   currentPageIndex: number = -1;
   selectedIndex: -1;
   totalPages: number = -1;
+  timeZoneAbbr:String="";
+  dateObj:Date;
 
-  constructor(public fileSystemService: FileSystemService, public router: Router, public messageDialog: MessageDialogService) {
-    this.displayedColumns = ['radio', 'fileName', 'fileType', 'fileModule'];
+  constructor(public fileSystemService: FileSystemService, public router: Router, public dataShare: DataSharedService, public messageDialog: MessageDialogService) {
+    this.displayedColumns = ['radio', 'fileName', 'fileType', 'fileModule', 'lastUpdatedTime'];
     this.getFileTypeList();
     this.getFileModuleList();
     this.getConfigFileList();
@@ -59,6 +62,7 @@ export class FileSystemComponent implements OnInit {
     this.currentPageValue = this.paginator.pageIndex * this.MAX_ROWS_PER_TABLE;
     this.currentPageValue = this.paginator.pageIndex * this.MAX_ROWS_PER_TABLE;
     this.currentPageIndex = this.paginator.pageIndex + 1;
+    this.timeZoneAbbr = this.dataShare.getTimeZoneAbbr();
   }
 
   ngAfterViewInit() {
@@ -87,6 +91,19 @@ export class FileSystemComponent implements OnInit {
     this.configListResponse = await this.fileSystemService.loadConfigFilesList();
     if (this.configListResponse.data != null && this.configListResponse.status == "success") {
       this.fileStorageDatasource.data = this.configListResponse.data;
+      var dataArray = this.configListResponse.data;
+      if (dataArray != undefined) {
+        dataArray.forEach((key) => {
+          var obj = key;
+          if (typeof obj["lastUpdatedTime"] !== "undefined") {
+              this.dateObj = new Date(obj["lastUpdatedTime"]*1000);
+              obj["lastUpdatedTime"] = this.dataShare.convertDateToSpecificDateFormat(
+                this.dateObj,
+                "yyyy-MM-dd HH:mm:ss"
+              );
+            }
+        });
+      }
       this.fileStorageDatasource.paginator = this.paginator;
     }
     this.totalPages = Math.ceil(this.fileStorageDatasource.data.length / this.MAX_ROWS_PER_TABLE);

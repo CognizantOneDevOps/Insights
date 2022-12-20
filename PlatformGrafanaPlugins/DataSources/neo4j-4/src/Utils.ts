@@ -145,7 +145,7 @@ export const convertResponseToDataFramesTimeSeries1 = (queries, res: any): DataQ
 export function checkCypherQueryModificationKeyword(cypherQuery) {
     let keywords: string[];
     keywords = ["create", "delete", "set", "update", "merge", "detach"];
-    let flag = 0;
+    let flag: number = 0;
     let queryCorrect = true;
     if (cypherQuery.statements[0].statement == undefined) {
         return queryCorrect;

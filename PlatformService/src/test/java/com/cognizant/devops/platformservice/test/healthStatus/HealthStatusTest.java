@@ -21,10 +21,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +30,6 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -47,12 +44,11 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.constants.ServiceStatusConstants;
 import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformservice.rest.health.service.HealthStatusServiceImpl;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -62,25 +58,18 @@ import com.google.gson.JsonSyntaxException;
 @Test
 @WebAppConfiguration
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
-public class HealthStatusTest extends AbstractTestNGSpringContextTests {
+public class HealthStatusTest extends HealthStatusTestData {
 
 	private static Logger log = LogManager.getLogger(HealthStatusTest.class);
 	private static final String AUTHORIZATION = "authorization";
-
 	MockHttpServletRequest httpRequest = new MockHttpServletRequest();
 	ResultMatcher ok = MockMvcResultMatchers.status().isOk();
-	String cookiesString;
+	String cookiesString="";
 	Map<String, String> testAuthData = new HashMap<>();
 	
 	@Autowired
-	HealthStatusServiceImpl healthStatusServiceImpl;
-	
-	HealthStatusTestData healthStatusTestData = new HealthStatusTestData();
-
-	@Autowired
 	private WebApplicationContext wac;
 	private MockMvc mockMvc;
-
 	String host = null;
 	Gson gson = new Gson();
 
@@ -158,7 +147,7 @@ public class HealthStatusTest extends AbstractTestNGSpringContextTests {
 	public void testGetDetailHealth() throws InsightsCustomException{
 		try {
 			this.mockMvc = getMacMvc();
-			MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/admin/health/detailHealth").param("category", healthStatusTestData.categoryGit).param("tool", healthStatusTestData.toolName).param("agentId", healthStatusTestData.agentId).accept(MediaType.APPLICATION_JSON);
+			MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/admin/health/detailHealth").param("category", categoryGit).param("tool",toolName).param("agentId", agentId).accept(MediaType.APPLICATION_JSON);
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing Get Detail Health Status" +e);
@@ -167,10 +156,22 @@ public class HealthStatusTest extends AbstractTestNGSpringContextTests {
 	}
 	
 	@Test(priority = 4)
+	public void testGetDetailHealthWrongInput() throws InsightsCustomException{
+		try {
+			this.mockMvc = getMacMvc();
+			MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/admin/health/detailHealth").param("category", categoryGitWrong).param("tool", toolName).param("agentId", agentId).accept(MediaType.APPLICATION_JSON);
+			this.mockMvc.perform(builder).andExpect(ok);
+		} catch (Exception e) {
+			log.error("Error while testing Get Detail Health Status" +e);
+		}
+		log.debug("Agents health details retrieved successfully!");
+	}
+	
+	@Test(priority = 5)
 	public void testGetAgentFailureDetails() throws InsightsCustomException{
 		try {
 			this.mockMvc = getMacMvc();
-			MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/admin/health/getAgentFailureDetails").param("category", healthStatusTestData.categoryGit).param("tool", healthStatusTestData.toolName).param("agentId", healthStatusTestData.failedAgentId).accept(MediaType.APPLICATION_JSON);
+			MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/admin/health/getAgentFailureDetails").param("category",categoryGit).param("tool", toolName).param("agentId", failedAgentId).accept(MediaType.APPLICATION_JSON);
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing Get Agent Failure Detail Status" +e);
@@ -178,6 +179,72 @@ public class HealthStatusTest extends AbstractTestNGSpringContextTests {
 		log.debug("Agents health failure details retrieved successfully!");
 	}
 	
+	@Test(priority = 6)
+	public void testGetDetailHealthCategoryService() throws InsightsCustomException{
+		try {
+			this.mockMvc = getMacMvc();
+			MockHttpServletRequestBuilder builder1 = MockMvcRequestBuilders.get("/admin/health/detailHealth").param("category", categoryService).param("tool",toolName).param("agentId", agentId).accept(MediaType.APPLICATION_JSON);
+			this.mockMvc.perform(builder1).andExpect(ok);
+		} catch (Exception e) {
+			log.error("Error while testing Get Agent Failure Detail Status" +e);
+		}
+		log.debug("Agents health failure details retrieved successfully!");
+	}
+	
+	@Test(priority = 7)
+	public void testGetDetailHealthCategoryEngine() throws InsightsCustomException{
+		try {
+			this.mockMvc = getMacMvc();
+			MockHttpServletRequestBuilder builder1 = MockMvcRequestBuilders.get("/admin/health/detailHealth").param("category", categoryEngine).param("tool",toolName).param("agentId", agentId).accept(MediaType.APPLICATION_JSON);
+			this.mockMvc.perform(builder1).andExpect(ok);
+		} catch (Exception e) {
+			log.error("Error while testing Get Agent Failure Detail Status" +e);
+		}
+		log.debug("Agents health failure details retrieved successfully!");
+	}
+	@Test(priority = 8)
+	public void testGetDetailHealthCategoryWorkflow() throws InsightsCustomException{
+		try {
+			this.mockMvc = getMacMvc();
+			MockHttpServletRequestBuilder builder1 = MockMvcRequestBuilders.get("/admin/health/detailHealth").param("category", categoryWorkflow).param("tool",toolName).param("agentId", agentId).accept(MediaType.APPLICATION_JSON);
+			this.mockMvc.perform(builder1).andExpect(ok);
+		} catch (Exception e) {
+			log.error("Error while testing Get Agent Failure Detail Status" +e);
+		}
+		log.debug("Agents health failure details retrieved successfully!");
+	}
+	
+	@Test(priority = 9)
+	public void testGetAgentFailureDetailsCheck() throws InsightsCustomException{
+		try {
+			this.mockMvc = getMacMvc();
+			MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/admin/health/getAgentFailureDetails").param("category", categoryGitWrong).param("tool", toolName).param("agentId", failedAgentId).accept(MediaType.APPLICATION_JSON);
+			this.mockMvc.perform(builder).andExpect(null);
+		
+		} catch (Exception e) {
+			log.error("Error while testing Get Agent Failure Detail Status" +e);
+		}
+		log.debug("Agents health failure details retrieved successfully!");
+	}
+	
+	@Test(priority = 10)
+	public void testGetComponentHealth() throws InsightsCustomException{
+		try {
+			this.mockMvc = getMacMvc();
+			MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/admin/health/detailHealth").param("category", ServiceStatusConstants.PLATFORM_WORKFLOW).param("tool", toolName).param("agentId", "").accept(MediaType.APPLICATION_JSON);
+			this.mockMvc.perform(builder).andExpect(ok);
+			builder = MockMvcRequestBuilders.get("/admin/health/detailHealth").param("category", ServiceStatusConstants.PLATFORM_ENGINE).param("tool", toolName).param("agentId", "").accept(MediaType.APPLICATION_JSON);
+			this.mockMvc.perform(builder).andExpect(ok);
+			builder = MockMvcRequestBuilders.get("/admin/health/detailHealth").param("category", ServiceStatusConstants.PLATFORM_SERVICE).param("tool",toolName).param("agentId", "").accept(MediaType.APPLICATION_JSON);
+			this.mockMvc.perform(builder).andExpect(ok);
+			builder = MockMvcRequestBuilders.get("/admin/health/detailHealth").param("category", ServiceStatusConstants.PLATFORM_WEBHOOK_SUBSCRIBER).param("tool", toolName).param("agentId", "").accept(MediaType.APPLICATION_JSON);
+			this.mockMvc.perform(builder).andExpect(ok);
+		} catch (Exception e) {
+			log.error("Error while testing Get Detail Health Status" +e);
+		}
+		log.debug("Agents health details retrieved successfully!");
+	}
+		
 	@AfterClass
 	public void cleanUp() throws InsightsCustomException, IOException {
 		

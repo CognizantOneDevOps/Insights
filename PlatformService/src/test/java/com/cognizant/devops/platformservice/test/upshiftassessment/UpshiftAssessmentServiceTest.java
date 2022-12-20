@@ -16,10 +16,14 @@
 
 package com.cognizant.devops.platformservice.test.upshiftassessment;
 
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.upshiftassessment.UpshiftAssessmentConfig;
 import com.cognizant.devops.platformdal.upshiftassessment.UpshiftAssessmentConfigDAL;
+import com.cognizant.devops.platformservice.upshiftassessment.service.UpshiftAssessmentService;
 import com.cognizant.devops.platformservice.upshiftassessment.service.UpshiftAssessmentServiceImpl;
+import com.google.gson.JsonObject;
+import com.cognizant.devops.platformservice.upshiftassessment.controller.ExternalApiController;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,6 +31,7 @@ import org.junit.BeforeClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.multipart.MultipartFile;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -36,13 +41,18 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 @Test
-@ContextConfiguration(locations = {"classpath:spring-test-config.xml"})
+@WebAppConfiguration
+@ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
 public class UpshiftAssessmentServiceTest extends UpshiftAssessmentServiceData {
+	
     @Autowired
-    public static final UpshiftAssessmentServiceImpl upshiftAssessmentService = new UpshiftAssessmentServiceImpl();
+    UpshiftAssessmentService upshiftAssessmentService;
     private static final Logger log = LogManager.getLogger(UpshiftAssessmentServiceTest.class);
     UpshiftAssessmentConfigDAL upshiftAssessmentConfigDAL = new UpshiftAssessmentConfigDAL();
 
+    @Autowired
+    ExternalApiController ExternalApiController;
+    
     @BeforeClass
     public void prepareData() throws InsightsCustomException {
         try {
@@ -52,11 +62,12 @@ public class UpshiftAssessmentServiceTest extends UpshiftAssessmentServiceData {
         }
 
     }
-
+    
     @Test(priority = 1)
     public void testsaveReport() throws InsightsCustomException {
         try {
-            upshiftAssessmentService.saveUpshiftAssessment("Test01", testFile);
+        	JsonObject response = ExternalApiController.importUpshiftAssessment("Test01", testFile);
+			Assert.assertEquals(response.get("status").getAsString().replace("\"", ""), PlatformServiceConstants.SUCCESS);
             UpshiftAssessmentConfig upshiftAssessmentConfig = upshiftAssessmentConfigDAL.fetchUpshiftAssessmentByUuid("Test01");
             Assert.assertNotNull(upshiftAssessmentConfig);
             Assert.assertNotNull(upshiftAssessmentConfig.getUpshiftUuid());
@@ -64,16 +75,25 @@ public class UpshiftAssessmentServiceTest extends UpshiftAssessmentServiceData {
         } catch (AssertionError e) {
             Assert.fail(e.getMessage());
         }
-
     }
-
-    @Test(priority = 2, expectedExceptions = InsightsCustomException.class)
-    public void testUploadContentInDatabaseWithWrongFileFormat() throws InsightsCustomException, IOException {
-        File configFileTxt = new File(classLoader.getResource("ContentsConfiguration.txt").getFile());
-        FileInputStream input = new FileInputStream(configFileTxt);
-        MultipartFile multipartFile = new MockMultipartFile("file", configFileTxt.getName(), "text/plain",
-                IOUtils.toByteArray(input));
-        upshiftAssessmentService.saveUpshiftAssessment("Test02", multipartFile);
+    
+    @Test(priority = 2)
+    public void testSaveReportDuplicate() throws InsightsCustomException {
+        try {
+        	Thread.sleep(5000);
+        	JsonObject response = ExternalApiController.importUpshiftAssessment("Test01", testFile);
+			Assert.assertEquals(response.get("status").getAsString().replace("\"", ""), PlatformServiceConstants.SUCCESS);
+           } catch (AssertionError | InterruptedException e) {
+            Assert.fail(e.getMessage());
+        }
     }
-
+    @Test(priority = 3)
+    public void testsaveReportError() throws InsightsCustomException {
+        try {
+        	JsonObject response = ExternalApiController.importUpshiftAssessment("Test01", testFile1);
+			Assert.assertEquals(response.get("status").getAsString().replace("\"", ""), PlatformServiceConstants.FAILURE);
+         } catch (AssertionError e) {
+            Assert.fail(e.getMessage());
+        }
+    }
 }

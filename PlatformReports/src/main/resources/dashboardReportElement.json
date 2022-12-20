@@ -10,7 +10,7 @@
 		],
 		"width": "() => { return document.getElementsByClassName('react-grid-layout')[0].getBoundingClientRect().width; }",
 		"height": "() => { return document.getElementsByClassName('react-grid-layout')[0].getBoundingClientRect().bottom; }",
-		"screenshotElement": "async () => { await new Promise((resolve, reject) => {    let totalHeight=0;    let distance =100;    let height_px= document.getElementsByClassName('react-grid-layout')[0].getBoundingClientRect().bottom;    let timer =setInterval(()=>{    var scrollHeight = height_px+160;    var element = document.querySelector('.view') == null ? document.querySelector('.scrollbar-view') : document.querySelector('.view');    element.scrollBy({   top: distance,    left: 0,    behavior: 'smooth'    });    totalHeight += distance;    console.log('totalHeight', totalHeight);    if (totalHeight >= scrollHeight) {    clearInterval(timer);resolve();}},300)    });    }"
+		"screenshotElement": "async () => { await new Promise((resolve, reject) => {    let totalHeight=0;    let distance =100;    let height_px= document.getElementsByClassName('react-grid-layout')[0].getBoundingClientRect().bottom;    let timer =setInterval(()=>{    var scrollHeight = height_px+160;    var element = document.querySelector('.view') == null ? document.querySelector('.main-view .scrollbar-view') : document.querySelector('.view');    element.scrollBy({   top: distance,    left: 0,    behavior: 'smooth'    });    totalHeight += distance;    console.log('totalHeight', totalHeight);    if (totalHeight >= scrollHeight) {    clearInterval(timer);resolve();}},300)    });    }"
 	},
 	"Printable": {
 		"elements": [

@@ -18,6 +18,7 @@ package com.cognizant.devops.engines.platformauditing.blockchaindatacollection.m
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
@@ -40,6 +41,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
+import com.cognizant.devops.engines.util.EngineUtils;
 import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
 import com.cognizant.devops.platformauditing.util.LoadFile;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
@@ -127,8 +129,9 @@ public class PlatformAuditProcessingExecutor implements Job, ApplicationConfigIn
                         String hc = getHash(dataElem.getAsJsonObject().get("row").getAsJsonArray());
                         LOG.debug(hc);
                         //decrypt digitalSign
-                        byte[] byteArray = Base64.getDecoder().decode(digitalSign.getBytes());                        
-                        String keyStr = new String(Files.readAllBytes(Paths.get(config.get("ENGINE_PRIVATE_KEY").getAsString())));
+                        byte[] byteArray = Base64.getDecoder().decode(digitalSign.getBytes()); 
+                		Path sourceFolderPath = Paths.get(EngineUtils.sanitizePathTraversal(Paths.get(config.get("ENGINE_PRIVATE_KEY").getAsString()).toString()));
+                		String keyStr = new String(Files.readAllBytes(sourceFolderPath));
                         keyStr = keyStr.replaceAll("\\n", "").replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "");
                         KeyFactory key = KeyFactory.getInstance(keyAlgorithm);
                         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(keyStr));

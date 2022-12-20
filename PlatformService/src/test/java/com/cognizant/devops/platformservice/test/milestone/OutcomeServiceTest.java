@@ -18,19 +18,18 @@ package com.cognizant.devops.platformservice.test.milestone;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.constants.MilestoneConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformdal.outcome.InsightsTools;
 import com.cognizant.devops.platformdal.outcome.OutComeConfigDAL;
 import com.cognizant.devops.platformservice.milestone.service.MileStoneServiceImpl;
 import com.cognizant.devops.platformservice.outcome.controller.OutComeController;
@@ -38,36 +37,27 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
+@Test
+@WebAppConfiguration
+@ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
 public class OutcomeServiceTest extends MilestoneOutcomeTestData {
 
 	private static final Logger log = LogManager.getLogger(OutcomeServiceTest.class);
 
-	MileStoneServiceImpl milestoneConfigServiceImpl = new MileStoneServiceImpl();
-	OutComeController outcomeConfigController = new OutComeController();
+	@Autowired
+	MileStoneServiceImpl milestoneConfigServiceImpl;
+	@Autowired
+	OutComeController outcomeConfigController;
 	List<JsonObject> filterList = new ArrayList<>();
 	OutComeConfigDAL outComeConfigDAL = new OutComeConfigDAL();
 
 	String host = null;
 	Gson gson = new Gson();
 
-	@BeforeClass
-		public void prepareData() throws InsightsCustomException {
-		try {
-			//ApplicationConfigCache.loadConfigCache();
-		} catch (Exception e) {
-			log.error("message", e);
-		}
-
-	}
-	
 	@Test(priority = 1)
 	public void testSaveOutcomeDefinitionRecord() throws InsightsCustomException {
 		try {
-			InsightsTools insightsMilestoneTools = outComeConfigDAL.getOutComeByToolName(toolName);
-			if(insightsMilestoneTools == null) {
-				prepareRequestData();
-				insightsMilestoneTools = outComeConfigDAL.getOutComeByToolName(toolName);
-			}
+			GetInsightsMilestoneTools();
 			int toolId = insightsMilestoneTools.getId();
 			saveOutcomeJson = saveOutcomeJson.replace("toolNameeee1", String.valueOf(toolId));
 			
@@ -88,8 +78,23 @@ public class OutcomeServiceTest extends MilestoneOutcomeTestData {
 				Assert.fail(e.getMessage());
 		}
 	}
-
+	
 	@Test(priority = 2)
+	public void testSaveOutcomeDefinitionDuplicate() throws InsightsCustomException{
+		try {
+			GetInsightsMilestoneTools();
+			int toolId = insightsMilestoneTools.getId();
+			saveOutcomeJson = saveOutcomeJson.replace("toolNameeee1", String.valueOf(toolId));
+			JsonObject response = outcomeConfigController.saveOutcomeConfig(saveOutcomeJson);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(PlatformServiceConstants.FAILURE, actual);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	
+	@Test(priority = 3)
 	public void testGetAlloutcomeList() throws InsightsCustomException {
 		try {
 			JsonObject outcomeJsonList = outcomeConfigController.getAllActiveOutcome();
@@ -108,7 +113,20 @@ public class OutcomeServiceTest extends MilestoneOutcomeTestData {
 		}
 	}
 	
-	@Test(priority = 3)
+	@Test(priority = 4)
+	public void testEditOutcomeConfigError() throws InsightsCustomException {
+		try {
+			for (JsonObject recordForSave : filterList) {
+				editOutcomeJson =editOutcomeJson.replace("iiddee", recordForSave.get("id").getAsString()).replace("Techtype","Business");
+			}
+			JsonObject response = outcomeConfigController.updateOutcomeConfig(statusUpdateError);
+			Assert.assertEquals(PlatformServiceConstants.FAILURE, response.get("status").getAsString().replace("\"", ""));	
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test(priority = 5)
 	public void testEditOutcomeRecord() throws InsightsCustomException {
 		try {
 			for (JsonObject recordForSave : filterList) {
@@ -132,8 +150,20 @@ public class OutcomeServiceTest extends MilestoneOutcomeTestData {
 		}
 	}
 	
-	@Test(priority = 4)
-	public void testStatusupdateOutcomeRecord() throws InsightsCustomException {
+	@Test(priority = 6)
+	public void testStatusUpdateOutcomeRecordError() throws InsightsCustomException {
+		try {
+			for (JsonObject recordForSave : filterList) {
+				statusUpdate =statusUpdate.replace("iiddee", recordForSave.get("id").getAsString()).replace("activee", "false");
+			}
+			JsonObject response = outcomeConfigController.updateOutcomeConfigStatus(statusUpdateError);
+	        Assert.assertEquals(PlatformServiceConstants.FAILURE, response.get("status").getAsString().replace("\"", ""));	
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	@Test(priority = 7)
+	public void testStatusUpdateOutcomeRecord() throws InsightsCustomException {
 		try {
 			for (JsonObject recordForSave : filterList) {
 				statusUpdate =statusUpdate.replace("iiddee", recordForSave.get("id").getAsString()).replace("activee", "false");
@@ -153,7 +183,7 @@ public class OutcomeServiceTest extends MilestoneOutcomeTestData {
 		}
 	}
 	
-	@Test(priority = 5)
+	@Test(priority = 8)
 	public void fetchMileStoneTools() throws InsightsCustomException {
 		try {
 			JsonObject outcomeJsonToolList = outcomeConfigController.fetchOutcomeTools();
@@ -170,23 +200,29 @@ public class OutcomeServiceTest extends MilestoneOutcomeTestData {
 		}
 	}
 	
-	@Test(priority = 6)
+	@Test(priority = 9)
 	public void testDeleteOutcomeRecord() throws InsightsCustomException {
 		log.debug(" filterList {} ",filterList);
 		try {
-			
 			for (JsonObject recordForDelete : filterList) {
 				outcomeConfigController.deleteOutcomeConfig(recordForDelete.get("id").getAsInt());
 			}
-
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
-	 
-
-	@AfterClass
-	public void cleanUp() throws InsightsCustomException {
-		
+	
+	@Test(priority = 10)
+	public void testSaveOutcomeDefinitionNoConfig() throws InsightsCustomException{
+		try {
+			GetInsightsMilestoneTools();
+			int toolId = insightsMilestoneTools.getId();
+			saveOutcomeJson = saveOutcomeJsonNoToolConfigJson.replace("toolNameeee1", String.valueOf(toolId));
+			JsonObject response = outcomeConfigController.saveOutcomeConfig(saveOutcomeJson);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(PlatformServiceConstants.SUCCESS, actual);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 }

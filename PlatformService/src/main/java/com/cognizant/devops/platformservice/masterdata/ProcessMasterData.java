@@ -45,7 +45,7 @@ public class ProcessMasterData {
 	List<String> queryList = new ArrayList<>();
 	
 	public static final List<String> MASTER_FILE_LIST = Collections.unmodifiableList(Arrays.asList("agent.json","ROI_Tools.json"
-			,"ScheduledTask.json","workflow.json"));
+			,"ScheduledTask.json","workflow.json","FileManagement.json"));
 
 	/**
 	 * Load json file for masterdata query processing

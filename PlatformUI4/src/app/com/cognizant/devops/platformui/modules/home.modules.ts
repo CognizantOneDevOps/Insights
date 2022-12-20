@@ -139,6 +139,8 @@ import { TaskHistoryDetailsDialog } from '@insights/app/modules/schedule-task-ma
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import { SnackbarComponent } from './application-dialog/snackbar-message';
 import { AgentDownloadDialogComponent } from './admin/agent-management/agent-download-dialog/agent-download-dialog.component';
+import { MultipleEmailConfigurationComponent } from '@insights/app/modules/multiple-email-configuration/multiple-email-configuration.component';
+import { AddComponent } from '@insights/app/modules/multiple-email-configuration/dialogs/add/add.component';
 
 @NgModule({
     declarations: [
@@ -158,6 +160,8 @@ import { AgentDownloadDialogComponent } from './admin/agent-management/agent-dow
         DataArchiveDetailsDialog,
         DataArchiveConfigureURLDialog,
         AgentConfigurationComponent,
+        MultipleEmailConfigurationComponent, 
+        AddComponent,
         BlockChainComponent,
         UserOnboardingComponent,
         LandingPageComponent,

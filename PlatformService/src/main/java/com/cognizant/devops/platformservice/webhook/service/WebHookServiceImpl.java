@@ -112,7 +112,7 @@ public class WebHookServiceImpl implements IWebHook {
 		try {
 			WebHookConfig webhookConfiguration = new WebHookConfig();
 			String responseTemplate = registerWebhookjson.get("responseTemplate").getAsString();
-			if (responseTemplate != "") {
+			if (!responseTemplate.isEmpty()) {
 				checkResponseTemplate(responseTemplate);
 			}
 			String dynamicTemplate = registerWebhookjson.get("dynamicTemplate").getAsString();
@@ -139,7 +139,7 @@ public class WebHookServiceImpl implements IWebHook {
 			if (dynamicTemplate.isEmpty()) {
 				webhookConfiguration.setDynamicTemplate(null);
 			}
-			if(eventConfig.isEmpty())
+			if (eventConfig.isEmpty())
 			{
 				webhookConfiguration.setEventConfigJson(null);
 			}

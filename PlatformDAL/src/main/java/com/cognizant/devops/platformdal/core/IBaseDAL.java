@@ -32,7 +32,7 @@ public interface IBaseDAL {
 	void update(Object entityObj);
 
 	<T> List<T> getResultList(String query, Class<T> type, Map<String,Object> parameters);
-	
+		
 	<T> T getUniqueResult(String query, Class<T> type, Map<String,Object> parameters);
 
 	<T> T getSingleResult(String query, Class<T> type, Map<String, Object> parameters);

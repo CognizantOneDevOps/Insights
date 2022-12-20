@@ -48,6 +48,17 @@
       </button>
       <button
         mat-icon-button
+        (click)="sendMail()"
+      >
+        <mat-icon
+          matTooltip="Mail Dashboards"
+          svgIcon="email_config"
+          class="mat-icon material-icons"
+        >
+        </mat-icon>
+      </button>
+      <button
+        mat-icon-button
         *ngIf="onRadioBtnSelect"
         [disabled]="
           this.selectedIndex == -1 ||

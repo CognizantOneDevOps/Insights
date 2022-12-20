@@ -32,9 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
 import org.apache.commons.text.StringSubstitutor;
-
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -44,10 +42,11 @@ public class TraceabilitySummaryUtil {
 
 	static Logger log = LogManager.getLogger(TraceabilitySummaryUtil.class);
 	static final String PATTERN ="[\\[\\](){}\"\\\"\"]";
-
+	
 	public static String calTimeDiffrence(String operandName, List<JsonObject> toolRespPayload, String message)
 			throws ParseException {
  		int totalCount = toolRespPayload.size();
+ 		
 		
 		// Check if total node count is greater than 0 and payload has both timestamp and author as mandatory properties
 		

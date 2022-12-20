@@ -19,15 +19,12 @@ Created on 15 May 2020
 @author: 302683
 """
 import csv
-import logging.handlers
 import multiprocessing
-import sys
 import time
 import json
 import docker
 import elasticsearch
 import elasticsearch.helpers
-import _thread
 import pika
 import queue
 import os
@@ -37,23 +34,18 @@ import tarfile
 
 from ....core.MessageQueueProvider3 import MessageFactory
 from ....core.BaseAgent3 import BaseAgent
-
-
-#from com.cognizant.devops.platformagents.core.MessageQueueProvider import MessageFactory
-#from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
-
 from dateutil import parser
-import imp
 
-#################################################################
 global myqueue
 
-
-def getCSVHeaderFromSchemaIndex(esHelperObj,indexName,logs):
+def  getCSVHeaderFromSchemaIndex(esHelperObj,indexName, indexType, logs):
     datatypeMapping = {'String':'','Boolean': ':BOOLEAN', 'Integer':':INT', 'Long':':LONG','Double':':DOUBLE','StringArray':':STRING[]','IntegerArray':':INT[]','DoubleArray':':DOUBLE[]'}
-    neo4j_Meta_Types = {'uuid':'uuid:ID' ,'_label':':LABEL' ,'_start':':START_ID' ,'_end':':END_ID','relationshipName':':TYPE' }
+    neo4j_Meta_Types = {'uuid' : 'uuid:ID','_label':':LABEL' ,'_start':':START_ID' ,'_end':':END_ID','relationshipName':':TYPE' }
 
     forceDataConversion = {'inSightsTime':'inSightsTime:DOUBLE'}
+    #Neo4j-4 is unable to process uuid as ID for relationships , so we are considering it as String here
+    if(indexType == "relationship"):
+        forceDataConversion["uuid"] = "uuid:String"
 
     csvHeaderList = {}
 
@@ -69,7 +61,7 @@ def getCSVHeaderFromSchemaIndex(esHelperObj,indexName,logs):
     ESResponse = elasticsearch.helpers.scan(esHelperObj, index=schemaIndex, doc_type="_doc",
                                 query={"query": nodeBody["query"]},
                                 scroll='10s', raise_on_error=True, preserve_order=False,
-                                size=1,
+                                size=10000,
                                 request_timeout=None)
 
 
@@ -189,7 +181,8 @@ def modifyDictKeys(dict,indexType1,csvHeaders):
 
         #Delimit arrays, eg..["1","2"]==>1^2
         elif "[]" in newHeaderVal and v!=None:
-            dict[newHeaderVal] = "^".join(v)
+            dict[newHeaderVal] = "^".join([str(val) for val in v])
+
 
 
     return dict
@@ -199,7 +192,7 @@ def getAllIndices (self,elasticsearch_hostname_uri,csv_download_path):
     allIndices={}
     global neo4jImportCmd
     #neo4jImportCmd = "./bin/neo4j-admin import  --delimiter=\",\" --array-delimiter=\"^\"  --multiline-fields=true "
-    neo4jImportCmd = "./bin/neo4j-import  --delimiter=\",\" --array-delimiter=\"^\"  --multiline-fields=true --ignore-empty-strings=true  --into data/databases/graph.db/"
+    neo4jImportCmd = "./bin/neo4j-admin import --database=neo4j --delimiter=\",\" --array-delimiter=\"^\"  --multiline-fields=true --ignore-empty-strings=true "
 
     esHelperObj = elasticsearch.Elasticsearch(hosts=elasticsearch_hostname_uri,http_auth=(self.getCredential('elasticsearch_username'), self.getCredential('elasticsearch_passwd')))
 
@@ -285,7 +278,9 @@ def es_write_csv(es_username,es_password,ESIndex, ESIndexType, elasticsearch_hos
 
             }
 
-        csvHeader = getCSVHeaderFromSchemaIndex(_es,ESIndex,logs)
+        csvHeader = getCSVHeaderFromSchemaIndex(_es,ESIndex, ESIndexType, logs)
+
+        
 
         #get the CSV Header from Index
         #csvHeader = getCSVHeaderFromESIndex(_es,ESIndex,ESIndexType,logs)
@@ -317,7 +312,7 @@ def es_write_csv(es_username,es_password,ESIndex, ESIndexType, elasticsearch_hos
         if not os.path.exists(csv_download_path):
             raise Exception("Invalid CSV Download Path....",csv_download_path)
 
-        with open(csv_download_path + "/"+ESIndex + '.csv', 'w') as f:
+        with open(csv_download_path + "/"+ESIndex + '.csv', 'w', encoding="utf-8") as f:
             w = csv.DictWriter(f,fieldnames=csvHeader.values(),escapechar="\\",quoting=csv.QUOTE_ALL)
             w.writeheader()
             for doc in ESResponse:
@@ -328,6 +323,7 @@ def es_write_csv(es_username,es_password,ESIndex, ESIndexType, elasticsearch_hos
                 # eg. 'uuid' --> ':ID', '_labels' --> ':LABEL'
                 # Append Datatype , eg:  'insightsTime' --> 'insightsTime:DATE'
                 my_dict = modifyDictKeys(my_dict, ESIndexType, csvHeader)
+                
                 # 3. Write Row
                 w.writerow(my_dict)
                 i=i+1
@@ -608,7 +604,8 @@ class ElasticTransferAgent(BaseAgent):
         allocatedPorts =[]
         for container in containers:
             for each_port in container['Ports']:
-                allocatedPorts.append(each_port['PublicPort'])
+                if(each_port.get("PublicPort", None)):
+                    allocatedPorts.append(each_port['PublicPort'])
 
         for x in range(0,portlen,2):
             volumeindex = x
@@ -705,7 +702,7 @@ class ElasticTransferAgent(BaseAgent):
               docker_auth={'username':'','password':''}
               docker_auth['username']=self.getCredential('docker_repo_username')
               docker_auth['password']=self.getCredential('docker_repo_passwd')
-              for line in cli.pull(dockerImage, auth_config=docker_auth, stream=True):
+              for line in cli.pull(dockerImage, auth_config=None, stream=True):
                   self.baseLogger.error((json.dumps(json.loads(line), indent=4 )))
             
             #fetch the import volume mapping for temporary container 
@@ -731,15 +728,35 @@ class ElasticTransferAgent(BaseAgent):
             cli.put_archive(temp_container_id,temp_mountVolume[0],csv_data)
             cli.remove_container(temp_container_id)      
 
+            neo4j_user_id = self.config.get('neo4j_user_id', "")
+            neo4j_password = self.config.get('neo4j_password', "")
             #####creating conatiner and importing csv ######
-            container_id = cli.create_container(self.config.get('dockerImageName','')+':'+self.config.get('dockerImageTag',''), 'ls', ports=self.config.get('dynamicTemplate', {}).get('bindPort',''), volumes=self.config.get('dynamicTemplate', {}).get('mountVolume',''),environment=['COMMAND_HERE='+neo4jImportCmd],host_config=cli.create_host_config(port_bindings=port,binds=volume,privileged=True))
+            containerName = self.config.get('dockerImageName','')+':'+self.config.get('dockerImageTag','')
+            containerPorts = self.config.get('dynamicTemplate', {}).get('bindPort','')
+            containerVolumes = self.config.get('dynamicTemplate', {}).get('mountVolume','')
+            containerEnvironment = ['NEO4J_AUTH='+neo4j_user_id+"/"+neo4j_password]
+            containerHostConfig = cli.create_host_config(binds=volume, port_bindings=port,privileged=True)
+            #Creating the container
+            container_id = cli.create_container(containerName, volumes= containerVolumes, ports=containerPorts,environment=containerEnvironment, host_config=containerHostConfig)
+            #Starting the container
             response = cli.start(container=container_id.get('Id'))
 
             self.baseLogger.info("For archival record "+archivalName)
             self.baseLogger.info("Container ID: "+container_id.get('Id'))
                         #####getting status of spawned container#####
-            container_details=cli.inspect_container(container_id["Id"])
+            
 
+            neo4jImportCmd += " --force=true"
+            exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c', neo4jImportCmd])
+            #Executing the Import Command
+            result=cli.exec_start(exec_id["Id"])    
+
+            #In Neo4j-4 the data wont reflect unless we restart neo4j
+            #Restarting Neo4j container
+            cli.restart(container=container_id["Id"])
+            time.sleep(10)
+
+            container_details=cli.inspect_container(container_id["Id"])
             mq_response["sourceUrl"]="http://"+container_details["NetworkSettings"]["Ports"][str(self.config.get('dynamicTemplate', {}).get('bindPort','')[0])+"/tcp"][0]["HostIp"]+":"+container_details["NetworkSettings"]["Ports"][str(self.config.get('dynamicTemplate', {}).get('bindPort','')[0])+"/tcp"][0]["HostPort"]
             mq_response["archivalName"]=archivalName
             mq_response["containerID"]=container_id.get('Id',None)
@@ -747,32 +764,19 @@ class ElasticTransferAgent(BaseAgent):
             if container_details["State"]["Status"]=="running":
                 mq_response["status"]="Success"
 
-            '''
-                        #####getting list of conatiners and its details#####
-            containers_list=cli.containers()
-            print("***************************")
-            for x in range(len(containers_list)):
-                print("Id : "+containers_list[x]["Id"])
-                print("Status : "+containers_list[x]["State"])
-                print("Ports : "+str(containers_list[x]["Ports"]))
-                print("Mounts : "+str(containers_list[x]["Mounts"]))
-                print("***************")
-                        #####executing command inside a conatiner#####
-            '''
 
-            neo4j_user_id = self.getCredential('neo4j_user_id')
-            neo4j_password = self.getCredential('neo4j_password')
-            exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c','cd neo4j-Insights && bin/cypher-shell -a bolt://localhost:7687 -u '+neo4j_user_id+' -p '+neo4j_password+' "match(n) return count (n)"'])
+            boltAddress = 'bolt://' +container_details["NetworkSettings"]["Ports"][str(self.config.get('dynamicTemplate', {}).get('bindPort','')[0])+"/tcp"][0]["HostIp"]+":" + mq_response["boltPort"]
+            exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c','./bin/cypher-shell -a ' + boltAddress + ' -u '+neo4j_user_id+' -p '+neo4j_password+' "match(n) return count (n)"'])
             result=cli.exec_start(exec_id["Id"])
             self.baseLogger.info("INFO::Cypher Test Exec Result::"+str(result))
 
             while "Connection refused" in str(result):
                 self.baseLogger.info("Waiting another 10 seconds for neo4j to start")
                 time.sleep(10)
-                exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c','cd neo4j-Insights && bin/cypher-shell -a bolt://localhost:7687 -u '+neo4j_user_id+' -p '+neo4j_password+' "match(n) return count (n)"'])
+                exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c','./bin/cypher-shell -a '+ boltAddress +' -u '+neo4j_user_id+' -p '+neo4j_password+' "match(n) return count (n)"'])
                 result=cli.exec_start(exec_id["Id"])
 
-            self.baseLogger.info("INFO::DockerContainer Creation Success..."+mq_response["sourceUrl"])
+            #self.baseLogger.info("INFO::DockerContainer Creation Success..."+mq_response["sourceUrl"])
             _es = elasticsearch.Elasticsearch(hosts=self.config.get('elasticsearch_hostname_uri',''),http_auth=(self.getCredential('elasticsearch_username'), self.getCredential('elasticsearch_passwd')))
 
             nodeBody = {
@@ -790,27 +794,25 @@ class ElasticTransferAgent(BaseAgent):
                                 size=1,
                                 request_timeout=None,ignore=[404])
 
-
-            #indexCreationCommand='cd neo4j-Insights && '
-            indexCreationCommand='echo "'
+            indexCreationCommand = 'echo "'
 
             for doc in ESResponse:
                 indexDict = doc['_source']
-                for index in indexDict:
-                  if indexDict[index] == 'ONLINE':
-                    #indexCreationCommand += 'bin/cypher-shell -a bolt://localhost:7687 -u '+neo4j_user_id+' -p '+neo4j_password+' "'+'CREATE '+ index+'";'
-                    indexCreationCommand += 'CREATE '+ index+';'
-                break
-
-            indexCreationCommand+='" | neo4j-Insights/bin/cypher-shell -a bolt://localhost:7687 -u '+neo4j_user_id+' -p '+neo4j_password
-            exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c',indexCreationCommand])
-            result=cli.exec_start(exec_id["Id"])
+                if indexDict["state"] == 'ONLINE':
+                    createStatements = indexDict["createStatement"].split("OPTIONS")
+                    createStatement =createStatements[0].replace("`", "")
+                    indexCreationCommand += createStatement + ';'
+                                   
+            indexCreationCommand += '" | ./bin/cypher-shell -a ' + boltAddress + ' -u ' + neo4j_user_id + ' -p ' + neo4j_password
+            exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c', indexCreationCommand])
+            #Executing the index creation command
+            result=cli.exec_start(exec_id["Id"]) 
 
             self.baseLogger.info("Waiting for index creation")
-            exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c','cd neo4j-Insights && bin/cypher-shell -a bolt://localhost:7687 -u '+neo4j_user_id+' -p '+neo4j_password+' "CALL db.awaitIndexes(36000)"'])
+            exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c',' ./bin/cypher-shell -a ' + boltAddress + ' -u '+neo4j_user_id+' -p '+neo4j_password+' "CALL db.awaitIndexes(36000)"'])
             result=cli.exec_start(exec_id["Id"])
 
-            exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c','cd neo4j-Insights && bin/cypher-shell -a bolt://localhost:7687 -u '+neo4j_user_id+' -p '+neo4j_password+' "match(n) return count (n)"'])
+            exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c',' ./bin/cypher-shell -a '+ boltAddress +  ' -u '+neo4j_user_id+' -p '+neo4j_password+' "match(n) return count (n)"'])
             result=cli.exec_start(exec_id["Id"])
             self.baseLogger.info("INFO::Cypher Test Exec Result::"+str(result))
 

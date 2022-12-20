@@ -113,6 +113,17 @@ export class DashboardListComponent implements OnInit {
     };
     this.router.navigate(["InSights/Home/dash-pdf-config"], navigationExtras);
   }
+
+  sendMail(){
+    let navigationExtras: NavigationExtras = {
+      skipLocationChange: true,
+      queryParams: {
+        source:"GRAFANADASHBOARDPDFREPORT",
+      },
+    };
+    this.router.navigate(["InSights/Home/email-configuration"], navigationExtras)
+  }
+
   edit() {
     this.grafanaService.iconClkSubject.next("CLICK");
     let dashboardJson = JSON.parse(this.selectedDashboard.dashboardJson);

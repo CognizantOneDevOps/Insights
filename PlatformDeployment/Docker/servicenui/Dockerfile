@@ -19,9 +19,9 @@
 
 
 FROM alpine:3.16
-MAINTAINER Onedevops Insights
+LABEL maintainer="Onedevops Insights"
 
-ARG INSIGHTSRELEASE=9.5
+ARG INSIGHTSRELEASE=9.7
 # Creating cofig folders
 
 RUN apk update && \
@@ -61,9 +61,9 @@ RUN wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${INS
     rm -rf /opt/PlatformUI3.zip && \
     unzip /opt/PlatformUI4.zip -d /opt && \
     rm -rf /opt/PlatformUI4.zip && \
-    wget -O /opt/apache-tomcat.tar.gz https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.64/bin/apache-tomcat-9.0.64.tar.gz && \
+    wget -O /opt/apache-tomcat.tar.gz https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.68/bin/apache-tomcat-9.0.68.tar.gz && \
     tar -zxvf /opt/apache-tomcat.tar.gz --directory /opt && rm -rf apache-tomcat.tar.gz && \
-    mv /opt/apache-tomcat-9.0.64 /opt/apache-tomcat
+    mv /opt/apache-tomcat-9.0.68 /opt/apache-tomcat
 EXPOSE 8080/tcp
 
 WORKDIR /opt/apache-tomcat

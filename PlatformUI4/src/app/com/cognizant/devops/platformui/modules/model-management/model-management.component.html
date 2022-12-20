@@ -251,6 +251,7 @@
               "
               [checked]="element.isActive"
               [(ngModel)]="element.isActive"
+              [disabled]="selectedIndex != i + currentPageIndex"
             >
             </mat-slide-toggle>
           </td>

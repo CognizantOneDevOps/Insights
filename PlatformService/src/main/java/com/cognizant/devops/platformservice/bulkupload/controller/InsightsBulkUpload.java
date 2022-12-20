@@ -28,9 +28,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformservice.bulkupload.service.BulkUploadService;
+import com.cognizant.devops.platformservice.bulkupload.service.IBulkUpload;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonObject;
 
@@ -40,7 +39,7 @@ public class InsightsBulkUpload {
 	static Logger log = LogManager.getLogger(InsightsBulkUpload.class.getName());
 
 	@Autowired
-	BulkUploadService bulkUploadService;
+	IBulkUpload bulkUploadService;
 	/**
 	 * entry point to upload Bulk Data
 	 *
@@ -55,7 +54,7 @@ public class InsightsBulkUpload {
 	@PostMapping(value = "/uploadToolData", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody JsonObject uploadToolData(@RequestParam("file") MultipartFile file,
 			@RequestParam String toolName, @RequestParam String label, @RequestParam String insightsTimeField,
-			@RequestParam String insightsTimeFormat) {
+			@RequestParam String insightsTimeFormat) throws IOException {
 		boolean status = false;
 		try {
 			status = bulkUploadService.uploadDataInDatabase(file, toolName, label, insightsTimeField,

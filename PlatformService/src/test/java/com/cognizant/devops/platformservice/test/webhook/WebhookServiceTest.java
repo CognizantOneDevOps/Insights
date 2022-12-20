@@ -15,102 +15,181 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.test.webhook;
 
-import java.util.List;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
-import com.cognizant.devops.platformservice.webhook.service.WebHookServiceImpl;
+import com.cognizant.devops.platformservice.webhook.service.IWebHook;
+import com.cognizant.devops.platformservice.webhook.controller.WebHookController;
 import com.google.gson.JsonObject;
 
 @Test
+@WebAppConfiguration
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
-public class WebhookServiceTest {
-	public static final WebHookServiceImpl webhookServiceImp = new WebHookServiceImpl();
-	public static final WebhookServiceTestData webhookTestData = new WebhookServiceTestData();
-
-	@Test(priority = 1, expectedExceptions = InsightsCustomException.class)
-	public void testsaveWebHookConfigurationIncorrectResponseTemp() throws InsightsCustomException {
-		Boolean webhookcheck = webhookServiceImp
-				.saveWebHookConfiguration(webhookTestData.registeredWebhookJsonIncorrectRT);
-		Assert.assertFalse(webhookcheck);
+public class WebhookServiceTest extends WebhookServiceTestData{
+	@Autowired
+	WebHookController webhookController;
+	
+	@Autowired
+	IWebHook webhookServiceImp;
+	
+	@Test(priority = 1)
+	public void testsaveWebHookConfigurationIncorrectResponseTemp() throws InsightsCustomException{
+		try {
+			JsonObject responseIncorrectRT = webhookController.saveWebhook(webhookJsonIncorrectRT);
+			String actual = responseIncorrectRT.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 
 	@Test(priority = 2)
-	public void testsaveWebHookConfiguration() throws InsightsCustomException {
-		Boolean webhookcheck = webhookServiceImp.saveWebHookConfiguration(webhookTestData.registeredWebhookJson);
-		Boolean expectedOutcome = true;
-		Assert.assertEquals(webhookcheck, expectedOutcome);
-			}
-
-	@Test(priority = 3, expectedExceptions = InsightsCustomException.class)
-	public void testsaveWebHookConfigurationException() throws InsightsCustomException {
-		Boolean webhookcheck = webhookServiceImp.saveWebHookConfiguration(webhookTestData.registeredWebhookJson);
-//		String expectedOutcome = "Webhook name already exists";
-//		Assert.assertEquals(webhookcheck, expectedOutcome);
-	}
-
-	@Test(priority = 4)
-	public void testgetRegisteredWebHooks() throws InsightsCustomException {
-
-		List<WebHookConfig> webhookConfigList = webhookServiceImp.getRegisteredWebHooks();
-		for (WebHookConfig webHookConfig : webhookConfigList) {
-			if (webHookConfig.getWebHookName().equals(webhookTestData.webhookname)) {
-				webhookTestData.setupdateWebhook(webHookConfig);
-			}
+	public void testsaveWebHookConfiguration() throws InsightsCustomException{
+		try {
+			JsonObject response = webhookController.saveWebhook(webhookJson);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
 		}
-		Assert.assertFalse(webhookConfigList.isEmpty());
 	}
 
+	@Test(priority = 3)
+	public void testsaveWebHookConfigurationException() throws InsightsCustomException{
+		try {
+			JsonObject response = webhookController.saveWebhook(webhookJson);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test(priority = 4)
+	public void testsaveWebHookConfigurationValidationError() throws InsightsCustomException{
+			JsonObject response = webhookController.saveWebhook(webhookJsonValidation);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+	}
+	
 	@Test(priority = 5)
-	public void testupdateWebHookConfiguration() throws InsightsCustomException {
-		JsonObject registeredWebhookJsonUpdate = webhookTestData.getregisteredWebhookJsonUpdate();
-		Boolean webhookcheck = webhookServiceImp.updateWebHook(registeredWebhookJsonUpdate);
-		Assert.assertTrue(webhookcheck);
+	public void testsaveWebHookConfigurationEmptyResponseTemp() throws InsightsCustomException{
+			JsonObject responseEmptyRT = webhookController.saveWebhook(webhookJsonEmptyRT);
+			String actual = responseEmptyRT.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
 	}
-
+	
 	@Test(priority = 6)
-	public void updateWebhookStatus() throws InsightsCustomException {
-
-		String expectedOutCome = PlatformServiceConstants.SUCCESS;
-		String response = webhookServiceImp.updateWebhookStatus(webhookTestData.getWebhookStatus());
-		Assert.assertEquals(expectedOutCome, response);
-
+	public void testsaveWebHookConfigurationRTMaxSizeException() throws InsightsCustomException{
+			JsonObject responseEmptyRT = webhookController.saveWebhook(webhookJsonMaxRTSize);
+			String actual = responseEmptyRT.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
 	}
-
+	
 	@Test(priority = 7)
-	public void testUninstallWebhook() throws InsightsCustomException {
-		String expectedOutCome = PlatformServiceConstants.SUCCESS;
-		String response = webhookServiceImp.uninstallWebhook(webhookTestData.webhookname);
-		Assert.assertEquals(expectedOutCome, response);
-
+	public void testgetRegisteredWebHooks() throws InsightsCustomException{
+		try {
+			JsonObject response = webhookController.getRegisteredWebHooks();
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
+			} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
 	}
-
-	@Test(priority = 8, expectedExceptions = InsightsCustomException.class)
-	public void testUninstallWebhookForException() throws InsightsCustomException {
-		String response = webhookServiceImp.uninstallWebhook("12345fghj");
-		String expectedOutCome = PlatformServiceConstants.FAILURE;
-		Assert.assertEquals(expectedOutCome, response);
+	
+	@Test(priority = 8)
+	public void testupdateWebHookConfiguration() throws InsightsCustomException{
+		try {
+			JsonObject response = webhookController.updateWebhook(webhookUpdateJson);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
+			} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
 	}
-
+	
 	@Test(priority = 9)
-	public void testsaveWebHookConfigurationEmptyResposneAndDynamic() throws InsightsCustomException {
-		Boolean webhookcheck = webhookServiceImp
-				.saveWebHookConfiguration(webhookTestData.registeredWebhookJsonEmptyDTAndNodeupdate);
-		Boolean expectedOutcome = true;
-		Assert.assertEquals(webhookcheck, expectedOutcome);
+	public void testupdateWebHookConfigurationWrongData() throws InsightsCustomException{
+			JsonObject response = webhookController.updateWebhook(webhookUpdateWrongData);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+	}
+	
+	@Test(priority = 10)
+	public void testupdateWebHookConfigurationInvalidJsonKeys() throws InsightsCustomException{
+			JsonObject response = webhookController.updateWebhook(webhookUpdateInvalidJsonKeys);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+	}
+	
+	@Test(priority = 11)
+	public void testupdateWebHookConfigurationValidationError() throws InsightsCustomException{
+			JsonObject response = webhookController.updateWebhook(webhookUpdateJsonValidation);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
 	}
 
-	@Test(priority = 10)
-	public void testUninstallWebhookAgain() throws InsightsCustomException {
-		String expectedOutCome = PlatformServiceConstants.SUCCESS;
-		String response = webhookServiceImp.uninstallWebhook("git_demo");
-		Assert.assertEquals(expectedOutCome, response);
+	@Test(priority = 12)
+	public void updateWebhookStatus() throws InsightsCustomException{
+		try {
+			JsonObject response = webhookController.updateWebhookStatus(webhookStatus);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
+			} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test(priority = 13)
+	public void updateWebhookStatusValidationError() throws InsightsCustomException{
+			JsonObject response = webhookController.updateWebhookStatus(webhookStatusValidation);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+	}
+	
+	@Test(priority = 14)
+	public void updateWebhookStatusInvalidInput() throws InsightsCustomException{
+			JsonObject response = webhookController.updateWebhookStatus(webhookStatusInvalidInput);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+	}
+	
+	@Test(priority = 15)
+	public void testUninstallWebhook() throws InsightsCustomException{
+		try {
+			JsonObject response = webhookController.uninstallWebhook(webhookname);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
+			} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test(priority = 16)
+	public void testUninstallWebhookException() throws InsightsCustomException{
+		try {
+			JsonObject response = webhookController.uninstallWebhook("12345fghj");
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+			} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
 
+	@Test(priority = 17)
+	public void testsaveWebHookConfigurationEmptyResposneAndDynamic() throws InsightsCustomException{
+		try {
+			JsonObject response = webhookController.saveWebhook(webhookEmptyDT);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
+			JsonObject uninstallResponse = webhookController.uninstallWebhook("git_demo");
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 
 }

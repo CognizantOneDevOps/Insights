@@ -16,26 +16,73 @@
 
 package com.cognizant.devops.platformservice.test.accessGroupManagement;
 
-import javax.servlet.http.Cookie;
+import java.util.Base64;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
+import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
+import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
-public class GroupsAndUserTestData {
-
+public class GroupsAndUserTestData extends AbstractTestNGSpringContextTests{
+	
+	@Autowired
+	HttpServletRequest httpRequest;
+	
+	String BASICAUTH = "Basic ";
+	String NAME = "name";
+	String orgName = "InsightsTestOrg123";
+	String orgName1 = "";
+	String userLoginName1="TestUser1";
+	String userLoginName2="TestUser2";
+	int orgId=0;
+	String tempOrgName="TestInsightsOrg123";
+	int tempOrgId=0;
+	int userId=0;
+	String uid="";
 	String accept = "application/json, text/plain, */*";
 	String authorization = "token";
-	
+	String outcomeResponse="User added to organization";
+	String outcomeResponseExistingUserDifferentRole="User exists in currrent org with different role";
 	String themePreference = "dark";
-	String orgName = "Insights285";
-	int orgId = 14;
 	String userName = "user";
 	String role = "Admin";
-	int userId = 25;
 
 	// Delete
 	String roleDelete = "Editor";
 	int userIdDelete = 26;
 
 	// AddUser
-	String userPropertyListAdmin = "{\"name\":\"userAdmin\",\"email\":\"demo123@gmail.com\",\"userName\":\"userAdmin\",\"password\":\"userTest\",\"role\":\"Admin\",\"orgName\":\"Insights285\",\"orgId\":14}";
+	String NewUserRoleAdmin = "";
+	String NewUserRoleViewer = "";
+	String AssignUserRoleViewerToEditor="";
+	String AssignNewUserRoleViewerToEditor="";
+	String DuplicateUserRoleAdmin="";
+	String DuplicateUserRoleViewer = "";
+	String NewUserAdminEmailExist = "";
+	String NewUserAdminUserNameExist = "";
+	String assignNonExistingUserData="";
+	String assignExistingUserDataToNewOrg="";
+	String assignExistingUserDatatoSameOrg="";
+	int mainId=0;
+	String mainOrg="";
+	String mainEmailAdmin="";
+	String mainEmailViewer="";
+	String mainUserNameAdmin="";
+	String mainUserNameViewer="";
+	String NewUserRoleAdminMainOrg = "";
+	String NewUserRoleAdminViewerOrg = "";
+	String ExisitngUserRoleOrg = "";
+	
+	JsonObject NewUserRoleViewerJson = null;
+	JsonArray assignNonExistingUserDataJson = null;
 	String userPropertyListEditor = "{\"name\":\"userEditor\",\"email\":\"demo123@gmail.com\",\"userName\":\"userEditor\",\"password\":\"userTest1\",\"role\":\"Editor\",\"orgName\":\"Insights285\",\"orgId\":14}";
 	String userPropertyListViewer = "{\"name\":\"userViewer\",\"email\":\"demo123@gmail.com\",\"userName\":\"userViewer\",\"password\":\"userTest2\",\"role\":\"Viewer\",\"orgName\":\"Insights285\",\"orgId\":14}";
 
@@ -43,4 +90,85 @@ public class GroupsAndUserTestData {
 	String assignUserData = "[{\"orgName\":\"Insight_Org\",\"orgId\":2,\"roleName\":\"Viewer\",\"userName\":\"userTest\"}]";
 	String expectedSearchData = "{\"status\":\"success\",\"data\":[{\"orgId\":2,\"name\":\"Insight_Org\",\"role\":\"Editor\"},{\"orgId\":14,\"name\":\"Insights285\",\"role\":\"Editor\"},{\"orgId\":1,\"name\":\"Main Org.\",\"role\":\"Viewer\"},{\"orgId\":4,\"name\":\"T-Demo\",\"role\":\"Viewer\"}]}";
 
+	
+	GrafanaHandler grafanaHandler = new GrafanaHandler();
+	
+	public int getGrafanaOrgId(String orgName) throws InsightsCustomException{
+		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
+		String authString = ApplicationConfigProvider.getInstance().getGrafana().getAdminUserName() + ":"
+				+ ApplicationConfigProvider.getInstance().getGrafana().getAdminUserPassword();
+		String encodedString = Base64.getEncoder().encodeToString(authString.getBytes());
+		headers.put(AuthenticationUtils.AUTH_HEADER_KEY, BASICAUTH + encodedString);
+		
+		// check if organization exists
+		String orgResponse = grafanaHandler.grafanaGet(PlatformServiceConstants.API_ORGS + "name/" + orgName, headers);
+		JsonObject orgResponseJson = JsonUtils.parseStringAsJsonObject(orgResponse);
+		if (orgResponse.contains("id"))
+			orgId = orgResponseJson.get("id").getAsInt();
+		else
+			orgId = -1;
+		return orgId;
+	}
+	
+	public void deleteGrafanaOrgId(String id) throws InsightsCustomException{
+		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
+		String authString = ApplicationConfigProvider.getInstance().getGrafana().getAdminUserName() + ":"
+				+ ApplicationConfigProvider.getInstance().getGrafana().getAdminUserPassword();
+		String encodedString = Base64.getEncoder().encodeToString(authString.getBytes());
+		headers.put(AuthenticationUtils.AUTH_HEADER_KEY, BASICAUTH + encodedString);
+		grafanaHandler.grafanaDelete(PlatformServiceConstants.API_ORGS + id, headers);
+	 }
+	public void setOrdId(int id, String orgName) {
+		this.orgId = id;
+		String email="demo123"+String.valueOf(id)+"@gmail.com";
+		String userName = "User"+String.valueOf(id);
+		//forNewUserAdditionWithNewEmail
+		NewUserRoleAdmin = "{\"name\":\"userAdminTest\",\"email\":\""+email+"\",\"userName\":\""+userName+"\",\"password\":\"userTest\",\"role\":\"Admin\",\"orgName\":\""+orgName+"\",\"orgId\":"+id+"}";
+		DuplicateUserRoleAdmin = NewUserRoleAdmin;
+
+		//forDuplicateUserAdditionWithDifferentRole 4th attempt
+		DuplicateUserRoleViewer = "{\"name\":\"userAdminTest\",\"email\":\""+email+"\",\"userName\":\""+userName+"\",\"password\":\"userTest\",\"role\":\"Viewer\",\"orgName\":\""+orgName+"\",\"orgId\":"+id+"}";
+				
+		//forNewUserAdditionWithExistingEmail 2nd attempt
+		String newUserName=userName+"test"+String.valueOf(id);
+		NewUserAdminEmailExist = "{\"name\":\"userAdminTest\",\"email\":\""+email+"\",\"userName\":\""+newUserName+"\",\"password\":\"userTest\",\"role\":\"Admin\",\"orgName\":\""+orgName+"\",\"orgId\":"+id+"}";
+
+		email="test"+String.valueOf(id)+email;
+		NewUserRoleViewer = "{\"name\":\"userAdminTest\",\"email\":\""+email+"\",\"userName\":\""+newUserName+"\",\"password\":\"userTest\",\"role\":\"Viewer\",\"orgName\":\""+orgName+"\",\"orgId\":"+id+"}";
+		NewUserRoleViewerJson = JsonUtils.parseStringAsJsonObject(NewUserRoleViewer);
+		
+		NewUserAdminUserNameExist = "{\"name\":\"userAdminTest\",\"email\":\""+email+"\",\"userName\":\""+userName+"\",\"password\":\"userTest\",\"role\":\"Admin\",\"orgName\":\""+orgName+"\",\"orgId\":"+id+"}";
+	
+		assignNonExistingUserData = "[{\"orgName\":\"Insight_Org\",\"orgId\":2,\"roleName\":\"Viewer\",\"userName\":\"userAdminTest\"}]";
+		assignNonExistingUserDataJson = JsonUtils.parseStringAsJsonArray(assignNonExistingUserData);
+		assignExistingUserDatatoSameOrg = "[{\"orgName\":\""+orgName+"\",\"orgId\":"+id+",\"roleName\":\"Editor\",\"userName\":\""+newUserName+"\"}]";
+	
+		mainId=1;
+		mainOrg="Main Org.";
+		mainEmailAdmin="qwerty"+id+"@gmail.com";
+		mainEmailViewer="qwertytest"+id+"@gmail.com";
+		mainUserNameAdmin="MainUserTest"+id;
+		mainUserNameViewer="UserMainTest"+id;
+		
+		NewUserRoleAdminMainOrg = "{\"name\":\"userAdminTest\",\"email\":\""+mainEmailAdmin+"\",\"userName\":\""+mainUserNameAdmin+"\",\"password\":\"userTest\",\"role\":\"Admin\",\"orgName\":\""+mainOrg+"\",\"orgId\":"+mainId+"}";
+		NewUserRoleAdminViewerOrg ="{\"name\":\"userAdminTest\",\"email\":\""+mainEmailViewer+"\",\"userName\":\""+mainUserNameViewer+"\",\"password\":\"userTest\",\"role\":\"Viewer\",\"orgName\":\""+mainOrg+"\",\"orgId\":"+mainId+"}";
+	}
+	
+	public void setId(int id, String orgName)
+	{
+		ExisitngUserRoleOrg	= "{\"name\":\"userAdminTest\",\"email\":\""+mainEmailViewer+"\",\"userName\":\""+mainUserNameViewer+"\",\"password\":\"userTest\",\"role\":\"Viewer\",\"orgName\":\""+orgName+"\",\"orgId\":"+id+"}";
+	}
+	
+	public void setOrgName(String orgName1) {
+		this.orgName1 = orgName1;
+	}
+	
+	public void setNewOrdId(int id, String orgName) {
+		String user = NewUserRoleViewerJson.get("userName").getAsString();
+		assignExistingUserDataToNewOrg = "[{\"orgName\":\""+orgName+"\",\"orgId\":"+id+",\"roleName\":\"Editor\",\"userName\":\""+user+"\"}]";
+	}
+	
+	public void SetUid(String uid) {
+		this.uid = uid;
+	}
 }

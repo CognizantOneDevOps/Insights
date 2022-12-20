@@ -41,10 +41,10 @@
 		},
 		"costManagement": {
 			"insightsTimeXFieldMapping": {
-		        "timefield": "usagedate",
-		        "isEpoch": false,
-		        "timeformat": "%Y-%m-%d"
-		      },
+				"timefield": "usagedate",
+				"isEpoch": false,
+				"timeformat": "%Y-%m-%d"
+			},
 			"request": {
 				"type": "ActualCost",
 				"timeframe": "Custom",
@@ -141,25 +141,53 @@
 			}
 		},
 		"metrics": {
+			"insightsTimeXFieldMapping": {
+				"timefield": "timeStamp",
+				"isEpoch": false,
+				"timeformat": "%Y-%m-%d"
+			},
 			"metricsMetadata": {
 				"labels": [
 					"RESOURCE_METRICS"
 				],
 				"dataUpdateSupported": true,
 				"uniqueKey": [
-					"instanceid",
-					"metricname",
-					"startdate",
-					"enddate"
+					"resourceid",
+					"name",
+					"timeStamp"
 				]
+			},
+			"resourceMetricsRelationMetadata": {
+				"relation": {
+					"name": "RESOURCE_HAS_METRICS",
+					"source": {
+						"labels": [
+							"RESOURCE_DETAILS"
+						],
+						"constraints": [
+							"resourceid"
+						]
+					},
+					"destination": {
+						"labels": [
+							"RESOURCE_METRICS"
+						],
+						"constraints": [
+							"resourceid"
+						]
+					}
+				}
 			}
 		},
 		"forecast": {
 			"forcastDataCollectionInDays": 30,
 			"isForecastNeeded": true,
-		   	"forecastMetrics": "UNBLENDED_COST",
-		   	"forecastGranularity": "DAILY",
-		   	"forecastRegions": ["us-east-1", "us-west-1"],
+			"forecastMetrics": "UNBLENDED_COST",
+			"forecastGranularity": "DAILY",
+			"forecastRegions": [
+				"us-east-1",
+				"us-west-1"
+			],
 			"insightsTimeXFieldMapping": {
 				"timefield": "usagedate",
 				"isEpoch": false,
@@ -167,11 +195,13 @@
 			},
 			"forecastrequest": {
 				"Filter": {
-					  "Dimensions": {
+					"Dimensions": {
 						"Key": "REGION",
-						"Values": ["allregions"]
-					  }
+						"Values": [
+							"allregions"
+						]
 					}
+				}
 			},
 			"forecastMetadata": {
 				"labels": [
@@ -179,71 +209,80 @@
 				],
 				"dataUpdateSupported": true,
 				"uniqueKey": [
-					"usagedate"					
+					"usagedate"
 				]
 			}
 		},
 		"additionalResourceDetails": {
-			"period": "86400",
-			"isMetricsNeeded": false,
+			"period": 86400,
+			"isMetricsNeeded": true,
 			"resourceMetrics": {
 				"AWS/EC2": {
-					"resourceName": "InstanceId",
-					"ObjectProperties": "Amazon Elastic Compute Cloud",
-					"availablemetrics": {
-						"CPUUtilization": "Average",
-						"DiskReadOps": "Average"
-					}
-				},
-				"AWS/ELB": {
-					"resourceName": "InstanceId",
-					"ObjectProperties": "Amazon Elastic Compute Cloud",
+					"dimensionsName": "InstanceId",
+					"productName": "Amazon Elastic Compute Cloud",
 					"availablemetrics": {
 						"CPUUtilization": "Average",
 						"DiskReadOps": "Average"
 					}
 				},
 				"AWS/S3": {
-					"resourceName": "BucketName",
-					"ObjectProperties": "Amazon Simple Storage Service",
+					"dimensionsName": "BucketName",
+					"productName": "Amazon Simple Storage Service",
 					"availablemetrics": {
-						
+						"BucketUsedBytes": "Average",
+						"BytesDownloaded": "Average",
+						"NumberOfObjects": "Average"
+					}
+				},
+				"AWS/Lambda": {
+					"dimensionsName": "Resource",
+					"productName": "AWS Lambda",
+					"availablemetrics": {
+						"Invocations": "Sum",
+						"Errors": "Sum"
 					}
 				}
-			}		
+			}
 		}
-  },
-  "agentId": "",
-  "enableDataValidation": true,
-  "toolCategory": "FINOPS",
-  "toolName":"AWSFINOPS",
-  "toolsTimeZone": "GMT",
-  "insightsTimeZone": "Asia/Kolkata",
-  "enableValueArray": false,
-  "useResponseTemplate": false,
-  "auth": "base64",
-  "runSchedule": 0,
-  "runCron": "0 */2 * * *",
-  "timeStampField": "usagedatestart",
-  "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
-  "awsAccesskey": "",
-  "awsSecretkey": "",
-  "s3FilePath": "",
-  "startFrom": "2022-10-01T00:00:00",
-  "awsRegion": "us-east-1",
-  "isEpochTimeFormat": false,
-  "agentSecretDetails": ["awsAccesskey","awsSecretkey","s3FilePath"],
-  "isDebugAllowed": false,
-  "loggingSetting": {
-    "logLevel": "INFO",
-    "maxBytes": 5000000,
-    "backupCount": 10
-  },
-  "webhookEnabled": false,
-  "auditing": false,
-  "enableProxy":false,
-  "proxies":{
-    	"http":"",
-    	"https":""
-    }
+	},
+	"agentId": "insights_awsfinops_9.7",
+	"enableDataValidation": true,
+	"toolCategory": "FINOPS",
+	"toolName": "AWSFINOPS",
+	"toolsTimeZone": "GMT",
+	"insightsTimeZone": "Asia/Kolkata",
+	"enableValueArray": false,
+	"useResponseTemplate": false,
+	"auth": "base64",
+	"runSchedule": 0,
+	"runCron": "0 */4 * * *",
+	"timeStampField": "usagedatestart",
+	"timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
+    "awsAccesskey": "",
+    "awsSecretkey": "",
+    "s3FilePath": "",
+	"startFrom": "2022-10-01T00:00:00",
+	"awsRegion": "us-east-1",
+	"isEpochTimeFormat": false,
+	"agentSecretDetails": [
+		"awsAccesskey",
+		"awsSecretkey",
+		"s3FilePath"
+	],
+	"isDebugAllowed": false,
+	"loggingSetting": {
+		"logLevel": "INFO",
+		"maxBytes": 5000000,
+		"backupCount": 10
+	},
+	"webhookEnabled": false,
+	"auditing": false,
+	"enableProxy": false,
+	"proxies": {
+		"http": "",
+		"https": ""
+	},
+	"osversion": "windows",
+	"agentVersion": "v9.7",
+	"labelName": "AWSFINOPS"
 }

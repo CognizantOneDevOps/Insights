@@ -15,13 +15,13 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.rest.AccessGroupManagement;
 
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,14 +33,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
+import com.cognizant.devops.platformcommons.dal.RestApiHandler;
 import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformdal.grafana.pdf.GrafanaOrgToken;
 import com.cognizant.devops.platformservice.rest.es.models.DashboardResponse;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
@@ -61,11 +62,12 @@ public class AccessGroupManagement {
 	private HttpServletRequest httpRequest;
 
 	GrafanaHandler grafanaHandler = new GrafanaHandler();
-	AccessGroupManagementServiceImpl accessGrpMgmtServiceImpl = new AccessGroupManagementServiceImpl();
+	@Autowired
+	AccessGroupManagementServiceImpl accessGrpMgmtServiceImpl;
 
 	private static final String PATH = "/api/users/lookup?loginOrEmail=";
 	private static final String USERDETAIL = "/api/users/search?&query=";
-
+	
 	@GetMapping(value = "/getOrgs", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject getOrgs() throws InsightsCustomException {
 		log.debug("%n%nInside getOrgs method call");
@@ -182,16 +184,8 @@ public class AccessGroupManagement {
 	public JsonObject getUser() throws InsightsCustomException {
 		try {
 			Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
-
 			log.debug("Headers in get User {}", headers);
 			String response = grafanaHandler.grafanaGet(PlatformServiceConstants.API_USER, headers);
-			List<NewCookie> cookieList = grafanaHandler.getGrafanaCookies(PlatformServiceConstants.API_USER, null,
-					headers);
-			for (NewCookie cookie : cookieList) {
-				String value = ValidationUtils.cleanXSS(cookie.getValue());
-				log.debug("getUser cookies ================= {} ==== {}  ", cookie.getName(), value);
-			}
-			log.debug("Response in get User {}", cookieList);
 			return PlatformServiceUtil.buildSuccessResponseWithData(JsonUtils.parseString(response));
 		} catch (Exception e) {
 			log.error(" Error in getUser API ");
@@ -296,14 +290,11 @@ public class AccessGroupManagement {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
-
 	}
 
 	private JsonObject checkUserExistsInOrg(boolean orgFlag, String role, String orgCurrentRole, int orgId,
 			String email, Map<String, String> grafanaHeader) throws InsightsCustomException {
-
 		String message = "";
-
 		if (orgFlag) {
 			// if the user exists in the or we entered , then we check if it is in the same
 			// role or not
@@ -328,14 +319,12 @@ public class AccessGroupManagement {
 
 	private JsonObject addUserIfEmailNotExist(JsonObject jsonResponse, int orgId, String email, String role,
 			String message, Map<String, String> grafanaHeader) throws InsightsCustomException {
-
 		if (jsonResponse.get("id") != null && orgId != 1) {
 			// if the org is other than main org we are adding the created user to the org
 			String apiUrlorg = "/api/orgs/" + orgId + "/users";
 			JsonObject requestOrg = new JsonObject();
 			requestOrg.addProperty("loginOrEmail", email);
 			requestOrg.addProperty("role", role);
-
 			String responseOrg = grafanaHandler.grafanaPost(apiUrlorg, requestOrg, grafanaHeader);
 			message = responseOrg;
 			return PlatformServiceUtil.buildSuccessResponseWithData(message);
@@ -344,7 +333,6 @@ public class AccessGroupManagement {
 			// role to the created user
 			JsonObject createdUserId = jsonResponse.getAsJsonObject();
 			int userIdRole = createdUserId.get("id").getAsInt();
-
 			String apiUrlRole = "/api/orgs/" + orgId + "/users/" + userIdRole;
 			JsonObject requestRole = new JsonObject();
 			requestRole.addProperty("role", role);
@@ -398,7 +386,6 @@ public class AccessGroupManagement {
 	public JsonObject loadDashboardDataGrafana() {
 		Map<String, JsonArray> mapOfFolders = new HashMap<>();
 		JsonObject finalJson = new JsonObject();
-		
 		try {
 			Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 			String grafanaResponse = grafanaHandler.grafanaGet("/api/search", headers);
@@ -410,10 +397,8 @@ public class AccessGroupManagement {
 			String grafanaBaseUrl = "INSIGHTS_GRAFANA_HOST";
 			String grafanaUrl = grafanaBaseUrl;
 			String grafanaIframeUrl = grafanaBaseUrl + "/dashboard/script/iSight_ui3.js?url=";
-			
 			JsonArray starrreddashboardsArray = new JsonArray();
 			JsonArray generalDashboardArray = new JsonArray();
-
 			for (JsonElement data : dashboardsJsonArray) {
 				JsonObject dashboardData = data.getAsJsonObject();
 				JsonObject datamodel = new JsonObject();
@@ -441,15 +426,10 @@ public class AccessGroupManagement {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
-
 	}
-	
 
 	private JsonArray getGeneralDashboardArray(JsonObject dashboardData, Map<String, JsonArray> mapOfFolders,
 			JsonObject datamodel, JsonArray generalDashboardArray) {
-
-		
-
 		if (dashboardData.has("folderTitle")) {
 			String key = dashboardData.get("folderTitle").getAsString();
 			log.debug(key);
@@ -461,12 +441,10 @@ public class AccessGroupManagement {
 				folderArray.add(datamodel);
 				mapOfFolders.put(key, folderArray);
 			}
-
 		} else {
 			generalDashboardArray.add(datamodel);
 		}
 		return generalDashboardArray;
-		
 	}
 
 	@GetMapping(value = "/dashboards", produces = MediaType.APPLICATION_JSON_VALUE)

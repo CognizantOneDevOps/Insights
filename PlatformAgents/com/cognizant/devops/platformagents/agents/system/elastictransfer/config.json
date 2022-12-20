@@ -1,108 +1,96 @@
 {
-    "agentId": "",
-    "agentSecretDetails": ["docker_repo_username","docker_repo_passwd","elasticsearch_username","elasticsearch_passwd","neo4j_user_id","neo4j_password"],
-    "communication": {
-        "responseType": "JSON",
-        "sslVerify": false,
-        "type": "REST"
-    },
-    "dockerHost": "",
-    "dockerImageName": "infra.cogdevops.com:8090/onedevopsinsights",
-    "dockerImageTag": "neo4j-1.0",
-    "dockerPort": 2375,
-    "docker_repo_username":"",
-    "docker_repo_passwd":"",
-    "neo4j_user_id": "",
-    "neo4j_password": "",
-    "dynamicTemplate": {
-        "bindPort": [
-            7474,
-            7687
-        ],
-        "hostPort": [
-            7575,
-            7001,
-            7576,
-            7002,
-            7577,
-            7003,
-            7578,
-            7004,
-            7579,
-            7005
-        ],
-        "hostVolume": [
-            "data",
-            "import",
-            "logs",
-            "conf"
-        ],
-        "mountVolume": [
-            "/opt/NEO4J_HOME/neo4j-Insights/data",
-            "/opt/NEO4J_HOME/neo4j-Insights/import",
-            "/opt/NEO4J_HOME/neo4j-Insights/logs",
-            "/opt/NEO4J_HOME/neo4j-Insights/conf"
-        ],
-        "responseTemplate": {
-            "archivalName": "archivalName",
-            "containerID": "containerID",
-            "sourceUrl": "sourceUrl",
-            "status": "status"
-        }
-    },
-    "elasticsearch_hostname_uri": "",
-    "elasticsearch_username":"",
-    "elasticsearch_passwd":"",
-    "enrichData": {
-        "isEnrichmentRequired": true,
-        "keyPattern": "-",
-        "sourceProperty": "message",
-        "targetProperty": "key"
-    },
-    "es_indexes": {
-        "*": "*"
-    },
-    "fetch_all_data": 1,
-    "hostAddress": "",
-    "insightsTimeZone": "Asia/Kolkata",
-    "isDebugAllowed": false,
-    "isEpochTimeFormat": false,
-    "loggingSetting": {
-        "backupCount": 10,
-        "logLevel": "INFO",
-        "maxBytes": 5000000
-    },
-    "mqConfig": {
-        "agentControlXchg": "iAgent",
-        "exchange": "iSight",
-        "host": "127.0.0.1",
-        "password": "",
-        "user": "username for RabbitMq"
-    },
-    "no_of_processes": 8,
-    "publish": {
-        "data": "SYSTEM.ELASTICTRANSFER.DATA",
-        "health": "SYSTEM.ELASTICTRANSFER.HEALTH"
-    },
-    "runSchedule": 30,
-    "subscribe": {
-        "config": "SYSTEM.ELASTICTRANSFER.CONFIG",
-        "dataArchivalQueue": "SYSTEM.ELASTICTRANSFER.DATAARCHIVAL"
-    },
-    "timeStampField": "start_time",
-    "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
-    "time_format": "%Y-%m-%d %H:%M:%S",
-    "toolCategory": "SYSTEM",
-    "toolsTimeZone": "GMT",
-    "vault": {
-        "getFromVault": false,
-        "readToken": "vault_secret_token",
-        "secretEngine": "insights-kv",
-        "vaultUrl": "http://Vault_Host:port/v1/"
-    },
-	"enableProxy":false,
-  	"proxies":{
-    	"http":"",
-    	"https":""
+  "agentId": "",
+  "agentSecretDetails": [
+    "docker_repo_username",
+    "docker_repo_passwd",
+    "elasticsearch_username",
+    "elasticsearch_passwd",
+    "neo4j_user_id",
+    "neo4j_password"
+  ],
+  "communication": {
+    "responseType": "JSON",
+    "sslVerify": false,
+    "type": "REST"
+  },
+  "dockerHost": "",
+  "dockerImageName": "neo4j",
+  "dockerImageTag": "4.4.4-community",
+  "dockerPort": 2375,
+  "docker_repo_username": "",
+  "docker_repo_passwd": "",
+  "neo4j_user_id": "",
+  "neo4j_password": "",
+  "dynamicTemplate": {
+    "bindPort": [7474, 7687],
+    "hostPort": [7575, 7001, 7576, 7002, 7577, 7003, 7578, 7004, 7579, 7005],
+    "hostVolume": ["data", "import", "logs", "conf"],
+    "mountVolume": [
+      "/var/lib/neo4j/data",
+      "/var/lib/neo4j/import",
+      "/var/lib/neo4j/logs",
+      "/var/lib/neo4j/conf"
+    ],
+    "responseTemplate": {
+      "archivalName": "archivalName",
+      "containerID": "containerID",
+      "sourceUrl": "sourceUrl",
+      "status": "status"
     }
+  },
+  "elasticsearch_hostname_uri": "",
+  "elasticsearch_username": "",
+  "elasticsearch_passwd": "",
+  "enrichData": {
+    "isEnrichmentRequired": true,
+    "keyPattern": "-",
+    "sourceProperty": "message",
+    "targetProperty": "key"
+  },
+  "es_indexes": {
+    "*": "*"
+  },
+  "fetch_all_data": 1,
+  "hostAddress": "",
+  "insightsTimeZone": "Asia/Kolkata",
+  "isDebugAllowed": false,
+  "isEpochTimeFormat": false,
+  "loggingSetting": {
+    "backupCount": 10,
+    "logLevel": "INFO",
+    "maxBytes": 5000000
+  },
+  "mqConfig": {
+    "agentControlXchg": "iAgent",
+    "exchange": "iSight",
+    "host": "127.0.0.1",
+    "password": "",
+    "user": "username for RabbitMq"
+  },
+  "no_of_processes": 8,
+  "publish": {
+    "data": "SYSTEM.ELASTICTRANSFER.DATA",
+    "health": "SYSTEM.ELASTICTRANSFER.HEALTH"
+  },
+  "runSchedule": 30,
+  "subscribe": {
+    "config": "SYSTEM.ELASTICTRANSFER.CONFIG",
+    "dataArchivalQueue": "SYSTEM.ELASTICTRANSFER.DATAARCHIVAL"
+  },
+  "timeStampField": "start_time",
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
+  "time_format": "%Y-%m-%d %H:%M:%S",
+  "toolCategory": "SYSTEM",
+  "toolsTimeZone": "GMT",
+  "vault": {
+    "getFromVault": false,
+    "readToken": "vault_secret_token",
+    "secretEngine": "insights-kv",
+    "vaultUrl": "http://Vault_Host:port/v1/"
+  },
+  "enableProxy": false,
+  "proxies": {
+    "http": "",
+    "https": ""
+  }
 }

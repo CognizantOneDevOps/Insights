@@ -213,7 +213,7 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
     try {
       this.resourceImage = await this.grafanaService.getLogoImage();
       this.dataShare.removeCustomerLogoFromSesssion();
-      if (this.resourceImage) {
+      if (this.resourceImage.data.encodedString.length>0) {
         this.imageSrc = this.sanitizer.sanitize(
           0,
           "data:image/jpg;base64," + this.resourceImage.data.encodedString
@@ -225,7 +225,7 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
       } else {
         this.imageSrc = this.sanitizer.sanitize(
           0,
-          "icons/svg/landingPage/Insights_Logo.png"
+          "icons/png/insights.png"
         );
         (<HTMLInputElement>document.getElementById("logoimg")).src =
           this.imageSrc;

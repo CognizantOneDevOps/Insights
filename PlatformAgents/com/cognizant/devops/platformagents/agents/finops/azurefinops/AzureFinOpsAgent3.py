@@ -51,6 +51,7 @@ class AzureFinOpsAgent(BaseAgent):
         self.contentTypeJson = 'application/json'
         self.collectForecastData = self.config.get('collectForecastData', False)
         self.collectBudgetData = self.config.get('collectBudgetData', False)
+        self.baseCurrency = self.config.get('baseCurrency', "")
         self.agentDir = os.path.dirname(sys.modules[self.__class__.__module__].__file__) + os.path.sep
         self.baseURL = self.getCredential("baseURL")
         self.subscription_Id = self.getCredential("azureSubscriptionId")
@@ -72,7 +73,10 @@ class AzureFinOpsAgent(BaseAgent):
                     self.finopsUtilities.processForecastRecords(subscription, resourceGroupList)
                 
                 if self.collectBudgetData:
+                    self.finopsUtilities.loadCurrencyTacking(self.baseCurrency)
                     self.finopsUtilities.processBudgetData(subscription)
+                    
+            self.updateTrackingJson(self.tracking)
             
         except Exception as ex:
             self.baseLogger.error(ex)

@@ -20,7 +20,7 @@
 dos2unix /opt/grafana/conf/defaults.ini
 sed -i '/^\[database\]$/,/^\[/{s/^type[[:space:]]*=.*/type = postgres/}' /opt/grafana/conf/defaults.ini
 sed -i '/^\[database\]$/,/^\[/{s/^name[[:space:]]*=.*/name = grafana/}' /opt/grafana/conf/defaults.ini
-sed -i "/allow_loading_unsigned_plugins =/ s/=.*/=neo4j-datasource,Inference,cde-inference-plugin,cde-fusion-panel,cognizant-insights-charts/" /opt/grafana/conf/defaults.ini
+sed -i "/allow_loading_unsigned_plugins =/ s/=.*/=cts-neo-4-j-4-0,neo4j-datasource,Inference,cde-inference-plugin,cde-fusion-panel,cognizant-insights-charts/" /opt/grafana/conf/defaults.ini
 sed -i "/allow_embedding =/ s/=.*/=true/" /opt/grafana/conf/defaults.ini
 sed -i 's@</body>@<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script></body>@g' /opt/grafana/public/views/index.html
 

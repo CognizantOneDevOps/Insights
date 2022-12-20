@@ -16,6 +16,8 @@
 package com.cognizant.devops.engines.util;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map.Entry;
 import java.util.HashMap;
 import java.util.Map;
@@ -80,6 +82,22 @@ public class EngineUtils {
 				channel.close();
 			}
 		}
+	}
+	
+	public static String sanitizePathTraversal(String filename) {
+		 Path p = Paths.get(filename).normalize();
+		 String fileName = null;
+		 try {
+			 fileName = p.toFile().getCanonicalPath();
+			 String absoluteFileName = p.toFile().getAbsolutePath();
+			 if (! fileName.equalsIgnoreCase(absoluteFileName))
+			    {
+			        throw new InsightsCustomException("Directory traversal attempt");
+			    }
+		} catch (IOException | InsightsCustomException e) {
+			log.error(e);
+		}
+		return fileName;
 	}
 
 }

@@ -341,6 +341,7 @@
 	"useResponseTemplate": true,
 	"collectForecastData": true,
 	"collectBudgetData": true,
+	"baseCurrency":"INR",
 	"auth": "base64",
 	"runSchedule": 0,
 	"runCron": "0 * * * *",

@@ -17,6 +17,9 @@ package com.cognizant.devops.platformservice.test.assessmentReports;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +37,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.cognizant.devops.platformservice.assessmentreport.service.GrafanaUtilities;
+import com.cognizant.devops.platformservice.emailconfiguration.controller.InsightsEmailConfigurationController;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -64,7 +69,6 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		} catch (Exception e) {
 			log.error("message", e);
 		}
-		
 	}
 
 	@Autowired
@@ -74,11 +78,14 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 	@Autowired
 	FileManagementServiceImpl fileManagementService;
 	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
-
+    @Autowired
+    GrafanaUtilities GrafanaUtilities;
+    @Autowired
+	InsightsEmailConfigurationController insightsEmailConfigurationController;
+    
 	@Test(priority = 1)
 	public void testsaveKpiDefinition() throws InsightsCustomException, IOException {
 		try {
-
 			JsonObject response = insightsAssessmentReportController.saveKpiDefinition(registerkpi);
 			InsightsKPIConfig kpi = reportConfigDAL.getKPIConfig(registerkpiJson.get("kpiId").getAsInt());
 			Assert.assertNotNull(kpi);
@@ -112,18 +119,16 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 
 	@Test(priority = 4)
 	public void testsaveKpiDefinitionIncompleteData() throws InsightsCustomException, IOException {
-		String expectedOutcome = "failure";
 		JsonObject response = insightsAssessmentReportController.saveKpiDefinition(incorrectRegisterkpi);
 		String actual = response.get("status").getAsString().replace("\"", "");
-		Assert.assertEquals(actual, expectedOutcome);
+		Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
 	}
-
+	
 	@Test(priority = 5)
 	public void testsaveContentDefinition() throws InsightsCustomException, IOException {
 		try {
 			JsonObject response = insightsAssessmentReportController.saveContentDefinition(registerContent);
-			InsightsContentConfig content = reportConfigDAL
-					.getContentConfig(registerContentJson.get("contentId").getAsInt());
+			InsightsContentConfig content = reportConfigDAL.getContentConfig(registerContentJson.get("contentId").getAsInt());
 			Assert.assertNotNull(content);
 			Assert.assertNotNull(content.getKpiConfig().getKpiId());
 			Assert.assertEquals(content.getContentId().intValue(), registerContentJson.get("contentId").getAsInt());
@@ -142,10 +147,9 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 
 	@Test(priority = 7)
 	public void testsaveContentDefinitionIncompleteData() throws InsightsCustomException, IOException {
-		String expectedOutcome = "failure";
 		JsonObject response = insightsAssessmentReportController.saveContentDefinition(incorrectContent);
 		String actual = response.get("status").getAsString().replace("\"", "");
-		Assert.assertEquals(actual, expectedOutcome);
+		Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
 	}
 
 	@Test(priority = 8)
@@ -154,7 +158,6 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		JsonObject response = insightsAssessmentReportController.saveContentDefinition(contentWithoutKpi);
 		String actual = response.get("message").getAsString().replace("\"", "");
 		Assert.assertEquals(actual, expectedOutcome);
-
 	}
 
 	@Test(priority = 9)
@@ -162,8 +165,7 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		try {
 			String expectedOutcome = "All KPI records are inserted successfully. ";
 			FileInputStream input = new FileInputStream(kpiFile);
-			MultipartFile multipartFile = new MockMultipartFile("file", kpiFile.getName(), "text/plain",
-					IOUtils.toByteArray(input));
+			MultipartFile multipartFile = new MockMultipartFile("file", kpiFile.getName(), "text/plain",IOUtils.toByteArray(input));
 			JsonObject response = insightsAssessmentReportController.saveBulkKpiDefinition(multipartFile);
 			readFileAndgetKpiIdList(kpiFile.getName());
 			String actual = response.get("data").getAsString().replace("\"", "");
@@ -178,23 +180,20 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		try {
 			String expectedOutcome = "All Content records are inserted successfully.";
 			FileInputStream input = new FileInputStream(configFile);
-			MultipartFile multipartFile = new MockMultipartFile("file", configFile.getName(), "text/plain",
-					IOUtils.toByteArray(input));
+			MultipartFile multipartFile = new MockMultipartFile("file", configFile.getName(), "text/plain",IOUtils.toByteArray(input));
 			JsonObject response = insightsAssessmentReportController.saveBulkContentDefinition(multipartFile);
 			String actual = response.get("data").getAsString().replace("\"", "");
 			Assert.assertEquals(actual, expectedOutcome);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
-
 	}
 
 	@Test(priority = 11)
 	public void testUploadContentInDatabaseWithWrongFileFormat() throws InsightsCustomException, IOException {
 		String expectedOutcome = "Invalid file format.";
 		FileInputStream input = new FileInputStream(configFileTxt);
-		MultipartFile multipartFile = new MockMultipartFile("file", configFileTxt.getName(), "text/plain",
-				IOUtils.toByteArray(input));
+		MultipartFile multipartFile = new MockMultipartFile("file", configFileTxt.getName(), "text/plain",IOUtils.toByteArray(input));
 		JsonObject response = insightsAssessmentReportController.saveBulkContentDefinition(multipartFile);
 		String actual = response.get("message").getAsString().replace("\"", "");
 		Assert.assertEquals(actual, expectedOutcome);
@@ -204,8 +203,7 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 	public void testUploadKPIInDatabaseWithWrongFileFormat() throws InsightsCustomException, IOException {
 		String expectedOutcome = "Invalid kpi file format.";
 		FileInputStream input = new FileInputStream(kpiFileTxt);
-		MultipartFile multipartFile = new MockMultipartFile("file", kpiFileTxt.getName(), "text/plain",
-				IOUtils.toByteArray(input));
+		MultipartFile multipartFile = new MockMultipartFile("file", kpiFileTxt.getName(), "text/plain",IOUtils.toByteArray(input));
 		JsonObject response = insightsAssessmentReportController.saveBulkKpiDefinition(multipartFile);
 		String actual = response.get("message").getAsString().replace("\"", "");
 		Assert.assertEquals(actual, expectedOutcome);
@@ -213,71 +211,88 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 
 	@Test(priority = 13)
 	public void testUploadKPIInDatabaseWithEmptyFile() throws InsightsCustomException, IOException {
-		String expectedOutcome = "failure";
 		FileInputStream input = new FileInputStream(emptyFile);
-		MultipartFile multipartFile = new MockMultipartFile("file", emptyFile.getName(), "text/plain",
-				IOUtils.toByteArray(input));
+		MultipartFile multipartFile = new MockMultipartFile("file", emptyFile.getName(), "text/plain",IOUtils.toByteArray(input));
 		JsonObject response = insightsAssessmentReportController.saveBulkKpiDefinition(multipartFile);
 		String actual = response.get("status").getAsString().replace("\"", "");
-		Assert.assertEquals(actual, expectedOutcome);
+		Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
 	}
 
 	@Test(priority = 14)
 	public void testUploadContentInDatabaseWithEmptyFile() throws InsightsCustomException, IOException {
-		String expectedOutcome = "failure";
 		FileInputStream input = new FileInputStream(emptyFile);
-		MultipartFile multipartFile = new MockMultipartFile("file", emptyFile.getName(), "text/plain",
-				IOUtils.toByteArray(input));
+		MultipartFile multipartFile = new MockMultipartFile("file", emptyFile.getName(), "text/plain",IOUtils.toByteArray(input));
 		JsonObject response = insightsAssessmentReportController.saveBulkContentDefinition(multipartFile);
 		String actual = response.get("status").getAsString().replace("\"", "");
-		Assert.assertEquals(actual, expectedOutcome);
+		Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
 	}
 
 	@Test(priority = 15)
 	public void testSaveReportTemplate() throws InsightsCustomException {
 		try {
-			String expectedOutcome = "success";
 			JsonObject response = insightsAssessmentReportController.saveReportTemplate(reportTemplate);
 			String actual = response.get("status").getAsString().replace("\"", "");
 			reportIdString = response.get("data").getAsString().replace("\"", "").replaceAll("[^0-9]", "");
 			setReportId(reportIdString);
-			Assert.assertEquals(actual, expectedOutcome);
-
+			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
-
+	
 	@Test(priority = 16)
+	public void testEditReportTemplate() throws InsightsCustomException {
+		try {
+			JsonObject response = insightsAssessmentReportController.editReportTemplate(reportTemplateEdit);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test(priority = 17)
+	public void testEditReportTemplateMissingReportId() throws InsightsCustomException {
+			JsonObject response = insightsAssessmentReportController.editReportTemplate(reportTemplateEditMissingReportId);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+	}
+	
+	@Test(priority = 18)
+	public void testEditReportTemplateValidationError() throws InsightsCustomException {
+			JsonObject response = insightsAssessmentReportController.editReportTemplate(reportTemplateEditValidation);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+	}
+
+	@Test(priority = 19)
 	public void testSaveROIReportTemplate() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
-			String expectedOutcome = "success";
 			JsonObject response = insightsAssessmentReportController.saveReportTemplate(reportTemplateROI);
 			String actual = response.get("status").getAsString().replace("\"", "");
 			reportIdROIString = response.get("data").getAsString().replace("\"", "").replaceAll("[^0-9]", "");
 			setOneTimeAssessmentROIReport(reportIdROIString);
-			Assert.assertEquals(actual, expectedOutcome);
+			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
 
-	@Test(priority = 17)
+	@Test(priority = 20)
 	public void testGetReportTemplate() throws InsightsCustomException {
 		try {
-			String expectedOutcome = "success";
 			JsonObject reportTemplates = insightsAssessmentReportController.getReportTemplateList();
 			Assert.assertNotNull(reportTemplates.get("data"));
 			Assert.assertTrue(reportTemplates.getAsJsonArray("data").size() > 0);
 			String actual = reportTemplates.get("status").getAsString().replace("\"", "");
-			Assert.assertEquals(actual, expectedOutcome);
+			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
 
-	@Test(priority = 18)
+	@Test(priority = 21)
 	public void testGetKPIlistOfReportTemplate() throws InsightsCustomException {
 		try {
 			JsonObject kpiList = insightsAssessmentReportController.getKPIlist(reportIdString);
@@ -289,45 +304,38 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		}
 	}
 
-	@Test(priority = 19)
+	@Test(priority = 22)
 	public void testSaveReportTemplateWithoutKPIDs() throws InsightsCustomException {
-		String expectedOutcome = "failure";
 		JsonObject response = insightsAssessmentReportController.saveReportTemplate(reportTemplateWithoutKPIDs);
 		String actual = response.get("status").getAsString().replace("\"", "");
-		Assert.assertEquals(actual, expectedOutcome);
+		Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
 	}
 
-	@Test(priority = 20)
+	@Test(priority = 23)
 	public void testSaveReportTemplateWithoutExistingKPIDs() throws InsightsCustomException {
-		String expectedOutcome = "failure";
 		JsonObject response = insightsAssessmentReportController.saveReportTemplate(reportTemplateWithoutExistingKPIDs);
 		String actual = response.get("status").getAsString().replace("\"", "");
-		Assert.assertEquals(actual, expectedOutcome);
+		Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
 	}
 
-	@Test(priority = 21)
+	@Test(priority = 24)
 	public void testIncorrectReportTemplate() throws InsightsCustomException {
-		String expectedOutcome = "failure";
 		JsonObject response = insightsAssessmentReportController.saveReportTemplate(incorrectReportTemplate);
 		String actual = response.get("status").getAsString().replace("\"", "");
-		Assert.assertEquals(actual, expectedOutcome);
+		Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
 	}
 
-	@Test(priority = 22)
+	@Test(priority = 25)
 	public void testSaveDailyAssessmentReport() throws InsightsCustomException {
 		try {
 			JsonObject responseJson = insightsAssessmentReportController.saveAssessmentReport(dailyAssessmentReport);
 			JsonObject responseJsonData = responseJson.getAsJsonObject("data");
-			InsightsAssessmentConfiguration assessment = reportConfigDAL
-					.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
 			Assert.assertNotNull(assessment, "Report not found in db");
 			int assessmentId = assessment.getReportTemplateEntity().getReportId();
 			int templateId = convertStringIntoJson(dailyAssessmentReport).get("reportTemplate").getAsInt();
-
 			Assert.assertEquals(assessmentId, templateId, "Report Template not present in db as expected");
-
 			Long dailyExpectedNextRun = getNextRunTime(InsightsUtils.getCurrentTimeInSeconds(), "DAILY");
-
 			Assert.assertEquals(assessment.getStartDate(), dailyExpectedAssessmentStartDate, "Start Date not equal");
 			Assert.assertEquals(assessment.getEndDate(), dailyExpectedAssessmentEndDate, "End date not equal");
 			Assert.assertEquals(assessment.getWorkflowConfig().getNextRun(), dailyExpectedNextRun,
@@ -344,25 +352,23 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 			Assert.fail(e.getMessage());
 		}
 	}
+	
+	
 
-	@Test(priority = 23)
+	@Test(priority = 26)
 	public void testSaveWeeklyAssessmentReport() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
 			JsonObject responseJson = insightsAssessmentReportController.saveAssessmentReport(weeklyAssessmentReport);
 			JsonObject responseJsonData = responseJson.getAsJsonObject("data");
-			InsightsAssessmentConfiguration assessment = reportConfigDAL
-					.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
 			int templateId = convertStringIntoJson(weeklyAssessmentReport).get("reportTemplate").getAsInt();
-
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(), templateId,
 					"Report Template not present in db as expected");
 			Assert.assertEquals(assessment.getStartDate(), weeklyExpectedAssessmentStartDate, "Start Date not equal");
 			Assert.assertEquals(assessment.getEndDate(), weeklyExpectedAssessmentEndDate, "End date not equal");
-
 			weeklyExpectedNextRun = getNextRunTime(InsightsUtils.getCurrentTimeInSeconds(), "WEEKLY");
-
 			Assert.assertEquals(assessment.getWorkflowConfig().getNextRun(), weeklyExpectedNextRun,
 					"Next run not equal");
 			Assert.assertTrue(assessment.getWorkflowConfig().getTaskSequenceEntity().size() > 0,
@@ -378,25 +384,20 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		}
 	}
 
-	@Test(priority = 24)
+	@Test(priority = 27)
 	public void testSaveMonthlyAssessmentReport() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
 			JsonObject responseJson = insightsAssessmentReportController.saveAssessmentReport(monthlyAssessmentReport);
 			JsonObject responseJsonData = responseJson.getAsJsonObject("data");
-
-			InsightsAssessmentConfiguration assessment = reportConfigDAL
-					.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
 			int templateId = convertStringIntoJson(monthlyAssessmentReport).get("reportTemplate").getAsInt();
-
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(), templateId,
 					"Report Template not present in db as expected");
 			Assert.assertEquals(assessment.getStartDate(), monthlyExpectedAssessmentStartDate, "Start Date not equal");
 			Assert.assertEquals(assessment.getEndDate(), monthlyExpectedAssessmentEndDate, "End date not equal");
-
 			monthlyExpectedNextRun = getNextRunTime(InsightsUtils.getCurrentTimeInSeconds(), "MONTHLY");
-
 			Assert.assertEquals(assessment.getWorkflowConfig().getNextRun(), monthlyExpectedNextRun,
 					"Next run not equal");
 			Assert.assertTrue(assessment.getWorkflowConfig().getTaskSequenceEntity().size() > 0,
@@ -412,19 +413,15 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		}
 	}
 
-	@Test(priority = 25)
+	@Test(priority = 28)
 	public void testSaveQuarterlyAssessmentReport() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
-			JsonObject responseJson = insightsAssessmentReportController
-					.saveAssessmentReport(quarterlyAssessmentReport);
+			JsonObject responseJson = insightsAssessmentReportController.saveAssessmentReport(quarterlyAssessmentReport);
 			JsonObject responseJsonData = responseJson.getAsJsonObject("data");
-
-			InsightsAssessmentConfiguration assessment = reportConfigDAL
-					.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
 			int templateId = convertStringIntoJson(quarterlyAssessmentReport).get("reportTemplate").getAsInt();
 			quarterlyExpectedNextRun = getNextRunTime(InsightsUtils.getCurrentTimeInSeconds(), "QUARTERLY");
-
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(), templateId,
 					"Report Template not present in db as expected");
@@ -446,18 +443,15 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		}
 	}
 
-	@Test(priority = 26)
+	@Test(priority = 29)
 	public void testYearlyQuarterlyAssessmentReport() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
 			JsonObject responseJson = insightsAssessmentReportController.saveAssessmentReport(yearlyAssessmentReport);
 			JsonObject responseJsonData = responseJson.getAsJsonObject("data");
-
-			InsightsAssessmentConfiguration assessment = reportConfigDAL
-					.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
 			int templateId = convertStringIntoJson(yearlyAssessmentReport).get("reportTemplate").getAsInt();
 			yearlyExpectedNextRun = getNextRunTime(InsightsUtils.getCurrentTimeInSeconds(), "YEARLY");
-
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(), templateId,
 					"Report Template not present in db as expected");
@@ -478,19 +472,16 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		}
 	}
 
-	@Test(priority = 27)
+	@Test(priority = 30)
 	public void testSaveOneTimeAssessmentReport() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
 			JsonObject responseJson = insightsAssessmentReportController.saveAssessmentReport(oneTimeAssessmentReport);
 			JsonObject responseJsonData = responseJson.getAsJsonObject("data");
-
-			InsightsAssessmentConfiguration assessment = reportConfigDAL
-					.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
 			int templateId = convertStringIntoJson(oneTimeAssessmentReport).get("reportTemplate").getAsInt();
 			oneTimeExpectedAssessmentStartDate = getStartDate("2020-07-01T00:00:00Z");
 			oneTimeExpectedAssessmentEndDate = getEndDate("2020-07-03T00:00:00Z");
-
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(), templateId,
 					"Report Template not present in db as expected");
@@ -512,21 +503,15 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		}
 	}
 
-	@Test(priority = 28)
+	@Test(priority = 31)
 	public void testSaveROIOneTimeAssessmentReport() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
-
-			JsonObject responseJson = insightsAssessmentReportController
-					.saveAssessmentReport(oneTimeAssessmentROIReport);
+			JsonObject responseJson = insightsAssessmentReportController.saveAssessmentReport(oneTimeAssessmentROIReport);
 			JsonObject responseJsonData = responseJson.getAsJsonObject("data");
-
-			InsightsAssessmentConfiguration assessment = reportConfigDAL
-					.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
 			int templateId = convertStringIntoJson(oneTimeAssessmentROIReport).get("reportTemplate").getAsInt();
-
 			oneTimeAssessmentROIReportJson = convertStringIntoJson(oneTimeAssessmentROIReport);
-
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(), templateId,
 					"Report Template not present in db as expected");
@@ -548,20 +533,17 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		}
 	}
 
-	@Test(priority = 29)
+	@Test(priority = 32)
 	public void testSaveBiWeeklyAssessmentReport() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
 			JsonObject responseJson = insightsAssessmentReportController.saveAssessmentReport(biWeeklyAssessmentReport);
 			JsonObject responseJsonData = responseJson.getAsJsonObject("data");
-
-			InsightsAssessmentConfiguration assessment = reportConfigDAL
-					.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
 			int templateId = convertStringIntoJson(biWeeklyAssessmentReport).get("reportTemplate").getAsInt();
 			biWeeklyExpectedAssessmentStartDate = getStartDate("2020-07-01T00:00:00Z");
 			biWeeklyExpectedAssessmentEndDate = 0L;
 			biWeeklyExpectedNextRun = getNextRunTime(biWeeklyExpectedAssessmentStartDate, "BI_WEEKLY_SPRINT");
-
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(), templateId,
 					"Report Template not present in db as expected");
@@ -582,23 +564,18 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		}
 	}
 
-	@Test(priority = 30)
+	@Test(priority = 33)
 	public void testSaveTriWeeklyAssessmentReportWithoutReoccurence()
 			throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
-			JsonObject responseJson = insightsAssessmentReportController
-					.saveAssessmentReport(triWeeklyAssessmentReport);
+			JsonObject responseJson = insightsAssessmentReportController.saveAssessmentReport(triWeeklyAssessmentReport);
 			JsonObject responseJsonData = responseJson.getAsJsonObject("data");
-
-			InsightsAssessmentConfiguration assessment = reportConfigDAL
-					.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
 			int templateId = convertStringIntoJson(triWeeklyAssessmentReport).get("reportTemplate").getAsInt();
-
 			triWeeklyExpectedAssessmentStartDate = getStartDate("2020-06-02T00:00:00Z");
 			triWeeklyExpectedAssessmentEndDate = 0L;
 			triWeeklyExpectedNextRun = getNextRunTime(triWeeklyExpectedAssessmentStartDate, "TRI_WEEKLY_SPRINT");
-
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(), templateId,
 					"Report Template not present in db as expected");
@@ -620,23 +597,18 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		}
 	}
 
-	@Test(priority = 31)
+	@Test(priority = 34)
 	public void testSaveTriWeeklyAssessmentReportWithDataSource() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
 		try {
-			JsonObject responseJson = insightsAssessmentReportController
-					.saveAssessmentReport(triWeeklyAssessmentReportWithDataSource);
+			JsonObject responseJson = insightsAssessmentReportController.saveAssessmentReport(triWeeklyAssessmentReportWithDataSource);
 			JsonObject responseJsonData = responseJson.getAsJsonObject("data");
-			int templateId = convertStringIntoJson(triWeeklyAssessmentReportWithDataSource).get("reportTemplate")
-					.getAsInt();
-
-			InsightsAssessmentConfiguration assessment = reportConfigDAL
-					.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
+			int templateId = convertStringIntoJson(triWeeklyAssessmentReportWithDataSource).get("reportTemplate").getAsInt();
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
 			triWeeklyExpectedAssessmentStartDateWithDataSource = getStartDate("2020-06-02T00:00:00Z");
 			triWeeklyExpectedAssessmentEndDateWithDataSource = 0L;
 			triWeeklyExpectedNextRunWithDataSource = getNextRunTime(triWeeklyExpectedAssessmentStartDate,
 					"TRI_WEEKLY_SPRINT");
-
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(), templateId,
 					"Report Template not present in db as expected");
@@ -658,15 +630,14 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		}
 	}
 
-	@Test(priority = 32)
+	@Test(priority = 35)
 	public void testSaveAssessmentIncompleteReport() throws InsightsCustomException {
-		String expected = "failure";
 		JsonObject responseJson = insightsAssessmentReportController.saveAssessmentReport(incorrectAssessmentReport);
 		String actual = responseJson.get("status").getAsString().replace("\"", "");
-		Assert.assertEquals(actual, expected);
+		Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
 	}
 
-	@Test(priority = 33)
+	@Test(priority = 36)
 	public void testLoadAssessmentReportList() throws InsightsCustomException {
 		try {
 			String userDetail = "{\"userName\":\"Test_User\"}";
@@ -678,14 +649,14 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 			log.error(e);
 		}
 	}
+	
+	
 
-	@Test(priority = 34)
+	@Test(priority = 37)
 	public void testDeleteAssessmentReport() throws InsightsCustomException {
 		try {
 			dailyAssessmentReportJson = convertStringIntoJson(dailyAssessmentReport);
-
-			String deleteAssessmentReportConfigId = String.valueOf(reportConfigDAL
-					.getAssessmentByAssessmentName(dailyAssessmentReportJson.get("reportName").getAsString()).getId());
+			String deleteAssessmentReportConfigId = String.valueOf(reportConfigDAL.getAssessmentByAssessmentName(dailyAssessmentReportJson.get("reportName").getAsString()).getId());
 			JsonObject response = insightsAssessmentReportController.deleteReport(deleteAssessmentReportConfigId);
 			String actual = response.get("status").getAsString();
 			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
@@ -694,7 +665,7 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		}
 	}
 
-	@Test(priority = 35)
+	@Test(priority = 38)
 	public void testDeleteAssessmentReportWithWrongConfigID() throws InsightsCustomException {
 		try {
 			JsonObject response = insightsAssessmentReportController.deleteReport(deleteAssessmentReportWrongConfigId);
@@ -705,7 +676,7 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		}
 	}
 
-	@Test(priority = 36)
+	@Test(priority = 39)
 	public void testGetSchedule() throws InsightsCustomException {
 		try {
 			JsonArray scheduleRecords = insightsAssessmentReportController.getScheduleList().getAsJsonArray("data");
@@ -716,7 +687,7 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		}
 	}
 
-	@Test(priority = 37)
+	@Test(priority = 40)
 	public void testUpdateAssessmentReportState() throws InsightsCustomException {
 		try {
 			int assessmentStateid = reportConfigDAL.getAssessmentByAssessmentName(weeklyAssessmentReportJson.get("reportName").getAsString()).getId();
@@ -724,23 +695,18 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 			final JsonObject updateAssessmentReportStateJson = convertStringIntoJson(updateAssessmentReportState);
 			JsonObject response = insightsAssessmentReportController.updateWebhookStatus(updateAssessmentReportState);
 			String status = response.get("status").getAsString();
-			InsightsAssessmentConfiguration assessment = reportConfigDAL
-					.getAssessmentByConfigId(updateAssessmentReportStateJson.get("id").getAsInt());
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(updateAssessmentReportStateJson.get("id").getAsInt());
 			Assert.assertEquals(status, PlatformServiceConstants.SUCCESS);
-			Assert.assertEquals(assessment.getWorkflowConfig().isActive().booleanValue(),
-					updateAssessmentReportStateJson.get("isActive").getAsBoolean());
+			Assert.assertEquals(assessment.getWorkflowConfig().isActive().booleanValue(),updateAssessmentReportStateJson.get("isActive").getAsBoolean());
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
 
-	@Test(priority = 38)
+	@Test(priority = 41)
 	public void testUpdateAssessmentReportIncorrectData() throws InsightsCustomException {
-		String updateIncorrectAssessmentReport = "{\"isReoccuring\":true,\"emailList\":\"dasdsd\",\"id\":896}";
-
 		try {
-			JsonObject response = insightsAssessmentReportController
-					.updateAssessmentReport(updateIncorrectAssessmentReport);
+			JsonObject response = insightsAssessmentReportController.updateAssessmentReport(updateIncorrectAssessmentReport);
 			String actual = response.get("status").getAsString();
 			String message = response.get("message").getAsString().replace("\"", "");
 			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
@@ -748,13 +714,11 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
-
 	}
 
-	@Test(priority = 39)
+	@Test(priority = 42)
 	public void testSaveOneTimeAssessmentReportWithStartDateGreaterThanEndDate() throws InsightsCustomException, InterruptedException {
-		Thread.sleep(1000);
-		
+		Thread.sleep(1000);		
 		try {
 			JsonObject assessmentResponse = insightsAssessmentReportController.saveAssessmentReport(oneTimeAssessmentReportWithStartDateGreaterThanEndDate);
 			String actual = assessmentResponse.get("status").getAsString();
@@ -764,18 +728,13 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		}
 	}
 
-	@Test(priority = 40)
+	@Test(priority = 43)
 	public void testSaveDailyEmailAssessmentReport() throws InsightsCustomException {
-		dailyEmailExpectedAssessmentStartDate = 0L;
-		dailyEmailExpectedAssessmentEndDate = 0L;
-		dailyEmailExpectedNextRun = getNextRunTime(InsightsUtils.getCurrentTimeInSeconds(), "DAILY");
-		dailyEmailAssessmentReportJson = convertStringIntoJson(dailyEmailAssessmentReport);
 		try {
 			JsonObject responseJson = insightsAssessmentReportController.saveAssessmentReport(dailyEmailAssessmentReport);
 			JsonObject responseJsonData = responseJson.getAsJsonObject("data");
 			InsightsAssessmentConfiguration assessment = reportConfigDAL
 					.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
-			
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(),
 					dailyEmailAssessmentReportJson.get("reportTemplate")
@@ -804,20 +763,13 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		}
 	}
 
-	@Test(priority = 41)
+	@Test(priority = 44)
 	public void testSaveDailyWithoutEmailAssessmentReport() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
-		dailywithoutEmailExpectedAssessmentStartDate = 0L;
-		dailywithoutEmailExpectedAssessmentEndDate = 0L;
-		dailywithoutEmailExpectedNextRun = getNextRunTime(InsightsUtils.getCurrentTimeInSeconds(), "DAILY");
-		dailywithoutEmailAssessmentReportJson = convertStringIntoJson(dailywithoutEmailAssessmentReport);
-
 		try {
 			JsonObject responseJson = insightsAssessmentReportController.saveAssessmentReport(dailywithoutEmailAssessmentReport);
-			JsonObject responseJsonData = responseJson.getAsJsonObject("data");
-			
+			JsonObject responseJsonData = responseJson.getAsJsonObject("data");			
 			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
-			
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(),
 					dailywithoutEmailAssessmentReportJson.get("reportTemplate").getAsInt(),
@@ -842,22 +794,14 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		}
 	}
 
-	@Test(priority = 42)
+	@Test(priority = 45)
 	public void testSaveEmailCCAssessmentReport() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
-		dailyEmailCCExpectedAssessmentStartDate = 0L;
-		dailyEmailCCExpectedAssessmentEndDate = 0L;
-		dailyEmailCCExpectedNextRun = getNextRunTime(InsightsUtils.getCurrentTimeInSeconds(), "DAILY");
-		dailyEmailCCAssessmentReportJson = convertStringIntoJson(dailyEmailCcAssessmentReport);
-
 		try {
 			JsonObject responseJson = insightsAssessmentReportController.saveAssessmentReport(dailyEmailCcAssessmentReport);
-			JsonObject responseJsonData = responseJson.getAsJsonObject("data");
-			
+			JsonObject responseJsonData = responseJson.getAsJsonObject("data");			
 			InsightsAssessmentConfiguration assessment = reportConfigDAL
-					.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());
-			
-			
+					.getAssessmentByConfigId(responseJsonData.get("assessmentReportId").getAsInt());	
 			Assert.assertNotNull(assessment, "Report not found in db");
 			Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(),
 					dailyEmailAssessmentReportJson.get("reportTemplate").getAsInt(),
@@ -883,136 +827,62 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
-
 	}
 
-	@Test(priority = 43)
+	@Test(priority = 46)
 	public void testSaveEmailBCCAssessmentReport() throws InsightsCustomException, InterruptedException {
 		Thread.sleep(1000);
-		dailyEmailBCCExpectedAssessmentStartDate = 0L;
-		dailyEmailBCCExpectedAssessmentEndDate = 0L;
-		dailyEmailBCCExpectedNextRun = getNextRunTime(InsightsUtils.getCurrentTimeInSeconds(), "DAILY");
-		dailyEmailBCCAssessmentReportJson = convertStringIntoJson(dailyEmailBCCAssessmentReport);
 		try {
 			String expectedOutcome = "Assessment Report with the given Report name already exists";
-			String expectedStatus = "failure";
 			JsonObject responseJson = insightsAssessmentReportController.saveAssessmentReport(dailyEmailBCCAssessmentReport);
-			
 			String actualStatus = responseJson.get("status").getAsString().replace("\"", "");
-			String actualOutcome = responseJson.get("message").getAsString().replace("\"", "");
-			
-			Assert.assertEquals(actualStatus, expectedStatus);
-			Assert.assertEquals(actualOutcome, expectedOutcome);			
-			
+			Assert.assertEquals(actualStatus, PlatformServiceConstants.SUCCESS);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test(priority = 47)
+	public void testSaveAssessmentReportWithNoReportTemplate() throws InsightsCustomException, InterruptedException {
+		Thread.sleep(1000);
+		try {
+			JsonObject responseJson = insightsAssessmentReportController.saveAssessmentReport(saveAssessmentReportWithInvalidReportTemplate);
+			String actualStatus = responseJson.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actualStatus, PlatformServiceConstants.FAILURE);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
 
-	@Test(priority = 44)
+	@Test(priority = 48)
 	public void testUpdateAssessmentReport() throws InsightsCustomException {
 		try {
 			assessmentid = reportConfigDAL.getAssessmentByAssessmentName(dailyEmailAssessmentReportJson.get("reportName").getAsString()).getId();
 		    getInfoAssessmentReport(assessmentid);
 			JsonObject response = insightsAssessmentReportController.updateAssessmentReport(updateAssessmentReport);
-			
-			String expectedStatus = "success";
 			String expectedOutcome = " Assessment Report Id updated "+assessmentid;
-			
 			String actualStatus = response.get("status").getAsString().replace("\"", "");
 			String actualOutcome = response.get("data").getAsString().replace("\"", "");
-			
-			Assert.assertEquals(actualStatus, expectedStatus);
+			Assert.assertEquals(actualStatus, PlatformServiceConstants.SUCCESS);
 			Assert.assertEquals(actualOutcome, expectedOutcome);	
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
-
-	@Test(priority = 45)
-	public void testUpdateAssessmentReportGrafanaPdf() throws InsightsCustomException {
-		try {
-			JsonObject response = insightsAssessmentReportController.updateAssessmentReport(updateAssessmentReport);
-			
-			String expectedStatus = "success";
-			String expectedOutcome = " Assessment Report Id updated "+assessmentid;
-			
-			String actualStatus = response.get("status").getAsString().replace("\"", "");
-			String actualOutcome = response.get("data").getAsString().replace("\"", "");
-			
-			Assert.assertEquals(actualStatus, expectedStatus);
-			Assert.assertEquals(actualOutcome, expectedOutcome);
-		} catch (AssertionError e) {
-
-		}
-	}
-
-	@Test(priority = 46)
-	public void testsetRetryStatus() throws InsightsCustomException, InterruptedException {
-		Thread.sleep(1000);
-		dailyRestartAssessmentReport = convertStringIntoJson(dailyRestartAssessmentReportStr);
-
-		try {
-			JsonObject assessmentResponse = insightsAssessmentReportController.saveAssessmentReport(dailyRestartAssessmentReportStr);
-			JsonObject assessmentResponseData = assessmentResponse.getAsJsonObject("data");
-			int configId = reportConfigDAL
-					.getAssessmentByAssessmentName(dailyRestartAssessmentReport.get("reportName").getAsString())
-					.getId();
-			String retryJson = "{\"configId\":" + configId + ",\"status\":\"RESTART\"}";
-			String status = insightsAssessmentReportController.setWorkflowStatus(retryJson).get("status").getAsString().replace("\"", "");
-			InsightsAssessmentConfiguration assessment = reportConfigDAL
-					.getAssessmentByConfigId(Integer.valueOf(configId));
-			Assert.assertEquals(status, PlatformServiceConstants.SUCCESS);
-			Assert.assertEquals(assessment.getWorkflowConfig().getStatus(), "RESTART");
-		} catch (AssertionError e) {
-			Assert.fail(e.getMessage());
-		}
-
-	}
-
-	@Test(priority = 47)
-	public void testrunImmediateStatus() throws InsightsCustomException, InterruptedException {
-		Thread.sleep(1000);
-		
-		dailyRunImmediateAssessmentReport = convertStringIntoJson(dailyRunImmediateAssessmentReportStr);
-
-		try {
-			JsonObject assessmentResponse = insightsAssessmentReportController.saveAssessmentReport(dailyRunImmediateAssessmentReportStr);
-			JsonObject assessmentResponseData = assessmentResponse.getAsJsonObject("data");
-			
-			int configId = reportConfigDAL
-					.getAssessmentByAssessmentName(dailyRunImmediateAssessmentReport.get("reportName").getAsString())
-					.getId();
-			String retryJson = "{\"configId\":" + configId + ",\"runimmediate\":true}";
-			String status = insightsAssessmentReportController.setWorkflowStatus(retryJson).get("status").getAsString().replace("\"", "");
-			
-			
-			InsightsAssessmentConfiguration assessment = reportConfigDAL
-					.getAssessmentByConfigId(Integer.valueOf(configId));
-			Assert.assertEquals(status, PlatformServiceConstants.SUCCESS);
-			Assert.assertTrue(assessment.getWorkflowConfig().isRunImmediate());
-		} catch (AssertionError e) {
-			Assert.fail(e.getMessage());
-		}
-
-	}
-
-	@Test(priority = 48)
+	
+	@Test(priority = 49)
 	public void testGrafanaPDFSaveReportTemplate() throws InsightsCustomException {
 		try {
 			FileInputStream input = new FileInputStream(tableJson);
-			MultipartFile multipartConfigFile = new MockMultipartFile("file", tableJson.getName(), "text/plain",
-					IOUtils.toByteArray(input));
-			String message = fileManagementService.uploadConfigurationFile(multipartConfigFile, "table", "JSON",
-					"GRAFANA_PDF_TEMPLATE", false);
+			MultipartFile multipartConfigFile = new MockMultipartFile("file", tableJson.getName(), "text/plain",IOUtils.toByteArray(input));
+			String message = fileManagementService.uploadConfigurationFile(multipartConfigFile, "table", "JSON","GRAFANA_PDF_TEMPLATE", false);
 			assessmentService.saveKpiDefinition(registerGrafanakpiJson);
 			assessmentService.saveContentDefinition(registerGrafanaContentJson);
 			JsonObject response = insightsAssessmentReportController.saveReportTemplate(grafanaReportTemplate);
-			grafanaReportIdString = response.get("data").getAsString().replace("\"", "").replaceAll("[^0-9]", "");
-			
-			int grafanaReportId = Integer.parseInt(grafanaReportIdString);
-			InsightsAssessmentReportTemplate report = (InsightsAssessmentReportTemplate) reportConfigDAL
-					.getReportTemplateByReportId(grafanaReportId);
+			String grafanaReportIdString = response.get("data").getAsString().replace("\"", "").replaceAll("[^0-9]", "");
+			grafanaReportId = Integer.parseInt(grafanaReportIdString);
+			getGrafanaAssessmentReport(grafanaReportId);
+			InsightsAssessmentReportTemplate report = (InsightsAssessmentReportTemplate) reportConfigDAL.getReportTemplateByReportId(grafanaReportId);
 			assessmentReportDataInit();
 			Assert.assertNotNull(report);
 			Assert.assertTrue(report.getReportsKPIConfig().size() > 0);
@@ -1020,17 +890,102 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 			Assert.fail(e.getMessage());
 		}
 	}
+	
+	@Test(priority = 50)
+	public void testGetAllReportTitles() throws  InsightsCustomException {
+		try {
+			String expectedStatus = "success";
+			String userName = "{\"userName\":\"Test_User\"}";
+			
+			JsonObject response = insightsEmailConfigurationController.getAllReportTitles(REPORT_SOURCE, userName);
+			String actualStatus = response.get("status").getAsString().replace("\"", "");
+			JsonArray reportTitleList = response.get("data").getAsJsonArray();
+			
+			Assert.assertEquals(actualStatus, expectedStatus);
+			Assert.assertNotNull(reportTitleList);
+			Assert.assertTrue(reportTitleList.size()>0);
+		}
+		catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test(priority = 51)
+	public void testGrafanaPDFSaveAssessmentReport() throws InsightsCustomException, InterruptedException {
+		Thread.sleep(5000);
+		try {
+			JsonObject response=deleteGrafanaAPIToken(getGrafanaOrgId(grafanaAssessmentReportJson.get("userName").getAsString()));
+			JsonObject responseJson = insightsAssessmentReportController.saveAssessmentReport(grafanaAssessmentReport);
+			String actualStatus = responseJson.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actualStatus, PlatformServiceConstants.SUCCESS);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
 
-	@Test(priority = 49)
+	@Test(priority = 52)
+	public void testUpdateAssessmentReportGrafanaPdf() throws InsightsCustomException, InterruptedException {
+		Thread.sleep(5000);
+		try {
+			assessmentid = reportConfigDAL.getAssessmentByAssessmentName(grafanaAssessmentReportJson.get("reportName").getAsString()).getId();
+		    getInfoGrafanaAssessmentReport(assessmentid);
+			JsonObject response = insightsAssessmentReportController.updateAssessmentReport(updateGrafanaAssessmentReport);
+			String actualStatus = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actualStatus, PlatformServiceConstants.FAILURE);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test(priority = 53)
+	public void testSetRetryStatus() throws InsightsCustomException, InterruptedException {
+		Thread.sleep(1000);
+		try {
+			JsonObject assessmentResponse = insightsAssessmentReportController.saveAssessmentReport(dailyRestartAssessmentReportStr);
+			JsonObject assessmentResponseData = assessmentResponse.getAsJsonObject("data");
+			int configId = reportConfigDAL.getAssessmentByAssessmentName(dailyRestartAssessmentReport.get("reportName").getAsString()).getId();
+			setRetryStatusJson(configId);
+			String status = insightsAssessmentReportController.setWorkflowStatus(retryJson).get("status").getAsString().replace("\"", "");
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(Integer.valueOf(configId));
+			Assert.assertEquals(status, PlatformServiceConstants.SUCCESS);
+			Assert.assertEquals(assessment.getWorkflowConfig().getStatus(), "RESTART");
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test(priority = 54)
+	public void setWorkflowStatusValidationError() throws InsightsCustomException, InterruptedException {		
+		JsonObject response = insightsAssessmentReportController.setWorkflowStatus(retryJsonValidation);
+		String actual = response.get("status").getAsString().replace("\"", "");
+		Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+	}
+
+	@Test(priority = 55)
+	public void testRunImmediateStatus() throws InsightsCustomException, InterruptedException {
+		Thread.sleep(1000);
+		try {
+			JsonObject assessmentResponse = insightsAssessmentReportController.saveAssessmentReport(dailyRunImmediateAssessmentReportStr);
+			JsonObject assessmentResponseData = assessmentResponse.getAsJsonObject("data");
+			int configId = reportConfigDAL.getAssessmentByAssessmentName(dailyRunImmediateAssessmentReport.get("reportName").getAsString()).getId();
+			String retryJson = "{\"configId\":" + configId + ",\"runimmediate\":true}";
+			String status = insightsAssessmentReportController.setWorkflowStatus(retryJson).get("status").getAsString().replace("\"", "");
+			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(Integer.valueOf(configId));
+			Assert.assertEquals(status, PlatformServiceConstants.SUCCESS);
+			Assert.assertTrue(assessment.getWorkflowConfig().isRunImmediate());
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test(priority = 56)
 	public void testGrafanaPDFUpdateReportTemplate() throws InsightsCustomException {
 		try {
-			grafanaPDFreportTemplateJson.addProperty("reportId", Integer.parseInt(grafanaReportIdString));
+			grafanaPDFreportTemplateJson.addProperty("reportId", grafanaReportId);
 			String editGrafanaReport = grafanaPDFreportTemplateJson.toString();
 			JsonObject response = insightsAssessmentReportController.editReportTemplate(editGrafanaReport);
-			grafanaReportIdString = response.get("data").getAsString().replace("\"", "").replaceAll("[^0-9]", "");
-			
+			String grafanaReportIdString = response.get("data").getAsString().replace("\"", "").replaceAll("[^0-9]", "");
 			int grafanaReportId = Integer.parseInt(grafanaReportIdString);
-			
 			InsightsAssessmentReportTemplate report = (InsightsAssessmentReportTemplate) reportConfigDAL
 					.getReportTemplateByReportId(grafanaReportId);
 			assessmentReportDataInit();
@@ -1042,7 +997,7 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		}
 	}
 
-	@Test(priority = 50)
+	@Test(priority = 57)
 	public void testUpdateKpiDefinition() throws InsightsCustomException {
 		try {
 			JsonObject updatekpiJson = convertStringIntoJson(updatekpiString);
@@ -1056,70 +1011,69 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		}
 	}
 
-	@Test(priority = 51)
+	@Test(priority = 58)
 	public void testDeleteKpiDefinition() throws InsightsCustomException {
 		try {
 			JsonObject deleteKpijson = convertStringIntoJson(deleteKpiString);
-			String expectedResponse = "failure";
 			String expectedMessage = "KPI definition attached to report template";
 			JsonObject response = insightsAssessmentReportController.deleteKpiDefinition(deleteKpiString);
 			String actualStatus = response.get("status").getAsString().replace("\"", "");
 			String actualOutcome = response.get("message").getAsString().replace("\"", "");
-			
-			Assert.assertEquals(actualStatus, expectedResponse);
+			Assert.assertEquals(actualStatus, PlatformServiceConstants.FAILURE);
 			Assert.assertEquals(actualOutcome, expectedMessage);
-			
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
 
-	@Test(priority = 52)
+	@Test(priority = 59)
 	public void testUpdateContentDefinition() throws InsightsCustomException {
 		try {
 			JsonObject updateContentJson = convertStringIntoJson(updateContentString);
 			JsonObject response = insightsAssessmentReportController.updateContentDefinition(updateContentString);
+			JsonObject response1 = insightsAssessmentReportController.updateContentDefinition(updateContentString1);
+			JsonObject response2 = insightsAssessmentReportController.updateContentDefinition(updateContentString2);
 			InsightsKPIConfig kpi = reportConfigDAL.getKPIConfig(updateContentJson.get("kpiId").getAsInt());
 			Assert.assertNotNull(kpi);
 			Assert.assertNotNull(kpi.getKpiId());
 			Assert.assertEquals(kpi.getKpiId().intValue(), updateContentJson.get("kpiId").getAsInt());
-	
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
-
 	}
 	
-	@Test(priority = 53)
+	@Test(priority = 60)
 	public void testDeleteContentDefinition() throws InsightsCustomException{
 		try {
 			String deleteContentRequest = "{\"contentId\":10541}";
 			JsonObject deleteContentRequestJson = convertStringIntoJson(deleteContentRequest);
 			JsonObject response = insightsAssessmentReportController.deleteContentDefinition(deleteContentRequest);
-			String expectedStatus = "success";
 			String contentId = deleteContentRequestJson.get("contentId").getAsString();
 			String expectedOutcome = "Content definition deleted for ContentId "+contentId;
 			String actualStatus = response.get("status").getAsString().replace("\"", "");
 			String actualOutcome = response.getAsJsonObject("data").get("message").getAsString();
-			
 			Assert.assertEquals(actualOutcome, expectedOutcome);
-			Assert.assertEquals(actualStatus, expectedStatus);
+			Assert.assertEquals(actualStatus, PlatformServiceConstants.SUCCESS);
 		}catch(AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 }
 	
-	@Test(priority = 54)
+	@Test(priority = 61)
+	public void testDeleteContentDefinitionValidation() throws InsightsCustomException{
+			JsonObject response = insightsAssessmentReportController.deleteContentDefinition(deleteContentRequestValidation);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+}
+	
+	@Test(priority = 62)
 	public void testSetReportTemplateStatus() throws InsightsCustomException{
 		try {
 			JsonObject response = insightsAssessmentReportController.setReportTemplateStatus(setReportTemplateStatus);
-			String expectedStatus="success";
 			String expectedOutcome = "Report Template Id "+ reportIdString +" status changed successfully ";
-			
 			String actualStatus = response.get("status").getAsString().replace("\"", "");
 			String actualOutcome = response.get("data").getAsString().replace("\"", "");
-			
-			Assert.assertEquals(actualStatus, expectedStatus);
+			Assert.assertEquals(actualStatus, PlatformServiceConstants.SUCCESS);
 			Assert.assertEquals(actualOutcome, expectedOutcome);
 		}
 		catch(AssertionError e) {
@@ -1127,17 +1081,14 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		}
 	}
 	
-	@Test(priority = 55)
+	@Test(priority = 63)
 	public void testUploadReportTemplateDesignFiles() throws InsightsCustomException, NumberFormatException, IOException{
 		try {
-			JsonObject response = insightsAssessmentReportController.uploadReportTemplateDesignFiles(readReportTemplateDesignFiles(), Integer.parseInt(reportIdString));
-			String expectedStatus="success";
+			JsonObject response = insightsAssessmentReportController.uploadReportTemplateDesignFiles(readReportTemplateDesignFiles(4,templateDesignFilesArray), Integer.parseInt(reportIdString));
 			String expectedOutcome = "File uploaded";
-			
 			String actualStatus = response.get("status").getAsString().replace("\"", "");
 			String actualOutcome = response.get("data").getAsString().replace("\"", "");
-			
-			Assert.assertEquals(actualStatus, expectedStatus);
+			Assert.assertEquals(actualStatus, PlatformServiceConstants.SUCCESS);
 			Assert.assertEquals(actualOutcome, expectedOutcome);
 		}
 		catch(AssertionError e) {
@@ -1145,55 +1096,346 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		}
 	}
 	
-	@Test(priority = 56)
+	@Test(priority = 64)
+	public void testUploadReportTemplateDesignException() throws InsightsCustomException, NumberFormatException, IOException{
+		try {
+			JsonObject response = insightsAssessmentReportController.uploadReportTemplateDesignFiles(readReportTemplateDesignFiles(1,templateDesignFilesArrayError), Integer.parseInt(reportIdString));
+			Assert.assertEquals(response.get("status").getAsString().replace("\"", ""), PlatformServiceConstants.FAILURE);
+		}
+		catch(AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test(priority = 65)
 	public void testGetAllReportTemplateList() throws InsightsCustomException{
 		try {
 			JsonObject response = insightsAssessmentReportController.getAllReportTemplateList();
 			JsonArray reportTemplateList = response.getAsJsonArray("data");
-			String expectedStatus="success";
-			
 			String actualStatus = response.get("status").getAsString().replace("\"", "");
-			
-			Assert.assertEquals(actualStatus, expectedStatus);
+			Assert.assertEquals(actualStatus, PlatformServiceConstants.SUCCESS);
 			Assert.assertNotNull(reportTemplateList);
 			Assert.assertFalse(reportTemplateList.isEmpty());
 		}catch(AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
-
-
-	@AfterClass
-	public void cleanUp() {
-
-		// Delete assessment reports
-		List<String> assessmentReportNames = Arrays.asList(weeklyAssessmentReportJson.get("reportName").getAsString(),
-				monthlyAssessmentReportJson.get("reportName").getAsString(),
-				quarterlyAssessmentReportJson.get("reportName").getAsString(),
-				yearlyAssessmentReportJson.get("reportName").getAsString(),
-				oneTimeAssessmentReportJson.get("reportName").getAsString(),
-				oneTimeAssessmentROIReportJson.get("reportName").getAsString(),
-				biWeeklyAssessmentReportJson.get("reportName").getAsString(),
-				triWeeklyAssessmentReportJson.get("reportName").getAsString(),
-				triWeeklyAssessmentWithDataSourceReportJson.get("reportName").getAsString(),
-				dailyEmailAssessmentReportJson.get("reportName").getAsString(),
-				dailyEmailCCAssessmentReportJson.get("reportName").getAsString(),
-				dailyEmailBCCAssessmentReportJson.get("reportName").getAsString(),
-				dailywithoutEmailAssessmentReportJson.get("reportName").getAsString(),
-				dailyRestartAssessmentReport.get("reportName").getAsString(),
-				dailyRunImmediateAssessmentReport.get("reportName").getAsString());
-		for (String assessmentReport : assessmentReportNames) {
-			try {
+	
+	@Test(priority = 66)
+	public void testDeleteKpiDefinitionFail() throws InsightsCustomException {
+		try {
+			String expectedMessage = "KPI definition attached to report template";
+			JsonObject response = insightsAssessmentReportController.deleteKpiDefinition(deleteKpiStringFail);
+			String actualStatus = response.get("status").getAsString().replace("\"", "");
+			String actualOutcome = response.get("message").getAsString().replace("\"", "");
+			Assert.assertEquals(actualStatus, PlatformServiceConstants.FAILURE);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test(priority = 67)
+	public void testDeleteKpiDefinitionFailException() throws InsightsCustomException {
+		try {
+			String expectedMessage = "KPI definition attached to report template";
+			JsonObject response = insightsAssessmentReportController.deleteKpiDefinition(deleteKpiStringFailException);
+			String actualStatus = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actualStatus, PlatformServiceConstants.FAILURE);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test(priority = 68)
+	public void testUpdateKpiDefinitionFail() throws InsightsCustomException {
+		try {
+			JsonObject updatekpiJson = convertStringIntoJson(updatekpiStringFail);
+			JsonObject response = insightsAssessmentReportController.updateKpiDefinition(updatekpiStringFail);
+			InsightsKPIConfig kpi = reportConfigDAL.getKPIConfig(updatekpiJson.get("kpiId").getAsInt());
+			} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test(priority = 69)
+	public void testUploadKPIInDatabase1() throws InsightsCustomException, IOException {
+		try {
+			String expectedOutcome = "No KPI defination found in request json";
+			FileInputStream input = new FileInputStream(kpiFileNoData);
+			MultipartFile multipartFile = new MockMultipartFile("file", kpiFileNoData.getName(), "text/plain",
+					IOUtils.toByteArray(input));
+			JsonObject response = insightsAssessmentReportController.saveBulkKpiDefinition(multipartFile);
+			readFileAndgetKpiIdList(kpiFileNoData.getName());
+			String actual = response.get("data").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, expectedOutcome);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test(priority = 70)
+	public void testGetReportTemplateKpiDetails() throws InsightsCustomException, IOException {
+		try {
+			JsonObject response = insightsAssessmentReportController.getReportTemplateKpiDetails(String.valueOf(grafanaReportId));
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test(priority = 71)
+	public void testGetReportTemplateKpiDetailsFail() throws InsightsCustomException{
+			JsonObject response = insightsAssessmentReportController.getReportTemplateKpiDetails(reportIdString);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+	}
+	
+	@Test(priority = 72)
+	public void testLoadAssessmentReportList1() throws InsightsCustomException {
+			String userDetail = "{\"userNamererr\":\"Test_Userrrrr\"}";
+			JsonObject report = insightsAssessmentReportController.getAssessmentReport(userDetail);
+			String actualStatus = report.get("status").getAsString().replace("\"", "");
+			JsonArray reportList = report.getAsJsonArray("data");
+			Assert.assertEquals(actualStatus, PlatformServiceConstants.FAILURE);
+	}
+	
+	@Test(priority = 72)
+	public void testSaveReportTemplateDuplicate() throws InsightsCustomException {
+		try {
+			JsonObject response = insightsAssessmentReportController.saveReportTemplate(reportTemplateDuplicate);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test(priority = 74)
+	public void testUpdateAssessmentReportStateFail() throws InsightsCustomException {
+			final JsonObject updateAssessmentReportStateJson = convertStringIntoJson(updateAssessmentReportStateFail);
+			JsonObject response = insightsAssessmentReportController.updateWebhookStatus(updateAssessmentReportStateFail);
+			String status = response.get("status").getAsString();
+			Assert.assertEquals(status, PlatformServiceConstants.FAILURE);
+	}
+	
+	@Test(priority = 75)
+	public void testsaveKpiDefinitionValidationError() throws InsightsCustomException, IOException {
+		JsonObject response = insightsAssessmentReportController.saveKpiDefinition(registerkpiValidation);
+		String actual = response.get("status").getAsString().replace("\"", "");
+		Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+	}
+	
+	@Test(priority = 76)
+	public void testsaveContentDefinitionValidationError() throws InsightsCustomException, IOException {
+			JsonObject response = insightsAssessmentReportController.saveContentDefinition(registerContentValiation);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+	}
+	
+	@Test(priority = 77)
+	public void testSaveAssessmentReportValidationError() throws InsightsCustomException {
+			JsonObject response = insightsAssessmentReportController.saveAssessmentReport(AssessmentReportValidation);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+	}
+	
+	@Test(priority = 78)
+	public void testUpdateAssessmentReportValidationError() throws InsightsCustomException {
+			JsonObject response = insightsAssessmentReportController.updateAssessmentReport(AssessmentReportValidation);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+	}
+	
+	@Test(priority = 79)
+	public void testsaveReportTemplateValidationError() throws InsightsCustomException {
+			JsonObject response = insightsAssessmentReportController.saveReportTemplate(reportTemplateValidation);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+	}
+	
+	@Test(priority = 80)
+	public void testSetReportTemplateStatusFail() throws InsightsCustomException{
+			JsonObject response = insightsAssessmentReportController.setReportTemplateStatus(setReportTemplateStatusWrongId);
+			String actualStatus = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actualStatus, PlatformServiceConstants.FAILURE);
+	}
+	
+	@Test(priority = 81)
+	public void testSetReportTemplateStatusValidationError() throws InsightsCustomException{
+			JsonObject response = insightsAssessmentReportController.setReportTemplateStatus(setReportTemplateStatusValidation);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+	}
+	
+	@Test(priority = 82)
+	public void testDeleteReportTemplateBeforeDeleteAssessmentReport() throws InsightsCustomException{
+		    int id = Integer.parseInt(reportIdString);
+		    JsonObject response = insightsAssessmentReportController.deleteReportTemplate(deleteReportTemplate);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+	}
+	
+	@Test(priority = 83)
+	public void testDeleteAllAssessmentReport() throws InsightsCustomException {
+			List<String> assessmentReportNames = Arrays.asList(weeklyAssessmentReportJson.get("reportName").getAsString(),
+					monthlyAssessmentReportJson.get("reportName").getAsString(),
+					quarterlyAssessmentReportJson.get("reportName").getAsString(),
+					yearlyAssessmentReportJson.get("reportName").getAsString(),
+					oneTimeAssessmentReportJson.get("reportName").getAsString(),
+					oneTimeAssessmentROIReportJson.get("reportName").getAsString(),
+					biWeeklyAssessmentReportJson.get("reportName").getAsString(),
+					triWeeklyAssessmentReportJson.get("reportName").getAsString(),
+					triWeeklyAssessmentWithDataSourceReportJson.get("reportName").getAsString(),
+					dailyEmailAssessmentReportJson.get("reportName").getAsString(),
+					dailyEmailCCAssessmentReportJson.get("reportName").getAsString(),
+					dailyEmailBCCAssessmentReportJson.get("reportName").getAsString(),
+					dailywithoutEmailAssessmentReportJson.get("reportName").getAsString(),
+					dailyRestartAssessmentReport.get("reportName").getAsString(),
+					dailyRunImmediateAssessmentReport.get("reportName").getAsString(),
+					grafanaAssessmentReportJson.get("reportName").getAsString());
+			List<String> assessmentReportDeleteResponse = new ArrayList<String>();  
+			for (String assessmentReport : assessmentReportNames) {
 				InsightsAssessmentConfiguration assessment = reportConfigDAL
 						.getAssessmentByAssessmentName(assessmentReport.trim());
 				String workflowID = assessment.getWorkflowConfig().getWorkflowId();
-				int configID = assessment.getId();
-				reportConfigDAL.deleteAssessmentReport(configID);
 				workflowConfigDAL.deleteWorkflowTaskSequence(workflowID);
-			} catch (Exception e) {
-				log.error("Error cleaning up at AssessmentReportsServiceTest Assessment Records ", e);
+				String deleteAssessmentReportConfigId1 = String.valueOf(reportConfigDAL
+						.getAssessmentByAssessmentName(assessmentReport).getId());
+				JsonObject deleteResponse = insightsAssessmentReportController.deleteReport(deleteAssessmentReportConfigId1);
+				String deleteResponseActual = deleteResponse.get("status").getAsString();
+				assessmentReportDeleteResponse.add(deleteResponseActual);
 			}
+				Assert.assertEquals(false, assessmentReportDeleteResponse.contains("failure"));						
+	}
+	
+	@Test(priority = 84)
+	public void testUploadReportTemplate() throws InsightsCustomException, IOException {
+		try {
+			FileInputStream input = new FileInputStream(file);
+			MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "text/plain",IOUtils.toByteArray(input));
+			JsonObject response = insightsAssessmentReportController.uploadReportTemplate(multipartFile);
+			String actualStatus = response.get("status").getAsString().replace("\"", "");
+			String reportIdGenerated = response.get("data").getAsString().replace("\"", "").replaceAll("[^0-9]", "");
+			deleteUploadedReportTemplate(Integer.parseInt(reportIdGenerated));
+			JsonObject deleteResponse = insightsAssessmentReportController.deleteReportTemplate(deleteUploadedReportTemplate);
+			Assert.assertEquals(actualStatus, PlatformServiceConstants.SUCCESS);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
 		}
+	}
+	
+	@Test(priority = 85)
+	public void testDeleteReportTemplateAfterDeleteAssessmentReport() throws InsightsCustomException{
+		    JsonObject response = insightsAssessmentReportController.deleteReportTemplate(deleteReportTemplate);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
+	}
+	
+	@Test(priority = 86)
+	public void testDeleteGrafanaToken() throws InsightsCustomException, InterruptedException{
+		    JsonObject response = deleteGrafanaAPIToken(getGrafanaOrgId(grafanaAssessmentReportJson.get("userName").getAsString()));
+		    String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
+			Thread.sleep(5000);
+	}
+	
+	@Test(priority = 87)
+	public void testGetChartType() throws InsightsCustomException{
+		    JsonObject response = insightsAssessmentReportController.getChartType();
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
+	}
+	
+	@Test(priority = 88)
+	public void testGetVisualizationUtil() throws InsightsCustomException{
+		    JsonObject response = insightsAssessmentReportController.getVisualizationUtil();
+		    String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
+	}
+	
+	@Test(priority = 89)
+	public void testGetTemplateType() throws InsightsCustomException{
+		    JsonObject response = insightsAssessmentReportController.getTemplateType();
+	        String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
+	}
+	
+	@Test(priority = 90)
+	public void testGetAllActiveContentList() throws InsightsCustomException{
+		    JsonObject response = insightsAssessmentReportController.getAllActiveContentList();
+	        String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
+	}
+	
+	@Test(priority = 91)
+	public void testGetContentAction() throws InsightsCustomException{
+		    JsonObject response = insightsAssessmentReportController.getContentAction();
+	        String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
+	}
+	
+	@Test(priority = 92)
+	public void testUpdateContentDefinitionValidationError() throws InsightsCustomException {
+			JsonObject response = insightsAssessmentReportController.updateContentDefinition(updateContentStringValidation);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+	}
+	
+	@Test(priority = 93)
+	public void testDeleteKpiDefinitionValidationError() throws InsightsCustomException {
+			JsonObject response = insightsAssessmentReportController.deleteKpiDefinition(deleteKpiStringValidation);
+			String actual = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+	}
+	
+	@Test(priority = 94)
+	public void testDeleteKpiDefinitionAfterReportTemplateDelete() throws InsightsCustomException {
+		try {
+			JsonObject deleteKpijson = convertStringIntoJson(deleteKpiString);
+			JsonObject response = insightsAssessmentReportController.deleteKpiDefinition(deleteKpiString);
+			String actualStatus = response.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actualStatus, PlatformServiceConstants.SUCCESS);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test(priority = 95)
+	public void testUpdateKpiDefinitionValidationError() throws InsightsCustomException {
+		JsonObject response = insightsAssessmentReportController.updateKpiDefinition(updatekpiStringValidation);
+		String actual = response.get("status").getAsString().replace("\"", "");
+		Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+	}
+	
+	@Test(priority = 96)
+	public void testGetReportTemplateCheck() throws InsightsCustomException {
+		try {
+			JsonObject response1 = insightsAssessmentReportController.deleteReportTemplate(deleteGrafanaReportTemplate);
+			JsonObject response2 = insightsAssessmentReportController.deleteReportTemplate(deleteROIReportTemplate);
+			JsonObject reportTemplates = insightsAssessmentReportController.getReportTemplateList();
+			String actual = reportTemplates.get("status").getAsString().replace("\"", "");
+			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test(priority = 97)
+	public void testCreateOrgAndSaveDashboardInGrafana() throws InsightsCustomException {
+		try {
+			deleteGrafanaOrgId(String.valueOf(getGrafanaOrgId(username)));
+			GrafanaUtilities.createOrgAndSaveDashboardInGrafana(sampleDashboardJson,username);
+			Assert.assertEquals(String.valueOf(getGrafanaOrgId(username)).isEmpty(), false);
+			deleteGrafanaOrgId(String.valueOf(getGrafanaOrgId(username)));
+			} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	
+	@AfterClass
+	public void cleanUp() {
 
 		// deleteTask
 		try {
@@ -1218,14 +1460,6 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 			log.error("Error cleaning up at AssessmentReportsServiceTest EmailWorkflow Task", e);
 		}
 
-		// Delete Report Templates
-		try {
-			reportConfigDAL.deleteReportTemplatebyReportID(reportIdForList);
-			reportConfigDAL.deleteReportTemplatebyReportID(grafanaReportId);
-			reportConfigDAL.deleteReportTemplatebyReportID(reportIdForROI);
-		} catch (Exception e) {
-			log.error("Error cleaning up at AssessmentReportsServiceTest Report template", e);
-		}
 		// Delete Content
 		try {
 			reportConfigDAL.deleteContentbyContentID(registerContentJson.get("contentId").getAsInt());
@@ -1250,7 +1484,6 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 				log.error("Error cleaning up at AssessmentReportsServiceTest Bulk Content record", e);
 			}
 		}
-
 		// Delete bulk kpi
 
 		for (int element : kpiIdList) {
@@ -1267,7 +1500,5 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		} catch (InsightsCustomException e) {
 			log.error("Error cleaning up at AssessmentReportsServiceTest vType Json", e);
 		}
-
 	}
-
 }

@@ -13,4 +13,5 @@ export interface MyQuery extends DataQuery {
   fixTime: any;
   cacheType: any;
   cacheValue: any;
+  serviceUrl: any;
 }

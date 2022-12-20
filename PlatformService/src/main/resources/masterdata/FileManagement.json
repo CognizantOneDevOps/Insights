@@ -1,0 +1,6 @@
+[
+ {
+	"queryName":"update FileManagement for LastUpdated",
+	"sqlQuery":"update public.\"INSIGHTS_CONFIG_FILES\" set lastupdatedtime=CAST(EXTRACT(epoch FROM NOW()) AS BIGINT) where lastupdatedtime is null;"
+ }
+]

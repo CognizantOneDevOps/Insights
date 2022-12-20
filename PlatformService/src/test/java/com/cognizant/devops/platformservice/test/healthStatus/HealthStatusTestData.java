@@ -15,9 +15,15 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.test.healthStatus;
 
-public class HealthStatusTestData {
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+
+public class HealthStatusTestData extends AbstractTestNGSpringContextTests{
 	ClassLoader classLoader = ClassLoader.getSystemClassLoader();
 	String categoryGit = "SCM";
+	String categoryService = "Platform Service";
+	String categoryEngine = "Platform Engine";
+	String categoryWorkflow = "Platform Workflow";
+	String categoryGitWrong = "";
 	String toolName = "github2";
 	String agentId = "SJ_GITHUB2_June24";
 	String failedAgentId = "Git_Failed";
@@ -25,6 +31,4 @@ public class HealthStatusTestData {
 	String PLATFORM_SERVICE = "Platform Service";
 	String PLATFORM_ENGINE = "Platform Engine";
 	String PLATFORM_WORKFLOW = "Platform Workflow";
-
-
 }

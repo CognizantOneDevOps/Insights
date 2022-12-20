@@ -183,7 +183,7 @@
           >
             <mat-slide-toggle
               (change)="updateStatus($event, element)"
-              [disabled]="clicked[i]"
+              [disabled]="selectedIndex != i + currentPageValue"
               [(ngModel)]="element.action"
             >
             </mat-slide-toggle>

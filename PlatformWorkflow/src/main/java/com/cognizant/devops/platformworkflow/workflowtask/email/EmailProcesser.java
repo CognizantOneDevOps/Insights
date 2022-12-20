@@ -20,11 +20,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import javax.activation.DataHandler;
+import javax.mail.Address;
 import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -44,6 +47,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.EmailConfiguration;
 import com.cognizant.devops.platformcommons.core.email.EmailConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.sun.mail.util.MailConnectException;
 
@@ -68,7 +72,8 @@ public class EmailProcesser implements Callable<JsonObject> {
 		} catch (Exception e) {
 			log.error(e);
 			returnMessage.addProperty("status", "error");
-			returnMessage.addProperty("reportName", mailReportDTO.getEmailAttachmentName());
+			Set<String> keySet = mailReportDTO.getMailAttachments().keySet();
+			returnMessage.addProperty("reportsName", keySet.toString());
 			returnMessage.addProperty("message", e.getMessage());
 		}
 		return returnMessage;
@@ -128,16 +133,18 @@ public class EmailProcesser implements Callable<JsonObject> {
 			String htmlText = mail.getMailBody();
 			Multipart multipart = new MimeMultipart();
 			// Create the attachment part
-			BodyPart messageBodyPart = new MimeBodyPart();
-			if (mail.getMailAttachment()!=null && mail.getMailAttachment().length > 0) {
-				InputStream inputStream = new ByteArrayInputStream(mail.getMailAttachment());
-				ByteArrayDataSource bds = new ByteArrayDataSource(inputStream, "application/pdf");
-				log.debug("Workflow Detail ==== Attaching file from {} ", mail.getReportFilePath());
-				messageBodyPart.setDataHandler(new DataHandler(bds));
-				messageBodyPart.setFileName(mail.getEmailAttachmentName() + ".pdf");
-				multipart.addBodyPart(messageBodyPart);
-			}
-
+			if (mail.getMailAttachments()!= null && mail.getMailAttachments().size() > 0) {
+				for (Entry<String, byte[]> entry : mail.getMailAttachments().entrySet()) {
+					BodyPart messageBodyPart = new MimeBodyPart();
+					InputStream inputStream = new ByteArrayInputStream(entry.getValue());
+					ByteArrayDataSource bds = new ByteArrayDataSource(inputStream, "application/pdf");
+					log.debug("Workflow Detail ==== Attaching file from {} ", mail.getReportFilePath());
+					messageBodyPart.setDataHandler(new DataHandler(bds));
+					messageBodyPart.setFileName(entry.getKey() + ".pdf");
+					multipart.addBodyPart(messageBodyPart);
+				}
+			}	
+		
 			// Create the HTML Part
 			BodyPart htmlBodyPart = new MimeBodyPart();
 			htmlBodyPart.setContent(htmlText, "text/html");
@@ -158,6 +165,8 @@ public class EmailProcesser implements Callable<JsonObject> {
 	public void sendFinalEmail(Session session, MimeMessage msg) throws InsightsCustomException {
 		Transport transport = null;
 		try {
+			Object content = msg.getContent();
+			Address[] allRecipients = msg.getAllRecipients();
 			transport = session.getTransport();
 			log.debug("Workflow Detail ==== ReportEmailSubscriber Sending Email ===== ");
 			transport.connect(emailConf.getSmtpHostServer(), emailConf.getSmtpUserName(), emailConf.getSmtpPassword());
@@ -182,18 +191,23 @@ public class EmailProcesser implements Callable<JsonObject> {
 	
 	private void logDebugStatement(MailReport mail,long processingTime,String message)
 	{
-		log.debug("Type = EmailProcesser mailTo={}  mailCC={} mailBCC={} emailAttachmentName={} "
-				+ "reportFilePath={} processingTime={} message={}" ,mail.getMailTo()
-				,mail.getMailCC(),mail.getMailBCC(),mail.getEmailAttachmentName()
-				,mail.getReportFilePath(),processingTime,message);
+		mail.getMailAttachments().forEach((attachmentName, fileData) -> {
+			log.debug("Type = EmailProcesser mailTo={}  mailCC={} mailBCC={} emailAttachmentName={} "
+					+ "reportFilePath={} processingTime={} message={}" ,mail.getMailTo()
+					,mail.getMailCC(),mail.getMailBCC(), attachmentName
+					,mail.getReportFilePath(),processingTime,message);
+		});
+		
 	}
 	
 	private void logErrorStatement(MailReport mail,String message)
 	{
+		mail.getMailAttachments().forEach((attachmentName, fileData) -> {
 		log.error("Type = EmailProcesser mailTo={}  mailCC={} mailBCC={} emailAttachmentName={} "
 				+ "reportFilePath={}  processingTime={} message={}" ,mail.getMailTo()
-				,mail.getMailCC(),mail.getMailBCC(),mail.getEmailAttachmentName()
+				,mail.getMailCC(),mail.getMailBCC(), attachmentName
 				,mail.getReportFilePath(),0,message);
+		});
 	}
 
 }

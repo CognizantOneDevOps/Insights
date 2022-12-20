@@ -20,6 +20,10 @@
 		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TYPE\"(id, workflowtype) SELECT nextval('hibernate_sequence'), 'UPSHIFTASSESSMENT' WHERE NOT EXISTS(SELECT id from public.\"INSIGHTS_WORKFLOW_TYPE\" WHERE workflowtype = 'UPSHIFTASSESSMENT');"
 	},
 	{
+		"queryName": "Add workflow type",
+		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TYPE\"(id, workflowtype) SELECT nextval('hibernate_sequence'), 'GROUP_EMAIL' WHERE NOT EXISTS(SELECT id from public.\"INSIGHTS_WORKFLOW_TYPE\" WHERE workflowtype = 'GROUP_EMAIL');"
+	},
+	{
 		"queryName": "REPORT_KPI_Execute",
 		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TASK\"(taskid, componentname, dependency, description, mqchannel, workflowtype) SELECT nextval('hibernate_sequence'), 'com.cognizant.devops.platformreports.assessment.core.ReportKPISubscriber', 1, 'REPORT_KPI_Execute', 'WORKFLOW.TASK.KPI.EXCECUTION', 'Report' WHERE NOT EXISTS (SELECT taskid FROM public.\"INSIGHTS_WORKFLOW_TASK\" WHERE description = 'REPORT_KPI_Execute');"
 	},
@@ -54,5 +58,9 @@
 	{
 		"queryName": "SystemNotification_Execute",
 		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TASK\"(taskid, componentname, dependency, description, mqchannel, workflowtype) SELECT nextval('hibernate_sequence'), 'com.cognizant.devops.platformreports.assessment.core.SystemNotificationDetailSubscriber', -1, 'SystemNotification_Execute', 'WORKFLOW.SYSTEM_TASK.SYSTEMNOTIFICATION.EXECUTION', 'SYSTEM' WHERE NOT EXISTS (SELECT taskid FROM public.\"INSIGHTS_WORKFLOW_TASK\" WHERE description = 'SystemNotification_Execute');"
+	},
+	{
+		"queryName": "GROUP_EMAIL_Execute",
+		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TASK\"(taskid, componentname, dependency, description, mqchannel, workflowtype) SELECT nextval('hibernate_sequence'), 'com.cognizant.devops.platformreports.assessment.core.GroupEmailSubscriber', 1, 'GROUP_EMAIL_Execute', 'WORKFLOW.TASK.GROUP_EMAIL.EXECUTION', 'GROUP_EMAIL' WHERE NOT EXISTS (SELECT taskid FROM public.\"INSIGHTS_WORKFLOW_TASK\" WHERE description = 'GROUP_EMAIL_Execute');"
 	}
 ]

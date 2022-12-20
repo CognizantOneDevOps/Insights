@@ -36,6 +36,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.enums.JobSchedule;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 
+
 public class InsightsUtils {
 
 	static Logger log = LogManager.getLogger(InsightsUtils.class.getName());

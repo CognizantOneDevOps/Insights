@@ -131,6 +131,7 @@ export class ImageHandlerService implements IImageHandlerService {
         this.addImage('save', "./icons/svg/reportMgmt/save.svg");
         this.addImage('folder', "./icons/svg/landing page/folder.svg");
         this.addImage('refresh', "./icons/svg/landing page/time-reverse.svg");
+        this.addImage('email_config', "./icons/svg/emailConfig/mail.svg");
 
         this.addImage('minus', "./icons/svg/reportMgmt/minus.svg");
         this.addImage('homeHook', "./icons/svg/webhook/homeHook.svg");

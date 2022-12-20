@@ -13,18 +13,18 @@ interface State {
 
 }
 
-const cacheTypes: SelectableValue[] = [
+const cacheTypes: Array<SelectableValue> = [
   { value: 'Fixed Time', label: 'Fixed Time' },
   { value: 'Variance Time', label: 'Variance Time' }
 ];
 
-const fixedTime: SelectableValue[] = [
+const fixedTime: Array<SelectableValue> = [
   { value: '1', label: '1' },
   { value: '2', label: '2' },
   { value: '3', label: '3' }
 ];
 
-const varianeTime: SelectableValue[] = [
+const varianeTime: Array<SelectableValue> = [
   { value: '5', label: '5' },
   { value: '10', label: '10' },
   { value: '15', label: '15' }

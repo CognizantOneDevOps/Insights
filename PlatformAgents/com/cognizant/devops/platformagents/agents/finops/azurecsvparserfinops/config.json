@@ -164,6 +164,23 @@
 				]
 			}
 		},
+		"budget":{
+			"insightsTimeXFieldMapping": {
+				"timefield": "startDate",
+				"isEpoch": false,
+				"timeformat": "%Y-%m-%dT%H:%M:%S"
+			},
+			"budgetMetadata": {
+				"labels": [
+					"BUDGET"
+				],
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"id"
+				]
+			}
+
+		},
 		"resourceMetricsdDetails": {
 			"insightsTimeXFieldMapping": {
 				"timefield": "timeStamp",
@@ -233,7 +250,9 @@
 	"insightsTimeZone": "Asia/Kolkata",
 	"enableValueArray": false,
 	"useResponseTemplate": true,
-	"collectForecastData": false,
+	"collectForecastData": true,
+	"collectBudgetData": true,
+	"baseCurrency":"INR",
 	"auth": "base64",
 	"runSchedule": 0,
 	"runCron": "5 15 * * *",
@@ -243,8 +262,18 @@
     "storageAccountKey": "",
     "containerName": "",
     "storageConnectionString": "",
+	"azureSecretkey": "",
+	"azureSubscriptionId": "",
+	"azureTenantId":"",
 	"isEpochTimeFormat": false,
+	
+	"baseURL": "https://login.microsoftonline.com",
+	"apiURL": "https://management.azure.com",
+	
 	"agentSecretDetails": [
+		"azureSubscriptionId",
+		"azureTenantId",
+		"azureSecretkey",
 		"storageAccountUrl",
 		"storageAccountKey",
 		"containerName",

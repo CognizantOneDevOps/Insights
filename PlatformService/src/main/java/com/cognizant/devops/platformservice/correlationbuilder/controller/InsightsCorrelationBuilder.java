@@ -83,12 +83,10 @@ public class InsightsCorrelationBuilder {
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
-
 	}
 
 	@PostMapping(value = "/deleteCorrelation", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject deleteCorrelation(@RequestBody String relationName) {
-
 		try {
 			String relationNameValidate = ValidationUtils.validateRequestBody(relationName);
 			if (correlationBuilderService.deleteCorrelation(relationNameValidate)) {

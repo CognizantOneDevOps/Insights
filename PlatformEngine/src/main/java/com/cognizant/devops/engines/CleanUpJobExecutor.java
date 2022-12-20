@@ -25,6 +25,9 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.timertasks.InsightsSchedulerTaskDAL;
+import com.cognizant.devops.platformdal.healthutil.InsightsComponentHealthDetailDAL;
+import com.cognizant.devops.platformdal.healthutil.InsightsAgentHealthDetailDAL;
+
 
 public class CleanUpJobExecutor implements Job , ApplicationConfigInterface{
 	/**
@@ -34,6 +37,8 @@ public class CleanUpJobExecutor implements Job , ApplicationConfigInterface{
 	
 	private static final long serialVersionUID = -282836461086826715L;
 	InsightsSchedulerTaskDAL schedularTaskDAL = new InsightsSchedulerTaskDAL();
+	InsightsAgentHealthDetailDAL agentHealthDetailDAL = new InsightsAgentHealthDetailDAL();
+	InsightsComponentHealthDetailDAL componentHealthDetailDAL = new InsightsComponentHealthDetailDAL();
 
 	@Override
 	public void execute(JobExecutionContext context)
@@ -42,11 +47,16 @@ public class CleanUpJobExecutor implements Job , ApplicationConfigInterface{
 		try {
 			ApplicationConfigInterface.loadConfiguration();
 			cleanUpTimerTaskStatusRecord();
+			cleanUpAgentHealthDetailsRecords();
+			cleanUpComponentHealthDetailsRecords();
 		} catch (InsightsCustomException e) {
 			log.error(" CleanUpJobExecutor Error ====  {}",e.getMessage());			
 		}
 	}
 
+	/***
+	 * 
+	 */
 	private void cleanUpTimerTaskStatusRecord() {
 		try {
 			String query= " WITH limitStatusRecord AS " + 
@@ -74,10 +84,91 @@ public class CleanUpJobExecutor implements Job , ApplicationConfigInterface{
 					"     FROM limitStatusRecord);";
 			int executedRecord = schedularTaskDAL.executeUpdateWithSQLQuery(query);
 			log.debug(" cleanUpTimerTaskStatusRecord {} ",executedRecord);
+			
+			
+			
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
 		}
 		
+	}
+	
+	/***
+	 * Clean Up job to delete older agent health detail records 
+	 * 
+	 */	
+	private void cleanUpAgentHealthDetailsRecords() {
+		try {
+			String deleteAgentHealthQuery= "WITH oldAgentHealthRecords AS" +
+					" (SELECT agentHealthRecords.id as agentHealthId " +  
+				    " FROM public.\"INSIGHTS_AGENT_HEALTH_DETAILS\" agentHealthRecords," +   
+			        " (SELECT min(agentHealthRecords1.inSightsTime) AS minExecutionTime,agentHealthRecords1.agent_id " + 
+                    " FROM public.\"INSIGHTS_AGENT_HEALTH_DETAILS\" agentHealthRecords1 " +
+			        " WHERE agentHealthRecords1.id IN " + 
+			        " (SELECT agentHealthRecords2.id " +  
+			        " FROM public.\"INSIGHTS_AGENT_HEALTH_DETAILS\" agentHealthRecords2 " +
+			        " WHERE agentHealthRecords2.agent_id = agentHealthRecords1.agent_id  " +
+			        " ORDER BY agentHealthRecords2.inSightsTime DESC " + 
+			        " LIMIT 50 )  " +	   
+			        " GROUP BY agentHealthRecords1.agent_id " +
+				    " ORDER BY agentHealthRecords1.agent_id " +
+				    " ) AS minIdRecord " +  
+				    " WHERE " + 
+				    " agentHealthRecords.agent_id = minIdRecord.agent_id  " +
+				    " AND agentHealthRecords.inSightsTime < minIdRecord.minExecutionTime " + 
+				    " ORDER BY agentHealthRecords.agent_id,agentHealthRecords.inSightsTime DESC )  " +			  
+				    " DELETE " +  
+				    " FROM public.\"INSIGHTS_AGENT_HEALTH_DETAILS\" " +   
+				    " WHERE id IN (SELECT agentHealthId FROM oldAgentHealthRecords); ";				
+			
+			log.debug("deleteAgentHealthQuery : {}", deleteAgentHealthQuery); 
+			int executedRecord = agentHealthDetailDAL.executeUpdateWithSQLQuery(deleteAgentHealthQuery);
+			log.debug("cleanUpAgentHealthDetailsRecords--- Deleted Records Count: {} ",executedRecord);
+			
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
+		
+	}
+	
+	
+	/**
+	 * Clean Up job to delete older component health detail records 
+	 * 
+	 */
+	private void cleanUpComponentHealthDetailsRecords() {
+		try {
+			String deleteComponentHealthQuery= " WITH oldComponentHealthRecords AS "
+					+ " (SELECT componentHealthRecords.id as componentHealthId "
+					+ " FROM public.\"INSIGHTS_COMPONENTS_HEALTH_DETAILS\" componentHealthRecords,"
+					+ " (SELECT min(componentHealthRecords1.inSightsTime) AS minExecutionTime,componentHealthRecords1.component_name "
+					+ "  FROM public.\"INSIGHTS_COMPONENTS_HEALTH_DETAILS\" componentHealthRecords1 "
+					+ "  WHERE componentHealthRecords1.id IN "
+					+ "  (SELECT componentHealthRecords2.id"
+					+ "  FROM public.\"INSIGHTS_COMPONENTS_HEALTH_DETAILS\" componentHealthRecords2 "
+					+ "  WHERE componentHealthRecords2.component_name = componentHealthRecords1.component_name"
+					+ "  ORDER BY componentHealthRecords2.inSightsTime DESC "
+					+ "  LIMIT 50 ) "
+					+ "	 GROUP BY componentHealthRecords1.component_name"
+					+ "  ORDER BY componentHealthRecords1.component_name"
+					+ "  ) AS minIdRecord "
+					+ "  WHERE componentHealthRecords.component_name = minIdRecord.component_name"
+					+ "  AND componentHealthRecords.inSightsTime < minIdRecord.minExecutionTime"
+					+ "  ORDER BY componentHealthRecords.component_name,componentHealthRecords.inSightsTime DESC )"
+					+ "  DELETE"
+					+ "  FROM public.\"INSIGHTS_COMPONENTS_HEALTH_DETAILS\""
+					+ "  WHERE id IN "
+					+ "  (SELECT componentHealthId FROM oldComponentHealthRecords);" ;
+					
+			log.debug("deleteComponentHealthQuery : {}", deleteComponentHealthQuery);
+			int executedRecord = componentHealthDetailDAL.executeUpdateWithSQLQuery(deleteComponentHealthQuery);
+			log.debug("cleanUpComponentHealthDetailsRecords----Deleted Records Count: {} ",executedRecord);
+			
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}		
 	}
 }

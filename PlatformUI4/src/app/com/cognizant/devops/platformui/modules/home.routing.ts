@@ -60,8 +60,8 @@ import { MileStoneComponent } from './mile-stone/mile-stone-config/mile-stone.co
 import { MileStoneListComponent } from './mile-stone/mile-stone-list/mile-stone-list.component';
 import { MileStoneEditComponent } from './mile-stone/mile-stone-edit/mile-stone-edit.component';
 import { ScheduleTaskManagmentComponent } from '@insights/app/modules/schedule-task-managment/schedule-task-managment.component';
-
-
+import { MultipleEmailConfigurationComponent } from './multiple-email-configuration/multiple-email-configuration.component';
+import { AddComponent } from './multiple-email-configuration/dialogs/add/add.component';
 const homeRoutes: Routes = [
   {
     path: 'InSights/Home', component: HomeComponent,
@@ -111,8 +111,9 @@ const homeRoutes: Routes = [
       { path:'editMileStone', component:MileStoneEditComponent},
       {path:'workflow-configuration' , component:AddWorkflowTaskComponent},
       { path:'edit-dashboard',component:EditDashboardComponent},
-      { path:'taskManagement',component:ScheduleTaskManagmentComponent}
-
+      { path:'taskManagement',component:ScheduleTaskManagmentComponent},
+      { path : 'email-configuration',component : MultipleEmailConfigurationComponent },
+      { path: 'add-component', component: AddComponent }
     ],
     canActivate: [AuthGuard]
   }

@@ -130,6 +130,15 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("DATA_DICTIONARY_TOOLS_RELATIONSHIPS", '/PlatformService/datadictionary/getToolsRelationshipAndProperties');
         this.addEndPoint("INSIGHTS_LOG", '/PlatformService/insights/log');
 
+        //Multiple-Email Configuration
+        this.addEndPoint("GET_DASH_LIST", '/PlatformService/emailConfiguration/getReportTitles');
+        this.addEndPoint("SAVE_EMAIL_CONFIG", '/PlatformService/emailConfiguration/saveEmailConfig');
+        this.addEndPoint("DELETE_EMAIL_CONFIG", '/PlatformService/emailConfiguration/deleteEmailConfig');
+        this.addEndPoint("GET_EMAIL_CONFIG", '/PlatformService/emailConfiguration/getAllEmailConfig');
+        this.addEndPoint("UPDATE_EMAIL_CONFIG", '/PlatformService/emailConfiguration/updateEmailConfig');
+        this.addEndPoint("ACTIVE_TOGGLE_CHANGE", '/PlatformService/emailConfiguration/updateEmailConfigState');
+
+
         //Traceablity Dashboard
         this.addEndPoint("GET_DETAILS", '/PlatformService/traceabilitydashboard/getPipeline');
         this.addEndPoint("GET_TOOL_DETAILS", '/PlatformService/traceabilitydashboard/getToolSummary');

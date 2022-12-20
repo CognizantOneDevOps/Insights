@@ -71,7 +71,7 @@ export class ReportManagementComponent implements OnInit {
   templatesList = [];
   reponseForschedule: any;
   scheduleList = [];
-  selectedIndex: number = -1;
+  selectedIndex: number;
   currentPageIndex: number = -1;
   totalPages: number = -1;
 
@@ -230,6 +230,16 @@ export class ReportManagementComponent implements OnInit {
     });
   }
 
+  sendMail(){
+    let navigationExtras: NavigationExtras = {
+      skipLocationChange: true,
+      queryParams: {
+        source:"Report",
+      },
+    };
+    this.router.navigate(["InSights/Home/email-configuration"], navigationExtras)
+  }
+
   Refresh() {
     this.selectedIndex = -1;
     this.selectedReport = "";
@@ -348,6 +358,7 @@ export class ReportManagementComponent implements OnInit {
       ["InSights/Home/report-configuration"],
       navigationExtras
     );
+    
   }
 
   showWorkflowHistoryDetailsDialog(reportName: String, workflowId: String) {

@@ -16,17 +16,14 @@
 package com.cognizant.devops.platformservice.test.TaskManagement;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
@@ -35,7 +32,6 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -47,11 +43,9 @@ import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.testng.SkipException;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
@@ -68,24 +62,17 @@ import com.google.gson.reflect.TypeToken;
 @Test
 @WebAppConfiguration
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
-public class TaskManagementServiceTest extends AbstractTestNGSpringContextTests  {
+public class TaskManagementServiceTest extends TaskManagementTestData  {
 
 	private static final Logger log = LogManager.getLogger(TaskManagementServiceTest.class);
-	private static final String AUTHORIZATION = "authorization";
-	
-	TaskManagementTestData testData = new TaskManagementTestData();
 	MockHttpServletRequest httpRequest = new MockHttpServletRequest();
 	ResultMatcher ok = MockMvcResultMatchers.status().isOk();
-	String cookiesString;
 	Map<String, String> testAuthData = new HashMap<>();
 
 	@Autowired
 	private WebApplicationContext wac;
 	
 	private MockMvc mockMvc;
-
-	String host = null;
-	Gson gson = new Gson();
 	
 	@Resource
 	private FilterChainProxy springSecurityFilterChain;
@@ -122,7 +109,6 @@ public class TaskManagementServiceTest extends AbstractTestNGSpringContextTests 
 	}
 
 	private MockHttpServletRequestBuilder mockHttpServletRequestBuilderPost(String url, String content) {
-		//log.debug(" cookies " + httpRequest.getCookies());
 		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post(url).cookie(httpRequest.getCookies())
 				.header("Authorization", testAuthData.get(AUTHORIZATION)).header("Cookie", cookiesString)
 				.content(content).contentType(MediaType.APPLICATION_JSON_VALUE);
@@ -135,19 +121,46 @@ public class TaskManagementServiceTest extends AbstractTestNGSpringContextTests 
 	}
 	
 	private MockHttpServletRequestBuilder mockHttpServletRequestBuilderGet(String url) {
-
 		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get(url).cookie(httpRequest.getCookies())
 				.header("Authorization", testAuthData.get(AUTHORIZATION)).header("Cookie", cookiesString);
 		return builder;
 	}
-
+	
 	@Test(priority = 1)
+	public void testSaveTaskDefinitionRecordValidationError() throws Exception {
+		try {
+			this.mockMvc = getMacMvc();
+			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost("/admin/scheduletaskmanagement/saveOrEditTaskDefinition",saveTaskJsonValidation); 
+			MvcResult result = this.mockMvc.perform(builder).andReturn();
+			String saveresponse = new String(result.getResponse().getContentAsByteArray());
+			JsonObject actual = JsonUtils.parseStringAsJsonObject(saveresponse);
+			Assert.assertEquals(PlatformServiceConstants.FAILURE, actual.get("status").getAsString());
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		} 
+	}
+	
+	@Test(priority = 2)
+	public void testSaveTaskDefinitionRecordInvalidSchedule() throws Exception {
+		try {
+			this.mockMvc = getMacMvc();
+			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost("/admin/scheduletaskmanagement/saveOrEditTaskDefinition",saveTaskJsonInvalidSchedule); 
+			MvcResult result = this.mockMvc.perform(builder).andReturn();
+			String saveresponse = new String(result.getResponse().getContentAsByteArray());
+			JsonObject actual = JsonUtils.parseStringAsJsonObject(saveresponse);
+			Assert.assertEquals(PlatformServiceConstants.FAILURE, actual.get("status").getAsString());
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		} 
+	}
+
+	@Test(priority = 3)
 	public void testSaveTaskDefinitionRecord() throws InsightsCustomException {
 		try {
-			log.debug(" cookies {} data {} " ,httpRequest.getCookies(),testData.saveTaskJson);
+			log.debug(" cookies {} data {} " ,httpRequest.getCookies(),saveTaskJson);
 			this.mockMvc = getMacMvc();
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost(
-					"/admin/scheduletaskmanagement/saveOrEditTaskDefinition",testData.saveTaskJson); 
+					"/admin/scheduletaskmanagement/saveOrEditTaskDefinition",saveTaskJson); 
 			
 			MvcResult result = this.mockMvc.perform(builder).andReturn();
 			String saveresponse = new String(result.getResponse().getContentAsByteArray());
@@ -155,20 +168,17 @@ public class TaskManagementServiceTest extends AbstractTestNGSpringContextTests 
 			JsonObject saveTaskConfigjson = JsonUtils.parseStringAsJsonObject(saveresponse);
 			
 			if (saveresponse.contains("status")) {
-				
 				MockHttpServletRequestBuilder builderAllTaskList  =  mockHttpServletRequestBuilderGet("/admin/scheduletaskmanagement/getAllTaskDetail"); 
 				MvcResult resultAllTask =  this.mockMvc.perform(builderAllTaskList).andReturn();
 				String allTaskResponse = new String(resultAllTask.getResponse().getContentAsByteArray());
 				JsonObject taskConfigjson = JsonUtils.parseStringAsJsonObject(allTaskResponse);
 				log.debug(" webResponse  status  ============= {} ====== {} ",resultAllTask.getResponse().getStatus(),taskConfigjson);
-				
-				
 				List<JsonObject> taskList = gson.fromJson(taskConfigjson.get("data"),
 						new TypeToken<List<JsonObject>>() {
 						}.getType());
 				Assert.assertEquals(200, result.getResponse().getStatus());
 				Assert.assertTrue(taskList.stream().anyMatch(taskJson -> taskJson.get("componentName").getAsString()
-						.equalsIgnoreCase(testData.componentNameString)));
+						.equalsIgnoreCase(componentNameString)));
 				Assert.assertTrue(saveTaskConfigjson.get("status").getAsString()
 						.equalsIgnoreCase(PlatformServiceConstants.SUCCESS));
 			} else {
@@ -181,7 +191,7 @@ public class TaskManagementServiceTest extends AbstractTestNGSpringContextTests 
 		}
 	}
 
-	@Test(priority = 2)
+	@Test(priority = 4)
 	public void testGetAllTaskList() throws InsightsCustomException {
 		try {
 			this.mockMvc = getMacMvc();
@@ -205,12 +215,12 @@ public class TaskManagementServiceTest extends AbstractTestNGSpringContextTests 
 		}
 	}
 
-	@Test(priority = 3)
+	@Test(priority = 5)
 	public void testEditTaskDefinitionRecord() throws InsightsCustomException {
 		try {
 			this.mockMvc = getMacMvc();
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost(
-					"/admin/scheduletaskmanagement/saveOrEditTaskDefinition",testData.editTaskJson); 
+					"/admin/scheduletaskmanagement/saveOrEditTaskDefinition",editTaskJson); 
 			MvcResult result = this.mockMvc.perform(builder).andReturn();
 			String editresponse = new String(result.getResponse().getContentAsByteArray());
 			log.debug(" webResponse  status  ============= {} ======  editresponse {}  ",result.getResponse().getStatus(), editresponse);
@@ -222,10 +232,9 @@ public class TaskManagementServiceTest extends AbstractTestNGSpringContextTests 
 				String allTaskResponse = new String(resultAllTask.getResponse().getContentAsByteArray());
 				JsonObject taskConfigjson = JsonUtils.parseStringAsJsonObject(allTaskResponse);
 				log.debug(" webResponse  status  ============= {} ====== {} ",resultAllTask.getResponse().getStatus(),taskConfigjson);
-				
 				List<JsonObject> taskList = gson.fromJson(taskConfigjson.get("data"), new TypeToken<List<JsonObject>>(){}.getType());
 				Assert.assertTrue(taskList.stream().anyMatch(taskJson -> 
-					(taskJson.get("componentName").getAsString().equalsIgnoreCase(testData.componentNameString)&&
+					(taskJson.get("componentName").getAsString().equalsIgnoreCase(componentNameString)&&
 						taskJson.get("schedule").getAsString().equalsIgnoreCase("0 */12 * ? * *")
 						)));
 				Assert.assertTrue(editTaskConfigjson.get("status").getAsString().equalsIgnoreCase(PlatformServiceConstants.SUCCESS));		
@@ -239,13 +248,26 @@ public class TaskManagementServiceTest extends AbstractTestNGSpringContextTests 
 		}
 	}
 	
-			
-	@Test(priority = 4)
+	@Test(priority = 6)
+	public void testStatusUpdateWrongData() throws Exception {
+		try {
+			this.mockMvc = getMacMvc();
+			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost("/admin/scheduletaskmanagement/statusUpdateForTaskDefinition",statusUpdateInvalidData); 
+			MvcResult result = this.mockMvc.perform(builder).andReturn();
+			String saveresponse = new String(result.getResponse().getContentAsByteArray());
+			JsonObject actual = JsonUtils.parseStringAsJsonObject(saveresponse);
+			Assert.assertEquals(PlatformServiceConstants.FAILURE, actual.get("status").getAsString());
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		} 
+	}
+		
+	@Test(priority = 7)
 	public void testStatusupdateTaskDefinitionRecord() throws InsightsCustomException {
 		try {
 			this.mockMvc = getMacMvc();
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost(
-					"/admin/scheduletaskmanagement/statusUpdateForTaskDefinition",testData.statusUpdate); 
+					"/admin/scheduletaskmanagement/statusUpdateForTaskDefinition",statusUpdate); 
 			MvcResult result = this.mockMvc.perform(builder).andReturn();
 			String editresponse = new String(result.getResponse().getContentAsByteArray());
 			log.debug(" webResponse  status  ============= {} ======  editresponse {}  ",result.getResponse().getStatus(), editresponse);
@@ -257,10 +279,9 @@ public class TaskManagementServiceTest extends AbstractTestNGSpringContextTests 
 				String allTaskResponse = new String(resultAllTask.getResponse().getContentAsByteArray());
 				JsonObject taskConfigjson = JsonUtils.parseStringAsJsonObject(allTaskResponse);
 				log.debug(" webResponse  status  ============= {} ====== {} ",resultAllTask.getResponse().getStatus(),taskConfigjson);
-				
 				List<JsonObject> taskList = gson.fromJson(taskConfigjson.get("data"), new TypeToken<List<JsonObject>>(){}.getType());
 				Assert.assertTrue(taskList.stream().anyMatch(taskJson -> 
-				(taskJson.get("componentName").getAsString().equalsIgnoreCase(testData.componentNameString)&&
+				(taskJson.get("componentName").getAsString().equalsIgnoreCase(componentNameString)&&
 					taskJson.get("action").getAsString().equalsIgnoreCase("RESCHEDULE")
 					)));				
 				Assert.assertTrue(statusUpdateTaskConfigjson.get("status").getAsString().equalsIgnoreCase(PlatformServiceConstants.SUCCESS));		
@@ -274,14 +295,12 @@ public class TaskManagementServiceTest extends AbstractTestNGSpringContextTests 
 		}
 	}
 	
-	
-	
-	@Test(priority = 5)
+	@Test(priority = 8)
 	public void testTaskHistoryDefinitionRecord() throws InsightsCustomException {
 		try {
 			this.mockMvc = getMacMvc();
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost(
-					"/admin/scheduletaskmanagement/getTaskHistoryDetail",testData.taskHistoryRequest); 
+					"/admin/scheduletaskmanagement/getTaskHistoryDetail",taskHistoryRequest); 
 			MvcResult result = this.mockMvc.perform(builder).andReturn();
 			String editresponse = new String(result.getResponse().getContentAsByteArray());
 			log.debug(" webResponse  status  ============= {} ======  editresponse {}  ",result.getResponse().getStatus(), editresponse);
@@ -300,12 +319,26 @@ public class TaskManagementServiceTest extends AbstractTestNGSpringContextTests 
 		}
 	}
 	
-	@Test(priority = 6)
+	@Test(priority = 9)
+	public void testDeleteTaskDefinitionInvalidData() throws Exception {
+		try {
+			this.mockMvc = getMacMvc();
+			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost("/admin/scheduletaskmanagement/deleteTaskDefinition",deleteTaskJsonInvalidData); 
+			MvcResult result = this.mockMvc.perform(builder).andReturn();
+			String saveresponse = new String(result.getResponse().getContentAsByteArray());
+			JsonObject actual = JsonUtils.parseStringAsJsonObject(saveresponse);
+			Assert.assertEquals(PlatformServiceConstants.FAILURE, actual.get("status").getAsString());
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		} 
+	}
+	
+	@Test(priority = 9)
 	public void testDeleteTaskDefinitionRecord() throws InsightsCustomException {
 		try {
 			this.mockMvc = getMacMvc();
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost(
-					"/admin/scheduletaskmanagement/deleteTaskDefinition",testData.deleteTaskJson); 
+					"/admin/scheduletaskmanagement/deleteTaskDefinition",deleteTaskJson); 
 			MvcResult result = this.mockMvc.perform(builder).andReturn();
 			String editresponse = new String(result.getResponse().getContentAsByteArray());
 			log.debug(" webResponse  status  ============= {} ======  editresponse {}  ",result.getResponse().getStatus(), editresponse);
@@ -320,7 +353,7 @@ public class TaskManagementServiceTest extends AbstractTestNGSpringContextTests 
 				log.debug(" webResponse  status  ============= {} ====== {} ",resultAllTask.getResponse().getStatus(),taskConfigjson);
 				
 				List<JsonObject> taskList = gson.fromJson(taskConfigjson.get("data"), new TypeToken<List<JsonObject>>(){}.getType());
-				Assert.assertFalse(taskList.stream().anyMatch(taskJson -> taskJson.get("componentName").getAsString().equalsIgnoreCase(testData.componentNameString)));
+				Assert.assertFalse(taskList.stream().anyMatch(taskJson -> taskJson.get("componentName").getAsString().equalsIgnoreCase(componentNameString)));
 			}else {
 				Assert.fail(" delete task configure has issue  ");
 			}
@@ -330,12 +363,4 @@ public class TaskManagementServiceTest extends AbstractTestNGSpringContextTests 
 			Assert.fail(e.getMessage());
 		}
 	}
-	 
-
-	@AfterClass
-	public void cleanUp() throws InsightsCustomException {
-		
-		
-	}
-
 }

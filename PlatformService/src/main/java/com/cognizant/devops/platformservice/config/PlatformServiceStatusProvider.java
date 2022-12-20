@@ -15,17 +15,16 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.config;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.ServiceStatusConstants;
 import com.cognizant.devops.platformcommons.core.util.ComponentHealthLogger;
+import com.cognizant.devops.platformdal.healthutil.HealthUtil;
 
 public class PlatformServiceStatusProvider extends ComponentHealthLogger {
 	private static Logger log = LogManager.getLogger(PlatformServiceStatusProvider.class);
+	HealthUtil healthUtil = new HealthUtil();
 	
 	static PlatformServiceStatusProvider instance=null;
 	private PlatformServiceStatusProvider() {
@@ -41,16 +40,13 @@ public class PlatformServiceStatusProvider extends ComponentHealthLogger {
 	
 	public void createPlatformServiceStatusNode(String message,String status) {
 		try {
-			String version = "";
-			version = PlatformServiceInitializer.class.getPackage().getSpecificationVersion();
+			String version = PlatformServiceInitializer.class.getPackage().getSpecificationVersion();
 			log.debug(" Insights version {} ", version);
-			Map<String, String> extraParameter = new HashMap<>(0);
-			if(ApplicationConfigProvider.getInstance().getGraph().getAuthToken()!=null && 
-					!ApplicationConfigProvider.getInstance().getGraph().getAuthToken().equals("")) {
-				createComponentStatusNode("HEALTH:INSIGHTS_PLATFORMSERVICE", version, message, status, extraParameter);
-			}
+			healthUtil.createComponentHealthDetails(ServiceStatusConstants.PLATFORM_SERVICE,version, message, status);
+			
 		} catch (Exception e) {
-			log.error(" Unable to create node {} ", e.getMessage());
+			log.error("Unable to create Component Health records for PlatformService {} ", e.getMessage());
+
 		}
 	}
 

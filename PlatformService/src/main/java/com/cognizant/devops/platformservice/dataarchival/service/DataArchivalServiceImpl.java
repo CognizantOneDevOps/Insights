@@ -19,11 +19,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
-
 import com.cognizant.devops.platformcommons.constants.DataArchivalConstants;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
@@ -38,7 +36,6 @@ import com.cognizant.devops.platformdal.dataArchivalConfig.DataArchivalConfigDal
 import com.cognizant.devops.platformdal.dataArchivalConfig.InsightsDataArchivalConfig;
 import com.google.gson.JsonObject;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
 
 @Service("dataArchivalService")
 public class DataArchivalServiceImpl implements DataArchivalService {

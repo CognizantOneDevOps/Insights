@@ -78,11 +78,25 @@
                         {{element.fileModule}}
                     </td>
                 </ng-container>
+                <ng-container matColumnDef="lastUpdatedTime">
+                    <th
+                      mat-header-cell
+                      *matHeaderCellDef
+                      class="tableHeader"
+                      style="white-space: pre-wrap !important"
+                    >
+                      Last Updated ({{ timeZoneAbbr }})
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                      {{ element.lastUpdatedTime }}
+                    </td>
+                  </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;"> </tr>
             </mat-radio-group>
         </table>
+        <div class="footer">
         <div class="paginator rightAlignOnly" style="margin-top: 7px;">
             <mat-paginator class="visiblityHidden" #paginator [pageSize]="MAX_ROWS_PER_TABLE">
             </mat-paginator>
@@ -107,5 +121,5 @@
                 of {{totalPages}}
             </div>
         </div>
-
+    </div>
     </div>

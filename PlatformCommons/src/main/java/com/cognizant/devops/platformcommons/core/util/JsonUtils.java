@@ -133,4 +133,13 @@ public class JsonUtils {
 		}	
 		return response;
 	}
+	
+	
+	public static String getValueFromJson(JsonElement jsonElement,String property) {
+		JsonObject jsonObject = jsonElement.getAsJsonObject();
+		if(jsonObject.has(property)) {
+			return jsonObject.get(property).getAsString();
+		}
+		return "-";
+	}
 }

@@ -19,7 +19,7 @@
 
 
 FROM alpine:3.16
-MAINTAINER Onedevops Insights
+LABEL maintainer="Onedevops Insights"
 
 # Creating cofig folders
 

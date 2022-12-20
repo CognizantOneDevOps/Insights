@@ -527,7 +527,7 @@ export class EditDashboardComponent implements OnInit {
       dashboard.panels.forEach((x) => {
         if (x.type !== "row" && x.type !== "text") {
           this.urlArray.push(
-            InsightsInitService.grafanaHost +
+            "GRAFANA_URL" +
               "/d/" +
               dashboard.uid +
               "/" +
@@ -545,7 +545,7 @@ export class EditDashboardComponent implements OnInit {
             if (x.type !== "text")
               x.panels.forEach((x) => {
                 this.urlArray.push(
-                  InsightsInitService.grafanaHost +
+                  "GRAFANA_URL" +
                     "/d/" +
                     dashboard.uid +
                     "/" +
@@ -643,7 +643,7 @@ export class EditDashboardComponent implements OnInit {
           this.theme
       );
     this.saveUrl =
-      InsightsInitService.grafanaHost +
+      "GRAFANA_URL" +
       "/dashboard/db/" +
       this.asyncResult.data.meta.slug +
       "?orgId=" +

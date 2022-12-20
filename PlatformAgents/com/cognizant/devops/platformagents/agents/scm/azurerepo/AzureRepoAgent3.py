@@ -34,6 +34,7 @@ class AzureRepoAgent(BaseAgent):
         accessToken = self.config.get("accessToken", '')
         commitsBaseEndPoint = self.config.get("commitsBaseEndPoint", '')
         startFrom = self.config.get("startFrom", '')
+        dynamicTemplate = self.config.get("dynamicTemplate", '')
         startFrom = parser.parse(startFrom)
         getReposUrl = getRepos
         enableBranches = self.config.get("enableBranches", False)

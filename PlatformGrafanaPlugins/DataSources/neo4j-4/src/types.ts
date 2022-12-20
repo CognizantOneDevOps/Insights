@@ -15,11 +15,14 @@ export interface MyQuery extends DataQuery {
   fixTime: any;
   cacheType: any;
   cacheValue: any;
+  serviceUrl:any;
 }
 
 
 export const defaultQuery: Partial<MyQuery> = {
+  queryText: undefined,
   constant: 6.5,
+  cypherQuery: undefined,
   graph: false,
   timeseries: false,
   table: false,
@@ -38,6 +41,10 @@ export const defaultQuery: Partial<MyQuery> = {
  */
 export interface MyDataSourceOptions extends DataSourceJsonData {
   path?: string;
+  basicPassword: string;
+  logging: any ;
+  serviceUrl: any;
+  authToken: any;
 }
 
 /**
@@ -45,4 +52,14 @@ export interface MyDataSourceOptions extends DataSourceJsonData {
  */
 export interface MySecureJsonData {
   apiKey?: string;
+  basicPassword: string;
+}
+
+/** changes*/
+export const defaults: MyDataSourceOptions = {
+  logging :true,
+  path: '',
+  serviceUrl : '',
+  authToken : true,
+  basicPassword: ''
 }

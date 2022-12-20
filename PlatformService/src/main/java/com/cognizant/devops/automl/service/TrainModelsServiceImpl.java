@@ -20,25 +20,19 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.persistence.NoResultException;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.pdfbox.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.core.enums.AutoMLEnum;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
@@ -59,18 +53,19 @@ import com.google.gson.JsonObject;
 public class TrainModelsServiceImpl implements ITrainModelsService {
     private static final Logger log = LogManager.getLogger(TrainModelsServiceImpl.class);
     public static final String USECASE_NAME = "usecaseName";
-    String FILE_SEPERATOR = File.separator;
-    AutoMLConfigDAL autoMLConfigDAL;
-    H2oApiCommunicator h2oApiCommunicator;
+    String FILE_SEPERATOR  = File.separator;
+    
+    AutoMLConfigDAL autoMLConfigDAL = new AutoMLConfigDAL();
+    H2oApiCommunicator h2oApiCommunicator = new H2oApiCommunicator();
     File MLDIRECTORY = new File(ConfigOptions.ML_DATA_STORAGE_RESOLVED_PATH);
-    WorkflowServiceImpl workflowService = new WorkflowServiceImpl();
+   
+    @Autowired
+    WorkflowServiceImpl workflowService;
     ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
 
     public TrainModelsServiceImpl() {
-        h2oApiCommunicator = new H2oApiCommunicator();
-        autoMLConfigDAL = new AutoMLConfigDAL();
         if (!MLDIRECTORY.exists()) {
-            MLDIRECTORY.mkdir();
+        	MLDIRECTORY.mkdir();
         }
     }
 
@@ -295,10 +290,8 @@ public class TrainModelsServiceImpl implements ITrainModelsService {
 		if (isExists) {
 			log.error("AutoMLSerive======= unable to save record as usecase {} already exists", usecase);
 			throw new InsightsCustomException("usecase already exists " + usecase);
-		} else {
-			
-			/* Save file to Insights_Home */
-			
+		} 
+		else {	
 			try {
 				String folderPath = new File(ConfigOptions.ML_DATA_STORAGE_RESOLVED_PATH + ConfigOptions.FILE_SEPERATOR + usecase).getCanonicalPath();
 				File destfolder = new File(folderPath);

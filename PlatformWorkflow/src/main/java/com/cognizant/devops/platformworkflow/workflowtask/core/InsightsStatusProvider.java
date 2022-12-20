@@ -15,17 +15,18 @@
  ******************************************************************************/
 package com.cognizant.devops.platformworkflow.workflowtask.core;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.ServiceStatusConstants;
 import com.cognizant.devops.platformcommons.core.util.ComponentHealthLogger;
+import com.cognizant.devops.platformdal.healthutil.HealthUtil;
+
+
 
 public class InsightsStatusProvider extends ComponentHealthLogger {
 	private static Logger log = LogManager.getLogger(InsightsStatusProvider.class);
+	HealthUtil healthUtil = new HealthUtil();
 	
 	static InsightsStatusProvider instance=null;
 	private InsightsStatusProvider() {
@@ -51,13 +52,11 @@ public class InsightsStatusProvider extends ComponentHealthLogger {
 			String version = "";
 			version = InsightsStatusProvider.class.getPackage().getImplementationVersion();
 			log.debug(" Insights version {} ", version);
-			Map<String, String> extraParameter = new HashMap<>(0);
-			if (ApplicationConfigProvider.getInstance().getGraph().getAuthToken() != null
-					&& !ApplicationConfigProvider.getInstance().getGraph().getAuthToken().equals("")) {
-				createComponentStatusNode("HEALTH:INSIGHTS_WORKFLOW", version, message, status, extraParameter);
-			}
+			healthUtil.createComponentHealthDetails(ServiceStatusConstants.PLATFORM_WORKFLOW,version, message, status);			
+		
 		} catch (Exception e) {
-			log.error(" Unable to create node {} ", e.getMessage());
+			log.error(" Unable to create Component Health records for PlatformWorkflow {} ", e.getMessage());
+
 		}
 			return Boolean.TRUE;
 	}

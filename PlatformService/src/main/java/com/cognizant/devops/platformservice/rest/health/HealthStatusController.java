@@ -15,19 +15,20 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.rest.health;
 
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.cognizant.devops.platformcommons.constants.ErrorMessage;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
+import com.cognizant.devops.platformdal.healthutil.InsightsAgentHealthDetails;
+import com.cognizant.devops.platformdal.healthutil.InsightsComponentHealthDetails;
 import com.cognizant.devops.platformservice.rest.health.service.HealthStatusServiceImpl;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonObject;
@@ -64,21 +65,34 @@ public class HealthStatusController {
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(servicesAgentsHealthStatus);
 	}
-
+	
 	@GetMapping(value = "/detailHealth", produces = MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody JsonObject loadAgentsHealth(@RequestParam String category, @RequestParam String tool,
+	public @ResponseBody JsonObject loadHealth(@RequestParam String category, @RequestParam String tool,
 			@RequestParam String agentId) {
-		GraphResponse response = new GraphResponse();
+		
 		try {
-			if (StringUtils.isEmpty(category) || StringUtils.isEmpty(tool)) {
+			if(agentId.equalsIgnoreCase("")) {
+				List<InsightsComponentHealthDetails> response = null;
+			if (category.equalsIgnoreCase(null) || tool.equalsIgnoreCase(null)) {
 				return PlatformServiceUtil.buildFailureResponse(ErrorMessage.CATEGORY_AND_TOOL_NAME_NOT_SPECIFIED);
 			}
-			response = healthStatusServiceImpl.getDetailHealth(category, tool, agentId);
+			response = healthStatusServiceImpl.getComponentDetailHealth(category, tool, agentId);
+			return PlatformServiceUtil.buildSuccessResponseWithHtmlData(response);
+			}
+			
+			else {
+				List<InsightsAgentHealthDetails> response = null;
+				if (category.equalsIgnoreCase(null) || tool.equalsIgnoreCase(null)) {
+						return PlatformServiceUtil.buildFailureResponse(ErrorMessage.CATEGORY_AND_TOOL_NAME_NOT_SPECIFIED);
+					}
+					response = healthStatusServiceImpl.getDetailHealth(category, tool, agentId);
+					return PlatformServiceUtil.buildSuccessResponseWithHtmlData(response);
+			}
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
-		return PlatformServiceUtil.buildSuccessResponseWithHtmlData(response);
+		
 	}
 
 	@GetMapping(value = "/getAgentFailureDetails", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -92,5 +106,4 @@ public class HealthStatusController {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
 	}
-
 }

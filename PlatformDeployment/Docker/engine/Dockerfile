@@ -16,20 +16,21 @@
 
 
 
-FROM alpine:3.16
-MAINTAINER Onedevops Insights
+FROM centos:7
+LABEL maintainer="Onedevops Insights"
 
-ARG INSIGHTSRELEASE=9.5
+ARG INSIGHTSRELEASE=9.7
 
 # Creating cofig folders
 
-RUN apk update && \
-    apk add wget unzip vim dos2unix && \
-    apk add netcat-openbsd && \
-    apk --no-cache add procps && \
-    apk add --update openjdk11 && \
-    apk add --no-cache bash && \
-    set -ex && apk --no-cache add sudo && \
+RUN yum update -y && \
+    yum install -y  wget unzip vim dos2unix && \
+    yum install -y nc && \
+    yum install -y procps && \
+    yum install -y java-11-openjdk-devel && \
+    yum install -y bash && \
+    yum install -y libXcomposite libXdamage libXtst cups libXScrnSaver pango atk adwaita-cursor-theme adwaita-icon-theme at at-spi2-atk at-spi2-core cairo-gobject colord-libs dconf desktop-file-utils ed emacs-filesystem gdk-pixbuf2 glib-networking gnutls gsettings-desktop-schemas gtk-update-icon-cache gtk3 hicolor-icon-theme jasper-libs json-glib libappindicator-gtk3 libdbusmenu libdbusmenu-gtk3 libepoxy liberation-fonts liberation-narrow-fonts liberation-sans-fonts liberation-serif-fonts libgusb libindicator-gtk3 libmodman libproxy libsoup libwayland-cursor libwayland-egl libxkbcommon m4 mailx nettle patch psmisc redhat-lsb-core redhat-lsb-submod-security rest spax time trousers xdg-utils xkeyboard-config alsa-lib  && \
+    set -ex && yum install -y sudo && \
     mkdir /usr/INSIGHTS_HOME  /opt/insightsengine/ /opt/InSights/ /opt/insightsWorkflow/ /usr/INSIGHTS_HOME/workflowjar/ /opt/InSights/Promtail/
 
 #Install jq - json processor
@@ -74,8 +75,7 @@ RUN wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${INS
     chmod +x /etc/init.d/InSightsWorkflow && dos2unix /etc/init.d/InSightsWorkflow
 
 WORKDIR /opt/InSights/Promtail
-RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2 && \
-    wget https://github.com/grafana/loki/releases/download/v2.4.2/promtail-linux-amd64.zip && \
+RUN wget https://github.com/grafana/loki/releases/download/v2.4.2/promtail-linux-amd64.zip && \
     unzip "promtail-linux-amd64.zip" && \
     rm -r -f promtail-linux-amd64.zip && \
     chmod a+x "promtail-linux-amd64" && \

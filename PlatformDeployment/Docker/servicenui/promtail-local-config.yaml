@@ -26,7 +26,6 @@ clients:
     tenant_id: "machine1"
 
 scrape_configs:
-
   - job_name: PlatformService
     static_configs:
       - targets:
@@ -54,7 +53,35 @@ scrape_configs:
                 endpoint:
                 processingTime:
                 message:
+  - job_name: platformgrafana
+    static_configs:
+      - labels:
+          __path__: "${INSIGHTS_HOME}/logs/PlatformServiceGrafana/PlatformServiceGrafana.log"
+          job: platformgrafana
+          tenant_id: machine1
+        targets:
+          - localhost
+    pipeline_stages:
+      - match:
+          selector: '{job="platformgrafana"}'
+          stages:
+            - json:
+                expressions: {timestamp: timestamp, dashboardName: dashboardName, panelName: panelName, datasourceType: datasourceType, datasourceName: datasourceName, time_ms: time_ms, userName : userName, email: email, dashboardId: dashboardId, uid: uid, query: query, orgName: orgName, panelCount: panelCount, dashboardHit: dashboardHit }
+            - labels:
+                timestamp:
+                dashboardName:
+                panelName:
+                datasourceType:
+                datasourceName:
+                time_ms:
+                userName:
+                email:
+                dashboardId:
+                uid:
+                query:
+                orgName:
+                panelCount:
+                dashboardHit:
 
 target_config:
-    sync_period: "10s"
-
+  sync_period: "10s"

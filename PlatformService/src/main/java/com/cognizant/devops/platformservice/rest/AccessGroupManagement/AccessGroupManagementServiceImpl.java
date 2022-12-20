@@ -52,13 +52,10 @@ public class AccessGroupManagementServiceImpl {
 	VaultHandler vaultHandler = new VaultHandler();
 	GrafanaDatabaseDAL grafanaDBDAL = new GrafanaDatabaseDAL();
 	
-	
-	
 	public DashboardResponse loadGrafanaDashboardData() {
 		DashboardResponse dashboardResponse = new DashboardResponse();
 		try {
 			Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
-
 			String grafanaResponse = grafanaHandler.grafanaGet("/api/search", headers);
 			JsonElement response = JsonUtils.parseString(grafanaResponse);
 			JsonArray dashboardsJsonArray = response.getAsJsonArray();

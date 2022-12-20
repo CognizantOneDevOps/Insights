@@ -144,7 +144,6 @@ public class UserDetailsService {
 		return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);//success
 	}
 
-	
 
 	/** Used to validate authenticate Kerberos User and Redirect to UI application 
 	 * @param request
@@ -155,6 +154,7 @@ public class UserDetailsService {
 		log.debug("Inside authenticateKerberosUser kerberosLogin ");
 		HttpHeaders httpHeaders = new HttpHeaders();
 		JsonObject jsonResponse = new JsonObject();
+		
 		try {
 			SecurityContext context = SecurityContextHolder.getContext();
 			KerberosServiceRequestToken authKerberos = (KerberosServiceRequestToken) context.getAuthentication();

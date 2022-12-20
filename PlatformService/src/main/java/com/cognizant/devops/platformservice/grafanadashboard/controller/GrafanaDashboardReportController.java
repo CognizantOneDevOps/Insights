@@ -18,7 +18,6 @@ package com.cognizant.devops.platformservice.grafanadashboard.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -101,7 +99,6 @@ public class GrafanaDashboardReportController {
 				jsonobject.addProperty("isActive", dashboardConfig.getWorkflowConfig().isActive());
 				jsonarray.add(jsonobject);
 			}
-
 			return PlatformServiceUtil.buildSuccessResponseWithData(jsonarray);
 		} catch (Exception e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
@@ -163,5 +160,4 @@ public class GrafanaDashboardReportController {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
 	}
-
 }

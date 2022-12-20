@@ -53,22 +53,54 @@ class AzureCSVParserFinOpsAgent(BaseAgent):
         self.startDateFromTracking = self.tracking.get('lastModifiedCSVDate', None)
         self.contentTypeJson = 'application/json'
         self.collectForecastData = self.config.get('collectForecastData', False)
+        self.collectBudgetData = self.config.get('collectBudgetData', False)
         self.storageAccountUrl = self.config.get('storageAccountUrl', "")
         self.storageAccountKey = self.config.get('storageAccountKey', "")
+        self.baseCurrency = self.config.get('baseCurrency', "")
         self.containerName = self.config.get('containerName', "")
         self.storageConnectionString = self.config.get('storageConnectionString', "")
         self.unzipDirectoryName = "Finops_Azure_Report"
-        self.uniqueResouseGroupList = [] 
-        self.uniquesubscriptionList: List[str] = []
         self.unzipDirPath = os.path.join(os.path.dirname(sys.modules[self.__class__.__module__].__file__) + os.path.sep, self.unzipDirectoryName)
+        self.uniqueSubscriptionAndResourceList = []
+        self.agentDir = os.path.dirname(sys.modules[self.__class__.__module__].__file__) + os.path.sep
+        
 
         
         try:
+            
+            self.finopsUtilities = FinOpsUtilities(self.agentDir, parentclass=self)
+            
+            self.finopsUtilities.loadCurrencyTacking(self.baseCurrency)
+
             self.blob_service_client_instance = BlobServiceClient(
                 account_url=self.storageAccountUrl, credential=self.storageAccountKey)
             
             self.addAndRemoveUnzipDirectory()
-            self.downloadCSVFiles()           
+            self.downloadCSVFiles()  
+            
+            if len(self.uniqueSubscriptionAndResourceList) > 0:
+                
+                subscription_resource_df = pd.DataFrame(self.uniqueSubscriptionAndResourceList)
+                
+                uniqueSubscriptionList  = subscription_resource_df[['subscriptionid','subscriptionname']].drop_duplicates().values.tolist()
+                
+                for row in uniqueSubscriptionList:
+                    
+                    subscriptiondict = {'subscriptionId': row[0], 'displayName':row[1]}
+                    resourceGroupList = subscription_resource_df[subscription_resource_df['subscriptionid'] == subscriptiondict['subscriptionId']]['resourcegroups'].drop_duplicates().values.tolist()
+                    resourceGroupListDict = []
+                    
+                    for resourceGroup in resourceGroupList:
+                        resourceGroupListDict.append({'name':resourceGroup})
+                        
+                    
+                    if self.collectForecastData:
+                        self.finopsUtilities.processForecastRecords(subscriptiondict, resourceGroupListDict)
+                        
+                    if self.collectBudgetData:
+                        self.finopsUtilities.processBudgetData(subscriptiondict)  
+                        
+            self.updateTrackingJson(self.tracking)      
         
         except Exception as ex:
             self.baseLogger.error(ex)
@@ -84,19 +116,16 @@ class AzureCSVParserFinOpsAgent(BaseAgent):
         file_date_df_filter = self.getLastestModifiedManifestFile()
         
         for index, row in file_date_df_filter.iterrows():
-            # self.baseLogger.info(index)
-            #self.baseLogger.info(row['blob_name'] + " ========== " + str(row['last_modified']))
+
             blobname = row['blob_name']
             manifestFilePath = os.path.join(self.unzipDirPath, '_manifest.json')
 
             blob_client_instance = self.blob_service_client_instance.get_blob_client(self.containerName, blobname, snapshot=None) 
-            #
     
             blob_data = blob_client_instance.download_blob()
             data = blob_data.readall()
             self.updateManifest(manifestFilePath, data)
             blobsDetails = self.loadManifest(manifestFilePath, data)
-            # self.baseLogger.info(blobsDetails)  
             
             for blobobj in blobsDetails:
                 lastDataCollectionDate = self.processCSVFiles(blobobj)
@@ -104,9 +133,8 @@ class AzureCSVParserFinOpsAgent(BaseAgent):
                     self.tracking["lastModifiedCSVDate"] = str(row['last_modified'])
                     self.tracking["lastDataCollectionDate"] = str(lastDataCollectionDate)
                     self.tracking["lastProcessBlobFileName"] = str(blobname)
-        
         self.updateTrackingJson(self.tracking)
-
+    
     def getLastestModifiedManifestFile(self): 
         container = ContainerClient.from_connection_string(conn_str=self.storageConnectionString, container_name=self.containerName)
     
@@ -114,19 +142,13 @@ class AzureCSVParserFinOpsAgent(BaseAgent):
         count = 0
         
         listblobs = container.list_blobs()
-        #self.baseLogger.info("Size of list blob "+str(len(list(listblobs))))
         
         for blob in listblobs:
-        #for blob in container.list_blobs():
             blobnamedict = blob.get("name")
             if "_manifest.json" in blobnamedict:
-                #self.baseLogger.info(blob)
                 file_date_df.loc[count] = [f'{blob.name}', f'{blob.last_modified}']
                 count = count + 1
-                
-        for index, row in file_date_df.iterrows():
-           self.baseLogger.info(row) 
-                
+          
         file_date_df['last_modified'] = pd.to_datetime(file_date_df['last_modified'], format='%Y-%m-%dT%H:%M:%S')
         
         blobRecordsSortWithDate = file_date_df.sort_values(by="last_modified")
@@ -185,9 +207,8 @@ class AzureCSVParserFinOpsAgent(BaseAgent):
         csvData = pd.read_csv(localpath)
         
         csvRecordFilterWithDate = csvData.sort_values(by="Date")
-
+        
         for index, row in csvRecordFilterWithDate.iterrows():
-            # self.baseLogger.info(str(index)+"  "+row['Date'])
             lastDataCollectionDate = self.processCostRecords(costData, row)
             
             if not pd.isna(row["ResourceId"]):
@@ -233,6 +254,7 @@ class AzureCSVParserFinOpsAgent(BaseAgent):
         costRowDetailDict["metercategory"] = row["MeterCategory"]
         costRowDetailDict["metersubcategory"] = row["MeterSubCategory"]
         costRowDetailDict["meter"] = row["MeterName"]
+        costRowDetailDict["costUSD"]  = self.finopsUtilities.convertCostINUSD(costRowDetailDict['cost'], costRowDetailDict['usagedate']) 
 
         costData.append(costRowDetailDict)
         
@@ -260,11 +282,9 @@ class AzureCSVParserFinOpsAgent(BaseAgent):
         resourceDetailsDict["pricingmodel"] = row["PricingModel"]
         resourceDetailsDict['cloudtype'] = 'azurecsv'    
         
-        if row['SubscriptionId'] not in self.uniquesubscriptionList and not pd.isna(row['SubscriptionId']):
-            self.uniquesubscriptionList.append(row['SubscriptionId']) 
-            
-        if resourceGroup not in self.uniquesubscriptionList and not pd.isna(resourceGroup):
-            self.uniqueResouseGroupList.append(resourceGroup) 
+        if not pd.isna(row['SubscriptionId']) and not pd.isna(resourceGroup):
+            subdict={subDict:resourceDetailsDict[subDict] for subDict in ['subscriptionid','subscriptionname','resourcegroups']}
+            self.uniqueSubscriptionAndResourceList.append(subdict) 
         
         if not pd.isna(row["AdditionalInfo"]):
              res = json.loads(row["AdditionalInfo"])

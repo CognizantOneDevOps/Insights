@@ -18,23 +18,28 @@ package com.cognizant.devops.platformservice.test.automl;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
-
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.multipart.MultipartFile;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
 import com.cognizant.devops.automl.service.TrainModelsServiceImpl;
+import com.cognizant.devops.automl.controller.InsightsTrainModelController;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformdal.assessmentreport.InsightsKPIConfig;
+import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
 import com.cognizant.devops.platformdal.autoML.AutoMLConfig;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
@@ -44,27 +49,30 @@ import com.cognizant.devops.platformservice.workflow.service.WorkflowServiceImpl
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+@Test
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
+@SuppressWarnings("unused")
+@WebAppConfiguration
 public class TrainModelsServiceTest extends TrainModelsServiceTestData {
 	private static Logger log = LogManager.getLogger(TrainModelsServiceTest.class);
 	
+	@Autowired
+	InsightsTrainModelController InsightsTrainModelController;
+	@Autowired
 	TrainModelsServiceImpl trainModelsServiceImpl;
-	WorkflowServiceImpl workflowService = new WorkflowServiceImpl();
+	@Autowired
+	WorkflowServiceImpl workflowService;//= new WorkflowServiceImpl();
 	WorkflowDAL workflowConfigDAL = new WorkflowDAL();
-	
+	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
 	@BeforeClass
 	public void onInit() throws InsightsCustomException, IOException {
-		
-		trainModelsServiceImpl = new TrainModelsServiceImpl();
-
 		//add workflow type for automl
 		InsightsWorkflowType workflowTypeObj = workflowConfigDAL.getWorkflowType(WorkflowTaskEnum.WorkflowType.AUTOML.getValue());
 		if (workflowTypeObj == null) {
 			InsightsWorkflowType type = new InsightsWorkflowType();
 			type.setWorkflowType(WorkflowTaskEnum.WorkflowType.AUTOML.getValue());
 			workflowConfigDAL.saveWorkflowType(type);
-		} 
-
+		}
 		//add workflow task for automl if not present
 		List<InsightsWorkflowTask> listofTasks = workflowConfigDAL.getTaskLists(WorkflowTaskEnum.WorkflowType.AUTOML.getValue());
 		if(listofTasks.isEmpty()) {
@@ -72,10 +80,7 @@ public class TrainModelsServiceTest extends TrainModelsServiceTestData {
 		} else {
 			isTaskExists = true;
 		}
-		
 		h2oEndpoint = ApplicationConfigProvider.getInstance().getMlConfiguration().getH2oEndpoint();
-		
-		
 	}
 	
 	//save automl usecase and check entry in workflow Config
@@ -83,43 +88,39 @@ public class TrainModelsServiceTest extends TrainModelsServiceTestData {
 	public void testSaveAutoMLConfig() throws IOException, InsightsCustomException {
 		FileInputStream input = new FileInputStream(file);
 		MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "text/plain",IOUtils.toByteArray(input));
-		int id = trainModelsServiceImpl.saveAutoMLConfig(multipartFile, usecase, configuration, 
+		ResponseEntity<JsonObject> response = InsightsTrainModelController.saveUsecase(multipartFile, usecase, configuration, 
 				trainingPercent, predictionColumn, numOfModels, getTaskList(),"Regression");
-		AutoMLConfig automl = autoMLConfigDAL.getMLConfigByUsecase(usecase);
+		
+	    AutoMLConfig automl = autoMLConfigDAL.getMLConfigByUsecase(usecase);
 		InsightsWorkflowConfiguration workflowConfig = workflowConfigDAL.getWorkflowByWorkflowId(automl.getWorkflowConfig()
 				.getWorkflowId());
 		Assert.assertTrue(workflowConfig.isRunImmediate());
 		Assert.assertEquals(workflowConfig.getStatus(), WorkflowTaskEnum.WorkflowStatus.NOT_STARTED.toString());
 		Assert.assertNotNull(automl);
-		Assert.assertNotNull(id);
-		Assert.assertNotEquals(id, -1);
 	}
 	
 	//save with existing usecase name
-	@Test(priority = 2, expectedExceptions = InsightsCustomException.class)
+	@Test(priority = 2)
 	public void testSaveAutoMlConfigWithExistingUsecase() throws InsightsCustomException, IOException {
 		FileInputStream input = new FileInputStream(file);
 		MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "text/plain",IOUtils.toByteArray(input));
-		int id = trainModelsServiceImpl.saveAutoMLConfig(multipartFile, usecase, configuration, 
+		ResponseEntity<JsonObject> response = InsightsTrainModelController.saveUsecase(multipartFile, usecase, configuration, 
 				trainingPercent, predictionColumn, numOfModels, getTaskList(),"Regression");
+		Assert.assertEquals(response.getStatusCodeValue(), 200);
+		Assert.assertEquals(response.getBody().get("status").getAsString().replace("\"", ""), PlatformServiceConstants.FAILURE);
 	}
 	
 	@Test(priority = 3)
 	public void validateUsecaseName() throws InsightsCustomException, IOException {
-		JsonObject response = trainModelsServiceImpl.validateUsecaseName(usecase);
-		Assert.assertTrue(response.has("UniqueUsecase"));
-		Assert.assertEquals(response.get("UniqueUsecase").getAsBoolean(), true);
-		
+		JsonObject response = InsightsTrainModelController.validateUsecaseName(usecase);
+		Assert.assertEquals(response.get("data").getAsJsonObject().get("UniqueUsecase").getAsBoolean(), true);
 	}
 	
-	//get all usecases from db
 	@Test(priority = 4)
 	public void testGetUsecase() throws InsightsCustomException {
-		JsonObject automl = trainModelsServiceImpl.getUsecases();
-		Assert.assertNotNull(automl);
-		Assert.assertTrue(automl.has("usecases"));
+		ResponseEntity<JsonObject> response = InsightsTrainModelController.getUsecases();
+		Assert.assertEquals(response.getBody().get("data").getAsJsonObject().get("usecases").isJsonNull(), false);
 	}
-	
 	
 	@Test(priority = 5)
 	public void testGetLeaderBoard() throws InsightsCustomException, IOException {
@@ -134,7 +135,6 @@ public class TrainModelsServiceTest extends TrainModelsServiceTestData {
 		Assert.assertTrue(leaderboard.has("data"));
 		Assert.assertNotNull(leaderboard);
 		Assert.assertNotNull(modelName);
-
 	}
 	
 	@Test(priority = 6)
@@ -174,29 +174,68 @@ public class TrainModelsServiceTest extends TrainModelsServiceTestData {
 		JsonObject usecaseJson = new JsonObject();
 		usecaseJson.addProperty("usecaseName", usecase);
 		usecaseJson.addProperty("isActive", false);
-		String actual = trainModelsServiceImpl.updateUsecaseState(usecaseJson);
-		String expected = usecase + " state updated successfully.";
-		Assert.assertEquals(actual, expected);
+		JsonObject response = InsightsTrainModelController.updateUsecaseState(usecaseJson.toString());
+		Assert.assertEquals(response.get("status").getAsString().replace("\"", ""), PlatformServiceConstants.SUCCESS);
+		String expectedResponse = usecase + " state updated successfully.";
+		Assert.assertEquals(response.get("data").getAsString().replace("\"", ""), expectedResponse);
 	}
 	
+	@Test(priority = 10)
+	public void testUpdateUsecaseStatewithInvalidUseCase() throws InsightsCustomException {
+		JsonObject usecaseJson = new JsonObject();
+		usecaseJson.addProperty("usecaseName", usecase+"321");
+		usecaseJson.addProperty("isActive", false);
+		JsonObject response = InsightsTrainModelController.updateUsecaseState(usecaseJson.toString());
+		Assert.assertEquals(response.get("status").getAsString().replace("\"", ""), PlatformServiceConstants.FAILURE);
+	}
+	
+	@Test(priority = 11)
+	public void testUpdateUsecaseStatewithKPIHasUseCase() throws InsightsCustomException {
+		insightsAssessmentReportController.saveKpiDefinition(registerkpiwithUsecase);
+		List<InsightsKPIConfig> list = reportConfigDAL.getKpiConfigByUsecase(usecase);
+		JsonObject usecaseJson = new JsonObject();
+		usecaseJson.addProperty("usecaseName", usecase);
+		usecaseJson.addProperty("isActive", false);
+		JsonObject response = InsightsTrainModelController.updateUsecaseState(usecaseJson.toString());
+		Assert.assertEquals(response.get("status").getAsString().replace("\"", ""), PlatformServiceConstants.FAILURE);
+		JsonObject response1 = insightsAssessmentReportController.deleteKpiDefinition(deleteKpiString);
+	}
+	
+	@Test(priority = 12)
+	public void testUpdateUsecaseStatewithKPIHasUseCaseAndActiveState() throws InsightsCustomException {
+		insightsAssessmentReportController.saveKpiDefinition(registerkpiwithUsecaseActiveState);
+		List<InsightsKPIConfig> list = reportConfigDAL.getKpiConfigByUsecase(usecase);
+		JsonObject usecaseJson = new JsonObject();
+		usecaseJson.addProperty("usecaseName", usecase);
+		usecaseJson.addProperty("isActive", true);
+		JsonObject response = InsightsTrainModelController.updateUsecaseState(usecaseJson.toString());
+		Assert.assertEquals(response.get("status").getAsString().replace("\"", ""), PlatformServiceConstants.SUCCESS);
+		JsonObject response1 = insightsAssessmentReportController.deleteKpiDefinition(deleteKpiString);	
+	}
 	
 	//delete usecase from postgres along with Csv file
-	@Test(priority = 10)
+	@Test(priority = 13)
 	public void testDeleteUsecase() throws InsightsCustomException {
-		JsonObject automl = trainModelsServiceImpl.deleteUsecase(usecase);
-		Assert.assertNotNull(automl);
-		Assert.assertEquals(automl.get("statusCode").getAsInt(), 1);
+		ResponseEntity<JsonObject> response = InsightsTrainModelController.deleteUsecase(usecase);
+	    Assert.assertEquals(response.getBody().get("status").getAsString().replace("\"", ""), PlatformServiceConstants.SUCCESS);
+	    Assert.assertEquals(response.getBody().get("data").getAsJsonObject().get("statusCode").getAsInt(), 1);
+	}
+	
+	@Test(priority = 14)
+	public void testDeleteWithInValidUsecase() throws InsightsCustomException {
+		try {
+			ResponseEntity<JsonObject> response = InsightsTrainModelController.deleteUsecase("&amp;{<"+usecase);
+			}catch (Exception e) {
+			Assert.assertEquals(true, e.toString().contains("Invalid request"));
+		}
 	}
 	
 	@AfterClass
 	public void cleanUp() {
-		
 		//delete workflow task
 		if(!isTaskExists) {
 			int taskId = workflowConfigDAL.getTaskId(mqChannel);
 			workflowConfigDAL.deleteTask(taskId);
 		}
-		
 	}
-
 }

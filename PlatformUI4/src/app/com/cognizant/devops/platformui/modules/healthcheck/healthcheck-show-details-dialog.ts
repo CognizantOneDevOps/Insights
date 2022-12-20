@@ -51,7 +51,7 @@ export class ShowDetailsDialog implements OnInit {
   headerArrayDisplay = [];
   masterHeader = new Map<String, String>();
   finalHeaderToShow = new Map<String, String>();
-  displayedColumns: string[] = ["inSightsTimeX", "message"];
+  displayedColumns: string[] = ["inSightsTime", "message"];
   headerSet = new Set();
   showAgentFailureTab: boolean = false;
   timeZoneAbbr: string = "";
@@ -86,12 +86,12 @@ export class ShowDetailsDialog implements OnInit {
     }
   }
 
-  ngAfterViewInit() {}
+  ngAfterViewInit() { }
 
   fillMasterHeaderData() {
     this.masterHeader.set("execId", "Execution ID");
     this.masterHeader.set(
-      "inSightsTimeX",
+      "inSightsTime",
       "Execution Time (" + this.timeZoneAbbr + ")"
     );
     this.masterHeader.set("status", "Status");
@@ -109,9 +109,11 @@ export class ShowDetailsDialog implements OnInit {
         this.data.agentId
       )
       .then((data) => {
+        console.log(data);
         this.showThrobber = false;
         this.showContent = !this.showThrobber;
-        var dataArray = data.data.nodes;
+        var dataArray = data.data;
+        console.log(dataArray);
         if (dataArray != undefined) {
           this.pathName = this.data.pathName;
           if (
@@ -134,33 +136,31 @@ export class ShowDetailsDialog implements OnInit {
             this.showAgentFailureTab = true;
           }
 
-          for (var key in dataArray) {
-            var dataNodes = dataArray[key];
-            for (var node in dataNodes) {
-              if (node == "propertyMap") {
-                var obj = dataNodes[node];
-                if (typeof obj["inSightsTimeX"] !== "undefined") {
-                  obj["inSightsTimeX"] = this.datePipe.transform(
-                    obj["inSightsTimeX"],
-                    "yyyy-MM-dd HH:mm:ss"
-                  );
-                }
-                if (typeof obj["status"] !== "undefined") {
-                  obj["status"] = this.titlecase.transform(obj["status"]);
-                }
-                if (typeof obj["message"] !== "undefined") {
-                  obj["message"] = obj["message"].slice(0, 120);
-                }
-                this.agentDetailedNode.push(obj);
-                for (var attr in obj) {
-                  // fill data array in set , Only those header which mention in masterHeader
-                  if (this.masterHeader.has(attr)) {
-                    this.headerSet.add(attr);
-                  }
-                }
+          dataArray.forEach((obj) => {
+
+            if (typeof obj["inSightsTime"] !== "undefined") {
+              var utcSeconds=  obj["inSightsTime"];
+              var inSightsTimeX = new Date(0); 
+              inSightsTimeX.setUTCSeconds(utcSeconds);  
+              obj["inSightsTime"] = this.datePipe.transform(
+                inSightsTimeX,
+                "yyyy-MM-dd HH:mm:ss"
+              );       
+            }
+            if (typeof obj["status"] !== "undefined") {
+              obj["status"] = this.titlecase.transform(obj["status"]);
+            }
+            if (typeof obj["message"] !== "undefined") {
+              obj["message"] = obj["message"].slice(0, 120);
+            }
+            this.agentDetailedNode.push(obj);
+            for (var attr in obj) {
+              // fill data array in set , Only those header which mention in masterHeader
+              if (this.masterHeader.has(attr)) {
+                this.headerSet.add(attr);
               }
             }
-          }
+          })
           this.agentDetailedDatasource.data = this.agentDetailedNode;
           console.log(this.agentDetailedDatasource.data);
 
@@ -178,27 +178,19 @@ export class ShowDetailsDialog implements OnInit {
       )
       .then((data) => {
         // Method body
-        var failureRecords = data.data.nodes;
+        var failureRecords = data.data;
+        console.log(failureRecords);
         if (failureRecords != undefined) {
-          for (var key in failureRecords) {
-            var dataNodes = failureRecords[key];
-            for (var node in dataNodes) {
-              if (node == "propertyMap") {
-                var obj = dataNodes[node];
-                if (typeof obj["inSightsTimeX"] !== "undefined") {
-                  obj["inSightsTimeX"] = this.datePipe.transform(
-                    obj["inSightsTimeX"],
-                    "yyyy-MM-dd HH:mm:ss"
-                  );
-                }
-
-                if (typeof obj["message"] !== "undefined") {
-                  obj["message"] = obj["message"];
-                }
-                this.agentFailureRecords.push(obj);
-              }
+          failureRecords.forEach((obj) => {
+            if (typeof obj["inSightsTime"] !== "undefined") {
+              obj["inSightsTime"] = this.dataShare.formatInsightsTime(obj["inSightsTime"]);
             }
-          }
+
+            if (typeof obj["message"] !== "undefined") {
+              obj["message"] = obj["message"];
+            }
+            this.agentFailureRecords.push(obj);
+          })
           this.agentFailureDetailsDatasource.data = this.agentFailureRecords;
         }
       });

@@ -17,24 +17,19 @@ package com.cognizant.devops.platformservice.test.grafanadashboard;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import javax.servlet.http.Cookie;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -44,12 +39,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.testng.Assert;
 import org.testng.AssertJUnit;
 import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
@@ -58,8 +53,10 @@ import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfig;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfigDAL;
-import com.cognizant.devops.platformservice.grafanadashboard.service.GrafanaPdfServiceImpl;
+import com.cognizant.devops.platformservice.emailconfiguration.controller.InsightsEmailConfigurationController;
+import com.cognizant.devops.platformservice.grafanadashboard.service.GrafanaPdfService;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
+import com.cognizant.devops.platformservice.workflow.service.WorkflowServiceImpl;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -70,25 +67,22 @@ import com.google.gson.JsonSyntaxException;
 @Test
 @WebAppConfiguration
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
-public class GrafanaDashboardReportTest extends AbstractTestNGSpringContextTests {
+public class GrafanaDashboardReportTest extends GrafanaDashboardReportData{
 
-	private static final Logger log = LogManager.getLogger(GrafanaDashboardReportTest.class);
-	private static final String AUTHORIZATION = "authorization";
-
-	Map<String, String> testAuthData = new HashMap<>();
-
-	GrafanaDashboardReportData grafanaDashboard = new GrafanaDashboardReportData();
-
-	MockHttpServletRequest httpRequest = new MockHttpServletRequest();
-	ResultMatcher ok = MockMvcResultMatchers.status().isOk();
-	String cookiesString;
-
-	GrafanaPdfServiceImpl grafanaPdfServiceImpl = new GrafanaPdfServiceImpl();
-
+	private static final Logger log = LogManager.getLogger(GrafanaDashboardReportData.class);
+	
+	@Autowired
+	WorkflowServiceImpl workflowService;
+	@Autowired
+	GrafanaPdfService grafanaPdfServiceImpl;
 	@Autowired
 	private WebApplicationContext wac;
-
+	@Autowired
+	InsightsEmailConfigurationController insightsEmailConfigurationController;
+	MockHttpServletRequest httpRequest = new MockHttpServletRequest();
+	ResultMatcher ok = MockMvcResultMatchers.status().isOk();
 	private MockMvc mockMvc;
+	private final String AUTHORIZATION = "authorization";
 
 	@DataProvider
 	public void getData() {
@@ -102,7 +96,29 @@ public class GrafanaDashboardReportTest extends AbstractTestNGSpringContextTests
 		}
 		testAuthData = new Gson().fromJson(jsonData, Map.class);
 	}
-
+	
+	private void deleteApiKeys() {
+		try {
+			GrafanaHandler grafanaHandler = new GrafanaHandler();
+			Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
+			String responseAuthKey = grafanaHandler.grafanaGet("/api/auth/keys", headers);
+			JsonArray detailsOfAPIJsonArray = JsonUtils.parseStringAsJsonArray(responseAuthKey);
+			for (JsonElement jsonElement : detailsOfAPIJsonArray) {
+				if (jsonElement.getAsJsonObject().has("id")
+						&& jsonElement.getAsJsonObject().get("name").getAsString().equalsIgnoreCase("pdftoken")) {
+					try {
+						grafanaHandler.grafanaDelete("/api/auth/keys/" + jsonElement.getAsJsonObject().get("id"),
+								headers);
+					} catch (Exception e) {
+						log.error(" Unable to delete API token ", e);
+					}
+				}
+			}
+		} catch (Exception e) {
+			log.error(" Unable to delete API token ", e);
+		}
+	}
+	
 	@BeforeClass
 	public void onInit() throws InterruptedException, IOException, InsightsCustomException {
 		getData();
@@ -140,47 +156,20 @@ public class GrafanaDashboardReportTest extends AbstractTestNGSpringContextTests
 		return MockMvcRequestBuilders.post(url).cookie(httpRequest.getCookies())
 				.header("Authorization", testAuthData.get(AUTHORIZATION)).header("Cookie", cookiesString);
 	}
-
-	private void deleteApiKeys() {
-		try {
-			GrafanaHandler grafanaHandler = new GrafanaHandler();
-
-			Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
-			String responseAuthKey = grafanaHandler.grafanaGet("/api/auth/keys", headers);
-			JsonArray detailsOfAPIJsonArray = JsonUtils.parseStringAsJsonArray(responseAuthKey);
-
-			for (JsonElement jsonElement : detailsOfAPIJsonArray) {
-				if (jsonElement.getAsJsonObject().has("id")
-						&& jsonElement.getAsJsonObject().get("name").getAsString().equalsIgnoreCase("pdftoken")) {
-					try {
-						grafanaHandler.grafanaDelete("/api/auth/keys/" + jsonElement.getAsJsonObject().get("id"),
-								headers);
-					} catch (Exception e) {
-						log.error(" Unable to delete API token ", e);
-						log.error(e);
-					}
-				}
-			}
-		} catch (Exception e) {
-			log.error(" Unable to delete API token ", e);
-		}
-	}
-
+	
 	@Test(priority = 1)
 	public void publishGrafanaDashboardDetails() throws InsightsCustomException {
-
 		try {
 			deleteApiKeys();
 			this.mockMvc = getMacMvc();
 			log.debug(" cookies " + httpRequest.getCookies());
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost(
-					"/dashboardReport/exportPDF/saveDashboardAsPDF", grafanaDashboard.dashboardJson);
+					"/dashboardReport/exportPDF/saveDashboardAsPDF", dashboardJson);
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing Save Dashboard " + e);
 		}
 		log.debug("Test case Save Dashboard successfully ");
-
 	}
 
 	@Test(priority = 2)
@@ -189,7 +178,6 @@ public class GrafanaDashboardReportTest extends AbstractTestNGSpringContextTests
 			deleteApiKeys();
 			this.mockMvc = getMacMvc();
 			log.debug(" cookies " + httpRequest.getCookies());
-
 			MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
 					.get("/dashboardReport/exportPDF/fetchGrafanaDashboardConfigs").cookie(httpRequest.getCookies())
 					.header("Authorization", testAuthData.get(AUTHORIZATION)).header("Cookie", cookiesString);
@@ -212,15 +200,36 @@ public class GrafanaDashboardReportTest extends AbstractTestNGSpringContextTests
 					id = g.getId();
 				}
 			}
-			JsonObject detailsJson = JsonUtils.parseStringAsJsonObject(grafanaDashboard.updateJson);
+			JsonObject detailsJson = JsonUtils.parseStringAsJsonObject(updateJson);
 			detailsJson.toString();
 			detailsJson.addProperty("id", id);
 			this.mockMvc = getMacMvc();
 			log.debug(" cookies " + httpRequest.getCookies());
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost(
-					"/dashboardReport/exportPDF/updateDashboardConfig", grafanaDashboard.updateJson);
-			grafanaPdfServiceImpl.updateGrafanaDashboardDetails(detailsJson);
+					"/dashboardReport/exportPDF/updateDashboardConfig", detailsJson.toString());
 			this.mockMvc.perform(builder).andExpect(ok);
+			
+			MockHttpServletRequestBuilder builder1 = mockHttpServletRequestBuilderPost(
+					"/dashboardReport/exportPDF/updateDashboardConfig", updateJson);
+			this.mockMvc.perform(builder1).andExpect(ok);
+			
+			MockHttpServletRequestBuilder builder2 = mockHttpServletRequestBuilderPost(
+					"/externalApi/exportPDF/getDashboardAsPDF", detailsJson.toString());
+			this.mockMvc.perform(builder2).andExpect(ok);
+			
+			JsonObject detailsJson1 = JsonUtils.parseStringAsJsonObject(updateJsonDBTrue);
+			detailsJson1.toString();
+			detailsJson1.addProperty("id", id);
+			MockHttpServletRequestBuilder builder3 = mockHttpServletRequestBuilderPost(
+					"/externalApi/exportPDF/getDashboardAsPDF", detailsJson1.toString());
+			this.mockMvc.perform(builder3).andExpect(ok);
+			
+			JsonObject detailsJson2 = JsonUtils.parseStringAsJsonObject(updateJsonValidation);
+			detailsJson2.toString();
+			detailsJson2.addProperty("id", id);
+			MockHttpServletRequestBuilder builder4 = mockHttpServletRequestBuilderPost(
+					"/externalApi/exportPDF/getDashboardAsPDF", detailsJson2.toString());
+			this.mockMvc.perform(builder4).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing Update Dashboard " + e);
 		}
@@ -299,7 +308,7 @@ public class GrafanaDashboardReportTest extends AbstractTestNGSpringContextTests
 			}
 		}
 
-		JsonObject dashObject = JsonUtils.parseStringAsJsonObject(grafanaDashboard.updateJson);
+		JsonObject dashObject = JsonUtils.parseStringAsJsonObject(updateJson);
 		dashObject.addProperty("id", id);
 		grafanaPdfServiceImpl.updateGrafanaDashboardDetails(dashObject);
 		List<GrafanaDashboardPdfConfig> updateDashboardPdfConfigs = grafanaPdfServiceImpl
@@ -312,7 +321,7 @@ public class GrafanaDashboardReportTest extends AbstractTestNGSpringContextTests
 	public void updateGrafanaDashboardDetailsExceptionTest() throws InsightsCustomException {
 
 		int id = 0;
-		JsonObject dashObject = JsonUtils.parseStringAsJsonObject(grafanaDashboard.updateJson);
+		JsonObject dashObject = JsonUtils.parseStringAsJsonObject(updateJson);
 		dashObject.addProperty("id", id);
 		grafanaPdfServiceImpl.updateGrafanaDashboardDetails(dashObject);
 	}
@@ -372,8 +381,30 @@ public class GrafanaDashboardReportTest extends AbstractTestNGSpringContextTests
 		JsonObject dashboardJson = JsonUtils.parseStringAsJsonObject(dashboardJsonString);
 		grafanaPdfServiceImpl.setDashboardActiveState(dashboardJson);
 	}
-
+	
 	@Test(priority = 15)
+		public void testGetAllDashboardTitleList() throws InsightsCustomException {
+			try {
+				
+				String expectedStatus = "success";
+				String userName = "{\"userName\":\"Test_User\"}";
+				
+				JsonObject response = insightsEmailConfigurationController.getAllReportTitles(GRAFANA_PDF_SOURCE, userName);
+				String actualStatus = response.get("status").getAsString().replace("\"", "");
+				JsonArray reportTitleList = response.get("data").getAsJsonArray();
+				
+				Assert.assertEquals(actualStatus, expectedStatus);
+				Assert.assertNotNull(reportTitleList);
+				Assert.assertTrue(reportTitleList.size()>0);
+				
+			}
+			catch (AssertionError e) {
+				Assert.fail(e.getMessage());
+			}
+		}
+
+
+	@Test(priority = 16)
 	public void deleteGrafanaDashboardDetails() throws InsightsCustomException {
 		try {
 			deleteApiKeys();

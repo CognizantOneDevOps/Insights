@@ -15,20 +15,25 @@
  *******************************************************************************/
 package com.cognizant.devops.platformservice.test.grafanaUser;
 
+import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.http.Cookie;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import com.google.gson.JsonElement;
 
-public class GrafanaUserDetailsTestData {
+public class GrafanaUserDetailsTestData extends AbstractTestNGSpringContextTests {
 
 	Cookie[] cookies = { new Cookie("JSESSIONID", ""), new Cookie("grafanaOrg", "1"),
 			new Cookie("grafanaRole", "Admin"), new Cookie("XSRF-TOKEN", "") };
-
+	JsonElement jsonData = null;
+	Map<String, String> testAuthData = new HashMap<>();
+	String AUTHORIZATION = "authorization";
 	String accept = "application/json, text/plain, */*";
 	String authorization = "";
 	String origin = "http://localhost:8181";
 	String referer = "http://localhost:8181/app";
 	String contentType = "application/json";
 	String XSRFTOKEN = "";
-
 	String authorizationException = "";
 	String host = "insights.cogdevops.com";
 	String contentTypeException = "application/json";

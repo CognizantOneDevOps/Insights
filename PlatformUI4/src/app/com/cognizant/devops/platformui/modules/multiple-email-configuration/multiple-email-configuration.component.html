@@ -1,0 +1,283 @@
+<!--
+*******************************************************************************
+ * Copyright 2022 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+
+ <div class ="cardCss">
+  <div layout layout-align="left" class="titleStyle" style="cursor: pointer">
+    <div> Email Configuration</div>
+  </div>
+  <div layout layout-align="left" class="sectionHeadingStyle">
+
+    <span style="padding-top: 3px; margin-left: 3px">
+      <button mat-icon-button (click)="list()" style="vertical-align: super">
+        <mat-icon svgIcon="backButton" matTooltip="Back"> </mat-icon>
+      </button>
+    </span>
+    <span class="alignSubHeader" style="margin-left: 5px"
+      ><b>Email Configuration</b> (Configure an Email)
+    </span>
+    <span class="btnAlign" style="margin-top: 0px; margin-bottom: 0px">
+      <button mat-icon-button (click)="addEmailConfig()">
+        <mat-icon
+          matTooltip="Add Email"
+          svgIcon="add"
+          class="mat-icon material-icons"
+        >
+        </mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        [disabled]="disableEdit"
+        (click)="editEmailConfig()"
+      >
+        <mat-icon
+          matTooltip="Edit Report"
+          svgIcon="edit"
+          class="mat-icon material-icons"
+        >
+        </mat-icon>
+      </button>
+      <button
+      mat-icon-button
+      
+      [disabled]="disableEdit"
+      (click)="deleteEmailConfig()"
+    >
+      <mat-icon
+        matTooltip="Delete Report"
+        svgIcon="trash"
+        class="mat-icon material-icons"
+        id="Delete"
+      >
+      </mat-icon>
+    </button>
+      
+    </span>
+    
+  </div>
+  <div>
+    <div style="display: flex; justify-content: center; align-items: center">
+      <div class="loading-indicator">
+        <mat-progress-spinner
+          *ngIf="isDatainProgress"
+          [diameter]="100"
+          color="primary"
+          mode="indeterminate"
+        >
+        </mat-progress-spinner>
+      </div>
+    </div>
+    <div>
+      <mat-radio-group [(ngModel)] = "selectedEmailConfig">
+        <table
+          mat-table
+          [dataSource]="userDataSource"          
+          class=""
+        >
+        <!-- Radio Button Column -->
+        <ng-container matColumnDef="radio">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="tableHeader"
+            style="width: 2% !important"
+          ></th>
+          <td
+            mat-cell
+            *matCellDef="let element; let i = index"
+            style="width: 3% !important"
+          >
+            <mat-radio-button
+              [value]="element"
+              [checked]="refreshRadio"
+              (click)="enableButtons($event, i)"
+              style="padding-top: 10px !important;"
+            ></mat-radio-button>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="batchname">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">Name</th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            style="width: 25% !important"
+          >
+            {{ element.batchName }}
+          </td>
+        </ng-container>
+        
+        <ng-container matColumnDef="schedule">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            Schedule
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            style="width: 18% !important"
+          >
+            {{ element.schedule }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="lastrun">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            Last Email Sent ({{ timeZoneAbbr }})
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            style="width: 18% !important"
+          >
+            {{ element.lastRun}}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="nextrun">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            Next Schedule ({{ timeZoneAbbr }})
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            style="width: 18% !important"
+          >
+            {{ element.nextRun}}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Active">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            Active
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element; let i = index"
+            style="width: 12% !important"
+          >
+            <mat-slide-toggle
+              (change)="updateStatus($event, element.groupTemplateId, element)"
+              [(ngModel)]="element.isActive"
+              [checked]="isActive"
+              [disabled]="selectedIndex != i + currentPageValue"
+              [matTooltip]="element.isActive ? 'Active' : 'Inactive'"
+            >
+            </mat-slide-toggle>
+          </td>
+        </ng-container>
+        
+        <ng-container matColumnDef="details">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            Details
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element; let i = index"
+            style="width: 10% !important"
+          >
+            <button
+              mat-icon-button
+              (click)="showWorkflowHistoryDetailsDialog(
+                element.batchName,
+                element.workflowId
+              )"
+              [disabled]="selectedIndex != i + currentPageValue"
+            >
+              <mat-icon
+                svgIcon="healthcheck_show_details"
+                [ngStyle]="{
+                  height: '20px',
+                  width: '20px',
+                  'margin-bottom': '10px',
+                  'padding-left': '0.8% !important'
+                }"
+              >
+              </mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </mat-radio-group>
+    <div class="footer">
+      <div class="paginator">
+        <mat-paginator
+          style="visibility: hidden"
+          #paginator
+          [pageSize]="MAX_ROWS_PER_TABLE"
+        >
+        </mat-paginator>
+        <div
+          class="paginatorElement"
+          (click)="goToPrevPage()"
+          [attr.disabled]="!this.paginator.hasPreviousPage()"
+          [ngStyle]="
+            !this.paginator.hasPreviousPage() ? { cursor: 'not-allowed' } : ''
+          "
+        >
+          <mat-icon
+            svgIcon="prev-page"
+            class="pageIcons"
+            style="cursor: pointer"
+            *ngIf="this.paginator.hasPreviousPage()"
+            style="height: 24px !important; width: 24px !important"
+          >
+          </mat-icon>
+          <mat-icon
+            svgIcon="prev-page"
+            class="pageIcons disabled-icon"
+            *ngIf="!this.paginator.hasPreviousPage()"
+            style="height: 24px !important; width: 24px !important"
+          >
+          </mat-icon>
+        </div>
+        <div class="paginatorElement paginatorIndexElement">
+          {{ currentPageIndex }}
+        </div>
+        <div
+          class="paginatorElement"
+          (click)="goToNextPage()"
+          [attr.disabled]="!this.paginator.hasNextPage()"
+          [ngStyle]="
+            !this.paginator.hasNextPage() ? { cursor: 'not-allowed' } : ''
+          "
+        >
+          <mat-icon
+            svgIcon="next-page"
+            style="cursor: pointer"
+            class="pageIcons"
+            *ngIf="this.paginator.hasNextPage()"
+            style="height: 24px !important; width: 24px !important"
+          >
+          </mat-icon>
+          <mat-icon
+            svgIcon="next-page"
+            class="pageIcons disabled-icon"
+            *ngIf="!this.paginator.hasNextPage()"
+            style="height: 24px !important; width: 24px !important"
+          >
+          </mat-icon>
+        </div>
+        <div>of {{ totalPages }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+

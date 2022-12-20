@@ -51,11 +51,13 @@ public final class AssessmentReportAndWorkflowConstants {
 	public static final String TASK_DESCRIPTION = "description";
 	public static final String WORKFLOW = "Workflow";
 	public static final String WORKFLOW_ID = "workflowId";
+	public static final String AGENT_ID = "agentId";
 	// WorkflowDataHandler class constant
 	public static final String CURRENTTASKID = "currentTaskId";
 	public static final String EXECUTIONID = "executionId";
 	public static final String NEXT_TASK_ID = "nextTaskId";
 	public static final String CONTENTNAME = "contentName";
+	public static final String COMPONENTNAME = "componentName";
 
 	public static final String ACTUALDIRECTION = "actualdirection";
 	public static final String BELOW = "Below";

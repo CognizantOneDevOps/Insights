@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.test.workflow;
 
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
@@ -22,16 +23,26 @@ import com.cognizant.devops.platformdal.workflow.InsightsWorkflowExecutionHistor
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.google.gson.JsonObject;
 
-public class WorkflowServiceTestData {
+public class WorkflowServiceTestData extends AbstractTestNGSpringContextTests{
 
 	WorkflowDAL workflowConfigDAL = new WorkflowDAL();
-
+	int taskID = 0;
+	int emailTaskID = 0;
+	int assessmentId = 0;
+	int systemHealthTaskId = 0;
+	int systemEmailTaskId = 0;
+	int workflowTypeId = 0;
+	String workflowId = null;
+	String system_workflowId = "SYSTEM_HealthNotification";
 	String workflowType = "Report";
-
+	String incorrectWorkflowType = "Reportt";
+	String updateWorkflowTaskData = "";
+	String updateWorkflowTaskDataValidation="";
+	String workflowTaskDataUpdateException = "";
+	public JsonObject dailyAssessmentReportWorkflowJson=null;
 	int historyid = 0;
-
 	int reportId = 0;
-
+	
 	String registerkpiWorkflow = "{\"kpiId\":123456,\"name\":\"Total Successful Deployments_workflow\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN count(n.SPKstatus) as totalDeploymentCount\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"totalDeploymentCount\",\"outputDatasource\":\"NEO4J\",\"usecase\":\"\"}";
 	public JsonObject registerkpiWorkflowJson = convertStringIntoJson(registerkpiWorkflow);
 
@@ -46,15 +57,42 @@ public class WorkflowServiceTestData {
 
 	String incorrectWorkflowTask = "{\"description\": \"KPI_Execute_Workflow_test\",\"componentName\": \"com.cognizant.devops.platforminsights.workflowtask.message.tasksubscribers.ReportKPISubscriber\",\"dependency\": \"100\",\"workflowType\": \"Report\"}";
 
+	String workflowTaskDataException = "{\"Id\":123, \"descriptionn\": \"KPI_Execute_Workflow_test\",\"mqChannnel\": \"WORKFLOW.WORKFLOWSERVICE_TEST.TASK.KPI.EXCECUTION\",\"componentName\": \"com.cognizant.devops.platformreports.assessment.core.ReportKPISubscriber\",\"dependency\": \"100\",\"workflowType\": \"Report\"}";
+	
+	String workflowTaskDataExceptionValidation = "&amp;{<\"Id\":123, \"descriptionn\": \"KPI_Execute_Workflow_test\",\"mqChannnel\": \"WORKFLOW.WORKFLOWSERVICE_TEST.TASK.KPI.EXCECUTION\",\"componentName\": \"com.cognizant.devops.platformreports.assessment.core.ReportKPISubscriber\",\"dependency\": \"100\",\"workflowType\": \"Report\"}";
+
 	public JsonObject incorrectWorkflowTaskJson = convertStringIntoJson(incorrectWorkflowTask);
 
+	public void getWorkflowTaskData(int TaskId)
+	{
+		this.updateWorkflowTaskData = "{\"taskId\":" + TaskId+ ",\"description\": \"demo\",\"mqChannel\": \"WORKFLOW.WORKFLOWSERVICE_TEST.TASK.KPI.EXCECUTION\",\"componentName\": \"com.cognizant.devops.platformreports.assessment.core.ReportKPISubscriber\",\"dependency\": \"100\",\"workflowType\": \"Report\"}";
+		this.updateWorkflowTaskDataValidation = "&amp;{<\"taskId\":" + TaskId+ ",\"description\": \"demo\",\"mqChannel\": \"WORKFLOW.WORKFLOWSERVICE_TEST.TASK.KPI.EXCECUTION\",\"componentName\": \"com.cognizant.devops.platformreports.assessment.core.ReportKPISubscriber\",\"dependency\": \"100\",\"workflowType\": \"Report\"}";
+		this.workflowTaskDataUpdateException = "{\"taskId\":" + (TaskId+123)+ ",\"description\": \"demo\",\"mqChannel\": \"WORKFLOW.WORKFLOWSERVICE_TEST.TASK.KPI.EXCECUTION\",\"componentName\": \"com.cognizant.devops.platformreports.assessment.core.ReportKPISubscriber\",\"dependency\": \"100\",\"workflowType\": \"Report\"}";
+		
+	}
+	
+	public void setReportId(int reportId) {
+		this.reportId=reportId;
+	}
+	
 	public JsonObject convertStringIntoJson(String convertregisterkpi) {
 		JsonObject objectJson = new JsonObject();
 		objectJson = JsonUtils.parseStringAsJsonObject(convertregisterkpi);
 		return objectJson;
 	}
 
-	public int updateWorkflowExecutionHistory(String workflowId, int taskId) {
+	public void SetInfo(int task, int emailTaskID)
+	{
+		this.taskID = task;
+		this.emailTaskID=emailTaskID;
+		String dailyAssessmentReportWorkflow = "{\"reportName\":\"Daily_Deployment_Workflow\",\"reportTemplate\":"+this.reportId+",\"emailList\":\"fdfsfsdfs\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"+taskID+",\"sequence\":0}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null,\"orgName\":\"Test Org\",\"userName\":\"Test_User\"}";
+		dailyAssessmentReportWorkflowJson = convertStringIntoJson(dailyAssessmentReportWorkflow);
+
+	}
+	
+	public int updateWorkflowExecutionHistory(String workflowId, int taskId, int assessmentId) {
+		this.workflowId=workflowId;
+		this.assessmentId=assessmentId;
 		InsightsWorkflowConfiguration workflowConfig = workflowConfigDAL.getWorkflowConfigByWorkflowId(workflowId);
 		InsightsWorkflowExecutionHistory historyConfig = new InsightsWorkflowExecutionHistory();
 		historyConfig.setCurrenttask(taskId);
@@ -65,4 +103,5 @@ public class WorkflowServiceTestData {
 		int historyId = workflowConfigDAL.saveTaskworkflowExecutionHistory(historyConfig);
 		return historyId;
 	}
+	
 }

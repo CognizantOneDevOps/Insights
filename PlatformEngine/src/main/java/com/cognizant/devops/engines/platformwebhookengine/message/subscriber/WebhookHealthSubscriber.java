@@ -26,16 +26,18 @@ import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogg
 import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformdal.healthutil.HealthUtil;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Envelope;
+import com.cognizant.devops.platformcommons.constants.ServiceStatusConstants;
 
 public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 	private static Logger log = LogManager.getLogger(WebhookHealthSubscriber.class);
 	private String jobName = ""; 
+	HealthUtil healthUtil = new HealthUtil();
 	
 	public WebhookHealthSubscriber(String routingKey, String jobName) throws Exception {
 		super(routingKey);
@@ -45,7 +47,6 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 	@Override
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body)
 			throws IOException {
-		GraphDBHandler dbHandler = new GraphDBHandler();
 		String message = new String(body, StandardCharsets.UTF_8);
 		String routingKey = envelope.getRoutingKey();
 		log.debug(" {}  Received  {} : {}", consumerTag, routingKey, message);
@@ -54,52 +55,32 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 		if (json.isJsonObject()) {
 			log.debug("This is normal json object for webhook health ");
 			dataList.add(json.getAsJsonObject());
-		}
-				
+		}				
 		JsonObject messageObj = json.getAsJsonObject();
+		String componentName = ServiceStatusConstants.PLATFORM_WEBHOOK_SUBSCRIBER;
+		String status = JsonUtils.getValueFromJson(messageObj, "status");
+		String healthMessage = JsonUtils.getValueFromJson(messageObj , "message");
+		String version = JsonUtils.getValueFromJson(messageObj , "version");
+		//WebhookHealthSubscriber.class.getPackage().getImplementationVersion();				
+		
 		try {		
-			log.debug("Type=WebhookHealth {} routingKey={} status={} serverPort={}"
-					,messageObj.get("message").getAsString(),routingKey,messageObj.get("status").getAsString(),messageObj.get("serverPort").getAsString());
-			if (!dataList.isEmpty()) {
-				String healthLabels = ":" + routingKey.replace(".", ":");
-				boolean isRecordUpdate = createHealthNodes(dbHandler, dataList, healthLabels);
-				log.debug("Webhook Health Record update status {} ==== " , isRecordUpdate);
-				if (isRecordUpdate) {
-					getChannel().basicAck(envelope.getDeliveryTag(), false);
-				}
+			log.debug("Type=WebhookHealth {} routingKey={} status={} serverPort={}",message,routingKey,status,messageObj.get("serverPort").getAsString());
+			if (!dataList.isEmpty()) {				
+				healthUtil.createComponentHealthDetails(componentName,version,healthMessage,status);				
+				log.debug("Insights WebhookHealthSubscriber Health Record updated");
+				getChannel().basicAck(envelope.getDeliveryTag(), false);				
 			} else {
 				log.error(" Data List is empty for webhook health record ");
 				EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
-						" Data List is empty for webhook health record: " + routingKey,
+						"Data List is empty for webhook health record: " + routingKey,
 						PlatformServiceConstants.FAILURE,jobName);
 			}
 		} catch (InsightsCustomException e) {
 			log.error("Type=WebhookHealth routingKey={} message={}  status={} serverPort={} error={}"
-					,routingKey,messageObj.get("message").getAsString(),messageObj.get("status").getAsString(),messageObj.get("serverPort").getAsString(),e.getMessage());
+					,routingKey,message,status,messageObj.get("serverPort").getAsString(),e.getMessage());
 			getChannel().basicReject(envelope.getDeliveryTag(), false);
 		}
 	}
 
-	/**
-	 * @param dbHandler
-	 * @param dataList
-	 * @param nodeLabels
-	 */
-	private boolean createHealthNodes(GraphDBHandler dbHandler, List<JsonObject> dataList, String nodeLabels)
-			throws InsightsCustomException {
-		String cypherhealthQuery;
-		boolean isRecordUpdate = Boolean.TRUE;
-		// For Sequential/successive webhook health publishing
-		cypherhealthQuery = "UNWIND $props AS properties CREATE (n" + nodeLabels
-				+ ") set n=properties return count(n)";
-
-		JsonObject graphResponse = dbHandler.executeQueryWithData(cypherhealthQuery, dataList);
-		if (graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0) {
-			isRecordUpdate = Boolean.FALSE;
-			log.error("Unable to insert health nodes for routing key: {} error {}  ", nodeLabels, graphResponse);
-			EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
-					"Unable to insert health nodes for routing key: " + nodeLabels, PlatformServiceConstants.FAILURE,jobName);
-		}
-		return isRecordUpdate;
-	}
+	
 }

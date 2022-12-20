@@ -19,18 +19,19 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.google.gson.JsonObject;
 
-public class DataArchivalServiceData {
-	
+
+public class DataArchivalServiceData extends AbstractTestNGSpringContextTests {
 	String configDetails = "{\"mqConfig\":{\"user\":\"iSight\",\"password\":\"iSight\",\"host\":\"127.0.0.1\",\"exchange\":\"iSight\",\"agentControlXchg\":\"iAgent\"},\"subscribe\":{\"config\":\"SYSTEM.ELASTICTRANSFER.CONFIG\",\"agentCtrlQueue\":\"Archival_agent_test\",\"dataArchivalQueue\":\"SYSTEM.ELASTICTRANSFER.DATAARCHIVAL\"},\"publish\":{\"data\":\"SYSTEM.ELASTICTRANSFER.DATA\",\"health\":\"SYSTEM.ELASTICTRANSFER.HEALTH\"},\"agentId\":\"Archival_agent_test\",\"toolCategory\":\"SYSTEM\",\"toolsTimeZone\":\"GMT\",\"insightsTimeZone\":\"Asia/Kolkata\",\"startFrom\":\"2017-10-01 00:00:01\",\"isDebugAllowed\":false,\"loggingSetting\":{\"logLevel\":\"WARN\",\"maxBytes\":5000000,\"backupCount\":1000},\"osversion\":\"windows\",\"agentVersion\":\"v6.8\",\"toolName\":\"elastictransfer\",\"labelName\":\"ELASTICTRANSFER\"}";
 	JsonObject agentJson = convertStringIntoJson(configDetails);
 	String trackingDetails = "";
 	Date updateDate = Timestamp.valueOf(LocalDateTime.now());
 	Boolean vault = false;
-	
 	String saveArchivalRecords = "{\"archivalName\":\"Dib_testng_10\",\"startDate\":\"2020-07-08T00:00:00Z\",\"endDate\":\"2020-07-10T00:00:00Z\",\"daysToRetain\":3,\"author\":\"\"}";
 	Long expectedStartDate = InsightsUtils.getEpochTime("2020-07-08T00:00:00Z") / 1000;
 	Long expectedEndDate = InsightsUtils.getEpochTime("2020-07-10T00:00:00Z") / 1000;

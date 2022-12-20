@@ -28,6 +28,7 @@ import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.AgentManagementDataModel;
 import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.ConfigurationFileManagementDataModel;
 import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.DashboardReportDataModel;
+import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.GroupEmailDashRepoDataModel;
 import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.OutcomeConfigDataModel;
 import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.ReportConfigurationDataModel;
 import com.cognizant.devops.platformregressiontest.test.ui.testdatamodel.TraceabilityDataModel;
@@ -88,6 +89,26 @@ public class ReadJsonData {
 		JsonElement dataSet = jsonData.getAsJsonObject().get("dataset");
 		List<DashboardReportDataModel> testData = new Gson().fromJson(dataSet,
 				new TypeToken<List<DashboardReportDataModel>>() {
+				}.getType());
+		Object[][] returnValue = new Object[testData.size()][1];
+		int index = 0;
+		for (Object[] each : returnValue) {
+			each[0] = testData.get(index++);
+		}
+		return returnValue;
+	}
+	
+	public static Object[][] readGroupEmailData(String jsonFile)
+			throws JsonIOException, JsonSyntaxException, FileNotFoundException {
+		JsonElement jsonData = null;
+		try {
+			jsonData = new JsonParser().parse(new FileReader(new File(jsonFile).getCanonicalPath()));
+		} catch (JsonIOException | JsonSyntaxException | IOException e) {
+			log.error(e);
+		}
+		JsonElement dataSet = jsonData.getAsJsonObject().get("dataset");
+		List<GroupEmailDashRepoDataModel> testData = new Gson().fromJson(dataSet,
+				new TypeToken<List<GroupEmailDashRepoDataModel>>() {
 				}.getType());
 		Object[][] returnValue = new Object[testData.size()][1];
 		int index = 0;

@@ -28,22 +28,25 @@ import com.google.gson.JsonObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
 
-public class UpshiftAssessmentServiceData {
+public class UpshiftAssessmentServiceData extends AbstractTestNGSpringContextTests{
     private static final Logger log = LogManager.getLogger(UpshiftAssessmentServiceData.class);
     ClassLoader classLoader = ClassLoader.getSystemClassLoader();
     UpshiftAssessmentConfigDAL upshiftAssessmentConfigDAL = new UpshiftAssessmentConfigDAL();
-    WorkflowServiceImpl workflowService = new WorkflowServiceImpl();
+    @Autowired
+    WorkflowServiceImpl workflowService;// = new WorkflowServiceImpl();
     WorkflowDAL workflowConfigDAL = new WorkflowDAL();
 
     int taskID = 0;
     int relationTaskID = 0;
-    MultipartFile testFile;
+    MultipartFile testFile, testFile1;
 
     void prepareAssessmentData() throws InsightsCustomException {
         try {
@@ -91,6 +94,14 @@ public class UpshiftAssessmentServiceData {
             File upshiftReportFile = new File(classLoader.getResource("UpshiftAssessment.json").getFile());
             FileInputStream input = new FileInputStream(upshiftReportFile);
             testFile = new MockMultipartFile("file",
+                    upshiftReportFile.getName(), "text/plain", IOUtils.toByteArray(input));
+        }catch (Exception e){
+            log.error("Error reading test upshift Report ", e);
+        }
+        try {
+            File upshiftReportFile = new File(classLoader.getResource("UpshiftAssessmentTest.xml").getFile());
+            FileInputStream input = new FileInputStream(upshiftReportFile);
+            testFile1 = new MockMultipartFile("file",
                     upshiftReportFile.getName(), "text/plain", IOUtils.toByteArray(input));
         }catch (Exception e){
             log.error("Error reading test upshift Report ", e);

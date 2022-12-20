@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.assessmentreport.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -120,7 +121,7 @@ public class InsightsAssessmentReportController {
 	/* Assessment Report Controller Methods */
 	@GetMapping(value = "/getSchedule", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getScheduleList() {
-		List<String> scheduleList;
+		List<String> scheduleList=new ArrayList<>();
 		try {
 			scheduleList = assessmentReportService.getSchedule();
 			return PlatformServiceUtil.buildSuccessResponseWithData(scheduleList);
@@ -204,7 +205,7 @@ public class InsightsAssessmentReportController {
 			if (message.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
 				return PlatformServiceUtil.buildSuccessResponse();
 			} else {
-				return PlatformServiceUtil.buildFailureResponse("Unable to update assessment report");
+				return PlatformServiceUtil.buildFailureResponse("Unable to update assessment report. Error: "+message);
 			}
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
@@ -262,7 +263,7 @@ public class InsightsAssessmentReportController {
 
 	@GetMapping(value = "/getReportTemplate", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getReportTemplateList() {
-		List<InsightsAssessmentReportTemplate> reportTemplateList;
+		List<InsightsAssessmentReportTemplate> reportTemplateList = new ArrayList<>();
 		JsonArray jsonarray = new JsonArray();
 		try {
 			reportTemplateList = assessmentReportService.getReportTemplate();
@@ -355,7 +356,7 @@ public class InsightsAssessmentReportController {
 
 	@GetMapping(value = "/getKpiCategory", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getKpiCategorylist() {
-		List<String> categoryList;
+		List<String> categoryList = new ArrayList<>();
 		try {
 			categoryList = assessmentReportService.getKpiCategory();
 			return PlatformServiceUtil.buildSuccessResponseWithData(categoryList);
@@ -367,7 +368,7 @@ public class InsightsAssessmentReportController {
 
 	@GetMapping(value = "/getKpiDataSource", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getKpiDataSourcelist() {
-		List<String> dataSourceList;
+		List<String> dataSourceList = new ArrayList<>();
 		try {
 			dataSourceList = assessmentReportService.getKpiDataSource();
 			return PlatformServiceUtil.buildSuccessResponseWithData(dataSourceList);
@@ -456,7 +457,7 @@ public class InsightsAssessmentReportController {
 
 	@GetMapping(value = "/getContentAction", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getContentAction() {
-		List<String> categoryList;
+		List<String> categoryList = new ArrayList<>();
 		try {
 			categoryList = assessmentReportService.getContentAction();
 			return PlatformServiceUtil.buildSuccessResponseWithData(categoryList);
@@ -505,7 +506,7 @@ public class InsightsAssessmentReportController {
 	
 	@GetMapping(value = "/getAllReportTemplate", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getAllReportTemplateList() {
-		List<InsightsAssessmentReportTemplate> reportTemplateList;
+		List<InsightsAssessmentReportTemplate> reportTemplateList = new ArrayList<>();
 		JsonArray jsonarray = new JsonArray();
 		try {
 			reportTemplateList = assessmentReportService.getAllReportTemplate();
@@ -541,7 +542,7 @@ public class InsightsAssessmentReportController {
 
 	@GetMapping(value = "/getChartType", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getChartType() {
-		JsonObject vTypeList;
+		JsonObject vTypeList = null; 
 		try {
 			vTypeList = assessmentReportService.getAllChartType();
 			return PlatformServiceUtil.buildSuccessResponseWithData(vTypeList);
@@ -553,7 +554,7 @@ public class InsightsAssessmentReportController {
 
 	@GetMapping(value = "/getVisualizationUtil", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getVisualizationUtil() {
-		List<String> chartHandlerList;
+		List<String> chartHandlerList = new ArrayList<>(); 
 		try {
 			chartHandlerList = assessmentReportService.getVisualizationUtil();
 			return PlatformServiceUtil.buildSuccessResponseWithData(chartHandlerList);
@@ -565,7 +566,7 @@ public class InsightsAssessmentReportController {
 	
 	@GetMapping(value = "/getTemplateType", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getTemplateType() {
-		List<String> templateTypeList;
+		List<String> templateTypeList=new ArrayList<>(); 
 		try {
 			templateTypeList = assessmentReportService.getTemplateType();
 			return PlatformServiceUtil.buildSuccessResponseWithData(templateTypeList);

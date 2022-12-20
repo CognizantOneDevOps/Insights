@@ -33,7 +33,7 @@ import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
-import com.cognizant.devops.platformservice.webhook.service.WebHookServiceImpl;
+import com.cognizant.devops.platformservice.webhook.service.IWebHook;
 import com.google.gson.JsonObject;
 
 @RestController
@@ -42,22 +42,16 @@ public class WebHookController {
 	static Logger log = LogManager.getLogger(WebHookController.class);
 
 	@Autowired
-	WebHookServiceImpl webhookConfigurationService;
+	IWebHook webhookConfigurationService;
 
 	@RequestMapping(value = "/saveWebhook", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject saveWebhook(@RequestBody String registerWebhookJson) {
-
 		try {
+			registerWebhookJson = registerWebhookJson.replace("\n", "").replace("\r", "");
 			String validatedResponse = ValidationUtils.validateRequestBody(registerWebhookJson);
 			JsonObject registerWebhookjson = JsonUtils.parseStringAsJsonObject(validatedResponse);
 			Boolean result = webhookConfigurationService.saveWebHookConfiguration(registerWebhookjson);
-			if (result) {
-				return PlatformServiceUtil.buildSuccessResponse();
-			} else {
-				return PlatformServiceUtil
-						.buildFailureResponse("Something went wrong,while saving the data of webhook.");
-			}
-
+			return PlatformServiceUtil.buildSuccessResponse();
 		} catch (InsightsCustomException e) {
 			log.error(e);
 			if (e.getMessage().equals(PlatformServiceConstants.INCORRECT_RESPONSE_TEMPLATE) ){
@@ -96,12 +90,12 @@ public class WebHookController {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
-
 	}
 
 	@RequestMapping(value = "/updateWebhook", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject updateWebhook(@RequestBody String registerWebhookJson) {
 		try {
+			registerWebhookJson = registerWebhookJson.replace("\n", "").replace("\r", "");
 			String validatedResponse = ValidationUtils.validateRequestBody(registerWebhookJson);
 			JsonObject registerWebhookjson = JsonUtils.parseStringAsJsonObject(validatedResponse);
 			Boolean result = webhookConfigurationService.updateWebHook(registerWebhookjson);
@@ -114,7 +108,6 @@ public class WebHookController {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
-
 	}
 
 	@RequestMapping(value = "/updateWebhookStatus", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -126,7 +119,7 @@ public class WebHookController {
 			message = webhookConfigurationService.updateWebhookStatus(updateWebhookJsonValidated);
 			log.debug(" Response in updateWebhookStatus {} ", message);
 			return PlatformServiceUtil.buildSuccessResponse();
-		} catch (InsightsCustomException e) {
+		} catch (Exception e) {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}

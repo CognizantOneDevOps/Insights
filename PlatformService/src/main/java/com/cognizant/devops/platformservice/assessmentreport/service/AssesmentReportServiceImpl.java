@@ -18,8 +18,6 @@ package com.cognizant.devops.platformservice.assessmentreport.service;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,10 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import javax.persistence.NoResultException;
-
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
@@ -43,7 +38,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
@@ -613,6 +607,7 @@ public class AssesmentReportServiceImpl {
 		JsonObject reportTemplateJsonObject = new JsonObject();
 		reportTemplateJsonObject.addProperty("reportId", reporttemplate.getReportId());
 		reportTemplateJsonObject.addProperty("templateName", reporttemplate.getTemplateName());
+		reportTemplateJsonObject.addProperty("templateType", reporttemplate.getTemplateType());
 		jsonobject.add("template", reportTemplateJsonObject);
 		jsonobject.addProperty(ReportStatusConstants.MILESTONE_ID, (assessmentReport.getMilestoneId()!= null ?assessmentReport.getMilestoneId():null));
 
@@ -753,7 +748,6 @@ public class AssesmentReportServiceImpl {
 			throws InsightsCustomException {
 		int reportId = -1;
 		JsonObject emailDetails = null;
-		//JsonObject responseJson = new JsonObject();
 		try {
 			log.debug(" Assessment Json to be saved {} ", assessmentReportJson);
 			reportId = assessmentReportJson.get("reportTemplate").getAsInt();
@@ -826,9 +820,6 @@ public class AssesmentReportServiceImpl {
 			} 
 			return getResponseJson(assessmentConfig,username, reportName, reportTemplate,reportHasPDFTask,schedule,epochStartDate,epochEndDate);
 			
-		} catch (NoResultException e) {
-			log.error(e);
-			throw new InsightsCustomException("Report Template not found for report id : " + reportId);
 		} catch (Exception e) {
 			log.error(e);
 			throw new InsightsCustomException(e.getMessage());

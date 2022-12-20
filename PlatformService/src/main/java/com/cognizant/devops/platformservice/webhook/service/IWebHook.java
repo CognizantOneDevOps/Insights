@@ -23,9 +23,9 @@ import com.google.gson.JsonObject;
 
 public interface IWebHook {
 
-	public  Boolean saveWebHookConfiguration(JsonObject registerWebhookjson) throws InsightsCustomException;
+	public Boolean saveWebHookConfiguration(JsonObject registerWebhookjson) throws InsightsCustomException;
 	public List<WebHookConfig> getRegisteredWebHooks() throws InsightsCustomException;
 	public String uninstallWebhook(String webhookname) throws InsightsCustomException;
 	public Boolean updateWebHook(JsonObject registerWebhookjson) throws InsightsCustomException ;
-	
+	public String updateWebhookStatus(JsonObject updateWebhookJsonValidated)throws InsightsCustomException;
 }

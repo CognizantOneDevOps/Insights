@@ -18,14 +18,11 @@ package com.cognizant.devops.platformservice.assessmentreport.service;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
@@ -44,16 +41,15 @@ import com.google.gson.JsonObject;
 
 @Component
 public class GrafanaUtilities {
-	
 	private static final Logger log = LogManager.getLogger(GrafanaUtilities.class);
-	
 	private static final String ORGANISATION = "organisation";
 	private static final String NAME = "name";
 	private static final String PDFTOKEN = "pdftoken";
 	private static final String ADMIN = "Admin";
 	private static final String ROLE = "role";
 	private static final String ORG_NAME_PREFIX = "Report Org. ";
-
+	private static final String BASICAUTH = "Basic ";
+	
 	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
 	GrafanaHandler grafanaHandler = new GrafanaHandler();
 	GrafanaDashboardPdfConfigDAL grafanaDashboardConfigDAL = new GrafanaDashboardPdfConfigDAL();
@@ -70,11 +66,9 @@ public class GrafanaUtilities {
 			String authString = ApplicationConfigProvider.getInstance().getGrafana().getAdminUserName() + ":"
 					+ ApplicationConfigProvider.getInstance().getGrafana().getAdminUserPassword();
 			String encodedString = Base64.getEncoder().encodeToString(authString.getBytes());
-			headers.put(AuthenticationUtils.AUTH_HEADER_KEY, "Basic " + encodedString);
-
+			headers.put(AuthenticationUtils.AUTH_HEADER_KEY, BASICAUTH+ encodedString);
 			// check if organization exists
 			String orgResponse = grafanaHandler.grafanaGet(PlatformServiceConstants.API_ORGS + "name/" + orgName, headers);
-
 			if (!orgResponse.contains("id")) {
 				// create org
 				JsonObject request = new JsonObject();
@@ -86,27 +80,20 @@ public class GrafanaUtilities {
 				JsonObject orgResponseJson = JsonUtils.parseStringAsJsonObject(orgResponse);
 				orgId = orgResponseJson.get("id").getAsInt();
 			}
-
 			// add user in organization
 			addUser(orgId, userName, headers);
-
 			// create API key
 			generateGrafanaToken(orgId);
-
 			// create datasource
 			createDatasourceInGrafana(orgId);
-
 			// create dashboard
 			dashboardApiResponseObj = createDashboardInGrafana(orgId, requestDashboardObj);
-
 		} catch (Exception e) {
 			log.error(e);
 			throw new InsightsCustomException(e.getMessage());
 		}
-
 		return dashboardApiResponseObj;
 	}
-	
 	/**
 	 * Method to delete dashboard from Grafana
 	 * 
@@ -121,11 +108,8 @@ public class GrafanaUtilities {
 		} catch (Exception e) {
 			log.error("Error while deleting dashboard.", e);
 			throw new InsightsCustomException(e.getMessage());
-		}
-		
+		}	
 	}
-	
-	
 	/**
 	 * Method to create dashboard in grafana
 	 * 
@@ -153,7 +137,6 @@ public class GrafanaUtilities {
 		}
 		return dashboardApiResponseObj.toString();
 	}
-
 	/**
 	 * Method to add user in organization
 	 * 
@@ -183,10 +166,8 @@ public class GrafanaUtilities {
 		} catch(Exception e) {
 			log.error(e);
 			throw new InsightsCustomException(e.getMessage());
-		}
-		
+		}	
 	}
-
 	/**
 	 * Method to create datasource in grafana
 	 * 
@@ -214,16 +195,12 @@ public class GrafanaUtilities {
 				datasourceReqObj.add("secureJsonData", secureJsonData);
 				String datasourceResponse = grafanaHandler.grafanaPost(PlatformServiceConstants.ADD_DATASOURCE_PATH, datasourceReqObj, getGrafanaHeaders(orgId));
 				log.debug(" datasourceResponse {} ", datasourceResponse);
-			}
-			
+			}	
 		} catch (Exception e) {
 			log.error(e);
 			throw new InsightsCustomException(e.getMessage());
 		}
-
 	}
-	
-	
 	/** This method use to prepare Grafana header object 
 	 * 
 	 * @param orgId 
@@ -231,12 +208,11 @@ public class GrafanaUtilities {
 	 */
 	private Map<String, String> getGrafanaHeaders(int orgId) {
 		GrafanaOrgToken grafanaOrgToken = grafanaDashboardConfigDAL.getTokenByOrgId(orgId);
-		String token = "Bearer "+AES256Cryptor.decrypt(grafanaOrgToken.getApiKey(), AssessmentReportAndWorkflowConstants.GRAFANA_PDF_TOKEN_SIGNING_KEY);
+		String token = "Bearer "+ AES256Cryptor.decrypt(grafanaOrgToken.getApiKey(), AssessmentReportAndWorkflowConstants.GRAFANA_PDF_TOKEN_SIGNING_KEY);
 		Map<String, String> headers = new HashMap<>();
 		headers.put(AuthenticationUtils.AUTH_HEADER_KEY, token);
 		return headers;
 	}
-	
 	/**
 	 * Method use to create API key in Grafana and save created key in database.
 	 * 
@@ -247,8 +223,11 @@ public class GrafanaUtilities {
 		try {				
 			GrafanaOrgToken grafanaOrgToken = new GrafanaOrgToken();
 			Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
+			String authString = ApplicationConfigProvider.getInstance().getGrafana().getAdminUserName() + ":"
+					+ ApplicationConfigProvider.getInstance().getGrafana().getAdminUserPassword();
+			String encodedString = Base64.getEncoder().encodeToString(authString.getBytes());
+			headers.put(AuthenticationUtils.AUTH_HEADER_KEY, BASICAUTH + encodedString);
 			headers.put("x-grafana-org-id", String.valueOf(orgId));
-			headers.put("Content-Type", "application/json");
 			
 			//check if API key exists in Grafana
 			boolean keyExists = false;
@@ -280,6 +259,4 @@ public class GrafanaUtilities {
 			throw new InsightsCustomException(e.getMessage());
 		}
 	}
-	
-	
 }

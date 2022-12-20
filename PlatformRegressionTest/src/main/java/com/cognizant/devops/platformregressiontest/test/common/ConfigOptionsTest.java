@@ -85,4 +85,12 @@ public interface ConfigOptionsTest {
 	String WORKFLOW_TASK="workflow_task";
 	String WORKFLOW_TASK_JSON_FILE = "workFlow.json";
 	String UPDATE_WORKFLOW_TASK_JSON_FILE = "updateWorkflow.json";
+	
+	String GROUP_EMAIL_CONFIG_DASH = "group_email_config_dash";
+	String GROUP_EMAIL_DASH_REPO = "createGroupEmail.json";
+	String GROUP_EMAIL_EDIT = "editGroupEmail.json";
+	
+	String GROUP_EMAIL_CONFIG_REPO = "group_email_config_report";
+	String GROUP_EMAIL_REPO_MGM = "createGroupEmailReport.json";
+	String GROUP_EMAIL_REPORT_EDIT = "editGroupEmailReport.json";
 }

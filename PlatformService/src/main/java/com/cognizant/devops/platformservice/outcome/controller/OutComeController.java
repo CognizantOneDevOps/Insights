@@ -17,6 +17,7 @@ package com.cognizant.devops.platformservice.outcome.controller;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,10 +26,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformservice.outcome.service.OutComeService;
 import com.cognizant.devops.platformservice.outcome.service.OutComeServiceImpl;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonArray;
@@ -40,8 +39,8 @@ public class OutComeController {
 
 	static Logger log = LogManager.getLogger(OutComeController.class);
 
-	
-	OutComeService outComeServiceImpl = new OutComeServiceImpl();
+	@Autowired
+	OutComeServiceImpl outComeServiceImpl;
 	
 	@GetMapping(value = "/fetchMileStoneTools", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject fetchOutcomeTools(){

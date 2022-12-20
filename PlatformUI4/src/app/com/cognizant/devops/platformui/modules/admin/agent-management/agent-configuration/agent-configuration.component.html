@@ -91,8 +91,8 @@
               <mat-select required [(ngModel)]="selectedTool" name="selectedTool" [style.width.%]="100"
                 placeholder="Tool" (ngModelChange)="getAgentConfig(selectedVersion, selectedTool)"
                 [disabled]="btnValue == 'Update'">
-                <mat-option *ngFor="let tool of toolsArr | keyvalue" value="{{ tool.value }}" class="optionsBckgnd">
-                  {{ tool.value }}</mat-option>
+                <mat-option *ngFor="let tool of toolsArr" value="{{ tool }}" class="optionsBckgnd">
+                  {{ tool }}</mat-option>
               </mat-select>
               <mat-icon matSuffix svgIcon="arrow-down" class="arrow-icon"
                 style="width: 12px !important; height: 12px !important"></mat-icon>

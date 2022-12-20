@@ -43,6 +43,7 @@ import com.cognizant.devops.platformdal.dataArchivalConfig.InsightsDataArchivalC
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfig;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaOrgToken;
+import com.cognizant.devops.platformdal.groupemail.InsightsGroupEmailConfiguration;
 import com.cognizant.devops.platformdal.icon.Icon;
 import com.cognizant.devops.platformdal.milestone.InsightsMileStoneOutcomeConfig;
 import com.cognizant.devops.platformdal.milestone.MileStoneConfig;
@@ -59,7 +60,8 @@ import com.cognizant.devops.platformdal.workflow.InsightsWorkflowExecutionHistor
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowType;
-
+import com.cognizant.devops.platformdal.healthutil.InsightsAgentHealthDetails;
+import com.cognizant.devops.platformdal.healthutil.InsightsComponentHealthDetails;
 
 public class PlatformDALSessionFactoryProvider {
 	private static SessionFactory sessionFactory;
@@ -108,6 +110,10 @@ public class PlatformDALSessionFactoryProvider {
 		    configuration.addAnnotatedClass(InsightsMileStoneOutcomeConfig.class);
 		    configuration.addAnnotatedClass(InsightsSchedulerTaskDefinition.class);
 		    configuration.addAnnotatedClass(InsightsSchedulerTaskStatus.class);
+		    configuration.addAnnotatedClass(InsightsGroupEmailConfiguration.class);
+		    configuration.addAnnotatedClass(InsightsAgentHealthDetails.class);
+		    configuration.addAnnotatedClass(InsightsComponentHealthDetails.class);
+		    
 		    
 			PostgreData postgre = ApplicationConfigProvider.getInstance().getPostgre();
 			if(postgre != null){				

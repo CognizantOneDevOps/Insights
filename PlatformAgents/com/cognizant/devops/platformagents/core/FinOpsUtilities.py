@@ -24,6 +24,7 @@ from dateutil import parser
 import datetime
 import inspect
 from forex_python.converter import CurrencyRates
+from locale import currency
 
 class FinOpsUtilities():
     
@@ -33,8 +34,10 @@ class FinOpsUtilities():
         self.parentclass.baseLogger.info('Inside init of FinOpsUtilities =======')
         self.dynamicTemplate = self.parentclass.config.get('dynamicTemplate', '{}')
         self.apiVersionsTrackingDetail = {}
+        self.currencyConversionTrackingDetail = {}
         self.headersWithAuth = {'Authorization':'auth1bc'}
         self.apiVersionFileName = "tracking_API_Versions"
+        self.currencyConversionFileName = "tracking_Currency_Conversion"
         self.contentTypeJson = 'application/json'
         self.apiURL = self.parentclass.getCredential("apiURL")
         self.agentBaseDir = agentBaseDir
@@ -44,9 +47,11 @@ class FinOpsUtilities():
         self.client_Id = self.parentclass.getCredential("azureClientId")
         self.secret = self.parentclass.getCredential("azureSecretkey")
         self.endDateToday = date.today().strftime("%Y-%m-%dT%H:%M:%S")
+       
         
         self.access_token = self.generateAuthToken()
         self.loadAPIVersionTacking()
+        self.currencyRates = CurrencyRates()
         
        
         
@@ -67,10 +72,18 @@ class FinOpsUtilities():
     
     def loadAPIVersionTacking(self):
         if not self.checkAPITrackingFiles(self.apiVersionFileName) :
-            self.updateTrackingCache(self.apiVersionFileName, dict())  # creates repository wise tracking json file
+            self.updateTrackingCache(self.apiVersionFileName, dict())  # creates API version tracking json file
             self.fetchResourceTypeWiseAPIVersions()
         else:
             self.apiVersionsTrackingDetail = self.trackingCacheFileLoad(self.apiVersionFileName)
+    
+    def loadCurrencyTacking(self, baseCurrency):
+        if not self.checkAPITrackingFiles(self.currencyConversionFileName) :
+            self.updateTrackingCache(self.currencyConversionFileName, dict())  # creates currency tracking json file
+            
+        self.currencyConversionTrackingDetail = self.trackingCacheFileLoad(self.currencyConversionFileName)
+        self.captureCurrencyConversion(baseCurrency)
+        
             
     def fetchResourceTypeWiseAPIVersions(self):
         
@@ -238,7 +251,7 @@ class FinOpsUtilities():
         else:
             self.parentclass.tracking["lastForecastDataCollectionDate"] = (parser.parse(forecastDate, ignoretz=True)).strftime("%Y-%m-%dT%H:%M:%S")
         
-        self.parentclass.updateTrackingJson(self.parentclass.tracking)
+        #self.parentclass.updateTrackingJson(self.parentclass.tracking)
         
     def processForecastData(self, forecastData, columnsList, rowList, subscriptions, resourcegrp):
         forecastDate = None
@@ -271,7 +284,7 @@ class FinOpsUtilities():
     
     def processBudgetData(self,subscription):
         budgetList = []
-        c = CurrencyRates()
+        self.prepareRequestHeader('application/json')
         budgetMetadata = self.dynamicTemplate.get("budget", "{}").get("budgetMetadata", "{}")
         budgetApiVersionDict = self.apiVersionsTrackingDetail.get("microsoft.consumption/budgets", None)
         if budgetApiVersionDict == None:
@@ -280,7 +293,7 @@ class FinOpsUtilities():
             budgetApiVersionDict = budgetApiVersionDict["apiversion"]
         azurebudgetapi = self.apiURL + "/subscriptions/"+ subscription['subscriptionId'] +"/providers/Microsoft.Consumption/budgets?api-version="+budgetApiVersionDict
         responsemetric = self.parentclass.getResponse(azurebudgetapi, 'GET', None, None, data=None, reqHeaders=self.headersWithAuth)
-        self.parentclass.baseLogger.info(responsemetric)
+        #self.parentclass.baseLogger.info(responsemetric)
         responseLst = responsemetric.get("value")
         for valueObj in responseLst:
             budgetObj = {}
@@ -293,10 +306,40 @@ class FinOpsUtilities():
             budgetObj["unit"] = budgetObjProps["currentSpend"]["unit"]
             budgetObj["currentamount"] = budgetObjProps["currentSpend"]["amount"]
             budgetObj["category"] = budgetObjProps["category"]
-            #budgetObj["amountUSD"]  = c.convert('INR', 'USD', budgetObjProps["amount"])
+            budgetObj['cloudtype'] = 'azurecsv'
+            startFromDate = (parser.parse(budgetObj["startDate"], ignoretz=True)).strftime("%Y-%m-%d")
+            budgetObj["amountUSD"]  = self.convertCostINUSD(budgetObjProps["amount"], startFromDate)
             budgetList.append(budgetObj)
-        self.parentclass.publishToolsData(budgetList, budgetMetadata)    
+        self.parentclass.publishToolsData(budgetList, budgetMetadata) 
+        
+        
+    def captureCurrencyConversion(self, base_cur):
+        try:
+            enddate = date.today().strftime("%Y-%m-%d")
+            if "lastCurrencyDataCollectionDate" in self.parentclass.tracking:
+                startFromDate = self.parentclass.tracking.get("lastCurrencyDataCollectionDate")
+            else:
+                startFromDate = (parser.parse(self.parentclass.startFromConfig, ignoretz=True)).strftime("%Y-%m-%d")
+            currencyConverterapi = 'https://api.exchangerate.host/timeseries?base={0}&start_date={1}&end_date={2}&symbols={3}'.format(base_cur, startFromDate , enddate, 'USD')
+            currencyConverteresponse = self.parentclass.getResponse(currencyConverterapi, 'GET', None, None, data=None)
+            for key, value in currencyConverteresponse["rates"].items():
+                if not self.currencyConversionTrackingDetail.get(key):
+                    self.currencyConversionTrackingDetail[key] = value.get("USD")
+            self.updateTrackingCache(self.currencyConversionFileName, self.currencyConversionTrackingDetail)
+            self.parentclass.tracking["lastCurrencyDataCollectionDate"] = enddate
+            self.parentclass.updateTrackingJson(self.parentclass.tracking)
+        except Exception as ex:
+            self.parentclass.baseLogger.error(ex)
+           
     
-            
+    
+    def convertCostINUSD(self,cost, date): 
+        usdCost = cost
+        try:
+            if date in self.currencyConversionTrackingDetail and cost > 0 :
+                usdCost = cost * self.currencyConversionTrackingDetail.get(date)
+        except Exception as ex:
+            self.parentclass.baseLogger.error(ex)
+        return usdCost      
             
         

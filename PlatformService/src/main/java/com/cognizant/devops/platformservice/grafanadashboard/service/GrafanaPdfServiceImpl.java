@@ -22,20 +22,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.EmailConfiguration;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
-import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsEmailTemplates;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfig;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfigDAL;
-import com.cognizant.devops.platformdal.grafana.pdf.GrafanaOrgToken;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
@@ -56,7 +53,6 @@ public class GrafanaPdfServiceImpl implements GrafanaPdfService{
 	private static final String MAIL_BODY_TEMPLATE = "mailBodyTemplate";
 	private static final String RECEIVER_CC_EMAIL_ADDRESS= "receiverCCEmailAddress";
 	private static final String RECEIVER_BCC_EMAIL_ADDRESS= "receiverBCCEmailAddress";
-
 
 	GrafanaDashboardPdfConfigDAL grafanaDashboardConfigDAL = new GrafanaDashboardPdfConfigDAL();
 	WorkflowDAL workflowConfigDAL = new WorkflowDAL();
@@ -132,7 +128,6 @@ public class GrafanaPdfServiceImpl implements GrafanaPdfService{
 			} catch(Exception e) {
 				throw new InsightsCustomException(e.getMessage());
 			}
-
 	}
 
 	/**
@@ -243,7 +238,6 @@ public class GrafanaPdfServiceImpl implements GrafanaPdfService{
 			grafanaDashboardPdfConfig.setSource(dashboardDetails.get("source").getAsString());
 			grafanaDashboardPdfConfig.setScheduleType(schedule);
 			grafanaDashboardPdfConfig.setCreatedDate(InsightsUtils.getCurrentTimeInEpochMilliSeconds());
-
 			grafanaDashboardConfigDAL.updateGrafanaDashboardConfig(grafanaDashboardPdfConfig);
 		} catch(Exception e) {
 			throw new InsightsCustomException(e.getMessage());
@@ -294,7 +288,6 @@ public class GrafanaPdfServiceImpl implements GrafanaPdfService{
 			throw new InsightsCustomException(e.getMessage());
 		}
 	}
-	
 	/**
 	 * Used to set grafana dashboard active state
 	 * 

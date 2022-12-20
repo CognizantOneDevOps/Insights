@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="Suite" preserve-order="true">
+	<test name="PlatformServiceTest" preserve-order="true">
+		<classes>
+			<class name="com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest" />  	
+   	 		<class name="com.cognizant.devops.platformservice.test.agentManagement.AgentManagementTest" />  
+			<class name="com.cognizant.devops.platformservice.test.CorrelationBuilder.CorrelationBuilderTest" />
+			<class name="com.cognizant.devops.platformservice.test.bulkUpload.BulkUploadTest" />
+			<class name="com.cognizant.devops.platformservice.test.dataDictionary.DataDictionaryTest" />
+			<class name="com.cognizant.devops.platformservice.test.webhook.WebhookServiceTest" />
+			<class name="com.cognizant.devops.platformservice.test.grafanaAuthentication.GrafanaAuthenticationTest" />
+			<class name="com.cognizant.devops.platformservice.test.grafanaUser.GrafanaUserDetailsTest" />
+			<class name="com.cognizant.devops.platformservice.test.accessGroupManagement.GroupsAndUserTest" />
+			<class name="com.cognizant.devops.platformservice.test.traceabilitydashboard.TraceabilityDashboardTest" />
+			<class name="com.cognizant.devops.platformservice.test.assessmentReports.AssessmentReportServiceTest" />
+			<class name="com.cognizant.devops.platformservice.test.assessmentReports.ReportTemplateKPIContentServiceTest" />
+			<class name="com.cognizant.devops.platformservice.test.workflow.WorkflowServiceTest" />
+			<class name="com.cognizant.devops.platformservice.test.dataArchival.DataArchivalServiceTest" />
+			<class name="com.cognizant.devops.platformservice.test.automl.TrainModelsServiceTest" />
+			<class name="com.cognizant.devops.platformservice.test.serverConfig.ServerConfigServiceTest" />
+			<class name="com.cognizant.devops.platformservice.test.fileManagement.FileManagementTest" />
+			<class name="com.cognizant.devops.platformservice.test.upshiftassessment.UpshiftAssessmentServiceTest" />
+			<class name="com.cognizant.devops.platformservice.test.grafanadashboard.GrafanaDashboardReportTest" /> 
+			<class name="com.cognizant.devops.platformservice.test.TaskManagement.TaskManagementServiceTest" />
+			<class name="com.cognizant.devops.platformservice.test.milestone.OutcomeServiceTest" />
+			<class name="com.cognizant.devops.platformservice.test.milestone.MilestoneServiceTest" />  
+			<class name="com.cognizant.devops.platformservice.test.healthStatus.HealthStatusTest" />
+			<class name = "com.cognizant.devops.platformservice.test.InferenceDataProvider.InferenceDataProviderTest" />
+		</classes>
+	</test>
+</suite>

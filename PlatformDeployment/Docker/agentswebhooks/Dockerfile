@@ -14,9 +14,9 @@
 # the License.
 #-------------------------------------------------------------------------------
 FROM python:3.10.0-alpine
-MAINTAINER Onedevops Insights
+LABEL maintainer="Onedevops Insights"
 
-ARG INSIGHTSRELEASE=9.5
+ARG INSIGHTSRELEASE=9.7
 # Creating cofig folders
 
 RUN apk update && \

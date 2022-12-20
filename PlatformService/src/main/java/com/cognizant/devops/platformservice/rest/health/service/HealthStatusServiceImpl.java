@@ -15,17 +15,19 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.rest.health.service;
 
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import com.cognizant.devops.platformcommons.constants.ErrorMessage;
 import com.cognizant.devops.platformcommons.constants.ServiceStatusConstants;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.healthutil.HealthUtil;
+import com.cognizant.devops.platformdal.healthutil.InsightsAgentHealthDetailDAL;
+import com.cognizant.devops.platformdal.healthutil.InsightsAgentHealthDetails;
+import com.cognizant.devops.platformdal.healthutil.InsightsComponentHealthDetails;
 import com.cognizant.devops.platformservice.rest.health.HealthStatusController;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonObject;
@@ -34,7 +36,6 @@ import com.google.gson.JsonObject;
 public class HealthStatusServiceImpl{
 	static Logger log = LogManager.getLogger(HealthStatusServiceImpl.class);
 	HealthUtil healthUtil = new HealthUtil();
-
 	/**
 	 * Method to get Health status
 	 * 
@@ -51,11 +52,9 @@ public class HealthStatusServiceImpl{
 			log.error("Error occured while fetching health status {}", e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
 		}
-
 		log.debug(" servicesHealthStatus {}", servicesHealthStatus.toString());
 		return servicesHealthStatus;
 	}
-
 	/**
 	 * Method to fetch Agent Health status
 	 * 
@@ -73,7 +72,6 @@ public class HealthStatusServiceImpl{
 		}
 		return servicesAgentsHealthStatus;
 	}
-
 	/**
 	 * Method to fetch Detailed Health records
 	 * 
@@ -83,7 +81,31 @@ public class HealthStatusServiceImpl{
 	 * @return GraphResponse
 	 * @throws InsightsCustomException
 	 */
-	public GraphResponse getDetailHealth(String category, String tool, String agentId) throws InsightsCustomException {
+	public List<InsightsComponentHealthDetails> getComponentDetailHealth(String category, String tool, String agentId) throws InsightsCustomException {
+		try {
+			final int MAX_RECORD = 10;
+			log.debug(" message tool name {}  {}  {} ", category, tool, agentId);
+			String componentName = null;
+			if (category.equalsIgnoreCase(ServiceStatusConstants.PLATFORM_SERVICE)) {
+				componentName="Platform Service";
+			} else if (category.equalsIgnoreCase(ServiceStatusConstants.PLATFORM_ENGINE)) {
+				componentName="Platform Engine";
+			} 
+			else if (category.equalsIgnoreCase(ServiceStatusConstants.PLATFORM_WORKFLOW)) {
+				componentName="Platform Workflow";
+			}
+			else if (category.equalsIgnoreCase(ServiceStatusConstants.PLATFORM_WEBHOOK_SUBSCRIBER)) {
+				componentName="Platform WebhookSubscriber";
+			} 
+			return healthUtil.loadComponentHealthData(componentName, MAX_RECORD);
+		} catch (Exception e) {
+			log.error("Error occured while fetching detail health status {}", e.getMessage());
+			throw new InsightsCustomException(e.getMessage());
+		}
+	}
+
+	
+	public List<InsightsAgentHealthDetails> getDetailHealth(String category, String tool, String agentId) throws InsightsCustomException {
 		try {
 			final int MAX_RECORD = 10;
 			log.debug(" message tool name {}  {}  {} ", category, tool, agentId);
@@ -100,13 +122,12 @@ public class HealthStatusServiceImpl{
 				label.append(":").append(category);
 				label.append(":").append(tool);
 			}
-			return healthUtil.loadHealthData(label.toString(), agentId, MAX_RECORD);
+			return healthUtil.loadHealthData(agentId, MAX_RECORD);
 		} catch (Exception e) {
 			log.error("Error occured while fetching detail health status {}", e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
 		}
 	}
-
 	/**
 	 * Method to create Agent Health Failure Label
 	 * 
@@ -121,19 +142,19 @@ public class HealthStatusServiceImpl{
 		try {
 			log.debug(" message tool name {}  {} ", category, tool);
 			StringBuilder label = new StringBuilder("HEALTH_FAILURE");
-			if (StringUtils.isEmpty(category) || StringUtils.isEmpty(tool)) {
+			if (category.equalsIgnoreCase("") || tool.equalsIgnoreCase("")) {
 				return PlatformServiceUtil.buildFailureResponse(ErrorMessage.CATEGORY_AND_TOOL_NAME_NOT_SPECIFIED);
 			} else {
 				label.append(":").append(category);
 				label.append(":").append(tool);
 			}
-			return loadAgentsFailureHealthData(label.toString(), agentId, 10);
+			List<InsightsAgentHealthDetails> response =loadAgentsFailureHealthData(agentId, 10);
+			return PlatformServiceUtil.buildSuccessResponseWithHtmlData(response);
 		} catch (Exception e) {
 			log.error("Error occured while creating agent failure health label {}", e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
 		}
 	}
-
 	/**
 	 * Method to fetch Agent Failure Health data
 	 * 
@@ -142,32 +163,25 @@ public class HealthStatusServiceImpl{
 	 * @param limitOfRow
 	 * @return JsonObject
 	 */
-	private JsonObject loadAgentsFailureHealthData(String nodeLabel, String agentId, int limitOfRow) {
+	private List<InsightsAgentHealthDetails> loadAgentsFailureHealthData(String agentId, int limitOfRow) {
 		String query = "";
 
 		if (agentId.equalsIgnoreCase("")) {
-			query = "MATCH (n:" + nodeLabel
-					+ ") where n.inSightsTime IS NOT NULL RETURN n order by n.inSightsTime DESC LIMIT " + limitOfRow;
+			query="FROM InsightsAgentHealthDetails n where n.inSightsTime IS NOT NULL AND n.status = 'failure' ORDER BY n.inSightsTime DESC";
 		} else if (!agentId.equalsIgnoreCase("")) {
-			String queueName = healthUtil.getAgentHealthQueueName(agentId);
-			// To handle case where Agent delete from Postgres but data present in Neo4j
-			if (queueName == null) {
-				queueName = nodeLabel;
-			}
-			queueName = queueName.replaceFirst("HEALTH", "HEALTH_FAILURE");
-			query = "MATCH (n:" + queueName + ") where n.inSightsTime IS NOT NULL and n.agentId ='" + agentId
-					+ "' RETURN n order by n.inSightsTime DESC LIMIT " + limitOfRow;
+			query = "FROM InsightsAgentHealthDetails n where n.inSightsTime IS NOT NULL AND n.status = 'failure' AND n.agentId = :agentId ORDER BY n.inSightsTime DESC";
 		}
+		log.info("query  ====== {} ", query);
+		List<InsightsAgentHealthDetails> dbResponse=null;
 		try {
-			GraphDBHandler dbHandler = new GraphDBHandler();
-			GraphResponse response = dbHandler.executeCypherQuery(query);
-			return PlatformServiceUtil.buildSuccessResponseWithData(response);
+			InsightsAgentHealthDetailDAL agentHealthDetailDAL=new InsightsAgentHealthDetailDAL();
+			dbResponse = agentHealthDetailDAL.fetchAgentHealthDetail(query,agentId,limitOfRow);
+			
 		} catch (Exception e) {
-			log.error("Error occured while loading agent failure health data {}", e.getMessage());
-			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
+			log.error(e.getMessage());
 		}
+		return dbResponse;
 	}
-
 	/**
 	 * Method to get Version Details
 	 * 
@@ -194,7 +208,6 @@ public class HealthStatusServiceImpl{
 			throw new InsightsCustomException(e.getMessage());
 		}
 	}
-	
 	/**
 	 * Method to merge JsonObjects
 	 * 
@@ -212,5 +225,4 @@ public class HealthStatusServiceImpl{
 		}
 		return mergedJson;
 	}
-
 }

@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
@@ -40,7 +39,7 @@ public class TraceabilityDashboardController {
 
 	@Autowired
 	TraceabilityDashboardServiceImpl traceabilityDashboardServiceImpl;
-
+	
 	@GetMapping(value = "/getToolSummary", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public JsonObject getToolSummary(@RequestParam String toolName, @RequestParam String cacheKey) {
@@ -50,8 +49,8 @@ public class TraceabilityDashboardController {
 		} catch (Exception e) {
 			return PlatformServiceUtil.buildSuccessResponseWithData("Unable to load data from cache");
 		}
-
 	}
+	
 	@GetMapping(value = "/getAvailableTools", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public JsonObject getAvailableTools() {
@@ -80,12 +79,12 @@ public class TraceabilityDashboardController {
 	public JsonObject getPipeline(@RequestParam String toolName, @RequestParam String fieldName,
 			@RequestParam String fieldValue) {
 		try {
-			JsonObject response = traceabilityDashboardServiceImpl.getPipeline(toolName, fieldName, Arrays.asList(fieldValue),"Other");
+			JsonObject response = traceabilityDashboardServiceImpl.getPipeline(toolName, fieldName, Arrays.asList(fieldValue), "Other");
 			return PlatformServiceUtil.buildSuccessResponseWithData(response);
-		} catch (InsightsCustomException e) {
+		} 
+		catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage()); 
 		}
-
 	}
 	
 	@GetMapping(value = "/getEpicIssues", produces = MediaType.APPLICATION_JSON_VALUE)

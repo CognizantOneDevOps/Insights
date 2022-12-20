@@ -124,7 +124,7 @@ public class SystemNotificationDetailSubscriber extends WorkflowTaskSubscriberHa
 			
 			File mailTemplate = new File(getClass().getClassLoader().getResource("mailTemplate.html").getFile());
 			String template = new String(Files.readAllBytes(mailTemplate.toPath()));
-			String validTemplate = ValidationUtils.cleanXSS(template);
+			String validTemplate = ValidationUtils.cleanXSSWithoutHTMLCheck(template.replace("\n", "").replace("\r", ""));
 			Document document = Jsoup.parse(validTemplate, StandardCharsets.UTF_8.name());
 			return createComponentTable(idDataMap,document);
 			

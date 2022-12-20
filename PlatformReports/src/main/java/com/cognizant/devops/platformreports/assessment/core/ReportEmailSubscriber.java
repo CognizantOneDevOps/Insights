@@ -99,8 +99,10 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 					throw new InsightsJobFailedException("Unable to send an email");
 				}
 				long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+				// New Changes
+				mailReportDTO.getMailAttachments().forEach((attachmentName, file) -> 
 				log.debug(StringExpressionConstants.STR_EXP_EMAIL_EXECUTION,executionId ,workflowId,
-						"-",mailReportDTO.getMailTo(),mailReportDTO.getMailFrom(),processingTime, " AttachmentName: " + mailReportDTO.getEmailAttachmentName());
+						"-",mailReportDTO.getMailTo(),mailReportDTO.getMailFrom(),processingTime, " AttachmentName: " + attachmentName));
 			} else {
 				throw new InsightsJobFailedException("Email template not found!");
 			}
@@ -115,17 +117,19 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 			} else {
 				setStatusLog(e.getMessage());
 			}
+			mailReportDTO.getMailAttachments().forEach((attachmentName, file) -> 
 			log.error(StringExpressionConstants.STR_EXP_EMAIL_EXECUTION,executionId ,workflowId,
-					"-",mailReportDTO.getMailTo(),mailReportDTO.getMailFrom(),0, " AttachmentName :" + mailReportDTO.getEmailAttachmentName() +
-					"Failed to send email in ReportEmailSubscriber" + e.getMessage());			
+					"-",mailReportDTO.getMailTo(),mailReportDTO.getMailFrom(),0, " AttachmentName :" + attachmentName +
+					"Failed to send email in ReportEmailSubscriber" + e.getMessage()));			
 			throw new InsightsJobFailedException("Failed to send email in ReportEmailSubscriber");
 		} catch (Exception e) {
 			log.error("Workflow Detail ==== ReportEmailSubscriberEmail Send failed to execute Exception ===== ", e);
 			InsightsStatusProvider.getInstance().createInsightStatusNode("ReportEmailSubscriberEmail Completed with error "+e.getMessage(),
 					PlatformServiceConstants.FAILURE);
+			mailReportDTO.getMailAttachments().forEach((attachmentName, file) -> 
 			log.error(StringExpressionConstants.STR_EXP_EMAIL_EXECUTION,executionId ,workflowId,
-					"-",mailReportDTO.getMailTo(),mailReportDTO.getMailFrom(),0, " AttachmentName :" + mailReportDTO.getEmailAttachmentName() +
-					"  ReportEmailSubscriberEmail Send failed to execute Exception " + e.getMessage());
+					"-",mailReportDTO.getMailTo(),mailReportDTO.getMailFrom(),0, " AttachmentName :" + attachmentName +
+					"  ReportEmailSubscriberEmail Send failed to execute Exception " + e.getMessage()));
 		}
 
 	}
@@ -157,7 +161,7 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 			executionId = incomingTaskMessage.get(AssessmentReportAndWorkflowConstants.EXECUTIONID).getAsLong();
 			mailReportDTO.setTimeOfReportGeneration(InsightsUtils.insightsTimeXFormat(executionId));
 			workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
-			mailReportDTO.setEmailAttachmentName(emailHistory.getMailAttachmentName());
+			Map<String, byte[]> attachments = new HashMap<>();
 			if (emailHistory.getMailTo() != null) {
 				String[] recipientList = emailHistory.getMailTo().split(",");
 				recipientAddress = createRecipientAddress(recipientList);
@@ -176,7 +180,8 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 			mailReportDTO.setMailFrom(emailHistory.getMailFrom());
 			mailReportDTO.setSubject(emailHistory.getSubject());
 			mailReportDTO.setMailBody(emailHistory.getMailBody());
-			mailReportDTO.setMailAttachment(emailHistory.getAttachmentData());
+			attachments.put(emailHistory.getMailAttachmentName(), emailHistory.getAttachmentData());
+			mailReportDTO.setMailAttachments(attachments);
 			return mailReportDTO;
 		} catch (Exception e) {
 			log.error("Workflow Detail ==== ReportEmailSubscriber Error while creating MailreportDTO ===== ", e);
@@ -201,9 +206,10 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 		statusObject.add("log", logArray);
 		// statusLog set here which is class variable of WorkflowTaskSubscriberHandler
 		log.error("Workflow Detail ==== unable to send an email statusLog {}  ", statusLog);
+		mailReportDTO.getMailAttachments().forEach((attachmentName, file) -> 
 		log.error(StringExpressionConstants.STR_EXP_EMAIL_EXECUTION,executionId ,workflowId,
-				"-",mailReportDTO.getMailTo(),mailReportDTO.getMailFrom(),0, "AttachmentName :" + mailReportDTO.getEmailAttachmentName() +" statuslog :" + statusLog +
-				"Unable to send an email");
+				"-",mailReportDTO.getMailTo(),mailReportDTO.getMailFrom(),0, "AttachmentName :" + attachmentName +" statuslog :" + statusLog +
+				"Unable to send an email"));
 		return statusObject;
 
 	}

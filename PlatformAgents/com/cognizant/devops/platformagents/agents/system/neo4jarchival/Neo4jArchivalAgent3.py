@@ -26,13 +26,11 @@ resumes push and pull operation on exception  in next cycle
 
 from ....core.BaseAgent3 import BaseAgent
 from datetime import datetime
-from neo4j import GraphDatabase, string
+from neo4j import GraphDatabase
 import json
 import elasticsearch
-from elasticsearch import Elasticsearch
 import time
-import logging.handlers
-from datetime import datetime
+import os
 
 
 class Neo4jArchivalAgent(BaseAgent):
@@ -155,16 +153,23 @@ class Neo4jArchivalAgent(BaseAgent):
             exit(1)
 
     def process_indexes(self, _es):
+        #below index name is a reserved name in neo4j, it will be created by neo4j itself
+        reservedIndex = "__org_neo4j_schema_index_label_scan_store_converted_to_token_index"
         try:
             self.baseLogger.info("INFO:: Inside Process Indexes")
             with self._driver.session() as session:
-                indexdict ={}
                 result = session.write_transaction(self.get_indexes)
                 if len(result)>0:
-                  for i in range(len(result)):
-                    indexdict[result[i]["description"]]=result[i]["state"]
-                  label= "neo4j_index"
-                  copy_index_data_to_es_result =self.copy_index_data_to_es(_es, indexdict, label)
+                    #creating seperate entries for each index in ES
+                    for i in range(len(result)):
+                        if result[i]["name"] == reservedIndex :
+                            continue
+                        indexDict = dict()  
+                        indexDict["createStatement"] = result[i]["createStatement"]
+                        indexDict["state"] = result[i]["state"]
+                        indexDict["name"] = result[i]["name"]
+                        label= "neo4j_index"
+                        copy_index_data_to_es_result =self.copy_index_data_to_es(_es, indexDict, label)
 
         except Exception as ex:
             self.baseLogger.error(ex)
@@ -236,7 +241,10 @@ class Neo4jArchivalAgent(BaseAgent):
                         elasticsearchID = str(nodeId)+str(insightstime)
                         convlabelstring = ""
                         for j in range(len(lstlabel)):
-                            convlabelstring = convlabelstring + "^" + lstlabel[j]
+                            if(len(convlabelstring) > 0) :
+                                convlabelstring = convlabelstring+"^"+lstlabel[j]
+                            else :
+                                convlabelstring = lstlabel[j]
                         #self.baseLogger.info(dictNode)
 
                         dictNode.update({'_label': convlabelstring})
@@ -387,7 +395,10 @@ class Neo4jArchivalAgent(BaseAgent):
                         elasticsearchID = str(nodeId)+str(insightstime)
                         convlabelstring=""
                         for j in range(len(lstlabel)):
-                            convlabelstring = convlabelstring+"^"+lstlabel[j]
+                            if(len(convlabelstring) > 0) :
+                                convlabelstring = convlabelstring+"^"+lstlabel[j]
+                            else :
+                                convlabelstring = lstlabel[j]
                         #self.baseLogger.info(dictNode)
                         dictNode.update({'_label': convlabelstring})
                         copy_node_data_to_es_result = self.copy_node_data_to_es(_es, elasticsearchID, dictNode, label)
@@ -522,7 +533,8 @@ class Neo4jArchivalAgent(BaseAgent):
                     #indexName = string.lower(indexName)
                     indexName = indexName.lower()
                     doc_type = "_doc"
-                    response = _es.index(index=indexName, doc_type=doc_type, id=indexName, body=jsonNode)
+                    deleteResponse =  _es.indices.delete(index=indexName, ignore=[400, 404])
+                    response = _es.index(index=indexName, doc_type=doc_type, id=indexName, document=jsonNode)
                     self.baseLogger.info("Nodes schema dumped to Elastic search successfully")
                     if response['result'] == "created":
                         self.baseLogger.info("Nodes schema dumped to Elastic search successfully")
@@ -556,7 +568,7 @@ class Neo4jArchivalAgent(BaseAgent):
                     #indexName = string.lower(indexName)
                     indexName = indexName.lower()
                     doc_type = "_doc"
-                    response = _es.index(index=indexName, doc_type=doc_type, id=indexName, body=jsonNode)
+                    response = _es.index(index=indexName, doc_type=doc_type, id=dctNode["name"], document=jsonNode)
                     self.baseLogger.info("Nodes schema dumped to Elastic search successfully")
                     if response['result'] == "created":
                         self.baseLogger.info("Nodes schema dumped to Elastic search successfully")
@@ -588,7 +600,7 @@ class Neo4jArchivalAgent(BaseAgent):
                 #indexName = string.lower(indexName)
                 indexName = indexName.lower()
                 doc_type = "_doc"
-                response = _es.index(index=indexName, doc_type=doc_type, id=nodeId, body=jsonNode)
+                response = _es.index(index=indexName, doc_type=doc_type, id=nodeId, document=jsonNode)
                 self.baseLogger.info("Nodes dumped to Elastic search successfully")
         except Exception as ex:
             self.baseLogger.error(ex)
@@ -624,7 +636,7 @@ class Neo4jArchivalAgent(BaseAgent):
                 time_node_start = int(result['time_node_start'])
                 elasticsearchID = str(relationshipID) + str(time_node_start)
                 response = _es.index(index=relationshipName, doc_type="_doc", id=elasticsearchID,
-                                     body=jsonNode)
+                                     document=jsonNode)
                 self.baseLogger.info((response['result']))
         except Exception as ex:
             self.baseLogger.error(ex)
@@ -673,7 +685,7 @@ class Neo4jArchivalAgent(BaseAgent):
     def total_unmigrated_node_count(self, tx, timeperiod, label1):
         try:
             result = tx.run("MATCH (n:{label}:DATA) "
-                            "WHERE toInt(n.inSightsTime) < $timeperiod and not exists(n.copy_to_ES)"
+                            "WHERE toInteger(n.inSightsTime) < $timeperiod and n.copy_to_ES is null"
                             "RETURN count(n) as Count ".format(label=label1), timeperiod=timeperiod).data()
             self.baseLogger.info("count of Nodes to left************")
             self.baseLogger.info(result)
@@ -686,7 +698,7 @@ class Neo4jArchivalAgent(BaseAgent):
     def total_unmigrated_node_count_unack(self, tx, timeperiod, label1):
         try:
             result = tx.run("MATCH (n:{label}:DATA) "
-                            "WHERE toInt(n.inSightsTime) < $timeperiod and n.copy_to_ES = false "
+                            "WHERE toInteger(n.inSightsTime) < $timeperiod and n.copy_to_ES = false "
                             "RETURN count(n) as Count ".format(label=label1), timeperiod=timeperiod).data()
             self.baseLogger.info("count of Nodes to left************")
             self.baseLogger.info(result)
@@ -699,7 +711,7 @@ class Neo4jArchivalAgent(BaseAgent):
     def total_node_deletion_count(self, tx, timeperiod, label1):
         try:
             result = tx.run("MATCH (n:{label}:DATA) "
-                            "WHERE toInt(n.inSightsTime) < $timeperiod and n.copy_to_ES = true "
+                            "WHERE toInteger(n.inSightsTime) < $timeperiod and n.copy_to_ES = true "
                             "RETURN count(n) as Count ".format(label=label1), timeperiod=timeperiod).data()
             self.baseLogger.info("count of Nodes to left************")
             self.baseLogger.info(result)
@@ -712,7 +724,7 @@ class Neo4jArchivalAgent(BaseAgent):
     def total_relationships_deletion_count(self, tx, timeperiod, label1):
         try:
             result = tx.run("MATCH (n:{label}:DATA)-[r]-(b) "
-                            "WHERE toInt(n.inSightsTime) < $timeperiod and r.copy_to_ES = true and exists(b.inSightsTime) "
+                            "WHERE toInteger(n.inSightsTime) < $timeperiod and r.copy_to_ES = true and b.inSightsTime is not null "
                             "RETURN count(r) as Count ".format(label=label1), timeperiod=timeperiod).data()
             self.baseLogger.info("count of Relationships to left************")
             self.baseLogger.info(result)
@@ -725,7 +737,7 @@ class Neo4jArchivalAgent(BaseAgent):
     def total_forward_unmigrated_realtionship_count(self, tx, timeperiod, label1):
         try:
             result = tx.run("MATCH (n:{label}:DATA)-[r]->(b)"
-                            "WHERE toInt(n.inSightsTime) < $timeperiod and not exists(r.copy_to_ES) and exists(b.inSightsTime) "
+                            "WHERE toInteger(n.inSightsTime) < $timeperiod and r.copy_to_ES is null and b.inSightsTime is not null "
                             "RETURN count(r) as Count ".format(label=label1), timeperiod=timeperiod).data()
             self.baseLogger.info("count of Relationships to left************")
             self.baseLogger.info(result)
@@ -738,7 +750,7 @@ class Neo4jArchivalAgent(BaseAgent):
     def total_backward_unmigrated_realtionship_count(self, tx, timeperiod, label1):
         try:
             result = tx.run("MATCH (n:{label}:DATA)<-[r]-(b)"
-                            "WHERE toInt(n.inSightsTime) < $timeperiod and not exists(r.copy_to_ES) and exists(b.inSightsTime) "
+                            "WHERE toInteger(n.inSightsTime) < $timeperiod and r.copy_to_ES is null and b.inSightsTime is not null "
                             "RETURN count(r) as Count ".format(label=label1), timeperiod=timeperiod).data()
             self.baseLogger.info("count of Relationships to left************")
             self.baseLogger.info(result)
@@ -753,7 +765,7 @@ class Neo4jArchivalAgent(BaseAgent):
     def total_unmigrated_forward_realtionship_count_unack(self, tx, timeperiod, label1):
         try:
             result = tx.run("MATCH (n:{label}:DATA)-[r]->(b)"
-                            "WHERE toInt(n.inSightsTime) < $timeperiod and r.copy_to_ES = false and exists(b.inSightsTime) "
+                            "WHERE toInteger(n.inSightsTime) < $timeperiod and r.copy_to_ES = false and b.inSightsTime is not null "
                             "RETURN count(r) as Count ".format(label=label1), timeperiod=timeperiod).data()
             self.baseLogger.info("count of Relationships to left************")
             self.baseLogger.info(result)
@@ -766,7 +778,7 @@ class Neo4jArchivalAgent(BaseAgent):
     def total_unmigrated_backward_realtionship_count_unack(self, tx, timeperiod, label1):
         try:
             result = tx.run("MATCH (n:{label}:DATA)<-[r]-(b)"
-                            "WHERE toInt(n.inSightsTime) < $timeperiod and r.copy_to_ES = false and exists(b.inSightsTime) "
+                            "WHERE toInteger(n.inSightsTime) < $timeperiod and r.copy_to_ES = false and b.inSightsTime is not null "
                             "RETURN count(r) as Count ".format(label=label1), timeperiod=timeperiod).data()
             self.baseLogger.info("count of Relationships to left************")
             self.baseLogger.info(result)
@@ -779,7 +791,7 @@ class Neo4jArchivalAgent(BaseAgent):
     def run_node_query_fordeletion(self, tx, timeperiod, label1):
         try:
             result = tx.run("MATCH (n:{label}:DATA) "
-                            "WHERE toInt(n.inSightsTime) < $timeperiod and n.copy_to_ES = true "
+                            "WHERE toInteger(n.inSightsTime) < $timeperiod and n.copy_to_ES = true "
                             "RETURN id(n) as ID ".format(label=label1), timeperiod=timeperiod).data()
 
         except Exception as ex:
@@ -790,7 +802,7 @@ class Neo4jArchivalAgent(BaseAgent):
     def get_node_details(self, tx, timeperiod, label1,neo4j_query_limit):
         try:
             result = tx.run("MATCH (n:{label}:DATA) "
-                            "WHERE toInt(n.inSightsTime) < $timeperiod and not exists(n.copy_to_ES) "
+                            "WHERE toInteger(n.inSightsTime) < $timeperiod and not n.copy_to_ES is not null "
                             "with n limit $neo4j_query_limit "
                             "SET n.copy_to_ES = false "
                             "RETURN n , id(n) as ID ,labels(n) as _label, n.inSightsTime as inSightsTime ".format(label=label1), timeperiod=timeperiod,neo4j_query_limit=neo4j_query_limit).data()
@@ -804,7 +816,7 @@ class Neo4jArchivalAgent(BaseAgent):
     def get_node_details_unack(self, tx, timeperiod, label1,neo4j_query_limit):
         try:
             result = tx.run("MATCH (n:{label}:DATA) "
-                            "WHERE toInt(n.inSightsTime) < $timeperiod and n.copy_to_ES = false "
+                            "WHERE toInteger(n.inSightsTime) < $timeperiod and n.copy_to_ES = false "
                             "with n limit $neo4j_query_limit "
                             "RETURN n , id(n) as ID ,labels(n) as _label, n.inSightsTime as inSightsTime ".format(label=label1),
                             timeperiod=timeperiod,neo4j_query_limit=neo4j_query_limit).data()
@@ -818,7 +830,7 @@ class Neo4jArchivalAgent(BaseAgent):
     def get_node_details_for_deletion(self, tx, timeperiod, label1,neo4j_query_limit):
         try:
             result = tx.run("MATCH (n:{label}:DATA) "
-                            "WHERE toInt(n.inSightsTime) < $timeperiod and n.copy_to_ES = true "
+                            "WHERE toInteger(n.inSightsTime) < $timeperiod and n.copy_to_ES = true "
                             "with n limit $neo4j_query_limit "
                             "RETURN id(n) as ID ".format(label=label1),
                             timeperiod=timeperiod,neo4j_query_limit=neo4j_query_limit).data()
@@ -842,54 +854,88 @@ class Neo4jArchivalAgent(BaseAgent):
         return result
 
     def get_forward_relationship_details(self, tx, label1, timeperiod,neo4j_query_limit):
+        records = []
         try:
-            result = tx.run("MATCH (a:{label}:DATA)-[r]->(b) "
-                            "WHERE not exists(r.copy_to_ES) and  toInt(a.inSightsTime) < $timeperiod and exists(b.inSightsTime)  "
+            results = tx.run("MATCH (a:{label}:DATA)-[r]->(b) "
+                            "WHERE r.copy_to_ES is null and  toInteger(a.inSightsTime) < $timeperiod and b.inSightsTime is not null  "
                             "SET r.copy_to_ES = false "
                             "RETURN distinct type(r) as relationshipName, id(r) as relationshipID, id(a) as startNodeID, id(b) as endNodeID ,a.inSightsTime as time_node_start , a.uuid as _start , b.inSightsTime as time_node_end, b.uuid as _end ,r "
-                            "limit $neo4j_query_limit ".format(label=label1), timeperiod=timeperiod,neo4j_query_limit=neo4j_query_limit).data()
+                            "limit $neo4j_query_limit ".format(label=label1), timeperiod=timeperiod,neo4j_query_limit=neo4j_query_limit)
         except Exception as ex:
             self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
+        for result in results:
+            record = dict()
+            # iterating through each key on the result and assigning the value due to 
+            # tx.run().data() doesn't provide the proper value, when the type of the value is a json/object
+            for key in result.keys():
+                record[key] = result[key]
+            records.append(record)
 
-        return result
+        return records
 
     def get_backward_relationship_details(self, tx, label1, timeperiod,neo4j_query_limit):
+        records = []
         try:
-            result = tx.run("MATCH (a:{label}:DATA)<-[r]-(b) "
-                            "WHERE not exists(r.copy_to_ES) and  toInt(a.inSightsTime) < $timeperiod and exists(b.inSightsTime) "
+            results = tx.run("MATCH (a:{label}:DATA)<-[r]-(b) "
+                            "WHERE r.copy_to_ES is null and  toInteger(a.inSightsTime) < $timeperiod and b.inSightsTime is not null "
                             "SET r.copy_to_ES = false "
                             "RETURN distinct type(r) as relationshipName, id(r) as relationshipID, id(a) as endNodeID, id(b) as startNodeID ,a.inSightsTime as time_node_end , a.uuid as _end , b.inSightsTime as time_node_start, b.uuid as _start , r   "
-                            "limit $neo4j_query_limit ".format(label=label1), timeperiod=timeperiod,neo4j_query_limit=neo4j_query_limit).data()
+                            "limit $neo4j_query_limit ".format(label=label1), timeperiod=timeperiod,neo4j_query_limit=neo4j_query_limit)
         except Exception as ex:
             self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
 
-        return result
+        for result in results:
+            record = dict()
+            # iterating through each key on the result and assigning the value due to 
+            # tx.run().data() doesn't provide the proper value, when the type of the value is a json/object
+            for key in result.keys():
+                record[key] = result[key]
+            records.append(record)
+
+        return records
 
     def get_forward_relationship_details_unack(self, tx, label1, timeperiod,neo4j_query_limit):
+        records = []
         try:
-            result = tx.run("MATCH (a:{label}:DATA)-[r]->(b) "
-                            "WHERE r.copy_to_ES = false and  toInt(a.inSightsTime) < $timeperiod and exists(b.inSightsTime)  "
-                            "RETURN distinct type(r) as relationshipName, id(r) as relationshipID, id(a) as startNodeID, id(b) as endNodeID ,a.inSightsTime as time_node_start , a.uuid as _start , b.inSightsTime as time_node_end, b.uuid as _end  ,r "
-                            "limit $neo4j_query_limit ".format(label=label1), timeperiod=timeperiod,neo4j_query_limit=neo4j_query_limit).data()
+            results = tx.run("MATCH (a:{label}:DATA)-[r]->(b) "
+                            "WHERE r.copy_to_ES = false and  toInteger(a.inSightsTime) < $timeperiod and b.inSightsTime is not null  "
+                            "RETURN distinct type(r) as relationshipName, id(r) as relationshipID, id(a) as startNodeID, id(b) as endNodeID ,a.inSightsTime as time_node_start , a.uuid as _start , b.inSightsTime as time_node_end, b.uuid as _end, r "
+                            "limit $neo4j_query_limit ".format(label=label1), timeperiod=timeperiod,neo4j_query_limit=neo4j_query_limit)
         except Exception as ex:
             self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
 
-        return result
+        for result in results:
+            record = dict()
+            # iterating through each key on the result and assigning the value due to 
+            # tx.run().data() doesn't provide the proper value, when the type of the value is a json/object
+            for key in result.keys():
+                record[key] = result[key]
+            records.append(record)
 
+        return records
     def get_backward_relationship_details_unack(self, tx, label1, timeperiod,neo4j_query_limit):
+        records = []
         try:
-            result = tx.run("MATCH (a:{label}:DATA)<-[r]-(b) "
-                            "WHERE r.copy_to_ES = false and  toInt(a.inSightsTime) < $timeperiod and exists(b.inSightsTime) "
+            results = tx.run("MATCH (a:{label}:DATA)<-[r]-(b) "
+                            "WHERE r.copy_to_ES = false and  toInteger(a.inSightsTime) < $timeperiod and b.inSightsTime is not null "
                             "RETURN distinct type(r) as relationshipName, id(r) as relationshipID, id(a) as startNodeID, id(b) as endNodeID ,a.inSightsTime as time_node_start , a.uuid as _start , b.inSightsTime as time_node_end, b.uuid as _end , r  "
-                            "limit $neo4j_query_limit ".format(label=label1), timeperiod=timeperiod,neo4j_query_limit=neo4j_query_limit).data()
+                            "limit $neo4j_query_limit ".format(label=label1), timeperiod=timeperiod,neo4j_query_limit=neo4j_query_limit)
         except Exception as ex:
             self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
 
-        return result
+        for result in results:
+            record = dict()
+            # iterating through each key on the result and assigning the value due to 
+            # tx.run().data() doesn't provide the proper value, when the type of the value is a json/object
+            for key in result.keys():
+                record[key] = result[key]
+            records.append(record)
+
+        return records
 
 
     def set_flag_true_rel(self, tx, label1, relId):
@@ -947,7 +993,7 @@ class Neo4jArchivalAgent(BaseAgent):
     def run_match_query_count_acknowledged(self, tx, timeperiod, label1):
         try:
             result = tx.run("MATCH (n:{label}:DATA) "
-                            "WHERE toInt(n.inSightsTime) < $timeperiod and n.copy_to_ES = true "
+                            "WHERE toInteger(n.inSightsTime) < $timeperiod and n.copy_to_ES = true "
                             "RETURN count(n) as Count ".format(label=label1), timeperiod=timeperiod).data()
             self.baseLogger.info("count of Nodes to left ack")
             self.baseLogger.info(result)
@@ -959,7 +1005,7 @@ class Neo4jArchivalAgent(BaseAgent):
 
     def find_labels(self, tx):
         try:
-            result = tx.run("match(n:DATA) where exists(n.uuid) "
+            result = tx.run("match(n:DATA) where n.uuid is not null "
                             "with distinct labels(n) as labels "
                             "unwind labels as label "
                             "with distinct label "
@@ -999,12 +1045,11 @@ class Neo4jArchivalAgent(BaseAgent):
 
     def get_indexes(self,tx):
         try:
-            result = tx.run("call db.indexes ").data()
+            result = tx.run("SHOW INDEXES YIELD *").data()
         except Exception as ex:
             self.baseLogger.error(ex)
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
         return result
-
 
 
 if __name__ == "__main__":

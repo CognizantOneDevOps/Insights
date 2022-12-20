@@ -25,6 +25,9 @@ export class ReportManagementService {
     private httpClient: HttpClient,
     private dataShare: DataSharedService
   ) {}
+
+isReport: boolean = false;
+
   saveDataforReport(reportJson: string): Promise<any> {
     return this.restCallHandlerService
       .postWithData("SAVE_REPORT", reportJson, "", {
@@ -68,6 +71,8 @@ export class ReportManagementService {
   }
 
   getAssesmentReport(UserDetail: string) {
+    this.isReport = true
+    console.log(this.isReport)
     return this.restCallHandlerService
       .postWithData("GET_ASSESSMENT_REPORT", UserDetail, "", {
         "Content-Type": "application/json",

@@ -24,9 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
-import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.grafanadashboard.service.GrafanaPdfService;
 import com.cognizant.devops.platformservice.rest.querycaching.service.QueryCachingConstants;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
@@ -61,11 +59,9 @@ public class GrafanaPdfController {
 			} else {
 				grafanaPdfServiceImpl.saveGrafanaDashboardConfig(detailsJson);
 			}
-			
-		} catch (InsightsCustomException e) {
+		} catch (Exception e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
-	
 }

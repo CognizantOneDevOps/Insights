@@ -10,7 +10,7 @@ services:
       retries: 10
     restart: always
     env_file:
-      - ./postgres/config.env
+      - ./config.env
     volumes:
       - $VOL_PATH/InsightsData/postgres/data:/var/lib/postgresql/data
       - ./postgres/postgresql.conf:/etc/postgresql.conf
@@ -26,7 +26,7 @@ services:
       - $VOL_PATH/InsightsData/neo4j/logs:/logs
       - $VOL_PATH/InsightsData/neo4j/conf:/conf
     env_file:
-      - ./neo4j/config.env
+      - ./config.env
     healthcheck:
       test: ["CMD", "cypher-shell", "match (n) return count(n)"]
       interval: 10s
@@ -38,16 +38,15 @@ services:
       - 7687:7687
 
   grafana:
-    image: devopsbasservice/onedevopsinsights:grafana8.4.5
+    image: devopsbasservice/onedevopsinsights:grafana9.0.6
     env_file:
-      - ./grafana/config.env
+      - ./config.env
     healthcheck:
       test: curl --fail -s http://localhost:30000/api/healthy || exit 1
       interval: 1m30s
       timeout: 10s
       retries: 3
     volumes:
-       - ./grafana/ldap.toml:/opt/grafana/conf/ldap.toml
        - $VOL_PATH/InsightsData/grafana/logs:/usr/INSIGHTS_HOME/logs
     depends_on:
       - postgres
@@ -61,7 +60,7 @@ services:
       - $VOL_PATH/InsightsData/rabbitmq/data:/var/lib/rabbitmq
       - $VOL_PATH/InsightsData/rabbitmq/log:/var/log/rabbitmq
     env_file:
-      - ./rabbitmq/config.env
+      - ./config.env
     hostname: rabbitmqtest
     healthcheck:
       test: rabbitmq-diagnostics -q ping
@@ -76,9 +75,9 @@ services:
 
 
   serviceui:
-    image: devopsbasservice/onedevopsinsights:servicenui9.5
+    image: devopsbasservice/onedevopsinsights:servicenui$INSIGHTS_VERSION
     env_file:
-      - ./servicenui/config.env
+      - ./config.env
     depends_on:
       - grafana
       - neo4j
@@ -90,7 +89,7 @@ services:
       - 38080:8080
 
   engine:
-    image: devopsbasservice/onedevopsinsights:engine9.5
+    image: devopsbasservice/onedevopsinsights:engine$INSIGHTS_VERSION
     depends_on:
       - neo4j
       - rabbitmq
@@ -98,16 +97,16 @@ services:
       -  $VOL_PATH/InsightsData/engine/logs:/usr/INSIGHTS_HOME/logs
       -  serverconfig:/usr/INSIGHTS_HOME/.InSights
     env_file:
-      - ./engine/config.env
+      - ./config.env
 
   agentwebhook:
-    image: devopsbasservice/onedevopsinsights:agentwebhook9.5
+    image: devopsbasservice/onedevopsinsights:agentwebhook$INSIGHTS_VERSION
     volumes:
       - $VOL_PATH/InsightsData/agentswebhook/data:/opt/insightsagents/PlatformAgents
       - $VOL_PATH/InsightsData/agentswebhook/logs:/usr/INSIGHTS_HOME/logs
       - agentinitscripts:/etc/init.d
     env_file:
-      - ./agentswebhooks/config.env
+      - ./config.env
     depends_on:
       - rabbitmq
     ports:

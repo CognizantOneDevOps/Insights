@@ -70,15 +70,17 @@ export class ReportConfigComponent implements OnInit {
   frequencyPlaceholder: string = "Select frequency";
   inputDataSourcePlaceholder: string = "Select datasource";
   emailDetails: any = null;
+  selectedReportId: number;
   enableEmailDetails: boolean = false;
   emailReg = "email";
   receivedReportTemplates = [];
   receivedScheduleList = [];
-  selectedMilestone: any = {milestoneId:0, id:0};
+  selectedMilestone: any = { milestoneId: 0, id: 0 };
   isROITemplate: boolean = false;
   mileStoneName: any = null;
   responseForMilestone: any;
   listOfMilestones = [];
+  templateType: string;
 
 
   constructor(
@@ -90,12 +92,12 @@ export class ReportConfigComponent implements OnInit {
     public reportmanagementservice: ReportManagementService,
     public milestoneservice: MileStoneService,
     private dataArchivingService: DataArchivingService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.route.queryParams.subscribe((params) => {
       this.receivedParam = JSON.parse(params["reportparam"]);
-      console.log("RecievedParams :",this.receivedParam);
+      console.log("RecievedParams :", this.receivedParam);
       this.receivedReportTemplates = JSON.parse(params["reportTemplates"]);
       this.receivedScheduleList = JSON.parse(params["scheduleList"]);
       this.receivedReportTemplates = JSON.parse(params["reportTemplates"]);
@@ -104,7 +106,7 @@ export class ReportConfigComponent implements OnInit {
     this.initializeVariable();
   }
 
-  ngAfterViewInit() {}
+  ngAfterViewInit() { }
 
   async initializeVariable() {
     if (this.receivedParam.type == "edit") {
@@ -122,7 +124,6 @@ export class ReportConfigComponent implements OnInit {
           this.receivedParam.data.asseementreportdisplayname;
       }
       this.listOfReports.push(this.receivedParam.data.template);
-      console.log("List Of Reports:",this.listOfReports);
       this.schedule = this.receivedParam.data.schedule;
       //this.schedule = this.receivedParam.data.schedule;
       this.datasource = this.receivedParam.data.inputDatasource;
@@ -143,12 +144,16 @@ export class ReportConfigComponent implements OnInit {
       this.taskListTobeSaved = this.receivedParam.data.taskDesc;
       this.taskidInOrder = this.taskListTobeSaved;
       this.selectedReport = this.receivedParam.data.template;
+      this.selectedReportId = this.selectedReport.reportId;
       this.templateName = this.receivedParam.data.template.templateName;
       this.isReoccuring = this.receivedParam.data.isReoccuring;
       this.viewListDisabled = false;
-      this.loadMilestones();
+      this.templateType = this.receivedParam.data.template.templateType
+      if (this.templateType != undefined && this.templateType == 'ROITemplate') {
+        this.loadMilestones();
+      }
       this.selectedMilestone.id = this.receivedParam.data.milestoneId;
-      if(this.selectedMilestone.id != 0 && this.selectedMilestone.id != undefined){
+      if (this.selectedMilestone.id != 0 && this.selectedMilestone.id != undefined) {
         this.isROITemplate = true;
       }
       for (var element of this.taskListTobeSaved) {
@@ -167,12 +172,12 @@ export class ReportConfigComponent implements OnInit {
 
   Refresh() {
     if (this.receivedParam.type == "edit") {
-      if (this.schedule == "ONETIME"){
-      this.startDateInput = this.receivedParam.data.startdate;
-      this.endDateInput =  this.receivedParam.data.enddate;
+      if (this.schedule == "ONETIME") {
+        this.startDateInput = this.receivedParam.data.startdate;
+        this.endDateInput = this.receivedParam.data.enddate;
       }
       else
-      this.isReoccuring =  this.receivedParam.data.isReoccuring;
+        this.isReoccuring = this.receivedParam.data.isReoccuring;
       this.disableRefresh = false;
     } else {
       this.reportName = "";
@@ -187,7 +192,7 @@ export class ReportConfigComponent implements OnInit {
       this.disableRefresh = false;
       this.enableEmailDetails = null;
       this.viewListDisabled = true;
-      this.selectedMilestone = {milestoneId: 0};
+      this.selectedMilestone = { milestoneId: 0 };
     }
   }
 
@@ -264,18 +269,17 @@ export class ReportConfigComponent implements OnInit {
   }
 
   getTemplateName() {
-    console.log("Inside getTemplateName");
     for (var data of this.listOfReports) {
-      console.log("data:",data);
-      if (data.reportId == this.selectedReport.reportId) {
+      console.log("data:", data);
+      if (data.reportId == this.selectedReportId) {
         this.templateName = data.templateName;
-        console.log("Inside GetTemplate:",this.templateName)
-        if(data.templateType !== undefined && data.templateType == 'ROITemplate'){
+        console.log("Inside GetTemplate:", this.templateName)
+        if (data.templateType !== undefined && data.templateType == 'ROITemplate') {
           this.isROITemplate = true;
           this.listOfSchedule = ["ONETIME"];
           this.loadMilestones();
         }
-        else{
+        else {
           this.isROITemplate = false;
           this.listOfSchedule = this.receivedScheduleList;
         }
@@ -286,14 +290,15 @@ export class ReportConfigComponent implements OnInit {
   async loadMilestones() {
     console.log("Inside lOadMilestones");
     this.responseForMilestone = await this.milestoneservice.fetchMileStoneConfig();
+    console.log(this.responseForMilestone.data.length)
     if (this.responseForMilestone.data != null && this.responseForMilestone.status == 'success') {
       this.listOfMilestones = [];
-      for (var record of this.responseForMilestone.data){
-        if(record.status == "COMPLETED"){
+      for (var record of this.responseForMilestone.data) {
+        if (record.status == "COMPLETED") {
           this.listOfMilestones.push(record);
         }
       }
-      if(this.listOfMilestones.length<1){
+      if (this.listOfMilestones.length < 1) {
         this.isROITemplate = false;
         this.selectedReport = { reportId: 0, description: "" };
         this.messageDialog.showApplicationsMessage(
@@ -301,7 +306,8 @@ export class ReportConfigComponent implements OnInit {
           "ERROR"
         );
       }
-    } else {
+    }
+    else {
       this.messageDialog.showApplicationsMessage(
         "Failed to load the milestones.Please check logs for more details.",
         "ERROR"
@@ -327,7 +333,7 @@ export class ReportConfigComponent implements OnInit {
         disableClose: true,
         data: {
           title: "List Of Kpi(s) of " + this.templateName,
-          id: this.selectedReport.reportId,
+          id: this.selectedReportId,
         },
       });
     }
@@ -419,7 +425,7 @@ export class ReportConfigComponent implements OnInit {
       reportAPIRequestJson["reportName"] = self.reportName;
       reportAPIRequestJson["asseementreportdisplayname"] =
         self.reportdisplayName;
-      reportAPIRequestJson["reportTemplate"] = self.selectedReport.reportId;
+      reportAPIRequestJson["reportTemplate"] = self.selectedReportId;
       reportAPIRequestJson["milestoneId"] = self.selectedMilestone.id;
       reportAPIRequestJson["schedule"] = self.schedule;
       reportAPIRequestJson["startdate"] = this.startdate;

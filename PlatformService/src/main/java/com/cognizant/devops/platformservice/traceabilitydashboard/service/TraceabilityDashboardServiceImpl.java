@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.ehcache.Cache;
@@ -42,7 +41,6 @@ import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.config.units.EntryUnit;
 import org.ehcache.config.units.MemoryUnit;
 import org.springframework.stereotype.Service;
-
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.FileDetailsEnum;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
@@ -68,15 +66,13 @@ import com.google.gson.JsonSyntaxException;
  */
 @Service("TreceabilityDashboardService")
 public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardService {
-
-	Cache<String, String> pipelineCache;
-	Cache<String, String> masterdataCache;
-	String toolName;
-	String fieldName;
-	List<String> fieldValue;
-	String cacheKey;
+	Cache<String, String> pipelineCache=null;
+	Cache<String, String> masterdataCache=null;
+	String toolName="";
+	String fieldName="";
+	List<String> fieldValue=null;
+	String cacheKey="";
 	Map<String,List<JsonObject>> mapOfPayload=new HashMap<>();
-	
 
 	static final String PATTERN = "[\\[\\](){}\"\\\"\"]";
 	static final String DATE_PATTERN = "MM/dd/yyyy HH:mm:ss";
@@ -93,7 +89,6 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 
 	private static final Logger LOG = LogManager.getLogger(TraceabilityDashboardServiceImpl.class.getName());
 	{
-
 		CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
 				.withCache("traceability",
 						CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
@@ -101,7 +96,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 										MemoryUnit.MB)))
 				.build();
 		cacheManager.init();
-		LOG.debug("Traceability===== Cache Manaher Initilized ");
+		LOG.debug("Traceability===== Cache Manager Initilized ");
 		pipelineCache = cacheManager.createCache("pipeline",
 				CacheConfigurationBuilder
 						.newCacheConfigurationBuilder(String.class, String.class,
@@ -114,16 +109,12 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 								ResourcePoolsBuilder.heap(TraceabilityConstants.MASTER_CACHE_HEAP_SIZE_BYTES))
 						.withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(
 								Duration.ofSeconds(TraceabilityConstants.MASTER_CACHE_EXPIRY_IN_SEC))));
-
 	}
-
-	
 	/** this method loads traceability json from database.
 	 * @throws InsightsCustomException
 	 */
 	private void loadTraceabilityJson() throws InsightsCustomException {
 		try {
-
 			List<InsightsConfigFiles> configFile = configFilesDAL
 					.getAllConfigurationFilesForModule(FileDetailsEnum.FileModule.TRACEABILITY.name());
 			String configFileData = new String(configFile.get(0).getFileData(), StandardCharsets.UTF_8);
@@ -649,17 +640,13 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 				String toolCategory = dataModel.get(toolName).getAsJsonObject().get(TraceabilityConstants.CATEGORY).getAsString();
 				if (type.equals("Epic")) {
 					return processEpic(toolName, fieldName, toolCategory, new ArrayList<String>(fieldValue));
-
 				} else {				
-					
-					return getMasterMapResponse(toolCategory,type);
-					
+					return getMasterMapResponse(toolCategory,type);	
 				}
-
 			} catch (JsonSyntaxException | JsonIOException | InsightsCustomException ex1) {
 				LOG.error(ex1.getMessage());
 				throw new InsightsCustomException(ex1.getMessage());
-			}
+		     }
 		}
 	}
 	
@@ -698,12 +685,10 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 		if (type.equals(TraceabilityConstants.OTHER_PIPELINE)) {
 			response = formatOrder(response);
 		}
-		LOG.debug("Pipeline response prepared successfully");
+		LOG.debug("Pipeline response prepared successfully ");
 		/* Get the MasterResponse Map which will used for caching */
 		pipelineCache.put(cacheKey, response.toString());
-		
 		return response;
-		
 	}
 
 	private void getLinkMapSize(String toolName, HashMap<String, List<String>> uplinkMap,

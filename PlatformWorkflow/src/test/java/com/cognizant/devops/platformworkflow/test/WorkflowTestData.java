@@ -484,7 +484,6 @@ public class WorkflowTestData {
 		String mailCC = "ab@ab.com";
 		String mailBcc = "ab@acb.com";
 		mailReportDTO.setTimeOfReportGeneration(InsightsUtils.insightsTimeXFormat(System.currentTimeMillis()));
-		mailReportDTO.setEmailAttachmentName("Report name");
 		mailReportDTO.setReportFilePath("filepath");
 		String[] recipientList = mailTO.split(",");// workflowConfig.getAssessmentConfig().getEmails().split(",")
 		String[] recipientCCList = mailCC.split(",");
@@ -493,12 +492,13 @@ public class WorkflowTestData {
 		List<InternetAddress> recipientCcAddress = createRecipientAddress(recipientCCList);
 		List<InternetAddress> recipientBccAddress = createRecipientAddress(recipientBCCList);
 		mailReportDTO.setMailTo(recipientAddress);
-		mailReportDTO.setMailCC(recipientAddress);
-		mailReportDTO.setMailBCC(recipientAddress);
+		mailReportDTO.setMailCC(recipientCcAddress);
+		mailReportDTO.setMailBCC(recipientBccAddress);
 		mailReportDTO.setMailFrom("abc@a.com");
 		mailReportDTO.setSubject("subject");
 		mailReportDTO.setMailBody("sending mail");
-		mailReportDTO.setMailAttachment(new byte[] {10, 45, -4});
+		Map<String, byte[]> attachments = new HashMap<>();
+		attachments.put("Report name", new byte[] {10, 45, -4});
 		return mailReportDTO;
 	}
 

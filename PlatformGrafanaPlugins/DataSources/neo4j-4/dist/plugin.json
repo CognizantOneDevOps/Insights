@@ -4,6 +4,9 @@
   "name": "Neo4j 4.0 Datasource",
   "id": "cts-neo-4-j-4-0",
   "metrics": true,
+  "logs": true,
+  "annotations": true,
+ 
   "info": {
     "description": "Neo4j 4.0 Datasource",
     "author": {
@@ -29,10 +32,34 @@
     ],
     "screenshots": [],
     "version": "1.0.0",
-    "updated": "2022-07-20"
+    "updated": "2022-12-08"
   },
   "dependencies": {
     "grafanaDependency": ">=8.4.5",
     "plugins": []
-  }
+  },
+  "routes": [
+    {
+      "path": "platformservice",
+      "method": "*",
+      "url": "{{ .JsonData.path }}",
+      "headers": [
+        {
+          "name": "Authorization",
+          "content": "Basic {{ .SecureJsonData.apiKey }}"
+        }
+      ]
+    },
+    {
+      "path": "neo4jLog",
+      "method": "*",
+      "url": "{{ .JsonData.serviceUrl }}",
+      "headers": [
+        {
+          "name": "PLAFORM_AUTHORIZATION",
+          "content": "Basic {{ .JsonData.basicPassword }}"
+        }
+      ]
+    }
+  ]
 }

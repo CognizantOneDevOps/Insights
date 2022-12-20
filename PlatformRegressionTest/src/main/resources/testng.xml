@@ -4,7 +4,7 @@
 
 <suite thread-count="1" name="suite" verbose="10">
 
-	  <test name="platformapitest">
+	    <test name="platformapitest">
 		<classes>
 			<class
 				name="com.cognizant.devops.platformregressiontest.test.testnginitializer.TestNGInitializer" />
@@ -54,13 +54,13 @@
 				name="com.cognizant.devops.platformregressiontest.test.TaskManagement.WorkflowTaskManagementAPI" />
 		</classes>
 	</test>
-	<test name="logintest">
+	 <test name="logintest">
 		<classes>
 			<class
 				name="com.cognizant.devops.platformregressiontest.test.login.LoginTest" />
 		</classes>
 	</test>
-	 <test name="groupsandusertest">
+	<test name="groupsandusertest">
 		<classes>
 			<class
 				name="com.cognizant.devops.platformregressiontest.test.ui.groupsanduser.GroupsAndUserTest" />
@@ -97,6 +97,20 @@
 		<classes>
 			<class
 				name="com.cognizant.devops.platformregressiontest.test.ui.dashboardreportdownload.DashboardReportDownloadTest" />
+		</classes>
+	</test> 
+
+	<test name="multipleemailconfig">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.multipleemailconfig.MultipleEmailDashRepoTest" />
+		</classes>
+	</test>
+	
+	<test name="multipleemailconfigreportmgm">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.ui.multipleemailconfig.MultipleEmailRepoMgmTest" />
 		</classes>
 	</test>
 
@@ -193,6 +207,6 @@
 			<class
 				name="com.cognizant.devops.platformregressiontest.test.ui.dataarchival.DataArchivalTest" />
 		</classes>
-	</test> 
+	</test>
 
 </suite>

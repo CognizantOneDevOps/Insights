@@ -63,6 +63,15 @@
 
       <button
         mat-icon-button
+        class="btnHeight"
+        (click)="sendMail()"
+      >
+        <mat-icon matTooltip="Mail Dashboards" svgIcon="email_config" >
+        </mat-icon>
+      </button>
+
+      <button
+        mat-icon-button
         (click)="startImmediate()"
         class="btnHeight"
         [disabled]="disableStartImmediate"
@@ -185,7 +194,7 @@
               (change)="updateStatus($event, element.configId, element)"
               [(ngModel)]="element.isActive"
               [checked]="isActive"
-              [disabled]="clicked[i]"
+              [disabled]="selectedIndex != i + currentPageIndex"
               [matTooltip]="element.isActive ? 'Active' : 'Inactive'"
             >
             </mat-slide-toggle>

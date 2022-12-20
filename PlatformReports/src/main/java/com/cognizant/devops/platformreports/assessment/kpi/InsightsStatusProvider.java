@@ -15,16 +15,16 @@
  ******************************************************************************/
 package com.cognizant.devops.platformreports.assessment.kpi;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.constants.ServiceStatusConstants;
 import com.cognizant.devops.platformcommons.core.util.ComponentHealthLogger;
+import com.cognizant.devops.platformdal.healthutil.HealthUtil;
 
 public class InsightsStatusProvider extends ComponentHealthLogger {
 	private static Logger log = LogManager.getLogger(InsightsStatusProvider.class);
+	HealthUtil healthUtil = new HealthUtil();
 	
 	static InsightsStatusProvider instance=null;
 	private InsightsStatusProvider() {
@@ -42,11 +42,11 @@ public class InsightsStatusProvider extends ComponentHealthLogger {
 	try {
 			String version = "";
 			version = InsightsStatusProvider.class.getPackage().getImplementationVersion();
-			log.debug( " Insights version{} " ,  version    );
-			Map<String,String> extraParameter= new HashMap<String,String>(0);
-			createComponentStatusNode("HEALTH:INSIGHTS",version,message,status,extraParameter);
+			log.debug("Insights version{} " ,version);			
+			healthUtil.createComponentHealthDetails(ServiceStatusConstants.INSIGHTSINFERENCE,version, message, status);
+			
 		} catch (Exception e) {
-			log.error(" Unable to create node {} " , e.getMessage());
+			log.error("Unable to create Component Health records for PlatformReports {} ",e.getMessage());
 		}
 			return Boolean.TRUE;
 	}

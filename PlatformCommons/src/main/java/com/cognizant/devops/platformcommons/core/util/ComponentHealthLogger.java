@@ -60,5 +60,5 @@ public abstract class ComponentHealthLogger {
 		}else {
 			return Boolean.FALSE;
 		}
-	}
+	}	
 }
