@@ -573,8 +573,6 @@ class BaseAgent(object):
         data = []
         currentTime = self.getRemoteDateTime(datetime.utcnow())
         tokens = self.dataRoutingKey.split('.')
-        self.categoryName = tokens[0]
-        self.toolName = tokens[1]
         health_basic = {'toolName': self.config.get('toolName', tokens[1]),
                         'categoryName': self.config.get('toolCategory', tokens[0]),
                         'agentId': self.config.get('agentId'), 'inSightsTimeX': currentTime['time'],

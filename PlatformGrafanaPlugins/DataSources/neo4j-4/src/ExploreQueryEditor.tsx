@@ -7,6 +7,7 @@ import { MyQuery, MyDataSourceOptions } from './types';
 
 export type Props = QueryEditorProps<DataSource, MyQuery, MyDataSourceOptions>;
 
+/* eslint-disable react/display-name */
 export default (props: Props) => {
   //console.log(props);
   const { query } = props;

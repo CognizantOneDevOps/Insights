@@ -21,7 +21,7 @@ Created on Jul 08, 2021
 from datetime import datetime, timedelta
 from dateutil import parser
 from ....core.BaseAgent3 import BaseAgent
-from ....core.ROIUtilities import ROIUtilities
+from .ROIUtilities import ROIUtilities
 import json
 import urllib
 import threading

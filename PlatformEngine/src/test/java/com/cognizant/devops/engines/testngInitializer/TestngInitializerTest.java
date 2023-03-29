@@ -22,7 +22,6 @@ import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.core.CommonDALUtils;
 
@@ -30,7 +29,14 @@ import com.cognizant.devops.platformdal.core.CommonDALUtils;
 public class TestngInitializerTest {
 	
 	static Logger log = LogManager.getLogger(TestngInitializerTest.class);	
-
+	
+	public static String TESTNG_TESTDATA = "TestNG_TestData";
+	public static String TESTNG_PLATFORMENGINE = "PlatformEngine";
+	public static String TESTNG_PLATFORMSERVICE = "PlatformService";
+	public static String H2_DB_URL = "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS testdb\\;SET SCHEMA testdb";
+	public static String H2_DRIVER = "org.h2.Driver";
+	public static String H2_DIALECT = "org.hibernate.dialect.H2Dialect";
+	
 	@BeforeSuite
 	public void testOnStartup() throws Exception {
 		try {
@@ -43,10 +49,14 @@ public class TestngInitializerTest {
 		log.debug("Testng initializer class to load Config Cache");
 	}
 	
-	public void loadDBDetails() {
-		ApplicationConfigProvider.getInstance().getPostgre().setInsightsDBUrl(UnitTestConstant.H2_DB_URL);
-		ApplicationConfigProvider.getInstance().getPostgre().setDriver(UnitTestConstant.H2_DRIVER);
-		ApplicationConfigProvider.getInstance().getPostgre().setDialect(UnitTestConstant.H2_DIALECT);
-		ApplicationConfigProvider.updateConfig(ApplicationConfigProvider.getInstance());
+	public void loadDBDetails() throws InsightsCustomException{
+		try {
+			ApplicationConfigProvider.getInstance().getPostgre().setInsightsDBUrl(H2_DB_URL);
+			ApplicationConfigProvider.getInstance().getPostgre().setDriver(H2_DRIVER);
+			ApplicationConfigProvider.getInstance().getPostgre().setDialect(H2_DIALECT);
+			ApplicationConfigProvider.updateConfig(ApplicationConfigProvider.getInstance());
+		}catch(Exception ex) {
+			throw new InsightsCustomException("Issue in loading db");
+		}
 	}
 }

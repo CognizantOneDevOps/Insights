@@ -1,0 +1,23 @@
+{
+ "name": "insights_ui",
+ "version": "9.9",
+ "description": "insights_ui",
+ "dependencies": {
+  "express": "^4.18.2"
+ },
+ "engine": "node >=12.x.x",
+ "scripts": {
+  "start": "node UI.js"
+ },
+ "main": "UI.js",
+ "repository": {
+  "type": "git",
+  "url": ""
+ },
+ "author": "insights",
+ "license": "insights",
+ "bugs": {
+  "url": ""
+ },
+ "homepage": "/"
+}

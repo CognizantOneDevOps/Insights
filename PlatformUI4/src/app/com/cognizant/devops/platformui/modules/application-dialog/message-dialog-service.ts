@@ -59,18 +59,18 @@ export class MessageDialogService implements OnInit {
     openSnackBar(message: string, action: string) {
         let panelCls: string;
         if (action.toUpperCase() === 'SUCCESS') {
-            if (message.length > 68) {
+            if (message.length <= 115 && message.length > 68) {
                 panelCls = 'snackBar-style-success-2liner'
-            } else if (message.length > 136) {
+            } else if (message.length > 115) {
                 panelCls = 'snackBar-style-success-3liner'
             } else {
                 panelCls = 'snackBar-style-success'
             }
         }
         if (action.toUpperCase() === 'ERROR') {
-            if (message.length > 68) {
+            if (message.length <= 115 && message.length > 68) {
                 panelCls = 'snackBar-style-error-2liner'
-            } else if (message.length > 136) {
+            } else if (message.length > 115) {
                 panelCls = 'snackBar-style-error-3liner'
             } else {
                 panelCls = 'snackBar-style-error'

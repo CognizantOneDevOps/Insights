@@ -32,6 +32,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.web.multipart.MultipartFile;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
@@ -46,6 +47,7 @@ import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformservice.assessmentreport.service.GrafanaUtilities;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
+import com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest;
 import com.cognizant.devops.platformservice.workflow.service.WorkflowServiceImpl;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -62,6 +64,9 @@ public class AssessmentReportServiceData extends AbstractTestNGSpringContextTest
 	WorkflowServiceImpl workflowService;
 	@Autowired
 	private HttpServletRequest httpRequest;
+	
+	JsonObject testData = new JsonObject();
+	
 	
 	WorkflowDAL workflowConfigDAL = new WorkflowDAL();
 	File kpiFile = new File(classLoader.getResource("KPIDefination.json").getFile());
@@ -89,21 +94,6 @@ public class AssessmentReportServiceData extends AbstractTestNGSpringContextTest
 	JsonObject registerGrafanaContentJson = null;
 	JsonObject grafanaPDFreportTemplateJson = null;
 	
-	//variables for code coverage methods
-	String updatekpiString = "{\"kpiId\":100201,\"name\":\"TotalSuccessfulDeploymentsUpdate\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH(n:RUNDECK:DATA)WHEREn.SPKstartTime>{startTime}andn.SPKstartTime<{endTime}andn.SPKvector='DEPLOYMENT'andn.SPKstatus='Success'RETURNcount(n.SPKstatus)astotalDeploymentCount\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"totalDeploymentCount\",\"outputDatasource\":\"NEO4J\",\"usecase\":\"\"}" ;
-	String updatekpiStringFail = "{\"kpiId\":124332,\"name\":\"TotalSuccessfulDeploymentsUpdate\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH(n:RUNDECK:DATA)WHEREn.SPKstartTime>{startTime}andn.SPKstartTime<{endTime}andn.SPKvector='DEPLOYMENT'andn.SPKstatus='Success'RETURNcount(n.SPKstatus)astotalDeploymentCount\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"totalDeploymentCount\",\"outputDatasource\":\"NEO4J\",\"usecase\":\"\"}" ;
-	String updatekpiStringValidation = "&amp;{<\"kpiId\":100201,\"name\":\"TotalSuccessfulDeploymentsUpdate\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH(n:RUNDECK:DATA)WHEREn.SPKstartTime>{startTime}andn.SPKstartTime<{endTime}andn.SPKvector='DEPLOYMENT'andn.SPKstatus='Success'RETURNcount(n.SPKstatus)astotalDeploymentCount\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"totalDeploymentCount\",\"outputDatasource\":\"NEO4J\",\"usecase\":\"\"}" ;
-	
-	String deleteContentRequestValidation = "&amp;{<\"contentId\":10541}";
-	String deleteKpiString = "{\"kpiId\":\"100201\"}";
-	String deleteKpiStringFail = "{\"kpiId\":\"124332\"}";
-	String deleteKpiStringFailException = "{\"kpiId\":\"1002011111111\"}";
-	String deleteKpiStringValidation = "&amp;{<\"kpiId\":\"100201\"}";
-	
-	String updateContentString = "{\"contentId\":10541,\"expectedTrend\":\"UPWARDS\",\"contentName\":\"Total successful Deployments Update\",\"kpiId\":\"100201\",\"noOfResult\":2,\"threshold\":0,\"message\":{\"contentMessage\":\"Successful Deployments captured in last run were {totalDeploymentCount}\"},\"isActive\":\"TRUE\"}";
-	String updateContentString1 = "{\"contentId\":105411111,\"expectedTrend\":\"UPWARDS\",\"contentName\":\"Total successful Deployments Update\",\"kpiId\":\"100201\",\"noOfResult\":2,\"threshold\":0,\"message\":{\"contentMessage\":\"Successful Deployments captured in last run were {totalDeploymentCount}\"},\"isActive\":\"TRUE\"}";
-	String updateContentString2 = "{\"contentId\":105411111,\"expectedTrend\":\"UPWARDS\",\"contentName\":\"Total successful Deployments Update\",\"kpiId\":\"123456\",\"noOfResult\":2,\"threshold\":0,\"message\":{\"contentMessage\":\"Successful Deployments captured in last run were {totalDeploymentCount}\"},\"isActive\":\"TRUE\"}";
-	String updateContentStringValidation = "&amp;{<\"contentId\":10541,\"expectedTrend\":\"UPWARDS\",\"contentName\":\"Total successful Deployments Update\",\"kpiId\":\"100201\",\"noOfResult\":2,\"threshold\":0,\"message\":{\"contentMessage\":\"Successful Deployments captured in last run were {totalDeploymentCount}\"},\"isActive\":\"TRUE\"}";
 	String reportTemplateEdit ="";
 	String reportTemplateDuplicate="";
 	String reportTemplateEditMissingReportId="";
@@ -199,46 +189,7 @@ public class AssessmentReportServiceData extends AbstractTestNGSpringContextTest
 	String reportIdString="";
 	String reportIdROIString="";
 	int assessmentid =0;
-	String registerkpi = "{\"kpiId\":100201,\"name\":\"Total Successful Deployments\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN count(n.SPKstatus) as totalDeploymentCount\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"totalDeploymentCount\",\"outputDatasource\":\"NEO4J\",\"usecase\":\"\"}";
 
-	String registerROIkpi = "{\"kpiId\":100202,\"name\":\"Total Successful Deployments\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN count(n.SPKstatus) as totalDeploymentCount\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"totalDeploymentCount\",\"outputDatasource\":\"NEO4J\",\"usecase\":\"\"}";
-	
-	String incorrectRegisterkpi = "{\"kpiId\":1001,\"name\":\"Avg all employee productivity for threshold \",\"schedule\":\"DAILY\",\"toolName\":\"PRODUCTIVITY\",\"group\":\"PRODUCTIVITY\",\"lastRunTime\":\"1586284260000\",\"neo4jQuery\":\"MATCH (n:PRODUCTIVITY) where n.completionDateEpochTime > {startTime} AND n.completionDateEpochTime < {endTime} WITH  avg(n.storyPoints*8) as StoryPoint, avg(n.authorTimeSpent) as authorTimeSpent  return   StoryPoint, authorTimeSpent, round((toFloat(StoryPoint)/authorTimeSpent)*100) as Productivity\",\"resultField\":\"Productivity\"}";
-	
-	String registerSecondkpi = "{\"kpiId\":100144,\"name\":\"Minimum Deployment Time\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH (n:RUNDECK:DATA) WHERE  n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN COALESCE(Min(toInt(n.SPKduration)),0) as MinDeploymentTime\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"MinDeploymentTime\",\"outputDatasource\":\"NEO4J\",\"usecase\":\"\"}";
-
-	String registerkpiValidation = "&amp;{<\"kpiId\":100201,\"name\":\"Total Successful Deployments\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN count(n.SPKstatus) as totalDeploymentCount\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"totalDeploymentCount\",\"outputDatasource\":\"NEO4J\",\"usecase\":\"\"}";
-
-	String reportTemplateSave = "{\"reportName\":\"report_template_save\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":100201,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"Query\"}]}]}";
-
-	String editReportTemplate = "{\"reportName\":\"report_template_save\",\"reportId\":\"reportIdData\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":100201,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"Query\"}]},{\"kpiId\":100144,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"Query\"}]}]}";	
-	
-	String registerContent = "{\"contentId\":10541,\"expectedTrend\":\"UPWARDS\",\"contentName\":\"Total successful Deployments\",\"kpiId\":\"100201\",\"noOfResult\":2,\"threshold\":0,\"message\":{\"contentMessage\":\"Successful Deployments captured in last run were {totalDeploymentCount}\"},\"isActive\":\"TRUE\"}";
-	
-	String incorrectContent = "{\"expectedTrend\":\"DOWNWARDS\",\"contentName\":\"Average Build Time\",\"kpiId\":\"1110\",\"noOfResult\":2,\"threshold\":0,\"message\":{\"positive\":\"Average Build Time has decreased to {current:avgOutput}s from {previous:avgOutput}s \",\"negative\":\"Average Build Time has increased to {current:avgOutput}s from {previous:avgOutput}s \",\"neutral\":\"Average Build Time has remained constant to {avgOutput}s\"},\"isActive\":\"TRUE\"}";
-	
-	String contentWithoutKpi = "{\"contentId\":10,\"expectedTrend\":\"DOWNWARDS\",\"contentName\":\"Average Build Time\",\"category\":\"COMPARISON\",\"kpiId\":\"11\",\"noOfResult\":2,\"threshold\":0,\"message\":{\"positive\":\"Average Build Time has decreased to {current:avgOutput}s from {previous:avgOutput}s \",\"negative\":\"Average Build Time has increased to {current:avgOutput}s from {previous:avgOutput}s \",\"neutral\":\"Average Build Time has remained constant to {avgOutput}s\"},\"isActive\":\"TRUE\"}";
-	
-	String registerContentValiation = "&amp;{<\"contentId\":10541,\"expectedTrend\":\"UPWARDS\",\"contentName\":\"Total successful Deployments\",\"kpiId\":\"100201\",\"noOfResult\":2,\"threshold\":0,\"message\":{\"contentMessage\":\"Successful Deployments captured in last run were {totalDeploymentCount}\"},\"isActive\":\"TRUE\"}";
-	
-	String reportTemplate = "{\"reportName\":\"Fail_Report_test\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":100201,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"Query\"}]}]}";
-	
-	String reportTemplateEditValidation = "&amp;{<\"reportName\":\"Fail_Report_test123\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":100201,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"Query\"}]}]}";
-
-	String reportTemplateValidation = "&amp;{<\"reportName\":\"Fail_Report_test\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":100201,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"Query\"}]}]}";
-
-	String reportTemplateROI = "{\"reportName\":\"ROI_ReportTest\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"templateType\":\"ROITemplate\",\"kpiConfigs\":[{\"kpiId\":100202,\"visualizationConfigs\":[{\"vId\":\"101\",\"vQuery\":\"Query\"}]}]}";
-	
-	String reportTemplateROIValidation = "&amp;{<\"reportName\":\"ROI_ReportTest\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"templateType\":\"ROITemplate\",\"kpiConfigs\":[{\"kpiId\":100202,\"visualizationConfigs\":[{\"vId\":\"101\",\"vQuery\":\"Query\"}]}]}";
-	
-	String reportTemplateWithoutKPIDs = "{\"reportName\":\"Productivity_test\",\"description\":\"Backend Team\",\"visualizationutil\":\"FUSION\",\"isActive\":true}";
-	
-	String reportTemplateWithoutExistingKPIDs = "{\"reportName\":\"Productivity_test\",\"description\":\"Backend Team\",\"isActive\":true,\"visualizationutil\":\"Fusion\",\"kpiConfigs\":[{\"kpiId\":1,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"\"}]}]}";
-	
-	String incorrectReportTemplate = "{\"reportName\":\"Productivity_test\",\"description\":\"Backend Team\",\"isActive\":true,\"visualizationutil\":\"FUSION\"}";
-	
-	String grafanaReportTemplate = "{\"reportName\":\"Grafana_PDFReport_test12344\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"GRAFANAPDF\",\"kpiConfigs\":[{\"kpiId\":200202,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.kpiId={kpiId} RETURN  n.`ISSUE API` as `ISSUE API`, n.`TOOL NAME` as `TOOL NAME`, n.`STATUS` as `STATUS`, n.`Key` as `Key`\",\"vType\":\"table_200202\"}]}]}";
-	
 	File file = new File(classLoader.getResource("report_template_upload_test.json").getFile()); 
 	
 	public static List<Integer> contentIdList = new ArrayList<Integer>();
@@ -254,13 +205,7 @@ public class AssessmentReportServiceData extends AbstractTestNGSpringContextTest
 	String biWeeklyAssessmentReport="";
 	String triWeeklyAssessmentReport="";
 	String triWeeklyAssessmentReportWithDataSource="";
-	String incorrectAssessmentReport = "{\"reportName\":\"Incorrect_Deployment_test\",\"emailList\":\"fdfsfsdfs\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
-			+ taskID+ ",\"sequence\":0}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null,\"orgName\":\"Test Org\",\"userName\":\"Test_User\"}";
-	
-	String setReportTemplateStatusWrongId = "{\"reportName\":\"report_template_status\",\"reportId\":" + 1234567 + ",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":100201,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"Query\"}]}]}";
-	
-	String updateIncorrectAssessmentReport = "{\"isReoccuring\":true,\"emailList\":\"dasdsd\",\"id\":896}";
-	String oneTimeAssessmentReportWithStartDateGreaterThanEndDate=""; 
+    String oneTimeAssessmentReportWithStartDateGreaterThanEndDate=""; 
 	String dailyEmailAssessmentReport=""; 
 	String dailywithoutEmailAssessmentReport=""; 
 	String dailyEmailCcAssessmentReport=""; 
@@ -281,8 +226,6 @@ public class AssessmentReportServiceData extends AbstractTestNGSpringContextTest
 	String updateGrafanaAssessmentReport="";
 	String grafanaAssessmentReport="";
 	String deleteGrafanaReportTemplate="";
-	String sampleDashboard="{\"dashboard\":{\"id\":null,\"uid\":null,\"title\":\"Report_send_email_service_test1\",\"tags\":[],\"panels\":[{\"datasource\":\"Neo4j Data Source\",\"description\":\"\",\"fieldConfig\":{\"defaults\":{\"color\":{\"mode\":\"thresholds\"},\"custom\":{\"align\":\"auto\",\"displayMode\":\"auto\"},\"mappings\":[],\"thresholds\":{\"mode\":\"absolute\",\"steps\":[{\"color\":\"blue\",\"value\":null}]}},\"overrides\":[]},\"gridPos\":{\"h\":9,\"w\":12,\"x\":0,\"y\":18},\"id\":1,\"options\":{\"showHeader\":true},\"pluginVersion\":\"8.1.3\",\"targets\":[{\"cache\":false,\"cacheType\":false,\"cacheValue\":false,\"constant\":6.5,\"fixTime\":false,\"graph\":false,\"queryText\":\"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.kpiId=200202 RETURN  n.`ISSUE API` as `ISSUE API`, n.`TOOL NAME` as `TOOL NAME`, n.`STATUS` as `STATUS`, n.`Key` as `Key`\",\"raw\":false,\"refId\":\"A\",\"stats\":false,\"table\":true,\"timeseries\":false,\"varTime\":false}],\"title\":\"Total Successful Deployments\",\"type\":\"table\"},{\"datasource\":\"Neo4j Data Source\",\"fieldConfig\":{\"defaults\":{\"color\":{\"mode\":\"thresholds\"},\"custom\":{\"align\":\"auto\",\"displayMode\":\"color-text\",\"filterable\":false},\"mappings\":[],\"thresholds\":{\"mode\":\"absolute\",\"steps\":[{\"color\":\"green\",\"value\":null},{\"color\":\"red\",\"value\":80}]}},\"overrides\":[]},\"gridPos\":{\"h\":9,\"w\":12,\"x\":12,\"y\":0},\"id\":2,\"options\":{\"showHeader\":false},\"pluginVersion\":\"8.1.3\",\"targets\":[{\"cache\":false,\"cacheType\":false,\"cacheValue\":false,\"constant\":6.5,\"fixTime\":false,\"graph\":false,\"queryText\":\"MATCH (n:CONTENT_RESULT) where n.assessmentReportName= 'Report_send_email_service_test1' and n.kpiId= 200202 with distinct max(n.executionId) as latestexecutionId Match (b:CONTENT_RESULT) where b.executionId =latestexecutionId and b.kpiId= 200202 RETURN b.inferenceText as Text order by b.executionId, b.kpiId desc\",\"raw\":false,\"refId\":\"A\",\"stats\":false,\"table\":true,\"timeseries\":false,\"varTime\":false}],\"title\":\"Observation of Total Successful Deployments\",\"transparent\":true,\"type\":\"table\"}],\"timepicker\":{},\"templating\":{\"list\":[]},\"timezone\":\"browser\",\"schemaVersion\":16,\"version\":0},\"folderId\":0,\"overwrite\":false}";
-	JsonObject sampleDashboardJson = convertStringIntoJson(sampleDashboard);
 	String username="Test_User ";
 	
 	public void setReportId(String reportIdString) {
@@ -396,7 +339,9 @@ public class AssessmentReportServiceData extends AbstractTestNGSpringContextTest
 	}
 	
 	void prepareAssessmentData() throws InsightsCustomException {
-		try {
+		try {String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + TestngInitializerTest.TESTNG_TESTDATA + File.separator
+				+ TestngInitializerTest.TESTNG_PLATFORMSERVICE + File.separator + "AssessmentReportService.json";
+		testData = JsonUtils.getJsonData(path).getAsJsonObject();
 			InsightsWorkflowType type = new InsightsWorkflowType();
 			type.setWorkflowType(WorkflowTaskEnum.WorkflowType.REPORT.getValue());
 			workflowConfigDAL.saveWorkflowType(type);
@@ -405,7 +350,7 @@ public class AssessmentReportServiceData extends AbstractTestNGSpringContextTest
 		}
 		
 		try {
-			String workflowTaskTest = "{\"description\": \"KPI_Execute_service_test\",\"mqChannel\": \"WORKFLOW.ASSESSMENTSERVICE_TEST.TASK.KPI.EXCECUTION\",\"componentName\": \"com.cognizant.devops.platformreports.assessment.core.ReportKPISubscriber\",\"dependency\": \"1\",\"workflowType\": \"Report\"}";
+			String workflowTaskTest=testData.get("workflowTaskTest").toString();
 			JsonObject workflowTaskJson = convertStringIntoJson(workflowTaskTest);
 			int response = workflowService.saveWorkflowTask(workflowTaskJson);
 			InsightsWorkflowTask tasks = workflowConfigDAL
@@ -416,7 +361,7 @@ public class AssessmentReportServiceData extends AbstractTestNGSpringContextTest
 		}
 
 		try {
-			String pdfworkflowTaskTest = "{\"description\": \"PDF_Execute_service_test\",\"mqChannel\": \"WORKFLOW.ASSESSMENTSERVICE_TEST.TASK.PDF.EXCECUTION\",\"componentName\": \"com.cognizant.devops.platformreports.assessment.core.PDFExecutionSubscriber\",\"dependency\": \"2\",\"workflowType\": \"Report\"}";
+			String pdfworkflowTaskTest=testData.get("pdfworkflowTaskTest").toString();
 			JsonObject pdfworkflowTaskTestJson = convertStringIntoJson(pdfworkflowTaskTest);
 			int pdfresponse = workflowService.saveWorkflowTask(pdfworkflowTaskTestJson);
 			InsightsWorkflowTask pdftasks = workflowConfigDAL
@@ -427,7 +372,7 @@ public class AssessmentReportServiceData extends AbstractTestNGSpringContextTest
 		}
 		
 		try {
-			String emailworkflowTaskTest = "{\"description\": \"Email_Execute_service_test\",\"mqChannel\": \"WORKFLOW.ASSESSMENTSERVICE_TEST.TASK.EMAIL.EXCECUTION\",\"componentName\": \"com.cognizant.devops.platformreports.assessment.core.ReportEmailSubscriber\",\"dependency\": \"3\",\"workflowType\": \"Report\"}";
+			String emailworkflowTaskTest=testData.get("emailworkflowTaskTest").toString();
 			JsonObject emailworkflowTaskTestJson = convertStringIntoJson(emailworkflowTaskTest);
 			int emailresponse = workflowService.saveWorkflowTask(emailworkflowTaskTestJson);
 			InsightsWorkflowTask emailtasks = workflowConfigDAL
@@ -437,50 +382,56 @@ public class AssessmentReportServiceData extends AbstractTestNGSpringContextTest
 			log.error("Error preparing AssessmentReportServiceData Email task ", e);
 		}
 
-		String registerkpi = "{\"kpiId\":100201,\"name\":\"Total Successful Deployments\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN count(n.SPKstatus) as totalDeploymentCount\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"totalDeploymentCount\",\"outputDatasource\":\"NEO4J\",\"usecase\":\"\"}";
+		String registerkpi=testData.get("registerkpi").toString();
 		registerkpiJson = convertStringIntoJson(registerkpi);
 		
-		String registerROIkpi = "{\"kpiId\":100202,\"name\":\"Total Successful Deployments\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN count(n.SPKstatus) as totalDeploymentCount\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"totalDeploymentCount\",\"outputDatasource\":\"NEO4J\",\"usecase\":\"\"}";
+	    String registerROIkpi=testData.get("registerROIkpi").toString();
 		registerROIkpiJson = convertStringIntoJson(registerROIkpi);
 
-		String incorrectRegisterkpi = "{\"kpiId\":1001,\"name\":\"Avg all employee productivity for threshold \",\"schedule\":\"DAILY\",\"toolName\":\"PRODUCTIVITY\",\"group\":\"PRODUCTIVITY\",\"lastRunTime\":\"1586284260000\",\"neo4jQuery\":\"MATCH (n:PRODUCTIVITY) where n.completionDateEpochTime > {startTime} AND n.completionDateEpochTime < {endTime} WITH  avg(n.storyPoints*8) as StoryPoint, avg(n.authorTimeSpent) as authorTimeSpent  return   StoryPoint, authorTimeSpent, round((toFloat(StoryPoint)/authorTimeSpent)*100) as Productivity\",\"resultField\":\"Productivity\"}";
+		String incorrectRegisterkpi=testData.get("incorrectRegisterkpi").toString();
 		incorrectregisterkpiJson = convertStringIntoJson(incorrectRegisterkpi);
 
-		String registerContent = "{\"contentId\":10541,\"expectedTrend\":\"UPWARDS\",\"contentName\":\"Total successful Deployments\",\"kpiId\":\"100201\",\"noOfResult\":2,\"threshold\":0,\"message\":{\"contentMessage\":\"Successful Deployments captured in last run were {totalDeploymentCount}\"},\"isActive\":\"TRUE\"}";
+	    String registerContent=testData.get("registerContent").toString();
 		registerContentJson = convertStringIntoJson(registerContent);
 
-		String incorrectContent = "{\"expectedTrend\":\"DOWNWARDS\",\"contentName\":\"Average Build Time\",\"kpiId\":\"1110\",\"noOfResult\":2,\"threshold\":0,\"message\":{\"positive\":\"Average Build Time has decreased to {current:avgOutput}s from {previous:avgOutput}s \",\"negative\":\"Average Build Time has increased to {current:avgOutput}s from {previous:avgOutput}s \",\"neutral\":\"Average Build Time has remained constant to {avgOutput}s\"},\"isActive\":\"TRUE\"}";
+	    String incorrectContent=testData.get("incorrectContent").toString();
 		incorrectregisterContentJson = convertStringIntoJson(incorrectContent);
 
-		String contentWithoutKpi = "{\"contentId\":10,\"expectedTrend\":\"DOWNWARDS\",\"contentName\":\"Average Build Time\",\"category\":\"COMPARISON\",\"kpiId\":\"11\",\"noOfResult\":2,\"threshold\":0,\"message\":{\"positive\":\"Average Build Time has decreased to {current:avgOutput}s from {previous:avgOutput}s \",\"negative\":\"Average Build Time has increased to {current:avgOutput}s from {previous:avgOutput}s \",\"neutral\":\"Average Build Time has remained constant to {avgOutput}s\"},\"isActive\":\"TRUE\"}";
+		String contentWithoutKpi=testData.get("contentWithoutKpi").toString();
 		contentWithoutKpiJson = convertStringIntoJson(contentWithoutKpi);
 
-		String reportTemplate = "{\"reportName\":\"Fail_Report_test\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":100201,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"Query\"}]}]}";
+        String reportTemplate=testData.get("reportTemplate").toString();
 		reportTemplateJson = convertStringIntoJson(reportTemplate);
 		
-		String reportTemplateROI = "{\"reportName\":\"ROI_ReportTest\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"templateType\":\"ROITemplate\",\"kpiConfigs\":[{\"kpiId\":100202,\"visualizationConfigs\":[{\"vId\":\"101\",\"vQuery\":\"Query\"}]}]}";
+        String reportTemplateROI=testData.get("reportTemplateROI").toString();
 		reportTemplateROIJson = convertStringIntoJson(reportTemplateROI);
 		
-		String registerGrafanakpi = "{\"kpiId\":200202,\"name\":\"Total Successful Deployments\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN count(n.SPKstatus) as totalDeploymentCount\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"totalDeploymentCount\",\"outputDatasource\":\"NEO4J\",\"usecase\":\"\"}";
+	    String registerGrafanakpi=testData.get("registerGrafanakpi").toString();
 		registerGrafanakpiJson = convertStringIntoJson(registerGrafanakpi);
 		
-		String registerGrafanaContent = "{\"contentId\":50022,\"expectedTrend\":\"UPWARDS\",\"contentName\":\"Total successful Deployments\",\"kpiId\":\"200202\",\"noOfResult\":2,\"threshold\":0,\"message\":{\"contentMessage\":\"Successful Deployments captured in last run were {totalDeploymentCount}\"},\"isActive\":\"TRUE\"}";
+	    String registerGrafanaContent=testData.get("registerGrafanaContent").toString();
 		registerGrafanaContentJson = convertStringIntoJson(registerGrafanaContent);
 		
-		String grafanaReportTemplate = "{\"reportName\":\"Grafana_PDFReport_test\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"GRAFANAPDF\",\"kpiConfigs\":[{\"kpiId\":200202,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.kpiId={kpiId} RETURN  n.`ISSUE API` as `ISSUE API`, n.`TOOL NAME` as `TOOL NAME`, n.`STATUS` as `STATUS`, n.`Key` as `Key`\",\"vType\":\"table_200202\"}]}]}";
+        String grafanaReportTemplate=testData.get("grafanaReportTemplate").toString();
 		grafanaPDFreportTemplateJson = convertStringIntoJson(grafanaReportTemplate);
 		
-		String reportTemplateWithoutKPIDs = "{\"reportName\":\"Productivity_test\",\"description\":\"Backend Team\",\"visualizationutil\":\"FUSION\",\"isActive\":true}";
+        String reportTemplateWithoutKPIDs=testData.get("reportTemplateWithoutKPIDs").toString();
 		reportTemplateWithoutKPIsJson = convertStringIntoJson(reportTemplateWithoutKPIDs);
 
-		String reportTemplateWithoutExistingKPIDs = "{\"reportName\":\"Productivity_test\",\"description\":\"Backend Team\",\"isActive\":true,\"visualizationutil\":\"Fusion\",\"kpiConfigs\":[{\"kpiId\":1,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"\"}]}]}";
+        String reportTemplateWithoutExistingKPIDs=testData.get("reportTemplateWithoutExistingKPIDs").toString();
 		reportTemplateWithoutExistingKPIDsJson = convertStringIntoJson(reportTemplateWithoutExistingKPIDs);
 
-		String incorrectReportTemplate = "{\"reportName\":\"Productivity_test\",\"description\":\"Backend Team\",\"isActive\":true,\"visualizationutil\":\"FUSION\"}";
+	    String incorrectReportTemplate=testData.get("incorrectReportTemplate").toString();
 		incorrectReportTemplateJson = convertStringIntoJson(incorrectReportTemplate);
 	}
 
 	public void assessmentReportDataInit() {
+		try{String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + TestngInitializerTest.TESTNG_TESTDATA + File.separator
+				+ TestngInitializerTest.TESTNG_PLATFORMSERVICE + File.separator + "AssessmentReportService.json";
+		testData = JsonUtils.getJsonData(path).getAsJsonObject();}
+		catch (Exception e) {
+			log.error("message", e);
+		}
 		dailyExpectedAssessmentStartDate = 0L;
 		dailyExpectedAssessmentEndDate = 0L;
 		dailyExpectedNextRun = getNextRunTime(InsightsUtils.getCurrentTimeInSeconds(), "DAILY");
@@ -528,10 +479,7 @@ public class AssessmentReportServiceData extends AbstractTestNGSpringContextTest
 				"TRI_WEEKLY_SPRINT");
 		triWeeklyAssessmentWithDataSourceReportJson = convertStringIntoJson(triWeeklyAssessmentReportWithDataSource);
 
-		incorrectAssessmentReportJson = convertStringIntoJson(incorrectAssessmentReport);
-
-		updateIncorrectAssessmentReport = "{\"isReoccuring\":true,\"emailList\":\"dasdsd\",\"id\":896}";
-		updateAssessmentReportIncorrectJson = convertStringIntoJson(updateIncorrectAssessmentReport);
+		updateAssessmentReportIncorrectJson = convertStringIntoJson(testData.get("updateIncorrectAssessmentReport").toString());
 
 		oneTimeAssessmentReportWithStartDateGreaterThanEndDateJson = convertStringIntoJson(
 				oneTimeAssessmentReportWithStartDateGreaterThanEndDate);

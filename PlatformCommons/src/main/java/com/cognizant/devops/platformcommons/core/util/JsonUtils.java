@@ -15,6 +15,9 @@
  *******************************************************************************/
 package com.cognizant.devops.platformcommons.core.util;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.Reader;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -22,10 +25,14 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 
 public class JsonUtils {
 	private static final Logger log = LogManager.getLogger(JsonUtils.class);
@@ -141,5 +148,18 @@ public class JsonUtils {
 			return jsonObject.get(property).getAsString();
 		}
 		return "-";
+	}
+	
+	public static JsonObject getJsonData(String path) throws InsightsCustomException {
+		JsonObject testData = new JsonObject();
+		try {
+			JsonElement jsonData;
+			jsonData = JsonUtils.parseReader(new FileReader(new File(path).getCanonicalPath()));
+			testData = new Gson().fromJson(jsonData, JsonObject.class);
+		} catch (JsonIOException | JsonSyntaxException | IOException e) {
+			log.error(" Error while reading data from json file ",e); 
+			throw new InsightsCustomException(" Error while reading data from file ");
+		}
+		return testData;
 	}
 }

@@ -57,7 +57,6 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
 import com.cognizant.devops.platformcommons.core.util.AES256Cryptor;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -66,6 +65,7 @@ import com.cognizant.devops.platformservice.rest.AccessGroupManagement.AccessGro
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.cognizant.devops.platformservice.test.assessmentReports.AssessmentReportServiceData;
+import com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -99,7 +99,7 @@ public class GroupsAndUserTest extends GroupsAndUserTestData {
 	@DataProvider
 	public void getData() {
 		String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator
-				+ UnitTestConstant.TESTNG_TESTDATA + File.separator + "grafanaAuth.json";
+				+ TestngInitializerTest.TESTNG_TESTDATA + File.separator + "grafanaAuth.json";
 		JsonElement jsonData;
 		try {
 			jsonData = JsonUtils.parseReader(new FileReader(new File(path).getCanonicalPath()));

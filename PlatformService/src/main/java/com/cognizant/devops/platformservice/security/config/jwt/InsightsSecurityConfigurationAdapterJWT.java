@@ -33,13 +33,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.FilterChainProxy;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -57,7 +57,7 @@ import com.cognizant.devops.platformservice.security.config.InsightsResponseHead
 @EnableWebSecurity
 @Order(value = 4)
 @Conditional(InsightsJWTBeanInitializationCondition.class)
-public class InsightsSecurityConfigurationAdapterJWT extends WebSecurityConfigurerAdapter {
+public class InsightsSecurityConfigurationAdapterJWT {
 
 	private static Logger log = LogManager.getLogger(InsightsSecurityConfigurationAdapterJWT.class);
 
@@ -71,46 +71,62 @@ public class InsightsSecurityConfigurationAdapterJWT extends WebSecurityConfigur
 
 	static final String AUTHTYPE = "JWT";
 
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		log.debug("message Inside InsightsSecurityConfigurationAdapter, AuthenticationManagerBuilder **** {} ",
+	@Bean
+	AuthenticationManager nativeAuthenticationManager(AuthenticationManagerBuilder auth) {
+		log.debug("message Inside InsightsSecurityConfigurationAdapterJWT, AuthenticationManagerBuilder **** {} ",
 				ApplicationConfigProvider.getInstance().getAutheticationProtocol());
 		if (AUTHTYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
 			log.debug("message Inside InsightsSecurityConfigurationAdapter, check authentication provider **** ");
 			ApplicationConfigProvider.performSystemCheck();
 			auth.authenticationProvider(jwtAuthenticationProvider());
 		}
+		return auth.getObject();
 	}
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		log.debug("message Inside InsightsSecurityConfigurationAdapter ,HttpSecurity **** {} ",
+
+	@Bean
+	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		log.debug("message Inside InsightsSecurityConfigurationAdapterJWT ,HttpSecurity **** {} ",
 				ApplicationConfigProvider.getInstance().getAutheticationProtocol());
 		if (AUTHTYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
 			log.debug("message Inside InsightsSecurityConfigurationAdapter,HttpSecurity check **** ");
 
-			http.cors().and().authorizeRequests().antMatchers("/datasources/**").permitAll().antMatchers("/admin/**")
-					.access("hasAuthority('Admin')").antMatchers("/traceability/**").access("hasAuthority('Admin')")
-					.antMatchers("/configure/loadConfigFromResources").permitAll().antMatchers("/**").authenticated() // .permitAll()
-					.and().exceptionHandling().accessDeniedHandler(springAccessDeniedHandler);
+			http.csrf().ignoringRequestMatchers(AuthenticationUtils.CSRF_IGNORE.toArray(new String[0]))
+			.csrfTokenRepository(authenticationUtils.csrfTokenRepository());
+			
+			http.exceptionHandling().accessDeniedHandler(springAccessDeniedHandler);
 
-			http.csrf().ignoringAntMatchers(AuthenticationUtils.CSRF_IGNORE.toArray(new String[0]))
-					.csrfTokenRepository(authenticationUtils.csrfTokenRepository()).and()
-					.addFilterBefore(insightsFilter(), BasicAuthenticationFilter.class);
+			http.addFilterAfter(insightsFilter(), BasicAuthenticationFilter.class);
 			http.headers().addHeaderWriter(new StaticHeadersWriter("X-FRAME-OPTIONS", "ALLOW-FROM "
 					+ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getJwtTokenOriginServerURL()));
 			http.sessionManagement().maximumSessions(1).and() // sameOrigin()
 					.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
+			
+			http.anonymous().disable().authorizeHttpRequests()
+			.requestMatchers("/datasources/**").permitAll()
+			.requestMatchers("/datasource/**").permitAll()
+			.requestMatchers("/admin/**").hasAuthority("Admin")
+			.requestMatchers("/traceability/**").hasAuthority("hasAuthority('Admin')")
+			.requestMatchers("/configure/loadConfigFromResources").permitAll()
+			.anyRequest().authenticated()
+			.and().exceptionHandling().accessDeniedHandler(springAccessDeniedHandler);
+			
+
+			
 		}
+		return http.build();
 	}
 
 	/**
 	 * used to configure WebSecurity ignore
 	 */
-	@Override
-	public void configure(WebSecurity web) throws Exception {
-		web.ignoring().antMatchers("/datasource/**");
-	}
+	 @Bean
+	 @Conditional(InsightsJWTBeanInitializationCondition.class)
+	    public WebSecurityCustomizer webSecurityCustomizer() {
+	        return (web) -> web.ignoring()
+	        		.requestMatchers("/datasource/**");
+	  }
+	
 
 	/**
 	 * Used to add necessary filter for JWT Authentication
@@ -118,7 +134,6 @@ public class InsightsSecurityConfigurationAdapterJWT extends WebSecurityConfigur
 	 * @return
 	 * @throws Exception
 	 */
-	@Bean
 	@Conditional(InsightsJWTBeanInitializationCondition.class)
 	public FilterChainProxy insightsFilter() throws Exception {
 		log.debug("message Inside FilterChainProxy, initial bean InsightsSecurityConfigurationAdapterJWT **** ");
@@ -175,7 +190,6 @@ public class InsightsSecurityConfigurationAdapterJWT extends WebSecurityConfigur
 	/**
 	 * Used to set authenticationManager Native Grafana
 	 */
-	@Override
 	protected AuthenticationManager authenticationManager() throws Exception {
 		return new ProviderManager(Arrays.asList(new JWTAuthenticationProvider()));
 	}
@@ -185,7 +199,6 @@ public class InsightsSecurityConfigurationAdapterJWT extends WebSecurityConfigur
 	 * 
 	 * @return
 	 */
-	@Bean
 	@Conditional(InsightsJWTBeanInitializationCondition.class)
 	public JWTAuthenticationProvider jwtAuthenticationProvider() {
 		JWTAuthenticationProvider provider = new JWTAuthenticationProvider();
@@ -195,7 +208,6 @@ public class InsightsSecurityConfigurationAdapterJWT extends WebSecurityConfigur
 	/** This bean use to validate External Request 
 	 * @return
 	 */
-	@Bean
 	@Conditional(InsightsJWTBeanInitializationCondition.class)
 	public InsightsExternalAPIAuthenticationFilter insightsExternalProcessingFilter() {
 		return new InsightsExternalAPIAuthenticationFilter();

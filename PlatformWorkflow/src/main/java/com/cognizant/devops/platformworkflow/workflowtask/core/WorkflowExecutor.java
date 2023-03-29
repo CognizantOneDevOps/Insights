@@ -36,9 +36,6 @@ import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowTask
 import com.google.gson.JsonObject;
 
 public class WorkflowExecutor implements Job , ApplicationConfigInterface{
-	/**
-	 * 
-	 */
 	private static final Logger log = LogManager.getLogger(WorkflowExecutor.class);
 	
 	private static final long serialVersionUID = -282836461086726715L;
@@ -65,14 +62,14 @@ public class WorkflowExecutor implements Job , ApplicationConfigInterface{
 	 * prepare request message and publish that in RabbitMq
 	 */
 	public void executeWorkflow() {
-		log.debug(" Worlflow Detail ====  Schedular Inside executeWorkflow  ");
+		log.debug(" Workflow Detail  ====  Schedular Inside executeWorkflow  ");
 		long startTime = System.nanoTime();
 		List<InsightsWorkflowConfiguration> readyToRunWorkflow = workflowProcessing.getReadyToRunWorkFlowConfigs();
 		long processingTime =0;
 		if (!readyToRunWorkflow.isEmpty()) {
 			for (InsightsWorkflowConfiguration workflowConfig : readyToRunWorkflow) {
 				long executionId = System.currentTimeMillis();
-				log.debug(" Worlflow Detail ==== workflowid {} executionId {}  ", workflowConfig.getWorkflowId(),
+				log.debug(" WorKflow Detail ==== workflowId {} executionId {}  ", workflowConfig.getWorkflowId(),
 						executionId);
 				InsightsWorkflowTaskSequence firstworkflowTask = workflowProcessing
 						.getWorkflowTaskSequenceByWorkflowId(workflowConfig.getWorkflowId());
@@ -83,14 +80,14 @@ public class WorkflowExecutor implements Job , ApplicationConfigInterface{
 				
 				try {
 					Thread.sleep(1);
-					log.debug(" Worlflow Detail ==== before publish message executeWorkflow {} ", mqRequestJson);
+					log.debug(" Workflow Detail ==== workflowId {} before publish message executeWorkflow {} ", workflowConfig.getWorkflowId(), mqRequestJson);
 					workflowProcessing.publishMessageInMQ(firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),
 							mqRequestJson);
 					processingTime= TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
 					log.debug(StringExpressionConstants.STR_EXP_WORKFLOW_1,executionId,workflowConfig.getWorkflowId(),workflowConfig.getWorkflowType(),firstworkflowTask.getWorkflowTaskEntity().getDescription(),firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),workflowConfig.getStatus(),workflowConfig.getLastRun()
 							,workflowConfig.getNextRun(),workflowConfig.getScheduleType(),"-","-",processingTime,"-");			
 				} catch (WorkflowTaskInitializationException e) {
-					log.debug(" Worlflow Detail ====  workflow failed to execute due to MQ exception {}  ",
+					log.debug(" Worlflow Detail ====  workflowId {} failed to execute due to MQ exception {} ",
 							workflowConfig.getWorkflowId());
 					InsightsStatusProvider.getInstance().createInsightStatusNode("WorkflowExecutor failed due to exception: "+workflowConfig.getWorkflowId(),
 							PlatformServiceConstants.FAILURE);
@@ -101,7 +98,7 @@ public class WorkflowExecutor implements Job , ApplicationConfigInterface{
 					
 				}catch (Exception e) {
 					log.error(e);
-					log.debug(" Worlflow Detail ====  workflow failed to execute due to exception {}  ",
+					log.debug(" Worlflow Detail ====  workflowId{} failed to execute due to exception {} ",
 							workflowConfig.getWorkflowId());
 					InsightsStatusProvider.getInstance().createInsightStatusNode("WorkflowExecutor failed due to exception: "+workflowConfig.getWorkflowId(),
 							PlatformServiceConstants.FAILURE);

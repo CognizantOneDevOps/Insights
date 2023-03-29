@@ -5,14 +5,14 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>9.8</version>
+		<version>10.0</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformUI4</artifactId>
-	<version>9.8</version>
+	<version>10.0</version>
 	<name>PlatformUI4</name>
 
 	<repositories>

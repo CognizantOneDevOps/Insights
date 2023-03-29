@@ -20,6 +20,7 @@ import { MessageDialogService } from '../application-dialog/message-dialog-servi
 import { Router } from '@angular/router';
 import { KpiService } from '../kpi-addition/kpi-service';
 import { ContentService } from '../content-config-list/content-service';
+import { OfflineService } from '@insights/app/modules/offline-data-processing/offline-service';
 
 @Component({
   selector: "app-file-upload",
@@ -49,6 +50,7 @@ export class FileUploadDialog implements OnInit {
     public dialog: MatDialog,
     public messageDialog: MessageDialogService,
     public kpiService: KpiService,
+    public offlineService :OfflineService,
     public contentService: ContentService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
@@ -144,9 +146,11 @@ export class FileUploadDialog implements OnInit {
         this.uploadTemplateDesighFile();
       } else if (this.fileUploadType === "REPORT_TEMPLATE") {
         this.uploadReportTemplate();
-      }
+      } else if (this.fileUploadType === "OFFLINE_DATA") {
+        this.uploadFileOfflineData();
     }
   }
+}
   uploadFileKpi() {
     var self = this;
     console.log(this.formDataFiles)
@@ -163,6 +167,27 @@ export class FileUploadDialog implements OnInit {
             self.kpiService.fileUploadSubject.next("REFRESH");
           } else {
             self.messageDialog.openSnackBar("Error Creating KPI", "error");
+          }
+        });
+    } else {
+      self.messageDialog.showApplicationsMessage(
+        "Please choose a valid JSON file to upload.",
+        "WARN"
+      );
+    }
+  }
+  uploadFileOfflineData(){
+    var self = this;
+    if (this.formDataFiles.has("file")) {
+      this.restCallHandlerService
+        .postFormData("UPLOAD_BULK_OFFLINE_DATA", this.formDataFiles)
+        .toPromise()
+        .then(function (response) {
+          if (response.status === "success") {
+            self.messageDialog.openSnackBar(response.data, "success");
+            self.dialogRef.close(true);
+          } else {
+            self.messageDialog.openSnackBar("Failed to save offline data.", "error");
           }
         });
     } else {

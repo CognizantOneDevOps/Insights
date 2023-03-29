@@ -16,13 +16,13 @@
 	<fileSets>
 		<fileSet>
 			<directory>${project.basedir}/../</directory>
-			<outputDirectory>/insights</outputDirectory>
+			<outputDirectory>/UI</outputDirectory>
 			<includes>
 				<include>OneDevOpInsights*.pdf</include>
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>${project.basedir}/insights/</directory>
+			<directory>${project.basedir}/UI/</directory>
 		</fileSet>
 	</fileSets>
 </assembly>

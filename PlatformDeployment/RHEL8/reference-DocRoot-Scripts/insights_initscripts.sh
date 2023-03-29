@@ -23,7 +23,8 @@ sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/P
 sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL8/initscripts/InSightsWorkflow.sh -O InSightsWorkflow.sh  && dos2unix InSightsWorkflow.sh 
 sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL8/initscripts/InsightsLoki.sh  -O InsightsLoki.sh  && dos2unix InsightsLoki.sh 
 sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL8/initscripts/InsightsPromtail.sh -O InsightsPromtail.sh  && dos2unix InsightsPromtail.sh 
-sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL8/initscripts/Tomcat.sh -O Tomcat.sh  && dos2unix Tomcat.sh 
+sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL8/initscripts/Insights_Service.sh -O Insights_Service.sh  && dos2unix Insights_Service.sh 
+sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL8/initscripts/Insights_UI.sh -O Insights_UI.sh  && dos2unix Insights_UI.sh 
 sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL8/initscripts/Neo4j.sh -O Neo4j.sh  && dos2unix Neo4j.sh 
 sudo chmod +x *.sh
 sudo cp -rp * /etc/init.d

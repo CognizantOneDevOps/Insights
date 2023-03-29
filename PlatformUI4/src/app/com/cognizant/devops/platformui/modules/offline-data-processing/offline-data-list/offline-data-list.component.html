@@ -1,0 +1,373 @@
+<!--
+*******************************************************************************
+ * Copyright 2022 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div class="cardCss">
+  <div layout layout-align="left" class="main-section-title">
+    <div style="color: var(--text-clr1)">
+      <b
+        >Configuration |
+        <span class="blueTitleTxt" style="color: #2d67ff"
+          >Offline Data Configuration
+        </span></b
+      >
+    </div>
+  </div>
+
+  <div class="sectionHeadingStyle">
+    <span class="alignSubHeader1" style="font-size: 14px"
+      ><b>Offline Data Configuration | </b> (Configure an Offline Data
+      Query)</span
+    >
+
+    <div class="btnAlign" style="margin-top: 0px">
+      <button mat-icon-button>
+        <mat-icon
+          matTooltip="Add"
+          class="mat-icon material-icons"
+          (click)="addnewOfflineData()"
+          svgIcon="add"
+          id="Add OfflineData"
+        >
+        </mat-icon></button
+      >
+
+      <button mat-icon-button [disabled]="!onRadioBtnSelect" (click)="edit()">
+        <mat-icon
+          matTooltip="Edit"
+          class="mat-icon material-icons"
+          svgIcon="edit"
+          id="Edit OfflineData"
+        >
+        </mat-icon>
+      </button>
+
+      <button
+        mat-icon-button
+        [disabled]="!onRadioBtnSelect"
+        (click)="deleteOfflineConfig()"
+      >
+        <mat-icon
+          matTooltip="Delete"
+          class="mat-icon material-icons"
+          svgIcon="trash"
+          id="Delete OfflineData"
+        >
+        </mat-icon>
+      </button>
+
+      <button mat-icon-button>
+        <mat-icon
+          matTooltip="Upload"
+          class="mat-icon material-icons"
+          (click)="uploadFile()"
+          svgIcon="upload"
+          id="Upload JSON"
+        >
+        </mat-icon>
+      </button>
+
+      <button mat-icon-button (click)="refresh()">
+        <mat-icon
+          matTooltip="Refresh"
+          class="mat-icon material-icons"
+          svgIcon="retry"
+          id="Refresh"
+        >
+        </mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div style="margin-top: 2%">
+    <mat-form-field appearance="fill" class="columnComponent">
+      <input
+        matInput
+        (keyup)="applyFilter($event.target.value)"
+        placeholder="Search"
+        class="inputColCss"
+        id="searchButton"
+      />
+
+      <button
+        matSuffix
+        class="searchCss"
+        style="border: none; background: transparent"
+      >
+        <mat-icon
+          title="Search"
+          svgIcon="searchIcon"
+          style="height: 14px !important; width: 14px !important"
+          id="Search"
+        >
+        </mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
+  <div class="offlineData-table">
+    <mat-radio-group [(ngModel)]="selectedOfflineData">
+      <table
+        mat-table
+        [dataSource]="offlineDatasource"
+        class="mat-elevation-z8"
+        style="margin-top: 2% !important ; box-shadow: none !important"
+      >
+        <!-- Radio Column-->
+        <ng-container matColumnDef="radio">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader"></th>
+          <td
+            mat-cell
+            *matCellDef="let element; let i = index"
+            style="width: 5%; text-align: center !important"
+          >
+            <mat-radio-button
+              [value]="element"
+              (click)="enableButtons(element, i)"
+              style="margin-top: 5px !important"
+            ></mat-radio-button>
+          </td>
+        </ng-container>
+
+        <!-- Query Id Column -->
+        <ng-container matColumnDef="toolName">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">Tool</th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            style="width: 10% !important; text-align: center"
+          >
+            {{ element.toolName }}
+          </td>
+        </ng-container>
+
+        <!-- Query Name Column -->
+        <ng-container matColumnDef="queryName">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            Query Name
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            style="width: 10% !important; text-align: center"
+          >
+            {{ element.queryName }}
+          </td>
+        </ng-container>
+
+        <!-- Schedule Column -->
+        <ng-container matColumnDef="schedule">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="tableHeader"
+          >
+            Schedule
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            style="width: 10% !important; text-align: center"
+            [title]="getTitle(element.cronSchedule)"
+          >
+            {{ element.cronSchedule }}
+          </td>
+        </ng-container>
+ 
+        <!-- Active Column -->
+        <ng-container matColumnDef="active">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">Active</th>
+          <td
+            mat-cell
+            *matCellDef="let element; let i = index"
+            style="width: 10% !important; text-align: center"
+          >
+            <mat-slide-toggle
+              (change)="updateOfflineQueryStatus($event, element)"
+              [checked]="element.isActive"
+              [(ngModel)]="element.isActive"
+              [disabled]="selectedIndex != i + currentPageValue"
+              [matTooltip]="element.isActive ? 'Active' : 'Inactive'"
+            >
+              <!--(change)="updateOfflineQueryStatus($event, element)"-->
+            </mat-slide-toggle>
+          </td>
+        </ng-container>
+
+         <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader">Status</th>
+          <td mat-cell *matCellDef="let element" style="text-align: center; padding: 0 10px">
+            <mat-icon svgIcon="success_status" *ngIf="element.status == 'Success'" matTooltip="Success">
+            </mat-icon>
+            <mat-icon svgIcon="failure_status" *ngIf="element.status == 'Failure'" matTooltip="Failure"
+              class="failure-icon">
+            </mat-icon>
+          </td>
+        </ng-container>
+
+        <!-- Last Execution Time Column -->
+        <ng-container matColumnDef="lastExecutionTime">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader" style="white-space: nowrap !important">
+            Last Execution Time ({{ timeZoneAbbr }})
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            style="width: 10% !important; text-align: center"
+          >
+            {{ element.lastExecutionTime }}
+          </td>
+        </ng-container>
+
+        <!-- Query Processing Time Column -->
+        <ng-container matColumnDef="queryProcessingTime">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="tableHeader"
+            style="white-space: pre-wrap !important"
+          >
+            Query Processing Time (sec)
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            style="width: 10% !important; text-align: center"
+          >
+            {{ element.queryProcessingTime }}
+          </td>
+        </ng-container>
+
+        <!-- Records Processed Column-->
+        <ng-container matColumnDef="recordsProcessed">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="tableHeader"
+            style="white-space: pre-wrap !important"
+          >
+            Records Processed
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            style="width: 10% !important; text-align: center"
+          >
+            {{ element.recordsProcessed }}
+          </td>
+        </ng-container>
+
+        <!-- Details Column  -->
+        <ng-container matColumnDef="details">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="tableHeader"
+            style="padding-right: 5px !important"
+          >
+            Details
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element; let i = index"
+            style="
+              width: 10%;
+              text-align: center;
+              padding-right: 5px !important;
+            "
+          >
+            <button
+              mat-icon-button
+              (click)="showDetailsDialog(element)"
+              [disabled]="selectedIndex != i + currentPageValue"
+            >
+              <mat-icon
+                svgIcon="healthcheck_show_details"
+                matTooltip="View Details"
+                style="margin-bottom: 10px !important"
+              >
+              </mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </mat-radio-group>
+  </div>
+
+  <div class="footer">
+    <div class="paginator">
+      <mat-paginator
+        style="visibility: hidden"
+        #paginator
+        [pageSize]="MAX_ROWS_PER_TABLE"
+      >
+      </mat-paginator>
+      <div
+        class="paginatorElement"
+        (click)="goToPrevPage()"
+        [attr.disabled]="!this.paginator.hasPreviousPage()"
+        [ngStyle]="
+          !this.paginator.hasPreviousPage() ? { cursor: 'not-allowed' } : ''
+        "
+      >
+        <mat-icon
+          svgIcon="prev-page"
+          class="pageIcons"
+          style="cursor: pointer"
+          *ngIf="this.paginator.hasPreviousPage()"
+          style="height: 24px !important; width: 24px !important"
+        >
+        </mat-icon>
+        <mat-icon
+          svgIcon="prev-page"
+          class="pageIcons disabled-icon"
+          *ngIf="!this.paginator.hasPreviousPage()"
+          style="height: 24px !important; width: 24px !important"
+        >
+        </mat-icon>
+      </div>
+      <div class="paginatorElement paginatorIndexElement">
+        {{ currentPageIndex }}
+      </div>
+      <div
+        class="paginatorElement"
+        (click)="goToNextPage()"
+        [attr.disabled]="!this.paginator.hasNextPage()"
+        [ngStyle]="
+          !this.paginator.hasNextPage() ? { cursor: 'not-allowed' } : ''
+        "
+      >
+        <mat-icon
+          svgIcon="next-page"
+          style="cursor: pointer"
+          class="pageIcons"
+          *ngIf="this.paginator.hasNextPage()"
+          style="height: 24px !important; width: 24px !important"
+        >
+        </mat-icon>
+        <mat-icon
+          svgIcon="next-page"
+          class="pageIcons disabled-icon"
+          *ngIf="!this.paginator.hasNextPage()"
+          style="height: 24px !important; width: 24px !important"
+        >
+        </mat-icon>
+      </div>
+      <div>of {{ totalPages }}</div>
+    </div>
+  </div>
+</div>

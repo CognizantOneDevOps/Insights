@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.test.workflow;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Base64;
@@ -29,8 +30,11 @@ import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentConfiguration;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
@@ -41,6 +45,7 @@ import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowType;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformservice.assessmentreport.service.AssesmentReportServiceImpl;
+import com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest;
 import com.cognizant.devops.platformservice.workflow.controller.InsightsWorkflowController;
 import com.cognizant.devops.platformservice.workflow.service.WorkflowServiceImpl;
 import com.google.gson.JsonArray;
@@ -61,11 +66,16 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 	WorkflowDAL workflowConfigDAL = new WorkflowDAL();
 	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
 
+	JsonObject testData = new JsonObject();
+	
 	@BeforeClass
 	public void prepareData() throws InsightsCustomException {
 		try {
-			int response = assessmentService.saveKpiDefinition(registerkpiWorkflowJson);
-			int reportId = assessmentService.saveTemplateReport(reportTemplateWorkflowJson);
+		    String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + TestngInitializerTest.TESTNG_TESTDATA + File.separator
+                    + TestngInitializerTest.TESTNG_PLATFORMSERVICE + File.separator + "WorkflowService.json";
+			testData = JsonUtils.getJsonData(path).getAsJsonObject();
+			int response = assessmentService.saveKpiDefinition(testData.get("registerkpiWorkflow").getAsJsonObject());
+			int reportId = assessmentService.saveTemplateReport(testData.get("reportTemplateWorkflow").getAsJsonObject());
 			setReportId(reportId);
 		    InsightsWorkflowType type = new InsightsWorkflowType();
 			type.setWorkflowType(WorkflowTaskEnum.WorkflowType.REPORT.getValue());
@@ -78,10 +88,10 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 	@Test(priority = 1)
 	public void testSaveWorkflowTask() throws InsightsCustomException {
 		try {
-			JsonObject response = workflowController.saveAssessmentTask(workflowTaskData);
+			JsonObject response = workflowController.saveAssessmentTask(testData.get("workflowTaskData").toString());
 			String responseId = response.get("data").getAsString().replace("\"", "").replaceAll("[^0-9]", "");
 			
-			JsonObject responseEmail = workflowController.saveAssessmentTask(workflowEmailTaskData);
+			JsonObject responseEmail = workflowController.saveAssessmentTask(testData.get("workflowEmailTaskData").toString());
 			String responseEmailId = responseEmail.get("data").getAsString().replace("\"", "").replaceAll("[^0-9]", "");
 			
 			InsightsWorkflowTask task = workflowConfigDAL.getTaskByTaskId(Integer.parseInt(responseId));
@@ -104,7 +114,7 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 	@Test(priority = 2)
 	public void testSaveIncorrectWorkflowTask() throws InsightsCustomException{
 		try {
-			JsonObject response = workflowController.saveAssessmentTask(incorrectWorkflowTask);
+			JsonObject response = workflowController.saveAssessmentTask(testData.get("incorrectWorkflowTask").toString());
 			String actual = response.get("status").getAsString().replace("\"", "");
 			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
 		} catch (AssertionError e) {
@@ -115,7 +125,7 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 	@Test(priority = 3)
 	public void testSaveWorkflowTaskException() throws InsightsCustomException {
 		try {
-			JsonObject response = workflowController.saveAssessmentTask(workflowTaskDataException);
+			JsonObject response = workflowController.saveAssessmentTask(testData.get("workflowTaskDataException").toString());
 			String actual = response.get("status").getAsString();
 			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
 			} catch (AssertionError e) {
@@ -162,7 +172,7 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 			String actual = response.get("status").getAsString().replace("\"", "");
 			
 			JsonArray records = workflowService.getWorkFlowExecutionRecords(configIdJson).getAsJsonArray("records");
-			String expected = workflowTaskAsJson.get("description").getAsString();
+			String expected = testData.get("workflowTaskData").getAsJsonObject().get("description").getAsString();
 			
 			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
 			Assert.assertNotNull(records);
@@ -344,7 +354,7 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 	@Test(priority = 15)
 	public void testDeleteTaskDetails() throws InsightsCustomException {
 		try {
-			int response = workflowService.saveWorkflowTask(workflowTaskAsJson);
+			int response = workflowService.saveWorkflowTask(testData.get("workflowTaskData").getAsJsonObject());
 			InsightsWorkflowTask task = workflowConfigDAL.getTaskByTaskId(response);
 			taskID = task.getTaskId();
 			JsonObject responseJson = workflowController.deleteWorkflowtask(taskID);
@@ -366,7 +376,7 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 	@Test(priority = 17)
 	public void testUpdateTaskDetails() throws InsightsCustomException {
 		try {
-			int taskId = workflowService.saveWorkflowTask(workflowTaskAsJson);
+			int taskId = workflowService.saveWorkflowTask(testData.get("workflowTaskData").getAsJsonObject());
 			getWorkflowTaskData(taskId);
 			JsonObject responseJson = workflowController.updateWorkflowTask(updateWorkflowTaskData);
 			String actual = responseJson.get("status").getAsString().replace("\"", "");
@@ -429,7 +439,7 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 	@Test(priority = 22)
 	public void testconvertStringIntoJson() throws InsightsCustomException {
 		try {
-			JsonObject taskList = workflowService.convertStringIntoJson(registerkpiWorkflow);
+			JsonObject taskList = workflowService.convertStringIntoJson(testData.get("registerkpiWorkflow").toString());
 			Assert.assertNotNull(taskList);
 			} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
@@ -480,7 +490,7 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 	
 	@Test(priority = 26)
 	public void testSaveWorkflowTaskValidationError() throws InsightsCustomException {
-			JsonObject response = workflowController.saveAssessmentTask(workflowTaskDataExceptionValidation);
+			JsonObject response = workflowController.saveAssessmentTask("&amp;"+testData.get("workflowTaskDataExceptionValidation").toString());
 			String actual = response.get("status").getAsString();
 			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
 	}
@@ -580,7 +590,7 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 
 		// Delete KPI
 		try {
-			reportConfigDAL.deleteKPIbyKpiID(registerkpiWorkflowJson.get("kpiId").getAsInt());
+			reportConfigDAL.deleteKPIbyKpiID(testData.get("registerkpiWorkflowJson").getAsJsonObject().get("kpiId").getAsInt());
 		} catch (Exception e) {
 			log.error("Error cleaning data up at WorkflowServiceTest KPI ID ", e);
 		}

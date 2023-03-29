@@ -24,7 +24,6 @@ public class BulkUploadTestData extends AbstractTestNGSpringContextTests{
 
 	ClassLoader classLoader = ClassLoader.getSystemClassLoader();
 
-	String toolJson = "[{ \"toolName\":\"GIT\",\"label\":\"SCM:GIT:DATA\"}]";
 	File toolDetailsFile = new File(classLoader.getResource("toolDetailTest.json").getFile());
 	String toolDetailFileName = "toolDetailTest";
 	File file = new File(classLoader.getResource("BulkUploadTest_GIT.csv").getFile());

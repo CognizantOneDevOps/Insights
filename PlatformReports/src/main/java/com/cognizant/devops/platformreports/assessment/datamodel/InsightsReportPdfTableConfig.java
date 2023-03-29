@@ -21,12 +21,12 @@ public class InsightsReportPdfTableConfig {
 	private String font="";
 	
 	//Table caption
-	private String tableCaptionFontSize="20";
+	private String tableCaptionFontSize="14";
 	
 	//TableHeader
 	private String tableHeaderFillColor="";
 	private String tableHeaderTextColor="";
-	private String tableHeaderFontSize="14";
+	private String tableHeaderFontSize="12";
 	
 	//TableRows
 	private String tableRowsFontSize="10";

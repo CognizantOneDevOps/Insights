@@ -41,7 +41,6 @@ import com.cognizant.devops.platformcommons.config.EmailConfiguration;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.AES256Cryptor;
@@ -72,6 +71,7 @@ import com.cognizant.devops.platformreports.assessment.core.PDFExecutionSubscrib
 import com.cognizant.devops.platformreports.assessment.core.ReportEmailSubscriber;
 import com.cognizant.devops.platformreports.assessment.core.ReportKPISubscriber;
 import com.cognizant.devops.platformreports.assessment.core.SystemNotificationDetailSubscriber;
+import com.cognizant.devops.platformreports.test.testngInitializer.TestngInitializerTest;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowDataHandler;
 import com.cognizant.devops.platformworkflow.workflowtask.message.factory.WorkflowTaskSubscriberHandler;
 import com.google.gson.Gson;
@@ -490,7 +490,7 @@ public class AssessmentReportsTestData {
 		assessmentReportWithEmail = "{\"reportName\":\"report_Email_test10002154\",\"reportTemplate\":" + reportIdProdRT + ",\"emailList\":\"onedevops@cogdevops.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"startdate\":\"2020-05-12T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\": {\"senderEmailAddress\":\""+ From +"\",\"receiverEmailAddress\":\""+ To +"\",\"receiverCCEmailAddress\":\"\",\"receiverBCCEmailAddress\":\"\",\"mailSubject\":\"Sub_mail\",\"mailBodyTemplate\":\"sending a mail for report\"}}";	
 	}
 	public void getData() {
-		String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + UnitTestConstant.TESTNG_TESTDATA+ File.separator
+		String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + TestngInitializerTest.TESTNG_TESTDATA+ File.separator
 				+ "grafanaAuth.json";
 		JsonElement jsonData;
 		try {

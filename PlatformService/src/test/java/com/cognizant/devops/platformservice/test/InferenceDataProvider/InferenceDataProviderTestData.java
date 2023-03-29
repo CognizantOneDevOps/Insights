@@ -32,10 +32,12 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.testng.annotations.BeforeClass;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.EmailConfiguration;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.AES256Cryptor;
@@ -62,13 +64,29 @@ import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowType;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
+import com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class InferenceDataProviderTestData {
-
+	private static Logger log = LogManager.getLogger(InferenceDataProviderTest.class);
+	
+    static JsonObject testData = new JsonObject();
+	
+	@BeforeClass
+	public void beforeMethod() throws InsightsCustomException {
+		try {
+			String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + TestngInitializerTest.TESTNG_TESTDATA + File.separator
+                    + TestngInitializerTest.TESTNG_PLATFORMSERVICE + File.separator + "InferenceDataProvider.json";
+			testData = JsonUtils.getJsonData(path).getAsJsonObject();
+			
+		} catch (Exception e) {
+			log.error("Error preparing data at InferenceDataProviderTestData record ", e);
+		}
+	}
+	
 	ClassLoader classLoader = ClassLoader.getSystemClassLoader();
 	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
 	WorkflowDAL workflowDAL = new WorkflowDAL();
@@ -79,51 +97,25 @@ public class InferenceDataProviderTestData {
 	int reportIdProdRT = 300600;
 	int reportIdSonarRT = 300601;
 	
-	private static Logger log = LogManager.getLogger(InferenceDataProviderTest.class);
-	
 	int reportIdkpisRT = 300603;
 	int workflowTypeId = 0;
 	boolean deleteWorkflowType = false;
 	String grafanaPDFExportUrl = null;
 	String smtpHostServer = null;
 	int id;
-	String taskKpiExecution = "{\"description\":\"TEST.REPORT_KPI_Execute\",\"mqChannel\":\"TEST.WORKFLOW.TASK.KPI.EXCECUTION\",\"componentName\":\"com.cognizant.devops.platformreports.assessment.core.ReportKPISubscriber\",\"dependency\":1,\"workflowType\":\"Report\"}";
-	String taskPDFExecution = "{\"description\":\"TEST.REPORT_PDF_Execute\",\"mqChannel\":\"TEST.WORKFLOW.TASK.PDF.EXCECUTION\",\"componentName\":\"com.cognizant.devops.platformreports.assessment.core.PDFExecutionSubscriber\",\"dependency\":2,\"workflowType\":\"Report\"}";
-	String taskEmailExecution = "{\"description\":\"TEST.REPORT_EMAIL_Execute\",\"mqChannel\":\"TEST.WORKFLOW.TASK.EMAIL.EXCECUTION\",\"componentName\":\"com.cognizant.devops.platformreports.assessment.core.ReportEmailSubscriber\",\"dependency\":3,\"workflowType\":\"Report\"}";
-	String taskSystemHealthNotificationExecution = "{\"description\":\"TEST.SystemNotification_Execute\",\"mqChannel\":\"TEST.WORKFLOW.SYSTEM_TASK.SYSTEMNOTIFICATION.EXECUTION\",\"componentName\":\"com.cognizant.devops.platformreports.assessment.core.SystemNotificationDetailSubscriber\",\"dependency\":100,\"workflowType\":\"SYSTEM\"}";
-	String taskSystemEmailNotificationExecution = "{\"description\":\"TEST.Email_Execute\",\"mqChannel\":\"TEST.WORKFLOW.SYSTEM_TASK.EMAIL.EXECUTION\",\"componentName\":\"com.cognizant.devops.platformreports.assessment.core.ReportEmailSubscriber\",\"dependency\":101,\"workflowType\":\"SYSTEM\"}";
-
-	String reportTemplatekpi_Inference = "{\"reportName\":\"Report_Grafana_Inference\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"GRAFANAPDF\",\"kpiConfigs\":[{\"kpiId\":350,\"visualizationConfigs\":[{\"vType\":\"Table_100127\",\"vQuery\":\"\"}]}]}";
-	
-	
-	String reportTemplatekpis = "{\"reportName\":\"Testing_fail_queries\",\"description\":\"Testing_queries\",\"isActive\":true,\"visualizationutil\":\"GRAFANAPDF\",\"kpiConfigs\":[{\"kpiId\":100127,\"visualizationConfigs\":[{\"vType\":\"Table_100127\",\"vQuery\":\"\"}]},{\"kpiId\":100161,\"visualizationConfigs\":[{\"vType\":\"Table_100161\",\"vQuery\":\"\"}]}]}";
-	
-	JsonObject reportTemplateJson = JsonUtils.parseStringAsJsonObject(reportTemplatekpi_Inference);
-	JsonObject reportTemplateKpisJson = JsonUtils.parseStringAsJsonObject(reportTemplatekpis);
-
+	String taskSystemEmailNotificationExecution = "";
 	String assessmentReportWithEmail="";
-	
 	String host = null;
 	Gson gson = new Gson();
 	int typeId = 0;
 	int reportTypeId = 0;
-	int reportIdkpi_Inference = 300602;
-	String assessmentReport_Inference = "{\"reportName\":\"Report_Grafana_Inference\",\"reportTemplate\":" + reportIdkpi_Inference + ",\"emailList\":\"abc@abc.com\",\"vUtil\":\"GRAFANAPDF\",\"schedule\":\"DAILY\",\"startdate\":\"2022-03-04T00:00:00Z\",\"enddate\":\"2022-04-04T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_Grafana_Inference\",\"emailDetails\":null}";
-
-	
-	String assessmentReportFail = "{\"reportName\":\"report_test_Sonar100064032\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":" + reportIdSonarRT + ",\"vUtil\":\"GRAFANAPDF\",\"emailList\":\"abc@abc.com\",\"schedule\":\"QUARTERLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-	String assessmentReportWrongkpi = "{\"reportName\":\"report_test_10083556935\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":" + reportIdkpi_Inference + ",\"vUtil\":\"GRAFANAPDF\",\"emailList\":\"abc@abc.com\",\"schedule\":\"MONTHLY\",\"startdate\":null,\"enddate\":\"2022-04-04T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-	String assessmentReportWrongkpis = "{\"reportName\":\"report_test_10083563542\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":" + reportIdkpisRT + ",\"vUtil\":\"GRAFANAPDF\",\"emailList\":\"abc@abc.com\",\"schedule\":\"MONTHLY\",\"startdate\":null,\"enddate\":\"2022-04-04T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-	
-	String assessmentReport = "{\"reportName\":\"report_test100021547\",\"reportTemplate\":" + reportIdProdRT + ",\"emailList\":\"demo123@gmail.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"vUtil\":\"GRAFANAPDF\",\"startdate\":\"2022-03-12T00:00:00Z\",\"enddate\":\"2022-04-04T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"emailDetails\":null,\"asseementreportdisplayname\":\"Report_test\"}";
 
 	String mqChannelKpiExecution = "TEST.WORKFLOW.TASK.KPI.EXCECUTION";
 	String mqChannelPDFExecution = "TEST.WORKFLOW.TASK.PDF.EXCECUTION";
 	String mqChannelEmailExecution = "TEST.WORKFLOW.TASK.EMAIL.EXCECUTION";
 	String mqChannelSystemHealthNotificationExecution = "TEST.WORKFLOW.SYSTEM_TASK.SYSTEMNOTIFICATION.EXECUTION";
 	String mqChannelSystemEmailExecution = "TEST.WORKFLOW.SYSTEM_TASK.EMAIL.EXECUTION";
-	static String tableData = "{\"datasource\":\"Neo4jDataSource\",\"description\":\"\",\"fieldConfig\":{\"defaults\":{\"color\":{\"mode\":\"thresholds\"},\"custom\":{\"align\":\"auto\",\"displayMode\":\"auto\"},\"mappings\":[],\"thresholds\":{\"mode\":\"absolute\",\"steps\":[{\"color\":\"blue\",\"value\":null}]}},\"overrides\":[]},\"gridPos\":{\"h\":9,\"w\":12,\"x\":0,\"y\":18},\"id\":null,\"options\":{\"showHeader\":true},\"pluginVersion\":\"8.1.3\",\"targets\":[{\"cache\":false,\"cacheType\":false,\"cacheValue\":false,\"constant\":6.5,\"fixTime\":false,\"graph\":false,\"queryText\":\"\",\"raw\":false,\"refId\":\"A\",\"stats\":false,\"table\":true,\"timeseries\":false,\"varTime\":false}],\"title\":\"\",\"type\":\"table\"}";
-	
+
 	public static String workflowIdProd = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "10000567276";
 	public static String workflowIdWithEmail = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "10000567999";
 	public static String workflowIdWithoutEmail = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "10000568296";
@@ -344,7 +336,7 @@ public class InferenceDataProviderTestData {
 		configFile.setFileName("Table");
 		configFile.setFileType("JSON");
 		configFile.setFileModule("GRAFANA_PDF_TEMPLATE");
-		configFile.setFileData(tableData.getBytes());
+		configFile.setFileData(testData.get("tableData").toString().getBytes());
 		return configFile;
 	}
 

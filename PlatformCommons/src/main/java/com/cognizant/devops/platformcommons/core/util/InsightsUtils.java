@@ -507,6 +507,21 @@ public class InsightsUtils {
 		Duration d = Duration.between(lastRunTimeInput, now);
 		return d.abs().toDays();
 	}
+	
+	/**
+	 * 
+	 * Calculates difference between currentTime and lastRunTime (now - lastRunTime)
+	 * 
+	 * @param lastRunTime
+	 * @return
+	 */
+	public static long getDifferenceFromLastRunTimeInMinutes(long lastRunTimeInSeconds) {
+		ZonedDateTime now = ZonedDateTime.now(InsightsUtils.zoneIdUTC);
+		ZonedDateTime lastRunTimeInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(lastRunTimeInSeconds),
+				InsightsUtils.zoneIdUTC);
+		Duration d = Duration.between(lastRunTimeInput, now);
+		return d.abs().toMinutes();
+	}
 
 	/**
 	 * Calculates difference between nextRunTime and lastRunTime (nextRunTime -

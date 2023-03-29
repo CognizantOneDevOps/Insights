@@ -200,7 +200,7 @@ public class PdfTableUtil {
 			log.debug("Normalized AssetList --{} ",assetList);
 			constructReportData(assetList, assetResults);
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			log.error(e1);
 		}
 		Collections.sort(assetResults, new Comparator<String[]>() {
 			@Override

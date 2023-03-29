@@ -13,7 +13,7 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>9.8</version>
+		<version>10.0</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -21,15 +21,15 @@
 	<artifactId>PlatformInsightsWebHook</artifactId>
 	<packaging>jar</packaging>
 	<name>PlatformInsightsWebHook</name>
-	<version>9.8</version>
+	<version>10.0</version>
 	<description>PlatformInsightsWebHook for webhook testing</description>
 	<url>http://maven.apache.org</url>
 
 	<properties>
 		<java.version>11</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.version>2.7.0</spring.version>
-		<testng.version>7.6.1</testng.version>
+		<spring.version>2.7.9</spring.version>
+		<testng.version>7.7.1</testng.version>
 		<project.name>PlatformInsights</project.name>
 	</properties>
 
@@ -44,11 +44,6 @@
 					<artifactId>snakeyaml</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.yaml</groupId>
-			<artifactId>snakeyaml</artifactId>
-			<version>1.32</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -112,8 +107,7 @@
 			<version>1.48</version>
 		</dependency>
 	</dependencies>
-	<build>
-		<finalName>PlatformInsightsWebHook</finalName>
+	<build>		
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

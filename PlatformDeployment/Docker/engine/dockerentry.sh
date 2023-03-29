@@ -62,7 +62,6 @@ jq --arg rabbitMqPassword $rabbitMqPassword '(.messageQueue.password) |= $rabbit
 jq --arg rabbitMqPort $rabbitMqPort '(.messageQueue.port) |= $rabbitMqPort' $configPath > INPUT.tmp && mv INPUT.tmp $configPath 
 jq --arg insightsServiceURL $ServiceEndpoint '(.insightsServiceURL) |= $insightsServiceURL' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
 
-
 sed -i "s/\r$//g" $configPath
 
 jq . $configPath > $configPath.tmp

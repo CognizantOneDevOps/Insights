@@ -19,6 +19,7 @@ import java.awt.Color;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -64,6 +65,7 @@ public class PdfReportTableUtil {
 	private static final Logger log = LogManager.getLogger(PdfReportTableUtil.class);
 
 	private PDFont font;
+	private static final String DASHBOARD = "Dashboard";
 	/**
 	 * Create table based on number of rows with observations.
 	 * @param doc
@@ -268,12 +270,22 @@ public class PdfReportTableUtil {
 		return headerRow;
 	}
 
-	public PDPage addNewPage(PDDocument doc) {
-		PDPage page = new PDPage(PDRectangle.A3);
+	public PDPage addNewPage(PDDocument doc, String pdfType) {
+		PDPage page = null;
+		if(pdfType.equalsIgnoreCase(DASHBOARD)) {
+			page = new PDPage(new PDRectangle(968, 900));
+		}
+		else {
+			page = new PDPage(PDRectangle.A4);
+		}
 		doc.addPage(page);
 		return page;
 	}
+	
+	
+	
 
+	
 	/**
 	 * Add page number and date .
 	 * @param assessmentReportDTO
@@ -283,25 +295,36 @@ public class PdfReportTableUtil {
 	 * @return
 	 * @throws IOException
 	 */
-	public PDDocument footer(InsightsAssessmentConfigurationDTO assessmentReportDTO, PDDocument doc, int fusionPages, InsightsReportPdfTableConfig insightsReportPdfTableConfig) throws IOException {
+	public PDDocument footer(InsightsAssessmentConfigurationDTO assessmentReportDTO, PDDocument doc, int fusionPages, InsightsReportPdfTableConfig insightsReportPdfTableConfig, String pdfType) throws IOException {
 		try{
 			getFont(doc, assessmentReportDTO, insightsReportPdfTableConfig);
 
 			PDPageTree pages = doc.getPages();
 			int page = fusionPages + 1;
 			for(PDPage p : pages){
+				
 
 				PDPageContentStream contentStream = new PDPageContentStream(doc, p, AppendMode.APPEND, false);
 				contentStream.beginText();
-				contentStream.newLineAtOffset(100, 15);
+				contentStream.setNonStrokingColor(0f,0f,0f); 
+				contentStream.newLineAtOffset(13, 10);
 				contentStream.setFont(font, 10);
-				contentStream.showText(String.valueOf(page));
+				
+				contentStream.showText("Page "+String.valueOf(page));
+				
 				contentStream.endText();
 				contentStream.beginText();
-				contentStream.newLineAtOffset(650, 15);
+				
+				if(pdfType.equalsIgnoreCase(DASHBOARD)) {
+				contentStream.newLineAtOffset(910, 10);
+				}
+				else {
+					contentStream.newLineAtOffset(530, 10);
+				}
 				contentStream.setFont(font, 10);
 				contentStream.showText(InsightsUtils.getLocalDateTime("MM/dd/yyyy"));
 				contentStream.endText();
+				
 				contentStream.close();
 				page++;
 			}

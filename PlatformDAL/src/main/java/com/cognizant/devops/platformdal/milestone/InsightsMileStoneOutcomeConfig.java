@@ -32,7 +32,7 @@ import com.cognizant.devops.platformdal.outcome.InsightsOutcomeTools;
 @Table(name="\"INSIGHTS_MILESTONE_OUTCOME_CONFIGURATION\"")
 public class InsightsMileStoneOutcomeConfig {
 
-	
+
 	@Id
 	@Column(name = "id", unique = true, nullable = false)
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -103,8 +103,5 @@ public class InsightsMileStoneOutcomeConfig {
 		this.lastUpdatedDate = lastUpdatedDate;
 	}
 	
-	
-	
-
 	
 }

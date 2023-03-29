@@ -57,16 +57,10 @@ public class TrainModelsServiceTestData extends AbstractTestNGSpringContextTests
 	String predictionColumn = "Commits";
 	String numOfModels = "6";
 	File file = new File(classLoader.getResource("GitAuthorData.csv").getFile());
-	String configuration = "[{\"FieldName\":\"Date\",\"DataType\":\"Time\",\"EnableNLP\":false},{\"FieldName\":\"AuthorName\",\"DataType\":\"Enum\",\"EnableNLP\":false},{\"FieldName\":\"Experience\",\"DataType\":\"Numeric\",\"EnableNLP\":false},{\"FieldName\":\"RepoName\",\"DataType\":\"Numeric\",\"EnableNLP\":false},{\"FieldName\":\"Commits\",\"DataType\":\"Numeric\",\"EnableNLP\":false}]";
-	String workflowTask = "{\"description\":\"H2O_AutoML_Execute\",\"mqChannel\":\"WORKFLOW.TASK.AUTOML.EXCECUTION\",\"componentName\":\"com.cognizant.devops.automl.task.core.AutoMLSubscriber\",\"dependency\":-1,\"workflowType\":\"AUTOML\"}";
-	JsonObject workflowTaskJson = JsonUtils.parseStringAsJsonObject(workflowTask);
 	boolean isTaskExists = false;
 	String mqChannel = "WORKFLOW.TASK.AUTOML.EXCECUTION";
 	String modelName = null;
 	String h2oEndpoint = null;
-	String registerkpiwithUsecase = "{\"kpiId\":100201,\"name\":\"Total Successful Deployments\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN count(n.SPKstatus) as totalDeploymentCount\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"totalDeploymentCount\",\"outputDatasource\":\"NEO4J\",\"usecase\":\""+usecase+"\"}";
-	String registerkpiwithUsecaseActiveState = "{\"kpiId\":100202,\"name\":\"Total Successful Upload\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN count(n.SPKstatus) as totalDeploymentCount\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"totalDeploymentCount\",\"outputDatasource\":\"NEO4J\",\"usecase\":\""+usecase+"\"}";
-	String deleteKpiString = "{\"kpiId\":\"100201\"}";
 	
 	public String getTaskList() {
 		List<InsightsWorkflowTask> listofTasks = workflowConfigDAL.getTaskLists("AUTOML");

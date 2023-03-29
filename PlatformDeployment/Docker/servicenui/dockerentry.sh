@@ -28,7 +28,7 @@ neo4jToken=$(echo -n $neo4jUser:$neo4jPassword | base64)
 grafanaDBEndpoint=jdbc:postgresql://$postgresIP:$postgresPort/grafana
 insightsDBUrl=jdbc:postgresql://$postgresIP:$postgresPort/insight
 grafanaDBUrl=jdbc:postgresql://$postgresIP:$postgresPort/grafana
-
+grafanaPublicHost=http://$hostPublicIP:$grafanaPort
 
 if [[ ! -z $enablespin ]]
 then
@@ -44,8 +44,8 @@ grafanaEndpoint=http://$hostPrivateIP:$grafanaPort
 #UPDATE ServiceEndpoint - uiConfig.json and server-config.json
 configPath='/usr/INSIGHTS_HOME/.InSights/server-config.json'
 dos2unix $configPath
-uiConfigPath='/opt/apache-tomcat/webapps/app/config/uiConfig.json'
-dos2unix $uiConfigPath
+uiConfigPath='/opt/UI/insights/config/uiConfig.json'
+# dos2unix $uiConfigPath
 
 jq --arg grafanaEndpoint $grafanaEndpoint '(.grafana.grafanaEndpoint) |= $grafanaEndpoint' $configPath  > INPUT.tmp && mv INPUT.tmp $configPath
 jq --arg grafanaDBEndpoint $grafanaDBEndpoint '(.grafana.grafanaDBEndpoint) |= $grafanaDBEndpoint' $configPath  > INPUT.tmp && mv INPUT.tmp $configPath
@@ -65,17 +65,13 @@ jq --arg insightsServiceURL $ServiceEndpoint '(.insightsServiceURL) |= $insights
 
 sed -i "s/\r$//g" $configPath
 
-#jq . $configPath > $configPath.tmp
-#mv $configPath.tmp $configPath
-
-
 #update uiconfig
 echo $(jq --arg serviceHost $ServiceEndpoint '(.serviceHost) |= $serviceHost' $uiConfigPath) > $uiConfigPath
-echo $(jq --arg grafanaHost $hostPublicIP '(.grafanaHost) |= $grafanaHost' $uiConfigPath) > $uiConfigPath
+echo $(jq --arg grafanaHost $grafanaPublicHost '(.grafanaHost) |= $grafanaHost' $uiConfigPath) > $uiConfigPath
 
 jq . $uiConfigPath > $uiConfigPath.tmp
 mv $uiConfigPath.tmp $uiConfigPath
-cp /opt/apache-tomcat/webapps/app/config/uiConfig.json /opt/apache-tomcat/webapps/insights/config/
+
 PROMTAIL_PORT=${PROMTAIL_LISTEN_PORT} yq e  -i '.server.http_listen_port = env(PROMTAIL_PORT)' /opt/InSights/Promtail/promtail-local-config.yaml
 LOKI="http://${LOKI_HOST}:${LOKI_PORT}/loki/api/v1/push" yq e  -i '.clients[0].url = strenv(LOKI)' /opt/InSights/Promtail/promtail-local-config.yaml
 
@@ -99,7 +95,7 @@ source /etc/environment
 source /etc/profile
 
 #starting services
-cd /opt/apache-tomcat/bin && ./startup.sh
+cd /opt/PlatformService/ && nohup java  -Xmx1024M -Xms512M  -jar /opt/PlatformService/PlatformService.jar  > /dev/null 2>&1 &
 if [ "$enablePromtail" == true ]
 then
  sh +x /etc/init.d/InsightsPromtail start

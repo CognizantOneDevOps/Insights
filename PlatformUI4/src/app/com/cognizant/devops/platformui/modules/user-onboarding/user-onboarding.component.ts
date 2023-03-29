@@ -605,7 +605,7 @@ export class UserOnboardingComponent implements OnInit {
     this.showDetail2 = true;
     this.assignRadioSelected = true;
     this.addRadioSelected = false;
-    this.pass = null;
+    this.pass = undefined;
     this.username = null;
     this.email = null;
     this.names = null;
@@ -819,4 +819,9 @@ export class UserOnboardingComponent implements OnInit {
       this.searchData(this.searchOrgForUser, this.selectedAdminOrg);
     }
   };
+
+
+  onPassChange(newVal) {
+    this.pass = newVal;
+  }
 }

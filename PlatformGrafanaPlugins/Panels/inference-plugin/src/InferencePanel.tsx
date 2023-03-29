@@ -33,7 +33,7 @@ export class InferencePanel extends React.Component<Props>{
         google.charts.load('46', {'packages':['corechart','charteditor','gantt']});
         google.charts.setOnLoadCallback(this.googleChart);
         let inferenceLists;
-        if(data.length == 0){
+        if(data.length === 0){
             inferenceLists = "No Records found!";
         }else{
            inferenceLists = data[0].data.map(link => {
@@ -62,7 +62,7 @@ export class InferencePanel extends React.Component<Props>{
         chartData = link.resultSet;
         chartCaption = link.inference;
         chartType = this.props.options.fusionChartType;
-        palettecolors=link.color == 'green'?'#008000':'#FF0000';
+        palettecolors=link.color === 'green'?'#008000':'#FF0000';
         //console.log('pale--',palettecolors);
         if(options.enableFusion){
             this.fusionChart();
@@ -76,7 +76,7 @@ export class InferencePanel extends React.Component<Props>{
         let FusionCharts = (window as any).FusionCharts;
         const chartConfig = this.fetchChartConfig();
         FusionCharts.ready(function () {
-            var fusioncharts = new FusionCharts(chartConfig);
+            let  fusioncharts = new FusionCharts(chartConfig);
             fusioncharts.resizeTo('100%', '100%');
             fusioncharts.render();
         });
@@ -114,11 +114,11 @@ export class InferencePanel extends React.Component<Props>{
     /*Fetch KPI for google and render google chart*/
     googleChart(link){
         let google = (window as any).google
-        var data = new google.visualization.DataTable();
+        let  data = new google.visualization.DataTable();
         if(this === undefined){
             return;
         }
-        var data = google.visualization.arrayToDataTable(this.filterData(link));
+        data = google.visualization.arrayToDataTable(this.filterData(link));
         /*data.addColumn('string', 'Topping');
         data.addColumn('number', 'Slices');
         data.addRows([
@@ -144,7 +144,7 @@ export class InferencePanel extends React.Component<Props>{
             options['vAxis'] = { textStyle: { color: 'white' } };
         }
         let chart;
-        if(this.props.options.googleChartType == 'bar'){
+        if(this.props.options.googleChartType === 'bar'){
              chart = new google.visualization.BarChart(document.getElementById('insights-inference-google' + this.props.id));
         }else{
              chart = new google.visualization.LineChart(document.getElementById( 'insights-inference-google' + this.props.id));

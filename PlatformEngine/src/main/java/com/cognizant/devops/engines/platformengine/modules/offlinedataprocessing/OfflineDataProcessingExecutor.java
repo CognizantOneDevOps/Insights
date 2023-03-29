@@ -47,6 +47,7 @@ import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFilesDAL;
+import com.cognizant.devops.platformdal.offlineDataProcessing.InsightsOfflineConfig;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
@@ -73,6 +74,7 @@ public class OfflineDataProcessingExecutor implements Job, ApplicationConfigInte
 	private static final String JSON_FILE_EXTENSION = "json";
 	private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT).withZone(InsightsUtils.zoneId);
 	InsightsConfigFilesDAL configFilesDAL = new InsightsConfigFilesDAL();
+	OfflineDataProcessingFromDB offlineDataProcessingDB = new OfflineDataProcessingFromDB();
 	private Map<String,String> loggingInfo = new ConcurrentHashMap<>();
 	String jobName="";
 	
@@ -85,7 +87,12 @@ public class OfflineDataProcessingExecutor implements Job, ApplicationConfigInte
 					PlatformServiceConstants.SUCCESS,jobName);
 			ApplicationConfigInterface.loadConfiguration();
 			loggingInfo.put(MilestoneConstants.EXECID, String.valueOf(System.currentTimeMillis()));
-			executeOfflineProcessing();
+			List<InsightsOfflineConfig> offlineDataConfigList = offlineDataProcessingDB.getAllActiveOfflineDataConfigFromDB();
+			if (offlineDataConfigList != null &&  !offlineDataConfigList.isEmpty()) {
+				offlineDataProcessingDB.processOfflineConfigurationFromDB(offlineDataConfigList, loggingInfo);
+			} else {
+				executeOfflineProcessing();
+			}
 			log.debug(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} ProcessingTime={} processedRecords={} Offline Data Processing completed",loggingInfo.get(MilestoneConstants.EXECID),"-","-",0,0);
 		} catch (Exception e) {
 			log.error("Offline Data Procesing has some issue",e);
@@ -278,5 +285,5 @@ public class OfflineDataProcessingExecutor implements Job, ApplicationConfigInte
 		return false;
 		
 	}
-	
+
 }

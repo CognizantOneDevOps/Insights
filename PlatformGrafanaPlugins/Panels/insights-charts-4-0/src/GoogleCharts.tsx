@@ -33,23 +33,26 @@ export const GoogleCharts = ({
   const contRef = useRef<HTMLDivElement>(null);
   const conatinerViewId = "containerIdDiv_";
   const containerEditId = "containerIdDivEdit_";
+  const resizeObserver = new ResizeObserver(entries => {
+    drawChart()
+    });
   useEffect(() => {
     google.charts.load('46', { 'packages': ['corechart', 'charteditor', 'gantt'] });
     google.charts.setOnLoadCallback(drawChart);
-  }, [])
+  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
   const drawChart = () => {
     let chartDataArr: ChartData[] = [];
     for (let dt of data.series) {
 
       let refId: string = dt.refId || "";
-      let columnModelArr: ColumnModel[] = new Array();
+      let columnModelArr: ColumnModel[] = [];
       for (let field of dt.fields) {
         let columnModelObj: ColumnModel;
         columnModelObj = columnModel.find(o => o.name === field.name && o.refId === refId)!;
         columnModelArr.push(columnModelObj);
       }
       let chartDataObjIndx = chartDataArr.findIndex(obj => obj.id === refId);
-      if (chartDataObjIndx != -1) {
+      if (chartDataObjIndx !== -1) {
         chartDataArr[chartDataObjIndx].data = data;
         chartDataArr[chartDataObjIndx].columns = columnModelArr
       } else {
@@ -60,11 +63,11 @@ export const GoogleCharts = ({
     let dataTb = joinDataTables(dataTables);
     dataTb = transformData(dataTb);
     let chartOptionsObj: any = {};
-    if (chartOptions != undefined && chartOptions != "") {
+    if (chartOptions !== undefined && chartOptions !== "") {
       chartOptionsObj = JSON.parse(chartOptions);
     }
     let parentNd: any;
-    let container: string = "";
+    let container: string;
     if (!isEdit) {
       container = conatinerViewId + rootId;
       parentNd = document.getElementById(container)?.parentNode?.parentNode;
@@ -72,11 +75,12 @@ export const GoogleCharts = ({
       container = containerEditId + rootId;
       parentNd = document.getElementById(container)?.parentNode?.parentNode;
     }
+	resizeObserver.observe(parentNd?.parentNode)
     let chartDimensions = innerDimensions(parentNd)
     chartOptionsObj["height"] = chartDimensions.height;
     chartOptionsObj["width"] = chartDimensions.width;
     chartOptionsObj = applyTheme(chartOptionsObj);
-    var wrapper = new google.visualization.ChartWrapper({
+    let wrapper = new google.visualization.ChartWrapper({
       'chartType': chartType,
       'dataTable': dataTb,
       'containerId': container,

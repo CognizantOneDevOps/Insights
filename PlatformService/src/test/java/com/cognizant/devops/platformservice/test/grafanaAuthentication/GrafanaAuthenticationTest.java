@@ -53,13 +53,13 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
-import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.AccessGroupManagement.AccessGroupManagement;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.cognizant.devops.platformservice.test.accessGroupManagement.GroupsAndUserTestData;
+import com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
@@ -95,7 +95,7 @@ public class GrafanaAuthenticationTest extends AbstractTestNGSpringContextTests 
 	
 	@DataProvider
 	public void getData() {
-		String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + UnitTestConstant.TESTNG_TESTDATA + File.separator
+		String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + TestngInitializerTest.TESTNG_TESTDATA + File.separator
 				+ "grafanaAuth.json";
 		JsonElement jsonData;
 		try {
@@ -116,7 +116,7 @@ public class GrafanaAuthenticationTest extends AbstractTestNGSpringContextTests 
 			httpRequest.addHeader("Authorization", testAuthData.get(AUTHORIZATION));
 			cookiesMap = PlatformServiceUtil.getGrafanaCookies(httpRequest);
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			log.error(e1);
 		}
 
 		cookiesString = cookiesMap.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())

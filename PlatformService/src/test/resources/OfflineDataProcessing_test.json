@@ -1,0 +1,23 @@
+[
+	{
+		"toolName": "GIT",
+		"queryName": "Sprint Test1",
+		"cypherQuery": "MATCH(n:GIT) where not exists(n.processed) with n limit 100 set n.processed=true return count(n)",
+		"lastExecutionTime": "2018/07/12 01:27 PM",
+		"cronSchedule": "0 */5 * ? * *"
+	},
+	{
+		"toolName": "JIRA",
+		"queryName": "Sprint Test2",
+		"cypherQuery": "MATCH(n:JIRA) where not exists(n.processed) with n limit 100 set n.processed=true return count(n)",
+		"cronSchedule": "0 */5 * ? * *",
+		"lastExecutionTime": "2018/07/12 01:27 PM"
+	},
+	{
+		"toolName": "GIT",
+		"queryName": "Sprint Test3",
+		"cypherQuery": "MATCH(n:GIT) where not exists(n.processed) with n limit 100 set n.processed=true return count(n)",
+		"cronSchedule": "0 */10 * ? * *",
+		"lastExecutionTime": "2018/07/12 01:27 PM"
+	}
+]

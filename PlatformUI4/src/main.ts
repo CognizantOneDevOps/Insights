@@ -40,5 +40,5 @@ if (environment) {
 }
 
 platformBrowserDynamic().bootstrapModule(InsightsAppModule)
-  .catch(err => console.log(err));
+ .catch(err => console.log(err));
 

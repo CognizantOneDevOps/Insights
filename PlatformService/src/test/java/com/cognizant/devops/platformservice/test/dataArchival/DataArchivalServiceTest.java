@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.test.dataArchival;
 
+import java.io.File;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -27,9 +28,10 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
@@ -37,6 +39,7 @@ import com.cognizant.devops.platformdal.dataArchivalConfig.DataArchivalConfigDal
 import com.cognizant.devops.platformdal.dataArchivalConfig.InsightsDataArchivalConfig;
 import com.cognizant.devops.platformservice.agentmanagement.service.AgentManagementServiceImpl;
 import com.cognizant.devops.platformservice.dataarchival.service.DataArchivalServiceImpl;
+import com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest;
 import com.google.gson.JsonObject;
 import com.cognizant.devops.platformservice.dataarchival.controller.DataArchivalController;
 
@@ -58,10 +61,17 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 	AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 	String host = null;
 
+	JsonObject testData = new JsonObject();
+	
 	@BeforeClass
 	public void prepareData() throws InsightsCustomException {
 		// register agent in DB
 		try {
+			   String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + TestngInitializerTest.TESTNG_TESTDATA + File.separator
+	                    + TestngInitializerTest.TESTNG_PLATFORMSERVICE + File.separator + "DataArchivalService.json";
+			   testData = JsonUtils.getJsonData(path).getAsJsonObject();
+				
+			JsonObject agentJson=testData.get("agentJson").getAsJsonObject();
 			Boolean status = agentConfigDAL.saveAgentConfigFromUI(agentJson.get("agentId").getAsString(),
 					agentJson.get("toolCategory").getAsString(), agentJson.get("labelName").getAsString(),
 					agentJson.get("toolName").getAsString(), agentJson, agentJson.get("agentVersion").getAsString(),
@@ -77,9 +87,9 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 		try {
 			Long expectedCreatedOn = InsightsUtils.getTodayTime() / 1000;
 			Long expectedExpiredDate = getExpiryDate(expectedCreatedOn, expectedDaysToRetain);
-			JsonObject status = DataArchivalController.saveDataArchivalDetails(saveArchivalRecords);
+			JsonObject status = DataArchivalController.saveDataArchivalDetails(testData.get("saveArchivalRecords").toString());
 			InsightsDataArchivalConfig dataArchivalConfig = dataArchivalConfigDal
-					.getSpecificArchivalRecord(saveArchivalRecordsJson.get("archivalName").getAsString());
+					.getSpecificArchivalRecord(testData.get("saveArchivalRecords").getAsJsonObject().get("archivalName").getAsString());
 			
 			Assert.assertEquals(PlatformServiceConstants.SUCCESS, status.get("status").getAsString().replace("\"", ""));
 			
@@ -96,10 +106,10 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 			Long expectedCreatedOnForDeleteCase = InsightsUtils.getTodayTime() / 1000;
 			Long expectedExpiryDateForDeleteCase = getExpiryDate(expectedCreatedOnForDeleteCase,
 					expectedDaysToRetainForDeleteCase);
-			JsonObject status = DataArchivalController.saveDataArchivalDetails(saveArchivalRecordsForDeleteCase);
+			JsonObject status = DataArchivalController.saveDataArchivalDetails(testData.get("saveArchivalRecordsForDeleteCase").toString());
 			
 			InsightsDataArchivalConfig dataArchivalConfig = dataArchivalConfigDal
-					.getSpecificArchivalRecord(saveArchivalRecordsForDeleteCaseJson.get("archivalName").getAsString());
+					.getSpecificArchivalRecord(testData.get("saveArchivalRecordsForDeleteCase").getAsJsonObject().get("archivalName").getAsString());
 			Assert.assertEquals(PlatformServiceConstants.SUCCESS, status.get("status").getAsString().replace("\"", ""));
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
@@ -109,7 +119,7 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 	@Test(priority = 3)
 	public void testSaveDuplicateArchivalRecord() throws InsightsCustomException {
 		try {
-			JsonObject response = DataArchivalController.saveDataArchivalDetails(saveArchivalRecords);
+			JsonObject response = DataArchivalController.saveDataArchivalDetails(testData.get("saveArchivalRecords").toString());
 			Assert.assertEquals(PlatformServiceConstants.FAILURE, response.get("status").getAsString().replace("\"", ""));
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
@@ -119,7 +129,7 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 	@Test(priority = 4)
 	public void testSaveArchivalRecordWithoutArchivalName() throws InsightsCustomException {
 		try {
-			JsonObject response = DataArchivalController.saveDataArchivalDetails(saveArchivalRecordsWithoutName);
+			JsonObject response = DataArchivalController.saveDataArchivalDetails(testData.get("saveArchivalRecordsWithoutName").toString());
 			Assert.assertEquals(PlatformServiceConstants.FAILURE,response.get("status").getAsString().replace("\"", ""));
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
@@ -129,7 +139,7 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 	@Test(priority = 5)
 	public void testSaveArchivalRecordWithIncompleteData() throws InsightsCustomException {
 		try {
-			DataArchivalController.saveDataArchivalDetails(saveArchivalRecordsIncompleteData);
+			DataArchivalController.saveDataArchivalDetails(testData.get("saveArchivalRecordsIncompleteData").toString());
 			}
 		catch (Exception e) {
 			Assert.assertEquals(true, e.toString().contains("NullPointerException"));
@@ -139,7 +149,7 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 	@Test(priority = 6)
 	public void testSaveArchivalRecordWithIncorrectNameData() throws InsightsCustomException {
 		try {
-			JsonObject response = DataArchivalController.saveDataArchivalDetails(saveArchivalRecordsIncorrectNameData);
+			JsonObject response = DataArchivalController.saveDataArchivalDetails(testData.get("saveArchivalRecordsIncorrectNameData").toString());
 			Assert.assertEquals(PlatformServiceConstants.FAILURE, response.get("status").getAsString().replace("\"", ""));
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
@@ -149,7 +159,7 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 	@Test(priority = 7)
 	public void testSaveArchivalRecordWithIncorrectDateFormat() throws InsightsCustomException {
 		try {
-			JsonObject response = DataArchivalController.saveDataArchivalDetails(saveArchivalRecordsIncorrectDateData);
+			JsonObject response = DataArchivalController.saveDataArchivalDetails(testData.get("saveArchivalRecordsIncorrectDateData").toString());
 			Assert.assertEquals(PlatformServiceConstants.FAILURE, response.get("status").getAsString().replace("\"", ""));
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
@@ -159,7 +169,7 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 	@Test(priority = 8)
 	public void testSaveArchivalRecordWithIncorrectDaysToRetain() throws InsightsCustomException {
 		try {
-			JsonObject response = DataArchivalController.saveDataArchivalDetails(saveArchivalRecordsIncorrectDaysToRetainData);
+			JsonObject response = DataArchivalController.saveDataArchivalDetails(testData.get("saveArchivalRecordsIncorrectDaysToRetainData").toString());
 			Assert.assertEquals(PlatformServiceConstants.FAILURE, response.get("status").getAsString().replace("\"", ""));
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
@@ -169,7 +179,7 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 	@Test(priority = 9)
 	public void testSaveArchivalRecordWithLargeDaysToRetain() throws InsightsCustomException {
 		try {
-			JsonObject response = DataArchivalController.saveDataArchivalDetails(saveArchivalRecordsLargeDaysToRetainData);
+			JsonObject response = DataArchivalController.saveDataArchivalDetails(testData.get("saveArchivalRecordsLargeDaysToRetainData").toString());
 			Assert.assertEquals(PlatformServiceConstants.FAILURE, response.get("status").getAsString().replace("\"", ""));
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
@@ -179,7 +189,7 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 	@Test(priority = 10)
 	public void testsaveArchivalRecordsWithStartDateGreaterThanEndDate() throws InsightsCustomException {
 		try {
-			JsonObject response = DataArchivalController.saveDataArchivalDetails(saveArchivalRecordsWithStartDateGreaterThanEndDateData);
+			JsonObject response = DataArchivalController.saveDataArchivalDetails(testData.get("saveArchivalRecordsLargeDaysToRetainData").toString());
 			Assert.assertEquals(PlatformServiceConstants.FAILURE, response.get("status").getAsString().replace("\"", ""));
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
@@ -189,8 +199,8 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 	@Test(priority = 11)
 	public void testsaveArchivalRecordsWithNoDataArchivalAgent() throws InsightsCustomException {
 		try {
-			List<AgentConfig> agentConfigs = agentConfigDAL.deleteAgentConfigurations(agentJson.get("agentId").getAsString());
-			JsonObject response = DataArchivalController.saveDataArchivalDetails(saveArchivalRecords);
+			List<AgentConfig> agentConfigs = agentConfigDAL.deleteAgentConfigurations(testData.get("agentJson").getAsJsonObject().get("agentId").getAsString());
+			JsonObject response = DataArchivalController.saveDataArchivalDetails(testData.get("saveArchivalRecords").toString());
 			Assert.assertEquals(PlatformServiceConstants.FAILURE, response.get("status").getAsString().replace("\"", ""));
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
@@ -200,10 +210,10 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 	@Test(priority = 12)
 	public void testUpdateArchivalSourceURL() throws InsightsCustomException {
 		try {
-			JsonObject response = DataArchivalController.updateArchivalSourceUrl(updateSourceURL);
+			JsonObject response = DataArchivalController.updateArchivalSourceUrl(testData.get("updateSourceURL").toString());
 			Assert.assertEquals(PlatformServiceConstants.SUCCESS, response.get("status").getAsString().replace("\"", ""));
-		    InsightsDataArchivalConfig dataArchivalConfig = dataArchivalConfigDal.getSpecificArchivalRecord(updateSourceURLJson.get("archivalName").getAsString());
-			Assert.assertEquals(dataArchivalConfig.getSourceUrl(), updateSourceURLJson.get("sourceUrl").getAsString());
+		    InsightsDataArchivalConfig dataArchivalConfig = dataArchivalConfigDal.getSpecificArchivalRecord(testData.get("updateSourceURL").getAsJsonObject().get("archivalName").getAsString());
+			Assert.assertEquals(dataArchivalConfig.getSourceUrl(), testData.get("updateSourceURL").getAsJsonObject().get("sourceUrl").getAsString());
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
@@ -212,7 +222,7 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 	@Test(priority = 13)
 	public void testUpdateArchivalSourceURLWithEmptyArchivalName() throws InsightsCustomException {
 		try {
-			JsonObject response = DataArchivalController.updateArchivalSourceUrl(updateSourceURLWithEmptyName);
+			JsonObject response = DataArchivalController.updateArchivalSourceUrl(testData.get("updateSourceURLWithEmptyName").toString());
 			Assert.assertEquals(PlatformServiceConstants.FAILURE, response.get("status").getAsString().replace("\"", ""));
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
@@ -222,11 +232,11 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 	@Test(priority = 14)
 	public void testInActivateArchivalRecord() throws InsightsCustomException {
 		try {
-			JsonObject response = DataArchivalController.inactivateArchivalRecord(saveArchivalRecordsJson.get("archivalName").getAsString());
+			JsonObject response = DataArchivalController.inactivateArchivalRecord(testData.get("saveArchivalRecords").getAsJsonObject().get("archivalName").getAsString());
 		    Assert.assertEquals(PlatformServiceConstants.SUCCESS, response.get("status").getAsString().replace("\"", ""));
 	
 			InsightsDataArchivalConfig dataArchivalConfig = dataArchivalConfigDal
-					.getSpecificArchivalRecord(updateSourceURLJson.get("archivalName").getAsString());
+					.getSpecificArchivalRecord(testData.get("updateSourceURL").getAsJsonObject().get("archivalName").getAsString());
 			Assert.assertEquals("INACTIVE", dataArchivalConfig.getStatus());
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
@@ -246,11 +256,11 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 	@Test(priority = 16)
 	public void testActivateArchivalRecord() throws InsightsCustomException {
 		try {
-			JsonObject response = DataArchivalController.activateArchivalRecord(saveArchivalRecordsJson.get("archivalName").getAsString());
+			JsonObject response = DataArchivalController.activateArchivalRecord(testData.get("saveArchivalRecords").getAsJsonObject().get("archivalName").getAsString());
 		    Assert.assertEquals(PlatformServiceConstants.SUCCESS, response.get("status").getAsString().replace("\"", ""));
 	
 			InsightsDataArchivalConfig dataArchivalConfig = dataArchivalConfigDal
-					.getSpecificArchivalRecord(updateSourceURLJson.get("archivalName").getAsString());
+					.getSpecificArchivalRecord(testData.get("updateSourceURL").getAsJsonObject().get("archivalName").getAsString());
 			Assert.assertEquals("ACTIVE", dataArchivalConfig.getStatus());
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
@@ -291,8 +301,8 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 	@Test(priority = 20)
 	public void testDeleteArchivalRecords() throws Exception {
 		try {
-			dataArchivalConfigDal.updateArchivalStatus(saveArchivalRecordsJson.get("archivalName").getAsString(), DataArchivalStatus.TERMINATED.name());
-		    JsonObject response = DataArchivalController.deleteArchivalRecord(saveArchivalRecordsJson.get("archivalName").getAsString());
+			dataArchivalConfigDal.updateArchivalStatus(testData.get("saveArchivalRecords").getAsJsonObject().get("archivalName").getAsString(), DataArchivalStatus.TERMINATED.name());
+		    JsonObject response = DataArchivalController.deleteArchivalRecord(testData.get("saveArchivalRecords").getAsJsonObject().get("archivalName").getAsString());
             Assert.assertEquals(PlatformServiceConstants.SUCCESS, response.get("status").getAsString().replace("\"", ""));
 		}
 		catch (AssertionError e) {
@@ -314,7 +324,7 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 	@Test(priority = 22)
 	public void testDeleteArchivalRecordsError() throws InsightsCustomException {
 		try {
-			JsonObject response = DataArchivalController.deleteArchivalRecord(saveArchivalRecordsForDeleteCaseJson.get("archivalName").getAsString());
+			JsonObject response = DataArchivalController.deleteArchivalRecord(testData.get("saveArchivalRecordsForDeleteCase").getAsJsonObject().get("archivalName").getAsString());
 	        Assert.assertEquals(PlatformServiceConstants.FAILURE, response.get("status").getAsString().replace("\"", ""));
 			}
 			catch (AssertionError e) {
@@ -326,13 +336,13 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 	public void cleanUp() throws InsightsCustomException {
 		try {
 			Boolean statusAfterInActivating = dataArchivalServiceImpl
-					.inactivateArchivalRecord(saveArchivalRecordsJson.get("archivalName").getAsString());
+					.inactivateArchivalRecord(testData.get("saveArchivalRecords").getAsJsonObject().get("archivalName").getAsString());
 		} catch (Exception e) {
 			log.error("Error cleaning data in  DataArchivalServiceTest statusInactive record ", e);
 		}
 		try {
 			Boolean statusAfterDeleting = dataArchivalServiceImpl
-					.deleteArchivalRecord(saveArchivalRecordsJson.get("archivalName").getAsString());
+					.deleteArchivalRecord(testData.get("saveArchivalRecords").getAsJsonObject().get("archivalName").getAsString());
 		} catch (Exception e) {
 			log.error("Error cleaning data in DataArchivalServiceTest archival record ", e);
 		}

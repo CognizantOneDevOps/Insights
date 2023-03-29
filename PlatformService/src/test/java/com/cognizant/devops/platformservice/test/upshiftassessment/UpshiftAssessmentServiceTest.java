@@ -21,24 +21,16 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.upshiftassessment.UpshiftAssessmentConfig;
 import com.cognizant.devops.platformdal.upshiftassessment.UpshiftAssessmentConfigDAL;
 import com.cognizant.devops.platformservice.upshiftassessment.service.UpshiftAssessmentService;
-import com.cognizant.devops.platformservice.upshiftassessment.service.UpshiftAssessmentServiceImpl;
 import com.google.gson.JsonObject;
 import com.cognizant.devops.platformservice.upshiftassessment.controller.ExternalApiController;
-import org.apache.commons.compress.utils.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.web.multipart.MultipartFile;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 
 @Test
 @WebAppConfiguration
@@ -64,7 +56,7 @@ public class UpshiftAssessmentServiceTest extends UpshiftAssessmentServiceData {
     }
     
     @Test(priority = 1)
-    public void testsaveReport() throws InsightsCustomException {
+    public void testsaveReport() throws InsightsCustomException {    	
         try {
         	JsonObject response = ExternalApiController.importUpshiftAssessment("Test01", testFile);
 			Assert.assertEquals(response.get("status").getAsString().replace("\"", ""), PlatformServiceConstants.SUCCESS);

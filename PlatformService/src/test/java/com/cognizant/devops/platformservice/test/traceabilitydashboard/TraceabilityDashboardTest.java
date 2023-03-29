@@ -32,6 +32,8 @@ import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.FileDetailsEnum;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
@@ -40,6 +42,7 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFilesDAL;
 import com.cognizant.devops.platformservice.rest.filemanagement.service.FileManagementServiceImpl;
+import com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest;
 import com.cognizant.devops.platformservice.traceabilitydashboard.service.TraceabilityDashboardServiceImpl;
 import com.cognizant.devops.platformservice.traceabilitydashboard.controller.TraceabilityDashboardController;
 import com.google.gson.JsonObject;
@@ -61,12 +64,17 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 	FileManagementServiceImpl fileManagementServiceImpl;
 	String traceabilityFileName = "TraceabilityTest";
 	InsightsConfigFiles config=new InsightsConfigFiles();
+	JsonObject testData = new JsonObject();
 	@BeforeClass
 	public void beforeMethod() throws InsightsCustomException {		
 		graphDBHandler = new GraphDBHandler();
 		deleteNodeInNeo4j();
 		insertNodeInNeo4j();
 		try {
+			 String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + TestngInitializerTest.TESTNG_TESTDATA + File.separator
+	                    + TestngInitializerTest.TESTNG_PLATFORMSERVICE + File.separator + "TraceabilityDashboard.json";
+				testData = JsonUtils.getJsonData(path).getAsJsonObject();
+				
 		ClassLoader classLoader = ClassLoader.getSystemClassLoader();
 		File traceabilityFile = new File(classLoader.getResource("TraceabilityTest.json").getFile());
 		FileInputStream input = new FileInputStream(traceabilityFile);
@@ -178,7 +186,7 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 	@Test(priority = 9)
 	public void testGetPipelineForSelectedNode() throws InsightsCustomException{
 		try {
-			JsonObject response = TraceabilityDashboardController.getIssuePipeline(data);
+			JsonObject response = TraceabilityDashboardController.getIssuePipeline(testData.get("data").toString());
 			String actual = response.get("status").getAsString().replace("\"", "");
 			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
 			Assert.assertEquals(response.get("data").getAsJsonObject().get("pipeline").getAsJsonArray().isJsonNull(), false);
@@ -190,7 +198,7 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 	@Test(priority = 10)
 	public void testGetPipelineForSelectedNodeWithoutEpicIssueType() throws InsightsCustomException{
 		try {
-			JsonObject response = TraceabilityDashboardController.getIssuePipeline(dataWithoutEpicIssueType);
+			JsonObject response = TraceabilityDashboardController.getIssuePipeline(testData.get("dataWithoutEpicIssueType").toString());
 			String actual = response.get("status").getAsString().replace("\"", "");
 			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
 			Assert.assertEquals(response.get("data").getAsJsonObject().get("pipeline").getAsJsonArray().isJsonNull(), false);

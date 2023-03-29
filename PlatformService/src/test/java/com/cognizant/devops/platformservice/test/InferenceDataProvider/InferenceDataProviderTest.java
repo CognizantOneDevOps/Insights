@@ -49,21 +49,22 @@ import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
-import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentConfiguration;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
+import com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
 @Test
 @WebAppConfiguration
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
 public class InferenceDataProviderTest extends AbstractTestNGSpringContextTests {
-
+	JsonObject testData = new JsonObject();	
 	private static Logger log = LogManager.getLogger(InferenceDataProviderTest.class);
 	private static final String AUTHORIZATION = "authorization";
 
@@ -95,7 +96,7 @@ public class InferenceDataProviderTest extends AbstractTestNGSpringContextTests 
 	@DataProvider
 	public void getData() {
 		String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator
-				+ UnitTestConstant.TESTNG_TESTDATA + File.separator + "grafanaAuth.json";
+				+ TestngInitializerTest.TESTNG_TESTDATA + File.separator + TestngInitializerTest.TESTNG_PLATFORMSERVICE + File.separator + "grafanaAuth.json";
 		JsonElement jsonData;
 		try {
 			jsonData = JsonUtils.parseReader(new FileReader(new File(path).getCanonicalPath()));
@@ -110,6 +111,9 @@ public class InferenceDataProviderTest extends AbstractTestNGSpringContextTests 
 
 		Map<String, String> cookiesMap = null;
 		try {
+				String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + TestngInitializerTest.TESTNG_TESTDATA + File.separator
+						+ TestngInitializerTest.TESTNG_PLATFORMSERVICE + File.separator + "InferenceDataProvider.json";
+				testData = JsonUtils.getJsonData(path).getAsJsonObject();
 			getData();
 			httpRequest.addHeader("Authorization", testAuthData.get(AUTHORIZATION));
 
@@ -127,7 +131,7 @@ public class InferenceDataProviderTest extends AbstractTestNGSpringContextTests 
 			typeId = inferenceDataProviderTestData.saveWorkflowType("Report");
 
 			// save workflow task in db
-			inferenceDataProviderTestData.saveWorkflowTask(inferenceDataProviderTestData.taskKpiExecution);
+			inferenceDataProviderTestData.saveWorkflowTask(testData.get("taskKpiExecution").toString());
 
 			// save assessmentreport
 			inferenceDataProviderTestData.saveAssessmentReport(InferenceDataProviderTestData.workflowIdWithoutEmail,
@@ -137,7 +141,7 @@ public class InferenceDataProviderTest extends AbstractTestNGSpringContextTests 
 			assessmentReport.setId(415911);
 
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			log.error(e1);
 		}
 
 		cookiesString = cookiesMap.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())

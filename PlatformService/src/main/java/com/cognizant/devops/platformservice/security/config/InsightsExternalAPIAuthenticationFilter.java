@@ -29,6 +29,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -48,14 +49,16 @@ public class InsightsExternalAPIAuthenticationFilter extends OncePerRequestFilte
 			throws IOException, ServletException {
 		log.debug("message Inside InsightsExternalAPIAuthenticationFilter **** {} ",httpRequest.getRequestURL());
 		String authToken = AuthenticationUtils.extractAndValidateAuthToken(httpRequest, httpResponce);
+
 		try {
-			externalAPIValidator.validateExternalUserDetails(authToken);
+				externalAPIValidator.validateExternalUserDetails(authToken);
+				
+				List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
+				updatedAuthorities.add(AuthenticationUtils.getSpringAuthorityRole("Viewer"));
+				Authentication authentication = new InsightsAuthenticationToken(authToken,null, null, updatedAuthorities);
+				
+				SecurityContextHolder.getContext().setAuthentication(authentication);
 			
-			List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
-			updatedAuthorities.add(AuthenticationUtils.getSpringAuthorityRole("Viewer"));
-			Authentication authentication = new InsightsAuthenticationToken(authToken,null, null, updatedAuthorities);
-			
-			SecurityContextHolder.getContext().setAuthentication(authentication);
 		} catch (InsightsCustomException e) {
 			log.error(e);
 			throw new InsightsAuthenticationException(" Invalid Invalid Authentication for external API  ");

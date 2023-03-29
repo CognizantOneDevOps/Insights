@@ -15,10 +15,14 @@
  ******************************************************************************/
 package com.cognizant.devops.engines.platformengine.test.engine;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -27,12 +31,17 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
+import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFilesDAL;
+import com.cognizant.devops.platformdal.outcome.InsightsTools;
+import com.cognizant.devops.platformdal.timertasks.InsightsSchedulerTaskDAL;
+import com.cognizant.devops.platformdal.timertasks.InsightsSchedulerTaskDefinition;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -63,7 +72,10 @@ public class EngineTestData {
 	public static String jenkinLabelName = "JENKINS_UNTEST";
 	public static String saveDataConfig = "{\"destination\":{\"toolName\":\"JENKINS\",\"toolCategory\":\"CI\",\"labelName\":\"JENKINS_UNTEST\",\"fields\":[\"scmcommitId\"]},\"source\":{\"toolName\":\"GIT\",\"toolCategory\":\"SCM\",\"labelName\":\"GIT_UNTEST\",\"fields\":[\"commitId\"]},\"relationName\":\"TEST_FROM_GIT_TO_JENKINS\",\"relationship_properties\":[],\"isSelfRelation\":false}";
 	public static String saveEnrichmentData = "[{\"queryName\":\"Add test to GIT_UNTEST\",\"cypherQuery\":\"match(n:GIT_UNTEST) where not exists (n.test) set n.test=\\\"completed\\\" return count(n)\",\"runSchedule\":10,\"lastExecutionTime\":\"2020/12/16 11:48 AM\",\"recordsProcessed\":0,\"queryProcessingTime\":1598}]";
-
+	public static String saveCorrelationConfig = "[{\"destination\":{\"toolName\":\"GIT\",\"toolCategory\":\"SCM\",\"labelName\":\"GIT_UNTEST\",\"fields\":[\"key\"]},\"source\":{\"toolName\":\"JIRA\",\"toolCategory\":\"ALM\",\"labelName\":\"JIRA_UNTEST\",\"fields\":[\"almkey\"]},\"relationName\":\"TEST_FROM_GIT_TO_JIRA\",\"relationship_properties\":[],\"isSelfRelation\":false}]";
+	static InsightsConfigFilesDAL configFilesDAL = new InsightsConfigFilesDAL();
+	static InsightsSchedulerTaskDAL schedularTaskDAL = new InsightsSchedulerTaskDAL();
+	
 	public static JsonObject getJsonObject(String jsonString) {
 		Gson gson = new Gson();
 		JsonElement jelement = gson.fromJson(jsonString.trim(), JsonElement.class);
@@ -176,5 +188,76 @@ public class EngineTestData {
 		configFile.setFileData(saveEnrichmentData.getBytes());
 		return configFile;
 	}
+	
+	public static InsightsConfigFiles createCorrelationData() {
+		InsightsConfigFiles configFile = new InsightsConfigFiles();
+		configFile.setFileName("CorrelationTest");
+		configFile.setFileType("JSON");
+		configFile.setFileModule("CORRELATION");
+		configFile.setFileData(saveCorrelationConfig.getBytes());
+		return configFile;
+	}
 
+	public static InsightsConfigFiles createDataEnrichmentDataFile(String filePath) {
+		InsightsConfigFiles configFile = new InsightsConfigFiles();
+		int index = filePath.lastIndexOf("\\");
+		String fileName = filePath.substring(index + 1, filePath.lastIndexOf("."));
+		configFile.setFileName(fileName);
+		configFile.setFileType("JSON");
+		configFile.setFileModule("DATAENRICHMENT");
+		try {
+			configFile.setFileData(Files.readAllBytes(new File(filePath).toPath()));
+			configFilesDAL.saveConfigurationFile(configFile);
+		} catch (IOException e) {
+			log.error(e);
+		}
+
+		return configFile;
+	}
+	
+	public InsightsTools prepareInsightsToolData(int id, String toolName, String category, String agentCommunicationQueue,
+			String toolConfigJson, Boolean isActive) {
+		InsightsTools insightsTools= new InsightsTools();
+		insightsTools.setId(id);
+		insightsTools.setToolName(toolName);
+		insightsTools.setCategory(category);
+		insightsTools.setAgentCommunicationQueue(agentCommunicationQueue);
+		insightsTools.setToolConfigJson(toolConfigJson);
+		insightsTools.setIsActive(isActive);
+		return insightsTools;
+	}
+	
+	public static void SaveSchedulatTaskDefination(JsonObject schedulatTaskDefination) {
+		InsightsSchedulerTaskDefinition insightsSchedulatTaskDefination = new InsightsSchedulerTaskDefinition();
+		insightsSchedulatTaskDefination.setTimerTaskId(schedulatTaskDefination.get("timerTaskId").getAsInt());
+		insightsSchedulatTaskDefination.setAction(schedulatTaskDefination.get("action").getAsString());
+		insightsSchedulatTaskDefination.setComponentClassDetail(schedulatTaskDefination.get("componentClassDetail").getAsString());
+		insightsSchedulatTaskDefination.setComponentName(schedulatTaskDefination.get("componentName").getAsString());
+		insightsSchedulatTaskDefination.setSchedule(schedulatTaskDefination.get("schedule").getAsString());
+		schedularTaskDAL.save(insightsSchedulatTaskDefination);
+	}
+	
+	public static void saveToolsMappingLabel(String agentMappingJson) {
+		List<JsonObject> nodeProperties = new ArrayList<>();
+		try {
+			String validatedResponse = ValidationUtils.validateRequestBody(agentMappingJson);
+			GraphDBHandler dbHandler = new GraphDBHandler();
+			String constraintQuery = "CREATE CONSTRAINT ON (n:METADATA) ASSERT n.metadata_id  IS UNIQUE";
+			if (ApplicationConfigProvider.getInstance().getGraph().getVersion().contains("4.")) {
+				constraintQuery = "CREATE CONSTRAINT IF NOT EXISTS FOR (n:METADATA) REQUIRE n.metadata_id IS UNIQUE";
+			}
+			dbHandler.executeCypherQuery(constraintQuery);
+			String query = "UNWIND $props AS properties " + "CREATE (n:METADATA:BUSINESSMAPPING) "
+					+ "SET n = properties"; // DATATAGGING
+			JsonObject json = JsonUtils.parseStringAsJsonObject(validatedResponse);
+			log.debug("arg0 {} ", json);
+			nodeProperties.add(json);
+			JsonObject graphResponse = dbHandler.bulkCreateNodes(nodeProperties, query);
+			if (graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0) {
+				log.error(graphResponse);
+			}
+		} catch (InsightsCustomException e) {
+			log.error(e);
+		}
+	}
 }

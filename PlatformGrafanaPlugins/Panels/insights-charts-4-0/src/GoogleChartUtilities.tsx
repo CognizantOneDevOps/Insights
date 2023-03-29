@@ -46,7 +46,7 @@ export function googlechartutilities(theme: any, transformDataInstruction: strin
     };
 
     const innerDimensions = (node: any) => {
-        var computedStyle = getComputedStyle(node);
+        let computedStyle = getComputedStyle(node);
 
         let width = node.clientWidth; // width with padding
         let height = node.clientHeight; // height with padding

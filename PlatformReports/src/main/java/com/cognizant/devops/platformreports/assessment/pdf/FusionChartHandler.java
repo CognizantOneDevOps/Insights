@@ -299,7 +299,7 @@ public class FusionChartHandler implements BasePDFProcessor {
 			String reportDirPath = assessmentReportDTO.getPdfReportDirPath() + File.separator;
 			PdfReportTableUtil pdfReportTableUtil = new PdfReportTableUtil();
 			PDDocument doc = new PDDocument();
-			PDPage page = pdfReportTableUtil.addNewPage(doc);
+			PDPage page = pdfReportTableUtil.addNewPage(doc, "tablePDF");
 			pdfReportTableUtil.fetchPdfConfig(reportDirPath, insightsReportPdfTableConfig);
 			Elements allTableDiv = document.getElementsByAttributeValueMatching("id", "table_*");
 			if (!allTableDiv.isEmpty()) {
@@ -409,7 +409,7 @@ public class FusionChartHandler implements BasePDFProcessor {
 				if(openFile.exists()) {
 					PDDocument fusionPages = PDDocument.load(new File(fusion));
 					PDDocument openPages = PDDocument.load(new File(open));
-					PDDocument f = new PdfReportTableUtil().footer(assessmentReportDTO,openPages,fusionPages.getPages().getCount(),insightsReportPdfTableConfig);
+					PDDocument f = new PdfReportTableUtil().footer(assessmentReportDTO,openPages,fusionPages.getPages().getCount(),insightsReportPdfTableConfig, "tablePDF");
 					f.save(new File(open));
 					PDFMergerUtility merger = new PDFMergerUtility();
 					merger.setDestinationFileName(exportedFilePath);

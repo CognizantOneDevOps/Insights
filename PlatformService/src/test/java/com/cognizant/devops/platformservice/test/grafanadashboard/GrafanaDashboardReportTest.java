@@ -47,7 +47,6 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -56,6 +55,7 @@ import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfigDAL
 import com.cognizant.devops.platformservice.emailconfiguration.controller.InsightsEmailConfigurationController;
 import com.cognizant.devops.platformservice.grafanadashboard.service.GrafanaPdfService;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
+import com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest;
 import com.cognizant.devops.platformservice.workflow.service.WorkflowServiceImpl;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -68,7 +68,7 @@ import com.google.gson.JsonSyntaxException;
 @WebAppConfiguration
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
 public class GrafanaDashboardReportTest extends GrafanaDashboardReportData{
-
+	JsonObject testData = new JsonObject();	
 	private static final Logger log = LogManager.getLogger(GrafanaDashboardReportData.class);
 	
 	@Autowired
@@ -87,7 +87,7 @@ public class GrafanaDashboardReportTest extends GrafanaDashboardReportData{
 	@DataProvider
 	public void getData() {
 		String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator
-				+ UnitTestConstant.TESTNG_TESTDATA + File.separator + "grafanaAuth.json";
+				+ TestngInitializerTest.TESTNG_TESTDATA + File.separator + "grafanaAuth.json";
 		JsonElement jsonData;
 		try {
 			jsonData = JsonUtils.parseReader(new FileReader(new File(path).getCanonicalPath()));
@@ -135,6 +135,13 @@ public class GrafanaDashboardReportTest extends GrafanaDashboardReportData{
 			cookie.setPath("/");
 			httpRequest.setCookies(cookie);
 		}
+		try {
+			String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + TestngInitializerTest.TESTNG_TESTDATA + File.separator
+					+ TestngInitializerTest.TESTNG_PLATFORMSERVICE + File.separator + "GrafanaDashboardReport.json";
+			testData = JsonUtils.getJsonData(path).getAsJsonObject();
+		} catch (Exception e) {
+			log.error("message", e);
+		}
 	}
 
 	private MockHttpServletRequestBuilder mockHttpServletRequestBuilderPost(String url, String content) {
@@ -164,7 +171,7 @@ public class GrafanaDashboardReportTest extends GrafanaDashboardReportData{
 			this.mockMvc = getMacMvc();
 			log.debug(" cookies " + httpRequest.getCookies());
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost(
-					"/dashboardReport/exportPDF/saveDashboardAsPDF", dashboardJson);
+					"/dashboardReport/exportPDF/saveDashboardAsPDF", testData.get("dashboardJson").toString());
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing Save Dashboard " + e);
@@ -200,7 +207,7 @@ public class GrafanaDashboardReportTest extends GrafanaDashboardReportData{
 					id = g.getId();
 				}
 			}
-			JsonObject detailsJson = JsonUtils.parseStringAsJsonObject(updateJson);
+			JsonObject detailsJson = JsonUtils.parseStringAsJsonObject(testData.get("updateJson").toString());
 			detailsJson.toString();
 			detailsJson.addProperty("id", id);
 			this.mockMvc = getMacMvc();
@@ -210,21 +217,21 @@ public class GrafanaDashboardReportTest extends GrafanaDashboardReportData{
 			this.mockMvc.perform(builder).andExpect(ok);
 			
 			MockHttpServletRequestBuilder builder1 = mockHttpServletRequestBuilderPost(
-					"/dashboardReport/exportPDF/updateDashboardConfig", updateJson);
+					"/dashboardReport/exportPDF/updateDashboardConfig", testData.get("updateJson").toString());
 			this.mockMvc.perform(builder1).andExpect(ok);
 			
 			MockHttpServletRequestBuilder builder2 = mockHttpServletRequestBuilderPost(
 					"/externalApi/exportPDF/getDashboardAsPDF", detailsJson.toString());
 			this.mockMvc.perform(builder2).andExpect(ok);
 			
-			JsonObject detailsJson1 = JsonUtils.parseStringAsJsonObject(updateJsonDBTrue);
+			JsonObject detailsJson1 = JsonUtils.parseStringAsJsonObject(testData.get("updateJsonDBTrue").toString());
 			detailsJson1.toString();
 			detailsJson1.addProperty("id", id);
 			MockHttpServletRequestBuilder builder3 = mockHttpServletRequestBuilderPost(
 					"/externalApi/exportPDF/getDashboardAsPDF", detailsJson1.toString());
 			this.mockMvc.perform(builder3).andExpect(ok);
 			
-			JsonObject detailsJson2 = JsonUtils.parseStringAsJsonObject(updateJsonValidation);
+			JsonObject detailsJson2 = JsonUtils.parseStringAsJsonObject(testData.get("updateJsonValidation").toString());
 			detailsJson2.toString();
 			detailsJson2.addProperty("id", id);
 			MockHttpServletRequestBuilder builder4 = mockHttpServletRequestBuilderPost(
@@ -308,7 +315,7 @@ public class GrafanaDashboardReportTest extends GrafanaDashboardReportData{
 			}
 		}
 
-		JsonObject dashObject = JsonUtils.parseStringAsJsonObject(updateJson);
+		JsonObject dashObject = JsonUtils.parseStringAsJsonObject(testData.get("updateJson").toString());
 		dashObject.addProperty("id", id);
 		grafanaPdfServiceImpl.updateGrafanaDashboardDetails(dashObject);
 		List<GrafanaDashboardPdfConfig> updateDashboardPdfConfigs = grafanaPdfServiceImpl
@@ -321,7 +328,7 @@ public class GrafanaDashboardReportTest extends GrafanaDashboardReportData{
 	public void updateGrafanaDashboardDetailsExceptionTest() throws InsightsCustomException {
 
 		int id = 0;
-		JsonObject dashObject = JsonUtils.parseStringAsJsonObject(updateJson);
+		JsonObject dashObject = JsonUtils.parseStringAsJsonObject(testData.get("updateJson").toString());
 		dashObject.addProperty("id", id);
 		grafanaPdfServiceImpl.updateGrafanaDashboardDetails(dashObject);
 	}

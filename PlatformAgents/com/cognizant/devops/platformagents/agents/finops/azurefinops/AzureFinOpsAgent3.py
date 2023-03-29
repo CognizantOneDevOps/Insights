@@ -31,7 +31,7 @@ import time
 import os
 import sys
 from dateutil import parser
-from ....core.FinOpsUtilities import FinOpsUtilities
+from .FinOpsUtilities import FinOpsUtilities
 
 
 class AzureFinOpsAgent(BaseAgent):

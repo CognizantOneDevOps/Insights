@@ -41,7 +41,7 @@ echo "1)insights_first
 5)insights_grafana
 6)insights_python
 7)insights_rabbitmq
-8)insights_tomcat
+8)insights_UI_Service
 9)insights_enginejar
 10)insights_workflow
 11)insights_agents
@@ -69,7 +69,7 @@ case $package in
    ;;
    "insights_rabbitmq") sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL8/reference-DocRoot-Scripts/insights_rabbitmq.sh -O insights_rabbitmq.sh && dos2unix insights_rabbitmq.sh && sh insights_rabbitmq.sh
    ;;
-   "insights_tomcat") sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL8/reference-DocRoot-Scripts/insights_tomcat.sh -O insights_tomcat.sh && dos2unix insights_tomcat.sh && sh insights_tomcat.sh
+   "insights_UI_Service") sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL8/reference-DocRoot-Scripts/insights_UI_Service.sh -O insights_UI_Service.sh && dos2unix insights_UI_Service.sh && sh insights_UI_Service.sh
    ;;
    "insights_enginejar") sudo wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL8/reference-DocRoot-Scripts/insights_enginejar.sh -O insights_enginejar.sh && dos2unix insights_enginejar.sh && sh insights_enginejar.sh
    ;;

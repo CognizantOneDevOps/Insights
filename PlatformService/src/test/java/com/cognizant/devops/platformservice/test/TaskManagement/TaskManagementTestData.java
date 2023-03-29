@@ -23,13 +23,4 @@ public class TaskManagementTestData extends AbstractTestNGSpringContextTests{
 	public static final String AUTHORIZATION = "authorization";
 	String cookiesString ="";
 	String componentNameString = "EngineAggregatorTest";
-	String saveTaskJson = "{\"componentName\":\""+componentNameString+"\",\"componentClassDetail\":\"com.cognizant.devops.engines.platformengine.modules.aggregator.EngineAggregatorModule\",\"schedule\":\"0 */10 * ? * *\"}";
-	String saveTaskJsonValidation = "&amp;{<\"componentName\":\""+componentNameString+"\",\"componentClassDetail\":\"com.cognizant.devops.engines.platformengine.modules.aggregator.EngineAggregatorModule\",\"schedule\":\"0 */10 * ? * *\"}";
-	String saveTaskJsonInvalidSchedule = "{\"componentName\":\""+componentNameString+"\",\"componentClassDetail\":\"com.cognizant.devops.engines.platformengine.modules.aggregator.EngineAggregatorModule\",\"schedule\":\"0 */10 * ? ? *\"}";
-	String deleteTaskJson = "{\"componentName\":\""+componentNameString+"\"}";
-	String deleteTaskJsonInvalidData = "{\"componentName\":\""+componentNameString+"123"+"\"}";
-	String editTaskJson = "{\"componentName\":\""+componentNameString+"\",\"componentClassDetail\":\"com.cognizant.devops.engines.platformengine.modules.aggregator.EngineAggregatorModule\",\"schedule\":\"0 */12 * ? * *\"}";
-	String statusUpdate = "{\"componentName\":\""+componentNameString+"\",\"action\":\"RESCHEDULE\"}";
-	String statusUpdateInvalidData = "{\"componentName\":\""+componentNameString+"123"+"\",\"action\":\"RESCHEDULE\"}";
-	String taskHistoryRequest = "{\"componentName\":\""+componentNameString+"\"}";
-}
+	}

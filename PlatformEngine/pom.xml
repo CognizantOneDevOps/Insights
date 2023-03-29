@@ -12,19 +12,19 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>9.8</version>
+		<version>10.0</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformEngine</artifactId>
 	<packaging>jar</packaging>
-	<version>9.8</version>
+	<version>10.0</version>
 	<name>PlatformEngine</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<testng.version>7.6.1</testng.version>
+		<testng.version>7.7.1</testng.version>
 	</properties>
 
 	<dependencies>
@@ -36,7 +36,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>9.8</version>
+			<version>10.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.wnameless</groupId>
@@ -67,7 +67,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformAuditing</artifactId>
-			<version>9.8</version>
+			<version>10.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.apache.logging.log4j</groupId>
@@ -90,7 +90,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>9.8</version>
+			<version>10.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.apache.logging.log4j</groupId>
@@ -119,8 +119,7 @@
 	         <artifactId>guava</artifactId>
 	    </dependency>
 	</dependencies>
-	<build>
-		<finalName>PlatformEngine</finalName>
+	<build>		
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

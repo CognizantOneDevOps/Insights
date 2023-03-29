@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.test.milestone;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,15 +25,18 @@ import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.MilestoneConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.outcome.OutComeConfigDAL;
 import com.cognizant.devops.platformservice.milestone.service.MileStoneServiceImpl;
 import com.cognizant.devops.platformservice.outcome.controller.OutComeController;
+import com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -53,13 +57,26 @@ public class OutcomeServiceTest extends MilestoneOutcomeTestData {
 
 	String host = null;
 	Gson gson = new Gson();
-
+    JsonObject testData = new JsonObject();
+	
+	@BeforeClass
+	public void prepareData() throws InsightsCustomException {
+		try {
+		    String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + TestngInitializerTest.TESTNG_TESTDATA + File.separator
+                    + TestngInitializerTest.TESTNG_PLATFORMSERVICE + File.separator + "OutcomeService.json";
+			testData = JsonUtils.getJsonData(path).getAsJsonObject();
+			
+		} catch (Exception e) {
+			log.error("Error preparing data at OutcomeServiceTest record ", e);
+		}
+	}
+	
 	@Test(priority = 1)
 	public void testSaveOutcomeDefinitionRecord() throws InsightsCustomException {
 		try {
 			GetInsightsMilestoneTools();
 			int toolId = insightsMilestoneTools.getId();
-			saveOutcomeJson = saveOutcomeJson.replace("toolNameeee1", String.valueOf(toolId));
+			String saveOutcomeJson = testData.get("saveOutcomeJson").toString().replace("toolNameeee1", String.valueOf(toolId));
 			
 			JsonObject saveOutcomeConfigjson = outcomeConfigController.saveOutcomeConfig(saveOutcomeJson);
 			Assert.assertNotNull(saveOutcomeConfigjson);
@@ -84,7 +101,7 @@ public class OutcomeServiceTest extends MilestoneOutcomeTestData {
 		try {
 			GetInsightsMilestoneTools();
 			int toolId = insightsMilestoneTools.getId();
-			saveOutcomeJson = saveOutcomeJson.replace("toolNameeee1", String.valueOf(toolId));
+			String saveOutcomeJson = testData.get("saveOutcomeJson").toString().replace("toolNameeee1", String.valueOf(toolId));
 			JsonObject response = outcomeConfigController.saveOutcomeConfig(saveOutcomeJson);
 			String actual = response.get("status").getAsString().replace("\"", "");
 			Assert.assertEquals(PlatformServiceConstants.FAILURE, actual);
@@ -117,9 +134,9 @@ public class OutcomeServiceTest extends MilestoneOutcomeTestData {
 	public void testEditOutcomeConfigError() throws InsightsCustomException {
 		try {
 			for (JsonObject recordForSave : filterList) {
-				editOutcomeJson =editOutcomeJson.replace("iiddee", recordForSave.get("id").getAsString()).replace("Techtype","Business");
+				String editOutcomeJson =testData.get("editOutcomeJson").toString().replace("iiddee", recordForSave.get("id").getAsString()).replace("Techtype","Business");
 			}
-			JsonObject response = outcomeConfigController.updateOutcomeConfig(statusUpdateError);
+			JsonObject response = outcomeConfigController.updateOutcomeConfig(testData.get("statusUpdateError").toString());
 			Assert.assertEquals(PlatformServiceConstants.FAILURE, response.get("status").getAsString().replace("\"", ""));	
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
@@ -129,8 +146,9 @@ public class OutcomeServiceTest extends MilestoneOutcomeTestData {
 	@Test(priority = 5)
 	public void testEditOutcomeRecord() throws InsightsCustomException {
 		try {
+			String editOutcomeJson="";
 			for (JsonObject recordForSave : filterList) {
-				editOutcomeJson =editOutcomeJson.replace("iiddee", recordForSave.get("id").getAsString()).replace("Techtype","Business");
+				editOutcomeJson =testData.get("editOutcomeJson").toString().replace("iiddee", recordForSave.get("id").getAsString()).replace("Techtype","Business");
 			}
 			JsonObject editOutcomeConfigjson = outcomeConfigController.updateOutcomeConfig(editOutcomeJson);
 			Assert.assertNotNull(editOutcomeConfigjson);
@@ -154,9 +172,9 @@ public class OutcomeServiceTest extends MilestoneOutcomeTestData {
 	public void testStatusUpdateOutcomeRecordError() throws InsightsCustomException {
 		try {
 			for (JsonObject recordForSave : filterList) {
-				statusUpdate =statusUpdate.replace("iiddee", recordForSave.get("id").getAsString()).replace("activee", "false");
+				String statusUpdate =testData.get("statusUpdate").toString().replace("iiddee", recordForSave.get("id").getAsString()).replace("activee", "false");
 			}
-			JsonObject response = outcomeConfigController.updateOutcomeConfigStatus(statusUpdateError);
+			JsonObject response = outcomeConfigController.updateOutcomeConfigStatus(testData.get("statusUpdateError").toString());
 	        Assert.assertEquals(PlatformServiceConstants.FAILURE, response.get("status").getAsString().replace("\"", ""));	
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
@@ -165,8 +183,9 @@ public class OutcomeServiceTest extends MilestoneOutcomeTestData {
 	@Test(priority = 7)
 	public void testStatusUpdateOutcomeRecord() throws InsightsCustomException {
 		try {
+			String statusUpdate="";
 			for (JsonObject recordForSave : filterList) {
-				statusUpdate =statusUpdate.replace("iiddee", recordForSave.get("id").getAsString()).replace("activee", "false");
+				statusUpdate =testData.get("statusUpdate").toString().replace("iiddee", recordForSave.get("id").getAsString()).replace("activee", "false");
 			}
 			JsonObject editOutcomeConfigjson = outcomeConfigController.updateOutcomeConfigStatus(statusUpdate);
 			Assert.assertNotNull(editOutcomeConfigjson);
@@ -217,7 +236,7 @@ public class OutcomeServiceTest extends MilestoneOutcomeTestData {
 		try {
 			GetInsightsMilestoneTools();
 			int toolId = insightsMilestoneTools.getId();
-			saveOutcomeJson = saveOutcomeJsonNoToolConfigJson.replace("toolNameeee1", String.valueOf(toolId));
+		    String saveOutcomeJson = testData.get("saveOutcomeJsonNoToolConfigJson").toString().replace("toolNameeee1", String.valueOf(toolId));
 			JsonObject response = outcomeConfigController.saveOutcomeConfig(saveOutcomeJson);
 			String actual = response.get("status").getAsString().replace("\"", "");
 			Assert.assertEquals(PlatformServiceConstants.SUCCESS, actual);

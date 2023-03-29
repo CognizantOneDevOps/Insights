@@ -101,14 +101,13 @@ export class InsightsInitService {
         InsightsInitService.showWebhookConfiguration = UIConfigResponse.showWebhookConfiguration;
         InsightsInitService.jwtTokenOriginServerURL = UIConfigResponse.jwtTokenOriginServerURL;
         InsightsInitService.jwtOriginServerLoginURL = UIConfigResponse.jwtOriginServerLoginURL;
-        console.info("Selected authetication Protocol is "+UIConfigResponse.autheticationProtocol);
+        console.info("Selected authetication Protocol is " + UIConfigResponse.autheticationProtocol);
         if (this.autheticationProtocolList.indexOf(UIConfigResponse.autheticationProtocol) < 0) {
             console.error("Please provide valid authetication Protocol from list " + String(this.autheticationProtocolList));
         }
         InsightsInitService.autheticationProtocol = UIConfigResponse.autheticationProtocol;
         InsightsInitService.singleSignOnConfig = InsightsInitService.configDescResponse[UIConfigResponse.autheticationProtocol];
         InsightsInitService.enableInsightsToolbar = UIConfigResponse.enableInsightsToolbar
-        //InsightsInitService.isDebugModeEnable = UIConfigResponse.isDebugModeEnable
         InsightsInitService.enableLogoutButton = UIConfigResponse.enableLogoutButton
     }
 

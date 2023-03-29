@@ -105,11 +105,13 @@ public class InsightsAuthenticationTokenUtils {
 		String authToken = AuthenticationUtils.extractAndValidateAuthToken(request, response);
 		InsightsAuthenticationToken jwtAuthenticationToken = null;
 		
+		log.debug("Inside authenticateUserUsingJWT ======= {}",request.getServletPath());
+		
 		/*
 		 * This Block use to validate External Token received from clinet
 		 */
-		if(AuthenticationUtils.JWT_LOGIN_URL.contains(request.getPathInfo()) || 
-			AuthenticationUtils.JWT_USER_DETAIL_URL.contains(request.getPathInfo()) ) {
+		if(AuthenticationUtils.JWT_LOGIN_URL.contains(request.getRequestURI()) || 
+			AuthenticationUtils.JWT_USER_DETAIL_URL.contains(request.getRequestURI()) ) {
 			log.debug("Inside JWTAuthenticationProvider for Authentication started === ");
 			JWTClaimsSet jwtClaimsSet = AuthenticationUtils.validateIncomingToken(authToken);
 			if (jwtClaimsSet != null) {
@@ -122,6 +124,7 @@ public class InsightsAuthenticationTokenUtils {
 				log.error(" Error while validating token and retriving claims ");
 				throw new InsightsAuthenticationException(" Error while validating token and retriving claims {} ");
 			}
+			log.debug(" Inside authenticateUserUsingJWT , processing completed  ");
 		} else {
 			/*
 			 * This Block use to validate Insights generated Token.

@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,6 +37,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
@@ -69,6 +71,7 @@ import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
+import com.cognizant.devops.platformservice.security.config.saml.ResourceLoaderService;
 import com.cognizant.devops.platformservice.workflow.service.WorkflowServiceImpl;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -87,6 +90,9 @@ public class AssesmentReportServiceImpl {
 
 	@Autowired
 	GrafanaUtilities grafanaUtilities;
+	
+	@Autowired
+	ResourceLoaderService resourceLoaderService;
 
 	/* Kpi and Content service methods */
 
@@ -1301,8 +1307,9 @@ public class AssesmentReportServiceImpl {
 	public JsonObject fetchTemplateJson(String filename) throws InsightsCustomException {
 		JsonObject templateJson = null;
 		try {
-			File templateFile = new File(getClass().getClassLoader().getResource("dashboardandpaneltemplate/"+filename).getFile());
-			String template = new String(Files.readAllBytes(templateFile.toPath()));
+			Resource resource = resourceLoaderService.getResource("classpath:dashboardandpaneltemplate/" + filename);
+			InputStream fileInputStream = resource.getInputStream();
+			String template = new String(fileInputStream.readAllBytes(), StandardCharsets.UTF_8);
 			templateJson = JsonUtils.parseStringAsJsonObject(template);
 		} catch (Exception e) {
 			log.error("Error while fetching template JSON ====", e);

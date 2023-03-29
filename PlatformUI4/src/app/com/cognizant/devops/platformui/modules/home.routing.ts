@@ -12,7 +12,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-
 import { Routes, RouterModule } from '@angular/router';
 import { ModuleWithProviders } from '@angular/core';
 import { PlaylistComponent } from '@insights/app/modules/playlist/playlist.component';
@@ -62,6 +61,10 @@ import { MileStoneEditComponent } from './mile-stone/mile-stone-edit/mile-stone-
 import { ScheduleTaskManagmentComponent } from '@insights/app/modules/schedule-task-managment/schedule-task-managment.component';
 import { MultipleEmailConfigurationComponent } from './multiple-email-configuration/multiple-email-configuration.component';
 import { AddComponent } from './multiple-email-configuration/dialogs/add/add.component';
+import { OfflineDataListComponent } from '@insights/app/modules/offline-data-processing/offline-data-list/offline-data-list.component';
+import { OfflineConfigurationComponent } from '@insights/app/modules/offline-data-processing/offline-configuration/offline-configuration.component';
+import { OfflineDetailsComponent } from '@insights/app/modules/offline-data-processing/offline-details/offline-details.component';
+
 const homeRoutes: Routes = [
   {
     path: 'InSights/Home', component: HomeComponent,
@@ -113,7 +116,9 @@ const homeRoutes: Routes = [
       { path:'edit-dashboard',component:EditDashboardComponent},
       { path:'taskManagement',component:ScheduleTaskManagmentComponent},
       { path : 'email-configuration',component : MultipleEmailConfigurationComponent },
-      { path: 'add-component', component: AddComponent }
+      { path: 'add-component', component: AddComponent },
+      { path: 'offlineDataList', component:OfflineDataListComponent },
+      { path: 'offlineConfiguration', component:OfflineConfigurationComponent }
     ],
     canActivate: [AuthGuard]
   }

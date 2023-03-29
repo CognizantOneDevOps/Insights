@@ -17,12 +17,6 @@
   "devDependencies": {
     "@types/lodash": "^4.14.182",
     "grafana-sdk-mocks": "github:grafana/grafana-sdk-mocks",
-    "grunt": "^1.5.3",
-    "grunt-contrib-clean": "2.0.1",
-    "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-watch": "^1.1.0",
-    "grunt-string-replace": "1.3.3",
-    "grunt-typescript": "^0.8.0",
     "karma": "~6.3.20",
     "karma-chrome-launcher": "~3.1.1",
     "load-grunt-tasks": "5.1.0",

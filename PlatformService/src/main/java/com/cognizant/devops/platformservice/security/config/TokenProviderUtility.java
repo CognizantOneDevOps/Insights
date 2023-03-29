@@ -35,6 +35,7 @@ import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.config.units.EntryUnit;
 import org.ehcache.config.units.MemoryUnit;
 import org.ehcache.spi.loaderwriter.CacheWritingException;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -56,7 +57,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
 @Component("tokenProviderUtility")
-@Repository
+@DependsOn("platformServiceInitializer")
 public class TokenProviderUtility {
 	private static Logger log = LogManager.getLogger(TokenProviderUtility.class);
 	private String signingKey = ApplicationConfigProvider.getInstance().getSingleSignOnConfig()

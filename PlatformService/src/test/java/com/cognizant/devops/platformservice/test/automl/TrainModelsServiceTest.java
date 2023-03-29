@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.test.automl;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
@@ -35,8 +36,10 @@ import org.testng.annotations.Test;
 import com.cognizant.devops.automl.service.TrainModelsServiceImpl;
 import com.cognizant.devops.automl.controller.InsightsTrainModelController;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsKPIConfig;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
@@ -45,6 +48,7 @@ import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowType;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
+import com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest;
 import com.cognizant.devops.platformservice.workflow.service.WorkflowServiceImpl;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -54,6 +58,7 @@ import com.google.gson.JsonObject;
 @SuppressWarnings("unused")
 @WebAppConfiguration
 public class TrainModelsServiceTest extends TrainModelsServiceTestData {
+	JsonObject testData = new JsonObject();
 	private static Logger log = LogManager.getLogger(TrainModelsServiceTest.class);
 	
 	@Autowired
@@ -67,6 +72,14 @@ public class TrainModelsServiceTest extends TrainModelsServiceTestData {
 	@BeforeClass
 	public void onInit() throws InsightsCustomException, IOException {
 		//add workflow type for automl
+		try {
+			String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + TestngInitializerTest.TESTNG_TESTDATA + File.separator
+					+ TestngInitializerTest.TESTNG_PLATFORMSERVICE + File.separator + "TrainModelsService.json";
+			testData = JsonUtils.getJsonData(path).getAsJsonObject();
+			
+		} catch (Exception e) {
+			log.error("message", e);
+		}
 		InsightsWorkflowType workflowTypeObj = workflowConfigDAL.getWorkflowType(WorkflowTaskEnum.WorkflowType.AUTOML.getValue());
 		if (workflowTypeObj == null) {
 			InsightsWorkflowType type = new InsightsWorkflowType();
@@ -76,6 +89,7 @@ public class TrainModelsServiceTest extends TrainModelsServiceTestData {
 		//add workflow task for automl if not present
 		List<InsightsWorkflowTask> listofTasks = workflowConfigDAL.getTaskLists(WorkflowTaskEnum.WorkflowType.AUTOML.getValue());
 		if(listofTasks.isEmpty()) {
+			JsonObject workflowTaskJson = JsonUtils.parseStringAsJsonObject(testData.get("workflowTask").toString());
 			workflowService.saveWorkflowTask(workflowTaskJson);
 		} else {
 			isTaskExists = true;
@@ -88,7 +102,7 @@ public class TrainModelsServiceTest extends TrainModelsServiceTestData {
 	public void testSaveAutoMLConfig() throws IOException, InsightsCustomException {
 		FileInputStream input = new FileInputStream(file);
 		MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "text/plain",IOUtils.toByteArray(input));
-		ResponseEntity<JsonObject> response = InsightsTrainModelController.saveUsecase(multipartFile, usecase, configuration, 
+		ResponseEntity<JsonObject> response = InsightsTrainModelController.saveUsecase(multipartFile, usecase, testData.get("configuration").toString(), 
 				trainingPercent, predictionColumn, numOfModels, getTaskList(),"Regression");
 		
 	    AutoMLConfig automl = autoMLConfigDAL.getMLConfigByUsecase(usecase);
@@ -104,7 +118,7 @@ public class TrainModelsServiceTest extends TrainModelsServiceTestData {
 	public void testSaveAutoMlConfigWithExistingUsecase() throws InsightsCustomException, IOException {
 		FileInputStream input = new FileInputStream(file);
 		MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "text/plain",IOUtils.toByteArray(input));
-		ResponseEntity<JsonObject> response = InsightsTrainModelController.saveUsecase(multipartFile, usecase, configuration, 
+		ResponseEntity<JsonObject> response = InsightsTrainModelController.saveUsecase(multipartFile, usecase, testData.get("configuration").toString(), 
 				trainingPercent, predictionColumn, numOfModels, getTaskList(),"Regression");
 		Assert.assertEquals(response.getStatusCodeValue(), 200);
 		Assert.assertEquals(response.getBody().get("status").getAsString().replace("\"", ""), PlatformServiceConstants.FAILURE);
@@ -191,26 +205,26 @@ public class TrainModelsServiceTest extends TrainModelsServiceTestData {
 	
 	@Test(priority = 11)
 	public void testUpdateUsecaseStatewithKPIHasUseCase() throws InsightsCustomException {
-		insightsAssessmentReportController.saveKpiDefinition(registerkpiwithUsecase);
+		insightsAssessmentReportController.saveKpiDefinition(testData.get("registerkpiwithUsecase").toString());
 		List<InsightsKPIConfig> list = reportConfigDAL.getKpiConfigByUsecase(usecase);
 		JsonObject usecaseJson = new JsonObject();
 		usecaseJson.addProperty("usecaseName", usecase);
 		usecaseJson.addProperty("isActive", false);
 		JsonObject response = InsightsTrainModelController.updateUsecaseState(usecaseJson.toString());
 		Assert.assertEquals(response.get("status").getAsString().replace("\"", ""), PlatformServiceConstants.FAILURE);
-		JsonObject response1 = insightsAssessmentReportController.deleteKpiDefinition(deleteKpiString);
+		JsonObject response1 = insightsAssessmentReportController.deleteKpiDefinition(testData.get("deleteKpiString").toString());
 	}
 	
 	@Test(priority = 12)
 	public void testUpdateUsecaseStatewithKPIHasUseCaseAndActiveState() throws InsightsCustomException {
-		insightsAssessmentReportController.saveKpiDefinition(registerkpiwithUsecaseActiveState);
+		insightsAssessmentReportController.saveKpiDefinition(testData.get("registerkpiwithUsecaseActiveState").toString());
 		List<InsightsKPIConfig> list = reportConfigDAL.getKpiConfigByUsecase(usecase);
 		JsonObject usecaseJson = new JsonObject();
 		usecaseJson.addProperty("usecaseName", usecase);
 		usecaseJson.addProperty("isActive", true);
 		JsonObject response = InsightsTrainModelController.updateUsecaseState(usecaseJson.toString());
 		Assert.assertEquals(response.get("status").getAsString().replace("\"", ""), PlatformServiceConstants.SUCCESS);
-		JsonObject response1 = insightsAssessmentReportController.deleteKpiDefinition(deleteKpiString);	
+		JsonObject response1 = insightsAssessmentReportController.deleteKpiDefinition(testData.get("deleteKpiString").toString());	
 	}
 	
 	//delete usecase from postgres along with Csv file
