@@ -113,7 +113,7 @@ public class CorrelationExecutor {
 		}
 	}
    
-	private void loadCorrelationConfigfromJson(List<CorrelationConfiguration> correlations) { 
+	public void loadCorrelationConfigfromJson(List<CorrelationConfiguration> correlations) { 
 		List<Correlation> correlationsList = loadCorrelationsFromFile();
 		if(correlationsList != null && !correlationsList.isEmpty()) {
 			convertCorrelationDTO(correlationsList, correlations);

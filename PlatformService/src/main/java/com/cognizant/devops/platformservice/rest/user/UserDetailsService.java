@@ -268,7 +268,7 @@ public class UserDetailsService {
 	@ResponseBody
 	public ResponseEntity<Object> authenticateUserUsingJWT() {
 
-		log.debug("Inside authenticateUserUsingJWT ======= ");
+		log.debug("Inside authenticateUserUsingJWT ======= {}",httpRequest.getRequestURI());
 		Map<String, String> headersGrafana = new HashMap<>();
 		HttpHeaders httpHeaders = new HttpHeaders();
 		JsonObject jsonResponse = new JsonObject();
@@ -294,8 +294,8 @@ public class UserDetailsService {
 				log.error(" KerberosServiceRequestToken is Empty, Please try again  ");
 			}
 		} catch (Exception e) {
-			log.error("Error in authenticate Kerberos User  ", e);
-			String msg = "Error while login using Kerberos, For detail Please check log file ";
+			log.error("Error in authenticate JWT User  ", e);
+			String msg = "Error while login using JWT, For detail Please check log file ";
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg);
 		}
 

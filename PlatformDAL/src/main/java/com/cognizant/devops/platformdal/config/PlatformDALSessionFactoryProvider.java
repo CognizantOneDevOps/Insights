@@ -47,6 +47,7 @@ import com.cognizant.devops.platformdal.groupemail.InsightsGroupEmailConfigurati
 import com.cognizant.devops.platformdal.icon.Icon;
 import com.cognizant.devops.platformdal.milestone.InsightsMileStoneOutcomeConfig;
 import com.cognizant.devops.platformdal.milestone.MileStoneConfig;
+import com.cognizant.devops.platformdal.offlineDataProcessing.InsightsOfflineConfig;
 import com.cognizant.devops.platformdal.outcome.InsightsOutcomeTools;
 import com.cognizant.devops.platformdal.outcome.InsightsTools;
 import com.cognizant.devops.platformdal.relationshipconfig.RelationshipConfiguration;
@@ -113,6 +114,7 @@ public class PlatformDALSessionFactoryProvider {
 		    configuration.addAnnotatedClass(InsightsGroupEmailConfiguration.class);
 		    configuration.addAnnotatedClass(InsightsAgentHealthDetails.class);
 		    configuration.addAnnotatedClass(InsightsComponentHealthDetails.class);
+		    configuration.addAnnotatedClass( InsightsOfflineConfig.class);
 		    
 		    
 			PostgreData postgre = ApplicationConfigProvider.getInstance().getPostgre();

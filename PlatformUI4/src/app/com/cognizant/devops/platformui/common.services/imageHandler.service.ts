@@ -97,12 +97,12 @@ export class ImageHandlerService implements IImageHandlerService {
         this.addImage('playlist_Menu', "icons/svg/homePage/svgmenuicons/playlist.svg");
         this.addImage('userName', "./icons/svg/login/userName.svg");
         this.addImage('password', "./icons/svg/login/password.svg");
-        this.addImage('list', "./icons/svg/landing page/list.svg");
-        this.addImage('thumb', "./icons/svg/landing page/view-thumb.svg");
-        this.addImage('searchIcon', "./icons/svg/landing page/searchIcon.svg");
-        this.addImage('dashboard_grp', "./icons/svg/landing page/dashboard_grp.svg");
-        this.addImage('star', "./icons/svg/landing page/star.svg");
-        this.addImage('time-reverse', "./icons/svg/landing page/time-reverse.svg");
+        this.addImage('list', "./icons/svg/landingpage/list.svg");
+        this.addImage('thumb', "./icons/svg/landingpage/view-thumb.svg");
+        this.addImage('searchIcon', "./icons/svg/landingpage/searchIcon.svg");
+        this.addImage('dashboard_grp', "./icons/svg/landingpage/dashboard_grp.svg");
+        this.addImage('star', "./icons/svg/landingpage/star.svg");
+        this.addImage('time-reverse', "./icons/svg/landingpage/time-reverse.svg");
         this.addImage('add', "./icons/svg/reportMgmt/add.svg");
         this.addImage('edit', "./icons/svg/reportMgmt/edit.svg");
         this.addImage('trash', "./icons/svg/reportMgmt/trash.svg");
@@ -129,8 +129,8 @@ export class ImageHandlerService implements IImageHandlerService {
         this.addImage('refreshHook', "./icons/svg/webhook/refreshHook.svg");
         this.addImage('arrow-down', "./icons/svg/agentManagement/arrow_down.svg");
         this.addImage('save', "./icons/svg/reportMgmt/save.svg");
-        this.addImage('folder', "./icons/svg/landing page/folder.svg");
-        this.addImage('refresh', "./icons/svg/landing page/time-reverse.svg");
+        this.addImage('folder', "./icons/svg/landingpage/folder.svg");
+        this.addImage('refresh', "./icons/svg/landingpage/time-reverse.svg");
         this.addImage('email_config', "./icons/svg/emailConfig/mail.svg");
 
         this.addImage('minus', "./icons/svg/reportMgmt/minus.svg");

@@ -58,14 +58,14 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		super(routingKey);
 	}
 
-	private String category;
-	private String toolName;
-	private String labelName;
+	private String category="";
+	private String toolName="";
+	private String labelName=null;
 	private Boolean isEnrichmentRequired= false;
 	private String targetProperty="";
 	private String keyPattern="";
 	private String sourceProperty ="";
-	private String agentId;
+	private String agentId="";
 	List<BusinessMappingData> businessMappingList = new ArrayList<>(0);
 	private Map<String,String> loggingInfo = new ConcurrentHashMap<>();
 
@@ -129,7 +129,6 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 			} 
 
 			if (json.isJsonArray()) {
-				
 				List<JsonObject> dataList = prepareDatalist(json,enableOnlineDatatagging);
 				String cypherQuery = prepareCypherQuery(labels,relationMetadata,dataUpdateSupported,uniqueKey);			
 				insertNodes(dataList,cypherQuery,routingKey);
@@ -191,7 +190,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		}
 	}
 	
-    private String getUniqueKey(JsonObject metadata) {
+	private String getUniqueKey(JsonObject metadata) {
     	String uniqueKey = "";
     	JsonArray uniqueKeyArray = metadata.getAsJsonArray("uniqueKey");
     	StringBuilder keys = new StringBuilder();
@@ -203,7 +202,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		return uniqueKey;    	
     }
     
-	private void insertNodes(List<JsonObject> dataList, String cypherQuery, String routingKey) throws InsightsCustomException {
+    private void insertNodes(List<JsonObject> dataList, String cypherQuery, String routingKey) throws InsightsCustomException {
 		List<List<JsonObject>> partitionList = partitionList(dataList, 1000);
 		for (List<JsonObject> chunk : partitionList) {
 			JsonObject graphResponse = dbHandler.bulkCreateNodes(chunk,cypherQuery);
@@ -300,7 +299,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		}
 	}
 	
-    private List<String> prepareBusinessMappingArray(JsonObject asJsonObject){
+	private List<String> prepareBusinessMappingArray(JsonObject asJsonObject){
     	List<String> businessMappingArray = new ArrayList<>(0);
     	
     	for (BusinessMappingData businessMappingData : businessMappingList) {
@@ -345,7 +344,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
     	return labelMap;
     }
 
-	private <T> List<List<T>> partitionList(List<T> list, final int size) {
+    private <T> List<List<T>> partitionList(List<T> list, final int size) {
 		List<List<T>> parts = new ArrayList<>();
 		final int N = list.size();
 		for (int i = 0; i < N; i += size) {

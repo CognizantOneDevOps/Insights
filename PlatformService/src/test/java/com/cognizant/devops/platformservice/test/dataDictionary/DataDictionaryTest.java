@@ -15,8 +15,11 @@
  *******************************************************************************/
 package com.cognizant.devops.platformservice.test.dataDictionary;
 
+import java.io.File;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -28,6 +31,8 @@ import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
@@ -35,6 +40,7 @@ import com.cognizant.devops.platformservice.agentmanagement.service.AgentConfigT
 import com.cognizant.devops.platformservice.agentmanagement.service.AgentManagementServiceImpl;
 import com.cognizant.devops.platformservice.rest.datadictionary.controller.DataDictionaryController;
 import com.cognizant.devops.platformservice.rest.datadictionary.service.DataDictionaryServiceImpl;
+import com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest;
 import com.cognizant.devops.platformservice.webhook.service.WebHookServiceImpl;
 import com.google.gson.JsonObject;
 
@@ -43,6 +49,7 @@ import com.google.gson.JsonObject;
 @WebAppConfiguration
 public class DataDictionaryTest extends DataDictionaryTestData {
 	public static final DataDictionaryTestData dataDictionaryTestData = new DataDictionaryTestData();
+	private static final Logger log = LogManager.getLogger(DataDictionaryTest.class);
 	
 	@Autowired
 	DataDictionaryServiceImpl dataDictionaryImpl;
@@ -50,15 +57,24 @@ public class DataDictionaryTest extends DataDictionaryTestData {
 	@Autowired
 	DataDictionaryController dataDictionaryController;
 	
+	JsonObject testData = new JsonObject();
+	
 	@BeforeClass
 	public void beforeMethod() throws InsightsCustomException {
+		try {
+			String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + TestngInitializerTest.TESTNG_TESTDATA + File.separator
+                    + TestngInitializerTest.TESTNG_PLATFORMSERVICE + File.separator + "DataDictionary.json";
+			testData = JsonUtils.getJsonData(path).getAsJsonObject();
+			
+		
+		
 		ApplicationConfigCache.loadConfigCache();
 		WebHookServiceImpl webhookServiceImp = new WebHookServiceImpl();
 		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		graphDBHandler = new GraphDBHandler();
 		
-		insertAgentDataInNeo4j(destCat, destLabel, gitAgentData);
-		insertAgentDataInNeo4j(sourceCat, sourcelabel, jiraAgentData);
+		insertAgentDataInNeo4j(destCat, destLabel, testData.get("gitAgentData").toString());
+		insertAgentDataInNeo4j(sourceCat, sourcelabel, testData.get("jiraAgentData").toString());
 		graphDBHandler.executeCypherQuery(dataDictionaryTestData.relationQuery);
 		
 		List<WebHookConfig> webhookConfigList = webhookServiceImp.getRegisteredWebHooks();
@@ -73,8 +89,11 @@ public class DataDictionaryTest extends DataDictionaryTestData {
 			String configJson = agentServiceImpl.getToolRawConfigFile("v9.1", "git",false);
 			String response = agentServiceImpl.registerAgent(dataDictionaryTestData.toolName,
 					dataDictionaryTestData.agentVersion, dataDictionaryTestData.osversion,
-					dataDictionaryTestData.configDetails, dataDictionaryTestData.trackingDetails, false,false,"Agent");
+					dataDictionaryTestData.testData.get("configDetails").toString(), dataDictionaryTestData.trackingDetails, false,false,"Agent");
 
+		}
+		} catch (Exception e) {
+			log.error("Error preparing data at data dictionary record ", e);
 		}
 		
 	}

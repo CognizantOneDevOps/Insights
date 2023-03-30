@@ -153,12 +153,15 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 					.and().addFilterAfter(new InsightsCustomCsrfFilter(), CsrfFilter.class);
 
 			http.exceptionHandling().authenticationEntryPoint(samlEntryPoint());
-			http.addFilterBefore(metadataGeneratorFilter(), ChannelProcessingFilter.class).addFilterAfter(samlFilter(),
-					BasicAuthenticationFilter.class);
+			http.addFilterBefore(metadataGeneratorFilter(), ChannelProcessingFilter.class)
+			.addFilterAfter(samlFilter(),BasicAuthenticationFilter.class);
 
-			http.anonymous().disable().authorizeRequests().antMatchers("/error").permitAll().antMatchers("/admin/**")
-					.access("hasAuthority('Admin')").antMatchers("/saml/**").permitAll()
-					// .antMatchers("/user/insightsso/**").permitAll() ///logout
+			http.anonymous().disable().authorizeHttpRequests()
+			
+			.antMatchers("/error/**").permitAll()
+			.antMatchers("/saml/**").permitAll()
+			.antMatchers("/admin/**").hasAuthority("Admin")
+			.requestMatchers("/configure/loadConfigFromResources").permitAll()
 					.anyRequest().authenticated();
 
 			http.logout().logoutSuccessUrl("/");
@@ -168,10 +171,10 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 	@Override
 	public void configure(WebSecurity web) throws Exception {
 		if (AUTHTYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
-			web.ignoring().antMatchers("/datasource/**");
+			web.ignoring()
+			.antMatchers("/datasource/**");
 		}
 	}
-
 	/**
 	 * Used to add filter in saml flow, This will call right filter based on Request
 	 * Matcher pattern
@@ -179,11 +182,11 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 	 * @return
 	 * @throws Exception
 	 */
-	@Bean
+    @Bean
 	@Conditional(InsightsSAMLBeanInitializationCondition.class)
 	public FilterChainProxy samlFilter() throws Exception {
 		LOG.debug("message Inside FilterChainProxy, initial bean **** ");
-
+   
 		AuthenticationUtils.setSecurityFilterchain(
 				new DefaultSecurityFilterChain(new AntPathRequestMatcher("/metadata/**"), metadataDisplayFilter()));//chains.add
 
@@ -230,6 +233,7 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 		WebSSOProfileOptions webSSOProfileOptions = new WebSSOProfileOptions();
 		webSSOProfileOptions.setRelayState("/user/insightsso/authenticateSSO");
 		webSSOProfileOptions.setIncludeScoping(false);
+		//webSSOProfileOptions.setForceAuthN(Boolean.TRUE);
 		return webSSOProfileOptions;
 	}
 
@@ -375,7 +379,7 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 	 * @return
 	 * @throws Exception
 	 */
-	@Bean
+	//@Bean
 	@Conditional(InsightsSAMLBeanInitializationCondition.class)
 	public InsightsAuthenticationFilter insightsServiceProcessingFilter() throws Exception {
 		return  new InsightsAuthenticationFilter("/**", authenticationManager());
@@ -387,7 +391,7 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 	 * @return
 	 * @throws Exception
 	 */
-	@Bean
+	//@Bean
 	@Conditional(InsightsSAMLBeanInitializationCondition.class)
 	public InsightsSAMLAuthenticationFilter insightsSSOProcessingFilter() {
 		 return new InsightsSAMLAuthenticationFilter();
@@ -676,7 +680,7 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 	/** This bean use to validate External Request 
 	 * @return
 	 */
-	@Bean
+	//@Bean
 	@Conditional(InsightsSAMLBeanInitializationCondition.class)
 	public InsightsExternalAPIAuthenticationFilter insightsExternalProcessingFilter() {
 		return new InsightsExternalAPIAuthenticationFilter();

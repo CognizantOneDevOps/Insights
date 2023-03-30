@@ -40,7 +40,7 @@ public class GrafanaUserDetailsService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String login) {
 		log.debug(" In GrafanaUserDetailsService Grafana ...... ");
-		BCryptPasswordEncoder encoder = passwordEncoder();
+		BCryptPasswordEncoder encoder = passwordEncoderGrafana();
 		UserDetails user = GrafanaUserDetailsUtil.getUserDetails(request);
 		return new org.springframework.security.core.userdetails.User(user.getUsername(),
 				encoder.encode(user.getPassword()), user.getAuthorities());
@@ -52,7 +52,7 @@ public class GrafanaUserDetailsService implements UserDetailsService {
 	 * @return
 	 */
 	@Bean
-	public BCryptPasswordEncoder passwordEncoder() {
+	public BCryptPasswordEncoder passwordEncoderGrafana() {
 		return new BCryptPasswordEncoder();
 	}
 

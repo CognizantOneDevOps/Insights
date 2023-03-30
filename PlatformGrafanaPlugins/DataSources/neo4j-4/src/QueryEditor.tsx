@@ -13,18 +13,18 @@ interface State {
 
 }
 
-const cacheTypes: Array<SelectableValue> = [
+const cacheTypes: SelectableValue[] = [
   { value: 'Fixed Time', label: 'Fixed Time' },
   { value: 'Variance Time', label: 'Variance Time' }
 ];
 
-const fixedTime: Array<SelectableValue> = [
+const fixedTime: SelectableValue[] = [
   { value: '1', label: '1' },
   { value: '2', label: '2' },
   { value: '3', label: '3' }
 ];
 
-const varianeTime: Array<SelectableValue> = [
+const varianeTime: SelectableValue[] = [
   { value: '5', label: '5' },
   { value: '10', label: '10' },
   { value: '15', label: '15' }
@@ -70,10 +70,10 @@ export class QueryEditor extends PureComponent<Props, State> {
       this.props.query['cache'] = !this.props.query[type];
     } else {
       Object.keys(this.props.query).forEach(c => {
-        if (c == type) {
+        if (c === type) {
           obj[type] = !this.props.query[type];
           this.props.query[type] = !this.props.query[type];
-        } else if (c == 'constant' || c == 'queryText' || c == 'cypherQuery' || c == 'refId') {
+        } else if (c === 'constant' || c === 'queryText' || c === 'cypherQuery' || c === 'refId') {
           // do nothing
         }
         else {

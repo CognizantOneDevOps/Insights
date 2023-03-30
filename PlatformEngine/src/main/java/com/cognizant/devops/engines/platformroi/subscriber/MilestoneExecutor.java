@@ -44,8 +44,10 @@ public class MilestoneExecutor {
 
 			List<MileStoneConfig> mileStoneConfigList =  mileStoneConfigDAL.fetchMileStoneByStatus();
 			
-			for (MileStoneConfig mileStoneConfig : mileStoneConfigList) {
+			for (MileStoneConfig mileStoneConfig : mileStoneConfigList) { 
+				
 				publishMilestoneDetail(mileStoneConfig);
+
 			}
 			log.debug(" Milestone Executor completed successfully ");
 		}catch (Exception e) {

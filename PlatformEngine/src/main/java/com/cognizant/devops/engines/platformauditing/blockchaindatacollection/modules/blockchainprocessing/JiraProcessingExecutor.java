@@ -68,6 +68,7 @@ public class JiraProcessingExecutor implements Job, ApplicationConfigInterface {
     private String keyAlgorithm = config.get("keyAlgorithm").getAsString();
     String jobName="";
 
+   
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		LOG.info("Blockchain Processing Executer jira module is getting executed");
@@ -77,6 +78,7 @@ public class JiraProcessingExecutor implements Job, ApplicationConfigInterface {
 			EngineStatusLogger.getInstance().createSchedularTaskStatusNode("JiraProcessingExecutor execution Start ",
 					PlatformServiceConstants.SUCCESS,jobName);
 			ApplicationConfigInterface.loadConfiguration();
+
 			JiraNodeExtraction();
 		} catch (InsightsCustomException e) {
 			LOG.error(e);
@@ -98,7 +100,7 @@ public class JiraProcessingExecutor implements Job, ApplicationConfigInterface {
 		cypher.append("NOT \"SPRINT\" IN labels(n) AND ");
 		cypher.append("(NOT EXISTS (n.").append(blockchainProcessedFlag).append(") ");
 		cypher.append("OR n.").append(blockchainProcessedFlag).append(" = false) ");
-
+		
 		try {
 			LOG.debug("into try block");
 			boolean nextBatchQuery = true;
@@ -177,7 +179,7 @@ public class JiraProcessingExecutor implements Job, ApplicationConfigInterface {
 		}
 	}
 	
-    private String getHash(JsonArray row) {
+	private String getHash(JsonArray row) {
         String dataString = "";
         HashCode sb = null;        
         if(row.get(0).getAsJsonObject().has("changeId")){

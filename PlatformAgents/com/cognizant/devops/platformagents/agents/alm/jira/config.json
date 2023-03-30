@@ -132,10 +132,26 @@
 			"Cancelled",
 			"implemented"
 		],
+		"selectedProject":[],
 		"extensions": {
+			"projects": {
+				"runSchedule": 1440,
+				"projectApiUrl" : "https://<JIRA_HOST>/rest/api/2/project",
+				"projectMetaData" :{
+				"labels": [
+					"JIRA_PROJECTS"
+				],
+				"deteUpdateSupported": true,
+				"uniqueKey": [
+					"key",
+					"id"
+				]
+			}
+		},
 			"backlog1": {
 				"runSchedule": 720,
 				"boardApiUrl": "https://<JIRA_HOST>/rest/agile/1.0/board",
+				"boardProjectApiUrl": "https://<JIRA_HOST>/rest/agile/1.0/board/boardId/project",
 				"backlogMetaDate": {
 					"labels": [
 						"BACKLOG"
@@ -147,6 +163,21 @@
 					]
 				}
 			},
+			"boards":{
+				"runSchedule":1440,
+				"boardApiUrl":"https://<JIRA_HOST>/rest/agile/1.0/board",
+				"boardProjectApiUrl":"https://<JIRA_HOST>/rest/agile/1.0/board/boardId/project",
+				"boardMetaData":{
+				  "labels": [
+					"JIRA_PROJECT_BOARD"
+					],
+					"dataUpdateSupported": true,
+					"uniqueKey": [
+					"boardId",
+					"projectId"
+					]
+				}
+			  },
 			"sprints": {
 				"insightsTimeXFieldMapping": {
 					"timefield": "sprintCompleteDate",

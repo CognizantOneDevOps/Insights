@@ -31,8 +31,8 @@ echo "Install Python 3.10 with required libraries needed for Insights"
 wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL7/reference-DocRoot-Scripts/insights_python3.sh -O insights_python.sh && dos2unix insights_python.sh && sh insights_python.sh
 echo "Install Erlang and RabbitMQ"
 wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL7/reference-DocRoot-Scripts/insights_rabbitmq.sh -O insights_rabbitmq.sh && dos2unix insights_rabbitmq.sh && sh insights_rabbitmq.sh
-echo "Install Tomcat "
-wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL7/reference-DocRoot-Scripts/insights_tomcat.sh -O insights_tomcat.sh && dos2unix insights_tomcat.sh && sh insights_tomcat.sh
+echo "Install Service and UI "
+wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL7/reference-DocRoot-Scripts/insights_UI_Service.sh -O insights_UI_Service.sh && dos2unix insights_UI_Service.sh && sh insights_UI_Service.sh
 echo "Get Insights Engine"
 wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/RHEL7/reference-DocRoot-Scripts/insights_enginejar.sh -O insights_enginejar.sh && dos2unix insights_enginejar.sh && sh insights_enginejar.sh
 echo "Install Insights Workflow"

@@ -4,7 +4,7 @@
 	<test name="PlatformServiceTest" preserve-order="true">
 		<classes>
 			<class name="com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest" />  	
-   	 		<class name="com.cognizant.devops.platformservice.test.agentManagement.AgentManagementTest" />  
+   	 	    <class name="com.cognizant.devops.platformservice.test.agentManagement.AgentManagementTest" />  
 			<class name="com.cognizant.devops.platformservice.test.CorrelationBuilder.CorrelationBuilderTest" />
 			<class name="com.cognizant.devops.platformservice.test.bulkUpload.BulkUploadTest" />
 			<class name="com.cognizant.devops.platformservice.test.dataDictionary.DataDictionaryTest" />
@@ -26,8 +26,9 @@
 			<class name="com.cognizant.devops.platformservice.test.milestone.OutcomeServiceTest" />
 			<class name="com.cognizant.devops.platformservice.test.milestone.MilestoneServiceTest" />  
 			<class name="com.cognizant.devops.platformservice.test.healthStatus.HealthStatusTest" />
-			<class name = "com.cognizant.devops.platformservice.test.InferenceDataProvider.InferenceDataProviderTest" /> 
-			<class name = "com.cognizant.devops.platformservice.test.groupEmail.GroupEmailTest" />
+			<class name ="com.cognizant.devops.platformservice.test.InferenceDataProvider.InferenceDataProviderTest" /> 
+			<class name ="com.cognizant.devops.platformservice.test.groupEmail.GroupEmailTest" />
+			<class name ="com.cognizant.devops.platformservice.test.offlineDataProcessing.OfflineDataProcessingTest" />	
 		</classes>
 	</test>
 </suite>

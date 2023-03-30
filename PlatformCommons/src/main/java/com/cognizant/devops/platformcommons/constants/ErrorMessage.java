@@ -23,9 +23,9 @@ public final class ErrorMessage {
 	 public static final String USERNAME_MISSING = "Missing Username";
 	 public static final String ROLES_MISSING = "Missing Roles";
 	 public static final String LAYOUT_SETTINGS_MISSING = "Layout settings are not specified";
-	public static final String ERRORLOG="errorLog";
-	public static final String PDFEXECUTION_ERROR="PDFExecutionSubscriber Completed with error ";
-	public static final String WORKFLOW_ERROR="Worlflow Detail ==== Error setting PDF details in Email History table";
-	public static final String FETCH_ERROR_MESSAGE="Error while fetching execution ids";
+	 public static final String ERRORLOG="errorLog";
+	 public static final String PDFEXECUTION_ERROR="PDFExecutionSubscriber Completed with error ";
+	 public static final String WORKFLOW_ERROR="Worlflow Detail ==== Error setting PDF details in Email History table";
+	 public static final String FETCH_ERROR_MESSAGE="Error while fetching execution ids";
 	 						
 }

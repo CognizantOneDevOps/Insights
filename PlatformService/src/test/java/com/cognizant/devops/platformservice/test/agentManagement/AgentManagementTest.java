@@ -31,22 +31,25 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.agentmanagement.controller.InsightsAgentConfiguration;
 import com.cognizant.devops.platformservice.agentmanagement.service.AgentManagementServiceImpl;
+import com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-import net.minidev.json.JSONObject;
+
 
 @Test
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
 @WebAppConfiguration
 public class AgentManagementTest extends AgentManagementTestData {
-
+	JsonObject testData = new JsonObject();	
 	public static final AgentManagementTestData agentManagementTestData = new AgentManagementTestData();
 	public static final AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
 	private static Logger log = LogManager.getLogger(AgentManagementTestData.class);
@@ -58,6 +61,9 @@ public class AgentManagementTest extends AgentManagementTestData {
 	@BeforeClass
 	public void prepareData() throws InsightsCustomException {
 		try {
+			String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + TestngInitializerTest.TESTNG_TESTDATA + File.separator
+					+ TestngInitializerTest.TESTNG_PLATFORMSERVICE + File.separator + "AgentManagement.json";
+			testData = JsonUtils.getJsonData(path).getAsJsonObject();
 			prepareOfflineAgent(version);
 		} catch (Exception e) {
 			log.error("message", e);
@@ -95,16 +101,16 @@ public class AgentManagementTest extends AgentManagementTestData {
 	public void testRegisterAgent() throws InsightsCustomException {
 		String expectedOutcome = "success";
 
-		JSONObject obj = new JSONObject();
+		JsonObject obj = new JsonObject();
 
-		obj.put("toolName", "git");
-		obj.put("agentVersion", "v9.1");
-		obj.put("osversion", osversion);
-		obj.put("configJson", configDetails);
-		obj.put("trackingDetails", trackingDetails);
-		obj.put("vault", false);
-		obj.put("isWebhook", false);
-		obj.put("type", "Agent");
+		obj.addProperty("toolName", "git");
+		obj.addProperty("agentVersion", "v9.1");
+		obj.addProperty("osversion", osversion);
+		obj.addProperty("configJson", testData.get("configDetails").toString());
+		obj.addProperty("trackingDetails", trackingDetails);
+		obj.addProperty("vault", false);
+		obj.addProperty("isWebhook", false);
+		obj.addProperty("type", "Agent");
 
 		String jsonobj = obj.toString();
 		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
@@ -117,16 +123,16 @@ public class AgentManagementTest extends AgentManagementTestData {
 	public void testRegisterAgentWithDuplicateId() throws InsightsCustomException {
 		String expectedOutcome = "Agent Id already exsits.";
 
-		JSONObject obj = new JSONObject();
+		JsonObject obj = new JsonObject();
 
-		obj.put("toolName", "git");
-		obj.put("agentVersion", "v9.1");
-		obj.put("osversion", osversion);
-		obj.put("configJson", configDetails);
-		obj.put("trackingDetails", trackingDetails);
-		obj.put("vault", false);
-		obj.put("isWebhook", false);
-		obj.put("type", "Agent");
+		obj.addProperty("toolName", "git");
+		obj.addProperty("agentVersion", "v9.1");
+		obj.addProperty("osversion", osversion);
+		obj.addProperty("configJson", testData.get("configDetails").toString());
+		obj.addProperty("trackingDetails", trackingDetails);
+		obj.addProperty("vault", false);
+		obj.addProperty("isWebhook", false);
+		obj.addProperty("type", "Agent");
 
 		String jsonobj = obj.toString();
 		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
@@ -140,16 +146,16 @@ public class AgentManagementTest extends AgentManagementTestData {
 	public void testAgentIDandToolNamenotequal() throws InsightsCustomException {
 		String expectedOutcome = "Agent Id and Tool name cannot be the same.";
 
-		JSONObject obj = new JSONObject();
+		JsonObject obj = new JsonObject();
 
-		obj.put("toolName", "git");
-		obj.put("agentVersion", "v9.1");
-		obj.put("osversion", osversion);
-		obj.put("configJson", configDetailsWithSameIDs);
-		obj.put("trackingDetails", trackingDetails);
-		obj.put("vault", false);
-		obj.put("isWebhook", false);
-		obj.put("type", "Agent");
+		obj.addProperty("toolName", "git");
+		obj.addProperty("agentVersion", "v9.1");
+		obj.addProperty("osversion", osversion);
+		obj.addProperty("configJson", testData.get("configDetailsWithSameIDs").toString());
+		obj.addProperty("trackingDetails", trackingDetails);
+		obj.addProperty("vault", false);
+		obj.addProperty("isWebhook", false);
+		obj.addProperty("type", "Agent");
 
 		String jsonobj = obj.toString();
 		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
@@ -163,16 +169,16 @@ public class AgentManagementTest extends AgentManagementTestData {
 	public void testRegisterAgentWithInvalidDataLabelName() throws InsightsCustomException {
 		String expectedOutcome = "Invalid data label Name, it should contain only alphanumeric character,underscore & dot";
 
-		JSONObject obj = new JSONObject();
+		JsonObject obj = new JsonObject();
 
-		obj.put("toolName", "git");
-		obj.put("agentVersion", "v9.1");
-		obj.put("osversion", osversion);
-		obj.put("configJson", configDetailsWithInvalidDataLabel);
-		obj.put("trackingDetails", trackingDetails);
-		obj.put("vault", false);
-		obj.put("isWebhook", false);
-		obj.put("type", "Agent");
+		obj.addProperty("toolName", "git");
+		obj.addProperty("agentVersion", "v9.1");
+		obj.addProperty("osversion", osversion);
+		obj.addProperty("configJson", testData.get("configDetailsWithInvalidDataLabel").toString());
+		obj.addProperty("trackingDetails", trackingDetails);
+		obj.addProperty("vault", false);
+		obj.addProperty("isWebhook", false);
+		obj.addProperty("type", "Agent");
 
 		String jsonobj = obj.toString();
 		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
@@ -186,16 +192,16 @@ public class AgentManagementTest extends AgentManagementTestData {
 	public void testRegisterAgentWithInvalidHealthLabelName() throws InsightsCustomException {
 		String expectedOutcome = "Invalid health label Name, it should contain only alphanumeric character,underscore & dot";
 
-		JSONObject obj = new JSONObject();
+		JsonObject obj = new JsonObject();
 
-		obj.put("toolName", "git");
-		obj.put("agentVersion", "v9.1");
-		obj.put("osversion", osversion);
-		obj.put("configJson", configDetailsWithInvalidHealthLabel);
-		obj.put("trackingDetails", trackingDetails);
-		obj.put("vault", false);
-		obj.put("isWebhook", false);
-		obj.put("type", "Agent");
+		obj.addProperty("toolName", "git");
+		obj.addProperty("agentVersion", "v9.1");
+		obj.addProperty("osversion", osversion);
+		obj.addProperty("configJson", testData.get("configDetailsWithInvalidHealthLabel").toString());
+		obj.addProperty("trackingDetails", trackingDetails);
+		obj.addProperty("vault", false);
+		obj.addProperty("isWebhook", false);
+		obj.addProperty("type", "Agent");
 
 		String jsonobj = obj.toString();
 		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
@@ -330,17 +336,17 @@ public class AgentManagementTest extends AgentManagementTestData {
 		String expectedOutcome = "success";
 		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
 
-		JSONObject obj = new JSONObject();
+		JsonObject obj = new JsonObject();
 
-		obj.put("agentId", agentId);
-		obj.put("toolName", "git");
-		obj.put("agentVersion", "v9.1");
-		obj.put("osversion", osversion);
-		obj.put("configJson", configDetailsToUpdateAgent);
-		obj.put("trackingDetails", trackingDetails);
-		obj.put("vault", false);
-		obj.put("isWebhook", false);
-		obj.put("type", "Agent");
+		obj.addProperty("agentId", agentId);
+		obj.addProperty("toolName", "git");
+		obj.addProperty("agentVersion", "v9.1");
+		obj.addProperty("osversion", osversion);
+		obj.addProperty("configJson", testData.get("configDetailsToUpdateAgent").toString());
+		obj.addProperty("trackingDetails", trackingDetails);
+		obj.addProperty("vault", false);
+		obj.addProperty("isWebhook", false);
+		obj.addProperty("type", "Agent");
 
 		String jsonobj = obj.toString();
 		JsonObject response = insightsAgentConfiguration.updateAgent(jsonobj);
@@ -352,17 +358,17 @@ public class AgentManagementTest extends AgentManagementTestData {
 	public void testUpdateAgentVersion() throws InsightsCustomException {
 		String expectedOutcome = "success";
 
-		JSONObject obj = new JSONObject();
+		JsonObject obj = new JsonObject();
 
-		obj.put("agentId", agentId);
-		obj.put("toolName", "git");
-		obj.put("agentVersion", "v9.1");
-		obj.put("osversion", osversion);
-		obj.put("configJson", configDetailsToUpdateAgent);
-		obj.put("trackingDetails", trackingDetails);
-		obj.put("vault", false);
-		obj.put("isWebhook", false);
-		obj.put("type", "Agent");
+		obj.addProperty("agentId", agentId);
+		obj.addProperty("toolName", "git");
+		obj.addProperty("agentVersion", "v9.1");
+		obj.addProperty("osversion", osversion);
+		obj.addProperty("configJson", testData.get("configDetailsToUpdateAgent").toString());
+		obj.addProperty("trackingDetails", trackingDetails);
+		obj.addProperty("vault", false);
+		obj.addProperty("isWebhook", false);
+		obj.addProperty("type", "Agent");
 
 		String jsonobj = obj.toString();
 		JsonObject response = insightsAgentConfiguration.updateAgent(jsonobj);
@@ -412,16 +418,16 @@ public class AgentManagementTest extends AgentManagementTestData {
 
 		String expectedOutcome = "success";
 
-		JSONObject obj = new JSONObject();
+		JsonObject obj = new JsonObject();
 
-		obj.put("toolName", "git");
-		obj.put("agentVersion", "v9.1");
-		obj.put("osversion", osversion);
-		obj.put("configJson", webhookConfigDetails);
-		obj.put("trackingDetails", trackingDetails);
-		obj.put("vault", false);
-		obj.put("isWebhook", true);
-		obj.put("type", "Webhook");
+		obj.addProperty("toolName", "git");
+		obj.addProperty("agentVersion", "v9.1");
+		obj.addProperty("osversion", osversion);
+		obj.addProperty("configJson", testData.get("webhookConfigDetails").toString());
+		obj.addProperty("trackingDetails", trackingDetails);
+		obj.addProperty("vault", false);
+		obj.addProperty("isWebhook", true);
+		obj.addProperty("type", "Webhook");
 
 		String jsonobj = obj.toString();
 		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
@@ -435,16 +441,16 @@ public class AgentManagementTest extends AgentManagementTestData {
 
 		String expectedOutcome = "Agent Id already exsits.";
 
-		JSONObject obj = new JSONObject();
+		JsonObject obj = new JsonObject();
 
-		obj.put("toolName", "git");
-		obj.put("agentVersion", "v9.1");
-		obj.put("osversion", osversion);
-		obj.put("configJson", webhookConfigDetails);
-		obj.put("trackingDetails", trackingDetails);
-		obj.put("vault", false);
-		obj.put("isWebhook", true);
-		obj.put("type", "Webhook");
+		obj.addProperty("toolName", "git");
+		obj.addProperty("agentVersion", "v9.1");
+		obj.addProperty("osversion", osversion);
+		obj.addProperty("configJson", testData.get("webhookConfigDetails").toString());
+		obj.addProperty("trackingDetails", trackingDetails);
+		obj.addProperty("vault", false);
+		obj.addProperty("isWebhook", true);
+		obj.addProperty("type", "Webhook");
 
 		String jsonobj = obj.toString();
 		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
@@ -457,16 +463,16 @@ public class AgentManagementTest extends AgentManagementTestData {
 	public void testRegisterWebhookWithInvalidDataLabelName() throws InsightsCustomException {
 
 		String expectedOutcome = "Invalid data label Name, it should contain only alphanumeric character,underscore & dot";
-		JSONObject obj = new JSONObject();
+		JsonObject obj = new JsonObject();
 
-		obj.put("toolName", "git");
-		obj.put("agentVersion", "v9.1");
-		obj.put("osversion", osversion);
-		obj.put("configJson", webhookConfigDetailsWithInvalidDataLabel);
-		obj.put("trackingDetails", trackingDetails);
-		obj.put("vault", false);
-		obj.put("isWebhook", true);
-		obj.put("type", "Webhook");
+		obj.addProperty("toolName", "git");
+		obj.addProperty("agentVersion", "v9.1");
+		obj.addProperty("osversion", osversion);
+		obj.addProperty("configJson", testData.get("webhookConfigDetailsWithInvalidDataLabel").toString());
+		obj.addProperty("trackingDetails", trackingDetails);
+		obj.addProperty("vault", false);
+		obj.addProperty("isWebhook", true);
+		obj.addProperty("type", "Webhook");
 
 		String jsonobj = obj.toString();
 		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
@@ -480,16 +486,16 @@ public class AgentManagementTest extends AgentManagementTestData {
 
 		String expectedOutcome = "Invalid health label Name, it should contain only alphanumeric character,underscore & dot";
 
-		JSONObject obj = new JSONObject();
+		JsonObject obj = new JsonObject();
 
-		obj.put("toolName", "git");
-		obj.put("agentVersion", "v9.1");
-		obj.put("osversion", osversion);
-		obj.put("configJson", webhookConfigDetailsWithInvalidHealthLabel);
-		obj.put("trackingDetails", trackingDetails);
-		obj.put("vault", false);
-		obj.put("isWebhook", true);
-		obj.put("type", "Webhook");
+		obj.addProperty("toolName", "git");
+		obj.addProperty("agentVersion", "v9.1");
+		obj.addProperty("osversion", osversion);
+		obj.addProperty("configJson", testData.get("webhookConfigDetailsWithInvalidHealthLabel").toString());
+		obj.addProperty("trackingDetails", trackingDetails);
+		obj.addProperty("vault", false);
+		obj.addProperty("isWebhook", true);
+		obj.addProperty("type", "Webhook");
 
 		String jsonobj = obj.toString();
 		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
@@ -513,16 +519,16 @@ public class AgentManagementTest extends AgentManagementTestData {
 
 		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
 
-		JSONObject obj = new JSONObject();
+		JsonObject obj = new JsonObject();
 
-		obj.put("toolName", gitTool);
-		obj.put("agentVersion", version);
-		obj.put("osversion", osversion);
-		obj.put("configJson", ConfigDetailsWithInvalidAgentId);
-		obj.put("trackingDetails", trackingDetails);
-		obj.put("vault", false);
-		obj.put("isWebhook", false);
-		obj.put("type", "Agent");
+		obj.addProperty("toolName", gitTool);
+		obj.addProperty("agentVersion", version);
+		obj.addProperty("osversion", osversion);
+		obj.addProperty("configJson", testData.get("ConfigDetailsWithInvalidAgentId").toString());
+		obj.addProperty("trackingDetails", trackingDetails);
+		obj.addProperty("vault", false);
+		obj.addProperty("isWebhook", false);
+		obj.addProperty("type", "Agent");
 
 		String jsonobj = obj.toString();
 		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
@@ -538,17 +544,17 @@ public class AgentManagementTest extends AgentManagementTestData {
 		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
 		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
 
-		JSONObject obj = new JSONObject();
+		JsonObject obj = new JsonObject();
 
-		obj.put("agentId", webhookAgentId);
-		obj.put("toolName", "git");
-		obj.put("agentVersion", "v9.1");
-		obj.put("osversion", osversion);
-		obj.put("configJson", configDetailsToUpdateWebhook);
-		obj.put("trackingDetails", trackingDetails);
-		obj.put("vault", false);
-		obj.put("isWebhook", true);
-		obj.put("type", "Webhook");
+		obj.addProperty("agentId", webhookAgentId);
+		obj.addProperty("toolName", "git");
+		obj.addProperty("agentVersion", "v9.1");
+		obj.addProperty("osversion", osversion);
+		obj.addProperty("configJson", testData.get("configDetailsToUpdateWebhook").toString());
+		obj.addProperty("trackingDetails", trackingDetails);
+		obj.addProperty("vault", false);
+		obj.addProperty("isWebhook", true);
+		obj.addProperty("type", "Webhook");
 
 		String jsonobj = obj.toString();
 		JsonObject response = insightsAgentConfiguration.updateAgent(jsonobj);
@@ -594,16 +600,16 @@ public class AgentManagementTest extends AgentManagementTestData {
 		}
 		String expectedOutcome = "success";
 
-		JSONObject obj = new JSONObject();
+		JsonObject obj = new JsonObject();
 
-		obj.put("toolName", ROITool);
-		obj.put("agentVersion", "v9.1");
-		obj.put("osversion", osversion);
-		obj.put("configJson", configDetailsForROIAgent);
-		obj.put("trackingDetails", trackingDetails);
-		obj.put("vault", false);
-		obj.put("isWebhook", false);
-		obj.put("type", "ROIAgent");
+		obj.addProperty("toolName", ROITool);
+		obj.addProperty("agentVersion", "v9.1");
+		obj.addProperty("osversion", osversion);
+		obj.addProperty("configJson", testData.get("configDetailsForROIAgent").toString());
+		obj.addProperty("trackingDetails", trackingDetails);
+		obj.addProperty("vault", false);
+		obj.addProperty("isWebhook", false);
+		obj.addProperty("type", "ROIAgent");
 
 		String jsonobj = obj.toString();
 		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
@@ -620,16 +626,16 @@ public class AgentManagementTest extends AgentManagementTestData {
 		}
 		String expectedOutcome = "Agent Id already exsits.";
 
-		JSONObject obj = new JSONObject();
+		JsonObject obj = new JsonObject();
 
-		obj.put("toolName", ROITool);
-		obj.put("agentVersion", "v9.1");
-		obj.put("osversion", osversion);
-		obj.put("configJson", configDetailsForROIAgent);
-		obj.put("trackingDetails", trackingDetails);
-		obj.put("vault", false);
-		obj.put("isWebhook", false);
-		obj.put("type", "ROIAgent");
+		obj.addProperty("toolName", ROITool);
+		obj.addProperty("agentVersion", "v9.1");
+		obj.addProperty("osversion", osversion);
+		obj.addProperty("configJson", testData.get("configDetailsForROIAgent").toString());
+		obj.addProperty("trackingDetails", trackingDetails);
+		obj.addProperty("vault", false);
+		obj.addProperty("isWebhook", false);
+		obj.addProperty("type", "ROIAgent");
 
 		String jsonobj = obj.toString();
 		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
@@ -647,16 +653,16 @@ public class AgentManagementTest extends AgentManagementTestData {
 		}
 		String expectedOutcome = "Invalid data label Name, it should contain only alphanumeric character,underscore & dot";
 
-		JSONObject obj = new JSONObject();
+		JsonObject obj = new JsonObject();
 
-		obj.put("toolName", ROITool);
-		obj.put("agentVersion", "v9.1");
-		obj.put("osversion", osversion);
-		obj.put("configJson", configDetailsForROIAgentWithInvalidDataLabel);
-		obj.put("trackingDetails", trackingDetails);
-		obj.put("vault", false);
-		obj.put("isWebhook", false);
-		obj.put("type", "ROIAgent");
+		obj.addProperty("toolName", ROITool);
+		obj.addProperty("agentVersion", "v9.1");
+		obj.addProperty("osversion", osversion);
+		obj.addProperty("configJson", testData.get("configDetailsForROIAgentWithInvalidDataLabel").toString());
+		obj.addProperty("trackingDetails", trackingDetails);
+		obj.addProperty("vault", false);
+		obj.addProperty("isWebhook", false);
+		obj.addProperty("type", "ROIAgent");
 
 		String jsonobj = obj.toString();
 		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
@@ -674,16 +680,16 @@ public class AgentManagementTest extends AgentManagementTestData {
 		}
 		String expectedOutcome = "Invalid health label Name, it should contain only alphanumeric character,underscore & dot";
 
-		JSONObject obj = new JSONObject();
+		JsonObject obj = new JsonObject();
 
-		obj.put("toolName", ROITool);
-		obj.put("agentVersion", "v9.1");
-		obj.put("osversion", osversion);
-		obj.put("configJson", configDetailsForROIAgentWithInvalidHealthLabel);
-		obj.put("trackingDetails", trackingDetails);
-		obj.put("vault", false);
-		obj.put("isWebhook", false);
-		obj.put("type", "ROIAgent");
+		obj.addProperty("toolName", ROITool);
+		obj.addProperty("agentVersion", "v9.1");
+		obj.addProperty("osversion", osversion);
+		obj.addProperty("configJson", testData.get("configDetailsForROIAgentWithInvalidHealthLabel").toString());
+		obj.addProperty("trackingDetails", trackingDetails);
+		obj.addProperty("vault", false);
+		obj.addProperty("isWebhook", false);
+		obj.addProperty("type", "ROIAgent");
 
 		String jsonobj = obj.toString();
 		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);
@@ -710,17 +716,17 @@ public class AgentManagementTest extends AgentManagementTestData {
 		String expectedOutcome = "failure";
 		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
 
-		JSONObject obj = new JSONObject();
+		JsonObject obj = new JsonObject();
 
-		obj.put("agentId", "");
-		obj.put("toolName", "git");
-		obj.put("agentVersion", "v9.1");
-		obj.put("osversion", osversion);
-		obj.put("configJson", configDetailsToUpdateAgent);
-		obj.put("trackingDetails", trackingDetails);
-		obj.put("vault", false);
-		obj.put("isWebhook", false);
-		obj.put("type", "Agent");
+		obj.addProperty("agentId", "");
+		obj.addProperty("toolName", "git");
+		obj.addProperty("agentVersion", "v9.1");
+		obj.addProperty("osversion", osversion);
+		obj.addProperty("configJson", testData.get("configDetailsToUpdateAgent").toString());
+		obj.addProperty("trackingDetails", trackingDetails);
+		obj.addProperty("vault", false);
+		obj.addProperty("isWebhook", false);
+		obj.addProperty("type", "Agent");
 
 		String jsonobj = obj.toString();
 		JsonObject response = insightsAgentConfiguration.updateAgent(jsonobj);
@@ -800,16 +806,16 @@ public class AgentManagementTest extends AgentManagementTestData {
 		String expectedOutcome = "success";
 		String oldVersion = "v9.1";
 
-		JSONObject obj = new JSONObject();
+		JsonObject obj = new JsonObject();
 
-		obj.put("toolName", gitTool);
-		obj.put("agentVersion", oldVersion);
-		obj.put("osversion", osversion);
-		obj.put("configJson", configDetailsForTracking);
-		obj.put("trackingDetails", tracking);
-		obj.put("vault", false);
-		obj.put("isWebhook", false);
-		obj.put("type", "Agent");
+		obj.addProperty("toolName", gitTool);
+		obj.addProperty("agentVersion", oldVersion);
+		obj.addProperty("osversion", osversion);
+		obj.addProperty("configJson", testData.get("configDetailsForTracking").toString());
+		obj.addProperty("trackingDetails", testData.get("tracking").toString());
+		obj.addProperty("vault", false);
+		obj.addProperty("isWebhook", false);
+		obj.addProperty("type", "Agent");
 
 		String jsonobj = obj.toString();
 		JsonObject response = insightsAgentConfiguration.registerAgentV2(jsonobj);

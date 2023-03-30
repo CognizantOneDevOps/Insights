@@ -20,7 +20,7 @@ import sys
 import os
 from datetime import datetime, timedelta
 from ....core.BaseAgent3 import BaseAgent
-from ....core.ROIUtilities import ROIUtilities
+from .ROIUtilities import ROIUtilities
 import json
 import threading
 import base64

@@ -66,7 +66,7 @@ public abstract class WorkflowTaskSubscriberHandler {
 	 * @throws Exception
 	 */
 	public void registerSubscriber(String routingKey) throws IOException, InsightsCustomException, TimeoutException {
-
+		
 		try {
 			String queueName = routingKey.replace(".", "_");
 			
@@ -141,6 +141,7 @@ public abstract class WorkflowTaskSubscriberHandler {
 	 * @return
 	 */
 	private synchronized int workflowTaskPreProcesser(byte[] body) {
+		
 		int exectionHistoryId = -1;
 		try {
 			String message = new String(body, StandardCharsets.UTF_8);
@@ -175,21 +176,21 @@ public abstract class WorkflowTaskSubscriberHandler {
 	 * @param status
 	 */
 	private synchronized void workflowTaskPostProcesser(byte[] body, int exectionHistoryId, String status) {
+		
 		String workflowId = "";
 		try {
 			String message = new String(body, StandardCharsets.UTF_8);
 
-			log.debug("Worlflow Detail ==== workflowTaskPostProcesser message handleDelivery ===== {} ", message);
 			Map<String, Object> requestMessage = WorkflowUtils.convertJsonObjectToMap(message);
 
 			workflowId = (String) requestMessage.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID);
-			// update complete time in INSIGHTS_WORKFLOW_EXECUTION_ENTITY
+			// update complete time in INSIGHTS_WORKFLOW_EXECUTION_ENTITY			
 			workflowStateProcess.updateWorkflowExecutionHistory(exectionHistoryId, status, statusLog);
 			// send message to next task
 			if (status.equalsIgnoreCase(WorkflowTaskEnum.WorkflowStatus.COMPLETED.toString())) {
 				workflowStateProcess.publishMessageToNextInMQ(requestMessage);
 			} else {
-				log.error("Worlflow Detail ==== Current execution status not completed Status is {} message is {} ",
+				log.error("Worlflow Detail ==== workflowId {} Current execution status not completed Status is {} message is {} ", workflowId,
 						status, message);
 			}
 			// Mq ack message
@@ -211,6 +212,7 @@ public abstract class WorkflowTaskSubscriberHandler {
 	 * @param exectionHistoryId
 	 */
 	private synchronized void workflowTaskErrorHandler(byte[] body, int exectionHistoryId) {
+		
 		try {
 			String message = new String(body, StandardCharsets.UTF_8);
 			log.debug("Worlflow Detail ==== Error Handler  ===== {} ", message);

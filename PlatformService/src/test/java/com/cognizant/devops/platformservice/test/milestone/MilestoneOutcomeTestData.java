@@ -48,20 +48,8 @@ public class MilestoneOutcomeTestData  extends AbstractTestNGSpringContextTests 
 	int milestoneOutcomeConfigId=0;
 	String toolName = "NEWRELIC";
 	String outcomeNameString = "Threads_Count";
-	String saveOutcomeJson = "{\"outcomeName\":\""+outcomeNameString+"\",\"outcomeType\":\"Tech\",\"toolName\":\"toolNameeee1\",\"newRelicAppId\":\"\",\"splunkIndex\":\"\",\"appDynamicsAppName\":\"\",\"appDynamicsMetricPath\":\"\",\"metricName\":\"\",\"metricKey\":\"\",\"logKey\":\"\",\"isActive\":true,\"metricUrl\":\"https://abc.com/v2/applications/88908/metrics.json\",\"parameters\":[{\"key\":\"Names[]\",\"value\":\"Threads/Time/CPU/New Relic Harvest Service/UserTime\"}],\"toolConfigJson\":{\"newRelicAppId\":\"\",\"metricName\":\"\"}}";
-	String saveOutcomeJsonNoToolConfigJson = "{\"outcomeName\":\""+outcomeNameString+"123"+"\",\"outcomeType\":\"Tech\",\"toolName\":\"toolNameeee1\",\"newRelicAppId\":\"\",\"splunkIndex\":\"\",\"appDynamicsAppName\":\"\",\"appDynamicsMetricPath\":\"\",\"metricName\":\"\",\"metricKey\":\"\",\"logKey\":\"\",\"isActive\":true,\"metricUrl\":\"https://abc.com/v2/applications/88908/metrics.json\",\"parameters\":[{\"key\":\"Names[]\",\"value\":\"Threads/Time/CPU/New Relic Harvest Service/UserTime\"}]}";
-	String editOutcomeJson = "{\"id\":\"iiddee\",\"outcomeName\":\""+outcomeNameString+"\",\"outcomeType\":\"Techtype\",\"toolName\":\"NEWRELIC\",\"newRelicAppId\":\"\",\"splunkIndex\":\"\",\"metricName\":\"\",\"metricKey\":\"\",\"logKey\":\"\",\"isActive\":\"true\",\"toolId\":\"1\",\"category\":\"APPMONITORING\",\"toolQueue\":\"NEWRELIC_MILESTONE_EXECUTION\",\"toolStatus\":\"true\",\"createdDate\":\"1631026474842\",\"metricUrl\":\"https://abc.com/v2/applications/8890812/metrics.json\",\"parameters\":[{\"key\":\"Names[]\",\"value\":\"Threads/Time/CPU/New Relic Harvest Service/UserTime\"}],\"toolConfigJson\":{\"newRelicAppId\":\"\",\"metricName\":\"\"}}";
-	String deleteOutcomeJson = "{\"id\":iiddee}";
-	String statusUpdate = "{\"id\":iiddee,\"isActive\":activee}";
-	String statusUpdateError = "{\"id\":iiddee,\"isActive\":activee}";
-	JsonObject statusUpdateJson = convertStringIntoJson(statusUpdate);
-	String milestoneNameString = "Mile9";
-	String saveMilestoneJson = "{\"mileStoneName\":\""+milestoneNameString+"\",\"milestoneReleaseID\":\"Version_1\",\"startDate\":\"2025-10-10T00:00:00Z\",\"endDate\":\"2026-10-22T00:00:00Z\",\"outcomeList\":[\"Outcommmme\"]}";
-	JsonObject saveMilestoneConfigJson = convertStringIntoJson(saveMilestoneJson);
-	String saveMilestoneJsonWrongStartTime = "{\"mileStoneName\":\""+milestoneNameString+"\",\"milestoneReleaseID\":\"Version_1\",\"startDate\":\"2025-10-10T00:00:00Z\",\"endDate\":\"2020-10-22T00:00:00Z\",\"outcomeList\":[\"Outcommmme\"]}";
-	String editMilestoneAddProperty = "[{\"NewOutcomeList\":\"Outcommmme\"},{\"NewOutcomeList\":\"Outcommmme\"}]";
-	String statusUpdateMilstone = "{\"id\":iiddee}";
-    JsonArray arr = new JsonArray();
+    String milestoneNameString = "Mile9";
+	JsonArray arr = new JsonArray();
     JsonArray outcomeList1 = new JsonArray();
 	InsightsTools insightsMilestoneTools = null;
 	void prepareRequestData(){
@@ -73,14 +61,7 @@ public class MilestoneOutcomeTestData  extends AbstractTestNGSpringContextTests 
 		newtool.setAgentCommunicationQueue("NEWRELIC_MILESTONE_EXECUTION");
 		outComeConfigDAL.saveInsightsTools(newtool);
 	}
-	
-	public String getSaveJson() {
-		InsightsTools insightsMilestoneTools = outComeConfigDAL.getOutComeByToolName(toolName);
-		int toolId = insightsMilestoneTools.getId();
-		saveOutcomeJson = saveOutcomeJson.replace("toolNameeee1", String.valueOf(toolId));
-		return saveOutcomeJson;
-	}
-	
+
 	void GetInsightsMilestoneTools() {
 		this.insightsMilestoneTools = outComeConfigDAL.getOutComeByToolName(toolName);
 		if(this.insightsMilestoneTools == null) {

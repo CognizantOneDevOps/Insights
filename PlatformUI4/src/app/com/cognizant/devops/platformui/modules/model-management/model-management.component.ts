@@ -23,6 +23,7 @@ import { ModelManagementService } from "@insights/app/modules/model-management/m
 import { Router, NavigationExtras } from "@angular/router";
 import { DataSharedService } from "@insights/common/data-shared-service";
 import { WorkflowHistoryDetailsDialog } from "@insights/app/modules/reportmanagement/workflow-history-details/workflow-history-details-dialog";
+import { MatRadioChange } from "@angular/material/radio";
 
 @Component({
   selector: "app-model-management",
@@ -60,6 +61,7 @@ export class ModelManagementComponent implements OnInit {
   selectedIndex: number;
   totalPages: number = -1;
   currentPageIndex: number = -1;
+  currentPageValue: number= -1;
 
   constructor(
     public messageDialog: MessageDialogService,
@@ -93,6 +95,7 @@ export class ModelManagementComponent implements OnInit {
       .reduce((response, word) => (response += word.slice(0, 1)), "");
     //doStuff
     this.timeZoneAbbr = this.dataShare.getTimeZoneAbbr();
+    this.currentPageValue = this.paginator.pageIndex * this.MAX_ROWS_PER_TABLE;
     this.currentPageIndex = this.paginator.pageIndex + 1;
   }
   redirectToPrection(event) {
@@ -240,8 +243,9 @@ export class ModelManagementComponent implements OnInit {
     this.selectedUsecase = "";
   }
 
-  onSelect(selected) {
+  onSelect(selected, event: MatRadioChange, index) {
     this.enableDelete = true;
+    this.selectedIndex = index + this.currentPageValue;
     if (selected.status == "LEADERBOARD_READY") {
       this.enableLeaderboard = true;
     } else {

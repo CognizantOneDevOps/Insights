@@ -15,15 +15,23 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.test.groupEmail;
 
+import java.io.File;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.emailconfiguration.controller.InsightsEmailConfigurationController;
+import com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -32,16 +40,31 @@ import com.google.gson.JsonObject;
 @SuppressWarnings("unused")
 @WebAppConfiguration
 public class GroupEmailTest extends GroupEmailTestData {
-
+	private static final Logger log = LogManager.getLogger(GroupEmailTest.class);
+	
 	@Autowired
 	InsightsEmailConfigurationController insightsEmailConfigurationController;
 
+    JsonObject testData = new JsonObject();
+	
+	@BeforeClass
+	public void beforeMethod() throws InsightsCustomException {
+		try {
+			String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + TestngInitializerTest.TESTNG_TESTDATA + File.separator
+                    + TestngInitializerTest.TESTNG_PLATFORMSERVICE + File.separator + "GroupEmail.json";
+			testData = JsonUtils.getJsonData(path).getAsJsonObject();
+			
+		} catch (Exception e) {
+			log.error("Error preparing data at GroupEmailTest record ", e);
+		}
+	}
+	
 	// source=Report
 	@Test(priority = 1)
 	public void testSaveReportEmailConfig() {
 		try {
 			String expectedStatus = "success";
-			JsonObject response = insightsEmailConfigurationController.saveEmailConfig(testSaveReportBatchString);
+			JsonObject response = insightsEmailConfigurationController.saveEmailConfig(testData.get("testSaveReportBatchString").toString());
 			String actualStatus = response.get("status").getAsString().replace("\"", "");
 			int emailConfigId = response.get("data").getAsInt();
 			Assert.assertEquals(actualStatus, expectedStatus);
@@ -60,7 +83,7 @@ public class GroupEmailTest extends GroupEmailTestData {
 			Thread.sleep(5000);
 			String expectedStatus = "success";
 
-			JsonObject response = insightsEmailConfigurationController.saveEmailConfig(testSaveDashboardBatchString);
+			JsonObject response = insightsEmailConfigurationController.saveEmailConfig(testData.get("testSaveDashboardBatchString").toString());
 			String actualStatus = response.get("status").getAsString().replace("\"", "");
 			int grafanaEmailConfigId = response.get("data").getAsInt();
 			Assert.assertEquals(actualStatus, expectedStatus);
@@ -79,7 +102,7 @@ public class GroupEmailTest extends GroupEmailTestData {
 			String expectedStatus = "failure";
 			String expectedMessage = "GroupEmailConfiguration with the given Batch name already exists";
 
-			JsonObject response = insightsEmailConfigurationController.saveEmailConfig(testSaveEmailWithDuplicateName);
+			JsonObject response = insightsEmailConfigurationController.saveEmailConfig(testData.get("testSaveEmailWithDuplicateName").toString());
 			String actualStatus = response.get("status").getAsString().replace("\"", "");
 			String actualMessage = response.get("message").getAsString().replace("\"", "");
 
@@ -210,7 +233,7 @@ public class GroupEmailTest extends GroupEmailTestData {
 			String expectedStatus = "failure";
 
 			JsonObject response = insightsEmailConfigurationController
-					.updateEmailConfigurationState(testEditInvalidBatchState);
+					.updateEmailConfigurationState(testData.get("testSaveDashboardBatchString").toString());
 			String actualStatus = response.get("status").getAsString().replace("\"", "");
 
 			Assert.assertEquals(actualStatus, expectedStatus);
@@ -224,7 +247,7 @@ public class GroupEmailTest extends GroupEmailTestData {
 		try {
 			String expectedStatus = "failure";
 
-			JsonObject response = insightsEmailConfigurationController.saveEmailConfig(inValidEmailConfigString);
+			JsonObject response = insightsEmailConfigurationController.saveEmailConfig(testData.get("inValidEmailConfigString").toString());
 			String actualStatus = response.get("status").getAsString().replace("\"", "");
 
 			Assert.assertEquals(actualStatus, expectedStatus);
@@ -270,7 +293,7 @@ public class GroupEmailTest extends GroupEmailTestData {
 		try {
 			String expectedStatus = "failure";
 			JsonObject response = insightsEmailConfigurationController
-					.saveEmailConfig(emailConfigWithEmptyEmailDetails);
+					.saveEmailConfig(testData.get("emailConfigWithEmptyEmailDetails").toString());
 			String actualStatus = response.get("status").getAsString().replace("\"", "");
 			Assert.assertEquals(actualStatus, expectedStatus);
 		} catch (AssertionError e) {

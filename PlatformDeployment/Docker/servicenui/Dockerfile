@@ -30,9 +30,11 @@ RUN apk update && \
     apk --no-cache add procps && \
     apk add --no-cache bash && \
     apk add --update openjdk11 && \
+    apk add --update nodejs npm && \
     set -ex && apk --no-cache add sudo && \
     mkdir /opt/offlineAgent && \
     mkdir /opt/PlatformAgent && \
+    mkdir /opt/PlatformService && \
     mkdir /usr/INSIGHTS_HOME /opt/grafana /opt/insightsengine/ /opt/InSights/  mkdir /opt/insightsWebhook/ /opt/InSights/Promtail
 
 #Install jq - json processor
@@ -54,23 +56,20 @@ RUN cd /usr/INSIGHTS_HOME && \
         wget https://github.com/mikefarah/yq/releases/download/v4.11.1/yq_linux_amd64 -O /usr/bin/yq &&\
     chmod +x /usr/bin/yq
 ENV INSIGHTS_HOME=/usr/INSIGHTS_HOME
-RUN wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${INSIGHTSRELEASE}/PlatformService-${INSIGHTSRELEASE}.war -O /opt/PlatformService.war && \
-    wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${INSIGHTSRELEASE}/PlatformUI3-${INSIGHTSRELEASE}.zip -O /opt/PlatformUI3.zip && \
-    wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${INSIGHTSRELEASE}/PlatformUI4-${INSIGHTSRELEASE}.zip -O /opt/PlatformUI4.zip && \
-    unzip /opt/PlatformUI3.zip -d /opt && \
-    rm -rf /opt/PlatformUI3.zip && \
-    unzip /opt/PlatformUI4.zip -d /opt && \
-    rm -rf /opt/PlatformUI4.zip && \
-    wget -O /opt/apache-tomcat.tar.gz https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.68/bin/apache-tomcat-9.0.68.tar.gz && \
-    tar -zxvf /opt/apache-tomcat.tar.gz --directory /opt && rm -rf apache-tomcat.tar.gz && \
-    mv /opt/apache-tomcat-9.0.68 /opt/apache-tomcat
+    
+
+WORKDIR /opt/PlatformService
+RUN wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${INSIGHTSRELEASE}/PlatformService-${INSIGHTSRELEASE}.jar -O PlatformService.jar && \
 EXPOSE 8080/tcp
 
-WORKDIR /opt/apache-tomcat
-RUN cp -r /opt/app /opt/apache-tomcat/webapps/app && cp /opt/PlatformService.war /opt/apache-tomcat/webapps/ && \
-    cp -r /opt/insights /opt/apache-tomcat/webapps/  && \
-    rm -rf /opt/PlatformService.war /opt/app && chmod -R 755 /opt/apache-tomcat/ && \
-    rm -rf /opt/PlatformService.war /opt/insights
+
+WORKDIR /opt
+RUN wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${INSIGHTSRELEASE}/UI-${INSIGHTSRELEASE}.zip -O /opt/UI.zip && \
+    unzip /opt/UI.zip -d /opt/UI && \
+    rm -rf /opt/UI.zip && \
+    cd /UI
+    npm install -save express 
+EXPOSE 8081/tcp
 
 WORKDIR /opt/InSights/Promtail
 RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2 && \

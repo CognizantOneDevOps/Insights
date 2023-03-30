@@ -128,6 +128,10 @@ import { OutcomeProvider } from './outcome/outcome.provider';
 import { OutcomeListComponent } from './outcome/outcome-list/outcome-list.component';
 import { OutcomeEditComponent } from './outcome/outcome-edit/outcome-edit.component';
 import { OutComeDialogComponent } from './outcome/outcome-dialog/outcome-dialog.component';
+import { OfflineDataListComponent } from '@insights/app/modules/offline-data-processing/offline-data-list/offline-data-list.component';
+import { OfflineDetailsComponent } from '@insights/app/modules/offline-data-processing/offline-details/offline-details.component';
+import { OfflineConfigurationComponent } from '@insights/app/modules/offline-data-processing/offline-configuration/offline-configuration.component';
+import { OfflineService } from '@insights/app/modules/offline-data-processing/offline-service';
 import { MileStoneComponent } from './mile-stone/mile-stone-config/mile-stone.component';
 import { MileStoneService } from './mile-stone/mile-stone.service';
 import { MileStoneListComponent } from './mile-stone/mile-stone-list/mile-stone-list.component'
@@ -212,6 +216,9 @@ import { AddComponent } from '@insights/app/modules/multiple-email-configuration
         OutcomeListComponent,
         OutcomeEditComponent,
         OutComeDialogComponent,
+        OfflineDataListComponent,
+        OfflineConfigurationComponent,
+        OfflineDetailsComponent,
         MileStoneComponent,
         MileStoneListComponent,
         MileStoneEditComponent,
@@ -274,7 +281,8 @@ import { AddComponent } from '@insights/app/modules/multiple-email-configuration
         MileStoneService,
         OutcomeProvider,
         FileSystemService,
-        TaskManagementService
+        TaskManagementService,
+        OfflineService
     ]
 })
 export class HomeModules { }

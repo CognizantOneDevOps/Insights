@@ -16,6 +16,8 @@
 package com.cognizant.devops.platformservice.security.config;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -27,9 +29,13 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 
 public class InsightsAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
@@ -57,13 +63,21 @@ public class InsightsAuthenticationFilter extends AbstractAuthenticationProcessi
 	 */
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
-		log.debug(" Inside InsightsAuthenticationFilter, attemptAuthentication ==== ");
+		log.debug(" Inside InsightsAuthenticationFilter, attemptAuthentication ==== {} ",request.getServletPath());
 		Authentication authentication = null;
-		
-		if(AuthenticationUtils.WEB_IGNORE_URLS.contains(request.getPathInfo())) {
-			authentication= new InsightsAuthenticationToken("", null, null,null);
+		String pathInfo = request.getServletPath();
+		if(AuthenticationUtils.WEB_IGNORE_URLS.contains(pathInfo))
+		 {
+			SecurityContext context = SecurityContextHolder.getContext();
+			Authentication auth = context.getAuthentication();
+			if(auth != null) {
+				return auth;
+			}
+			List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
+			updatedAuthorities.add(AuthenticationUtils.getSpringAuthorityRole("Viewer"));
+			authentication= new InsightsAuthenticationToken(pathInfo, null, null,updatedAuthorities);
 			authenticationtokenUtils.updateSecurityContext(authentication);
-		} else if (ApplicationConfigProvider.getInstance().getAutheticationProtocol().equalsIgnoreCase("SAML")) {
+		}	else if (ApplicationConfigProvider.getInstance().getAutheticationProtocol().equalsIgnoreCase("SAML")) {
 			authentication = authenticationtokenUtils.authenticateSAMLData(request, response);
 			authentication = callAuthManager(authentication);
 		} else if (AuthenticationUtils.IS_NATIVE_AUTHENTICATION) {
@@ -92,6 +106,7 @@ public class InsightsAuthenticationFilter extends AbstractAuthenticationProcessi
 			Authentication authResult) throws IOException, ServletException {
 		authResult.getAuthorities().forEach(
 				b -> log.debug("In successfulAuthentication GrantedAuthority ==== {} ", b.getAuthority()));
+		authenticationtokenUtils.updateSecurityContext(authResult);
 		chain.doFilter(request, response);
 	}
 

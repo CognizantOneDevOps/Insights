@@ -49,14 +49,14 @@ export const CustomFieldSelectEditor: React.FC<Props> = ({
       setChartValue();
       for (let dt of context.data) {
         let refId: string = dt.refId || "";
-        let columnModelArr: ColumnModel[] = new Array();
+        let columnModelArr: ColumnModel[] = [];
         for (let field of dt.fields) {
           let columnModelObj: ColumnModel;
           columnModelObj = columnModel.find(o => o.name === field.name && o.refId === refId)!;
           columnModelArr.push(columnModelObj);
         }
         let chartDataObjIndx = chartDataArray.findIndex(obj => obj.id === refId);
-        if (chartDataObjIndx != -1) {
+        if (chartDataObjIndx !== -1) {
           chartDataArray[chartDataObjIndx].data = context.data;
           chartDataArray[chartDataObjIndx].columns = columnModelArr
         } else {
@@ -86,7 +86,7 @@ export const CustomFieldSelectEditor: React.FC<Props> = ({
         setColumnModel([new ColumnModel("", "")]);
       }
     }
-  }, [])
+  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
 
   const onDataTransformChange = (index: number) => (event: FormEvent<HTMLTextAreaElement>,) => {
     setDataTransform(event.currentTarget.value);
@@ -105,7 +105,9 @@ export const CustomFieldSelectEditor: React.FC<Props> = ({
 
   const onColumnModelChange = (columnName: string, refId: string) => (option: SelectableValue<string>) => {
     const i = columnModel.findIndex(element => element.name === columnName && element.refId === refId);
-    if (i > -1) columnModel[i].type = option.value;
+    if (i > -1){
+		columnModel[i].type = option.value;
+	}
     else {
       columnModel.push(new ColumnModel(columnName, option.value, refId))
     }
@@ -158,7 +160,7 @@ export const CustomFieldSelectEditor: React.FC<Props> = ({
 
     let data = buildChartData();
     let { defchartOptions, contId, contIdView }: { defchartOptions: any; contId: string; contIdView: string; } = buildChartOptions();
-    var wrapper = new google.visualization.ChartWrapper({
+    let wrapper = new google.visualization.ChartWrapper({
       'chartType': chartType,
       'dataTable': data,
       'options': defchartOptions
@@ -182,7 +184,7 @@ export const CustomFieldSelectEditor: React.FC<Props> = ({
       }, 2000
       );
 
-      var viewElement = document.getElementById(contIdView);
+      let viewElement = document.getElementById(contIdView);
       if (viewElement !== null) {
         let chartWrapperview = chartEditor.getChartWrapper();
         let containerDimView = innerDimensions(document.getElementById(contId)?.parentNode?.parentNode);
@@ -229,12 +231,12 @@ export const CustomFieldSelectEditor: React.FC<Props> = ({
     }
 
     function buildChartData() {
-      let targetModelArr: InsightsChartTargetModel[] = new Array();
+      let targetModelArr: InsightsChartTargetModel[] = [];
 
       for (let dt of context.data) {
 
         let refId: string = dt.refId || "";
-        let columnModelArr: ColumnModel[] = new Array();
+        let columnModelArr: ColumnModel[] = [];
         for (let field of dt.fields) {
 
           let columnModelObj: ColumnModel;
@@ -242,7 +244,7 @@ export const CustomFieldSelectEditor: React.FC<Props> = ({
           columnModelArr.push(columnModelObj);
         }
         let chartDataObjIndx = chartDataArray.findIndex(obj => obj.id === refId);
-        if (chartDataObjIndx != -1) {
+        if (chartDataObjIndx !== -1) {
           chartDataArray[chartDataObjIndx].data = context.data;
           chartDataArray[chartDataObjIndx].columns = columnModelArr
         } else {
@@ -262,7 +264,7 @@ export const CustomFieldSelectEditor: React.FC<Props> = ({
   }
 
   const appendChartContainer = () => {
-    var dialog = jquery('.google-visualization-charteditor-dialog');
+    let dialog = jquery('.google-visualization-charteditor-dialog');
     if (dialog.length === 0) {
       setTimeout(function () {
         appendChartContainer();
@@ -305,9 +307,9 @@ export const CustomFieldSelectEditor: React.FC<Props> = ({
       for (let dt of context.data) {
         const refId = (<div>{dt.refId}</div>);
         const fieldItems = dt.fields.map((field) =>
-          <div>
+          <div key={`${dt.refId}`}>
             <span>{field.name}</span>
-            <Select isLoading={false} value={columnModel.find(obj => obj.name == field.name && obj.refId === dt.refId)?.type} allowCustomValue onChange={onColumnModelChange(field.name, dt.refId || "")} options={selectOptions} />
+            <Select isLoading={false} value={columnModel.find(obj => obj.name === field.name && obj.refId === dt.refId)?.type} allowCustomValue onChange={onColumnModelChange(field.name, dt.refId || "")} options={selectOptions} />
           </div>
         );
         itemrows.push(refId);

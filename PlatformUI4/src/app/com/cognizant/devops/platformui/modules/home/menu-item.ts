@@ -246,6 +246,16 @@ export class MenuItem {
               parentMenuId :'Configuration'
             },
             {
+              displayName: 'Offline Data Processing',
+              iconName: 'feature',
+              route: 'InSights/Home/offlineDataList',
+              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+              showMenu: this.getMenuShowAdmin(['Admin', 'Editor']),
+              title: "Offline Data Processing",
+              menuId : "Offline Data Processing",
+              parentMenuId :'Configuration'
+            },
+            {
               displayName: 'Task Management',
               iconName: 'feature',
               isToolbarDisplay: InsightsInitService.enableInsightsToolbar,

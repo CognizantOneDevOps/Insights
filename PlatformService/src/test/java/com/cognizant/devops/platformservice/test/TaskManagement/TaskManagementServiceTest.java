@@ -48,10 +48,10 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
+import com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
@@ -63,7 +63,7 @@ import com.google.gson.reflect.TypeToken;
 @WebAppConfiguration
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
 public class TaskManagementServiceTest extends TaskManagementTestData  {
-
+	JsonObject testData = new JsonObject();	
 	private static final Logger log = LogManager.getLogger(TaskManagementServiceTest.class);
 	MockHttpServletRequest httpRequest = new MockHttpServletRequest();
 	ResultMatcher ok = MockMvcResultMatchers.status().isOk();
@@ -79,7 +79,7 @@ public class TaskManagementServiceTest extends TaskManagementTestData  {
 
 	@DataProvider
 	public void getData() {
-		String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + UnitTestConstant.TESTNG_TESTDATA + File.separator
+		String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + TestngInitializerTest.TESTNG_TESTDATA + File.separator
 				+ "grafanaAuth.json";
 		JsonElement jsonData;
 		try {
@@ -92,20 +92,28 @@ public class TaskManagementServiceTest extends TaskManagementTestData  {
 	
 	@BeforeClass
 	public void onInit() throws InterruptedException, IOException, InsightsCustomException {
-		getData();
-		httpRequest.addHeader("Authorization", testAuthData.get(AUTHORIZATION));
-		Map<String, String> cookiesMap = PlatformServiceUtil.getGrafanaCookies(httpRequest);
+		try {
+			String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + TestngInitializerTest.TESTNG_TESTDATA + File.separator
+					+ TestngInitializerTest.TESTNG_PLATFORMSERVICE + File.separator + "TaskManagement.json";
+			testData = JsonUtils.getJsonData(path).getAsJsonObject();
+			getData();
+			httpRequest.addHeader("Authorization", testAuthData.get(AUTHORIZATION));
+			Map<String, String> cookiesMap = PlatformServiceUtil.getGrafanaCookies(httpRequest);
 
-		cookiesString = cookiesMap.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
-				.collect(Collectors.joining(";"));
-		log.debug(" cookiesString " + cookiesString);
-		for (Map.Entry<String, String> entry : cookiesMap.entrySet()) {
-			Cookie cookie = new Cookie(entry.getKey(), entry.getValue());
-			cookie.setHttpOnly(true);
-			cookie.setMaxAge(60 * 30);
-			cookie.setPath("/");
-			httpRequest.setCookies(cookie);
+			cookiesString = cookiesMap.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
+					.collect(Collectors.joining(";"));
+			log.debug(" cookiesString " + cookiesString);
+			for (Map.Entry<String, String> entry : cookiesMap.entrySet()) {
+				Cookie cookie = new Cookie(entry.getKey(), entry.getValue());
+				cookie.setHttpOnly(true);
+				cookie.setMaxAge(60 * 30);
+				cookie.setPath("/");
+				httpRequest.setCookies(cookie);
+			}
+		} catch (Exception e) {
+			log.error("message", e);
 		}
+		
 	}
 
 	private MockHttpServletRequestBuilder mockHttpServletRequestBuilderPost(String url, String content) {
@@ -130,7 +138,7 @@ public class TaskManagementServiceTest extends TaskManagementTestData  {
 	public void testSaveTaskDefinitionRecordValidationError() throws Exception {
 		try {
 			this.mockMvc = getMacMvc();
-			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost("/admin/scheduletaskmanagement/saveOrEditTaskDefinition",saveTaskJsonValidation); 
+			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost("/admin/scheduletaskmanagement/saveOrEditTaskDefinition","&amp;"+testData.get("saveTaskJsonValidation").toString()); 
 			MvcResult result = this.mockMvc.perform(builder).andReturn();
 			String saveresponse = new String(result.getResponse().getContentAsByteArray());
 			JsonObject actual = JsonUtils.parseStringAsJsonObject(saveresponse);
@@ -144,7 +152,7 @@ public class TaskManagementServiceTest extends TaskManagementTestData  {
 	public void testSaveTaskDefinitionRecordInvalidSchedule() throws Exception {
 		try {
 			this.mockMvc = getMacMvc();
-			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost("/admin/scheduletaskmanagement/saveOrEditTaskDefinition",saveTaskJsonInvalidSchedule); 
+			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost("/admin/scheduletaskmanagement/saveOrEditTaskDefinition",testData.get("saveTaskJsonInvalidSchedule").toString()); 
 			MvcResult result = this.mockMvc.perform(builder).andReturn();
 			String saveresponse = new String(result.getResponse().getContentAsByteArray());
 			JsonObject actual = JsonUtils.parseStringAsJsonObject(saveresponse);
@@ -157,10 +165,10 @@ public class TaskManagementServiceTest extends TaskManagementTestData  {
 	@Test(priority = 3)
 	public void testSaveTaskDefinitionRecord() throws InsightsCustomException {
 		try {
-			log.debug(" cookies {} data {} " ,httpRequest.getCookies(),saveTaskJson);
+			log.debug(" cookies {} data {} " ,httpRequest.getCookies(),testData.get("saveTaskJson").toString());
 			this.mockMvc = getMacMvc();
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost(
-					"/admin/scheduletaskmanagement/saveOrEditTaskDefinition",saveTaskJson); 
+					"/admin/scheduletaskmanagement/saveOrEditTaskDefinition",testData.get("saveTaskJson").toString()); 
 			
 			MvcResult result = this.mockMvc.perform(builder).andReturn();
 			String saveresponse = new String(result.getResponse().getContentAsByteArray());
@@ -220,7 +228,7 @@ public class TaskManagementServiceTest extends TaskManagementTestData  {
 		try {
 			this.mockMvc = getMacMvc();
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost(
-					"/admin/scheduletaskmanagement/saveOrEditTaskDefinition",editTaskJson); 
+					"/admin/scheduletaskmanagement/saveOrEditTaskDefinition",testData.get("editTaskJson").toString()); 
 			MvcResult result = this.mockMvc.perform(builder).andReturn();
 			String editresponse = new String(result.getResponse().getContentAsByteArray());
 			log.debug(" webResponse  status  ============= {} ======  editresponse {}  ",result.getResponse().getStatus(), editresponse);
@@ -252,7 +260,7 @@ public class TaskManagementServiceTest extends TaskManagementTestData  {
 	public void testStatusUpdateWrongData() throws Exception {
 		try {
 			this.mockMvc = getMacMvc();
-			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost("/admin/scheduletaskmanagement/statusUpdateForTaskDefinition",statusUpdateInvalidData); 
+			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost("/admin/scheduletaskmanagement/statusUpdateForTaskDefinition",testData.get("statusUpdateInvalidData").toString()); 
 			MvcResult result = this.mockMvc.perform(builder).andReturn();
 			String saveresponse = new String(result.getResponse().getContentAsByteArray());
 			JsonObject actual = JsonUtils.parseStringAsJsonObject(saveresponse);
@@ -267,7 +275,7 @@ public class TaskManagementServiceTest extends TaskManagementTestData  {
 		try {
 			this.mockMvc = getMacMvc();
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost(
-					"/admin/scheduletaskmanagement/statusUpdateForTaskDefinition",statusUpdate); 
+					"/admin/scheduletaskmanagement/statusUpdateForTaskDefinition",testData.get("statusUpdate").toString()); 
 			MvcResult result = this.mockMvc.perform(builder).andReturn();
 			String editresponse = new String(result.getResponse().getContentAsByteArray());
 			log.debug(" webResponse  status  ============= {} ======  editresponse {}  ",result.getResponse().getStatus(), editresponse);
@@ -300,7 +308,7 @@ public class TaskManagementServiceTest extends TaskManagementTestData  {
 		try {
 			this.mockMvc = getMacMvc();
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost(
-					"/admin/scheduletaskmanagement/getTaskHistoryDetail",taskHistoryRequest); 
+					"/admin/scheduletaskmanagement/getTaskHistoryDetail",testData.get("taskHistoryRequest").toString()); 
 			MvcResult result = this.mockMvc.perform(builder).andReturn();
 			String editresponse = new String(result.getResponse().getContentAsByteArray());
 			log.debug(" webResponse  status  ============= {} ======  editresponse {}  ",result.getResponse().getStatus(), editresponse);
@@ -323,7 +331,7 @@ public class TaskManagementServiceTest extends TaskManagementTestData  {
 	public void testDeleteTaskDefinitionInvalidData() throws Exception {
 		try {
 			this.mockMvc = getMacMvc();
-			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost("/admin/scheduletaskmanagement/deleteTaskDefinition",deleteTaskJsonInvalidData); 
+			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost("/admin/scheduletaskmanagement/deleteTaskDefinition",testData.get("deleteTaskJsonInvalidData").toString()); 
 			MvcResult result = this.mockMvc.perform(builder).andReturn();
 			String saveresponse = new String(result.getResponse().getContentAsByteArray());
 			JsonObject actual = JsonUtils.parseStringAsJsonObject(saveresponse);
@@ -338,7 +346,7 @@ public class TaskManagementServiceTest extends TaskManagementTestData  {
 		try {
 			this.mockMvc = getMacMvc();
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost(
-					"/admin/scheduletaskmanagement/deleteTaskDefinition",deleteTaskJson); 
+					"/admin/scheduletaskmanagement/deleteTaskDefinition",testData.get("deleteTaskJson").toString()); 
 			MvcResult result = this.mockMvc.perform(builder).andReturn();
 			String editresponse = new String(result.getResponse().getContentAsByteArray());
 			log.debug(" webResponse  status  ============= {} ======  editresponse {}  ",result.getResponse().getStatus(), editresponse);

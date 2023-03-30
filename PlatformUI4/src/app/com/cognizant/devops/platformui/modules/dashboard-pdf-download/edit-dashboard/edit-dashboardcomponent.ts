@@ -100,10 +100,14 @@ export class EditDashboardComponent implements OnInit {
   loadTime: any;
   title: string;
   enableEmail: boolean;
+  queryVaribles : JSON;
   userName: string;
   theme: string;
   themes: any;
   inputDataJson:any;
+  panelUrlArray: any[];
+ 
+  
 
   constructor(
     public router: Router,
@@ -345,6 +349,18 @@ export class EditDashboardComponent implements OnInit {
     }
     return valid;
   }
+
+  panelArray(url, type, query,title){
+   
+    let panelInfoJson ={}
+    panelInfoJson["panelURL"] = url;
+    panelInfoJson["type"] = type;
+    panelInfoJson["query"] = query;
+    panelInfoJson["title"] = title;
+    this.panelUrlArray.push(panelInfoJson);
+    
+    }
+
   public async getDashboardJson(uuid) {
     this.globalMap.clear();
     this.totalMap.clear();
@@ -519,8 +535,12 @@ export class EditDashboardComponent implements OnInit {
     this.timeValue = "";
   }
   getUrlArray() {
+    this.panelUrlArray=[];
     this.urlArray = [];
+    let cypherQuery : string="";
     let variables;
+    var i:number=0;
+    var j:number=0;
     variables = this.urlString;
     let dashboard = this.asyncResult.data.dashboard;
     if (dashboard.panels.length > 0) {
@@ -540,6 +560,18 @@ export class EditDashboardComponent implements OnInit {
               "&theme=" +
               this.theme
           );
+          if(x.targets[0].cypherQuery==undefined){
+            cypherQuery=x.targets[0].queryText;
+          }
+          else{
+            cypherQuery=x.targets[0].cypherQuery;
+          }
+
+          
+          this.panelArray(this.urlArray[i],x.type,cypherQuery,x.title)
+          i=i+1;
+          
+          
         } else if (x.type === "row" && x.collapsed) {
           if (Array.isArray(x.panels)) {
             if (x.type !== "text")
@@ -557,6 +589,16 @@ export class EditDashboardComponent implements OnInit {
                     "&theme=" +
                     this.theme
                 );
+                if(x.targets[0].cypherQuery==undefined){
+                  cypherQuery=x.targets[0].queryText;
+                }
+                else{
+                 cypherQuery=x.targets[0].cypherQuery;
+                }
+      
+                
+                this.panelArray(this.urlArray[j],x.type,cypherQuery,x.title)
+                j=j+1;
               });
           }
         }
@@ -565,6 +607,7 @@ export class EditDashboardComponent implements OnInit {
       this.messageDialog.openSnackBar("No Panels to Download!", "error");
       return;
     }
+    this.queryVaribles =  dashboard.templating.list;
   }
   onPreviewClick() {
     if (this.validatePreview() === true) {
@@ -722,9 +765,11 @@ export class EditDashboardComponent implements OnInit {
     saveObj["scheduleType"] = this.frequency;
     saveObj["organisation"] = this.organisation;
     saveObj["dashboard"] = this.dashboard;
+    saveObj["panelUrlArray"]=this.panelUrlArray;
     saveObj["edit"] = true;
     saveObj["userName"] = this.userName;
     saveObj["theme"] = this.theme;
+    saveObj["grafanaVariables"] = this.queryVaribles;
     if (this.emailDetails != null) {
       saveObj["emailDetails"] = this.emailDetails;
     }

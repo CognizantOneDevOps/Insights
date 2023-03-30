@@ -72,7 +72,7 @@ public class InsightsCustomCsrfFilter extends OncePerRequestFilter {
 		} finally {
 			long processingTime = System.currentTimeMillis() - startTime;
 			MDC.put(LogMessageConstants.PROCESSINGTIME, processingTime);
-			log.debug(" processing time for method {} is {}",request.getPathInfo() , processingTime);
+			log.debug(" processing time for method {} is {}",request.getRequestURI() , processingTime);
 			MDC.clear();
 		}
 		log.debug("Out doFilter CustomCsrfFilter ...............");
@@ -89,6 +89,6 @@ public class InsightsCustomCsrfFilter extends OncePerRequestFilter {
 		MDC.put(LogMessageConstants.TRACEID, token);
 		MDC.put(LogMessageConstants.TYPE, LogMessageConstants.APILOGSTYPE);
 		MDC.put(LogMessageConstants.HTTPMETHOD, request.getMethod());
-		MDC.put(LogMessageConstants.ENDPOINT, request.getPathInfo());
+		MDC.put(LogMessageConstants.ENDPOINT, request.getRequestURI());
 	}
 }

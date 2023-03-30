@@ -432,8 +432,8 @@
                   matInput
                   [disabled]="!adduserSaveEnable"
                   type="password"
-                  [(ngModel)]="pass"
-                  [value]="searchValue"
+                  [ngModel]="pass"
+                  (ngModelChange)="onPassChange($event)"
                   required
                   placeholder=" Input a Password"
                 />

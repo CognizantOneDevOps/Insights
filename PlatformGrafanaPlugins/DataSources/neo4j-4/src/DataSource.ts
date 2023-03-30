@@ -171,9 +171,9 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
             return convertResponseToDataFramesGraph(queries, res);
           } else if (queries[0].raw) {
             return convertResponseToDataFramesRaw(queries, res);
-          } else if (queries[0].mode =='Metrics' || queries[0].showingTable) { //Explore Functionality
+          } else if (queries[0].mode ==='Metrics' || queries[0].showingTable) { //Explore Functionality
             return convertResponseToDataFramesTable(queries, res);
-          } else if (queries[0].mode =='Metrics' || queries[0].showingGraph) { //Explore Functionality
+          } else if (queries[0].mode ==='Metrics' || queries[0].showingGraph) { //Explore Functionality
             return convertResponseToDataFramesGraph(queries, res);
           } else {
               throw new Error("Select some response type");
@@ -197,8 +197,8 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   }
 
   metricFindQuery(query: string, options: any) {
-    var cypherQuery = {};
-    var statements = [] as any;
+    let cypherQuery = {};
+    let statements = [] as any;
     cypherQuery['statements'] = statements;
     if(this.timeSrv && this.timeSrv.timeRange()){
       let options = {range: this.timeSrv.timeRange()};
@@ -206,8 +206,8 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     }
     //query = addTimestampToQuery(query, null);
     query = this.templateSrv.replace(query, {}, applyTemplateVariables);
-    var resultDataContents = ["row"];
-    var statement = {
+    let resultDataContents = ["row"];
+    let statement = {
       "statement": query,
       "includeStats": false,
       "resultDataContents": resultDataContents

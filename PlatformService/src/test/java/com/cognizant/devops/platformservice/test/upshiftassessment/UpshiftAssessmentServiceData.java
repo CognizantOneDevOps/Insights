@@ -16,6 +16,7 @@
 
 package com.cognizant.devops.platformservice.test.upshiftassessment;
 
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -23,6 +24,7 @@ import com.cognizant.devops.platformdal.upshiftassessment.UpshiftAssessmentConfi
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowType;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
+import com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest;
 import com.cognizant.devops.platformservice.workflow.service.WorkflowServiceImpl;
 import com.google.gson.JsonObject;
 import org.apache.commons.io.IOUtils;
@@ -43,12 +45,22 @@ public class UpshiftAssessmentServiceData extends AbstractTestNGSpringContextTes
     @Autowired
     WorkflowServiceImpl workflowService;// = new WorkflowServiceImpl();
     WorkflowDAL workflowConfigDAL = new WorkflowDAL();
+    JsonObject testData = new JsonObject();
 
+	
     int taskID = 0;
     int relationTaskID = 0;
     MultipartFile testFile, testFile1;
 
     void prepareAssessmentData() throws InsightsCustomException {
+    	try {
+		    String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + TestngInitializerTest.TESTNG_TESTDATA + File.separator
+                    + TestngInitializerTest.TESTNG_PLATFORMSERVICE + File.separator + "UpshiftAssementService.json";
+			testData = JsonUtils.getJsonData(path).getAsJsonObject();
+			
+		} catch (Exception e) {
+			log.error(e);
+		}
         try {
             InsightsWorkflowType type = new InsightsWorkflowType();
             type.setWorkflowType(WorkflowTaskEnum.WorkflowType.UPSHIFTASSESSMENT.getValue());
@@ -58,13 +70,7 @@ public class UpshiftAssessmentServiceData extends AbstractTestNGSpringContextTes
         }
 
         try {
-            String workflowTaskTest = "{\n" +
-                    "\"description\":\"UPSHIFTNODE_Execute\",\n" +
-                    "\"mqChannel\":\"WORKFLOW.TASK.UPSHIFTREPORT.EXCECUTION\",\n" +
-                    "\"componentName\":\"com.cognizant.devops.platformreports.assessment.upshift.core.UpshiftAssessmentExecutionSubscriber\",\n" +
-                    "\"dependency\":\"0\",\n" +
-                    "\"workflowType\":\"UPSHIFTASSESSMENT\"\n" +
-                    "}";
+            String workflowTaskTest = testData.get("workflowTaskTest1").toString();
             JsonObject workflowTaskJson = convertStringIntoJson(workflowTaskTest);
             int response = workflowService.saveWorkflowTask(workflowTaskJson);
             InsightsWorkflowTask tasks = workflowConfigDAL
@@ -75,13 +81,7 @@ public class UpshiftAssessmentServiceData extends AbstractTestNGSpringContextTes
         }
 
         try {
-            String workflowTaskTest = "{\n" +
-                    "\"description\":\"UPSHIFTRELATION_Execute\",\n" +
-                    "\"mqChannel\":\"WORKFLOW.TASK.UPSHIFTRELATION.EXCECUTION\",\n" +
-                    "\"componentName\":\"com.cognizant.devops.platformreports.assessment.upshift.core.UpshiftAssessmentRelationExecutionSubscriber\",\n" +
-                    "\"dependency\":\"1\",\n" +
-                    "\"workflowType\":\"UPSHIFTASSESSMENT\"\n" +
-                    "}\n";
+            String workflowTaskTest = testData.get("workflowTaskTest2").toString();
             JsonObject workflowTaskJson = convertStringIntoJson(workflowTaskTest);
             int response = workflowService.saveWorkflowTask(workflowTaskJson);
             InsightsWorkflowTask tasks = workflowConfigDAL

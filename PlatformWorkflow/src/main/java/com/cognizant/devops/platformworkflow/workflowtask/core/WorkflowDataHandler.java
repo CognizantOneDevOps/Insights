@@ -45,9 +45,7 @@ import com.google.gson.JsonObject;
 
 public class WorkflowDataHandler {
 	private static final Logger log = LogManager.getLogger(WorkflowDataHandler.class);
-	
-	
-
+  
 	protected static Map<Integer, WorkflowTaskSubscriberHandler> registry = new HashMap<>(0);
 	WorkflowDAL workflowDAL = new WorkflowDAL();
 
@@ -60,35 +58,46 @@ public class WorkflowDataHandler {
 	 * @return
 	 */
 	public List<InsightsWorkflowConfiguration> getReadyToRunWorkFlowConfigs() {
-
 		List<InsightsWorkflowConfiguration> readyToRunReports = new ArrayList<>();
 		try {
 			List<InsightsWorkflowConfiguration> workflowConfigs = workflowDAL
 					.getAllScheduledAndActiveWorkflowConfiguration();
-			for (InsightsWorkflowConfiguration worflowConfig : workflowConfigs) {
+			for (InsightsWorkflowConfiguration workflowConfig : workflowConfigs) {
 
-				if (worflowConfig.getStatus().equalsIgnoreCase(WorkflowTaskEnum.WorkflowStatus.COMPLETED.name())&& worflowConfig.isReoccurence()) {
-					if (isWorkflowScheduledToRun(worflowConfig.getNextRun())) {
-						readyToRunReports.add(worflowConfig);
-						log.debug("Type=WorkFlow executionId={} workflowId={} LastRunTime={} NextRunTime={} schedule={} isTaskRetry={} TaskRetryCount={} TaskDescription={} "
-								+ StringExpressionConstants.STR_EXP_TASKMQ,"-",worflowConfig.getWorkflowId(),worflowConfig.getLastRun(),worflowConfig.getNextRun(),worflowConfig.getScheduleType(),"-","-","-","-",
-								worflowConfig.getWorkflowType(),0 ,"Completed","-");
+				if (workflowConfig.getStatus().equalsIgnoreCase(WorkflowTaskEnum.WorkflowStatus.COMPLETED.name())
+						&& workflowConfig.isReoccurence()) {
+					if (isWorkflowScheduledToRun(workflowConfig.getNextRun())) {
+						readyToRunReports.add(workflowConfig);
+						log.debug(
+								"Type=WorkFlow executionId={} workflowId={} LastRunTime={} NextRunTime={} schedule={} isTaskRetry={} TaskRetryCount={} TaskDescription={} "
+										+ StringExpressionConstants.STR_EXP_TASKMQ,
+								"-", workflowConfig.getWorkflowId(), workflowConfig.getLastRun(),
+								workflowConfig.getNextRun(), workflowConfig.getScheduleType(), "-", "-", "-", "-",
+								workflowConfig.getWorkflowType(), 0, "Completed", "-");
+					} else {
+						log.debug(
+								"Type=WorkFlow executionId={} workflowId={} LastRunTime={} NextRunTime={} schedule={} WorkflowType={} message={}",
+								"-", workflowConfig.getWorkflowId(), workflowConfig.getLastRun(),
+								workflowConfig.getNextRun(), workflowConfig.getScheduleType(),
+								workflowConfig.getWorkflowType(), "Not due for scheduled");
 					}
-				} else if (worflowConfig.getStatus()
+				} else if (workflowConfig.getStatus()
 						.equalsIgnoreCase(WorkflowTaskEnum.WorkflowStatus.NOT_STARTED.name())
-						|| worflowConfig.getStatus()						
+						|| workflowConfig.getStatus()
 								.equalsIgnoreCase(WorkflowTaskEnum.WorkflowStatus.RESTART.toString())) {
-					log.debug(StringExpressionConstants.STR_EXP_WORKFLOW_2+ StringExpressionConstants.STR_EXP_TASKMQ,"-"
-							,worflowConfig.getWorkflowId(),worflowConfig.getLastRun(),worflowConfig.getNextRun(),worflowConfig.getScheduleType(),"-","-","-","-",
-							worflowConfig.getWorkflowType(),0 ,"Restart","-");
-					readyToRunReports.add(worflowConfig);
+					log.debug(StringExpressionConstants.STR_EXP_WORKFLOW_2 + StringExpressionConstants.STR_EXP_TASKMQ,
+							"-", workflowConfig.getWorkflowId(), workflowConfig.getLastRun(),
+							workflowConfig.getNextRun(), workflowConfig.getScheduleType(), "-", "-", "-", "-",
+							workflowConfig.getWorkflowType(), 0, "Restart", "-");
+					readyToRunReports.add(workflowConfig);
 				}
 			}
 		} catch (Exception e) {
 			log.error("Error while preparing workflows for execution ", e);
-			log.error("Type=WorkFlow executionId={} WorkflowId={} LastRunTime={} NextRunTime={} schedule={} isTaskRetry={} TaskRetryCount={} TaskDescription={}"
-					+ StringExpressionConstants.STR_EXP_TASKMQ
-					,"-","-","-","-","-","-","-","-","-","-",0 ,"-",e.getMessage());
+			log.error(
+					"Type=WorkFlow executionId={} WorkflowId={} LastRunTime={} NextRunTime={} schedule={} isTaskRetry={} TaskRetryCount={} TaskDescription={}"
+							+ StringExpressionConstants.STR_EXP_TASKMQ,
+					"-", "-", "-", "-", "-", "-", "-", "-", "-", "-", 0, "-", e.getMessage());
 		}
 		return readyToRunReports;
 	}
@@ -99,7 +108,6 @@ public class WorkflowDataHandler {
 	 * @return
 	 */
 	public List<InsightsWorkflowConfiguration> getImmediateWorkFlowConfigs() {
-
 		
 		List<InsightsWorkflowConfiguration> readyToRunReports = new ArrayList<>();		
 		String WorkflowId ="-" ;		
@@ -147,7 +155,7 @@ public class WorkflowDataHandler {
 	 * @return
 	 */
 	public List<InsightsWorkflowExecutionHistory> getFailedTasksForRetry() {
-
+		
 		List<InsightsWorkflowExecutionHistory> workflowHistoryIds = new ArrayList<>();
 		try {
 			workflowHistoryIds = workflowDAL.getErrorExecutionHistoryBasedOnWorflow();
@@ -242,6 +250,7 @@ public class WorkflowDataHandler {
 	 */
 	public void publishMessageInMQ(String routingKey, JsonObject mqRequestJson)
 			throws WorkflowTaskInitializationException {
+		
 		long startTime = System.nanoTime();
 		try {
 			int subscribedTaskId = mqRequestJson.get(AssessmentReportAndWorkflowConstants.CURRENTTASKID).getAsInt();
@@ -273,6 +282,7 @@ public class WorkflowDataHandler {
 	 * @return
 	 */	
 	public int saveWorkflowExecutionHistory(Map<String, Object> requestMessage) {
+		
 		long startTime = System.nanoTime();
 		String workflowId = String.valueOf(requestMessage.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID));
 		InsightsWorkflowConfiguration workflowConfig = workflowDAL
@@ -290,7 +300,7 @@ public class WorkflowDataHandler {
 			updateWorkflowDetails(workflowId, WorkflowTaskEnum.WorkflowTaskStatus.IN_PROGRESS.toString(), false);
 		}
 		long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-		log.debug(" Worlflow Detail ==== saveWorkflowExecutionHistory completed  ");
+		log.debug(" Worlflow Detail ====  WorkflowId={} saveWorkflowExecutionHistory completed  ", workflowId);
 		log.debug(StringExpressionConstants.STR_EXP_WORKFLOW_2+ StringExpressionConstants.STR_EXP_TASKMQ,requestMessage.get(AssessmentReportAndWorkflowConstants.EXECUTIONID),workflowId,workflowConfig.getLastRun(),
 				workflowConfig.getNextRun(),workflowConfig.getScheduleType(),requestMessage.get(AssessmentReportAndWorkflowConstants.ISWOKFLOWTASKRETRY),historyConfig.getRetryCount(),"-","-","-",processingTime,"InProgress","-");		
 		return historyId;
@@ -321,11 +331,12 @@ public class WorkflowDataHandler {
 	 */
 	public void publishMessageToNextInMQ(Map<String, Object> requestMessage)
 			throws WorkflowTaskInitializationException {
+		
 		long startTime = System.nanoTime();
 		InsightsWorkflowTask insightsWorkflowTaskEntity = new InsightsWorkflowTask();
 		String workflowId =String.valueOf(requestMessage.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID));
 		try {
-			log.debug(" Worlflow Detail ==== publishMessageToNextInMQ start {}", requestMessage);			
+			log.debug(" Worlflow Detail ==== workflowId {} publishMessageToNextInMQ start {}", workflowId, requestMessage);			
 			insightsWorkflowTaskEntity = workflowDAL
 					.getTaskByTaskId((int) requestMessage.get(AssessmentReportAndWorkflowConstants.NEXT_TASK_ID));
 			InsightsWorkflowTaskSequence currentTaskSequence = workflowDAL
@@ -333,7 +344,7 @@ public class WorkflowDataHandler {
 			InsightsWorkflowTaskSequence nextTaskSequence = workflowDAL
 					.getWorkflowTaskSequenceByWorkflowAndTaskId(workflowId, (int) requestMessage.get(AssessmentReportAndWorkflowConstants.NEXT_TASK_ID));
 			if (currentTaskSequence.getNextTask() == -1) {
-				log.debug("Worlflow Detail ==== This is last task update workflow config ");
+				log.debug("Worlflow Detail ==== workflowId {} This is last task update workflow config ", workflowId);
 				updateWorkflowDetails(workflowId, WorkflowTaskEnum.WorkflowTaskStatus.COMPLETED.toString(), true);
 				
 			} else {
@@ -341,7 +352,7 @@ public class WorkflowDataHandler {
 				createTaskRequestJson((long) requestMessage.get(AssessmentReportAndWorkflowConstants.EXECUTIONID), workflowId,
 						(int) requestMessage.get("nextTaskId"), nextTaskSequence.getNextTask(),
 						nextTaskSequence.getSequence(), mqRequestJson);
-				log.debug(" Worlflow Detail ====  publish message for nexttask  {}", mqRequestJson);
+				log.debug(" Worlflow Detail ==== workflowId {} publish message for nexttask  {}", workflowId, mqRequestJson);
 				publishMessageInMQ(insightsWorkflowTaskEntity.getMqChannel(), mqRequestJson);
 				long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
 				log.debug("Type=WorkFlow  executionId={} WorkflowId={}  LastRunTime={} NextRunTime={} schedule={} isTaskRetry={} TaskRetryCount={} TaskDescription={} "
@@ -350,16 +361,16 @@ public class WorkflowDataHandler {
 				
 			}
 			
-			log.debug(" Worlflow Detail ====  publishMessageToNextInMQ completed ");			
+			log.debug(" Worlflow Detail ==== workflowId {} publishMessageToNextInMQ completed ", workflowId);			
 			
 		} catch (WorkflowTaskInitializationException we) {
-			log.error("Worlflow Detail ==== Error while publishMessageToNextInMQ  ", we);
+			log.error("Worlflow Detail ==== workflowId{} Error while publishMessageToNextInMQ  ", workflowId, we);
 			log.error(StringExpressionConstants.STR_EXP_WORKFLOW_2+ StringExpressionConstants.STR_EXP_TASKMQ,requestMessage.get(AssessmentReportAndWorkflowConstants.EXECUTIONID),workflowId,"-","-","-",
 					requestMessage.get(AssessmentReportAndWorkflowConstants.ISWOKFLOWTASKRETRY),"-",insightsWorkflowTaskEntity.getDescription(),insightsWorkflowTaskEntity.getMqChannel(),"-",0,"Error","-");
 			throw new WorkflowTaskInitializationException(
 					"Worlflow Detail ====  unable to next task publish message in MQ");			
 		} catch (Exception e) {
-			log.error("Worlflow Detail ==== Error while publishMessageToNextInMQ  ", e);
+			log.error("Worlflow Detail ==== workflowId {} Error while publishMessageToNextInMQ  ", workflowId, e);
 			log.error("Type=WorkFlow executionId={}  WorkflowId={} LastRunTime={} NextRunTime={} schedule={} isTaskRetry={} TaskRetryCount={} TaskDescription={} "
 					+ StringExpressionConstants.STR_EXP_TASKMQ,requestMessage.get(AssessmentReportAndWorkflowConstants.EXECUTIONID),workflowId,"-","-","-",
 					requestMessage.get(AssessmentReportAndWorkflowConstants.ISWOKFLOWTASKRETRY),"-",insightsWorkflowTaskEntity.getDescription(),insightsWorkflowTaskEntity.getMqChannel(),"-",0,"Error","-");
@@ -381,10 +392,10 @@ public class WorkflowDataHandler {
 		workflowConfig.setRunImmediate(Boolean.FALSE);
 		if (isUpdateLastRunTime) {
 			long workflowlastRunTime = InsightsUtils.getCurrentTimeInSeconds();
-			log.debug(" Worlflow Detail ==== Last nextruntime: {} ",workflowConfig.getNextRun());
+			log.debug(" Worlflow Detail ==== workflowId {} Last nextruntime: {} ", workflowId, workflowConfig.getNextRun());
 			long nextRunTime = InsightsUtils.getNextRunTime(workflowConfig.getNextRun(),
 					workflowConfig.getScheduleType(), false);
-			log.debug(" Worlflow Detail ==== Next nextruntime: {} ",nextRunTime);
+			log.debug(" Worlflow Detail ==== workflowId {} Next nextruntime: {} ", workflowId, nextRunTime);
 			workflowConfig.setNextRun(nextRunTime);
 			workflowConfig.setLastRun(workflowlastRunTime);
 		}
@@ -395,7 +406,7 @@ public class WorkflowDataHandler {
 		}
 		workflowConfig.setStatus(status);
 		workflowDAL.updateWorkflowConfig(workflowConfig);
-		log.debug(" Worlflow Detail ====  updateWorkflowStatus completed ");
+		log.debug(" Worlflow Detail ==== worlflowId {} updateWorkflowStatus completed ", workflowId);
 	}
 
 	/**
@@ -421,10 +432,10 @@ public class WorkflowDataHandler {
 		historyConfig.setTaskStatus(status);
 		workflowDAL.updateTaskworkflowExecutionHistory(historyConfig);
 		long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-		log.debug(" Worlflow Detail ====  updateWorkflowExecutionHistory completed ");
+		log.debug(" Worlflow Detail ==== workflowId {} updateWorkflowExecutionHistory completed ", workflowId);
 		log.debug("Type=WorkFlow  WorkflowId={} executionId={} LastRunTime={} NextRunTime={} schedule={} isTaskRetry={} TaskRetryCount={} TaskDescription={} "
-				+ StringExpressionConstants.STR_EXP_TASKMQ,historyConfig.getExecutionId(),"-","-","-","-"
-				,"-",historyConfig.getRetryCount(),"-","-","-",processingTime,historyConfig.getTaskStatus(),"-");
+				+ StringExpressionConstants.STR_EXP_TASKMQ, workflowId, historyConfig.getExecutionId(),"-","-","-","-",
+				historyConfig.getRetryCount(),"-","-",processingTime,historyConfig.getTaskStatus(),"completed");
 	}
 
 	/**

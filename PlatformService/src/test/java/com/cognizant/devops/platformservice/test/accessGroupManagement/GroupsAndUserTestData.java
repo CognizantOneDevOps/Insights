@@ -83,14 +83,7 @@ public class GroupsAndUserTestData extends AbstractTestNGSpringContextTests{
 	
 	JsonObject NewUserRoleViewerJson = null;
 	JsonArray assignNonExistingUserDataJson = null;
-	String userPropertyListEditor = "{\"name\":\"userEditor\",\"email\":\"demo123@gmail.com\",\"userName\":\"userEditor\",\"password\":\"userTest1\",\"role\":\"Editor\",\"orgName\":\"Insights285\",\"orgId\":14}";
-	String userPropertyListViewer = "{\"name\":\"userViewer\",\"email\":\"demo123@gmail.com\",\"userName\":\"userViewer\",\"password\":\"userTest2\",\"role\":\"Viewer\",\"orgName\":\"Insights285\",\"orgId\":14}";
 
-	// AssignUser
-	String assignUserData = "[{\"orgName\":\"Insight_Org\",\"orgId\":2,\"roleName\":\"Viewer\",\"userName\":\"userTest\"}]";
-	String expectedSearchData = "{\"status\":\"success\",\"data\":[{\"orgId\":2,\"name\":\"Insight_Org\",\"role\":\"Editor\"},{\"orgId\":14,\"name\":\"Insights285\",\"role\":\"Editor\"},{\"orgId\":1,\"name\":\"Main Org.\",\"role\":\"Viewer\"},{\"orgId\":4,\"name\":\"T-Demo\",\"role\":\"Viewer\"}]}";
-
-	
 	GrafanaHandler grafanaHandler = new GrafanaHandler();
 	
 	public int getGrafanaOrgId(String orgName) throws InsightsCustomException{

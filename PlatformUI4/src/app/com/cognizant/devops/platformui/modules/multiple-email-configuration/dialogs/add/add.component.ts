@@ -470,7 +470,7 @@ export class AddComponent implements OnInit {
             this.emailConfigForm.value.batchName
           );
           if (!isValidated) {
-            this.messageDialogText = "Please enter a valid Batch Name, it cannot be blank";
+            this.messageDialogText = "Please enter a valid Batch Name.";
           }
         }
       }

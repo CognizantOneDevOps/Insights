@@ -46,6 +46,8 @@ import jakarta.ws.rs.client.Entity;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.glassfish.jersey.apache5.connector.Apache5ConnectorProvider;
+import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
@@ -64,6 +66,7 @@ public class RestApiHandler {
 
 	static Client client ;
 	static Client multipartClient;
+	static Client patchClient;
 	static {
 		try {
 
@@ -129,6 +132,13 @@ public class RestApiHandler {
 			client = ClientBuilder.newBuilder().sslContext(sslContext).build();
 			multipartClient = ClientBuilder.newBuilder().sslContext(sslContext).register(MultiPartFeature.class)
 					.build();
+			
+			// building patchClient using Apache5ConnectorProvider
+			ClientConfig clientConfig = new ClientConfig();
+			clientConfig.connectorProvider(new Apache5ConnectorProvider());
+			patchClient = ClientBuilder.newBuilder().withConfig(clientConfig).sslContext(sslContext).build();
+			
+			
 			if(client == null) {
 				throw new InsightsCustomException("unable to initilize client");
 			}
@@ -220,7 +230,11 @@ public class RestApiHandler {
 		Response response = null;
 		WebTarget webTarget = null;
 		try {
-			webTarget = client.target(url);
+			if(action.equals("PATCH")) {
+				webTarget = patchClient.target(url);
+			} else {				
+				webTarget = client.target(url);
+			}
 			invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
 			invocationBuilder = invocationBuilderSetter(headers, invocationBuilder);
 			response = responseSetter(requestJson, action, invocationBuilder, response);

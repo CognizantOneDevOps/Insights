@@ -19,10 +19,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
@@ -35,7 +33,7 @@ import com.rabbitmq.client.Envelope;
 public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 
 	private static Logger log = LogManager.getLogger(AgentHealthSubscriber.class.getName());
-
+	
 	public AgentHealthSubscriber(String routingKey) throws Exception {
 		super(routingKey);
 	}

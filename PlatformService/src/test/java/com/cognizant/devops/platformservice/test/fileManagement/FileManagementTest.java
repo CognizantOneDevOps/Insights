@@ -15,9 +15,13 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.test.fileManagement;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Base64;
 import org.apache.commons.compress.utils.IOUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
@@ -25,13 +29,18 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.multipart.MultipartFile;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFilesDAL;
 import com.cognizant.devops.platformservice.rest.filemanagement.controller.FileManagementController;
 import com.cognizant.devops.platformservice.rest.filemanagement.service.FileManagementServiceImpl;
+import com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest;
 import com.google.gson.JsonObject;
 
 @Test
@@ -44,7 +53,20 @@ public class FileManagementTest extends FileManagementTestData {
 	@Autowired
 	FileManagementServiceImpl fileManagementService;
 	InsightsConfigFilesDAL configFilesDAL = new InsightsConfigFilesDAL();
-	
+	JsonObject testData = new JsonObject();	
+	private static Logger log = LogManager.getLogger(FileManagementTest.class);
+
+	@BeforeClass
+	public void prepareData() throws InsightsCustomException {
+		try {
+			String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + TestngInitializerTest.TESTNG_TESTDATA + File.separator
+					+ TestngInitializerTest.TESTNG_PLATFORMSERVICE + File.separator + "FileManagement.json";
+			testData = JsonUtils.getJsonData(path).getAsJsonObject();
+		} catch (Exception e) {
+			log.error("message", e);
+		}
+	}
+
 	@Test(priority = 1)
 	public void testGetFileTypeList() throws InsightsCustomException{
 		try {
@@ -148,6 +170,7 @@ public class FileManagementTest extends FileManagementTestData {
 	@Test(priority = 9)
 	public void testDownloadConfigFile() throws InsightsCustomException{
 		try {
+			String encodeString = new String(Base64.getEncoder().encodeToString(testData.get("fileDetails").toString().getBytes()));
 			ResponseEntity<byte[]> response = fileManagementController.downloadConfigFile(encodeString);
 			Boolean actual = response.toString().isEmpty();
 			Assert.assertEquals(actual, false);
@@ -171,14 +194,15 @@ public class FileManagementTest extends FileManagementTestData {
 	
 	@Test(priority = 11)
 	public void testGetFileDataException() throws InsightsCustomException{
-			JsonObject response = fileManagementController.deleteConfigurationFile(fileDetailsJson.get("fileName").getAsString());
+			JsonObject response = fileManagementController.deleteConfigurationFile(testData.get("fileDetails").getAsJsonObject().get("fileName").getAsString());
 			String actual = response.get("status").getAsString().replace("\"", "");
 			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
 	}
 	
 	@Test(priority = 12)
 	public void testDownloadConfigFileException() throws InsightsCustomException, IOException{
-			ResponseEntity<byte[]> response = fileManagementController.downloadConfigFile(encodeString);
+		String encodeString = new String(Base64.getEncoder().encodeToString(testData.get("fileDetails").toString().getBytes()));	
+		ResponseEntity<byte[]> response = fileManagementController.downloadConfigFile(encodeString);
 			Assert.assertEquals(response, null);
 	}
 }

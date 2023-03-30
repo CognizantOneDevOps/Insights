@@ -23,7 +23,7 @@ Created on Aug 24, 2022
 import time
 import sys
 from ....core.BaseAgent3 import BaseAgent
-from ....core.FinOpsUtilities import FinOpsUtilities
+from .FinOpsUtilities import FinOpsUtilities
 from datetime import date
 import datetime
 import json

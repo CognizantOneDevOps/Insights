@@ -28,14 +28,21 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 
 import org.apache.log4j.MDC;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.ServletContextInitializer;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.util.Assert;
-import org.springframework.web.WebApplicationInitializer;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
@@ -45,15 +52,19 @@ import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.masterdata.ProcessMasterData;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
-import com.cognizant.devops.platformservice.security.config.InsightsResponseHeaderWriterFilter;
 
 /**
  * 
  * @author 146414 This class will initialize the config.json.
  */
-public class PlatformServiceInitializer implements WebApplicationInitializer {
-	static Logger log = LogManager.getLogger(PlatformServiceInitializer.class.getName());
+@Configuration("platformServiceInitializer")
+public class PlatformServiceInitializer implements ServletContextInitializer  {
 
+	static Logger log = LogManager.getLogger(PlatformServiceInitializer.class.getName());
+	
+	@Autowired
+	ProcessMasterData processMasterData;
+	
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		long startTime = System.currentTimeMillis();
@@ -65,49 +76,51 @@ public class PlatformServiceInitializer implements WebApplicationInitializer {
 			MDC.put(LogMessageConstants.HTTPMETHOD, "-");
 			log.debug("Inside PlatformServiceInitializer onStartup ============================ ");
 			
+			AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
+			ctx.register(PlatformServiceInitializer.class);
+	        ctx.setServletContext(servletContext);
+	        ServletRegistration.Dynamic servlet = servletContext.addServlet("dispatcher", new DispatcherServlet(ctx));
+
 			loadServerConfig();
-			
+
 			ApplicationConfigCache.updateLogLevel(LogLevelConstants.PLATFORMSERVICE);
-			
+
 			validateAutheticationProtocol();
-			
+
 			disableSslVerification();
-			
-			ProcessMasterData processMasterData = new ProcessMasterData();
+
 			String triggerResponse = processMasterData.executeTriggerStatement();
 			log.debug(triggerResponse);
-			processMasterData.executeMasterDataProcessing();
+			processMasterData.executeMasterDataProcessing();	
 
-			servletContext.addFilter("InsightsResponseHeaderWriter", InsightsResponseHeaderWriterFilter.class)
-					.addMappingForUrlPatterns(null, false, "/*");
-			
-			//sessionCookiesDefine(servletContext);
-			
+			sessionCookiesDefine(servletContext);
+
 			PlatformServiceStatusProvider.getInstance().createPlatformServiceStatusNode(
 					"PlatformService Started Successfully", PlatformServiceConstants.SUCCESS);
 		} catch (Exception e) {
-			log.debug(" Error in starting PlatformService ",e);
+			log.debug(" Error in starting PlatformService ", e);
 			PlatformServiceStatusProvider.getInstance().createPlatformServiceStatusNode(
 					"Error in starting PlatformService", PlatformServiceConstants.FAILURE);
 			Assert.isTrue(Boolean.FALSE, "Error in starting PlatformService " + e.getMessage());
-		}finally {
-			long processingTime = System.currentTimeMillis() - startTime;
-			MDC.put(LogMessageConstants.PROCESSINGTIME, processingTime);
-			log.debug("Inside PlatformServiceInitializer onStartup completed ============================ ");
-			MDC.put(LogMessageConstants.PROCESSINGTIME, 0);
-		}
+		} 
+		
+		long processingTime = System.currentTimeMillis() - startTime;
+		MDC.put(LogMessageConstants.PROCESSINGTIME, processingTime);
+		log.debug("Inside PlatformServiceInitializer onStartup completed ============================ ");
+		MDC.put(LogMessageConstants.PROCESSINGTIME, 0);
 
 	}
 
-//	private void sessionCookiesDefine(ServletContext servletContext) {
-//		servletContext.setSessionTrackingModes(Collections.singleton(SessionTrackingMode.COOKIE));
-//        SessionCookieConfig sessionCookieConfig = servletContext.getSessionCookieConfig();
-//        sessionCookieConfig.setHttpOnly(true);
-//        sessionCookieConfig.setSecure(true);
-//	}
+	private void sessionCookiesDefine(ServletContext servletContext) {
+		servletContext.setSessionTrackingModes(Collections.singleton(SessionTrackingMode.COOKIE));
+		SessionCookieConfig sessionCookieConfig = servletContext.getSessionCookieConfig();
+		sessionCookieConfig.setHttpOnly(true);
+		sessionCookieConfig.setSecure(true);
+	}
 
 	private void loadServerConfig() {
 		try {
+			log.debug(" Inside loadServerConfig ");
 			ApplicationConfigCache.loadInitialConfigCache();
 		} catch (InsightsCustomException e) {
 			log.error(e);
@@ -139,27 +152,27 @@ public class PlatformServiceInitializer implements WebApplicationInitializer {
 					return myTrustedAnchors;
 				}
 
-			  @Override
-			    public void checkClientTrusted(X509Certificate[] certs, String authType) throws CertificateException {
-						try {
-							for (X509Certificate cert : certs) {
-								cert.checkValidity();
-							}
-						} catch (Exception e) {
-							log.error(e);
+				@Override
+				public void checkClientTrusted(X509Certificate[] certs, String authType) throws CertificateException {
+					try {
+						for (X509Certificate cert : certs) {
+							cert.checkValidity();
 						}
-			    }
+					} catch (Exception e) {
+						log.error(e);
+					}
+				}
 
-			    @Override
-			    public void checkServerTrusted(X509Certificate[] certs, String authType) throws CertificateException {
-						try {
-							for (X509Certificate cert : certs) {
-								cert.checkValidity();
-							}
-						} catch (Exception e) {
-							log.error(e);
+				@Override
+				public void checkServerTrusted(X509Certificate[] certs, String authType) throws CertificateException {
+					try {
+						for (X509Certificate cert : certs) {
+							cert.checkValidity();
 						}
-			    }
+					} catch (Exception e) {
+						log.error(e);
+					}
+				}
 			} };
 
 			// Install the all-trusting trust manager

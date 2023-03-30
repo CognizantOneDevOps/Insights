@@ -1,5 +1,4 @@
-import { DataSourceJsonData } from '@grafana/data';
-import { DataQuery } from '@grafana/data';
+import { DataSourceJsonData,DataQuery } from '@grafana/data';
 
 export interface MyQuery extends DataQuery {
   queryText?: string;
@@ -15,7 +14,7 @@ export interface MyQuery extends DataQuery {
   fixTime: any;
   cacheType: any;
   cacheValue: any;
-  serviceUrl:any;
+  serviceUrl: any;
 }
 
 

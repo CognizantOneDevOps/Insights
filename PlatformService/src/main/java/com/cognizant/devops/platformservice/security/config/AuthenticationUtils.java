@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AuthorizationServiceException;
@@ -49,6 +50,7 @@ import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.nimbusds.jwt.JWTClaimsSet;
 
 @Component("authenticationUtils")
+@DependsOn("platformServiceInitializer")
 public class AuthenticationUtils {
 	private static Logger log = LogManager.getLogger(AuthenticationUtils.class);
 

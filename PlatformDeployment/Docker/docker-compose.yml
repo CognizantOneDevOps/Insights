@@ -87,6 +87,7 @@ services:
       -  serverconfig:/usr/INSIGHTS_HOME/.InSights
     ports:
       - 38080:8080
+      - 38081:8081
 
   engine:
     image: devopsbasservice/onedevopsinsights:engine$INSIGHTS_VERSION

@@ -27,6 +27,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 
 public class InsightsResponseHeaderWriterFilter extends OncePerRequestFilter {
@@ -63,6 +64,11 @@ public class InsightsResponseHeaderWriterFilter extends OncePerRequestFilter {
 					request.getHeader(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD));
 			response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
 			response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+			
+			if ("JWT".equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
+				response.setHeader("X-Frame-Options", "ALLOW-FROM "
+					+ ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getJwtTokenOriginServerURL());
+			}
 		} catch (Exception e) {
 			log.error("Invalid detail in  InsightsResponseHeaderWriter {}", e.getMessage());
 			String msg = PlatformServiceUtil

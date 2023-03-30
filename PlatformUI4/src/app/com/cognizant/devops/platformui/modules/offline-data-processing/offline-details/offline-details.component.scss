@@ -1,0 +1,155 @@
+/********************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License. */
+
+table,
+mat-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.loading-indicator {
+  position: fixed;
+  z-index: 999;
+  height: 1em;
+  width: 1em;
+  overflow: show;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+.logDetails {
+  .logText {
+    color: var(--text-clr9);
+    font: normal normal normal 14px/24px Open Sans;
+  }
+  .logPath {
+    font: normal normal bold 14px/24px Open Sans;
+    color: var(--text-clr7);
+    text-decoration: none;
+  }
+}
+
+::ng-deep .mat-dialog-content {
+  padding: 10px 30px !important;
+  margin: 0 !important;
+}
+
+.mat-dialog-actions {
+  width: 100%;
+  margin-bottom: 0 !important;
+  position: fixed;
+  bottom: 15px !important;
+}
+
+.footer {
+  width: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  padding: 0 30px !important;
+  align-items: center;
+}
+
+tr.mat-footer-row,
+tr.mat-row-webhook {
+  height: 45px !important;
+  text-align: left !important;
+  vertical-align: middle;
+  padding-right: 65px !important;
+  padding-left: 65px !important;
+}
+
+.mat-row-webhook:nth-child(even) {
+  background-color: #e1e3e7;
+}
+
+.mat-row-webhook:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+.btnAlign {
+  margin-right: 7px;
+  float: right;
+  color: #0033a0;
+}
+
+::ng-deep .mat-form-field-appearance-fill .mat-form-field-flex {
+  background-color: #0b0c0e;
+  border-radius: 0 0 0 0 !important;
+  padding: 0 0 0 0.75em !important;
+  height: 40px;
+}
+
+.mat-select-value {
+  color: #9e9a9a;
+}
+
+td.mat-cell:first-of-type {
+  padding-left: 10px !important;
+}
+
+td.mat-cell:last-of-type {
+  padding-right: 10px !important;
+}
+
+.mat-select-disabled {
+  color: rgba(0, 0, 0, 0.38);
+  background-color: #e1e3e7;
+}
+
+tr.mat-header-row {
+  height: 40px;
+}
+
+td.mat-cell {
+  border-bottom-width: 0px;
+  border-bottom-style: none;
+}
+
+.columnComponent {
+  width: 40%;
+}
+
+.columnComponent {
+  width: 400px;
+
+  ::ng-deep .mat-form-field-infix {
+    padding: 0 !important;
+    border-top: 0 !important;
+  }
+}
+
+.alignSubHeader1 {
+  display: inline-block;
+  padding-top: 19px;
+  padding-left: 16px;
+}
+
+.footer {
+  justify-content: flex-start;
+}
+
+.mat-icon-button:disabled {
+  color: #9e9a9a;
+}
+.mat-icon-button {
+  color: #2d67ff;
+}
+.inputColCss {
+  font: normal normal normal 14px/24px Open Sans;
+}

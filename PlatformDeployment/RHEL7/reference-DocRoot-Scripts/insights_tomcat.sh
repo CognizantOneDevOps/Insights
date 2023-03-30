@@ -23,15 +23,15 @@ sudo rm -rf jq
 cd $INSIGHTS_APP_ROOT_DIRECTORY
 echo -n "Enter Release Version: " 
 read releaseVersion
-sudo wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${releaseVersion}/PlatformUI3-${releaseVersion}.zip -O PlatformUI3.zip
-sudo unzip PlatformUI3.zip && sudo rm -rf PlatformUI3.zip
+sudo wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${releaseVersion}/PlatformUI4-${releaseVersion}.zip -O PlatformUI4.zip
+sudo unzip PlatformUI4.zip && sudo rm -rf PlatformUI4.zip
 sudo wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${releaseVersion}/PlatformService-${releaseVersion}.war -O PlatformService.war
 #sudo wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.63/bin/apache-tomcat-9.0.63.tar.gz
 sudo wget https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.68/bin/apache-tomcat-9.0.68.tar.gz
 sudo tar -zxvf apache-tomcat*.tar.gz
 sudo mv apache-tomcat-9.0.68 apache-tomcat
 sudo cp -R ./app $INSIGHTS_APP_ROOT_DIRECTORY/apache-tomcat/webapps
-sudo rm -rf PlatformUI3
+sudo rm -rf PlatformUI4
 export myextip=$(wget -qO- icanhazip.com)
 echo $myextip
 ServiceEndpoint="http://$myextip:8080"

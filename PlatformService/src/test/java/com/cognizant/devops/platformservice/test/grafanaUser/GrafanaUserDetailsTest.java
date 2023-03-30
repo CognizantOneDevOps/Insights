@@ -30,11 +30,11 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
-import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.cognizant.devops.platformservice.security.config.grafana.GrafanaUserDetailsUtil;
+import com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
@@ -47,7 +47,7 @@ public class GrafanaUserDetailsTest extends GrafanaUserDetailsTestData {
 	@DataProvider
 	public void getData() throws FileNotFoundException {
 		String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator
-				+ UnitTestConstant.TESTNG_TESTDATA + File.separator + "grafanaAuth.json";
+				+ TestngInitializerTest.TESTNG_TESTDATA + File.separator + "grafanaAuth.json";
 		
 		try {
 			jsonData = JsonUtils.parseReader(new FileReader(new File(path).getCanonicalPath()));

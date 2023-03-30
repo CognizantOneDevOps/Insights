@@ -80,6 +80,8 @@ export class DashboardPdfDownloadComponent implements OnInit {
   theme: string;
   frequency: any;
   emailAdd: any;
+  panelUrlArray: any =[];
+  
   mailSubject: any;
   mailBody: any;
   disableSave: boolean;
@@ -101,6 +103,7 @@ export class DashboardPdfDownloadComponent implements OnInit {
   enableEmail: boolean;
   themes: any;
   userName: string;
+  queryVaribles : JSON;
 
   constructor(
     public router: Router,
@@ -470,9 +473,13 @@ export class DashboardPdfDownloadComponent implements OnInit {
   }
   getUrlArray() {
     this.urlArray = [];
+    this.panelUrlArray=[];
     let variables;
     variables = this.urlString;
     let dashboard = this.asyncResult.data.dashboard;
+    let cypherQuery : string="";
+    var i:number=0;
+    var j:number=0;
     if (dashboard.panels.length > 0) {
       dashboard.panels.forEach((x) => {
         if (x.type !== "row" && x.type !== "text") {
@@ -490,6 +497,16 @@ export class DashboardPdfDownloadComponent implements OnInit {
               "&theme=" +
               this.theme
           );
+          if(x.targets[0].cypherQuery==undefined){
+            cypherQuery=x.targets[0].queryText;
+          }
+          else{
+            cypherQuery=x.targets[0].cypherQuery;
+          }
+
+          
+          this.panelArray(this.urlArray[i],x.type,cypherQuery,x.title)
+          i=i+1;
         } else if (x.type === "row" && x.collapsed) {
           if (Array.isArray(x.panels)) {
             if (x.type !== "text")
@@ -508,6 +525,9 @@ export class DashboardPdfDownloadComponent implements OnInit {
                     "&theme=" +
                     this.theme
                 );
+                this.panelArray(this.urlArray[j],x.type,x.targets[0].queryText,x.title)
+                j=j+1;
+                
               });
           }
         }
@@ -523,12 +543,28 @@ export class DashboardPdfDownloadComponent implements OnInit {
       );
       return;
     }
+   
+    
+    this.queryVaribles =  dashboard.templating.list;
+  
   }
   onPreviewClick() {
     if (this.validatePreview() === true) {
       this.previewDashboard();
     }
   }
+
+  panelArray(url, type, query,title){
+   
+    let panelInfoJson ={}
+    panelInfoJson["panelURL"] = url;
+    panelInfoJson["type"] = type;
+    panelInfoJson["query"] = query;
+    panelInfoJson["title"] = title;
+    this.panelUrlArray.push(panelInfoJson);
+    
+    }
+
   validatePreview() {
     let filtArr = [];
     let containsNull: boolean;
@@ -686,7 +722,6 @@ export class DashboardPdfDownloadComponent implements OnInit {
     this.timeValue = event.value;
   }
   save() {
-    console.log(this.title);
     this.isDatainProgress = true;
     this.getUrlArray();
     let variables = "";
@@ -721,7 +756,6 @@ export class DashboardPdfDownloadComponent implements OnInit {
     saveObj["pdfType"] = [this.pdfType];
     saveObj["variables"] = variables;
     saveObj["dashUrl"] = this.saveUrl;
-    saveObj["panelUrls"] = this.urlArray;
     saveObj["metadata"] = metaObj;
     saveObj["range"] = this.timeRange;
     saveObj["scheduleType"] = this.frequency;
@@ -729,6 +763,8 @@ export class DashboardPdfDownloadComponent implements OnInit {
     saveObj["dashboard"] = this.dashboard;
     saveObj["userName"] = this.userName;
     saveObj["theme"] = this.theme;
+    saveObj["panelUrlArray"]=this.panelUrlArray;
+    saveObj["grafanaVariables"] = this.queryVaribles;
     if (this.emailDetails != null) {
       saveObj["emailDetails"] = this.emailDetails;
     }
@@ -746,6 +782,7 @@ export class DashboardPdfDownloadComponent implements OnInit {
       "30%"
     );
     dialogRef.afterClosed().subscribe((result) => {
+      console.log(saveObj);
       if (result == "yes") {
         this.grafanaService
           .saveDashboardAsPDF(saveObj)

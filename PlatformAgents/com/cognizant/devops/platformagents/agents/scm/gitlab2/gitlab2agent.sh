@@ -32,7 +32,7 @@ detectPythonVersion()
 {
      if echo "$1" | grep -q "Python 3"; then
       echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.gitlab2.GitLabAgentV2 import GitLabAgentV2; GitLabAgentV2()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.gitlab2.GitLabAgentV2 import GitLabAgent2; GitLabAgent2()" &
      else
       echo "python version not supported"
       exit 1;

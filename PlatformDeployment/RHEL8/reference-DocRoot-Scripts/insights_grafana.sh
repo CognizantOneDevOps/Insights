@@ -33,9 +33,9 @@ wget https://github.com/CognizantOneDevOps/Insights/archive/refs/heads/master.zi
 sudo unzip Insightsrepo.zip
 sudo mkdir /opt/grafana/data/plugins
 sudo chmod -R 777 data
-sudo cp -r /opt/Insightsrepo/Insights-master/PlatformGrafanaPlugins/Panels/* /opt/grafana/data/plugins/
-sudo cp -r /opt/Insightsrepo/Insights-master/PlatformGrafanaPlugins/DataSources/* /opt/grafana/data/plugins/
-sudo rm -rf /opt/Insightsrepo/*
+sudo cp -r /opt/Insights-master/PlatformGrafanaPlugins/Panels/* /opt/grafana/data/plugins/
+sudo cp -r /opt/Insights-master/PlatformGrafanaPlugins/DataSources/* /opt/grafana/data/plugins/
+sudo rm -rf /opt/Insights-master/*
 cd /opt/grafana/public/dashboards
 wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformGrafanaPlugins/ScriptedDashboard/iSight_ui3.js
 cd /opt/grafana/conf
@@ -50,7 +50,7 @@ sudo sed -i '/^\[database\]$/,/^\[/{s/^user[[:space:]]*=.*/user = grafana/}' def
 sudo sed -i '/^\[database\]$/,/^\[/{s/^password[[:space:]]*=.*/password = '$grafanacreds'/}' defaults.ini
 #sudo sed -i "/user =/ s/=.*/=grafana/" defaults.ini
 #sudo sed -i "/password =/ s/=.*/=$grafanacreds/" defaults.ini
-sudo sed -i "/allow_loading_unsigned_plugins =/ s/=.*/=neo4j-datasource,Inference,cde-inference-plugin,cde-fusion-panel,cognizant-insights-charts/" defaults.ini
+sudo sed -i "/allow_loading_unsigned_plugins =/ s/=.*/=cts-neo-4-j-4-0,Inference,cde-inference-plugin,cde-fusion-panel,cognizant-insights-charts/" defaults.ini
 sudo sed -i "/allow_embedding =/ s/=.*/=true/" defaults.ini
 sudo sed -i 's@</body>@<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script></body>@g' /opt/grafana/public/views/index.html
 cd /opt/grafana

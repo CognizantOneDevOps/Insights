@@ -33,10 +33,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.FilterChainProxy;
@@ -57,7 +55,7 @@ import com.cognizant.devops.platformservice.security.config.InsightsResponseHead
 @EnableWebSecurity
 @Order(value = 1)
 @Conditional(InsightsNativeBeanInitializationCondition.class)
-public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+public class InsightsSecurityConfigurationAdapter  {
 
 	private static Logger log = LogManager.getLogger(InsightsSecurityConfigurationAdapter.class);
 
@@ -70,20 +68,20 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 	DefaultSpringSecurityContextSource contextSource;
 
 	private static final String AUTH_TYPE = "NativeGrafana";
-
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		log.debug("message Inside InsightsSecurityConfigurationAdapter, AuthenticationManagerBuilder **** {} ",
-				ApplicationConfigProvider.getInstance().getAutheticationProtocol());
+	
+	@Bean
+	AuthenticationManager nativeAuthenticationManager(AuthenticationManagerBuilder auth) {
 		if (AUTH_TYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
 			log.debug("message Inside InsightsSecurityConfigurationAdapter, check authentication provider **** ");
 			ApplicationConfigProvider.performSystemCheck();
 			auth.authenticationProvider(new NativeInitialAuthenticationProvider());
 		}
+		return auth.getObject();
 	}
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
+
+	@Bean
+	 SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		log.debug("message Inside InsightsSecurityConfigurationAdapter ,HttpSecurity **** {} ",
 				ApplicationConfigProvider.getInstance().getAutheticationProtocol());
 	
@@ -91,35 +89,39 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 			log.debug("message Inside InsightsSecurityConfigurationAdapter,HttpSecurity check **** ");
 			
 			http.cors();
-			http.csrf().ignoringAntMatchers(AuthenticationUtils.CSRF_IGNORE.toArray(new String[0]))
+			http.csrf().ignoringRequestMatchers(AuthenticationUtils.CSRF_IGNORE.toArray(new String[0]))
 					.csrfTokenRepository(authenticationUtils.csrfTokenRepository());
 					
 			http.exceptionHandling().accessDeniedHandler(springAccessDeniedHandler); 
 			http.headers().xssProtection().and().contentSecurityPolicy("script-src 'self'");
 			
 			http
-			//.addFilterAfter(new InsightsCustomCsrfFilter(), CsrfFilter.class)
-			//.addFilterBefore(new InsightsCrossScriptingFilter(), ConcurrentSessionFilter.class)
 			.addFilterAfter(insightsFilter(), BasicAuthenticationFilter.class)
 			.addFilterAfter(new InsightsResponseHeaderWriterFilter(), BasicAuthenticationFilter.class);
 			
 			http.headers().frameOptions().sameOrigin();
 			
-			http.anonymous().disable().authorizeRequests().antMatchers("/datasources/**").permitAll().antMatchers("/admin/**")
-			.access("hasAuthority('Admin')").antMatchers("/traceability/**").access("hasAuthority('Admin')")
-			.antMatchers("/configure/loadConfigFromResources").permitAll().anyRequest().authenticated();
+			http.anonymous().disable().authorizeHttpRequests()
+			.requestMatchers("/datasources/**").permitAll()
+			.requestMatchers("/datasource/**").permitAll()
+			.requestMatchers("/admin/**").hasAuthority("Admin")
+			.requestMatchers("/traceability/**").hasAuthority("hasAuthority('Admin')")
+			.requestMatchers("/configure/loadConfigFromResources").permitAll()
+			.anyRequest().authenticated();
 			
 			http.logout().logoutSuccessUrl("/");
 		}
+		return http.build();
 	}
 
 	/**
 	 * used to configure WebSecurity ignore
 	 */
-	@Override
-	public void configure(WebSecurity web) throws Exception {
-		web.ignoring().antMatchers("/datasource/**");
-	}
+	 @Bean
+	    public WebSecurityCustomizer webSecurityCustomizer() {
+	        return (web) -> web.ignoring()
+	        		.requestMatchers("/datasource/**");
+	  }
 	
 	/**
 	 * Used to add necessary filter for Grafana Authentication
@@ -127,7 +129,7 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 	 * @return
 	 * @throws Exception
 	 */
-	@Bean
+	
 	@Conditional(InsightsNativeBeanInitializationCondition.class)
 	public FilterChainProxy insightsFilter() throws Exception {
 		log.debug("message Inside FilterChainProxy, initial bean InsightsSecurityConfigurationAdapter **** ");
@@ -175,7 +177,7 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 	/** This bean use for initial level validation
 	 * @return
 	 */
-	@Bean
+//	@Bean
 	@Conditional(InsightsNativeBeanInitializationCondition.class)
 	public InsightsGrafanaAuthenticationFilter insightsInitialProcessingFilter() {
 		InsightsGrafanaAuthenticationFilter initialAuthProcessingFilter = new InsightsGrafanaAuthenticationFilter("/user/authenticate/**");
@@ -183,10 +185,7 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 		return initialAuthProcessingFilter;
 	}
 	
-	/** This bean use to validate External Request 
-	 * @return
-	 */
-	@Bean
+
 	@Conditional(InsightsNativeBeanInitializationCondition.class)
 	public InsightsExternalAPIAuthenticationFilter insightsExternalProcessingFilter() {
 		return new InsightsExternalAPIAuthenticationFilter();

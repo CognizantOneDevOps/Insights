@@ -145,9 +145,9 @@ export const convertResponseToDataFramesTimeSeries1 = (queries, res: any): DataQ
 export function checkCypherQueryModificationKeyword(cypherQuery) {
     let keywords: string[];
     keywords = ["create", "delete", "set", "update", "merge", "detach"];
-    let flag: number = 0;
+    let flag = 0;
     let queryCorrect = true;
-    if (cypherQuery.statements[0].statement == undefined) {
+    if (cypherQuery.statements[0].statement === undefined) {
         return queryCorrect;
     }
     let j;
@@ -162,7 +162,7 @@ export function checkCypherQueryModificationKeyword(cypherQuery) {
             || query.indexOf(" " + keywords[j] + "\n") >= 0
             || query.indexOf("\n" + keywords[j] + "\n") >= 0) { console.log(keywords[j] + " is present."); flag = 1; break; }
     }
-    if (flag == 0) {
+    if (flag === 0) {
         return queryCorrect;
     }
     else {
@@ -178,13 +178,13 @@ export function addTimestampToQuery(query, options) {
             return query;
         }
         if (range.from) {
-            var fromTime = range.from.valueOf() / 1000;
+            let fromTime = range.from.valueOf() / 1000;
             if (query.indexOf('?START_TIME?') > -1) {
                 query = query.replace(/\?START_TIME\?/g, fromTime.toString());
             }
         }
         if (range.to) {
-            var toTime = range.to.valueOf() / 1000;
+            let toTime = range.to.valueOf() / 1000;
             if (query.indexOf('?END_TIME?') > -1) {
                 query = query.replace(/\?END_TIME\?/g, toTime.toString());
             }

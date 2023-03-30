@@ -22,6 +22,9 @@ from datetime import datetime as dateTime2
 import datetime 
 import copy
 import re 
+import json
+import os
+import sys
 from dateutil import parser
 from ....core.BaseAgent3 import BaseAgent
 
@@ -34,108 +37,248 @@ class JiraAgent(BaseAgent):
          self.passwd=self.getCredential("passwd")
          baseUrl=self.config.get("baseUrl",'')
          startFrom = self.config.get("startFrom",'')
-         lastUpdated = self.tracking.get("lastupdated",startFrom)
          currentDate = dateTime2.combine(dateTime2.now().date(), dateTime2.min.time())
          responseTemplate=self.getResponseTemplate()
          fields = self.extractFields(responseTemplate)
-         jiraIssuesUrl = baseUrl+"?jql=updated>='"+lastUpdated+"' ORDER BY updated ASC&maxResults="+str(self.config.get("dataFetchCount", 1000))+'&fields='+fields
          enableIssueModificationTimeline = self.config.get('enableIssueModificationTimeline',False)
          enableReSyncTrigger = self.config.get('enableReSyncTrigger', False)
          bypassSprintExtCall = self.config.get('bypassSprintExtCall', False)
-         issueModificationTimelineCaptureDate=self.tracking.get("issueModificationTimelineCaptureDate", lastUpdated).split(" ")[0]
-         issueModificationTimelineCaptureDate = parser.parse(issueModificationTimelineCaptureDate)
          issueStatusFilter = self.config.get('dynamicTemplate',dict()).get('issueStatusFilter',list())
          changeLog = self.config.get('dynamicTemplate',dict()).get('changeLog',None)
+         versionUrl = self.config.get('dynamicTemplate',{}).get('versionUrl','')
+         self.versionData = self.getResponse(versionUrl,'GET',self.userid,self.passwd,None)
+         self.selectedProjectList = self.config.get('dynamicTemplate','GET').get('selectedProject',None)
+         self.projectDetailsData = []
+         self.projectsData = []
+         self.boardsData = []
+         try:
+            self.resolveTrackingPath()
+            self.loadtrackingCacheFile()
+            if len(self.trackingProjectDetail) == 0:
+                self.processProjectDetails()
+            if len(self.trackingBoardDetail) == 0:
+                self.processBoardProjectDetaila()
+         except Exception as ex:
+            self.baseLogger.error(ex)
+
          if changeLog:
-             jiraIssuesUrl = jiraIssuesUrl+'&expand=changelog'
              changeLogFields = changeLog['fields']
              changeLogMetadata = changeLog['metadata']
              changeLogResponseTemplate= changeLog['responseTemplate']
              startFromDate = parser.parse(startFrom)
-         total = 1
-         maxResults = 0
-         startAt = 0
-         updatetimestamp = None
          sprintField = self.config.get('sprintField',None)
          fieldsList =  list()
          self.propertyExtractor(responseTemplate, fieldsList)
-         while (startAt + maxResults) < total:
-             data =[]
-             workLogData = []
-             issueModificationTimeline = []
-             #jiraIssuesUrl = self.buildJiraRestUrl(baseUrl, startFrom, fields) + '&startAt='+str(startAt + maxResults)
-             response = self.getResponse(jiraIssuesUrl+'&startAt='+str(startAt + maxResults), 'GET', self.userid, self.passwd, None)
-             jiraIssues = response["issues"]
-             for issue in jiraIssues:
-                 parsedIssue = self.parseResponse(responseTemplate, issue)
-                 issueStatus = issue.get('fields', dict()).get ('status',dict()).get('name','')
-                 isIssueStatusFilter = str(issueStatus) not in issueStatusFilter
-                 parsedIssue[0]['processed'] = False
-                 inwardIssueMetaData = list()
-                 outwardIssuesMetaData = list()
-                 issueLinkList = issue.get('fields',{}).get ('issuelinks', list())
-                 for issueLink in issueLinkList :
-                     if 'inwardIssue' in issueLink:
-                         linkType = issueLink.get ('type', {}).get('inward', '')
-                         key = issueLink.get ('inwardIssue', {}).get('key', '')
-                         inwardIssueMetaData.append (key+'__'+linkType)
-                     elif 'outwordIssue' in issueLink:
-                         linkType = issueLink.get ('type', {}).get('outward', '')
-                         key =    issueLink.get ('outwardIssue', {}).get('key', '')
-                         outwardIssuesMetaData.append (key+'__'+linkType)
-                 parsedIssue[0]['inwardIssuesMetaData'] = inwardIssueMetaData
-                 parsedIssue[0]['outwardIssuesMetaData'] = outwardIssuesMetaData
-                 if sprintField:
-                     self .processSprintInformation(parsedIssue, issue, isIssueStatusFilter, sprintField,self.tracking)
-                 for field in fieldsList:
-                     if field not in parsedIssue[0]:
-                        parsedIssue[0][field] = None
-                     data += parsedIssue
-                     if changeLog:
-                        workLogData += self.processChangeLog(issue, changeLogFields, changeLogResponseTemplate, startFromDate, enableIssueModificationTimeline, issueModificationTimeline, issueModificationTimelineCaptureDate)
-             maxResults = response['maxResults']
-             total = response['total']
-             startAt = response['startAt']
-             if len(jiraIssues) > 0:
-                 updatetimestamp = jiraIssues[len(jiraIssues) - 1]["fields"]["updated"]
-                 dt = parser.parse(updatetimestamp)
-                 fromDateTime = dt + datetime.timedelta(minutes=0o1)
-                 fromDateTime = fromDateTime.strftime('%Y-%m-%d %H:%M')
-                 self.tracking["lastupdated"] = fromDateTime
-                 jiraKeyMetadata = {"dataUpdateSupported" : True,"uniqueKey" : ["key"]}
-                 self.publishToolsData(data, jiraKeyMetadata)
-                 #self.publishToolsData(data)
-                 if len(workLogData) > 0:
-                     insighstTimeXFieldMapping = self.config.get('dynamicTemplate',dict()).get('changeLog', {}).get('insightsTimeXFieldMapping',None)
-                     timeStampField=insighstTimeXFieldMapping.get('timefield',None)
-                     timeStampFormat=insighstTimeXFieldMapping.get('timeformat',None)
-                     isEpoch=insighstTimeXFieldMapping.get('isEpoch',None); 
-                     self.publishToolsData(workLogData, changeLogMetadata ,timeStampField,timeStampFormat,isEpoch,True)
-                 if len(issueModificationTimeline) > 0:
-                     self.publishToolsData(issueModificationTimeline, {"labels": ["LATEST"], "relation": {"properties": list(self.changedFields) + ['fields'], "name":"ISSUE_CHANGE_TIMELINE", "source": {"constraints":["key"]}, "destination": {"labels": ["TIMELINE"], "constraints":["timelineDate","timelineDateEpoch"]}}})
-                 self.updateTrackingJson(self.tracking)
-             else:
-                 break
-         latestJiraDateStr = self.tracking["lastupdated"]
-         latestJiraDate = parser.parse(latestJiraDateStr)
-         lastTrackedDate = parser.parse(self.tracking.get("lastTrakced", lastUpdated).split(' ')[0])
-         lastTracked = lastTrackedDate.strftime("%Y-%m-%d %H:%M")
-         reSync = self.tracking.get("reSync", False)
-         if enableReSyncTrigger:
-             if maxResults and not reSync and 0 >= (currentDate - latestJiraDate).total_seconds() <= (26*60*60) and (currentDate - lastTrackedDate).total_seconds() == (24*60*60):
-                 self.tracking["lastupdated"] = lastTracked
-                 self.tracking["issueModificationTimelineCaptureDate"] = lastTracked
-                 self.tracking["reSync"] = True
-                 self.tracking ["lastTracked"] = currentDate.strftime("%Y-%m-%d %H:%M" )
-             elif reSync and currentDate >= lastTrackedDate:
-                 self.tracking["reSync"] = False
-         if enableIssueModificationTimeline :
-             self.tracking["issueModificationTimelineCaptureDate"] = self.tracking["lastupdated"]
-         if enableReSyncTrigger or enableIssueModificationTimeline:
-             self.updateTrackingJson(self.tracking)
-         if bypassSprintExtCall and maxResults:
-             self.retrieveSprintDetails()
-             self.retrieveSprintReports()
+
+         for project in self.trackingProjectDetail:
+            projectKey = project.get('key')
+            projectName = project['name']
+
+                
+            total = 1
+            maxResults = 0
+            startAt = 0
+            updatetimestamp = None
+            if len(self.selectedProjectList)>0 and projectName not in self.selectedProjectList:
+                continue
+
+            for board in self.trackingBoardDetail:
+                if projectName == board.get('projectName'):
+                    projectType = board.get('type')
+                    boardType = self.tracking.get("boardType",None)
+                    if boardType == None:
+                        boardType = dict()
+                    boardId =str(board.get('boardId'))
+                    boardType[boardId] = projectType
+                    self.tracking["boardType"] = boardType
+                    break
+            lastUpdated = self.tracking.get("lastupdated_"+projectKey,startFrom)
+            issueModificationTimelineCaptureDate = self.tracking.get("issueModificationTimeLineCaptureDate", lastUpdated).split(" ")[0]
+            issueModificationTimelineCaptureDate = parser.parse(issueModificationTimelineCaptureDate)
+            jiraIssuesUrl = baseUrl+"?jql=project='prKey' and updated>='"+lastUpdated+"' ORDER BY updated ASC&maxResults="+str(self.config.get("dataFetchCount",1000))+'&fields='+fields
+            if changeLog:
+                jiraIssuesUrl =jiraIssuesUrl+'&expand=changelog'
+            while (startAt + maxResults) < total:
+                data =[]
+                workLogData = []
+                issueModificationTimeline = []
+                jiraIssuesUrlModified = jiraIssuesUrl.replace('prKey',projectKey,1)
+                response = self.getResponse(jiraIssuesUrlModified+'&startAt='+str(startAt + maxResults), 'GET', self.userid, self.passwd, None)
+                jiraIssues = response["issues"]
+                for issue in jiraIssues:
+                    parsedIssue = self.parseResponse(responseTemplate, issue)
+                    issueStatus = issue.get('fields', dict()).get ('status',dict()).get('name','')
+                    isIssueStatusFilter = str(issueStatus) not in issueStatusFilter
+                    parsedIssue[0]['processed'] = False
+                    inwardIssueMetaData = list()
+                    outwardIssuesMetaData = list()
+                    issueLinkList = issue.get('fields',{}).get ('issuelinks', list())
+                    for issueLink in issueLinkList :
+                        if 'inwardIssue' in issueLink:
+                            linkType = issueLink.get ('type', {}).get('inward', '')
+                            key = issueLink.get ('inwardIssue', {}).get('key', '')
+                            inwardIssueMetaData.append (key+'__'+linkType)
+                        elif 'outwordIssue' in issueLink:
+                            linkType = issueLink.get ('type', {}).get('outward', '')
+                            key =    issueLink.get ('outwardIssue', {}).get('key', '')
+                            outwardIssuesMetaData.append (key+'__'+linkType)
+                    parsedIssue[0]['inwardIssuesMetaData'] = inwardIssueMetaData
+                    parsedIssue[0]['outwardIssuesMetaData'] = outwardIssuesMetaData
+                    if sprintField:
+                        self .processSprintInformation(parsedIssue, issue, isIssueStatusFilter, sprintField,self.tracking)
+                    for field in fieldsList:
+                        if field not in parsedIssue[0]:
+                            parsedIssue[0][field] = None
+                        data += parsedIssue
+                        if changeLog:
+                            workLogData += self.processChangeLog(issue, changeLogFields, changeLogResponseTemplate, startFromDate, enableIssueModificationTimeline, issueModificationTimeline, issueModificationTimelineCaptureDate)
+                maxResults = response['maxResults']
+                total = response['total']
+                startAt = response['startAt']
+                if len(jiraIssues) > 0:
+                    updatetimestamp = jiraIssues[len(jiraIssues) - 1]["fields"]["updated"]
+                    dt = parser.parse(updatetimestamp)
+                    fromDateTime = dt + datetime.timedelta(minutes=0o1)
+                    fromDateTime = fromDateTime.strftime('%Y-%m-%d %H:%M')
+                    self.tracking["lastupdated_"+projectKey] = fromDateTime
+                    jiraKeyMetadata = {"dataUpdateSupported" : True,"uniqueKey" : ["key"]}
+                    self.publishToolsData(data, jiraKeyMetadata)
+                    if len(workLogData) > 0:
+                        insighstTimeXFieldMapping = self.config.get('dynamicTemplate',dict()).get('changeLog', {}).get('insightsTimeXFieldMapping',None)
+                        timeStampField=insighstTimeXFieldMapping.get('timefield',None)
+                        timeStampFormat=insighstTimeXFieldMapping.get('timeformat',None)
+                        isEpoch=insighstTimeXFieldMapping.get('isEpoch',None); 
+                        self.publishToolsData(workLogData, changeLogMetadata ,timeStampField,timeStampFormat,isEpoch,True)
+                    if len(issueModificationTimeline) > 0:
+                        self.publishToolsData(issueModificationTimeline, {"labels": ["LATEST"], "relation": {"properties": list(self.changedFields) + ['fields'], "name":"ISSUE_CHANGE_TIMELINE", "source": {"constraints":["key"]}, "destination": {"labels": ["TIMELINE"], "constraints":["timelineDate","timelineDateEpoch"]}}})
+                    self.updateTrackingJson(self.tracking)
+                else:
+                    break
+            latestJiraDateStr = self.tracking["lastupdated_"+projectKey]
+            latestJiraDate = parser.parse(latestJiraDateStr)
+            lastTrackedDate = parser.parse(self.tracking.get("lastTrakced", lastUpdated).split(' ')[0])
+            lastTracked = lastTrackedDate.strftime("%Y-%m-%d %H:%M")
+            reSync = self.tracking.get("reSync", False)
+            if enableReSyncTrigger:
+                if maxResults and not reSync and 0 >= (currentDate - latestJiraDate).total_seconds() <= (26*60*60) and (currentDate - lastTrackedDate).total_seconds() == (24*60*60):
+                    self.tracking["lastupdated_"+projectKey] = lastTracked
+                    self.tracking["issueModificationTimelineCaptureDate"] = lastTracked
+                    self.tracking["reSync"] = True
+                    self.tracking ["lastTracked"] = currentDate.strftime("%Y-%m-%d %H:%M" )
+                elif reSync and currentDate >= lastTrackedDate:
+                    self.tracking["reSync"] = False
+            if enableIssueModificationTimeline :
+                self.tracking["issueModificationTimelineCaptureDate"] = self.tracking["lastupdated_"+projectKey]
+            if enableReSyncTrigger or enableIssueModificationTimeline:
+                self.updateTrackingJson(self.tracking)
+            if bypassSprintExtCall and maxResults and projectType == 'scrum':
+                self.retrieveSprintDetails()
+                self.retrieveSprintReports()
+
+    def processProjectDetails(self):
+        try:
+            self.baseLogger.info(" inside processProjectDetails method=======")
+            extensions = self.config.get('dynamicTemplate', {}).get('extensions', None)
+            projects = extensions.get('projects', None)
+            projectUrl = projects.get('projectApiUrl','')
+            projectMetaData = projects.get("projectMetaData")
+            allProjectaData = self.getResponse(projectUrl, 'GET',self.userid,self.passwd, None)
+            for project in allProjectaData:
+                projectDict = {
+                               "id": project["id"],
+                               "key": project["key"],
+                               "name": project["name"]
+                              }
+                projectcategory = project.get("projectCategory",None)
+                if projectcategory:
+                    projectDict["projectCategoryane"] = projectcategory.get("name")
+                    projectDict["projectCategoryId"]= projectcategory.get("id")
+                self.projectsData.append(projectDict)
+            self.updateJsonFile(self.trackingProjectDetailPath, self.projectsData)
+            self.loadtrackingCacheFile()
+            self.publishToolsData (self.projectsData, metadata=projectMetaData)
+        except Exception as ex:
+            self.baseLogger.error(ex)
+
+    def resolveTrackingPath(self):
+        try:
+            agentDir = os.path.dirname(sys.modules[self.__class__.__module__].__file__) + os.path.sep
+            self.trackingProjectDetailPath = agentDir +'trackingProjectDetail.json'
+            trackingProjectDetailPathPresent = os.path.isfile(self.trackingProjectDetailPath)
+            self.trackingBoardDetailPath = agentDir +'trackingBoardDetail.json'
+            trackingBoardDetailPathPresent = os.path.isfile(self.trackingBoardDetailPath)
+            if not trackingProjectDetailPathPresent:
+                self.updateJsonFile(self.trackingProjectDetailPath, [])
+            if not trackingBoardDetailPathPresent:
+                self.updateJsonFile(self.trackingBoardDetailPath, [])   
+        except Exception as ex:
+            raise ValueError(ex)
+
+    def loadtrackingCacheFile(self):
+        self.baseLogger.info('Inside loadtrackingCacheFile')
+        self.trackingProjectDetail = self.readJsonFile(self.trackingProjectDetailPath)
+        self.trackingBoardDetail = self.readJsonFile(self.trackingBoardDetailPath)
+
+    def readJsonFile(self, jsonFile): 
+        with open(jsonFile, 'r') as config_file:
+            trackingFileData = json.load(config_file) 
+        if trackingFileData == None:
+            raise ValueError('JiraAgent: unable to load '+jsonFile+' JSON')
+        return trackingFileData
+    
+    def updateJsonFile(self, jsonFile, data):
+        with open(jsonFile, 'w') as outfile:
+            json.dump(data, outfile, indent=4, sort_keys=True) 
+
+    def processBoardProjectDetaila (self):
+        try:
+            self.baseLogger.info(" inside processboardProjectDetaila method ====")
+            extensions= self.config.get('dynamicTemplate',{}).get('extensions',None)
+            boards = extensions.get('boards',None)
+            boardUrl = boards.get('boardApiUrl','')
+            boardProjectApiUrl = boards.get('boardProjectApiUrl','')
+            boardMetaData =boards.get("boardMetaData")
+
+            total = 1
+            maxResults = 0
+            startAt = 0
+            while (startAt + maxResults) < total:
+                boardsData = self.getResponse(boardUrl+'?startAt='+str(startAt + maxResults),'GET',self.userid,self.passwd,None)
+                allboards = boardsData.get("values",None)
+                for board in allboards:
+                    totalProject = 1
+                    maxResultsProject = 0
+                    startAtProject = 0
+                    while (startAtProject + maxResultsProject) <totalProject:
+                        boardProjectApiUrlModified = boardProjectApiUrl.replace("boardId",str(board["id"]))
+                        allBoardProjectsData = self.getResponse(boardProjectApiUrlModified+'?startAt='+str(startAtProject + maxResultsProject),'GET',self.userid,self.passwd,None)
+                        projectsDetail = allBoardProjectsData.get("values",None)
+                        for boardAttachedProject in projectsDetail:
+                            #for boardAttachedProject in projectsDetail:
+                                boardProjectDict = {
+                                    "boardId": board["id"],
+                                    "type": board["type"],
+                                    "boardName": board["name"],
+                                    "projectId": boardAttachedProject["id"],
+                                    "projectKey": boardAttachedProject["key"],
+                                    "projectName": boardAttachedProject["name"]
+                                }
+                                projectcategory = boardAttachedProject.get("projectCategory")
+                                if projectcategory:
+                                    boardProjectDict["projectCategoryName"] = projectcategory.get("name")
+                                    boardProjectDict["projectCategoryId"] = projectcategory.get("id")
+                                self.boardsData.append(boardProjectDict)
+                        maxResultsProject = allBoardProjectsData['maxResults']
+                        totalProject = allBoardProjectsData['total']
+                        startAtProject = allBoardProjectsData['startAt']
+                maxResults = boardsData['maxResults']
+                total = boardsData['total']
+                startAt = boardsData['startAt']
+            self.updateJsonFile(self.trackingBoardDetailPath, self.boardsData)
+            self.loadtrackingCacheFile()
+            self.publishToolsData(self.boardsData,metadata=boardMetaData)
+        except Exception as ex:
+            self.baseLogger.error(ex)
 
     def buildJiraRestUrl(self, baseUrl, startFrom, fields):
         lastUpdatedDate = self.tracking.get("lastupdated", startFrom)
@@ -236,6 +379,12 @@ class JiraAgent(BaseAgent):
             #backlog = extensions.get('backlog', None)
             #if backlog:
             #    self.registerExtension('backlog', self.retrieveBacklogDetails, backlog.get('runSchedule'))
+            projects = extensions.get('projects',None)
+            if projects:
+                self.registerExtension('projects', self.processProjectDetails, projects.get('runSchedule'))
+            boards = extensions.get('boards',None)
+            if boards:
+                self.registerExtension('boards', self.processBoardProjectDetaila, boards.get('runSchedule'))
             sprints = extensions.get('sprints', None)
             if sprints and not bypassSprintExtCall:
                 self.registerExtension('sprints', self.retrieveSprintDetails, sprints.get('runSchedule'))
@@ -343,12 +492,15 @@ class JiraAgent(BaseAgent):
 		
         boardApiUrl = sprintDetails.get('boardApiUrl')
         boards = self.tracking.get('boards', None)
+        boardType = self.tracking.get('boardType', None)
         if sprintDetails and boards:
             responseTemplate = sprintDetails.get('sprintResponseTemplate', None)
             sprintMetadata = sprintDetails.get('sprintMetadata')
             for boardId in boards:
                 data = []
                 board = boards[boardId]
+                if boardType[boardId] != 'scrum':
+                    continue 
                 boardRestUrl = boardApiUrl + '/' + str(boardId)
                 try:
                     boardResponse = self.getResponse(boardRestUrl, 'GET', self.userid, self.passwd, None)
@@ -431,6 +583,7 @@ class JiraAgent(BaseAgent):
         sprintDetails = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('sprintReport', None)
         boardApiUrl = sprintDetails.get('boardApiUrl')
         boards = self.tracking.get('boards', None)
+        boardType = self.tracking.get('boardType', None)
         if sprintDetails and boards:
             sprintReportUrl = sprintDetails.get('sprintReportUrl', None)
             responseTemplate = sprintDetails.get('sprintReportResponseTemplate', None)
@@ -439,6 +592,8 @@ class JiraAgent(BaseAgent):
             for boardId in boards:
                 board = boards[boardId]
                 boardName = board.get('name', None)
+                if boardType[boardId] != 'scrum':
+                    continue 
                 if boardName is None:
                     boardRestUrl = boardApiUrl + '/' + str(boardId)
                     try:

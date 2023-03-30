@@ -194,6 +194,10 @@
 	"baseUrl": "",
 	"userid": "",
 	"passwd": "",
+	"agentSecretDetails": [
+		"userid",
+		"passwd"
+	],
 	"loggingSetting": {
 		"logLevel": "WARN",
 		"maxBytes": 5000000,

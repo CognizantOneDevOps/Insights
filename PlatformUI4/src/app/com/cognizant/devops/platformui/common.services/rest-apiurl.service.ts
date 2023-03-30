@@ -217,7 +217,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("LIST_KPI", '/PlatformService/insights/report/getAllActiveKpiList');
         this.addEndPoint("DELETE_KPI", '/PlatformService/insights/report/deleteKpiDefinition');
         this.addEndPoint("UPLOAD_BULK_KPI", '/PlatformService/insights/report/saveBulkKpiDefinition');
-
+ 
         //content
         this.addEndPoint("LIST_CONTENT", '/PlatformService/insights/report/getAllActiveContentList');
         this.addEndPoint("SAVE_DATA_CONTENT", '/PlatformService/insights/report/saveContentDefinition');
@@ -251,7 +251,15 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("GET_CONFIG_FILES", '/PlatformService/filemanagement/getConfigurationFiles');
         this.addEndPoint("DELETE_CONFIG_FILE", '/PlatformService/filemanagement/deleteConfigFile');
         this.addEndPoint("DOWNLOAD_CONFIG_FILE", '/PlatformService/filemanagement/downloadConfigFile');
-
+               
+        //offline data
+        this.addEndPoint("LIST_OFFLINE_DATA", '/PlatformService/insights/offlinedataprocessing/getAllOfflineDataList');
+        this.addEndPoint("UPLOAD_BULK_OFFLINE_DATA", '/PlatformService/insights/offlinedataprocessing/saveBulkOfflineData');
+        this.addEndPoint("SAVE_OFFLINE_DATA", '/PlatformService/insights/offlinedataprocessing/saveOfflineDefinition');
+        this.addEndPoint("UPDATE_OFFLINE_DATA", '/PlatformService/insights/offlinedataprocessing/updateOfflineDefinition');
+        this.addEndPoint("DELETE_QUERY", '/PlatformService/insights/offlinedataprocessing/deleteOfflineDefinition');
+        this.addEndPoint("UPDATE_OFFLINE_CONFIG_STATUS", '/PlatformService/insights/offlinedataprocessing/updateOfflineConfigStatus');
+        
         //Outcome
         this.addEndPoint("SAVE_OUTCOME_CONFIG", '/PlatformService/outcome/saveOutcomeConfig');
         this.addEndPoint("FETCH_OUTCOME_TOOL_CONFIG", '/PlatformService/outcome/fetchMileStoneTools');

@@ -69,7 +69,6 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
 	 * @throws InsightsCustomException 
 	 */
 	public void validateAllParameter() throws InsightsCustomException {
-		log.debug("In getParameterValues .....");
 		Map<String, String[]> parameterMap = request.getParameterMap();
 		int maxParamCount = 50;
 		int paramCount = parameterMap.size();
@@ -96,7 +95,6 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
 		
 		Enumeration<String> headerNames = request.getHeaderNames();
 		List<String> headerNameslist = Collections.list(headerNames);
-		log.debug("In validateAllHeaders started ==== ");
 		StringBuilder headerInfo = new StringBuilder();
 		int maxParamCount = 50;
 		int headersCount = headerNameslist.size();
@@ -110,8 +108,7 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
 				headerInfo.append(headerName.concat(DatataggingConstants.VALIDATE_ALLHEADERS_EQUALS).concat(headersValue).concat(DatataggingConstants.COMMA));
 				ValidationUtils.cleanXSS(headerName,headersValue);				
 			}
-			log.debug("In validatedAllHeaders  ==== {} ",headerInfo);
-			log.debug("In validatedAllHeaders  ====  Completed ");
+			log.debug("In validatedAllHeaders  ==== Completed {} ",headerInfo);
 		}
 	}
 
@@ -120,7 +117,6 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
 	 * @param parameters
 	 */
 	public Cookie[] inValidateAllCookies() {
-		log.debug(" in RequestWrapper get cookies ==== ");
 		Cookie[] cookies = null;
 		cookies = PlatformServiceUtil.validateCookies(request.getCookies());
 		log.debug(" in RequestWrapper cookies ==== Complated ");
