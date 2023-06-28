@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2017 Cognizant Technology Solutions
+ * Copyright 2023 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -157,11 +157,11 @@ public class MileStoneExecutionAggregatorModuleTest {
 	}
 
 	@Test(priority = 4)
-	public void testMilestoneStatusCommunicationSubscriber() {
+	public void testMilestoneWithWrongData() {
 		try {
-			String statusRoutingKey = MQMessageConstants.MILESTONE_STATUS_QUEUE;
-			new MilestoneStatusCommunicationSubscriber(statusRoutingKey);
-			Assert.assertTrue(true);
+			String routingKey = MQMessageConstants.MILESTONE_STATUS_QUEUE;
+			MilestoneStatusCommunicationSubscriber mile = new MilestoneStatusCommunicationSubscriber(routingKey);
+			mile.handleDelivery(routingKey, testData.get("taskMessage").toString());
 		} catch (Exception e) {
 			log.error(e);
 		}

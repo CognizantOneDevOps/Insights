@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.test.assessmentReports;
 
+import static org.testng.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -50,6 +52,7 @@ import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentRepor
 import com.cognizant.devops.platformdal.assessmentreport.InsightsContentConfig;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsKPIConfig;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
+import com.cognizant.devops.platformdal.grafana.pdf.GrafanaOrgToken;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
 import com.cognizant.devops.platformservice.assessmentreport.controller.InsightsAssessmentReportController;
@@ -1441,10 +1444,22 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		}
 	}
 	
+	@Test(priority = 98)
+	public void refreshGrafanaTokenForDifferentOrgs() throws InsightsCustomException {
+		try {
+			int[] orgIds = { 1, 2, 3 };
+			for (int id : orgIds) {
+				GrafanaUtilities.refreshGrafanaToken(id);
+				deleteGrafanaAPIToken(id);
+			}
+			Assert.assertTrue(true);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
 	
 	@AfterClass
 	public void cleanUp() {
-
 		// deleteTask
 		try {
 			InsightsWorkflowTask tasks = workflowConfigDAL.getTaskbyTaskDescription("KPI_Execute_service_test");

@@ -22,10 +22,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.logging.Log;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,14 +35,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.kerberos.authentication.KerberosServiceRequestToken;
-import org.springframework.security.providers.ExpiringUsernameAuthenticationToken;
-import org.springframework.security.saml.SAMLCredential;
+import org.springframework.security.saml2.provider.service.authentication.DefaultSaml2AuthenticatedPrincipal;
+import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
+import org.springframework.security.saml2.provider.service.authentication.Saml2Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -65,7 +67,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 @RestController
 @RequestMapping("/user")
 public class UserDetailsService {
-	
+
 	private static Logger log = LogManager.getLogger(UserDetailsService.class.getName());
 
 	@Autowired
@@ -73,112 +75,84 @@ public class UserDetailsService {
 
 	GrafanaHandler grafanaHandler = new GrafanaHandler();
 
-	/**used to authenticate Grafana User
+	/**
+	 * used to authenticate Grafana User
+	 * 
 	 * @param request
 	 * @return
 	 */
 	@PostMapping(value = "/authenticate", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	@SuppressWarnings("unchecked")
-	public JsonObject authenticateUser(HttpServletRequest request)  {
+	public JsonObject authenticateUser(HttpServletRequest request) {
 		log.debug("Inside authenticateUser ");
 		SecurityContext context = SecurityContextHolder.getContext();
 		InsightsAuthenticationToken authGrafana = (InsightsAuthenticationToken) context.getAuthentication();
 		Map<String, String> responseHeadersgrafanaAttr = (Map<String, String>) authGrafana.getDetails();
-		if(responseHeadersgrafanaAttr!=null) {
-			UserDetails userDetail =(UserDetails) authGrafana.getPrincipal();
+		if (responseHeadersgrafanaAttr != null) {
+			UserDetails userDetail = (UserDetails) authGrafana.getPrincipal();
 			Map<String, Object> params = new HashMap<>();
-			params.put(AuthenticationUtils.AUTHORITY, new ArrayList<>(authGrafana.getAuthorities()).get(0).getAuthority());
-			params.put(AuthenticationUtils.GRAFANA_DETAIL,authGrafana.getDetails());
-			String jToken = AuthenticationUtils.getToken(userDetail.getUsername(), AuthenticationUtils.SESSION_TIME, params);
-			responseHeadersgrafanaAttr.put(AuthenticationUtils.JTOKEN,jToken);
+			params.put(AuthenticationUtils.AUTHORITY,
+					new ArrayList<>(authGrafana.getAuthorities()).get(0).getAuthority());
+			params.put(AuthenticationUtils.GRAFANA_DETAIL, authGrafana.getDetails());
+			String jToken = AuthenticationUtils.getToken(userDetail.getUsername(), AuthenticationUtils.SESSION_TIME,
+					params);
+			responseHeadersgrafanaAttr.put(AuthenticationUtils.JTOKEN, jToken);
 			for (Map.Entry<String, String> entry : responseHeadersgrafanaAttr.entrySet()) {
 				ValidationUtils.cleanXSS(entry.getValue());
 			}
 			return PlatformServiceUtil.buildSuccessResponseWithData(responseHeadersgrafanaAttr);
-		}else {
-			return PlatformServiceUtil.buildFailureResponse("Error in authenticate Grafana User,unable to retrive grafana cookies ");
+		} else {
+			return PlatformServiceUtil
+					.buildFailureResponse("Error in authenticate Grafana User,unable to retrive grafana cookies ");
 		}
 	}
 
-	/** used to authenticate SSO SAML User and Redirect to UI application
+	/**
+	 * used to authenticate SSO SAML User and Redirect to UI application
+	 * 
 	 * @return
 	 * @throws InsightsCustomException
 	 */
 	@GetMapping(value = "/insightsso/authenticateSSO", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public ResponseEntity<Object> authenticateSSOUser() throws InsightsCustomException {
+	public ResponseEntity<Object> authenticateSSOUser(@AuthenticationPrincipal Saml2AuthenticatedPrincipal principal)
+			throws InsightsCustomException {
 		log.debug("Inside authenticateSSOUser");
-
+		
 		HttpHeaders httpHeaders = new HttpHeaders();
 		JsonObject jsonResponse = new JsonObject();
 		try {
-			SecurityContext context = SecurityContextHolder.getContext();
-			Authentication auth = context.getAuthentication();
-			SAMLCredential credentials = (SAMLCredential) auth.getCredentials();
-			String userid = credentials.getNameID().getValue();
-			String givenname = credentials
-					.getAttributeAsString("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname");
-			
-			jsonResponse.addProperty("insights-user-fullname", givenname);
 
-			jsonResponse.addProperty(AuthenticationUtils.GRAFANA_WEBAUTH_HTTP_REQUEST_HEADER, userid);
+			String givenname = principal
+					.getFirstAttribute("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname");
+			String userid = principal.getFirstAttribute("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name");
+			String userEmail = principal
+					.getFirstAttribute("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress");
 
-			validateGrafanaDetail(jsonResponse, userid);
+			jsonResponse.addProperty(AuthenticationUtils.GRAFANA_WEBAUTH_HTTP_REQUEST_HEADER, givenname);
 
-			httpHeaders.add(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY, userid);
+
+			validateGrafanaDetail(jsonResponse, givenname, userid, userEmail);
+
+			httpHeaders.add(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY, givenname);
 
 			URI uri = new URI(ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getRelayStateUrl());
 
 			httpHeaders.setLocation(uri);
-
-		} catch (InsightsCustomException e) {
-			log.error("Error in authenticate SSO User  " , e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(PlatformServiceConstants.GRAFANA_LOGIN_ISSUE);
-		} catch (Exception e) {
+		}catch (Exception e) {
 			log.error("Error in authenticate SSO User  ", e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while login using sso, For detail Please check log file ");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("Error while login using sso, For detail Please check log file ");
 		}
 
-		return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);//success
+		return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);// success
 	}
 
-
-	/** Used to validate authenticate Kerberos User and Redirect to UI application 
-	 * @param request
-	 * @return
-	 */
-	@GetMapping(value = "/insightsso/kerberosLogin", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Object> authenticateKerberosUser(HttpServletRequest request) {
-		log.debug("Inside authenticateKerberosUser kerberosLogin ");
-		HttpHeaders httpHeaders = new HttpHeaders();
-		JsonObject jsonResponse = new JsonObject();
-		
-		try {
-			SecurityContext context = SecurityContextHolder.getContext();
-			KerberosServiceRequestToken authKerberos = (KerberosServiceRequestToken) context.getAuthentication();
-			if(authKerberos !=null) {
-			
-				URI uri = new URI(ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getRelayStateUrl());
 	
-				httpHeaders.setLocation(uri);
-			}else {
-				log.error(" KerberosServiceRequestToken is Empty, Please try again  ");
-			}
-		} catch (Exception e) {
-			log.error("Error in authenticate Kerberos User ", e);
-			String msg = "Error while login using Kerberos, For detail Please check log file ";
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg);
-		}
-		
-		
-		
-		return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);//success
-	}
-	
-
-	/** used to get SAML user detail after login application
+	/**
+	 * used to get SAML user detail after login application
+	 * 
 	 * @return
 	 */
 	@GetMapping(value = "/insightsso/getUserDetail", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -190,73 +164,40 @@ public class UserDetailsService {
 
 		try {
 			SecurityContext context = SecurityContextHolder.getContext();
-			Authentication auth = context.getAuthentication();
-			SAMLCredential credentials = (SAMLCredential) auth.getCredentials();
-			Object principal = auth.getPrincipal();
-			String userid = credentials.getNameID().getValue();
-			
-			String grafanaCurrentOrgRole = validateGrafanaDetail(jsonResponse, userid);
+			Saml2Authentication auth = (Saml2Authentication) context.getAuthentication();
+			DefaultSaml2AuthenticatedPrincipal principleDefault = (DefaultSaml2AuthenticatedPrincipal) auth
+					.getPrincipal();
+
+			String givenname = principleDefault
+					.getFirstAttribute("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname");
+			String userid = principleDefault
+					.getFirstAttribute("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name");
+			String userEmail = principleDefault
+					.getFirstAttribute("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress");
+
+
+			String grafanaCurrentOrgRole = validateGrafanaDetail(jsonResponse, givenname, userid, userEmail);
 			List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
 			updatedAuthorities.add(AuthenticationUtils.getSpringAuthorityRole(grafanaCurrentOrgRole));
-			
+
 			Date expDate = new Date(System.currentTimeMillis() + 60 * 60 * 1000);
-			
+
 			Map<String, Object> params = new HashMap<>();
 			params.put(AuthenticationUtils.AUTHORITY, updatedAuthorities);
-			params.put("tokenExpiration",expDate);
+			params.put("tokenExpiration", expDate);
 
 			String jToken = AuthenticationUtils.getToken(userid, AuthenticationUtils.SESSION_TIME, params);
 			jsonResponse.addProperty(AuthenticationUtils.JTOKEN, jToken);
 
-			// set Authority to spring context
-			ExpiringUsernameAuthenticationToken autharization = new ExpiringUsernameAuthenticationToken(expDate,
-					principal, auth.getCredentials(), updatedAuthorities);
-			
-			SecurityContextHolder.getContext().setAuthentication(autharization);
+			InsightsAuthenticationToken samlJwtAuthenticationToken = new InsightsAuthenticationToken(jToken,
+					auth.getPrincipal(), auth.getCredentials(), updatedAuthorities);
 
-			//httpRequest.setAttribute(AuthenticationUtils.RESPONSE_HEADER_KEY, jsonResponse);
+			SecurityContextHolder.getContext().setAuthentication(samlJwtAuthenticationToken);
+
 		} catch (Exception e) {
 			log.error("Error in SSO Cookie  ", e);
 			return PlatformServiceUtil.buildFailureResponse("Error in SSO Cookie " + e);
 		}
-		return PlatformServiceUtil.buildSuccessResponseWithData(jsonResponse);
-	}
-
-	/** used to get kerberos user detail 
-	 * @return
-	 * @throws InsightsCustomException
-	 */
-	@GetMapping(value = "/insightsso/getKerberosUserDetail", produces = MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody JsonObject getKerberosUserDetail() throws InsightsCustomException {
-
-		log.debug("Inside authenticateKerberos");
-		JsonObject jsonResponse = new JsonObject();
-		try {
-			SecurityContext context = SecurityContextHolder.getContext();
-			KerberosServiceRequestToken authKerberos = (KerberosServiceRequestToken) context.getAuthentication();
-
-			String userid = authKerberos.getName();
-
-			String grafanaCurrentOrgRole = validateGrafanaDetail(jsonResponse, userid);
-			
-			/* This is extracted Authorization header from Kerberos System */
-			String token = ValidationUtils.cleanXSS(httpRequest.getHeader(AuthenticationUtils.AUTH_HEADER_KEY));
-			jsonResponse.addProperty(AuthenticationUtils.JTOKEN, token);
-
-			List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
-			updatedAuthorities.add(AuthenticationUtils.getSpringAuthorityRole(grafanaCurrentOrgRole));
-
-			KerberosServiceRequestToken responseAuth = new KerberosServiceRequestToken(authKerberos.getDetails(),
-					authKerberos.getTicketValidation(), updatedAuthorities, authKerberos.getToken());
-
-			SecurityContextHolder.getContext().setAuthentication(responseAuth);
-
-		} catch (Exception e) {
-			log.error("Error in authenticate Kerberos User..  ", e);
-			return PlatformServiceUtil
-					.buildFailureResponseWithStatusCode("Error while authenticating kerberos request  ", "811");
-		}
-
 		return PlatformServiceUtil.buildSuccessResponseWithData(jsonResponse);
 	}
 
@@ -268,7 +209,7 @@ public class UserDetailsService {
 	@ResponseBody
 	public ResponseEntity<Object> authenticateUserUsingJWT() {
 
-		log.debug("Inside authenticateUserUsingJWT ======= {}",httpRequest.getRequestURI());
+		log.debug("Inside authenticateUserUsingJWT ======= {}", httpRequest.getRequestURI());
 		Map<String, String> headersGrafana = new HashMap<>();
 		HttpHeaders httpHeaders = new HttpHeaders();
 		JsonObject jsonResponse = new JsonObject();
@@ -291,7 +232,7 @@ public class UserDetailsService {
 						ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getRelayStateUrl());
 				httpHeaders.setLocation(uri);
 			} else {
-				log.error(" KerberosServiceRequestToken is Empty, Please try again  ");
+				log.error(" authenticateJWT is Empty, Please try again  ");
 			}
 		} catch (Exception e) {
 			log.error("Error in authenticate JWT User  ", e);
@@ -299,11 +240,11 @@ public class UserDetailsService {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg);
 		}
 
-		return new ResponseEntity<>(jsonResponse, httpHeaders, HttpStatus.OK);//success
+		return new ResponseEntity<>(jsonResponse, httpHeaders, HttpStatus.OK);// success
 	}
 
 	/**
-	 * used to get kerberos user detail
+	 * used to get getJWTUserDetail user detail
 	 * 
 	 * @return
 	 * @throws InsightsCustomException
@@ -319,31 +260,30 @@ public class UserDetailsService {
 			JWTClaimsSet detailData = (JWTClaimsSet) authJWT.getDetails();
 			String userid = detailData.getSubject();
 
-		
 			jsonResponse.addProperty(AuthenticationUtils.GRAFANA_WEBAUTH_HTTP_REQUEST_HEADER, userid);
-			String grafanaCurrentOrgRole = validateGrafanaDetail(jsonResponse, userid);
+			String grafanaCurrentOrgRole = validateGrafanaDetail(jsonResponse, userid, userid, userid);
 
 			List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
 			updatedAuthorities.add(AuthenticationUtils.getSpringAuthorityRole(grafanaCurrentOrgRole));
-			
+
 			Map<String, Object> params = new HashMap<>();
 			params.put(AuthenticationUtils.AUTHORITY, grafanaCurrentOrgRole);
-			params.put("OriginalToken",String.valueOf(authJWT.getPrincipal()));
-			params.put("exp",detailData.getClaim("exp"));
+			params.put("OriginalToken", String.valueOf(authJWT.getPrincipal()));
+			params.put("exp", detailData.getClaim("exp"));
 			String jToken = AuthenticationUtils.getToken(userid, AuthenticationUtils.SESSION_TIME, params);
 
 			InsightsAuthenticationToken jwtAuthenticationToken = new InsightsAuthenticationToken(authJWT.getPrincipal(),
 					detailData, null, updatedAuthorities);
-					
+
 			jsonResponse.addProperty(AuthenticationUtils.JTOKEN, jToken);
-			
+
 			InsightsAuthenticationTokenUtils authenticationtokenUtils = new InsightsAuthenticationTokenUtils();
 			authenticationtokenUtils.updateSecurityContext(jwtAuthenticationToken);
 
 		} catch (Exception e) {
-			log.error("Error in authenticate Kerberos User..  ", e);
+			log.error("Error in authenticate JWT token User..  ", e);
 			return PlatformServiceUtil
-					.buildFailureResponseWithStatusCode("Error while authenticating kerberos request  ", "811");
+					.buildFailureResponseWithStatusCode("Error while authenticating JWT token request  ", "811");
 		}
 
 		return PlatformServiceUtil.buildSuccessResponseWithData(jsonResponse);
@@ -357,24 +297,37 @@ public class UserDetailsService {
 	 * @return
 	 * @throws InsightsCustomException
 	 */
-	private String validateGrafanaDetail(JsonObject jsonResponse, String userid) throws InsightsCustomException {
+	public String validateGrafanaDetail(JsonObject jsonResponse, String name, String loginname, String email)
+			throws InsightsCustomException {
 		Map<String, String> headersGrafana = new HashMap<>();
-		headersGrafana.put(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY, userid);
-		headersGrafana.put(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY_NAME, userid);
-		headersGrafana.put(AuthenticationUtils.HEADER_COOKIES_KEY, "username=" + userid);
+		StringBuilder cookies = new StringBuilder();
+		cookies.append("username=" + loginname).append(";");
+		headersGrafana.put(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY, loginname);
+		headersGrafana.put(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY_NAME, loginname);
+		headersGrafana.put(AuthenticationUtils.HEADER_COOKIES_KEY, cookies.toString());
 
-		String grafanaCurrentOrg = getGrafanaCurrentOrg(headersGrafana);
+		JsonObject userResponseJson = getGrafanaUserInformation(headersGrafana);
+		updateUserDetails(userResponseJson, name, loginname, email);
+
+		String grafanaCurrentOrg = getGrafanaCurrentOrg(headersGrafana, userResponseJson);
 
 		String grafanaCurrentOrgRole = getCurrentOrgRole(headersGrafana, grafanaCurrentOrg);
 
 		jsonResponse.addProperty(AuthenticationUtils.GRAFANA_COOKIES_ORG, grafanaCurrentOrg);
 		jsonResponse.addProperty(AuthenticationUtils.GRAFANA_COOKIES_ROLE, grafanaCurrentOrgRole);
-		jsonResponse.addProperty(AuthenticationUtils.GRAFANA_WEBAUTH_HTTP_REQUEST_HEADER, userid);
-		jsonResponse.addProperty(AuthenticationUtils.SSO_USER_HEADER_KEY, userid);
+		jsonResponse.addProperty(AuthenticationUtils.GRAFANA_WEBAUTH_HTTP_REQUEST_HEADER, loginname);
+		jsonResponse.addProperty(AuthenticationUtils.SSO_USER_HEADER_KEY, loginname);
 		jsonResponse.addProperty(AuthenticationUtils.SSO_LOGOUT_URL,
 				ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getPostLogoutURL());
+		
+		String validatedGrafanaRole =   ValidationUtils.cleanXSS(
+		        org.apache.commons.lang.StringEscapeUtils.escapeHtml(
+		                org.apache.commons.lang.StringEscapeUtils.escapeJavaScript( grafanaCurrentOrgRole
+		                )));
+		
+		log.debug(" validatedGrafanaRole   ================= {} ",validatedGrafanaRole);
 
-		return grafanaCurrentOrgRole;
+		return validatedGrafanaRole;
 
 	}
 
@@ -402,12 +355,10 @@ public class UserDetailsService {
 				grafanaHeaders.put("grafana_sess", null);
 				grafanaHeaders.put("grafana_session", null);
 
-
 			} else {
 				String message = "Not able to logout Grafana";
 				return PlatformServiceUtil.buildFailureResponse(message);
 			}
-
 
 		} catch (Exception e) {
 			log.error(e);
@@ -426,7 +377,7 @@ public class UserDetailsService {
 		try {
 			HttpSession session = httpRequest.getSession(false);
 			String authToken = AuthenticationUtils.extractAndValidateAuthToken(httpRequest);
-			
+
 			logoutGrafana();
 
 			Map<String, String> grafanaHeaders = new HashMap<>();
@@ -435,32 +386,35 @@ public class UserDetailsService {
 			grafanaHeaders.put("grafana_user", null);
 			grafanaHeaders.put("grafana_sess", null);
 			grafanaHeaders.put("grafana_session", null);
-	
+
 			// Remove token
 			boolean isTokenRemoved = AuthenticationUtils.deleteToken(authToken);
-			
-			if(isTokenRemoved) {
+
+			if (isTokenRemoved) {
 				SecurityContextHolder.clearContext();
 				if (session != null) {
 					session.invalidate();
 				}
 			}
 			log.debug("Logout URL response done");
-		}  catch (Exception e) {
-			log.error("Error in logoutSSO User  " , e);
+		} catch (Exception e) {
+			log.error("Error in logoutSSO User  ", e);
 			String msg = "Error while login using sso, For detail Please check log file ";
 			return PlatformServiceUtil.buildFailureResponse(msg);
 		}
 		return PlatformServiceUtil.buildSuccessResponse();
 	}
 
-	/** Get Gafana current organization Role
+	/**
+	 * Get Gafana current organization Role
+	 * 
 	 * @param headers
 	 * @param grafanaCurrentOrg
 	 * @return
 	 * @throws InsightsCustomException
 	 */
-	private String getCurrentOrgRole(Map<String, String> headers, String grafanaCurrentOrg) throws InsightsCustomException {
+	private String getCurrentOrgRole(Map<String, String> headers, String grafanaCurrentOrg)
+			throws InsightsCustomException {
 		String grafanaCurrentOrgResponse = grafanaHandler.grafanaGet("/api/user/orgs", headers);
 		JsonArray grafanaOrgs = JsonUtils.parseStringAsJsonArray(grafanaCurrentOrgResponse);
 		String grafanaCurrentOrgRole = null;
@@ -470,26 +424,67 @@ public class UserDetailsService {
 				break;
 			}
 		}
-		return grafanaCurrentOrgRole;
+		return ValidationUtils.cleanXSS(grafanaCurrentOrgRole);
 	}
 
-	/** Get current Grafana organization 
+	/**
+	 * Get current Grafana organization
+	 * 
 	 * @param headers
 	 * @return
 	 * @throws InsightsCustomException
 	 */
-	private String getGrafanaCurrentOrg(Map<String, String> headers) throws InsightsCustomException {
-		String grafanaCurrentOrgResponse = grafanaHandler.grafanaGet("/api/user", headers);
-		JsonObject responseJson = JsonUtils.parseString(ValidationUtils.validateResponseBody(grafanaCurrentOrgResponse))
-				.getAsJsonObject();
-		String loginId = responseJson.get("login").toString();
+	private String getGrafanaCurrentOrg(Map<String, String> headers, JsonObject grafanaUserResponse)
+			throws InsightsCustomException {
+		String loginId = grafanaUserResponse.get("login").toString();
 		if (loginId == null || loginId.contains("(null)")) {
 			throw new InsightsCustomException(PlatformServiceConstants.GRAFANA_LOGIN_ISSUE);
 		}
-		return responseJson.get("orgId").toString();
+		return grafanaUserResponse.get("orgId").toString();
 	}
-	
-	/** Used to logout grafana for user 
+
+	/**
+	 * Update user information in Grafana
+	 * 
+	 * @param userResponseJson
+	 * @param name
+	 * @param loginname
+	 * @param email
+	 * @throws InsightsCustomException
+	 */
+	private void updateUserDetails(JsonObject userResponseJson, String name, String loginname, String email)
+			throws InsightsCustomException {
+
+		try {
+			Optional<String> loginName = Optional.ofNullable(String.valueOf(userResponseJson.get("name")));
+			if (loginName.isPresent() && !loginName.get().isEmpty()) {
+				String userId = userResponseJson.get("id").toString();
+				String authString = ApplicationConfigProvider.getInstance().getGrafana().getAdminUserName() + ":"
+						+ ApplicationConfigProvider.getInstance().getGrafana().getAdminUserPassword();
+				String encodedString = Base64.getEncoder().encodeToString(authString.getBytes());
+				Map<String, String> headers = new HashMap<>();
+				headers.put(AuthenticationUtils.AUTHORIZATION, AuthenticationUtils.BASIC + encodedString);
+				JsonObject requestCreate = new JsonObject();
+				requestCreate.addProperty("name", name);
+				requestCreate.addProperty("login", loginname);
+				requestCreate.addProperty("email", email);
+
+				grafanaHandler.grafanaPut("/api/users/" + userId, requestCreate, headers);
+			}
+		} catch (InsightsCustomException e) {
+			// log.error(e);
+			log.error("Unable to update user details in SSO login {} ", e.getMessage());
+		}
+	}
+
+	private JsonObject getGrafanaUserInformation(Map<String, String> headers) throws InsightsCustomException {
+		String grafanaUserResponse = grafanaHandler.grafanaGet("/api/user", headers);
+		return JsonUtils.parseString(ValidationUtils.validateResponseBody(grafanaUserResponse)).getAsJsonObject();
+	}
+
+	/**
+	 * Used to logout grafana for user
+	 * 
 	 * @return
 	 */
 	private boolean logoutGrafana() {
@@ -517,35 +512,34 @@ public class UserDetailsService {
 					.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getGrafana().getAdminUserName())) {
 				log.debug(" admin user logout processing");
 				String currentLoginAuthToken = grafanaHandler
-						.grafanaGet(PlatformServiceConstants.API_ADMIN_USERS + grafanauserId + "/auth-tokens", 
-						headers);
+						.grafanaGet(PlatformServiceConstants.API_ADMIN_USERS + grafanauserId + "/auth-tokens", headers);
 				JsonArray listOfAuthToken = JsonUtils.parseStringAsJsonArray(currentLoginAuthToken);
 				log.debug(" admin user logout processing tokal list are {} ", listOfAuthToken.size());
 				for (JsonElement jsonElement : listOfAuthToken) {
 					JsonObject authTokenRequest = new JsonObject();
 					authTokenRequest.addProperty("authTokenId", jsonElement.getAsJsonObject().get("id").getAsInt());
 
-					grafanaHandler.grafanaPost(
-							"/api/admin/users/" + grafanauserId + "/revoke-auth-token", authTokenRequest, headers);
+					grafanaHandler.grafanaPost("/api/admin/users/" + grafanauserId + "/revoke-auth-token",
+							authTokenRequest, headers);
 
 				}
 				logoutResponseStr = "All User auth token revoked";
 			} else {
 				log.debug("normal user logout processing started ");
 				logoutResponseStr = grafanaHandler.grafanaPost("/api/admin/users/" + grafanauserId + "/logout",
-					new JsonObject(), headers);
+						new JsonObject(), headers);
 			}
 
 			if (logoutResponseStr != null && (logoutResponseStr.contains("User auth token revoked")
 					|| logoutResponseStr.contains("User logged out")
 					|| logoutResponseStr.contains("All User auth token revoked"))) {
-				log.debug("Grafana logout done successfully" );
+				log.debug("Grafana logout done successfully");
 				isGrafanaLogout = Boolean.TRUE;
 			} else {
 				log.error("Error while logging out grafana appication {} ", logoutResponseStr);
 			}
 		} catch (Exception e) {
-			log.error(" Logout Grafana  ",e);
+			log.error(" Logout Grafana  ", e);
 		}
 		return isGrafanaLogout;
 	}

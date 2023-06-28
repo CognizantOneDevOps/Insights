@@ -59,10 +59,7 @@ public class LoginWithRolesObjectRepository extends LoginAndSelectModule{
 	
 	@FindBy(xpath = "//span[@id='DashboardGroupsName']")
 	WebElement dashboardGroups;
-	
-	@FindBy(xpath = "//div[@class='mat-list-text']//p[contains(text(),'Audit Reporting ')]")
-	WebElement auditReporting;
-	
+		
 	@FindBy(xpath = "//div[@class='mat-list-text']//p[contains(text(),'Playlist')]")
 	WebElement playlist;
 	

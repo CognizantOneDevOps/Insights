@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2017 Cognizant Technology Solutions
+ * Copyright 2023 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -19,6 +19,7 @@ package com.cognizant.devops.engines.platformengine.message.subscriber;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeoutException;
 
@@ -31,14 +32,15 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.engines.platformengine.modules.aggregator.EngineAggregatorModule;
-import com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing.OfflineDataProcessingExecutor;
 import com.cognizant.devops.engines.platformengine.test.engine.EngineTestData;
 import com.cognizant.devops.engines.testngInitializer.TestngInitializerTest;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
-import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfigDAL;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFilesDAL;
 import com.google.gson.JsonObject;
 
@@ -50,38 +52,16 @@ import com.google.gson.JsonObject;
  *
  */
 @Test
-public class AgentDataSubscriberTest {
-	final int NUM_OF_JSON_FILES = 6;
-	final String JSON_FILE_NAME = "data-enrichment.JSON";
-	final String INCORRECT_JSON_FILE_NAME = "data-enrichment.py";
-	final String FILE_TYPE = "Json";
-	final String LOCAL_DATE_FORMAT = "yyyy/MM/dd hh:mm a";
-	final String EXECUTION_DATE_TIME = "2018/07/16 12:53 PM";
-	String WRONG_EXECUTION_TIME = "2018/07/16 05:50 PM";
-	public static final String DATA_ENRICHMENT_TEMPLATE_ERROR = "data-enrichment-error.json";
-	public static final String DATA_ENRICHMENT_TEMPLATE_NO_QUERY = "data-enrichment-NoCypherQry.json";
-	String filePath = ConfigOptions.OFFLINE_DATA_PROCESSING_RESOLVED_PATH + ConfigOptions.FILE_SEPERATOR
-			+ ConfigOptions.DATA_ENRICHMENT_TEMPLATE;
-	String filePathError = ConfigOptions.OFFLINE_DATA_PROCESSING_RESOLVED_PATH + ConfigOptions.FILE_SEPERATOR
-			+ DATA_ENRICHMENT_TEMPLATE_ERROR;
-	String filePathNoQuery = ConfigOptions.OFFLINE_DATA_PROCESSING_RESOLVED_PATH + ConfigOptions.FILE_SEPERATOR
-			+ DATA_ENRICHMENT_TEMPLATE_NO_QUERY;
-	String CYPHERQUERY = "cypherQuery";
-	String CYPHERQUERYNEGATIVECASE = "cypherQueryNegativeCase";
-	String RUNSCHEDULE = "720";
-	String LASTRUNTIME = "2018/07/16 05:50 PM";
-	String CRON = "0 9 * * 1 ?";
-	String WRONG_CRON = "0 9 * * 1";
+public class AgentDataSubscriberTest extends AgentDataSubscriberTestData{
+	private static Logger log = LogManager.getLogger(AgentDataSubscriberTest.class.getName());
 	AgentDataSubscriberTest executor = null;
 	JsonObject testData = new JsonObject();
-
 	JsonObject engineAggregTestData = new JsonObject();
 	private FileReader reader = null;
 	private Properties p = null;
 	private AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-	CorrelationConfigDAL correlationConfigDAL = new CorrelationConfigDAL();
-	InsightsConfigFilesDAL configFilesDAL = new InsightsConfigFilesDAL();
-	private static Logger log = LogManager.getLogger(AgentDataSubscriberTest.class.getName());
+	private InsightsConfigFilesDAL configFilesDAL = new InsightsConfigFilesDAL();
+	
 	/*
 	 * Start Engine for Data Collection and Node Creation *
 	 */
@@ -117,6 +97,7 @@ public class AgentDataSubscriberTest {
 					EngineTestData.jenkinLabelName, "jenkins",
 					engineAggregTestData.get("jenkinsConfig").getAsJsonObject(), EngineTestData.agentVersion,
 					EngineTestData.osversion, EngineTestData.updateDate, false, false);
+			/******************************************************************************************/
 
 			// for saving business mapping data
 			EngineTestData.saveToolsMappingLabel(engineAggregTestData.get("businessMapping").toString());
@@ -129,32 +110,22 @@ public class AgentDataSubscriberTest {
 		Thread.sleep(1000);
 
 		/*
-		 * Publish Messages to MQ *
+		 * Publish Messages to Queue *
 		 */
-		EngineTestData.publishMessage(engineAggregTestData.get("gitQueueName").getAsString(),
-				engineAggregTestData.get("gitRoutingKey").getAsString(),
-				engineAggregTestData.get("rabbitMQGITTestPlayload").toString());
-		EngineTestData.publishMessage(engineAggregTestData.get("gitQueueName").getAsString(),
-				engineAggregTestData.get("gitRoutingKey").getAsString(),
-				engineAggregTestData.get("rabbitMQGITTestPlayloadWithUniqueKey").toString());
-		EngineTestData.publishMessage(engineAggregTestData.get("gitQueueName").getAsString(),
-				engineAggregTestData.get("gitRoutingKey").getAsString(),
-				engineAggregTestData.get("rabbitMQGITTestPlayloadWithRelation").toString());
-		EngineTestData.publishMessage(engineAggregTestData.get("jenkinQueueName").getAsString(),
-				engineAggregTestData.get("jenkinsRoutingKey").getAsString(),
-				engineAggregTestData.get("rabbitMQJENKINSTestPayload").toString());
+		
+		EngineTestData.publishMessage(engineAggregTestData.get("gitRoutingKey").getAsString(),
+				engineAggregTestData.get("GITTestPlayloadWithRelation").toString());
 
 		Thread.sleep(1000);
+
 
 		/*
 		 * Start Engine for Data Collection and Node Creation *
 		 */
+		
 		EngineAggregatorModule em = new EngineAggregatorModule();
 		em.executeJob();
 		Thread.sleep(1000);
-
-		OfflineDataProcessingExecutor oc = new OfflineDataProcessingExecutor();
-		oc.executeOfflineProcessing();
 
 		log.debug("Test Data flow has been created successfully");
 	}
@@ -167,14 +138,105 @@ public class AgentDataSubscriberTest {
 	@AfterMethod
 	protected void tearDown() throws Exception {
 	}
-
-	@Test
-	public void testAgentDataSubscriber() throws Exception {
+	
+	@Test(priority = 1)
+	public void testAgentData() {
 		try {
-			Assert.assertTrue(true);
+			String routingKey = engineAggregTestData.get("gitRoutingKey").getAsString();
+			String data = engineAggregTestData.get("GITTestPlayload").toString();
+			EngineTestData.publishMessage(routingKey, data);
+			AgentDataSubscriber ads = new AgentDataSubscriber(routingKey);
+			ads.handleDelivery(routingKey, data);
+			JsonObject jsonData = engineAggregTestData.get("GITTestPlayload").getAsJsonObject();
+			String value = jsonData.get("data").getAsJsonArray().get(0).getAsJsonObject().get("gitAuthorName")
+					.toString();
+			int countOfRecords = readNeo4JData(gitLabel, value);
+			Assert.assertTrue(countOfRecords > 0);
 		} catch (Exception e) {
 			log.error(e);
 		}
 	}
 
+	@Test(priority = 2)
+	public void testAgentDataWithUniqueKey() {
+		try {
+			String routingKey = engineAggregTestData.get("gitRoutingKey").getAsString();
+			String data = engineAggregTestData.get("GITTestPlayloadWithUniqueKey").toString();
+			EngineTestData.publishMessage(routingKey, data);
+			AgentDataSubscriber ads = new AgentDataSubscriber(routingKey);
+			ads.handleDelivery(routingKey, data);
+			JsonObject jsonData = engineAggregTestData.get("GITTestPlayloadWithUniqueKey").getAsJsonObject();
+			String value = jsonData.get("data").getAsJsonArray().get(0).getAsJsonObject().get("gitAuthorName")
+					.toString();
+			int countOfRecords = readNeo4JData(gitLabel, value);
+			Assert.assertTrue(countOfRecords > 0);
+		} catch (Exception e) {
+			log.error(e);
+		}
+	}
+
+	@Test(priority = 3)
+	public void testAgentDataWithRelation() {
+		try {
+			String routingKey = engineAggregTestData.get("gitRoutingKey").getAsString();
+			String data = engineAggregTestData.get("GITTestPlayloadWithRelation").toString();
+			EngineTestData.publishMessage(routingKey, data);
+			JsonObject jsonData = engineAggregTestData.get("GITTestPlayloadWithRelation").getAsJsonObject();
+			String value = jsonData.get("data").getAsJsonArray().get(0).getAsJsonObject().get("gitAuthorName")
+					.toString();
+			int countOfRecords = readNeo4JData(gitLabel, value);
+			Assert.assertTrue(countOfRecords > 0);
+		} catch (Exception e) {
+			log.error(e);
+		}
+	}
+	
+	@Test(priority = 4)
+	public void testPublishData() {
+		try {
+			Map map = EngineTestData.readNeo4JData(p.getProperty("gitDataNodeName"), "commitId");
+			Assert.assertEquals(p.getProperty("gitCommitId"), map.get("commitId"));
+			Assert.assertEquals(p.getProperty("gitToolName"), map.get("toolName"));
+			Assert.assertEquals(p.getProperty("gitCategoryName"), map.get("categoryName"));
+		} catch (Exception e) {
+			log.error(e);
+		}
+	}
+	
+	@Test(priority = 5)
+	public void testAgentHealthData() {
+		try {
+			String routingKey = engineAggregTestData.get("gitHealthRoutingKey").getAsString();
+			String data = engineAggregTestData.get("GITHealthPlayload").toString();
+			EngineTestData.publishMessage(routingKey, data);
+			AgentHealthSubscriber ads = new AgentHealthSubscriber(routingKey);
+			ads.handleDelivery(routingKey, data);
+			JsonObject jsonData = engineAggregTestData.get("GITHealthPlayload").getAsJsonObject();
+			String value = jsonData.get("data").getAsJsonArray().get(0).getAsJsonObject().get("gitAuthorName")
+					.toString();
+			int countOfRecords = readNeo4JData(gitLabel, value);
+			Assert.assertTrue(countOfRecords > 0);
+		} catch (Exception e) {
+			log.error(e);
+		}
+	}
+	
+	@Test(priority = 6)
+	public void testNeo4jData() {
+		GraphDBHandler dbHandler = new GraphDBHandler();
+		String query = "MATCH (n:GIT_UNTEST) where exists(n.execId) return count(n) as Total";
+		GraphResponse neo4jResponse;
+		try {
+			neo4jResponse = dbHandler.executeCypherQuery(query);
+			String finalJson = neo4jResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject()
+					.get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").toString().replace("[", "")
+					.replace("]", "");
+			/* Assert on Node Relationship */
+			log.debug("finalJson  {} ", finalJson);
+			Assert.assertTrue(Integer.parseInt(finalJson) > 0); 
+		} catch (InsightsCustomException | AssertionError e) {
+			log.error("InsightsCustomException : or AssertionError " + e);
+		}
+	}
+	
 }

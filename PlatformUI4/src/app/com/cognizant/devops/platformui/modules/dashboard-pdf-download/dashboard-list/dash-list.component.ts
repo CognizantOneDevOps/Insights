@@ -66,6 +66,7 @@ export class DashboardListComponent implements OnInit {
   isActive: boolean;
   currentPageIndex: number = -1;
   totalPages: number = -1;
+  asyncResult: any;
 
   constructor(
     public messageDialog: MessageDialogService,
@@ -164,6 +165,26 @@ export class DashboardListComponent implements OnInit {
     this.onRadioBtnSelect = false;
     this.disableDownload = true;
   }
+  refreshToken() {
+    this.generateNewToken();
+  }
+  
+  async generateNewToken() {
+    let dashboardJson = JSON.parse(this.selectedDashboard.dashboardJson);
+    let orgId = dashboardJson.organisation;
+    this.asyncResult = await this.grafanaService.refreshToken(orgId);
+    if (this.asyncResult.status === "success") {
+      this.messageDialog.openSnackBar(
+      this.asyncResult.data, "success"
+      );
+    } else {
+      this.messageDialog.openSnackBar(
+      this.asyncResult.data, "error"
+      );
+    }
+    this.refresh();
+  }
+
   enableButtons(event: MatRadioChange, i) {
     this.selectedIndex = i + this.currentPageValue;
     this.onRadioBtnSelect = true;

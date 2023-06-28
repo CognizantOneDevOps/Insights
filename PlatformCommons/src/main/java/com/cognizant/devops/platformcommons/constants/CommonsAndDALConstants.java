@@ -18,6 +18,7 @@ package com.cognizant.devops.platformcommons.constants;
 public final class CommonsAndDALConstants {
 
 	public static final String RABBIT_MQ_EXCEPTION = "Exception while initializing RabbitMQ connection.";
+	public static final String AWS_SQS_EXCEPTION = "Exception while establishing SQS connection";
 	public static final String COLUMN_DEFINITION = "columnDefinition";
 	public static final String MAX_RESULTS = "MaxResults";
 	public static final String ISACTIVE = "isActive";

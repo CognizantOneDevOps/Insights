@@ -56,7 +56,6 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
   logMsg: string;
   isLoginError: boolean;
   isDisabled: boolean;
-  kerberosToken: string;
   showThrobber: boolean = false;
   cookies: string;
   username: string;
@@ -101,9 +100,7 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
     );
     if (
       InsightsInitService.autheticationProtocol ==
-        AutheticationProtocol.SAML.toString() ||
-      InsightsInitService.autheticationProtocol ==
-        AutheticationProtocol.Kerberos.toString()
+        AutheticationProtocol.SAML.toString() 
     ) {
       console.log(" SSO is enable calling saml login");
       this.dataShare.storeTimeZone();
@@ -245,10 +242,8 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
     this.loginRequestSent = true;
     this.username = this.loginForm.value.username;
     this.password = this.loginForm.value.password;
-    this.kerberosToken = this.loginForm.value.kerberosToken;
     if (
-      (this.username === "" || this.password === "") &&
-      this.kerberosToken === ""
+      (this.username === "" || this.password === "") 
     ) {
       this.logMsg = "";
     } else if (
@@ -312,12 +307,6 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
           self.isLoginError = true;
           self.isDisabled = false;
         });
-    } else if (
-      InsightsInitService.autheticationProtocol ==
-      AutheticationProtocol.Kerberos.toString()
-    ) {
-      console.log("kerberosToken " + this.kerberosToken);
-      this.dataShare.setAuthorizationToken(this.kerberosToken);
     } else if (
       InsightsInitService.autheticationProtocol ==
       AutheticationProtocol.JWT.toString()

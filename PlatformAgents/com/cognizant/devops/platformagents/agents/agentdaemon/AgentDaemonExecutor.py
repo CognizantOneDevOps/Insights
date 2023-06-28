@@ -29,14 +29,23 @@ import logging.handlers
 import json
 from datetime import datetime
 from pytz import timezone
+from ...core.MessageQueueProvider3 import MessageFactory
+import base64
+import uuid
+from apscheduler.schedulers.blocking import BlockingScheduler
+from apscheduler.triggers.cron import CronTrigger
+import tzlocal
 
 class AgentDaemonExecutor:
     def __init__(self):
         self.loadConfig()
         self.setupLogging()
         self.loadVersionConfig()
-        self.initializeMQ()
-        self.subscribe()
+        #self.initializeMQ()
+        self.initializeDataProvider()
+        self.subscribeForAgentPackage()
+        if (self.mqProviderName != "RabbitMQ"):
+            self.scheduleAgent()
         
         
         
@@ -82,32 +91,28 @@ class AgentDaemonExecutor:
         handler.setFormatter(formatter)
         logging.getLogger().setLevel(loggingSetting.get('logLevel',logging.WARN))
         logging.getLogger().addHandler(handler)
-
-    def initializeMQ(self):
+        
+        default_sysout_formatter =logging.Formatter('t=%(asctime)s - lvl=%(levelname)s - filename=%(filename)s  - funcName=%(funcName)s - lineno=%(lineno)s message=%(message)s')
+        sysoutHandler = logging.StreamHandler(sys.stdout)
+        sysoutHandler.setLevel(loggingSetting.get('logLevel', logging.INFO))
+        sysoutHandler.setFormatter(default_sysout_formatter)
+        logging.getLogger().addHandler(sysoutHandler)
+        
+        
+    def initializeDataProvider(self):
+        logging.info('Inside initializeDataProvider')
         mqConfig = self.config.get('mqConfig', None)
+        
         if mqConfig == None:
-            raise ValueError('BaseAgent: unable to initialize MQ. mqConfig is not found')
+            raise ValueError('BaseAgent: unable to initialize Data Provide. mqConfig is not found')
         
-        user = mqConfig.get('user', None)
-        password = mqConfig.get('password', None)
-        host = mqConfig.get('host', None)
-        agentCtrlXchg  = mqConfig.get('agentExchange', None)
-        routingKey = self.config.get('subscribe').get('agentPkgQueue')
-        port = mqConfig.get('port', 5672)
-        enableDeadLetterExchange = mqConfig.get('enableDeadLetterExchange', False)
-        if enableDeadLetterExchange:
-            self.declareDeadLetterExchange()
-            arguments={"x-dead-letter-exchange" : "iRecover"}
-        else:
-            arguments={}
+        self.mqProviderName = mqConfig.get('providerName','RabbitMQ')
+
+        self.messageFactory = MessageFactory.messageQueueHandler(self, self.config)
         
-        credentials = pika.PlainCredentials(user, password)
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=host, port=port))
-        self.channel = self.connection.channel()
-        self.channel.exchange_declare(exchange=agentCtrlXchg, exchange_type='topic', durable=True)
-        self.channel.queue_declare(queue=routingKey, passive=False, durable=True, exclusive=False, auto_delete=False, arguments=arguments)
-        self.channel.queue_bind(queue=routingKey, exchange=agentCtrlXchg, routing_key=routingKey, arguments=None)
-    
+        if self.messageFactory == None:
+            raise ValueError('BaseAgent: unable to initialize MQ. messageFactory is Null')
+
     def generateHealthData(self, ex=None, systemFailure=False,note=None):
         data = []
         currentTime = self.getRemoteDateTime(datetime.now())
@@ -128,91 +133,82 @@ class AgentDaemonExecutor:
         return data
                
     def publishDaemonHealthData(self, data):
-        mqConfig = self.config.get('mqConfig', None)
-        port = mqConfig.get('port', 5672)
-        enableDeadLetterExchange = mqConfig.get('enableDeadLetterExchange', False)
-        if enableDeadLetterExchange:
-            arguments={"x-dead-letter-exchange" : "iRecover"}
+        
+        logging.info('Inside publishDaemonHealthData')
+        self.executionId = str(uuid.uuid1())
+        self.healthRoutingKey = self.config.get('publish').get('health')
+        self.healthQueue = self.healthRoutingKey.replace('.','_')
+        self.addExecutionId(data, self.executionId)
+        self.messageFactory.publish(self.healthQueue, data)
+
+    def subscribeForAgentPackage(self):
+        logging.info('Inside subscribeForAgentPackage method')
+        self.agentPkgroutingKey = self.config.get('subscribe').get('agentPkgQueue').replace('.','_')
+        if (self.mqProviderName != "RabbitMQ"):
+            self.messageFactory.subscribe(self.agentPkgroutingKey, self.callbackForAgentPackage)
         else:
-            arguments={}
-            
-        healthExchange = mqConfig.get('exchange', None)
-        healthRoutingKey = self.config.get('publish').get('health')
-        healthQueue = healthRoutingKey.replace('.','_')
-        credentials = pika.PlainCredentials(mqConfig.get('user', None), 
-                                            mqConfig.get('password', None))
-        connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=mqConfig.get('host', None), port=port))
-        channel = connection.channel()
-        channel.exchange_declare(exchange=healthExchange, exchange_type='topic', durable=True)
-        channel.queue_declare(queue=healthQueue, passive=False, durable=True, exclusive=False, auto_delete=False, arguments=arguments)
-        channel.queue_bind(queue=healthQueue, exchange=healthExchange, routing_key=healthRoutingKey, arguments=None)
-        dataJson = json.dumps(data)
-        channel.basic_publish(exchange=healthExchange,routing_key=healthRoutingKey,body=dataJson,properties=pika.BasicProperties(delivery_mode=2))
-        connection.close()
-        logging.info("health message publish successfully")
-        
-    def subscribe(self):
-        routingKey = self.config.get('subscribe').get('agentPkgQueue')
-        def callback(ch, method, properties, body):
+            self.messageFactory.subscribe(self.agentPkgroutingKey, self.callbackForAgentPackage, seperateThread=False)
+
+    
+    def callbackForAgentPackage(self, ch, method, properties, body):
             try:
-                 h = properties.headers
-                 pkgFileName = h.get('fileName')
-                 osType = h.get('osType')
-                 osType = osType.upper()
-                 agentToolName = h.get('agentToolName')
-                 agentId = h.get('agentId')
-                 agentServiceFileName = h.get('agentServiceFileName')
-                 action = h.get('action')
-                 #Code for handling subscribed messages
-                 basePath = self.config.get('baseExtractionPath')
-                 scriptPath = basePath + os.path.sep + agentToolName + os.path.sep + agentId
-                 installagentFilePath = os.environ['INSIGHTS_AGENT_HOME'] + os.path.sep + 'AgentDaemon'
-                 
-                 if (action == "REGISTER" or action == "UPDATE"):
-                     f = open(basePath + os.path.sep + pkgFileName, 'wb')
-                     #with open(basePath + os.path.sep + pkgFileName) as f :
-                     f.write(body)
-                     f.close()
-                     
-                     zip_ref = zipfile.ZipFile(basePath + os.path.sep + pkgFileName, 'r')
-                     zip_ref.extractall(scriptPath)
-                     zip_ref.close()
-                 
-                 '''
-                 Give execution permission and then execute the script. Script should have all steps to handle Agent execution.
-                 ''' 
-                 if osType == "WINDOWS":
-                     if (action == "START" or action == "STOP"):
-                        p = subprocess.Popen(['net',action,agentId],shell=True)
-                     else:
-                        scriptFile = installagentFilePath + os.path.sep +'installagent.bat'
-                        p = subprocess.Popen([scriptFile,action,agentToolName,agentId],cwd=installagentFilePath,shell=True)
-                        
-                 else:
-                     if (action == "START" or action == "STOP"):
-                        p = subprocess.Popen(['service '+agentId+ ' '+action.lower()],shell=True)
-                     else:   
-                         scriptFile = installagentFilePath + os.path.sep +'installagent.sh'
-                         p = subprocess.Popen(['chmod 777 '+scriptFile,scriptFile],shell=True)
-                         p = subprocess.Popen(['chmod -R 777 '+scriptFile,scriptFile],shell=True)
-                         p = subprocess.Popen(['chmod -R 777 '+basePath + os.path.sep + agentToolName,basePath + os.path.sep + agentToolName],shell=True)
-                         p = subprocess.Popen([scriptFile +' '+osType+' '+action+' '+agentToolName+' '+agentId],cwd=installagentFilePath,shell=True)
-                         #stdout, stderr = p.communicate()
-                         print('Process id - '+ str(p.returncode))
-                 ch.basic_ack(delivery_tag = method.delivery_tag)
-            except Exception as ex:
-                self.publishDaemonHealthData(self.generateHealthData(ex))
-                #ch.basic_ack(delivery_tag = method.delivery_tag)
-                logging.error(ex)
-                #self.logIndicator(self.EXECUTION_ERROR, self.config.get('isDebugAllowed', False)) 
                 
-            #self.channel.close(0, 'File Received')
-        
-        print('Inside subscribe method')
-        self.channel.basic_consume(routingKey,callback,auto_ack=False)
-        self.publishDaemonHealthData(self.generateHealthData(note="Agent Demon is in START mode"))
-        self.channel.start_consuming()
-        self.connection.close() 
+                self.processMessage(body)
+                ch.basic_ack(delivery_tag = method.delivery_tag)
+            except Exception as ex:
+                ch.basic_nack(delivery_tag = method.delivery_tag)
+                logging.error(ex)
+                self.publishDaemonHealthData(self.generateHealthData(ex))
+
+            
+    def processMessage(self, body):
+        try:
+            logging.info('Inside callbackForAgentPackage')
+            dataReceived = json.loads(body)
+            logging.info(dataReceived)
+            pkgFileName = dataReceived.get('fileName')
+            osType = dataReceived.get('osType').upper()
+            agentToolName = dataReceived.get('agentToolName')
+            agentId = dataReceived.get('agentId')
+            agentServiceFileName = dataReceived.get('agentServiceFileName')
+            action = dataReceived.get('action')
+            logging.info(action)
+            encodedData = dataReceived.get('data')
+            #Code for handling subscribed messages
+            basePath = self.config.get('baseExtractionPath')
+            scriptPath = basePath + os.path.sep + agentToolName + os.path.sep + agentId
+            installagentFilePath = os.environ['INSIGHTS_AGENT_HOME'] + os.path.sep + 'AgentDaemon'
+            if ((action == "REGISTER" or action == "UPDATE") and (encodedData != None)):
+                data = base64.b64decode(encodedData)
+                f = open(basePath + os.path.sep + pkgFileName, 'wb')
+                #with open(basePath + os.path.sep + pkgFileName) as f :
+                f.write(data)
+                f.close()
+                zip_ref = zipfile.ZipFile(basePath + os.path.sep + pkgFileName, 'r')
+                zip_ref.extractall(scriptPath)
+                zip_ref.close()
+            '''
+                Give execution permission and then execute the script. Script should have all steps to handle Agent execution.
+            '''
+            if osType == "WINDOWS":
+                if (action == "START" or action == "STOP"):
+                    p = subprocess.Popen(['net', action, agentId], shell=True)
+                else:
+                    scriptFile = installagentFilePath + os.path.sep + 'installagent.bat'
+                    p = subprocess.Popen([scriptFile, action, agentToolName, agentId], cwd=installagentFilePath, shell=True)
+            elif (action == "START" or action == "STOP"):
+                p = subprocess.Popen(['service ' + agentId + ' ' + action.lower()], shell=True)
+            else:
+                scriptFile = installagentFilePath + os.path.sep + 'installagent.sh'
+                p = subprocess.Popen(['chmod 777 ' + scriptFile, scriptFile], shell=True)
+                p = subprocess.Popen(['chmod -R 777 ' + scriptFile, scriptFile], shell=True)
+                p = subprocess.Popen(['chmod -R 777 ' + basePath + os.path.sep + agentToolName, basePath + os.path.sep + agentToolName], shell=True)
+                p = subprocess.Popen([scriptFile + ' ' + osType + ' ' + action + ' ' + agentToolName + ' ' + agentId], cwd=installagentFilePath, shell=True)
+                logging.info('Process id - ' + str(p.returncode))
+        except Exception as ex:
+            logging.error("Error While processing message/packet in  processMessage")
+            logging.error(body)
+            logging.error(ex)
         
     def getRemoteDateTime(self, time):
         self.toolsTimeZone = timezone("UTC") #GMT
@@ -224,30 +220,44 @@ class AgentDaemonExecutor:
                     'time' : remoteDateTime.strftime('%Y-%m-%dT%H:%M:%SZ')
                     }
         return response; 
-     
-    def declareDeadLetterExchange(self):
+    
+    def scheduleAgent(self):
+        logging.info('Inside scheduleAgent')
         
-        mqConfig = self.config.get('mqConfig', None)
-        if mqConfig == None:
-            raise ValueError('BaseAgent: unable to initialize MQ. mqConfig is not found')
+        scheduler = BlockingScheduler(timezone=str(tzlocal.get_localzone()))
+        self.scheduler = scheduler
+        self.scheduledJob = scheduler.add_job(self.fetchAndProcessPackage, 'interval', seconds=60 * 5)
+        try:
+            scheduler.start()
+        except (KeyboardInterrupt, SystemExit):
+            self.publishHealthData(self.generateHealthData(systemFailure=True))
         
-        user = mqConfig.get('user', None)
-        password = mqConfig.get('password', None)
-        host = mqConfig.get('host', None)
-        port = mqConfig.get('port', 5672)
+    
+    def fetchAndProcessPackage(self):
+        logging.info('fetchAndProcessPackage ============== ')
+        sub_queue_URL = self.messageFactory.getQueueURL(self.agentPkgroutingKey)
+        fetchData= True
         
-        credentials = pika.PlainCredentials(user, password)
-        connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=host, port=port))
-       
-        #Create dead letter queue 
-        channel = connection.channel()
-        channel.exchange_declare(exchange='iRecover',exchange_type='fanout', durable=True)
- 
-        channel.queue_declare(queue='INSIGHTS_RECOVER_QUEUE', passive=False, durable=True, exclusive=False, auto_delete=False, arguments=None)
-
-        channel.queue_bind(exchange='iRecover',
-                           routing_key='INSIGHTS.RECOVER.QUEUE', # x-dead-letter-routing-key
-                           queue='INSIGHTS_RECOVER_QUEUE') 
+        while fetchData:
+            messages = self.messageFactory.subscribeMessages(self.agentPkgroutingKey, sub_queue_URL)
+        
+            if (len(messages) == 0):
+                logging.info('No message pending for process in processFetchData')
+                fetchData = False
+            for msg in messages:
+                try:
+                    messageBody = msg["Body"]
+                    receipt_handle = msg['ReceiptHandle']
+                    self.processMessage(messageBody)
+                    self.messageFactory.acknowledgeMessages(sub_queue_URL, receipt_handle)
+                except Exception as ex:
+                    logging.error(ex)
+                    self.publishHealthDataForExceptions(ex)
+         
+    def addExecutionId(self, data, executionId):
+        logging.info('Inside addExecutionId')
+        for d in data:
+            d['execId'] = executionId
 
 if __name__=="__main__":
     AgentDaemonExecutor()

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="EngineSQSSuite">
+	<test name="PlatformEngineSQSTestCases" preserve-order="true">
+		<classes>
+			<class name="com.cognizant.devops.engines.testngInitializer.TestngSQSInitializerTest" /> 	
+			<class name="com.cognizant.devops.engines.platformengine.message.subscriber.AgentDataSubscriberTest" />
+			<class name="com.cognizant.devops.engines.platformwebhookengine.test.engine.WebhookEngineTest" />
+		</classes>
+	</test> <!-- PlatformEngineSQSTestCases -->
+</suite> <!-- EngineSQSSuite -->

@@ -153,9 +153,9 @@ class JenkinsAgent(BaseAgent):
             completedBuilds = builds[startIndex:len(builds)]
             if len(completedBuilds)>0:
                 buildDetails = self.parseResponse(self.responseTemplate, completedBuilds, injectData)
-                auditing=self.config.get('auditing',False)
-                if auditing:
-                    buildDetails = self.processLogParsing(buildDetails)                
+                logprocessing=self.config.get('logprocessing',False)
+                if logprocessing:
+                    buildDetails = self.processLogParsing(buildDetails)                                   
                 self.publishToolsData(buildDetails)
                 if not trackingUpdated:
                     if "id" in completedBuilds[0]:
@@ -204,6 +204,8 @@ class JenkinsAgent(BaseAgent):
                 build["deploymentStatus"] = 'Not Found'    
         return buildDetails
     
+    
+        
     def updateTrackingDetails(self, buildUrl, buildNumber):
         currentMasterTracking = self.tracking.get(self.currentJenkinsMaster, None)
         if currentMasterTracking is None:

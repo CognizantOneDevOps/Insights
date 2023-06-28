@@ -19,7 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
+import com.cognizant.devops.platformcommons.mq.core.RabbitMQProvider;
 import com.rabbitmq.client.Connection;
 
 public class WorkflowTaskSubscriberFactory {
@@ -32,7 +32,7 @@ public class WorkflowTaskSubscriberFactory {
 	 * @throws InsightsCustomException 
 	 */
 	private void initConnectionFactory() throws InsightsCustomException {
-		connection = RabbitMQConnectionProvider.getConnection();
+		connection = RabbitMQProvider.getConnection();
 	}
 
 	private WorkflowTaskSubscriberFactory() {

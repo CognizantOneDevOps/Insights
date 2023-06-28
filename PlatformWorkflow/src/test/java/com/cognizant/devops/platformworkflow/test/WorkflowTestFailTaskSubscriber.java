@@ -24,7 +24,6 @@ import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformworkflow.workflowtask.message.factory.WorkflowTaskSubscriberHandler;
-import com.cognizant.devops.platformworkflow.workflowtask.utils.MQMessageConstants;
 import com.google.gson.JsonObject;
 
 public class WorkflowTestFailTaskSubscriber extends WorkflowTaskSubscriberHandler {
@@ -39,8 +38,7 @@ public class WorkflowTestFailTaskSubscriber extends WorkflowTaskSubscriberHandle
 	}
 
 	@Override
-	public void handleTaskExecution(byte[] body) throws IOException {
-		String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
+	public void handleTaskExecution(String message) throws IOException {
 		JsonObject incomingTaskMessage = JsonUtils.parseStringAsJsonObject(message);
 		String workflowId = incomingTaskMessage.get("workflowId").getAsString();
 		executionId = incomingTaskMessage.get("executionId").getAsLong();

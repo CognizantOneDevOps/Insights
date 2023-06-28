@@ -61,7 +61,7 @@ public class InsightsWorkflowExternalController {
 				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 				byteArrayOutputStream.write(fileContent);
 
-				org.apache.pdfbox.pdmodel.PDDocument document = org.apache.pdfbox.pdmodel.PDDocument.load(fileContent);
+				org.apache.pdfbox.pdmodel.PDDocument document = org.apache.pdfbox.Loader.loadPDF(fileContent);
 
 				if (document == null) {
 					log.error("Invalid PDF file ");

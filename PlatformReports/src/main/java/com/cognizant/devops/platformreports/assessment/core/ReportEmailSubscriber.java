@@ -36,18 +36,17 @@ import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflo
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
-import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
+import com.cognizant.devops.platformcommons.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsEmailTemplates;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
-import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformworkflow.workflowtask.core.InsightsStatusProvider;
 import com.cognizant.devops.platformworkflow.workflowtask.email.EmailProcesser;
 import com.cognizant.devops.platformworkflow.workflowtask.email.MailReport;
 import com.cognizant.devops.platformworkflow.workflowtask.message.factory.WorkflowTaskSubscriberHandler;
-import com.cognizant.devops.platformworkflow.workflowtask.utils.MQMessageConstants;
 import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadPool;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -67,8 +66,7 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 	}
 
 	@Override
-	public void handleTaskExecution(byte[] body) throws IOException {
-		String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
+	public void handleTaskExecution(String message) throws IOException {
 		JsonObject statusObject = null;
 		JsonObject incomingTaskMessage = JsonUtils.parseStringAsJsonObject(message);
 		try {

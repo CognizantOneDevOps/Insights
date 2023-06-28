@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2017 Cognizant Technology Solutions
+ * Copyright 2023 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
+import javax.jms.JMSException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,10 +35,10 @@ import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
+import com.cognizant.devops.platformcommons.mq.core.AWSSQSProvider;
+import com.cognizant.devops.platformcommons.mq.core.RabbitMQProvider;
 import com.cognizant.devops.platformdal.webhookConfig.WebhookDerivedConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -57,7 +59,7 @@ public class WebhookEngineTestData {
 	public final String WEBHOOK_SUBSCRIBER_HEALTH_ROUTING_KEY = WEBHOOK_SUBSCRIBER_HEALTH_QUEUE.replace("_", ".");
 	public String healthMessageInstanceName = "localWebhookApp_PlatformInsightsWebHook_testData";
 	public String mqChannel = "IPW_git_demo";
-	public static String webhookName = "git_demo";
+	public static String webhookName = "git_test";
 	public String webhookNameException = "git_testException";
 	public Boolean isUpdateRequired = Boolean.FALSE;
 	public String fieldUsedForUpdate = "commitId";
@@ -93,17 +95,16 @@ public class WebhookEngineTestData {
 		String exchangeName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentExchange();
 		Connection connection = null;
 		Channel channel = null;
-		connection = RabbitMQConnectionProvider.getConnection();
+		connection = RabbitMQProvider.getConnection();
 		channel = connection.createChannel();
 		String message = new GsonBuilder().disableHtmlEscaping().create().toJson(playload);
 		message = message.substring(1, message.length() - 1).replace("\\", "");
 		DeclareOk exchangeResp;
 		try {
 			exchangeResp = channel.exchangeDeclarePassive(exchangeName);
-			channel.queueDeclare(queueName, true, false, false, RabbitMQConnectionProvider.getQueueArguments());
+			channel.queueDeclare(queueName, true, false, false, RabbitMQProvider.getQueueArguments());
 			channel.queueBind(queueName, exchangeName, routingKey);
 			channel.basicPublish(exchangeName, routingKey, null, message.getBytes());
-			//connection.close();
 		} catch (IOException e) {
 
 			/*
@@ -113,10 +114,9 @@ public class WebhookEngineTestData {
 
 			try {
 				channel.exchangeDeclare(exchangeName, MQMessageConstants.EXCHANGE_TYPE);
-				channel.queueDeclare(queueName, true, false, false, RabbitMQConnectionProvider.getQueueArguments());
+				channel.queueDeclare(queueName, true, false, false, RabbitMQProvider.getQueueArguments());
 				channel.queueBind(queueName, exchangeName, routingKey);
 				channel.basicPublish(exchangeName, routingKey, null, message.getBytes());
-				//connection.close();
 			} catch (IOException e1) {
 				LOG.error(e1);
 			}
@@ -140,8 +140,6 @@ public class WebhookEngineTestData {
 					.getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row");
 
 			String finalJson = tooldataObject.toString().replace("[", "").replace("]", "");
-			// Gson gson = new Gson();
-			// map = gson.fromJson(finalJson, Map.class); GraphDB
 			map = mapper.readValue(finalJson, Map.class);
 		} catch (Exception e) {
 			LOG.error(e);
@@ -149,4 +147,25 @@ public class WebhookEngineTestData {
 		return map;
 	}
 
+	public static void publishMessage(String routingKey, String data) {
+		try {
+			if (ApplicationConfigProvider.getInstance().getMessageQueue().getProviderName().equalsIgnoreCase("AWSSQS"))
+				AWSSQSProvider.publish(routingKey, data);
+			else
+				publishRMQMessage(routingKey, data);
+		} catch (InsightsCustomException | JMSException e) {
+			LOG.error(e.getMessage());
+		}
+	}
+
+	public static String publishRMQMessage(String routingKey, String data) {
+		String result = null;
+		try {
+			RabbitMQProvider.publish(routingKey, data);
+			result = "Message published";
+		} catch (InsightsCustomException | IOException | TimeoutException e) {
+			LOG.error(e.getMessage());
+		}
+		return result;
+	}
 }

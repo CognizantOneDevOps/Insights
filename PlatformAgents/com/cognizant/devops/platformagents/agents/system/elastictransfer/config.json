@@ -61,11 +61,15 @@
     "maxBytes": 5000000
   },
   "mqConfig": {
+    "providerName": "RabbitMQ",
     "agentControlXchg": "iAgent",
     "exchange": "iSight",
     "host": "127.0.0.1",
     "password": "",
-    "user": "username for RabbitMq"
+    "user": "username for RabbitMq",
+	"awsAccessKey": "",
+	"awsSecretKey": "",
+	"awsRegion": ""
   },
   "no_of_processes": 8,
   "publish": {

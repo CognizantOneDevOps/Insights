@@ -59,16 +59,16 @@ ENV INSIGHTS_HOME=/usr/INSIGHTS_HOME
     
 
 WORKDIR /opt/PlatformService
-RUN wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${INSIGHTSRELEASE}/PlatformService-${INSIGHTSRELEASE}.jar -O PlatformService.jar && \
+RUN wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${INSIGHTSRELEASE}/PlatformService-${INSIGHTSRELEASE}.jar -O PlatformService.jar
 EXPOSE 8080/tcp
 
 
 WORKDIR /opt
-RUN wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${INSIGHTSRELEASE}/UI-${INSIGHTSRELEASE}.zip -O /opt/UI.zip && \
+RUN wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${INSIGHTSRELEASE}/PlatformUI4-${INSIGHTSRELEASE}.zip -O /opt/UI.zip && \
     unzip /opt/UI.zip -d /opt/UI && \
     rm -rf /opt/UI.zip && \
-    cd /UI
-    npm install -save express 
+    cd /opt/UI/UI && \
+    npm install -save express
 EXPOSE 8081/tcp
 
 WORKDIR /opt/InSights/Promtail

@@ -1,10 +1,14 @@
 {
   "mqConfig": {
+    "providerName": "RabbitMQ",
     "user": "username for RabbitMq",
     "password": "",
     "host": "127.0.0.1",
     "exchange": "iSight",
-    "agentControlXchg":"iAgent"
+    "agentControlXchg":"iAgent",
+	"awsAccessKey": "",
+	"awsSecretKey": "",
+	"awsRegion": ""
   },
   "subscribe": {
     "config": "CI.JENKINS.config"
@@ -89,7 +93,7 @@
 	"maxBytes" : 5000000,
 	"backupCount" : 10
 },
-"auditing": false,
+ 
 "enableProxy":false,
 "proxies":{
     	"http":"",

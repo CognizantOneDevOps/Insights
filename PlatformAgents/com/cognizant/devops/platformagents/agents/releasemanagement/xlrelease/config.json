@@ -6,12 +6,16 @@
 		"vaultUrl": "http://Vault_Host:port/v1/"
 	},
 	"mqConfig": {
+		"providerName": "RabbitMQ",
 		"user": "username for RabbitMq",
 		"password": "",
 		"host": "127.0.0.1",
 		"port": 5672,
 		"exchange": "iTest",
-		"agentControlXchg": "iAgent"
+		"agentControlXchg": "iAgent",
+		"awsAccessKey": "",
+		"awsSecretKey": "",
+		"awsRegion": ""
 	},
 	"subscribe": {
 		"config": "RELEASEMANAGEMENT.XLRELEASE.config"
@@ -219,7 +223,7 @@
 		"maxBytes": 5000000,
 		"backupCount": 10
 	},
-	"auditing": false,
+	 
 	"webhookEnabled": false,
 	"osversion": "linux",
 	"agentVersion": "v6.0",

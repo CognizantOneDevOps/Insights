@@ -50,12 +50,15 @@ class JiraAgent(BaseAgent):
          self.selectedProjectList = self.config.get('dynamicTemplate','GET').get('selectedProject',None)
          self.projectDetailsData = []
          self.projectsData = []
+         self.userData = []
          self.boardsData = []
+         self.roleUserData = []
+         self.userEmail = {}
          try:
             self.resolveTrackingPath()
             self.loadtrackingCacheFile()
             if len(self.trackingProjectDetail) == 0:
-                self.processProjectDetails()
+                self.processProjectUserDetails()
             if len(self.trackingBoardDetail) == 0:
                 self.processBoardProjectDetaila()
          except Exception as ex:
@@ -154,7 +157,7 @@ class JiraAgent(BaseAgent):
                     self.updateTrackingJson(self.tracking)
                 else:
                     break
-            latestJiraDateStr = self.tracking["lastupdated_"+projectKey]
+            latestJiraDateStr = self.tracking.get("lastupdated_"+projectKey,startFrom)
             latestJiraDate = parser.parse(latestJiraDateStr)
             lastTrackedDate = parser.parse(self.tracking.get("lastTrakced", lastUpdated).split(' ')[0])
             lastTracked = lastTrackedDate.strftime("%Y-%m-%d %H:%M")
@@ -168,16 +171,17 @@ class JiraAgent(BaseAgent):
                 elif reSync and currentDate >= lastTrackedDate:
                     self.tracking["reSync"] = False
             if enableIssueModificationTimeline :
-                self.tracking["issueModificationTimelineCaptureDate"] = self.tracking["lastupdated_"+projectKey]
+                self.tracking["issueModificationTimelineCaptureDate"] = self.tracking.get("lastupdated_"+projectKey,startFrom)
             if enableReSyncTrigger or enableIssueModificationTimeline:
                 self.updateTrackingJson(self.tracking)
             if bypassSprintExtCall and maxResults and projectType == 'scrum':
                 self.retrieveSprintDetails()
                 self.retrieveSprintReports()
 
-    def processProjectDetails(self):
+    def processProjectUserDetails(self):
         try:
-            self.baseLogger.info(" inside processProjectDetails method=======")
+            self.processUserDetails()
+            self.baseLogger.info(" inside processProjectUserDetails method=======")
             extensions = self.config.get('dynamicTemplate', {}).get('extensions', None)
             projects = extensions.get('projects', None)
             projectUrl = projects.get('projectApiUrl','')
@@ -197,8 +201,74 @@ class JiraAgent(BaseAgent):
             self.updateJsonFile(self.trackingProjectDetailPath, self.projectsData)
             self.loadtrackingCacheFile()
             self.publishToolsData (self.projectsData, metadata=projectMetaData)
+            self.processRoleDetail()
         except Exception as ex:
             self.baseLogger.error(ex)
+
+    def processUserDetails(self):
+        try:
+            self.baseLogger.info(" inside processUserDetails method=======")
+            extensions = self.config.get('dynamicTemplate', {}).get('extensions', None)
+            userAccount = extensions.get('userAccount', None)
+            userUrl = userAccount.get('userApiUrl','')
+            userMetaData = userAccount.get("userMetaData")
+            allUserData = self.getResponse(userUrl, 'GET',self.userid,self.passwd, None)
+            for user in allUserData:
+                emailAddress = user["emailAddress"]
+                if user["emailAddress"]=='':
+                    continue
+                self.userEmail[user["accountId"]] = emailAddress
+                userDict = {
+                               "accountId": user["accountId"],
+                               "emailAddress": emailAddress,
+                               "displayName": user["displayName"]
+                              }
+                self.userData.append(userDict)
+            self.publishToolsData (self.userData, metadata=userMetaData)
+        except Exception as ex:
+            self.baseLogger.error(ex)
+
+    def processRoleDetail(self):
+        try:
+            self.baseLogger.info(" inside processRoleDetaila method ====")
+            extensions= self.config.get('dynamicTemplate',{}).get('extensions',None)
+            roles = extensions.get('roles',None)
+            roleApiUrl = roles.get('roleProjectApiUrl','')
+            roleMetaData =roles.get("roleMetaData")
+            for project in self.projectsData:
+                projectID = project["key"]
+                projectRoleUrl = roleApiUrl.replace("projectId",projectID)
+                try:
+                    projectroleData = self.getResponse(projectRoleUrl,'GET',self.userid,self.passwd,None)
+                except Exception as ex:
+                        continue
+                for role in projectroleData:
+                    roleUrl = projectroleData.get(role)
+                    roleData = self.getResponse(roleUrl,'GET',self.userid,self.passwd,None)
+                    allRoleUser = roleData.get('actors')
+                    if len(allRoleUser)>0:
+                        for user in allRoleUser:
+                            accountId = user["actorUser"]['accountId']
+                            email = self.getEmailAddress(accountId)
+                            if email=="":
+                                continue
+                            roleUserDict = {
+                               "role": role,
+                               "projectID": projectID,
+                               "emailAddress":email,
+                               "accountId": accountId,
+                               "displayName": user["displayName"]
+                              }
+                            self.roleUserData.append(roleUserDict)
+            self.publishToolsData(self.roleUserData,metadata=roleMetaData)
+        except Exception as ex:
+            self.baseLogger.error(ex)
+
+    def getEmailAddress(self,accountId):
+        try:            
+            return self.userEmail[accountId]
+        except Exception as ex:
+            return ""
 
     def resolveTrackingPath(self):
         try:
@@ -381,7 +451,7 @@ class JiraAgent(BaseAgent):
             #    self.registerExtension('backlog', self.retrieveBacklogDetails, backlog.get('runSchedule'))
             projects = extensions.get('projects',None)
             if projects:
-                self.registerExtension('projects', self.processProjectDetails, projects.get('runSchedule'))
+                self.registerExtension('projects', self.processProjectUserDetails, projects.get('runSchedule'))
             boards = extensions.get('boards',None)
             if boards:
                 self.registerExtension('boards', self.processBoardProjectDetaila, boards.get('runSchedule'))

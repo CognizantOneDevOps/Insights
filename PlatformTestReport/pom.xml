@@ -12,13 +12,13 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>10.0</version>
+		<version>10.1</version>
 	</parent>
 
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformTestReport</artifactId>
 	<name>PlatformTestReport</name>
-	<version>10.0</version>
+	<version>10.1</version>
 	<packaging>jar</packaging>
 
 	<dependencies>
@@ -26,45 +26,40 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>10.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.cognizant.devops</groupId>
-			<artifactId>PlatformAuditing</artifactId>
-			<version>10.0</version>
-		</dependency>
+			<version>10.1</version>
+		</dependency>		
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformService</artifactId>
-			<version>10.0</version>
+			<version>10.1</version>
 			<type>jar</type>
 		</dependency>
 
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>10.0</version>
+			<version>10.1</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformEngine</artifactId>
-			<version>10.0</version>
+			<version>10.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformWorkflow</artifactId>
-			<version>10.0</version>
+			<version>10.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformReports</artifactId>
-			<version>10.0</version>
+			<version>10.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformInsightsWebHook</artifactId>
-			<version>10.0</version>
+			<version>10.1</version>
 		</dependency>
 
 	</dependencies>

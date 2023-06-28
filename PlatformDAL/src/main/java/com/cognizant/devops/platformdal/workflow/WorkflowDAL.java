@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.workflow;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -28,12 +27,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.Type;
-import org.owasp.esapi.Validator;
 
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.CommonsAndDALConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsEmailTemplates;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
@@ -42,7 +41,8 @@ import com.cognizant.devops.platformdal.core.BaseDAL;
 public class WorkflowDAL extends BaseDAL {
 	
 	private static final Logger log = LogManager.getLogger(WorkflowDAL.class);
-
+	
+	
 	/**
 	 * Method to delete record from InsightsWorkflowTaskSequence table
 	 * 
@@ -50,27 +50,13 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return String
 	 */
 	public String deleteWorkflowTaskSequence(String workflowId) {
-
 		try {
-			Validator validate = getESAPIValidator() ;
-			String validatedworkflowId = validate.getValidInput("DAL_workflowId_parameter_checking", workflowId,
-					AssessmentReportAndWorkflowConstants.SAFESTRING, 600, false);
+			String validatedWorkflowId = ValidationUtils.validateDynamicValue(workflowId, ValidationUtils.ID_STRING_PATTERN);	
+			
 			Map<String, Object> parameters = new HashMap<>();
-			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, validatedworkflowId);
-			List<InsightsWorkflowTaskSequence> asssessmentList = getResultList(
-					"FROM InsightsWorkflowTaskSequence a WHERE a.workflowConfig.workflowId= :workflowId",
-					InsightsWorkflowTaskSequence.class, parameters);
-			List<Integer> listofPrimaryKey = new ArrayList<>();
-			for (InsightsWorkflowTaskSequence asssessment : asssessmentList) {
-				asssessment.setWorkflowConfig(null);
-				asssessment.setWorkflowTaskEntity(null);
-				listofPrimaryKey.add(asssessment.getId());
-				update(asssessment);
-			}
-			for (InsightsWorkflowTaskSequence asssessment : asssessmentList) {
-				delete(asssessment);
-			}
-			return PlatformServiceConstants.SUCCESS;
+			parameters.put("workflowInputId", validatedWorkflowId);
+			String query = "DELETE from \"INSIGHTS_WORKFLOW_TASK_SEQUENCE\" IWEH where IWEH.workflowid=:workflowInputId " ;
+			return executeUpdateWithSQLQueryWithParameter(query, parameters) >= 0 ? PlatformServiceConstants.SUCCESS:PlatformServiceConstants.FAILURE;
 		} catch (Exception e) {
 			log.error(e);
 			return PlatformServiceConstants.FAILURE;		}
@@ -442,17 +428,18 @@ public class WorkflowDAL extends BaseDAL {
 	public List<InsightsWorkflowTask> getTaskLists(String workflowType) {
 		try {
 			Map<String, Object> parameters = new HashMap<>();
-			parameters.put("workflowType", workflowType);
-			return getResultList(
-					"FROM InsightsWorkflowTask RE WHERE RE.workflowType.workflowType = :workflowType ORDER BY RE.dependency ASC",
+			parameters.put("workflowType.workflowType", workflowType);
+			Map<String, String> orderByParams = new HashMap<>();
+			orderByParams.put("asc", "dependency");
+			return getResultListCriteria(
 					InsightsWorkflowTask.class,
-					parameters);
+					parameters,orderByParams);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
 		}
 	}
-
+	
 	/**
 	 * Method to get Workflow Configuration using workflowId
 	 * 
@@ -581,23 +568,27 @@ public class WorkflowDAL extends BaseDAL {
 	 */
 	public InsightsWorkflowExecutionHistory getLastestTaskByEndTime(String workflowId, long latestExecutionId) throws Exception {
 		try {
-			Validator validate = getESAPIValidator() ;
-			String validatedworkflowId = validate.getValidInput("DAL_workflowId_parameter_checking_while_retrieving_task", workflowId,
-					AssessmentReportAndWorkflowConstants.SAFESTRING, 600, false);
-			String validatedlatestExecutionId = validate.getValidInput("DAL_workflow_executionId_parameter_checking", String.valueOf(latestExecutionId),
-					"ExecutionId", 600, false);
+			
+			String validatedworkflowId = ValidationUtils.validateDynamicValue(workflowId, ValidationUtils.ID_STRING_PATTERN);
+			String validatedlatestExecutionId = ValidationUtils.validateDynamicValue(String.valueOf(latestExecutionId),ValidationUtils.EXECUTION_ID_PATTERN);
+
 			Map<String, Object> parameters = new HashMap<>();
-			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, validatedworkflowId);
-			parameters.put("latestExecutionId", Long.parseLong(validatedlatestExecutionId));
-			List<InsightsWorkflowExecutionHistory> nextTasks = getResultList(
-					"FROM InsightsWorkflowExecutionHistory EH WHERE EH.workflowConfig.isActive = true and EH.workflowConfig.workflowId=:workflowId and EH.executionId=:latestExecutionId order by EH.endTime desc",
-					InsightsWorkflowExecutionHistory.class, parameters);
+			parameters.put("workflowConfig.isActive", "true");
+			parameters.put("workflowConfig.workflowId", validatedworkflowId);
+			parameters.put(AssessmentReportAndWorkflowConstants.EXECUTIONID, validatedlatestExecutionId);
+			Map<String, String> orderByParams = new HashMap<>();
+			orderByParams.put("desc", "endTime");
+			List<InsightsWorkflowExecutionHistory> nextTasks = getResultListCriteria(
+					InsightsWorkflowExecutionHistory.class,
+					parameters,orderByParams);
+			
 			List<String> errorStatusList = Arrays.asList("ERROR", "ABORTED", "RETRY_EXCEEDED", "IN_PROGRESS");
 			if (nextTasks.stream()
 					.noneMatch(anyFailedTask -> errorStatusList.contains(anyFailedTask.getTaskStatus()))) {
 				return nextTasks.get(0);
 			}
 			return null;
+
 		} catch (Exception e) {
 			log.error(e);
 			throw e;
@@ -881,19 +872,12 @@ public class WorkflowDAL extends BaseDAL {
 	 */
 	public String deleteEmailExecutionHistoryByWorkflowId(String workflowId) throws InsightsCustomException {
 		try {
-			Validator validate = getESAPIValidator() ;
-			String validatedworkflowId = validate.getValidInput("DAL_workflowId_parameter_checking_For_Email_deletion", workflowId,
-					AssessmentReportAndWorkflowConstants.SAFESTRING, 600, false);
+		
+			String validatedworkflowId = ValidationUtils.validateDynamicValue(workflowId, ValidationUtils.ID_STRING_PATTERN);
 			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, validatedworkflowId);
-			List<InsightsReportVisualizationContainer> executionRecords = getResultList(
-					"FROM InsightsReportVisualizationContainer a WHERE a.workflowId= :workflowId",
-					InsightsReportVisualizationContainer.class, parameters);
-
-			for (InsightsReportVisualizationContainer insightsReportVisualizationContainer : executionRecords) {
-				delete(insightsReportVisualizationContainer);
-			}
-			return PlatformServiceConstants.SUCCESS;
+			String query = "DELETE from \"INSIGHTS_REPORT_VISUALIZATION_CONTAINER\" IRVC where IRVC.workflowid=:workflowId " ;
+			return executeUpdateWithSQLQueryWithParameter(query, parameters) >= 0 ? PlatformServiceConstants.SUCCESS:PlatformServiceConstants.FAILURE;
 		} catch (Exception e) {
 			log.error(e);
 			throw new InsightsCustomException("Error while deleting email execution history  ");
@@ -909,23 +893,13 @@ public class WorkflowDAL extends BaseDAL {
 	 */
 	public String deleteEmailTemplateByWorkflowId(String workflowId) throws InsightsCustomException {
 		try {
-			Validator validate = getESAPIValidator() ;
-			String validatedworkflowId = validate.getValidInput("DAL_workflowId_parameter_checking_while_deleting_email_template", workflowId,
-					AssessmentReportAndWorkflowConstants.SAFESTRING, 600, false);
+			
+			String validatedworkflowId = ValidationUtils.validateDynamicValue(workflowId, ValidationUtils.ID_STRING_PATTERN);
 			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, validatedworkflowId);
-			List<InsightsEmailTemplates> executionRecords = getResultList(
-					"FROM InsightsEmailTemplates a WHERE a.workflowConfig.workflowId= :workflowId",
-					InsightsEmailTemplates.class, parameters);
+			String query = "DELETE from \"INSIGHTS_EMAIL_TEMPLATES\" IET where IET.workflowid=:workflowId " ;
+			return executeUpdateWithSQLQueryWithParameter(query, parameters) >= 0 ? PlatformServiceConstants.SUCCESS:PlatformServiceConstants.FAILURE;
 
-			for (InsightsEmailTemplates insightsEmailTemplates : executionRecords) {
-				insightsEmailTemplates.setWorkflowConfig(null);
-				save(insightsEmailTemplates);
-			}
-			for (InsightsEmailTemplates insightsEmailTemplates : executionRecords) {
-				delete(insightsEmailTemplates);
-			}
-			return PlatformServiceConstants.SUCCESS;
 		} catch (Exception e) {
 			log.error(e);
 			throw new InsightsCustomException("Error while deleting email template, Please check log for detail  ");

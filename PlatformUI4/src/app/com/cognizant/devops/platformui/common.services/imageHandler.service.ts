@@ -153,6 +153,7 @@ export class ImageHandlerService implements IImageHandlerService {
         this.addImage('backButton', "./icons/svg/common/backButton.svg");
         this.addImage('users', "./icons/svg/welcomePage/users.svg");
         this.addImage('admin', "./icons/svg/welcomePage/admin.svg");
+        this.addImage('regenerate', "./icons/svg/reportMgmt/regenerate.svg");
     }
 
     public addPathIconRegistry() {

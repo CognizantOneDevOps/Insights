@@ -33,7 +33,7 @@ import { InsightsAppComponent } from '@insights/app/insights.component';
 import { LoginComponent } from '@insights/app/login/login.component';
 import { AuthInterceptor } from '@insights/common/rest-api-setting';
 import { SSOLoginComponent } from './com/cognizant/devops/platformui/ssologin/ssologin.component';
-import { CookieModule } from 'ngx-cookie';
+import { CookieService } from 'ngx-cookie-service';
 import { LogoutHandlerComponent } from '@insights/app/com/cognizant/devops/platformui/logout-handler/logout-handler.component';
 
 
@@ -60,7 +60,6 @@ export function initializeApp(initConfig: InsightsInitService) {
     MaterialModule,
     SharedServices.forRoot(),
     HttpClientXsrfModule.withOptions({ cookieName: 'XSRF-TOKEN', headerName: 'XSRF-TOKEN' }),
-    CookieModule.forRoot()
   ],
   providers: [
     {
@@ -72,7 +71,8 @@ export function initializeApp(initConfig: InsightsInitService) {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true
-    }
+    },
+    CookieService
   ],
   bootstrap: [InsightsAppComponent]
 })

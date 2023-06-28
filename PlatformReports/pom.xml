@@ -13,13 +13,13 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>10.0</version>
+		<version>10.1</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformReports</artifactId>
-	<version>10.0</version>
+	<version>10.1</version>
 	<name>PlatformReports</name>
 	<description>PlatformReports</description>
 
@@ -45,28 +45,23 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.13.4.1</version>
+			<version>2.13.4.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>10.0</version>
+			<version>10.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>10.0</version>
+			<version>10.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformWorkflow</artifactId>
-			<version>10.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.cognizant.devops</groupId>
-			<artifactId>PlatformAuditing</artifactId>
-			<version>10.0</version>
-		</dependency>
+			<version>10.1</version>
+		</dependency>		
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-text</artifactId>
@@ -85,7 +80,7 @@
 		<dependency>
     		<groupId>com.microsoft.playwright</groupId>
     		<artifactId>playwright</artifactId>
-    		<version>1.22.0</version>
+    		<version>1.30.0</version>
 		</dependency>
 	</dependencies>
 	<build>		

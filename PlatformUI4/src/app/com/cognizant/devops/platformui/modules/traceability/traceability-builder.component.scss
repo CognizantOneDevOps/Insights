@@ -35,6 +35,10 @@
     height: 84vh;
 }
 
+.downloadBtn {
+    width: 85px !important;
+}
+
 .button-section-actions {
     display: flex;
     flex-direction: row;
@@ -186,6 +190,7 @@
     border-right: 1px solid var(--brdr-clr);
     border-bottom: 1px solid var(--brdr-clr);
     padding-top: 10px;
+    background-color: var(--backgnd-clr6);
 }
 
 :host ::ng-deep .mat-tab-body-content {

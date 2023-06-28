@@ -40,12 +40,10 @@ public class SpringAccessDeniedHandler implements AccessDeniedHandler {
 	@Override
 	public void handle(HttpServletRequest request, HttpServletResponse response,
 			AccessDeniedException accessDeniedException) throws IOException, ServletException {
-		log.error("SpringAccessDeniedHandler ",accessDeniedException);
-		String msg = PlatformServiceUtil.buildFailureResponse("Access Denied or user not validated ").toString();
-		PrintWriter writer = response.getWriter();
-		writer.write(msg);
-		writer.flush();
-		writer.close();
+		log.error("SpringJWTAccessDeniedHandler {} ",accessDeniedException.getMessage()); 
+		String msg = PlatformServiceUtil.buildFailureResponse("Access Denied, User does not have access to this page ").toString();
+		log.error(msg);
+		response.sendRedirect(request.getContextPath() + "/accessDenied");
 	}
 
 }

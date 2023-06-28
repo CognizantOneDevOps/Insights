@@ -1,17 +1,21 @@
 {
-  "baseExtractionPath":"/opt/insightsagents/PlatformAgents",
+  "baseExtractionPath":"/opt/insightsagents/PlatformAgents",  
   "insightsTimeZone": "Asia/Kolkata",
   "loggingSetting": {
     "logLevel": "WARN"
   },
   "mqConfig": {
+    "providerName": "RabbitMQ",
     "host": "127.0.0.1",
     "port": 5672,
-    "password": "iSight",
-    "user": "iSight",
+    "user": "",
+    "password": "",
     "exchange": "iSight",
     "agentExchange":"iAgent",
-    "enableDeadLetterExchange":false
+    "enableDeadLetterExchange":false,
+	"awsAccessKey": "",
+	"awsSecretKey": "",
+	"awsRegion": ""
   },
   "publish": {
     "data": "DAEMONAGENT.AGENTDAEMON.DATA",
@@ -21,7 +25,12 @@
   "subscribe": {
     "agentPkgQueue": "INSIGHTS.AGENTS.PACKAGE"
   },
-   "toolCategory" : "AGENTDAEMON",
+  "enableProxy":true,
+  "proxies":{
+    	"http":"",
+    	"https":""
+    },
+  "toolCategory" : "AGENTDAEMON",
   "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
   "toolsTimeZone": "GMT"
 }

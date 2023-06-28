@@ -16,8 +16,6 @@
 
 package com.cognizant.devops.engines.platformdataarchivalengine.message.subscriber;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -33,15 +31,13 @@ import com.cognizant.devops.platformcommons.constants.DataArchivalConstants;
 import com.cognizant.devops.platformcommons.constants.EngineConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
-import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.dataArchivalConfig.DataArchivalConfigDal;
 import com.cognizant.devops.platformdal.dataArchivalConfig.InsightsDataArchivalConfig;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.rabbitmq.client.AMQP.BasicProperties;
-import com.rabbitmq.client.Envelope;
 
 public class DataArchivalDataSubscriber extends EngineSubscriberResponseHandler {
 	
@@ -49,18 +45,14 @@ public class DataArchivalDataSubscriber extends EngineSubscriberResponseHandler 
 	DataArchivalConfigDal dataArchivalConfigDAL = new DataArchivalConfigDal();
 	private Map<String,String> loggingInfo = new ConcurrentHashMap<>();
 	private String agentId;
-	private String agent="agentId";
 	public DataArchivalDataSubscriber(String routingKey,String agentId) throws Exception {
 		super(routingKey);
 		this.agentId=agentId;
 	}
 
 	@Override
-	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body)
-			throws IOException {
-		String message=null;
+	public void handleDelivery(String routingKey, String message) throws InsightsCustomException {
 		try {
-			message = new String(body, StandardCharsets.UTF_8);
 			JsonArray messageJson = JsonUtils.parseStringAsJsonObject(message).get("data").getAsJsonArray();
 			JsonObject updateURLJson = messageJson.get(0).getAsJsonObject();
 
@@ -91,18 +83,16 @@ public class DataArchivalDataSubscriber extends EngineSubscriberResponseHandler 
 					dataArchivalConfigDAL.updateContainerDetails(archivalName, sourceUrl, containerID, expiryDate,boltPort);
 					log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Update Data Archival record with sourceurl and boltport",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),"-",loggingInfo.get(EngineConstants.EXECID));
 				}
-				getChannel().basicAck(envelope.getDeliveryTag(), false);
 			} else {
-				getChannel().basicAck(envelope.getDeliveryTag(), false);
 				log.error(" toolName={} category={} agentId={} routingKey={} execId={} Failed status in Data archival message received from MQ",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),"-",loggingInfo.get(EngineConstants.EXECID));
 				throw new InsightsCustomException("Failed status in Data archival message received from MQ.");
 			}
 		} catch (NoResultException e) {
 			log.error("toolName={} category={} agentId={} execId={} No Record found occured. data message :{} ",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),loggingInfo.get(EngineConstants.EXECID) ,message, e);
-			getChannel().basicReject(envelope.getDeliveryTag(), false);
+			throw new NoResultException(e.getMessage());
 		} catch (Exception e) {
 			log.error("toolName={} category={} agentId={} execId={} Exception occured ",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),loggingInfo.get(EngineConstants.EXECID),e);
-			getChannel().basicReject(envelope.getDeliveryTag(), false);
+			throw new InsightsCustomException(e.getMessage());
 		}
 
 	}

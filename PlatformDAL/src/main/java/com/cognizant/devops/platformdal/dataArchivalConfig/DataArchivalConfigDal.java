@@ -26,17 +26,14 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.core.BaseDAL;
-import org.owasp.esapi.ESAPI;
-import org.owasp.esapi.Validator;
-import org.owasp.esapi.reference.DefaultSecurityConfiguration;
-import java.util.Properties;
 
 public class DataArchivalConfigDal extends BaseDAL {
 	private static final String INSIGHTSDATAARCHIVALCONFIG_QUERY = "FROM InsightsDataArchivalConfig DA WHERE ";
-	private static final String ARCHIVALNAME = "archivalName";
-	private static final String DA_ARCHIVALNAME = "DA.archivalName = :archivalName";
+	private static final String ARCHIVALNAME = "aName";
+	private static final String DA_ARCHIVALNAME = "DA.archivalName = :aName";
 	private static Logger log = LogManager.getLogger(DataArchivalConfigDal.class);
 
 	/**
@@ -147,20 +144,28 @@ public class DataArchivalConfigDal extends BaseDAL {
 	 */
 	public Boolean updateArchivalStatus(String archivalName, String status) throws Exception  {
 		try {
-			Validator validate = getESAPIValidator() ;
-			String validatedArchivalName = validate.getValidInput("DAL_parameter_checking", archivalName, "SafeString",
-					600, false);
-			String validatedStatus = validate.getValidInput("DAL_parameter_checking", status, "SafeString", 600, false);
+			String validatedArchivalName = ValidationUtils.validateDynamicValue(archivalName, ValidationUtils.ID_STRING_PATTERN);
+			String validatedStatus = ValidationUtils.validateDynamicValue(status, ValidationUtils.ID_STRING_PATTERN);
+			
 			Map<String, Object> parameters = new HashMap<>();
-			parameters.put(ARCHIVALNAME, validatedArchivalName);
-			InsightsDataArchivalConfig updateStatus = getSingleResult(
-					INSIGHTSDATAARCHIVALCONFIG_QUERY + DA_ARCHIVALNAME, InsightsDataArchivalConfig.class, parameters);
-			updateStatus.setStatus(validatedStatus);
-			update(updateStatus);
-			return Boolean.TRUE;
+			Map<String, String> orderByParams = new HashMap<>();
+			parameters.put("archivalName", validatedArchivalName);
+			
+			List<InsightsDataArchivalConfig> dataArchivalList = getResultListCriteria(
+					InsightsDataArchivalConfig.class,
+					parameters,orderByParams);
+			
+			if(dataArchivalList.size()!=1) {
+				throw new InsightsCustomException(" Data Archival record not found ");
+				
+			}
+
+			parameters.put("dastatus", validatedStatus);
+			
+			String query = "update \"INSIGHTS_DATA_ARCHIVAL_CONFIGURATION\" set status=:dastatus where ARCHIVAL_NAME= :archivalName " ;
+			return executeUpdateWithSQLQueryWithParameter(query, parameters) > 0?Boolean.TRUE:Boolean.FALSE;
 		} catch (Exception e) {
 			log.error(e.getMessage());
-//			return Boolean.FALSE;
 			throw e;
 		}
 	}

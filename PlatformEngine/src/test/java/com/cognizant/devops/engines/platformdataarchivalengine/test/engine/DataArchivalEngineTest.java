@@ -19,14 +19,19 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.cognizant.devops.engines.platformdataarchivalengine.message.subscriber.DataArchivalDataSubscriber;
+import com.cognizant.devops.engines.platformdataarchivalengine.message.subscriber.DataArchivalHealthSubscriber;
 import com.cognizant.devops.engines.platformdataarchivalengine.modules.aggregator.DataArchivalAggregatorModule;
+import com.cognizant.devops.engines.platformengine.test.engine.EngineTestData;
 import com.cognizant.devops.engines.testngInitializer.TestngInitializerTest;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
@@ -89,8 +94,8 @@ public class DataArchivalEngineTest extends DataArchivalEngineData {
 		routingKeyHealth = configDetails.get("publish").getAsJsonObject().get("health").getAsString();
 		routingKeyHealthNeo4j = testData.get("routingKeyHealthNeo4j").getAsString();
 		urlJson = testData.get("urlMessage");
-		successHealthMessageJson = testData.get("successHealthMessageString");
-		failureHealthMessageJson = testData.get("failureHealthMessageString");
+		successHealthMessageJson = testData.get("successHealthMessage");
+		failureHealthMessageJson = testData.get("failureHealthMessage");
 		urlMessageWithEmptyArchivalName = testData.get("urlMessageWithEmptyArchivalName");
 		urlMessageWithEmptyURL = testData.get("urlMessageWithEmptyURL");
 		removeContainer = testData.get("removeContainer");
@@ -167,7 +172,7 @@ public class DataArchivalEngineTest extends DataArchivalEngineData {
 	@Test(priority = 1)
 	public void testSaveURLForArchivalRecord() throws IOException, TimeoutException, InterruptedException, InsightsCustomException {
 		try {
-			publishDataArchivalDetails(routingKey, urlJson.toString());
+			EngineTestData.publishMessage(routingKey, urlJson.toString());
 			Thread.sleep(2000);
 			InsightsDataArchivalConfig record = dataArchivalConfigdal.getSpecificArchivalRecord(archivalName);
 			Assert.assertNotNull(record);
@@ -183,7 +188,7 @@ public class DataArchivalEngineTest extends DataArchivalEngineData {
 	@Test(priority = 2)
 	public void testSaveURLWithEmptyArchivalName() throws Exception {
 		try {
-			publishDataArchivalDetails(routingKey, urlMessageWithEmptyArchivalName.toString());
+			EngineTestData.publishMessage(routingKey, urlMessageWithEmptyArchivalName.toString());
 			Thread.sleep(2000);
 			InsightsDataArchivalConfig record = dataArchivalConfigdal.getSpecificArchivalRecord(archivalFailName);
 			Assert.assertNotNull(record);
@@ -196,7 +201,7 @@ public class DataArchivalEngineTest extends DataArchivalEngineData {
 	@Test(priority = 3)
 	public void testSaveURLWithEmptyURL() throws Exception {
 		try {
-			publishDataArchivalDetails(routingKey, urlMessageWithEmptyURL.toString());
+			EngineTestData.publishMessage(routingKey, urlMessageWithEmptyURL.toString());
 			Thread.sleep(2000);
 			InsightsDataArchivalConfig record = dataArchivalConfigdal.getSpecificArchivalRecord(archivalFailName);
 			Assert.assertNotNull(record);
@@ -209,7 +214,7 @@ public class DataArchivalEngineTest extends DataArchivalEngineData {
 	@Test(priority = 4)
 	public void testRemoveContainer() throws Exception {
 		try {
-			publishDataArchivalDetails(routingKey, removeContainer.toString());
+			EngineTestData.publishMessage(routingKey, removeContainer.toString());
 			Thread.sleep(2000);
 			InsightsDataArchivalConfig record = dataArchivalConfigdal.getSpecificArchivalRecord(archivalFailName);
 			Assert.assertNotNull(record);
@@ -222,7 +227,7 @@ public class DataArchivalEngineTest extends DataArchivalEngineData {
 	@Test(priority = 5)
 	public void testSaveURLWithEmptyContainerId() throws Exception {
 		try {
-			publishDataArchivalDetails(routingKey, urlMessageWithEmptyContainer.toString());
+			EngineTestData.publishMessage(routingKey, urlMessageWithEmptyContainer.toString());
 			Thread.sleep(2000);
 			InsightsDataArchivalConfig record = dataArchivalConfigdal.getSpecificArchivalRecord(archivalFailName);
 			Assert.assertNotNull(record);
@@ -235,7 +240,7 @@ public class DataArchivalEngineTest extends DataArchivalEngineData {
 	@Test(priority = 6)
 	public void testSaveURLWithDBNotWorking() throws Exception {
 		try {
-			publishDataArchivalDetails(routingKey, urlMessageWithEmptyURL.toString());
+			EngineTestData.publishMessage(routingKey, urlMessageWithEmptyURL.toString());
 			host = ApplicationConfigProvider.getInstance().getPostgre().getInsightsDBUrl();
 			ApplicationConfigProvider.getInstance().getPostgre().setInsightsDBUrl("notLocalhost");
 			Thread.sleep(2000);
@@ -251,10 +256,10 @@ public class DataArchivalEngineTest extends DataArchivalEngineData {
 	@Test(priority = 7)
 	public void testSaveSuccessHealthNodeinNeo4j() throws Exception {
 		try {
-			publishDataArchivalDetails(routingKeyHealth, successHealthMessageJson.toString());
+			EngineTestData.publishRMQMessage(routingKeyHealth, successHealthMessageJson.toString());
 			Thread.sleep(2000);
 			int countOfRecords = readNeo4JData(routingKeyHealthNeo4j,
-					successHealthMessageJson.getAsJsonObject().get("execId").getAsString());
+					successHealthMessageJson.getAsJsonArray().get(0).getAsJsonObject().get("execId").getAsString());
 			Assert.assertTrue(countOfRecords > 0);
 		} catch (AssertionError e) {
 			log.error("message  {} ", e);
@@ -264,16 +269,100 @@ public class DataArchivalEngineTest extends DataArchivalEngineData {
 	@Test(priority = 8)
 	public void testSaveFailureHealthNodeinNeo4j() throws Exception {
 		try {
-			publishDataArchivalDetails(routingKeyHealth, failureHealthMessageJson.toString());
+			EngineTestData.publishRMQMessage(routingKeyHealth, failureHealthMessageJson.toString());
 			Thread.sleep(2000);
 			int countOfRecords = readNeo4JData(routingKeyHealthNeo4j,
-					failureHealthMessageJson.getAsJsonObject().get("execId").getAsString());
+					failureHealthMessageJson.getAsJsonArray().get(0).getAsJsonObject().get("execId").getAsString());
 			Assert.assertTrue(countOfRecords > 0);
 		} catch (AssertionError e) {
 			log.error("message  {} ", e);
 		}
 	}
 
+	@Test(priority = 9)
+	public void testPublishArchivalRecordSQS() throws Exception {
+		try {
+			if (ApplicationConfigProvider.getInstance().getMessageQueue().getProviderName()
+					.equalsIgnoreCase("AWSSQS")) {
+				EngineTestData.publishSQSMessage(routingKey, urlJson.toString());
+				Thread.sleep(2000);
+				InsightsDataArchivalConfig record = dataArchivalConfigdal.getSpecificArchivalRecord(archivalName);
+				Assert.assertNotNull(record);
+				Assert.assertEquals(record.getSourceUrl(), urlJson.getAsJsonObject().get("data").getAsJsonArray().get(0)
+						.getAsJsonObject().get("sourceUrl").getAsString());
+				Assert.assertEquals(record.getBoltPort(), urlJson.getAsJsonObject().get("data").getAsJsonArray().get(0)
+						.getAsJsonObject().get("boltPort").getAsInt());
+			}
+			Assert.assertTrue(true);
+		} catch (AssertionError e) {
+			log.error("message  {} ", e);
+		}
+	}
+
+	@Test(priority = 10)
+	public void testPublishSuccessHealthNodeSQS() throws Exception {
+		try {
+			if (ApplicationConfigProvider.getInstance().getMessageQueue().getProviderName()
+					.equalsIgnoreCase("AWSSQS")) {
+				EngineTestData.publishSQSMessage(routingKeyHealth, successHealthMessageJson.toString());
+				Thread.sleep(2000);
+				int countOfRecords = readNeo4JData(routingKeyHealthNeo4j,
+						successHealthMessageJson.getAsJsonArray().get(0).getAsJsonObject().get("execId").getAsString());
+				Assert.assertTrue(countOfRecords > 0);
+			}
+			Assert.assertTrue(true);
+		} catch (AssertionError e) {
+			log.error("message  {} ", e);
+		}
+	}
+
+	@Test(priority = 11)
+	public void testPublishFailureHealthNodeSQS() throws Exception {
+		try {
+			if (ApplicationConfigProvider.getInstance().getMessageQueue().getProviderName()
+					.equalsIgnoreCase("AWSSQS")) {
+				EngineTestData.publishSQSMessage(routingKeyHealth, failureHealthMessageJson.toString());
+				Thread.sleep(2000);
+				int countOfRecords = readNeo4JData(routingKeyHealthNeo4j,
+						failureHealthMessageJson.getAsJsonArray().get(0).getAsJsonObject().get("execId").getAsString());
+				Assert.assertTrue(countOfRecords > 0);
+			}
+			Assert.assertTrue(true);
+		} catch (AssertionError e) {
+			log.error("message  {} ", e);
+		}
+	}
+	
+	@Test(priority = 12)
+	public void testDataArchivalDataSubscriber() {
+		try {
+			String agentId = configDetails.getAsJsonObject().get("agentId").getAsString();
+			DataArchivalDataSubscriber dm = new DataArchivalDataSubscriber(routingKey, agentId);
+			dm.handleDelivery(routingKey, successHealthMessageJson.toString());
+			Thread.sleep(2000);
+		} catch (Exception e) {
+			log.error(e);
+		}
+	}
+
+	@Test(priority = 13)
+	public void testDataArchivalHealthSubscriber() {
+		try {
+			DataArchivalHealthSubscriber dm = new DataArchivalHealthSubscriber(routingKey);
+			dm.handleDelivery(routingKey, successHealthMessageJson.toString());
+			Thread.sleep(2000);
+		} catch (Exception e) {
+			log.error(e);
+		}
+	}
+
+	@AfterMethod
+	protected void tearDown() throws Exception {
+		DataArchivalAggregatorModule dam = new DataArchivalAggregatorModule();
+		dam.runDataArchival();
+		Thread.sleep(1000);
+	}
+	
 	@AfterClass
 	public void cleanUp() {
 		try {

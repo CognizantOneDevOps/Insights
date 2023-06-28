@@ -49,6 +49,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.AgentCommonConstant;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -101,24 +102,16 @@ public class AgentManagementUtil {
 		return jsonObject;
 	}
 
-	public String getAgentPackageFromGithub(URL zipFileUrl, File targetDir, String version) throws IOException {
+	public String getAgentPackageFromGithub(URL zipFileUrl, File targetDir, String version) throws IOException, InsightsCustomException {
 		String message = "";
 		if (targetDir.exists()) {
 			throw new IOException(version + " - Package already exist!");
 		} else {
+			if(!zipFileUrl.getProtocol().startsWith("http") && !zipFileUrl.getPath().contains("https://github.com/CognizantOneDevOps/"))
+			    throw new InsightsCustomException("Invalid URL ");
 			targetDir.mkdirs();
 			File zip = File.createTempFile("agents_", ".zip", targetDir);
-			URLConnection conn;
-			if (ApplicationConfigProvider.getInstance().getProxyConfiguration().isEnableProxy()) {
-				SocketAddress addr = new InetSocketAddress(
-						ApplicationConfigProvider.getInstance().getProxyConfiguration().getProxyHost(),
-						ApplicationConfigProvider.getInstance().getProxyConfiguration().getProxyPort());
-				Proxy proxy = new Proxy(Proxy.Type.HTTP, addr);
-				conn = zipFileUrl.openConnection(proxy);
-			} else {
-				conn = zipFileUrl.openConnection();
-			}
-			try (InputStream in = new BufferedInputStream(conn.getInputStream(), 1024);
+			try (InputStream in = new BufferedInputStream(zipFileUrl.openStream(), 1024);
 					OutputStream out = new BufferedOutputStream(new FileOutputStream(zip))) {
 				copyInputStream(in, out);
 			} catch (IOException e) {

@@ -146,7 +146,7 @@ public class InsightsWorkflowController {
 			
 			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 			byteArrayOutputStream.write(fileContent);
-			org.apache.pdfbox.pdmodel.PDDocument document = org.apache.pdfbox.pdmodel.PDDocument.load(fileContent, "12345");
+			org.apache.pdfbox.pdmodel.PDDocument document = org.apache.pdfbox.Loader.loadPDF(fileContent, "12345");
 			
 			if (document == null) {
 				throw new InsightsCustomException("Invalid file ");

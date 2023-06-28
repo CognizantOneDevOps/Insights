@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.cognizant.devops.engines.platformengine.modules.correlation;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,6 +29,7 @@ import com.cognizant.devops.engines.platformengine.modules.correlation.model.Cor
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.CorrelationConfig;
 import com.cognizant.devops.platformcommons.constants.EngineConstants;
+import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.FileDetailsEnum;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
@@ -84,14 +84,14 @@ public class CorrelationExecutor {
 				loggingInfo.put(EngineConstants.DESTINATION_TOOL, String.valueOf(correlation.getDestinationToolName()));
 				loggingInfo.put(EngineConstants.CORRELATION_NAME, String.valueOf(correlation.getRelationName()));
 				log.debug(" Type=Correlator execId={} correlationName={} sourceTool={} destinationTool={} ProcessingTime={} processedRecords={} Correlation started for {}",loggingInfo.get(EngineConstants.EXECID),loggingInfo.get(EngineConstants.CORRELATION_NAME),loggingInfo.get(EngineConstants.SOURCE_TOOL),loggingInfo.get(EngineConstants.DESTINATION_TOOL),0,0, correlation.getRelationName());
-				if (correlation.isSelfRelation()) {
-					continue;
-				}
+				
 				updateNodesMissingCorrelationFields(correlation);
 				
 				loadDestinationDataAndExecuteCorrelation(correlation);
 				
-				removeRawLabel(correlation);
+				if (!correlation.isSelfRelation()) {
+					removeRawLabel(correlation);
+				}
 				log.debug(" Type=Correlator execId={} correlationName={} sourceTool={} destinationTool={} ProcessingTime={} processedRecords={} Correlation end for{}",loggingInfo.get(EngineConstants.EXECID),loggingInfo.get(EngineConstants.CORRELATION_NAME),loggingInfo.get(EngineConstants.SOURCE_TOOL),loggingInfo.get(EngineConstants.DESTINATION_TOOL),0,0, correlation.getRelationName());
 			}
 		} else {
@@ -364,7 +364,7 @@ public class CorrelationExecutor {
 					.getAllConfigurationFilesForModule(FileDetailsEnum.FileModule.CORRELATION.name());
 			if (configFile != null && !configFile.isEmpty()) {
 				
-				String configFileData = new String(configFile.get(0).getFileData(), StandardCharsets.UTF_8);
+				String configFileData = new String(configFile.get(0).getFileData(), MQMessageConstants.MESSAGE_ENCODING);
 				Correlation[] correlationArray = new Gson().fromJson(configFileData, Correlation[].class);
 				correlations = Arrays.asList(correlationArray);
 				

@@ -31,9 +31,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.kerberos.authentication.KerberosServiceRequestToken;
-import org.springframework.security.providers.ExpiringUsernameAuthenticationToken;
-import org.springframework.security.saml.SAMLCredential;
+import org.springframework.security.saml2.provider.service.authentication.DefaultSaml2AuthenticatedPrincipal;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -77,15 +75,12 @@ public class InsightsAuthenticationTokenUtils {
 	 */
 	public Authentication authenticateSAMLData(HttpServletRequest request, HttpServletResponse response) {
 		log.debug(" Inside authenticationSAMLData , url ==== {} ", request.getRequestURI());
-		String authToken = AuthenticationUtils.extractAndValidateAuthToken(request, response);
 		SecurityContext context = SecurityContextHolder.getContext();
 		Authentication auth = context.getAuthentication();
 		if (auth != null) {
-			SAMLCredential credentials = (SAMLCredential) auth.getCredentials();
-			InsightsAuthenticationToken jwtAuthenticationToken = new InsightsAuthenticationToken(authToken,
-					auth.getDetails(), credentials, auth.getAuthorities());
+			InsightsAuthenticationToken samlJwtAuthenticationToken = (InsightsAuthenticationToken) context.getAuthentication();
 			log.debug(" Inside authenticationSAMLData completed ");
-			return jwtAuthenticationToken;
+			return samlJwtAuthenticationToken;
 		} else {
 			AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.SECURITY_CONTEXT_CODE,
 					"Authentication not successful ,Please relogin ");
@@ -170,22 +165,25 @@ public class InsightsAuthenticationTokenUtils {
 			updateSecurityContext(newAuth);
 			
 		} else if ("SAML".equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
-			Object principal = auth.getPrincipal();
+			
+			DefaultSaml2AuthenticatedPrincipal principleDefault = (DefaultSaml2AuthenticatedPrincipal) auth.getDetails();
+			String userid = principleDefault.getFirstAttribute("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name");
 			Date expDate = new Date(System.currentTimeMillis() + 60 * 60 * 1000);
-			ExpiringUsernameAuthenticationToken autharization = new ExpiringUsernameAuthenticationToken(expDate,
-					principal, auth.getCredentials(), updatedAuthorities);
 			
-			updateSecurityContext(autharization);
+			Map<String, Object> params = new HashMap<>();
+			params.put(AuthenticationUtils.AUTHORITY, updatedAuthorities);
+			params.put("tokenExpiration",expDate);
 
-		}else if ("Kerberos".equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
-			SecurityContext context = SecurityContextHolder.getContext();
-			KerberosServiceRequestToken authKerberos = (KerberosServiceRequestToken) context.getAuthentication();
-			KerberosServiceRequestToken responseAuth = new KerberosServiceRequestToken(authKerberos.getDetails(), authKerberos.getTicketValidation(),
-					updatedAuthorities, authKerberos.getToken());
+			jToken = AuthenticationUtils.getToken(userid, AuthenticationUtils.SESSION_TIME, params);
 			
-			updateSecurityContext(responseAuth);
+			InsightsAuthenticationToken samlJwtAuthenticationToken = new InsightsAuthenticationToken(jToken,
+					auth.getDetails(), auth.getCredentials(), updatedAuthorities);
+			
+			
+			SecurityContextHolder.getContext().setAuthentication(samlJwtAuthenticationToken);
 
-		} else if ("JWT".equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
+
+		}else if ("JWT".equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
 			SecurityContext context = SecurityContextHolder.getContext();
 			InsightsAuthenticationToken authJWT = (InsightsAuthenticationToken) context.getAuthentication();
 			

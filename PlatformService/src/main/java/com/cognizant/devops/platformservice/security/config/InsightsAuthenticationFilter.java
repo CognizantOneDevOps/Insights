@@ -32,6 +32,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.saml2.provider.service.authentication.Saml2Authentication;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
@@ -78,6 +79,10 @@ public class InsightsAuthenticationFilter extends AbstractAuthenticationProcessi
 			authentication= new InsightsAuthenticationToken(pathInfo, null, null,updatedAuthorities);
 			authenticationtokenUtils.updateSecurityContext(authentication);
 		}	else if (ApplicationConfigProvider.getInstance().getAutheticationProtocol().equalsIgnoreCase("SAML")) {
+			if(AuthenticationUtils.SAML_IGNORE_URLS.contains(pathInfo)) {
+				return SecurityContextHolder.getContext().getAuthentication();
+			}
+			
 			authentication = authenticationtokenUtils.authenticateSAMLData(request, response);
 			authentication = callAuthManager(authentication);
 		} else if (AuthenticationUtils.IS_NATIVE_AUTHENTICATION) {

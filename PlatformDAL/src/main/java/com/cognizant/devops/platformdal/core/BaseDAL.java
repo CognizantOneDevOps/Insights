@@ -15,13 +15,18 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.core;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import javax.persistence.PersistenceException;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,9 +35,6 @@ import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.hibernate.type.Type;
-import org.owasp.esapi.ESAPI;
-import org.owasp.esapi.Validator;
-import org.owasp.esapi.reference.DefaultSecurityConfiguration;
 
 import com.cognizant.devops.platformdal.config.PlatformDALSessionFactoryProvider;
 
@@ -374,6 +376,30 @@ public class BaseDAL implements IBaseDAL {
 		}
 	}
 	
+	/** used to update DB record based on SQL native query withParameter
+	 *	@param createQuery native/SQL query
+	 *	@return the number of entities updated or deleted 
+	 */
+	@Override
+	public int executeUpdateWithSQLQueryWithParameter(String createQuery,Map<String, Object> parameters) {
+		long starttime = System.nanoTime();
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			NativeQuery<?> createSQLQuery = session.createNativeQuery(createQuery);
+			
+			for (Map.Entry<String, Object> parameter : parameters.entrySet()) {
+				createSQLQuery.setParameter(parameter.getKey(), parameter.getValue());
+			}
+			int recordUpdated = createSQLQuery.executeUpdate();
+			session.getTransaction().commit();
+			printHibernateStatistics(starttime, createQuery, recordUpdated);
+			return recordUpdated;
+		} catch (PersistenceException e) {
+			printHibernateException(e, createQuery);
+			throw e;
+		}
+	}
+	
 	/** Used to get result list of entity from Hibernate based Native query   
 	 * @param query SQL/native query to be executed 
 	 * @param sclarValues Map of query return Scalar value with Hibernate datatype
@@ -404,6 +430,58 @@ public class BaseDAL implements IBaseDAL {
 			throw e;
 		}
 		return returnList;
+	}
+	
+	
+	/** Used to get result list of entity from Hibernate 
+	 * @param query Hibernate query to be executed 
+	 * @param parameters list of parameter in key value pair, 
+	 *	this will be use to set parameter placeholder in query if any 
+	 *	@return List of entity object 
+	 */
+	@Override 
+	public <T> List<T> getResultListCriteria(Class<T> type, Map<String, Object> parameters, Map<String, String> orderbyParams) {
+		long starttime = System.nanoTime();
+		List<T> returnList = null;
+		try (Session session = getSessionObj() ) {
+			CriteriaBuilder builder = session.getEntityManagerFactory().getCriteriaBuilder();
+			javax.persistence.criteria.CriteriaQuery<T> criteriaQuery = builder.createQuery(type);
+			Root<T> root = criteriaQuery.from(type);
+			criteriaQuery.select( root );
+			List<Predicate> predicates = new ArrayList<>();
+			for(Map.Entry<String, Object> entry : parameters.entrySet()) {
+				if(entry.getKey().contains(".")) {
+					String[] splitFiled = entry.getKey().split("[.]");
+					Join secondroot = root.join(splitFiled[0], JoinType.INNER);
+					if(String.valueOf(entry.getValue()).equalsIgnoreCase("true") || String.valueOf(entry.getValue()).equalsIgnoreCase("false"))
+						predicates.add(builder.equal( secondroot.get(splitFiled[1]), Boolean.valueOf(String.valueOf(entry.getValue())))) ;
+					else
+						predicates.add(builder.equal( secondroot.get(splitFiled[1]), entry.getValue())) ;
+
+				}else {
+					predicates.add(builder.equal( root.get( entry.getKey()), entry.getValue())) ;
+				}
+			}
+			
+			criteriaQuery.where(predicates.toArray(new Predicate[]{}));
+			
+			for(Map.Entry<String, String> orderby: orderbyParams.entrySet()) {
+				if(orderby.getKey().equalsIgnoreCase("asc")) {
+					criteriaQuery.orderBy(builder.asc(root.get(orderby.getValue())));
+				}else {
+					criteriaQuery.orderBy(builder.desc(root.get(orderby.getValue())));
+				}
+			}
+			
+			returnList = session.getEntityManagerFactory().createEntityManager().createQuery( criteriaQuery ).getResultList();
+
+			printHibernateStatistics(starttime, "Criteria for type "+type, returnList.size());
+		} catch (PersistenceException e) {
+			printHibernateException(e, "Criteria for type "+type);
+			throw e;
+		}
+		return returnList;
+
 	}
 
 	/** used to log PersistenceException in perticular format 
@@ -440,24 +518,6 @@ public class BaseDAL implements IBaseDAL {
 						+ "processingTime={} sourceProperty={} rows={} ",
 				stackTrace.getFileName(), stackTrace.getMethodName(), stackTrace.getLineNumber(),stacktraceService.getFileName(),stacktraceService.getMethodName(),stacktraceService.getLineNumber(), processingTime,
 				sourceProperty, rowCount);
-	}
-	
-	/** use to create ESAPI validator object 
-	 * @param startTime
-	 * @param sourceProperty
-	 * @param rowCount
-	 */
-	public Validator getESAPIValidator() {
-		Properties esapiProps = new Properties();
-		try {
-			esapiProps.load(getClass().getClassLoader().getResourceAsStream("ESAPI.properties"));
-
-		} catch (Exception e) {
-			logger.error(e);
-		}
-		ESAPI.override(new DefaultSecurityConfiguration(esapiProps));
-		Validator validate = ESAPI.validator();
-		return validate;
 	}
 
 }

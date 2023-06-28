@@ -34,7 +34,6 @@ import { PageNotFoundComponent } from '@insights/app/modules/page-not-found/page
 import { HealthCheckComponent } from '@insights/app/modules/healthcheck/healthcheck.component';
 import { ShowDetailsDialog } from '@insights/app/modules/healthcheck/healthcheck-show-details-dialog';
 import { AboutDialog } from '@insights/app/modules/about/about-show-popup';
-import { BlockChainComponent } from '@insights/app/modules/blockchain/blockchain.component';
 import { AgentManagementComponent } from '@insights/app/modules/admin/agent-management/agent-management.component';
 import { DatadictionaryComponent } from '@insights/app/modules/datadictionary/datadictionary.component';
 
@@ -58,14 +57,13 @@ import { ConfirmationMessageDialog } from '@insights/app/modules/application-dia
 import { ApplicationMessageDialog } from '@insights/app/modules/application-dialog/application-message-dialog';
 import { AddGroupMessageDialog } from '@insights/app/modules/user-onboarding/add-group-message-dialog';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
-import { BlockChainService } from '@insights/app/modules/blockchain/blockchain.service';
+
 import { DatePipe, TitleCasePipe } from '@angular/common';
 import { UserOnboardingService } from '@insights/app/modules/user-onboarding/user-onboarding-service';
 import { StorageServiceModule } from 'ngx-webstorage-service';
 import { LogoSettingComponent } from '@insights/app/modules/settings/logo-setting/logo-setting.component';
-import { AssetDetailsDialog } from '@insights/app/modules/blockchain/bc-asset-details-dialog';
 import { LogoSettingService } from '@insights/app/modules/settings/logo-setting/logo-setting.service';
-import { AssetPipe } from '@insights/app/modules/blockchain/bc-asset-pipe.pipe';
+
 import { ShowJsonDialog } from '@insights/app/modules/relationship-builder/show-correlationjson';
 import { RelationshipBuilderComponent } from '@insights/app/modules/relationship-builder/relationship-builder.component';
 import { RelationshipBuilderService } from '@insights/app/modules/relationship-builder/relationship-builder.service';
@@ -166,15 +164,12 @@ import { AddComponent } from '@insights/app/modules/multiple-email-configuration
         AgentConfigurationComponent,
         MultipleEmailConfigurationComponent, 
         AddComponent,
-        BlockChainComponent,
         UserOnboardingComponent,
         LandingPageComponent,
         ConfirmationMessageDialog,
         ApplicationMessageDialog,
         AddGroupMessageDialog,
         LogoSettingComponent,
-        AssetDetailsDialog,
-        AssetPipe,
         ShowJsonDialog,
         RelationshipBuilderComponent,
         BulkUploadComponent,
@@ -259,8 +254,7 @@ import { AddComponent } from '@insights/app/modules/multiple-email-configuration
         DataArchivingService,
         UserOnboardingService,
         MessageDialogService,
-        LogoSettingService,
-        BlockChainService,
+        LogoSettingService,      
         DatePipe,
         DragulaService,
         TitleCasePipe,

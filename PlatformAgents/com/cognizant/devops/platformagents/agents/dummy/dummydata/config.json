@@ -51,6 +51,7 @@
     "backupCount": 1000
   },
   "mqConfig": {
+    "providerName": "RabbitMQ",
     "host": "127.0.0.1",
     "password": "",
     "user": "",
@@ -58,7 +59,10 @@
     "agentControlXchg": "iAgent",
     "port": 5672,
     "enableDeadLetterExchange": false,
-    "prefetchCount": 5
+    "prefetchCount": 5,
+	"awsAccessKey": "",
+	"awsSecretKey": "",
+	"awsRegion": ""
   },
   "publish": {
     "data": "DUMMY.DUMMYDATA.DATA",

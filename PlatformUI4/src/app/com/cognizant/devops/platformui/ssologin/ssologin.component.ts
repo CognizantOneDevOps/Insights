@@ -22,7 +22,7 @@ import { HttpErrorResponse } from "@angular/common/http";
 import { RestAPIurlService } from '@insights/common/rest-apiurl.service'
 import { CookieService } from 'ngx-cookie-service';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
-
+import { CookieServiceInsights } from '@insights/common/cookiesService'
 
 @Component({
   selector: 'app-ssologin',
@@ -36,7 +36,8 @@ export class SSOLoginComponent implements OnInit {
   constructor(private restCallHandlerService: RestCallHandlerService, private dataShare: DataSharedService,
     public router: Router, private cookieService: CookieService,
     private loginService: LoginService, private restAPIUrlService: RestAPIurlService,
-    private route: ActivatedRoute, public messageDialog: MessageDialogService) {
+    private route: ActivatedRoute, public messageDialog: MessageDialogService,
+    private cookiesinsights : CookieServiceInsights) {
     console.log("Inside new ssoLogin component constructor");
     this.dataShare.setSession();
   }
@@ -68,18 +69,16 @@ export class SSOLoginComponent implements OnInit {
         date.setTime(date.getTime() + (minutes * 60 * 1000));
         for (var key in resData) {
           var value = resData[key];
-          //console.log("  key  " + key + "  keyvalue " + value);
           if (value == "" || value == undefined) {
             console.log("value is not define for cookie " + key);
           } else {
             if (key != "jtoken" && key != "postLogoutURL" && key != "insights-sso-givenname") {
-              this.cookieService.set(key, value, 0, '/', null, false, 'None');
-              //this.cookieService.set(key, value, { storeUnencoded: true, path: '/', SameSite : 'None' })
+              this.cookiesinsights.setCookie(key, value, 2, '/');
             }
             if (key == "insights-sso-token") {
               this.dataShare.setWebAuthToken(resData["insights-sso-token"]);
-              //this.cookieService.put("username", resData["insights-sso-token"], { storeUnencoded: true, path: '/' });
-              this.cookieService.set("username", resData["insights-sso-token"], 0, '/',null, false, 'None');
+              this.cookiesinsights.setCookie("username", resData["insights-sso-token"], 2, '/');
+              this.cookiesinsights.setCookie("insightsusername", resData["insights-sso-token"], 2, '/');
             } else if (key == "jtoken") {
               this.dataShare.setAuthorizationToken(resData["jtoken"]);
             } else if (key == "insights-sso-givenname") {

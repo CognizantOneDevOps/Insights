@@ -161,55 +161,13 @@ class JenkinsAgent(BaseAgent):
                     startIndex+=1
             completedBuilds = builds[startIndex:len(builds)]
             if len(completedBuilds)>0:
-                buildDetails = self.parseResponse(self.responseTemplate, completedBuilds, injectData)
-                auditing=self.config.get('auditing',False)
-                if auditing:
-                    buildDetails = self.processLogParsing(buildDetails)
+                buildDetails = self.parseResponse(self.responseTemplate, completedBuilds, injectData)                
                 self.publishToolsData(buildDetails)
                 if not trackingUpdated:
                     self.updateTrackingDetails(url, completedBuilds[0]["id"])
                     trackingUpdated = True
-            start = start + 100
+            start = start + 100   
     
-    def processLogParsing(self, buildDetails):
-        for build in buildDetails:
-            buildUrl = build['buildUrl']
-            logUrl = buildUrl + "consoleText"
-            logResponse = self.getBuildLog(logUrl)
-            if logResponse.find('Uploaded: ')!=-1:                
-                build["resourcekey"]=logResponse.split('Uploaded: ')[1].split('\n')[0]
-                build["resourcekey"]=build["resourcekey"][build["resourcekey"].find('repository/'):build["resourcekey"].rfind('/')] + build["resourcekey"][build["resourcekey"].rfind('.'):build["resourcekey"].rfind(' (')]                
-                build["resourcekey"]=build["resourcekey"][build["resourcekey"].index('/',build["resourcekey"].index('/') + 1) + 1:build["resourcekey"].rfind('/')]+build["resourcekey"][build["resourcekey"].rfind('.'):]                
-                build["resourcekey"]=build["resourcekey"][::-1].replace('/','-',2)[::-1]
-            elif logResponse.find('Uploaded to nexus: ')!=-1:
-                build["resourcekey"]=logResponse.split('Uploaded to nexus: ')[1].split('\n')[0]
-                build["resourcekey"]=build["resourcekey"][build["resourcekey"].find('repository/'):build["resourcekey"].rfind('/')] + build["resourcekey"][build["resourcekey"].rfind('.'):build["resourcekey"].rfind(' (')]
-                build["resourcekey"]=build["resourcekey"][build["resourcekey"].index('/',build["resourcekey"].index('/') + 1) + 1:build["resourcekey"].rfind('/')]+build["resourcekey"][build["resourcekey"].rfind('.'):]
-                build["resourcekey"]=build["resourcekey"][::-1].replace('/','-',2)[::-1]
-            else:                
-                build["resourcekey"]='Not Found'
-            if logResponse.find('Starting deployment process ')!=-1:                
-                deploymentDetails = logResponse.split('Starting deployment process ')[1].split('\n')[0]                
-                build["deploymentProcess"] = deploymentDetails.split(" ")[0].replace("'","")                
-                build["deploymentApplication"] = deploymentDetails.split("of application ")[1].split(' ')[0].replace("'","")
-                build["deploymentEnv"] = deploymentDetails.split("in environment ")[1].split('\n')[0].replace("'","").rstrip()                
-            else:                
-                build["deploymentProcess"] = 'Not Found'
-                build["deploymentApplication"] = 'Not Found'
-                build["deploymentEnv"] = 'Not Found'
-            if logResponse.find('Deployment request id is: ')!=-1:                
-                build["deploymentId"] = logResponse.split('Deployment request id is: ')[1].split('\n')[0].replace("'","")
-            elif logResponse.find('Deployment request created with id: ')!=-1:
-                build["deploymentId"] = logResponse.split('Deployment request created with id: ')[1].split('\n')[0].replace("'","").rstrip()
-            else:                
-                build["deploymentId"] = 'Not Found'
-            if logResponse.find('The deployment result is ')!=-1:
-                build["deploymentStatus"] = logResponse.split('The deployment result is ')[1].split('.')[0].replace("'","")
-            elif logResponse.find('The deployment ')!=-1:
-                build["deploymentStatus"] = logResponse.split('The deployment ')[1].split('.')[0].replace("'","")
-            else:                
-                build["deploymentStatus"] = 'Not Found' 
-        return buildDetails
     
     def updateTrackingDetails(self, buildUrl, buildNumber):
         currentMasterTracking = self.tracking.get(self.currentJenkinsMaster, None)

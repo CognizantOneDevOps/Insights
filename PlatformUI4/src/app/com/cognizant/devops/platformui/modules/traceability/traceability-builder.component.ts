@@ -23,6 +23,8 @@ import { DataSharedService } from '@insights/common/data-shared-service';
 import { ShowTraceabiltyDetailsDialog } from './traceabilty-show-details-dialog';
 import { TraceabiltyService } from './traceablity-builder.service';
 import { ImageHandlerService } from '@insights/common/imageHandler.service';
+import { saveAs as importedSaveAs } from "file-saver";
+import html2canvas from 'html2canvas';
 
 @Component({
     selector: 'app-traceabilitydashboard',
@@ -100,7 +102,8 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
     total: number;
     mapToolColor = new Map<String, Object[]>();
     listOfColor: any[] = ['#FAE0E1', '#D4F9DF', '#D4F0F0', '#FFFFE3', '#FEE1ED', '#D4F0F0', '#CBEBCA', '#F2FAE0', '#F9E0FA', '#EAE0FA']
-    selectedTabIndex :number = 0
+    selectedTabIndex: number = 0
+    isDownload = false;
 
     constructor(private dialog: MatDialog, public messageDialog: MessageDialogService,
         private traceablityService: TraceabiltyService, private imageHandeler: ImageHandlerService, private renderer: Renderer2, public dataShare: DataSharedService) {
@@ -121,7 +124,46 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
         //this.tabClick();
 
     }
-     
+
+    downloadPdf() {
+        this.list = [];
+        this.toolSummaryArray = [];
+        this.map = new Map<String, Object[]>();
+        this.cacheMap = new Map<String, Object[]>();
+        this.isEnable = false;
+        this.showDiv = false;
+        if (this.isDownload) {
+            this.createHTMLImage().then((imageString) => {
+                this.getTraceabilityPDF(this.selectedTool, this.selectedField, this.fieldValue, this.issueTypeSelected, imageString);
+            });
+        }
+    }
+
+    createHTMLImage(): Promise<String> {
+        return new Promise((resolve, reject) => {
+            let elementDoc = document.getElementById("traceabilityPDF");
+            window.scrollTo(0, 0);
+            elementDoc.style.overflow = 'visible';
+            elementDoc.style.height = "auto";
+            html2canvas(elementDoc, {
+                allowTaint: true,
+                useCORS: true,
+                width: elementDoc.scrollWidth,
+                height: elementDoc.scrollHeight,
+            }).then((canvas) => {
+                resolve(canvas.toDataURL('image/png', 1.0));
+            });
+            elementDoc.style.overflowY = 'auto';
+            elementDoc.style.height = "inherit";
+        });
+    }
+
+    getTraceabilityPDF(toolName: string, toolField: string, toolValue: string, type: string, imageSummary: any) {
+        this.traceablityService.downloadTraceabiltyPDF(toolName, toolField, toolValue, type, imageSummary).then(function (data) {
+            importedSaveAs(data, "Trace.pdf");
+        });
+    }
+
     getDetails() {
         this.list = [];
         this.toolSummaryArray = [];
@@ -139,6 +181,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
         else {
             this.getAssetHistoryDetails(this.selectedTool, this.selectedField, this.fieldValue, "Other");
         }
+        this.isDownload = true;
     }
     filterValues(data, key) {
         let searchKey = data;
@@ -191,7 +234,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
                         historyData.push(resultmap);
                     });
                     this.prepareSummaryDetail(data.data.summary);
-                    
+
                     if (data.data.combinedSummary.length > 0) {
                         this.list1 = data.data.combinedSummary;
                         console.log(this.list1)
@@ -205,6 +248,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
                     this.jiraArr = this.traceabilityData.data.pipeline.filter(x => x.toolName === 'JIRA');
                     this.workflow();
                     this.isDatainProgress = false;
+                    this.isDownload = true;
                 }
                 else {
                     this.messageDialog.openSnackBar("No data found for the given selection.",'error');
@@ -279,7 +323,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
             this.traceablityService.getIssuesPipeline(clickedElement)
                 .then((data) => {
                    // setTimeout(()=>{this.isDatainProgress=true},8000); 
-                   this.map = new Map<String, Object[]>(); 
+                   this.map = new Map<String, Object[]>();
                     let res = data.data.pipeline;
                     this.cacheMap.set(clickedElement.uuid, res);
                     console.log(data)
@@ -297,7 +341,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
                     this.globalMap = this.map;
                     this.isDatainProgress=false;   
                   this.prepareSummaryDetail(data.data.summary);
-                  
+
                     if (data.data.combinedSummary.length > 0) {
                         this.list1 = data.data.combinedSummary;
                     }

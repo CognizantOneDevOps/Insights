@@ -106,7 +106,7 @@ public class LoginWithRolesConfiguration extends LoginWithRolesObjectRepository 
 	 */
 	private boolean checkAdminMenu() {
 		try {
-			if(isPresent("Dashboard Groups") && isPresent("Audit Reporting") && isPresent("Playlist") &&
+			if(isPresent("Dashboard Groups") && isPresent("Playlist") &&
 					isPresent("Data Dictionary") && isPresent("Health Check") && isPresent("Configuration") &&
 					isPresent("Report Management") && isPresent("Dashboard Report Download")) {
 				log.info("All the admin's side menu are displayed");

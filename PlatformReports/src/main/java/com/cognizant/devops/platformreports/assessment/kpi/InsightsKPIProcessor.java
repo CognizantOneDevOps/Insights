@@ -31,6 +31,7 @@ import com.cognizant.devops.platformcommons.constants.ReportStatusConstants;
 import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
+import com.cognizant.devops.platformcommons.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformdal.milestone.MileStoneConfigDAL;
 import com.cognizant.devops.platformreports.assessment.dal.ReportDataHandler;
 import com.cognizant.devops.platformreports.assessment.dal.ReportDataHandlerFactory;
@@ -40,7 +41,6 @@ import com.cognizant.devops.platformreports.assessment.datamodel.QueryModel;
 import com.cognizant.devops.platformreports.assessment.util.ReportEngineEnum;
 import com.cognizant.devops.platformreports.assessment.util.ReportEngineEnum.ContentCategory;
 import com.cognizant.devops.platformreports.assessment.util.ReportEngineUtils;
-import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 

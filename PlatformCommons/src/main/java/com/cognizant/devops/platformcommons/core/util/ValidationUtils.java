@@ -22,6 +22,9 @@ import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.owasp.esapi.ESAPI;
+import org.owasp.esapi.Validator;
+import org.owasp.esapi.errors.ValidationException;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
@@ -41,7 +44,10 @@ public class ValidationUtils {
 	private static Pattern agentIdPattern = Pattern.compile("[^A-Za-z0-9\\_]", Pattern.CASE_INSENSITIVE);
 	private static Pattern agentVersionPattern = Pattern.compile("[v0-9]", Pattern.CASE_INSENSITIVE);
 	private static Pattern LabelPattern = Pattern.compile("[^A-Za-z0-9\\_\\.]", Pattern.CASE_INSENSITIVE);
-
+	public static final String AGENT_URL_PATTERN = "^[a-zA-Z0-9:.=?_\\/\\/\\\\\\\\-]{1,300}$";
+	public static final String ID_STRING_PATTERN = "[A-Za-z0-9\\_\\-]{1,600}$";
+	public static final String EXECUTION_ID_PATTERN = "[0-9]{1,13}$";
+	
 	public static String checkHTTPResponseSplitting(String value, boolean isReplace) {
 		Pattern CRLF = Pattern.compile(ConfigOptions.CRLF_PATTERN);
 		Matcher valueMatcher = CRLF.matcher(value);
@@ -430,5 +436,20 @@ public class ValidationUtils {
 	     result.addAll(one);
 	     result.addAll(two);
 	     return result;
+	}
+	
+	public static String validateDynamicValue(String inputValue, String pattern) throws InsightsCustomException {
+
+		Pattern validatepattern = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
+		try {
+			boolean hasHTML = validateStringForHTMLContent(inputValue);
+			if (hasHTML || !validatepattern.matcher(inputValue).matches()) {
+				throw new InsightsCustomException(inputValue + ": Invalid input. Please conform to regex ");
+			}
+		} catch (RuntimeException e) {
+			log.error("Invalid pattern found in data value ==== ");
+			throw new InsightsCustomException(PlatformServiceConstants.INVALID_REQUEST);
+		}
+		return inputValue;
 	}
 }

@@ -26,6 +26,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import javax.jms.JMSException;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
@@ -39,17 +40,16 @@ import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformcommons.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsEmailTemplates;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
 import com.cognizant.devops.platformdal.groupemail.GroupEmailConfigDAL;
 import com.cognizant.devops.platformdal.groupemail.InsightsGroupEmailConfiguration;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
-import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformworkflow.workflowtask.core.InsightsStatusProvider;
 import com.cognizant.devops.platformworkflow.workflowtask.email.EmailProcesser;
 import com.cognizant.devops.platformworkflow.workflowtask.email.MailReport;
 import com.cognizant.devops.platformworkflow.workflowtask.message.factory.WorkflowTaskSubscriberHandler;
-import com.cognizant.devops.platformworkflow.workflowtask.utils.MQMessageConstants;
 import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadPool;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -70,13 +70,13 @@ public class GroupEmailSubscriber extends WorkflowTaskSubscriberHandler {
 	private String workflowId;
 	MailReport mailReportDTO = new MailReport();
 
-	public GroupEmailSubscriber(String routingKey) throws IOException, InsightsCustomException, TimeoutException {
+	public GroupEmailSubscriber(String routingKey) throws IOException, InsightsCustomException, TimeoutException, InterruptedException, JMSException {
 		super(routingKey);
 	}
 
 	@Override
-	public void handleTaskExecution(byte[] body) throws IOException {
-		String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
+	public void handleTaskExecution(String message) throws IOException {
+//		String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
 		JsonObject statusObject = null;
 		JsonObject incomingTaskMessage = JsonUtils.parseStringAsJsonObject(message);
 		try {

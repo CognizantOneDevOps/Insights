@@ -1,0 +1,296 @@
+{
+	"vault": {
+	  "getFromVault": false,
+	  "secretEngine": "insights-kv",
+	  "readToken": "vault_secret_token",
+	  "vaultUrl": "http://Vault_Host:port/v1/"
+	},
+	"mqConfig": {
+	  "user": "",
+	  "password": "",
+	  "host": "127.0.0.1",
+	  "exchange": "iSight",
+	  "agentControlXchg": "iAgent",
+	  "port": 5672,
+	  "enableDeadLetterExchange": false,
+	  "prefetchCount": 21
+	},
+	"subscribe": {
+	  "config": "FINOPS.GCPFINOPS.config",
+	  "agentCtrlQueue": "gcp_finops_agent"
+	},
+	"publish": {
+	  "data": "FINOPS.GCPFINOPS.DATA",
+	  "health": "FINOPS.GCPFINOPS.HEALTH"
+	},
+	"enrichData": {
+	  "isEnrichmentRequired": false,
+	  "sourceProperty": "message",
+	  "keyPattern": "-",
+	  "targetProperty": "key"
+	},
+	"communication": {
+	  "type": "REST",
+	  "sslVerify": false,
+	  "responseType": "JSON"
+	},
+	"dynamicTemplate": {
+	  "responseTemplate": {
+		
+	  },
+	  "QueryProperties": {
+		"0": "billing_account_id",
+		"1": "service.id as serviceid",
+		"2": "sku.id as skuid",
+		"3": "project.id as projectid",
+		"4": "location.location",
+		"5": "location.country",
+		"6": "location.region",
+		"7": "location.zone",
+		"8": "resource.global_name as resourceglobalname",
+		"9": "TO_JSON_STRING(system_labels) as systemlabels",
+		"10": "TO_JSON_STRING(labels) as labels",
+		"11": "CAST(usage_start_time AS DATE) as strdt",
+		"12": "invoice.month as invoicemonth",
+		"13": "sum(cost) as cost",
+		"14": "sum(credits[SAFE_OFFSET(0)].amount) as creditamnt",
+		"15": "service.description as servicedesc",
+		"16": "sku.description as skudesc",
+		"17": "currency_conversion_rate",
+		"18": "currency"
+	  },
+	  "GroupByProperties": {
+		"0": "billing_account_id",
+		"1": "service.id",
+		"2": "sku.id",
+		"3": "project.id",
+		"4": "location",
+		"5": "country",
+		"6": "region",
+		"7": "zone",
+		"8": "resource.global_name",
+		"9": "TO_JSON_STRING(system_labels)",
+		"10": "TO_JSON_STRING(labels)",
+		"11": "CAST(usage_start_time AS DATE)",
+		"12": "invoice.month",
+		"13": "service.description",
+		"14": "sku.description",
+		"15": "currency_conversion_rate",
+		"16": "currency"
+	  },
+	  "recommendationzones": [
+		"us-west4-b",
+		"us-central1-a",
+		"us-central1-b",
+		"us-central1-c",
+		"us-central1-f",
+		"us-east4-a",
+		"us-east4-b",
+		"us-east4-c"
+	  ],
+	  "datasetdetails": {
+		"projectname": {
+		  "datasetname": "",
+		  "datareporttablename": ""
+		},
+		"projectname1": {
+		  "datasetname": "",
+		  "datareporttablename": ""
+		}
+	  },
+	  "timeFieldMapping": {
+		"usagedate": "%Y-%m-%d",
+		"usagedatestart": "%Y-%m-%dT%H:%M:%SZ"
+	  },
+	  "costManagement": {
+		"insightsTimeXFieldMapping": {
+		  "timefield": "usagedate",
+		  "isEpoch": false,
+		  "timeformat": "%Y-%m-%d"
+		},
+		"costMetadata": {
+		  "labels": [
+			"COST_MANAGEMENT"
+		  ]
+		}
+	  },
+	  "budget": {
+		"budgetMetadata": {
+		  "labels": [
+			"BUDGET"
+		  ],
+		  "dataUpdateSupported": true,
+		  "uniqueKey": [
+			"id"
+		  ]
+		}
+	  },
+	  "billing": {
+		"billingMetadata": {
+		  "labels": [
+			"GCPBILLING"
+		  ],
+		  "dataUpdateSupported": true,
+		  "uniqueKey": [
+			"id"
+		  ]
+		}
+	  },
+	  "project": {
+		"projectMetadata": {
+		  "labels": [
+			"GCPPROJECT"
+		  ],
+		  "dataUpdateSupported": true,
+		  "uniqueKey": [
+			"id"
+		  ]
+		}
+	  },
+	  "resourceTags": {
+		"resourceMetadata": {
+		  "labels": [
+			"RESOURCE_TAGS"
+		  ],
+		  "dataUpdateSupported": true,
+		  "uniqueKey": [
+			"resourceid",
+			"tagkey",
+			"tagvalue"
+		  ]
+		}
+	  },
+	  "resourceTagsIndividual": {
+		"resourceMetadata": {
+		  "labels": [
+			"RESOURCE_TAGS"
+		  ],
+		  "dataUpdateSupported": true,
+		  "uniqueKey": [
+			"resourceid",
+			"tagkey"
+		  ]
+		}
+	  },
+	  "recommendations": {
+		"recommendationsMetadata": {
+		  "labels": [
+			"GCPRECOMMENDATIONS"
+		  ],
+		  "dataUpdateSupported": true,
+		  "uniqueKey": [
+			"description",
+			"units",
+			"state"
+		  ]
+		}
+	  },
+	  "resourceDetails": {
+		"resourceDetailsMetadata": {
+		  "labels": [
+			"RESOURCE_DETAILS"
+		  ],
+		  "dataUpdateSupported": true,
+		  "uniqueKey": [
+			"resourceid",
+			"servicename"
+		  ]
+		},
+		"relationTagsMetadata": {
+		  "relation": {
+			"name": "TAGS_HAS_RESOURCE",
+			"source": {
+			  "labels": [
+				"RESOURCE_TAGS"
+			  ],
+			  "constraints": [
+				"resourceid"
+			  ]
+			},
+			"destination": {
+			  "labels": [
+				"RESOURCE_DETAILS",
+				"LATEST"
+			  ],
+			  "constraints": [
+				"resourceid"
+			  ]
+			}
+		  }
+		}
+	  },
+	  "resourceMetricsdDetails": {
+		"insightsTimeXFieldMapping": {
+		  "timefield": "timeStamp",
+		  "isEpoch": false,
+		  "timeformat": "%Y-%m-%dT%H:%M:%S"
+		},
+		"resourceMetricsMetadata": {
+		  "labels": [
+			"RESOURCE_METRICS"
+		  ],
+		  "dataUpdateSupported": true,
+		  "uniqueKey": [
+			"resourceid",
+			"metrictype",
+			"startdate"
+		  ]
+		},
+		"resourceMetricsRelationMetadata": {
+		  "relation": {
+			"name": "RESOURCE_HAS_METRICS",
+			"source": {
+			  "labels": [
+				"RESOURCE_DETAILS"
+			  ],
+			  "constraints": [
+				"resourceid"
+			  ]
+			},
+			"destination": {
+			  "labels": [
+				"RESOURCE_METRICS"
+			  ],
+			  "constraints": [
+				"resourceid"
+			  ]
+			}
+		  }
+		}
+	  }
+	},
+	"agentId": "",
+	"enableDataValidation": true,
+	"toolCategory": "FINOPS",
+	"toolName": "GCPFINOPS",
+	"toolsTimeZone": "GMT",
+	"insightsTimeZone": "Asia/Kolkata",
+	"enableValueArray": false,
+	"useResponseTemplate": false,
+	"auth": "base64",
+	"runSchedule": 0,
+	"runCron": "0 * * * *",
+	"timeStampField": "usagedate",
+	"timeStampFormat": "%Y-%m-%dT%H:%M:%S.%f %Z",	
+	"startFrom": "2023-04-01 00:00:00.000000 UTC",
+	"isEpochTimeFormat": false,
+	"isDebugAllowed": false,
+	"loggingSetting": {
+	  "logLevel": "INFO",
+	  "maxBytes": 5000000,
+	  "backupCount": 10
+	},
+	"webhookEnabled": false,
+	"auditing": false,
+	"enableProxy": false,
+	"proxies": {
+	  "http": "",
+	  "https": ""
+	},
+	"osversion": "windows",
+	"agentVersion": "v10.1",
+	"labelName": "GCPFINOPS",
+	"organizationId": "0",	
+	"credentials": ""
+	
+  }

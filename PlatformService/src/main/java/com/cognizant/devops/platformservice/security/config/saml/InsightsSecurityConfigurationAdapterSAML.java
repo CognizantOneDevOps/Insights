@@ -16,165 +16,204 @@
 package com.cognizant.devops.platformservice.security.config.saml;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.RSAPrivateKey;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Timer;
 
 import javax.servlet.Filter;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.velocity.app.VelocityEngine;
-import org.opensaml.saml2.metadata.provider.FilesystemMetadataProvider;
-import org.opensaml.saml2.metadata.provider.HTTPMetadataProvider;
-import org.opensaml.saml2.metadata.provider.MetadataProvider;
-import org.opensaml.saml2.metadata.provider.MetadataProviderException;
-import org.opensaml.xml.parse.StaticBasicParserPool;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.io.Resource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
-import org.springframework.security.saml.SAMLAuthenticationProvider;
-import org.springframework.security.saml.SAMLBootstrap;
-import org.springframework.security.saml.SAMLEntryPoint;
-import org.springframework.security.saml.SAMLLogoutFilter;
-import org.springframework.security.saml.SAMLLogoutProcessingFilter;
-import org.springframework.security.saml.SAMLProcessingFilter;
-import org.springframework.security.saml.SAMLRelayStateSuccessHandler;
-import org.springframework.security.saml.context.SAMLContextProviderLB;
-import org.springframework.security.saml.key.JKSKeyManager;
-import org.springframework.security.saml.key.KeyManager;
-import org.springframework.security.saml.log.SAMLDefaultLogger;
-import org.springframework.security.saml.metadata.CachingMetadataManager;
-import org.springframework.security.saml.metadata.ExtendedMetadata;
-import org.springframework.security.saml.metadata.ExtendedMetadataDelegate;
-import org.springframework.security.saml.metadata.MetadataDisplayFilter;
-import org.springframework.security.saml.metadata.MetadataGenerator;
-import org.springframework.security.saml.metadata.MetadataGeneratorFilter;
-import org.springframework.security.saml.parser.ParserPoolHolder;
-import org.springframework.security.saml.processor.HTTPArtifactBinding;
-import org.springframework.security.saml.processor.HTTPPAOS11Binding;
-import org.springframework.security.saml.processor.HTTPPostBinding;
-import org.springframework.security.saml.processor.HTTPRedirectDeflateBinding;
-import org.springframework.security.saml.processor.HTTPSOAP11Binding;
-import org.springframework.security.saml.processor.SAMLBinding;
-import org.springframework.security.saml.processor.SAMLProcessorImpl;
-import org.springframework.security.saml.userdetails.SAMLUserDetailsService;
-import org.springframework.security.saml.util.VelocityFactory;
-import org.springframework.security.saml.websso.ArtifactResolutionProfileImpl;
-import org.springframework.security.saml.websso.SingleLogoutProfile;
-import org.springframework.security.saml.websso.SingleLogoutProfileImpl;
-import org.springframework.security.saml.websso.WebSSOProfile;
-import org.springframework.security.saml.websso.WebSSOProfileConsumer;
-import org.springframework.security.saml.websso.WebSSOProfileConsumerHoKImpl;
-import org.springframework.security.saml.websso.WebSSOProfileConsumerImpl;
-import org.springframework.security.saml.websso.WebSSOProfileImpl;
-import org.springframework.security.saml.websso.WebSSOProfileOptions;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.converter.RsaKeyConverters;
+import org.springframework.security.saml2.core.Saml2X509Credential;
+import org.springframework.security.saml2.provider.service.metadata.OpenSamlMetadataResolver;
+import org.springframework.security.saml2.provider.service.registration.InMemoryRelyingPartyRegistrationRepository;
+import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration;
+import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration.Builder;
+import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
+import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrations;
+import org.springframework.security.saml2.provider.service.web.DefaultRelyingPartyRegistrationResolver;
+import org.springframework.security.saml2.provider.service.web.RelyingPartyRegistrationResolver;
+import org.springframework.security.saml2.provider.service.web.Saml2AuthenticationTokenConverter;
+import org.springframework.security.saml2.provider.service.web.Saml2MetadataFilter;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.FilterChainProxy;
-import org.springframework.security.web.access.channel.ChannelProcessingFilter;
-import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.config.SingleSignOnConfig;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationFilter;
 import com.cognizant.devops.platformservice.security.config.InsightsCrossScriptingFilter;
 import com.cognizant.devops.platformservice.security.config.InsightsCustomCsrfFilter;
 import com.cognizant.devops.platformservice.security.config.InsightsExternalAPIAuthenticationFilter;
 import com.cognizant.devops.platformservice.security.config.InsightsResponseHeaderWriterFilter;
+import com.cognizant.devops.platformservice.security.config.grafana.SpringAccessDeniedHandler;
 
 @ComponentScan(basePackages = { "com.cognizant.devops" })
 @Configuration
 @EnableWebSecurity
 @Order(value = 2)
 @Conditional(InsightsSAMLBeanInitializationCondition.class)
-public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigurerAdapter {
+public class InsightsSecurityConfigurationAdapterSAML {
 
-	private static Logger LOG = LogManager.getLogger(InsightsSecurityConfigurationAdapterSAML.class);
+	private static Logger log = LogManager.getLogger(InsightsSecurityConfigurationAdapterSAML.class);
+	static final String AUTHTYPE = "SAML";
 
-	private SingleSignOnConfig singleSignOnConfig = ApplicationConfigProvider.getInstance().getSingleSignOnConfig();
+	static final String REGISTRATION_ID = ApplicationConfigProvider.getInstance().getSingleSignOnConfig()
+			.getRegistrationId();
 
 	@Autowired
 	ResourceLoaderService resourceLoaderService;
-
-	DefaultSpringSecurityContextSource contextSource;
-
-	static final String AUTHTYPE = "SAML";
-
+	
 	@Autowired
-	private AuthenticationUtils authenticationUtils;
+	private SpringAccessDeniedHandler springAccessDeniedHandler;
+	
 
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		LOG.debug("message Inside InsightsSecurityConfigurationAdapterSAML, AuthenticationManagerBuilder **** {} ",
+	@Bean
+	@Conditional(InsightsSAMLBeanInitializationCondition.class)
+	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		log.debug("message Inside InsightsSecurityConfigurationAdapterSAML,HttpSecurity **** {} ",
 				ApplicationConfigProvider.getInstance().getAutheticationProtocol());
+		
 		if (AUTHTYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
-			LOG.debug("message Inside SAMLAuthConfig, check authentication provider **** ");
-			auth.authenticationProvider(samlAuthenticationProvider());
-		}
-	}
-
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		LOG.debug("message Inside InsightsSecurityConfigurationAdapterSAML,HttpSecurity **** {} ",
-				ApplicationConfigProvider.getInstance().getAutheticationProtocol());
-		if (AUTHTYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
-			LOG.debug("message Inside SAMLAuthConfig, check http security **** ");
-
+			
+			AuthenticationUtils authenticationUtils = new AuthenticationUtils();
+			log.debug("Inside SAMLAuthConfig, check http security **** ");
 			http.cors();
-			http.csrf().ignoringAntMatchers(AuthenticationUtils.CSRF_IGNORE.toArray(new String[0]))
-					.csrfTokenRepository(authenticationUtils.csrfTokenRepository())
-					.and().addFilterAfter(new InsightsCustomCsrfFilter(), CsrfFilter.class);
-
-			http.exceptionHandling().authenticationEntryPoint(samlEntryPoint());
-			http.addFilterBefore(metadataGeneratorFilter(), ChannelProcessingFilter.class)
-			.addFilterAfter(samlFilter(),BasicAuthenticationFilter.class);
+			
+			http.csrf().ignoringRequestMatchers(AuthenticationUtils.CSRF_IGNORE.toArray(new String[0]))
+			.csrfTokenRepository(authenticationUtils.csrfTokenRepository());
+			
+			http.headers().xssProtection().and().contentSecurityPolicy("script-src 'self'");
+			
+			http.saml2Login(saml2 -> saml2.defaultSuccessUrl("/user/insightsso/authenticateSSO"));
+			http.saml2Logout(Customizer.withDefaults());
+			http.addFilterAfter(samlFilter(), BasicAuthenticationFilter.class);
 
 			http.anonymous().disable().authorizeHttpRequests()
-			
-			.antMatchers("/error/**").permitAll()
-			.antMatchers("/saml/**").permitAll()
-			.antMatchers("/admin/**").hasAuthority("Admin")
+			.requestMatchers("/admin/**").hasAuthority("Admin")
+			.requestMatchers("/traceability/**").hasAuthority("hasAuthority('Admin')") 
 			.requestMatchers("/configure/loadConfigFromResources").permitAll()
-					.anyRequest().authenticated();
+			.anyRequest().authenticated().and().exceptionHandling().accessDeniedHandler(springAccessDeniedHandler);;
+		}
+		return http.build();
+	}
+	
+	@Bean
+	@Conditional(InsightsSAMLBeanInitializationCondition.class)
+	RelyingPartyRegistrationResolver relyingPartyRegistrationResolver(
+			RelyingPartyRegistrationRepository registrations) {
+		return new DefaultRelyingPartyRegistrationResolver(id -> registrations.findByRegistrationId(REGISTRATION_ID));
+	}
+	
+	@Bean
+	@Conditional(InsightsSAMLBeanInitializationCondition.class)
+	Saml2AuthenticationTokenConverter authentication(RelyingPartyRegistrationResolver registrations) {
+		return new Saml2AuthenticationTokenConverter(registrations);
+	}
 
-			http.logout().logoutSuccessUrl("/");
+	@Bean
+	@Conditional(InsightsSAMLBeanInitializationCondition.class)
+	FilterRegistrationBean<Saml2MetadataFilter> metadata(RelyingPartyRegistrationResolver registrations) {
+		Saml2MetadataFilter metadata = new Saml2MetadataFilter(registrations, new OpenSamlMetadataResolver());
+		FilterRegistrationBean<Saml2MetadataFilter> filter = new FilterRegistrationBean<>(metadata);
+		filter.setOrder(-101);
+		return filter;
+	}
+
+
+
+	@Bean
+	@Conditional(InsightsSAMLBeanInitializationCondition.class)
+	public RelyingPartyRegistrationRepository relyingPartyRegistrations() {
+		try {
+			
+			RSAPrivateKey privateKey = readPrivateKey(ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getPrivatekeyLocation());
+			
+			Saml2X509Credential signing = Saml2X509Credential.signing(privateKey, relyingPartyCertificate());
+
+			Builder registrationBuilder = null;
+			if( ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getMetadataUrl().isEmpty()) {
+				File metaData = new File(ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getMetdataFilePath());
+			    InputStream metaDataStream = new FileInputStream(metaData);				
+			    registrationBuilder = RelyingPartyRegistrations
+						.fromMetadata(metaDataStream);				
+			} else {
+				registrationBuilder = RelyingPartyRegistrations
+						.fromMetadataLocation(ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getMetadataUrl());						
+			}
+			registrationBuilder.registrationId(REGISTRATION_ID)
+			.entityId(ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getEntityId())
+			.assertionConsumerServiceLocation(ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getAppBaseUrl()+"/login/saml2/sso/"+REGISTRATION_ID)
+			.signingX509Credentials(c -> c.add(signing))			
+			.assertingPartyDetails(party -> party
+					.entityId(ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getEntityId())
+					.singleSignOnServiceLocation(ApplicationConfigProvider.getInstance().getSingleSignOnConfig()
+							.getSingleSignOnServiceLocation())
+					);
+			
+			RelyingPartyRegistration registration = registrationBuilder.build();
+		 	
+			return new InMemoryRelyingPartyRegistrationRepository(registration);
+
+		} catch (Exception e) {
+			log.error(e);
+		}
+
+		return null;
+	}
+	
+	X509Certificate relyingPartyCertificate() {
+		File cerFile = new File(
+				ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getKeyStoreFilePath());
+		try (InputStream is = new FileInputStream(cerFile)) {
+			return (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(is);
+		}
+		catch (Exception ex) {
+			throw new UnsupportedOperationException(ex);
+		}
+	}
+	
+	private  RSAPrivateKey readPrivateKey(String privateKeyLocation) {
+		File cerFile = new File(privateKeyLocation);
+		try (InputStream inputStream = new FileInputStream(cerFile)) {
+			return RsaKeyConverters.pkcs8().convert(inputStream);
+		}
+		catch (Exception ex) {
+			throw new IllegalArgumentException(ex);
 		}
 	}
 
-	@Override
-	public void configure(WebSecurity web) throws Exception {
-		if (AUTHTYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
-			web.ignoring()
-			.antMatchers("/datasource/**");
-		}
-	}
+	/**
+	 * used to configure WebSecurity ignore
+	 */
+	 @Bean
+	    public WebSecurityCustomizer webSecurityCustomizer() {
+	        return web -> web.ignoring()
+	        		.requestMatchers("/datasource/**");
+	  }
+	
+	
 	/**
 	 * Used to add filter in saml flow, This will call right filter based on Request
 	 * Matcher pattern
@@ -182,32 +221,20 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 	 * @return
 	 * @throws Exception
 	 */
-    @Bean
+	// @Bean
 	@Conditional(InsightsSAMLBeanInitializationCondition.class)
 	public FilterChainProxy samlFilter() throws Exception {
-		LOG.debug("message Inside FilterChainProxy, initial bean **** ");
-   
-		AuthenticationUtils.setSecurityFilterchain(
-				new DefaultSecurityFilterChain(new AntPathRequestMatcher("/metadata/**"), metadataDisplayFilter()));//chains.add
+		log.debug("message Inside FilterChainProxy, initial bean **** ");
 
-		AuthenticationUtils.setSecurityFilterchain(
-				new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/login/**"), samlEntryPoint()));
-
-		AuthenticationUtils.setSecurityFilterchain(new DefaultSecurityFilterChain(
-				new AntPathRequestMatcher("/saml/SSO/**"), samlWebSSOProcessingFilter()));
-
-		AuthenticationUtils.setSecurityFilterchain(
-				new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/logout/**"), samlLogoutFilter()));
-
-		AuthenticationUtils.setSecurityFilterchain(new DefaultSecurityFilterChain(
-				new AntPathRequestMatcher("/saml/SingleLogout/**"), samlLogoutProcessingFilter()));
-
-		AuthenticationUtils.setSecurityFilterchain(new DefaultSecurityFilterChain(
-				new AntPathRequestMatcher("/user/insightsso/**"), insightsSSOProcessingFilter()));
+		List<Filter> filtersExteranl = new ArrayList<>();
+		filtersExteranl.add(0, new InsightsCustomCsrfFilter());
+		filtersExteranl.add(1, new InsightsCrossScriptingFilter());
+		filtersExteranl.add(2, insightsExternalProcessingFilter());
+		filtersExteranl.add(3, new InsightsResponseHeaderWriterFilter());
 		
-		AuthenticationUtils.setSecurityFilterchain(
-				new DefaultSecurityFilterChain(new AntPathRequestMatcher("/externalApi/**"), insightsExternalProcessingFilter()));
-
+		AuthenticationUtils.setSecurityFilterchain(new DefaultSecurityFilterChain(
+				new AntPathRequestMatcher("/externalApi/**"), filtersExteranl));
+			
 		List<Filter> filters = new ArrayList<>();
 		filters.add(0, new InsightsCustomCsrfFilter());
 		filters.add(1, new InsightsCrossScriptingFilter());
@@ -217,161 +244,11 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 		AuthenticationUtils
 				.setSecurityFilterchain(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/**"), filters));
 
-		return new FilterChainProxy(AuthenticationUtils.getSecurityFilterchains());//chains
+		return new FilterChainProxy(AuthenticationUtils.getSecurityFilterchains());// chains
 
 	}
-
-	/**
-	 * Used to redirect after SAML authentication sucessful
-	 * 
-	 * @return
-	 */
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public WebSSOProfileOptions defaultWebSSOProfileOptions() {
-
-		WebSSOProfileOptions webSSOProfileOptions = new WebSSOProfileOptions();
-		webSSOProfileOptions.setRelayState("/user/insightsso/authenticateSSO");
-		webSSOProfileOptions.setIncludeScoping(false);
-		//webSSOProfileOptions.setForceAuthN(Boolean.TRUE);
-		return webSSOProfileOptions;
-	}
-
-	/**
-	 * Used to initialize bean for saml entry point
-	 * 
-	 * @return
-	 */
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public SAMLEntryPoint samlEntryPoint() {
-		SAMLEntryPoint samlEntryPoint = new SAMLEntryPoint();
-		samlEntryPoint.setDefaultProfileOptions(defaultWebSSOProfileOptions());
-		return samlEntryPoint;
-	}
-
-	/**
-	 * Add metadata Display filter
-	 * 
-	 * @return
-	 */
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public MetadataDisplayFilter metadataDisplayFilter() {
-		return new MetadataDisplayFilter();
-	}
-
-	/**
-	 * Used to handle logout senerio if unautheticated
-	 * 
-	 * @return
-	 */
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public SimpleUrlAuthenticationFailureHandler authenticationFailureHandler() {
-		LOG.debug(" Inside authenticationFailureHandler ==== ");
-		return new InsightsSimpleUrlAuthenticationFailureHandler("/insightsso/logout");
-	}
-
-	/**
-	 * used when authetication is successful to redirect to target URL success
-	 * Redirect Handler
-	 * 
-	 * @return
-	 */
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public SavedRequestAwareAuthenticationSuccessHandler successRedirectHandler() {
-		SavedRequestAwareAuthenticationSuccessHandler successRedirectHandler = new SAMLRelayStateSuccessHandler();
-		successRedirectHandler.setDefaultTargetUrl(singleSignOnConfig.getDefaultTargetUrl());
-		return successRedirectHandler;
-	}
-
-	/**
-	 * Used to initialize WebSSOProcessingFilter which can redirect saml/login
-	 * request to /saml/SSO
-	 * 
-	 * @return
-	 * @throws Exception
-	 */
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public SAMLProcessingFilter samlWebSSOProcessingFilter() throws Exception {
-		SAMLProcessingFilter samlWebSSOProcessingFilter = new SAMLProcessingFilter();
-		samlWebSSOProcessingFilter.setAuthenticationManager(super.authenticationManager());
-		samlWebSSOProcessingFilter.setAuthenticationSuccessHandler(successRedirectHandler());
-		samlWebSSOProcessingFilter.setAuthenticationFailureHandler(authenticationFailureHandler());
-		samlWebSSOProcessingFilter.setFilterProcessesUrl("/saml/SSO");
-		return samlWebSSOProcessingFilter;
-	}
-
-	/**
-	 * used to initialize logout Handler
-	 * 
-	 * @return
-	 */
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public SAMLLogoutFilter samlLogoutFilter() {
-		LOG.debug(" Inside samlLogoutFilter ==== ");
-		return new SAMLLogoutFilter(successLogoutHandler(), new LogoutHandler[] { logoutHandler() },
-				new LogoutHandler[] { logoutHandler() });
-	}
-
-	/**
-	 * used to initialize logout processing filter
-	 * 
-	 * @return
-	 */
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public SAMLLogoutProcessingFilter samlLogoutProcessingFilter() {
-		LOG.debug(" Inside samlLogoutProcessingFilter ==== ");
-		return new SAMLLogoutProcessingFilter(successLogoutHandler(), logoutHandler());
-	}
-
-	/**
-	 * used to initialize successLogoutHandler and it also redirect to insights
-	 * Application API when SSO logout is successful
-	 * 
-	 * @return
-	 */
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public SimpleUrlLogoutSuccessHandler successLogoutHandler() {
-		LOG.debug(" Inside successLogoutHandler ==== ");
-		SimpleUrlLogoutSuccessHandler simpleUrlLogoutSuccessHandler = new SimpleUrlLogoutSuccessHandler();
-		simpleUrlLogoutSuccessHandler.setDefaultTargetUrl("/user/insightsso/logout");
-		simpleUrlLogoutSuccessHandler.setAlwaysUseDefaultTargetUrl(true);
-		return simpleUrlLogoutSuccessHandler;
-	}
-
-	/**
-	 * used to initialize logout handler
-	 * 
-	 * @return
-	 */
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public SecurityContextLogoutHandler logoutHandler() {
-		LOG.debug(" Inside logoutHandler ==== ");
-		SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
-		logoutHandler.setInvalidateHttpSession(true);
-		logoutHandler.setClearAuthentication(true);
-		return logoutHandler;
-	}
-
-	/**
-	 * used to initialize metadataGeneratorFilter
-	 * 
-	 * @return
-	 */
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public MetadataGeneratorFilter metadataGeneratorFilter() {
-		return new MetadataGeneratorFilter(metadataGenerator());
-	}
-
+	
+	
 	/**
 	 * used to initialize Insight sAuthentication Filter which used for all
 	 * subsequent request
@@ -379,310 +256,27 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 	 * @return
 	 * @throws Exception
 	 */
-	//@Bean
 	@Conditional(InsightsSAMLBeanInitializationCondition.class)
 	public InsightsAuthenticationFilter insightsServiceProcessingFilter() throws Exception {
 		return  new InsightsAuthenticationFilter("/**", authenticationManager());
 	}
-
-	/**
-	 * This authentication filter used to handle all SAML login request
-	 * 
-	 * @return
-	 * @throws Exception
-	 */
-	//@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public InsightsSAMLAuthenticationFilter insightsSSOProcessingFilter() {
-		 return new InsightsSAMLAuthenticationFilter();
-	}
-
+	
+	
 	/**
 	 * used to initialize Authentication Provider for authentication Manager for all
 	 * subsequent request
 	 */
-	@Override
+	@Bean
 	protected AuthenticationManager authenticationManager() throws Exception {
 		return new ProviderManager(Arrays.asList(new InsightsSAMLTokenAuthenticationImpl()));
 	}
 
-	/**
-	 * used to generate metadata
-	 * 
-	 * @return
-	 */
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public MetadataGenerator metadataGenerator() {
-		MetadataGenerator metadataGenerator = new MetadataGenerator();
-		metadataGenerator.setEntityId(singleSignOnConfig.getEntityId());
-		metadataGenerator.setEntityBaseURL(singleSignOnConfig.getAppBaseUrl());
-		metadataGenerator.setExtendedMetadata(extendedMetadata());
-		metadataGenerator.setIncludeDiscoveryExtension(false);
-		metadataGenerator.setKeyManager(keyManager());
-		return metadataGenerator;
-	}
-
-	/**
-	 * Used to load .Jks file
-	 * 
-	 * @return
-	 */
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public KeyManager keyManager() {
-		Resource storeFile = resourceLoaderService.getResource("file:" + singleSignOnConfig.getKeyStoreFilePath());
-		Map<String, String> passwords = new HashMap<>();
-		passwords.put(singleSignOnConfig.getKeyAlias(), singleSignOnConfig.getKeyPass());
-		return new JKSKeyManager(storeFile, singleSignOnConfig.getKeyStorePass(), passwords,
-				singleSignOnConfig.getKeyAlias());
-	}
-
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public ExtendedMetadata extendedMetadata() {
-
-		ExtendedMetadata extendedMetadata = new ExtendedMetadata();
-		extendedMetadata.setIdpDiscoveryEnabled(false);
-		extendedMetadata.setSignMetadata(false);
-		return extendedMetadata;
-	}
-
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public VelocityEngine velocityEngine() {
-
-		return VelocityFactory.getEngine();
-	}
-
-	@Bean(initMethod = "initialize")
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public StaticBasicParserPool parserPool() {
-
-		return new StaticBasicParserPool();
-	}
-
-	@Bean(name = "parserPoolHolder")
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public ParserPoolHolder parserPoolHolder() {
-
-		return new ParserPoolHolder();
-	}
-
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public HTTPPostBinding httpPostBinding() {
-		return new HTTPPostBinding(parserPool(), velocityEngine());
-	}
-
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public HTTPRedirectDeflateBinding httpRedirectDeflateBinding() {
-		return new HTTPRedirectDeflateBinding(parserPool());
-	}
-
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public SAMLProcessorImpl processor() {
-
-		Collection<SAMLBinding> bindings = new ArrayList<>();
-
-		ArtifactResolutionProfileImpl artifactResolutionProfile = new ArtifactResolutionProfileImpl(httpClient());
-		HTTPSOAP11Binding soapBinding = new HTTPSOAP11Binding(parserPool());
-		artifactResolutionProfile.setProcessor(new SAMLProcessorImpl(soapBinding));
-
-		bindings.add(httpRedirectDeflateBinding());
-		bindings.add(httpPostBinding());
-		bindings.add(new HTTPArtifactBinding(parserPool(), velocityEngine(), artifactResolutionProfile));
-		bindings.add(new HTTPSOAP11Binding(parserPool()));
-		bindings.add(new HTTPPAOS11Binding(parserPool()));
-		return new SAMLProcessorImpl(bindings);
-	}
-
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public HttpClient httpClient() {
-		return new HttpClient(multiThreadedHttpConnectionManager());
-	}
-
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public MultiThreadedHttpConnectionManager multiThreadedHttpConnectionManager() {
-		return new MultiThreadedHttpConnectionManager();
-	}
-
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public static SAMLBootstrap sAMLBootstrap() {
-		return new SAMLBootstrap();
-	}
-
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public SAMLDefaultLogger samlLogger() {
-
-		SAMLDefaultLogger samlDefaultLogger = new SAMLDefaultLogger();
-		samlDefaultLogger.setLogAllMessages(true);
-		samlDefaultLogger.setLogErrors(true);
-		samlDefaultLogger.setLogMessagesOnException(true);
-		return samlDefaultLogger;
-	}
-
-	/**
-	 * Used to create custome SAMLContextProviderLB
-	 * 
-	 * @return
-	 */
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public SAMLContextProviderLB contextProvider() {
-		SAMLContextProviderLB samlContextProviderLB = new SAMLContextProviderLB();
-		samlContextProviderLB.setScheme(AuthenticationUtils.SMAL_SCHEMA);
-		samlContextProviderLB.setServerName(AuthenticationUtils.getHost(null));
-		samlContextProviderLB.setContextPath(AuthenticationUtils.APPLICATION_CONTEXT_NAME);
-		samlContextProviderLB.setServerPort(AuthenticationUtils.DEFAULT_PORT);
-		samlContextProviderLB.setIncludeServerPortInRequestURL(Boolean.FALSE);
-		LOG.debug(" samlContextProviderLB ==== {} ", samlContextProviderLB);
-		return samlContextProviderLB;
-	}
-
-	/**
-	 * SAML 2.0 WebSSO Assertion Consumer
-	 * 
-	 * @return
-	 */
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public WebSSOProfileConsumer webSSOprofileConsumer() {
-		WebSSOProfileConsumerImpl webSSOProfileConsumerImpl = new WebSSOProfileConsumerImpl();
-		webSSOProfileConsumerImpl.setResponseSkew(600);
-		webSSOProfileConsumerImpl.setMaxAuthenticationAge(36000);
-		return webSSOProfileConsumerImpl;
-	}
-
-	/**
-	 * SAML 2.0 Web SSO profile
-	 * 
-	 * @return
-	 */
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public WebSSOProfile webSSOprofile() {
-		return new WebSSOProfileImpl();
-	}
-
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public WebSSOProfileConsumerHoKImpl hokWebSSOprofileConsumer() {
-		return new WebSSOProfileConsumerHoKImpl();
-	}
-
-	/**
-	 * SAML 2.0 Holder-of-Key Web SSO profile,not used but autowired...
-	 * 
-	 * @return
-	 */
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public WebSSOProfileConsumerHoKImpl hokWebSSOProfile() {
-		return new WebSSOProfileConsumerHoKImpl();
-	}
-
-	/**
-	 * Set up logout profile for SAML
-	 * 
-	 * @return
-	 */
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public SingleLogoutProfile logoutProfile() {
-		return new SingleLogoutProfileImpl();
-	}
-
-	/**
-	 * Provide IDP Metadata
-	 * 
-	 * @return
-	 * @throws MetadataProviderException
-	 */
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public ExtendedMetadataDelegate idpMetadata() throws MetadataProviderException {
-
-		Timer backgroundTaskTimer = new Timer(true);
-		ExtendedMetadataDelegate extendedMetadataDelegate = null;
-		
-		if(singleSignOnConfig.getMetadataUrl() != null && !singleSignOnConfig.getMetadataUrl().trim().isEmpty() ) {
-			LOG.debug("Inside  Metadata : URL metadata provider =====================================  ");
-			
-			HTTPMetadataProvider httpMetadataProvider = new HTTPMetadataProvider(backgroundTaskTimer, new HttpClient(),
-					singleSignOnConfig.getMetadataUrl());
-			httpMetadataProvider.setParserPool(parserPool());
-			extendedMetadataDelegate = new ExtendedMetadataDelegate(httpMetadataProvider,
-					extendedMetadata());
-		}else {
-			LOG.debug("Inside  Metadata : File metadata provider =================================== ");
-			
-			File metadataFile = new File(singleSignOnConfig.getMetdataFilePath());
-			FilesystemMetadataProvider fileSystemProvider = new FilesystemMetadataProvider(backgroundTaskTimer,metadataFile);
-			fileSystemProvider.setParserPool(parserPool());
-			extendedMetadataDelegate = new ExtendedMetadataDelegate(fileSystemProvider,
-					extendedMetadata());
-		}
-		extendedMetadataDelegate.setMetadataTrustCheck(true);
-		extendedMetadataDelegate.setMetadataRequireSignature(true);
-		return extendedMetadataDelegate;
-	}
-
-	/**
-	 * used to provide Metadata Manager
-	 * 
-	 * @return
-	 * @throws MetadataProviderException
-	 */
-	@Bean
-	@Qualifier("metadata")
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public CachingMetadataManager metadata() throws MetadataProviderException {
-		List<MetadataProvider> providers = new ArrayList<>();
-		providers.add(idpMetadata());
-		return new CachingMetadataManager(providers);
-	}
-
-	/**
-	 * used to provide SAML Authentication Provider which is responsible to
-	 * Validated authentication at first time
-	 * This used for first API call to SAML
-	 * 
-	 * @return
-	 */
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public SAMLAuthenticationProvider samlAuthenticationProvider() {
-		SAMLAuthenticationProvider samlAuthenticationProvider = new InsightsSAMLAuthenticationProviderImpl();
-		samlAuthenticationProvider.setUserDetails(samlUserDetailsService());
-		samlAuthenticationProvider.setForcePrincipalAsString(false);
-		samlAuthenticationProvider.setSamlLogger(samlLogger());
-		return samlAuthenticationProvider;
-	}
-
-	/**
-	 * Used to provide SamlUserDetails object
-	 * 
-	 * @return
-	 */
-	@Bean
-	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public SAMLUserDetailsService samlUserDetailsService() {
-		return new SamlUserDetailsServiceImpl();
-	}
-	
 	/** This bean use to validate External Request 
 	 * @return
 	 */
-	//@Bean
 	@Conditional(InsightsSAMLBeanInitializationCondition.class)
 	public InsightsExternalAPIAuthenticationFilter insightsExternalProcessingFilter() {
 		return new InsightsExternalAPIAuthenticationFilter();
 	}
+
 }

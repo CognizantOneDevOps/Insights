@@ -16,7 +16,10 @@
 package com.cognizant.devops.platformservice.correlationbuilder.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -25,6 +28,7 @@ import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfigDAL;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
+import com.cognizant.devops.platformdal.relationshipconfig.RelationshipConfiguration;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -49,6 +53,7 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 	public boolean saveConfig(String config) throws InsightsCustomException {
 
 		CorrelationJson correlation = loadCorrelation(config);
+		String relationName = correlation.getRelationName();
 		CorrelationConfiguration correlationConfig = new CorrelationConfiguration();
 		correlationConfig.setSourceToolName(correlation.getSource().getToolName());
 		correlationConfig.setSourceToolCategory(correlation.getSource().getToolCategory());
@@ -67,16 +72,38 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 			correlationConfig.setDestinationLabelName(correlation.getDestination().getLabelName());
 		}
 		correlationConfig.setDestinationFields(String.join(",", correlation.getDestination().getFields()));
-		correlationConfig.setRelationName(correlation.getRelationName());
+		correlationConfig.setRelationName(relationName);
 		if (correlation.getPropertyList().length > 0) {
 			correlationConfig.setPropertyList(String.join(",", correlation.getPropertyList()));
 		}
 		correlationConfig.setEnableCorrelation(correlation.isEnableCorrelation());
 		correlationConfig.setSelfRelation(correlation.isSelfRelation());
-
+		correlationConfig.setRelationshipConfig(relationshipConfigSet(relationName));
 		CorrelationConfigDAL correlationConfigDAL = new CorrelationConfigDAL();
 		return correlationConfigDAL.saveCorrelationConfig(correlationConfig);
 
+	}
+	
+	/*
+	 * Setting the relationshipConfiguration
+	 */
+	public Set<RelationshipConfiguration> relationshipConfigSet(String relationName) {
+		Set<RelationshipConfiguration> relationshipConfigSet = new HashSet<>();
+		JsonObject jsonObj = new JsonObject();
+		jsonObj.addProperty("OperandOne", "inSightsTime");
+		jsonObj.addProperty("OperandTwo", "inSightsTime");
+		String operationJson = jsonObj.toString();
+		try {
+			RelationshipConfiguration relationshipConfig = new RelationshipConfiguration();
+			relationshipConfig.setFieldValue("handovertime");
+			relationshipConfig.setOperation("DIFF");
+			relationshipConfig.setOperationjson(operationJson);
+			relationshipConfig.setRelationname(relationName);
+			relationshipConfigSet.add(relationshipConfig);
+		} catch (Exception e) {
+			log.error(e);
+		}
+		return relationshipConfigSet;
 	}
 
 	@Override

@@ -57,6 +57,17 @@
         >
         </mat-icon>
       </button>
+      <button mat-icon-button 
+        [disabled]="!onRadioBtnSelect" 
+        (click)="refreshToken()"
+      >
+        <mat-icon
+          matTooltip="Refresh Grafana Token"
+          svgIcon="regenerate"
+          class="mat-icon material-icons"
+        >
+        </mat-icon>
+      </button>
       <button
         mat-icon-button
         *ngIf="onRadioBtnSelect"

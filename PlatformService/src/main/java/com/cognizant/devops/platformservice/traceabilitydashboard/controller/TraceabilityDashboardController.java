@@ -16,10 +16,16 @@
 
 package com.cognizant.devops.platformservice.traceabilitydashboard.controller;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
+import com.cognizant.devops.platformservice.traceabilitydashboard.service.TraceabilityDashboardPDFServiceImpl;
 import com.cognizant.devops.platformservice.traceabilitydashboard.service.TraceabilityDashboardServiceImpl;
 import com.google.gson.JsonObject;
 
@@ -40,6 +47,11 @@ public class TraceabilityDashboardController {
 	@Autowired
 	TraceabilityDashboardServiceImpl traceabilityDashboardServiceImpl;
 	
+	@Autowired
+	TraceabilityDashboardPDFServiceImpl traceabilityDashboardPDFServiceImpl;
+	
+	private static Logger log = LogManager.getLogger(TraceabilityDashboardController.class);
+
 	@GetMapping(value = "/getToolSummary", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public JsonObject getToolSummary(@RequestParam String toolName, @RequestParam String cacheKey) {
@@ -128,6 +140,44 @@ public class TraceabilityDashboardController {
 		} catch (Exception e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
+
+	}
+	
+	@PostMapping(value = "/getTraceabilityPDF")
+	@ResponseBody
+	public ResponseEntity<byte[]> getTraceabilityPDF(@RequestBody String request) {
+		ResponseEntity<byte[]> response = null;
+		try {
+
+			JsonObject requestBody = JsonUtils.parseStringAsJsonObject(request);
+
+			byte[] tracePDF = traceabilityDashboardPDFServiceImpl.getTraceabilityPDF(
+					requestBody.get("toolName").getAsString(), requestBody.get("fieldName").getAsString(),
+					Arrays.asList(requestBody.get("fieldValue").getAsString()), requestBody.get("type").getAsString(),
+					requestBody.get("file").getAsString());
+
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+			byteArrayOutputStream.write(tracePDF);
+
+			org.apache.pdfbox.pdmodel.PDDocument document = org.apache.pdfbox.Loader.loadPDF(tracePDF, "12345");
+
+			if (document == null) {
+				throw new InsightsCustomException("Invalid file ");
+			} else {
+				HttpHeaders headers = new HttpHeaders();
+				headers.setContentType(MediaType.parseMediaType("application/pdf"));
+				headers.add("Access-Control-Allow-Methods", "POST");
+				headers.add("Access-Control-Allow-Headers", "Content-Type");
+				headers.add("Content-Disposition", "attachment; filename=" + "TraceabilityPDF");
+				headers.add("Cache-Control", "no-cache, no-store, must-revalidate,post-check=0, pre-check=0");
+				headers.add("Pragma", "no-cache");
+				headers.add("Expires", "0");
+				response = new ResponseEntity<>(byteArrayOutputStream.toByteArray(), headers, HttpStatus.OK);
+			}
+		} catch (Exception e) {
+			log.error("Error, Failed to download traceability pdf -- {} ", e.getMessage());
+		}
+		return response;
 
 	}
 	

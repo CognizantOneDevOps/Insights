@@ -26,6 +26,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.timertasks.InsightsSchedulerTaskDAL;
 import com.cognizant.devops.platformdal.healthutil.InsightsComponentHealthDetailDAL;
+import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
 import com.cognizant.devops.platformdal.healthutil.InsightsAgentHealthDetailDAL;
 
 
@@ -39,6 +40,7 @@ public class CleanUpJobExecutor implements Job , ApplicationConfigInterface{
 	InsightsSchedulerTaskDAL schedularTaskDAL = new InsightsSchedulerTaskDAL();
 	InsightsAgentHealthDetailDAL agentHealthDetailDAL = new InsightsAgentHealthDetailDAL();
 	InsightsComponentHealthDetailDAL componentHealthDetailDAL = new InsightsComponentHealthDetailDAL();
+	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
 
 	@Override
 	public void execute(JobExecutionContext context)
@@ -49,6 +51,7 @@ public class CleanUpJobExecutor implements Job , ApplicationConfigInterface{
 			cleanUpTimerTaskStatusRecord();
 			cleanUpAgentHealthDetailsRecords();
 			cleanUpComponentHealthDetailsRecords();
+			cleanUpReportVisualizationRecords();
 		} catch (InsightsCustomException e) {
 			log.error(" CleanUpJobExecutor Error ====  {}",e.getMessage());			
 		}
@@ -170,5 +173,35 @@ public class CleanUpJobExecutor implements Job , ApplicationConfigInterface{
 			log.error(e);
 			throw e;
 		}		
+	}
+	
+	/**
+	 * Clean Up job to delete older report visualization records 
+	 * 
+	 */
+	private void cleanUpReportVisualizationRecords() {
+		try {
+			String deleteReportVisualizationQuery = "WITH oldReportVisualizationRecords AS"
+					+ " (SELECT reportRecords.id as reportId"
+					+ " FROM public.\"INSIGHTS_REPORT_VISUALIZATION_CONTAINER\" reportRecords" 
+					+ " WHERE reportRecords.id NOT IN" 
+					+ " (SELECT reportRecord1.id"
+					+ "	FROM public.\"INSIGHTS_REPORT_VISUALIZATION_CONTAINER\" reportRecord1" 
+					+ "	where reportRecord1.workflowid = reportRecords.workflowid" 
+					+ "	ORDER BY reportRecord1.executionid DESC LIMIT 5)" 
+					+ " ORDER BY reportRecords.id)"
+					+ " DELETE" 
+					+ " FROM public.\"INSIGHTS_REPORT_VISUALIZATION_CONTAINER\"" 
+					+ " WHERE id IN "
+					+ " (SELECT reportId FROM oldReportVisualizationRecords);";
+
+			log.debug("deleteReportVisualizationQuery : {}", deleteReportVisualizationQuery);
+			int executedRecord = reportConfigDAL.executeUpdateWithSQLQuery(deleteReportVisualizationQuery);
+			log.debug("cleanUpReportVisualizationRecords----Deleted Records Count: {} ", executedRecord);
+
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 }

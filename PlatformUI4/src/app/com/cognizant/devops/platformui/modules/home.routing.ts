@@ -24,7 +24,6 @@ import { DatadictionaryComponent } from '@insights/app/modules/datadictionary/da
 import { BusinessMappingComponent } from '@insights/app/modules/admin/businessmapping/businessmapping.component';
 import { DataArchivingComponent } from '@insights/app/modules/settings/dataarchiving/dataarchiving.component';
 import { AgentConfigurationComponent } from '@insights/app/modules/admin/agent-management/agent-configuration/agent-configuration.component';
-import { BlockChainComponent } from '@insights/app/modules/blockchain/blockchain.component';
 import { UserOnboardingComponent } from '@insights/app/modules/user-onboarding/user-onboarding.component';
 import { LandingPageComponent } from '@insights/app/modules/landing-page/landing-page.component';
 import { LogoSettingComponent } from '@insights/app/modules/settings/logo-setting/logo-setting.component';
@@ -70,8 +69,7 @@ const homeRoutes: Routes = [
     path: 'InSights/Home', component: HomeComponent,
     children: [
       { path: 'playlist', component: PlaylistComponent },
-      { path: 'grafanadashboard', component: GrafanaDashboardComponent },
-      { path: 'blockchain', component: BlockChainComponent },
+      { path: 'grafanadashboard', component: GrafanaDashboardComponent },   
       { path: 'healthcheck', component: HealthCheckComponent },
       { path: 'loggedout', redirectTo: 'login' },
       { path: 'agentmanagement', component: AgentManagementComponent },

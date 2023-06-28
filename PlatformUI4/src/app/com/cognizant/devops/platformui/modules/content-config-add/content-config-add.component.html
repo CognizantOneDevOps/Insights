@@ -253,7 +253,7 @@
               name="message"
               required
               placeholder="Please add a Message"
-              style="width: 100%; resize: vertical; height: 119px"
+              style="width: 100%; resize: vertical; height: 100px"
               rows="10"
             ></textarea>
           </mat-form-field>
@@ -262,29 +262,31 @@
 
       <div class="grid-item" *ngIf="category === 'THRESHOLD'">
         <div class="lblText">Threshold<span class="asteriskText">*</span></div>
+        <div class="text-area">
         <mat-form-field appearance="fill" class="formfield-custom">
-          <textarea
+          <textarea matInput
             [(ngModel)]="threshold"
             type="number"
             name="threshold"
             class="frmTxtarea"
             required
-            style="width: 85%; resize: none"
           ></textarea>
         </mat-form-field>
+        </div>
       </div>
 
       <div class="grid-item" *ngIf="category === 'THRESHOLD_RANGE'">
         <div class="lblText">Thresholds<span class="asteriskText">*</span></div>
+        <div class="text-area">
         <mat-form-field appearance="fill" class="formfield-custom">
-          <textarea
+          <textarea matInput
             [(ngModel)]="thresholds"
             name="thresholds"
             class="frmTxtarea"
             required
-            style="width: 85%; resize: none"
           ></textarea>
         </mat-form-field>
+      </div>
       </div>
     </div>
   </div>

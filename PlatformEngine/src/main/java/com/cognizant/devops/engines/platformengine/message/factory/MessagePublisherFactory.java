@@ -20,7 +20,7 @@ import java.util.concurrent.TimeoutException;
 
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
+import com.cognizant.devops.platformcommons.mq.core.RabbitMQProvider;
 import com.google.gson.GsonBuilder;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -33,9 +33,9 @@ public class MessagePublisherFactory {
 	public static void publish(String routingKey, String data) throws IOException, TimeoutException, InsightsCustomException {
 		String queueName = routingKey.replace(".", "_");
 		Channel channel = null;
-		try (Connection connection = RabbitMQConnectionProvider.getConnection();) {
-			channel = RabbitMQConnectionProvider.getConnection().createChannel();
-			channel = RabbitMQConnectionProvider.initilizeChannel(channel, routingKey, queueName, MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE);
+		try (Connection connection = RabbitMQProvider.getConnection();) {
+			channel = RabbitMQProvider.getConnection().createChannel();
+			channel = RabbitMQProvider.initilizeChannel(channel, routingKey, queueName, MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE);
    		    String message = new GsonBuilder().disableHtmlEscaping().create().toJson(data);
 			channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, message.getBytes());
 		

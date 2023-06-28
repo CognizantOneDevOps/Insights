@@ -99,7 +99,7 @@ public class GrafanaDashboardReportController {
 				jsonobject.addProperty("isActive", dashboardConfig.getWorkflowConfig().isActive());
 				jsonarray.add(jsonobject);
 			}
-			return PlatformServiceUtil.buildSuccessResponseWithData(jsonarray);
+			return PlatformServiceUtil.buildSuccessResponseWithHtmlData(jsonarray);
 		} catch (Exception e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}

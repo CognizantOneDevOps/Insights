@@ -30,6 +30,8 @@ public class SingleSignOnConfig implements Serializable {
 	
 	private String entityId;
 	private String appId;
+	private String registrationId = "insightsso";
+	private String singleSignOnServiceLocation;
 	private boolean metadataThroughFile;
 	private String metadataUrl;
 	private String metdataFilePath;
@@ -43,9 +45,8 @@ public class SingleSignOnConfig implements Serializable {
 	private String postLogoutURL;
 	@NotEmpty @NotBlank
 	private String tokenSigningKey;
-	private String servicePrincipalKerberos;
-	private String keyTabLocationKerberos;
 	private String jwtTokenOriginServerURL;
+	private String privatekeyLocation;
 	
 	public String getEntityId() {
 		return entityId;
@@ -58,6 +59,18 @@ public class SingleSignOnConfig implements Serializable {
 	}
 	public void setAppId(String appId) {
 		this.appId = appId;
+	}
+	public String getRegistrationId() {
+		return registrationId;
+	}
+	public void setRegistrationId(String registrationId) {
+		this.registrationId = registrationId;
+	}
+	public String getSingleSignOnServiceLocation() {
+		return singleSignOnServiceLocation;
+	}
+	public void setSingleSignOnServiceLocation(String singleSignOnServiceLocation) {
+		this.singleSignOnServiceLocation = singleSignOnServiceLocation;
 	}
 	public boolean isMetadataThroughFile() {
 		return metadataThroughFile;
@@ -134,27 +147,17 @@ public class SingleSignOnConfig implements Serializable {
 	public void setTokenSigningKey(String tokenSigningKey) {
 		this.tokenSigningKey = tokenSigningKey;
 	}
-
-	public String getServicePrincipalKerberos() {
-		return servicePrincipalKerberos;
-	}
-
-	public void setServicePrincipalKerberos(String servicePrincipalKerberos) {
-		this.servicePrincipalKerberos = servicePrincipalKerberos;
-	}
-
-	public String getKeyTabLocationKerberos() {
-		return keyTabLocationKerberos;
-	}
-
-	public void setKeyTabLocationKerberos(String keyTabLocationKerberos) {
-		this.keyTabLocationKerberos = keyTabLocationKerberos;
-	}
 	public String getJwtTokenOriginServerURL() {
 		return jwtTokenOriginServerURL;
 	}
 	public void setJwtTokenOriginServerURL(String jwtTokenOriginServerURL) {
 		this.jwtTokenOriginServerURL = jwtTokenOriginServerURL;
+	}
+	public String getPrivatekeyLocation() {
+		return privatekeyLocation;
+	}
+	public void setPrivatekeyLocation(String privatekeyLocation) {
+		this.privatekeyLocation = privatekeyLocation;
 	}
 
 }

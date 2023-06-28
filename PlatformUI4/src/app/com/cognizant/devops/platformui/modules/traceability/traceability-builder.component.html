@@ -72,7 +72,12 @@
 				</div>
 
 			</div>
-			<div class="button-section-actions">
+
+			<div class="button-section-actions ">
+				<button (click)="downloadPdf()" [disabled]="frmagentconfig.invalid"
+					class="button-save button-save-dimensions downloadBtn" name="file">
+					Download
+				</button>
 				<button (click)="getDetails()" [disabled]="frmagentconfig.invalid"
 					class="button-save button-save-dimensions">
 					Search
@@ -103,7 +108,7 @@
 			<mat-tab-group color="primary" class="tab-style tabGroup" (selectedTabChange)="tabChanged($event)">
 
 				<mat-tab label="Summary" class="tabStyle">
-					<div class="tabSection">
+					<div class="tabSection" id="traceabilityPDF">
 						<div class="summaryDiv" *ngIf="list1.length > 0">
 							<div>This search has fetched : </div>
 							<div>
@@ -154,7 +159,7 @@
 				</mat-tab>
 
 				<mat-tab label="Pipeline" class="tab-style">
-					<div class="tabSection">
+					<div class="tabSection" id="traceId">
 						<div class="columnToolPipeline" *ngFor="let data of map | keyvalue">
 							<div class="parentCard" (click)="showDetailsDialog(data.key.split('_')[1])">
 								<div class="toolNameCss">
@@ -171,7 +176,7 @@
 								</div>
 							</div>
 
-							<div class="scroll">
+							<div class="scroll" id="traceId">
 								<div class="childCardList" *ngFor="let epic of data.value;let i=index">
 									<mat-card class="childCard" id="{{i}}">
 

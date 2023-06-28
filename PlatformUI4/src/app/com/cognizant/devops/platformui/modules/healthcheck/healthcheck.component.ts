@@ -51,7 +51,6 @@ export class HealthCheckComponent implements OnInit {
   showMessage: string;
   reportLogsColumns: string[];
   reportLogsDataSource = new MatTableDataSource<any>();
-  showReportLog = false;
   isActive: boolean = false;
   workflowId: string = "";
   constructor(
@@ -62,8 +61,7 @@ export class HealthCheckComponent implements OnInit {
     private config: InsightsInitService
   ) {
     this.loadOtherHealthCheckInfo();
-    this.loadHealthNotificationStatus();
-    this.showReportLog = InsightsInitService.showAuditReporting;
+    this.loadHealthNotificationStatus();   
   }
 
   ngOnInit() {

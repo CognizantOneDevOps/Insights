@@ -107,29 +107,7 @@ export class MenuItem {
           showIcon :true,
           menuId : "DashboardGroups",
           parentMenuId :''
-        },
-        {
-          displayName: 'Audit Reporting',
-          iconName: 'audit_Menu',
-          showMenu: (InsightsInitService.showAuditReporting && this.getMenuShowAdmin(['Admin'])),
-          title: "Audit Report and search assets",
-          isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-          showIcon :true,
-          menuId : "AuditReporting",
-          parentMenuId :'',
-          children: [
-            {
-              displayName: 'Search Assets',
-              iconName: 'feature',
-              route: 'InSights/Home/blockchain',
-              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-              showMenu: (InsightsInitService.showAuditReporting && this.getMenuShowAdmin(['Admin'])),
-              title: "Search Assets",
-              menuId : "SearchAssets",
-              parentMenuId :'AuditReporting'
-            }
-          ]
-        },
+        },        
         {
           displayName: 'Playlist',
           iconName: 'playlist_Menu',

@@ -35,8 +35,9 @@ import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.constants.ReportStatusConstants;
 import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
-import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
+import com.cognizant.devops.platformcommons.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportsKPIConfig;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
@@ -45,10 +46,8 @@ import com.cognizant.devops.platformreports.assessment.dal.ReportPDFVisualizatio
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsAssessmentConfigurationDTO;
 import com.cognizant.devops.platformreports.assessment.pdf.BasePDFProcessor;
 import com.cognizant.devops.platformreports.assessment.pdf.PDFKPIVisualizationProcesser;
-import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformworkflow.workflowtask.core.InsightsStatusProvider;
 import com.cognizant.devops.platformworkflow.workflowtask.message.factory.WorkflowTaskSubscriberHandler;
-import com.cognizant.devops.platformworkflow.workflowtask.utils.MQMessageConstants;
 import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadPool;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -66,10 +65,9 @@ public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 	}
 
 	@Override
-	public void handleTaskExecution(byte[] body) throws IOException {
+	public void handleTaskExecution(String incomingTaskMessage) throws IOException {
 		try {
 			long startTime = System.nanoTime();
-			String incomingTaskMessage = new String(body, MQMessageConstants.MESSAGE_ENCODING);
 			log.debug(
 					"Worlflow Detail ==== PDFExecutionSubscriber started ... routing key  message handleDelivery ===== {} ",
 					incomingTaskMessage);

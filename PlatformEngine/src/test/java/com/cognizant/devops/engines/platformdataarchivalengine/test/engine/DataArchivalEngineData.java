@@ -16,27 +16,17 @@
 
 package com.cognizant.devops.engines.platformdataarchivalengine.test.engine;
 
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
-import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
-import com.cognizant.devops.platformcommons.core.util.JsonUtils;
-import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
 
 public class DataArchivalEngineData {
 	private static Logger log = LogManager.getLogger(DataArchivalEngineData.class.getName());
@@ -49,26 +39,6 @@ public class DataArchivalEngineData {
 	Long createdOn = 0l;
 	Long expiryDate = 0l;
 	Date updateDate = Timestamp.valueOf(LocalDateTime.now());
-
-	public void publishDataArchivalDetails(String routingKey, String publishDataJson)
-			throws InsightsCustomException, IOException, TimeoutException {
-		Connection connection = null;
-		Channel channel = null;
-		try {
-			connection = RabbitMQConnectionProvider.getConnection();
-			channel = connection.createChannel();
-			String queueName = routingKey.replace(".", "_");
-			channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE, true);
-			channel.queueDeclare(queueName, true, false, false, RabbitMQConnectionProvider.getQueueArguments());
-			channel.queueBind(queueName, MQMessageConstants.EXCHANGE_NAME, routingKey);
-			channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, publishDataJson.getBytes());
-		} catch (Exception e) {
-			log.error(e.getMessage());
-		} finally {
-			channel.close();
-			//connection.close();
-		}
-	}
 
 	public Long getExpiryDate(Long createdOn, int daysToRetain) {
 		Long days = (long) (daysToRetain * 24 * 60 * 60);

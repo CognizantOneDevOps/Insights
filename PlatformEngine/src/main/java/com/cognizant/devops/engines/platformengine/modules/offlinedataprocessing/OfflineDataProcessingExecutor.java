@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -38,6 +37,7 @@ import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogg
 import com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing.model.DataEnrichmentModel;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.constants.EngineConstants;
+import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.constants.MilestoneConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.FileDetailsEnum;
@@ -146,7 +146,7 @@ public class OfflineDataProcessingExecutor implements Job, ApplicationConfigInte
 	
 	public boolean processOfflineConfiguration(InsightsConfigFiles jsonFile) {
 		try {
-				String configFileData = new String(jsonFile.getFileData(), StandardCharsets.UTF_8);
+				String configFileData = new String(jsonFile.getFileData(), MQMessageConstants.MESSAGE_ENCODING);
 				List<DataEnrichmentModel> dataEnrichmentModels  = Arrays.asList(new Gson().fromJson(configFileData,
 						DataEnrichmentModel[].class));
 				for (DataEnrichmentModel dataEnrichmentModel : dataEnrichmentModels) {
