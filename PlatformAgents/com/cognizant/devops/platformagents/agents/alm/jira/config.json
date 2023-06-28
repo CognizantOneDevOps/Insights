@@ -6,11 +6,15 @@
 		"vaultUrl": "http://Vault_Host:port/v1/"
 	},
 	"mqConfig": {
+		"providerName": "RabbitMQ",
 		"user": "username for RabbitMq",
 		"password": "",
 		"host": "127.0.0.1",
 		"exchange": "iSight",
-		"agentControlXchg": "iAgent"
+		"agentControlXchg": "iAgent",
+		"awsAccessKey": "",
+		"awsSecretKey": "",
+		"awsRegion": ""
 	},
 	"subscribe": {
 		"config": "ALM.JIRA.config"
@@ -148,6 +152,19 @@
 				]
 			}
 		},
+		"userAccount": {
+			"userApiUrl": "https://<JIRA_HOST>/rest/api/2/user/search?query=+&maxResults=1000",
+			"userMetaData": {
+			  "labels": [
+				"JIRA_USERS"
+			  ],
+			  "dataUpdateSupported": true,
+			  "uniqueKey": [
+				"accountId",
+				"emailAddress"
+			  ]
+			}
+		  },
 			"backlog1": {
 				"runSchedule": 720,
 				"boardApiUrl": "https://<JIRA_HOST>/rest/agile/1.0/board",
@@ -163,6 +180,19 @@
 					]
 				}
 			},
+			"roles": {
+				"roleProjectApiUrl": "https://<JIRA_HOST>/rest/api/3/project/projectId/role",
+				"roleMetaData": {
+				  "labels": [
+					"PROJECT_USER_ROLE"
+				  ],
+				  "dataUpdateSupported": true,
+				  "uniqueKey": [
+					"accountId",
+					"role"
+				  ]
+				}
+			  },
 			"boards":{
 				"runSchedule":1440,
 				"boardApiUrl":"https://<JIRA_HOST>/rest/agile/1.0/board",
@@ -419,7 +449,7 @@
 	},
 	"labelName": "JIRA",
 	"toolName": "JIRA",
-	"auditing": false,
+	 
 	"enableProxy":false,
   	"proxies":{
     	"http":"",

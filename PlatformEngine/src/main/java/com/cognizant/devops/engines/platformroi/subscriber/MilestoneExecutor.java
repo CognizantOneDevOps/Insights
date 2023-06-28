@@ -26,7 +26,7 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.core.enums.MilestoneEnum;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
+import com.cognizant.devops.platformcommons.mq.core.RabbitMQProvider;
 import com.cognizant.devops.platformdal.milestone.InsightsMileStoneOutcomeConfig;
 import com.cognizant.devops.platformdal.milestone.MileStoneConfig;
 import com.cognizant.devops.platformdal.milestone.MileStoneConfigDAL;
@@ -106,8 +106,8 @@ public class MilestoneExecutor {
 		Channel channel = null;
 		try {
 			
-			channel = RabbitMQConnectionProvider.getConnection().createChannel();
-			channel = RabbitMQConnectionProvider.initilizeChannel(channel, routingKey, queueName, MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE);
+			channel = RabbitMQProvider.getConnection().createChannel();
+			channel = RabbitMQProvider.initilizeChannel(channel, routingKey, queueName, MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE);
 			channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, publishDataJson.getBytes());
 		
 		} catch (IOException e) {

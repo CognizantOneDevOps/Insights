@@ -1,5 +1,6 @@
 gitAgentId=GITTEST8800
 jenkinsAgentId=JENKINSTEST8800
+jiraAgentId=JIRATEST8800
 gitToolName=GIT
 gitCategoryName=SCM
 gitCommitId=CM-7569369619
@@ -15,3 +16,7 @@ webhookName=git_demo
 dataFormat=JSON
 nodeName=DATA
 compareFlag=commitId
+jiraDataNodeName=ALM:JIRA_UNTEST:DATA
+jiraToolName=JIRA
+jiraCategoryName=ALM
+jiraLabelName=JIRA_UNTEST

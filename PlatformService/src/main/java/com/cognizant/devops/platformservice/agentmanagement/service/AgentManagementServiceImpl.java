@@ -16,6 +16,7 @@
 package com.cognizant.devops.platformservice.agentmanagement.service;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -39,6 +40,9 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.jms.JMSException;
+
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -60,7 +64,8 @@ import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.RestApiHandler;
 import com.cognizant.devops.platformcommons.dal.vault.VaultHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
+import com.cognizant.devops.platformcommons.mq.core.AWSSQSProvider;
+import com.cognizant.devops.platformcommons.mq.core.RabbitMQProvider;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.cognizant.devops.platformdal.healthutil.HealthUtil;
@@ -73,8 +78,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.rabbitmq.client.AMQP.BasicProperties;
-import com.rabbitmq.client.Channel;
 
 @Service("agentManagementService")
 @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -84,11 +87,13 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	private static final String LAST_RUN_TIME = "lastRunTime";
 	private static final String HEALTH_STATUS = "healthStatus";
 	private static final String ACCEPT_TYPE_GITHUB = "application/vnd.github.v3+json";
-		
+
+	private String mqProviderName = ApplicationConfigProvider.getInstance().getMessageQueue().getProviderName();
+
 	boolean isProxyEnabled = ApplicationConfigProvider.getInstance().getProxyConfiguration().isEnableProxy();
 	AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 	VaultHandler vaultHandler = new VaultHandler();
-	OutComeConfigDAL  outComeConfigDAL  = new OutComeConfigDAL ();
+	OutComeConfigDAL outComeConfigDAL = new OutComeConfigDAL();
 	String fileUnzipPath = ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath();
 
 	String vaultURL = "/sys/raw/" + ApplicationConfigProvider.getInstance().getVault().getSecretEngine()
@@ -115,12 +120,14 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 
 			if (isWebhook) {
 				String webhookSubscribeQueue = AgentCommonConstant.WEBHOOK_QUEUE_CONSTANT + agentId;
-				json.get(PlatformServiceConstants.SUBSCRIBE).getAsJsonObject().addProperty("webhookPayloadDataQueue", webhookSubscribeQueue);
+				json.get(PlatformServiceConstants.SUBSCRIBE).getAsJsonObject().addProperty("webhookPayloadDataQueue",
+						webhookSubscribeQueue);
 				json.addProperty(AgentCommonConstant.WEBHOOK_ENABLED, true);
 			} else if (type.equalsIgnoreCase(AgentCommonConstant.ROI_AGENT)) {
 				InsightsTools configs = outComeConfigDAL.getOutComeByToolName(toolName.toUpperCase());
 				String communicationQueue = configs.getAgentCommunicationQueue();
-				json.get(PlatformServiceConstants.SUBSCRIBE).getAsJsonObject().addProperty("roiExecutionQueue", communicationQueue);
+				json.get(PlatformServiceConstants.SUBSCRIBE).getAsJsonObject().addProperty("roiExecutionQueue",
+						communicationQueue);
 				json.addProperty(AgentCommonConstant.IS_ROI_AGENT, true);
 			}
 
@@ -320,7 +327,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	public String getToolRawConfigFile(String version, String tool, boolean isWebhook) throws InsightsCustomException {
 		String configJson = null;
 		try {
-			if(!version.startsWith("v") ||  ! ValidationUtils.checkAgentVersion(version) ) {
+			if (!version.startsWith("v") || !ValidationUtils.checkAgentVersion(version)) {
 				throw new InsightsCustomException("Not a valid version ");
 			}
 			if (!ApplicationConfigProvider.getInstance().getAgentDetails().isOnlineRegistration()) {
@@ -358,8 +365,9 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			throws InsightsCustomException {
 		String config = null;
 		try {
-			String offlinePath = PlatformServiceUtil.sanitizePathTraversal(ApplicationConfigProvider.getInstance().getAgentDetails().getOfflineAgentPath()
-					+ File.separator + version + File.separator + tool);
+			String offlinePath = PlatformServiceUtil.sanitizePathTraversal(
+					ApplicationConfigProvider.getInstance().getAgentDetails().getOfflineAgentPath() + File.separator
+							+ version + File.separator + tool);
 			String agentPath = PlatformServiceUtil.sanitizePathTraversal(fileUnzipPath + File.separator + tool);
 			File agentPathFile = new File(agentPath);
 			if (agentPathFile.exists()) {
@@ -458,24 +466,24 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			throws IOException {
 		Path sourceFilePath = Paths.get(fileUnzipPath + File.separator + toolName).toAbsolutePath();
 		Path destinationFilePath = Paths.get(fileUnzipPath + File.separator + agentId).toAbsolutePath();
-	if ("Windows".equalsIgnoreCase(osversion)) {
+		if ("Windows".equalsIgnoreCase(osversion)) {
 			Path destinationFile = destinationFilePath.resolve(agentId + ".bat");
 			Files.copy(sourceFilePath.resolve(toolName + "agent.bat"), destinationFile, REPLACE_EXISTING);
-			addAgentKeyToServiceFile(destinationFile, agentId,isWebhook);
-		} else if ("linux".equalsIgnoreCase(osversion) || "dockerAlpine".equalsIgnoreCase(osversion) ) {
+			addAgentKeyToServiceFile(destinationFile, agentId, isWebhook);
+		} else if ("linux".equalsIgnoreCase(osversion) || "dockerAlpine".equalsIgnoreCase(osversion)) {
 			Path destinationFile = destinationFilePath.resolve(agentId + ".sh");
 			Files.copy(sourceFilePath.resolve(toolName + "agent.sh"), destinationFile, REPLACE_EXISTING);
-			addAgentKeyToServiceFile(destinationFile, agentId,isWebhook);
+			addAgentKeyToServiceFile(destinationFile, agentId, isWebhook);
 			addProcessKeyToServiceFile(destinationFile, agentId);
 		} else if ("Ubuntu".equalsIgnoreCase(osversion)) {
 			Path destinationFile = destinationFilePath.resolve(agentId + ".sh");
 			Files.copy(sourceFilePath.resolve(toolName + "agent.sh"), destinationFile, REPLACE_EXISTING);
-			addAgentKeyToServiceFile(destinationFile, agentId,isWebhook);
+			addAgentKeyToServiceFile(destinationFile, agentId, isWebhook);
 			addProcessKeyToServiceFile(destinationFile, agentId);
 
 			Path destinationServiceFile = destinationFilePath.resolve(agentId + ".service");
 			Files.copy(sourceFilePath.resolve(toolName + "agent.service"), destinationServiceFile, REPLACE_EXISTING);
-			addAgentKeyToServiceFile(destinationServiceFile, agentId,isWebhook);
+			addAgentKeyToServiceFile(destinationServiceFile, agentId, isWebhook);
 		}
 	}
 
@@ -535,11 +543,14 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			log.error("Error writing modified json file", e);
 			throw e;
 		}
-		Path sourceFolderPath = Paths.get(PlatformServiceUtil.sanitizePathTraversal(Paths.get(fileUnzipPath, agentId).toString()));
-		Path zipPath = Paths.get(PlatformServiceUtil.sanitizePathTraversal(Paths.get(fileUnzipPath, agentId + AgentCommonConstant.ZIPEXTENSION).toString()));
+		Path sourceFolderPath = Paths
+				.get(PlatformServiceUtil.sanitizePathTraversal(Paths.get(fileUnzipPath, agentId).toString()));
+		Path zipPath = Paths.get(PlatformServiceUtil.sanitizePathTraversal(
+				Paths.get(fileUnzipPath, agentId + AgentCommonConstant.ZIPEXTENSION).toString()));
 		Path agentZipPath = null;
 		try {
-			agentZipPath = new File(AgentManagementUtil.getInstance().getAgentZipFolder(sourceFolderPath, zipPath).toFile().getCanonicalPath()).toPath();
+			agentZipPath = new File(AgentManagementUtil.getInstance().getAgentZipFolder(sourceFolderPath, zipPath)
+					.toFile().getCanonicalPath()).toPath();
 		} catch (Exception e) {
 			log.error("Error creatig final zip file with modified json file", e);
 			throw new InsightsCustomException(e.getMessage());
@@ -599,62 +610,48 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	}
 
 	private void sendAgentPackage(byte[] data, String action, String fileName, String agentId, String toolName,
-			String osversion) throws IOException, TimeoutException, InsightsCustomException {
-		Map<String, Object> headers = new HashMap<>();
-		headers.put("fileName", fileName);
-		headers.put(AgentCommonConstant.OSTYPE, osversion);
-		headers.put(AgentCommonConstant.AGENT_TOOL_NAME, toolName);
-		headers.put(AgentCommonConstant.AGENTID, agentId);
-		headers.put(AgentCommonConstant.ACTION, action);
-		BasicProperties props = getBasicProperties(headers);
+			String osversion) throws IOException, TimeoutException, InsightsCustomException, JMSException {
 		String agentDaemonQueueName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentPkgQueue();
-		publishAgentAction(agentDaemonQueueName, data, props);
+		JsonObject json = new JsonObject();
+		json.addProperty("fileName", fileName);
+		json.addProperty(AgentCommonConstant.OSTYPE, osversion);
+		json.addProperty(AgentCommonConstant.AGENT_TOOL_NAME, toolName);
+		json.addProperty(AgentCommonConstant.AGENTID, agentId);
+		json.addProperty(AgentCommonConstant.ACTION, action);
+		json.addProperty("data", Base64.encodeBase64String(data));
+		publishAgentAction(agentDaemonQueueName,json);
 	}
 
 	private void uninstallAgent(String action, String agentId, String toolName, String osversion)
-			throws IOException, TimeoutException, InsightsCustomException {
-		Map<String, Object> headers = new HashMap<>();
-		headers.put(AgentCommonConstant.OSTYPE, osversion);
-		headers.put(AgentCommonConstant.AGENT_TOOL_NAME, toolName);
-		headers.put(AgentCommonConstant.AGENTID, agentId);
-		headers.put(AgentCommonConstant.ACTION, action);
-		BasicProperties props = getBasicProperties(headers);
+			throws IOException, TimeoutException, InsightsCustomException, JMSException {
 		String agentDaemonQueueName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentPkgQueue();
-		publishAgentAction(agentDaemonQueueName, action.getBytes(), props);
+		JsonObject json = new JsonObject();
+		json.addProperty(AgentCommonConstant.OSTYPE, osversion);
+		json.addProperty(AgentCommonConstant.AGENT_TOOL_NAME, toolName);
+		json.addProperty(AgentCommonConstant.AGENTID, agentId);
+		json.addProperty(AgentCommonConstant.ACTION, action);
+		publishAgentAction(agentDaemonQueueName, json);
 	}
 
 	private void performAgentAction(String agentId, String toolName, String osversion, String action, String queueName)
-			throws TimeoutException, IOException, InsightsCustomException {
-		Map<String, Object> headers = new HashMap<>();
-		headers.put(AgentCommonConstant.OSTYPE, osversion);
-		headers.put(AgentCommonConstant.AGENT_TOOL_NAME, toolName);
-		headers.put(AgentCommonConstant.AGENTID, agentId);
-		headers.put(AgentCommonConstant.ACTION, action);
-		BasicProperties props = getBasicProperties(headers);
-		publishAgentAction(queueName, action.getBytes(), props);
+			throws TimeoutException, IOException, InsightsCustomException, JMSException {
+		JsonObject json = new JsonObject();
+		json.addProperty(AgentCommonConstant.OSTYPE, osversion);
+		json.addProperty(AgentCommonConstant.AGENT_TOOL_NAME, toolName);
+		json.addProperty(AgentCommonConstant.AGENTID, agentId);
+		json.addProperty(AgentCommonConstant.ACTION, action);
+		publishAgentAction(queueName, json);
 	}
 
-	private void publishAgentAction(String routingKey, byte[] data, BasicProperties props)
-			throws InsightsCustomException, IOException, TimeoutException {
-		String exchangeName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentExchange();
-		Channel channel = null;
-		try {
-			
-			channel = RabbitMQConnectionProvider.getConnection().createChannel();
-			channel = RabbitMQConnectionProvider.initilizeChannel(channel, routingKey, routingKey, exchangeName, MQMessageConstants.EXCHANGE_TYPE);
-			channel.basicPublish(exchangeName, routingKey, props, data);
-			
-		}finally {
-			if(channel != null) {
-				channel.close();
-			}
+
+	private void publishAgentAction(String routingKey, JsonObject json)
+			throws IOException, InsightsCustomException, TimeoutException, JMSException {
+		String queueName = routingKey.replace(".", "_");
+		if (this.mqProviderName.equalsIgnoreCase("AWSSQS"))
+			AWSSQSProvider.publish(queueName, json.toString());
+		else {
+			RabbitMQProvider.publish(queueName, json.toString());
 		}
-	}
-
-	private BasicProperties getBasicProperties(Map<String, Object> headers) {
-		BasicProperties.Builder propertiesBuilder = new BasicProperties.Builder();
-		propertiesBuilder.headers(headers);
-		return propertiesBuilder.build();
 	}
 
 	private String getAgentkey(String toolName) {
@@ -809,14 +806,14 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		return updatedDataMap;
 
 	}
-	
+
 	public boolean isROIAgentCheck(String toolName) throws InsightsCustomException {
 		InsightsTools configs = outComeConfigDAL.getOutComeByToolName(toolName.toUpperCase());
-		if(configs == null) {
+		if (configs == null) {
 			throw new InsightsCustomException("This is not a ROI agent.");
 		}
 		return true;
-		
+
 	}
 
 	@Override
@@ -828,13 +825,14 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			agentList = new ArrayList<>();
 			for (AgentConfig agentConfig : agentConfigList) {
 				AgentConfigTO agentNode = new AgentConfigTO();
-				BeanUtils.copyProperties(agentConfig, agentNode, "agentJson", "updatedDate", PlatformServiceConstants.VAULT);
+				BeanUtils.copyProperties(agentConfig, agentNode, "agentJson", "updatedDate",
+						PlatformServiceConstants.VAULT);
 				JsonObject node = new JsonObject();
 				JsonObject agentHealthNode = healthUtil.getAgentHealth(node, agentNode.getAgentKey());
-				if(agentHealthNode.has(LAST_RUN_TIME)) {
+				if (agentHealthNode.has(LAST_RUN_TIME)) {
 					agentNode.setLastRunTime(agentHealthNode.get(LAST_RUN_TIME).getAsString());
 				}
-				if(agentHealthNode.has(HEALTH_STATUS)) {
+				if (agentHealthNode.has(HEALTH_STATUS)) {
 					agentNode.setHealthStatus(agentHealthNode.get(HEALTH_STATUS).getAsString());
 				}
 				agentList.add(agentNode);
@@ -846,27 +844,27 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		}
 		return agentList;
 	}
-	
-	
+
 	/**
-	 * fetches Insights releases from the GitHub and returns a Map of release id and tags
+	 * fetches Insights releases from the GitHub and returns a Map of release id and
+	 * tags
 	 * 
 	 * @return agentTags
 	 * @throws InsightsCustomException
 	 */
 	@Override
-	public Map<String, String> getAvailableAgentTags() throws InsightsCustomException  {
+	public Map<String, String> getAvailableAgentTags() throws InsightsCustomException {
 		Map<String, String> agentTags = new TreeMap<>();
 		log.debug("Inside getAvailableAgentTags ");
 		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getGithubAPI();
-		if(url == null || url.length() == 0) {
+		if (url == null || url.length() == 0) {
 			throw new InsightsCustomException("GithubAPI not configured in server configuration!");
 		}
 		Map<String, String> headers = new HashMap<>();
 		headers.put("Accept", ACCEPT_TYPE_GITHUB);
 		ApplicationConfigProvider.getInstance().getAgentDetails();
 		String accessToken = ApplicationConfigProvider.getInstance().getAgentDetails().getGithubAccessToken();
-		if(accessToken != null && accessToken.length() > 0) {
+		if (accessToken != null && accessToken.length() > 0) {
 			headers.put(ConfigOptions.AUTHORIZATION, accessToken);
 		}
 		String getResponse;
@@ -878,13 +876,15 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		}
 		JsonArray responseArray = JsonUtils.parseStringAsJsonArray(getResponse);
 		for (JsonElement jsonElement : responseArray) {
-			agentTags.put(jsonElement.getAsJsonObject().get("id").getAsString(), jsonElement.getAsJsonObject().get("tag_name").getAsString());
+			agentTags.put(jsonElement.getAsJsonObject().get("id").getAsString(),
+					jsonElement.getAsJsonObject().get("tag_name").getAsString());
 		}
 		return agentTags;
 	}
-	
+
 	/**
-	 * downloads the required agents package from GitHub and stores it in the offline path
+	 * downloads the required agents package from GitHub and stores it in the
+	 * offline path
 	 * 
 	 * @param version
 	 * @return downloadResult
@@ -894,28 +894,29 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	public String downloadAgentPackageFromGithub(String version) throws InsightsCustomException {
 		String downloadResult = "";
 		try {
-			if(!version.startsWith("v") ||  ! ValidationUtils.checkAgentVersion(version) ) {
+			if (!version.startsWith("v") || !ValidationUtils.checkAgentVersion(version)) {
 				throw new InsightsCustomException("Not a valid version ");
 			}
 			if (!ApplicationConfigProvider.getInstance().getAgentDetails().isOnlineRegistration()) {
-				String offlinePath = PlatformServiceUtil.sanitizePathTraversal(ApplicationConfigProvider.getInstance().getAgentDetails().getOfflineAgentPath()
-						+ File.separator + version);
+				String offlinePath = PlatformServiceUtil.sanitizePathTraversal(
+						ApplicationConfigProvider.getInstance().getAgentDetails().getOfflineAgentPath() + File.separator
+								+ version);
 				String packageURL = ApplicationConfigProvider.getInstance().getAgentDetails().getRepoUrl();
-				if(packageURL == null || packageURL.length() == 0) {
+				if (packageURL == null || packageURL.length() == 0) {
 					throw new InsightsCustomException("Repo URL not configured in server configuration!");
 				}
 				packageURL = packageURL + "/" + version + "/" + "agents.zip";
 				ESAPI.initialize("org.owasp.esapi.reference.DefaultSecurityConfiguration");
 				Validator validate = ESAPI.validator();
 				packageURL = validate.getValidInput("URL checking", packageURL, "URLPattern", 300, true);
-				downloadResult = AgentManagementUtil.getInstance()
-				.getAgentPackageFromGithub(new URL(packageURL), new File(offlinePath), version);
+				downloadResult = AgentManagementUtil.getInstance().getAgentPackageFromGithub(new URL(packageURL),
+						new File(offlinePath), version);
 			}
 		} catch (Exception e) {
 			log.error("Error downloading agents package ", e);
 			throw new InsightsCustomException(e.getMessage());
 		}
-		
+
 		return downloadResult;
 	}
 }

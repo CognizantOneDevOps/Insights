@@ -28,4 +28,5 @@ public final class MQMessageConstants  {
 	public static final String RECOVER_ROUNTINGKEY_QUEUE="INSIGHTS.RECOVER.QUEUE";
 	public static final String RECOVER_EXCHANGE_PROPERTY= "x-dead-letter-exchange";
 	public static final String MILESTONE_STATUS_QUEUE = "MILESTONE_STATUS_QUEUE";
+	public static final String FIFO_EXTENSION = ".fifo";
 }

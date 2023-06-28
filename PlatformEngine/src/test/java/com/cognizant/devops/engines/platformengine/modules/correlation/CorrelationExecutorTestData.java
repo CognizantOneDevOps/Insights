@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2017 Cognizant Technology Solutions
+ * Copyright 2023 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -15,17 +15,24 @@
  ******************************************************************************/
 package com.cognizant.devops.engines.platformengine.modules.correlation;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.cognizant.devops.engines.platformengine.test.engine.CorrelationJson;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfigDAL;
 import com.google.gson.JsonObject;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 
 public class CorrelationExecutorTestData {
-
-	public boolean saveConfig(String config) throws InsightsCustomException {
+	private static Logger log = LogManager.getLogger(CorrelationExecutorTestData.class.getName());
+	
+	public CorrelationConfiguration saveConfig(String config) throws InsightsCustomException {
 		
 				CorrelationJson correlation = loadCorrelation(config);
 				CorrelationConfiguration correlationConfig = new CorrelationConfiguration();
@@ -54,7 +61,8 @@ public class CorrelationExecutorTestData {
 				correlationConfig.setSelfRelation(false);
 		
 				CorrelationConfigDAL correlationConfigDAL = new CorrelationConfigDAL();
-				return correlationConfigDAL.saveCorrelationConfig(correlationConfig);
+				correlationConfigDAL.saveCorrelationConfig(correlationConfig);
+				return correlationConfig;
 		
 			}
 			
@@ -62,5 +70,22 @@ public class CorrelationExecutorTestData {
 				JsonObject json = JsonUtils.parseStringAsJsonObject(config);
 				CorrelationJson correlation = new Gson().fromJson(json, CorrelationJson.class);
 				return correlation;
+			}
+			
+			public int readNeo4JData(String nodeName, String value) {
+				int countOfRecords = 0;
+				GraphDBHandler dbHandler = new GraphDBHandler();
+				String query = "MATCH (n:" + nodeName + ") where n.authorName='" + value + "' return n";
+				log.debug(" query  {} ", query);
+				GraphResponse neo4jResponse;
+				try {
+					neo4jResponse = dbHandler.executeCypherQuery(query);
+					JsonArray tooldataObject = neo4jResponse.getJson().get("results").getAsJsonArray();
+					countOfRecords = tooldataObject.size();
+				} catch (InsightsCustomException e) {
+					log.error(e);
+				}
+				return countOfRecords;
+
 			}
 }

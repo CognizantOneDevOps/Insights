@@ -21,11 +21,12 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.cognizant.devops.platformcommons.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsContentConfig;
 import com.cognizant.devops.platformreports.assessment.dal.ReportPostgresDataHandler;
 import com.cognizant.devops.platformreports.assessment.datamodel.ContentConfigDefinition;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsKPIConfigDTO;
-import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 import com.google.gson.JsonArray;
 
 public class ContentExecutor implements Callable<Integer> {

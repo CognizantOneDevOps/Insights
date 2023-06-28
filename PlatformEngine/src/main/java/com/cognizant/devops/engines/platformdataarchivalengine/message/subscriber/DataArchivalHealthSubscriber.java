@@ -16,8 +16,6 @@
 
 package com.cognizant.devops.engines.platformdataarchivalengine.message.subscriber;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -34,12 +32,10 @@ import com.cognizant.devops.platformcommons.constants.EngineConstants;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.dataArchivalConfig.DataArchivalConfigDal;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.rabbitmq.client.AMQP.BasicProperties;
-import com.rabbitmq.client.Envelope;
 
 public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandler {
 	
@@ -52,15 +48,12 @@ public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandle
 	}
 
 	@Override
-	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body)
-			throws IOException {	
-		String message = new String(body, StandardCharsets.UTF_8);
+	public void handleDelivery(String routingKey, String message) throws InsightsCustomException {	
 		try {
-			String routingKey = envelope.getRoutingKey();
 			Boolean isFailure = Boolean.FALSE;
 			String healthStatus = "";
 			
-			log.debug( " {} [x] Received '{} ':' {} '",consumerTag,routingKey,message);
+			log.debug( " [] Received '{} ':' {} '",routingKey,message);
 			List<String> labels = Arrays.asList(routingKey.split(MQMessageConstants.ROUTING_KEY_SEPERATOR));
 
 			JsonElement json = JsonUtils.parseString(message);
@@ -74,7 +67,7 @@ public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandle
 			loggingInfo.put(AgentCommonConstant.CATEGORY, categoryName);
 			loggingInfo.put(AgentCommonConstant.AGENTID, agentId);
 			loggingInfo.put(EngineConstants.EXECID,String.valueOf( messageJson.get(EngineConstants.EXECID)));
-			log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Received :{} {} {}",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),"-",loggingInfo.get(EngineConstants.EXECID), consumerTag, routingKey, message);
+			log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Received :{} {} {}",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),"-",loggingInfo.get(EngineConstants.EXECID), "", routingKey, message);
 			
 			//Check data archival agent status
 			healthStatus = String.valueOf(messageJson.get("status"));
@@ -87,11 +80,10 @@ public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandle
 			if (Boolean.TRUE.equals(isFailure)) {							
 				updateErrorStateInArchivalRecord(messageJson);
 			}						
-			getChannel().basicAck(envelope.getDeliveryTag(), false);
 			log.debug(" Type=DataArchival toolName={} category={} agentId={} routingKey={} execId={} Data Archival Health message processed.",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),"-",loggingInfo.get(EngineConstants.EXECID));
 		} catch (Exception e) {
 			log.error(" toolName={} category={} agentId={} execId={} Error occured in Data Archival Health Subscriber.Health message: {}",loggingInfo.get(AgentCommonConstant.TOOLNAME),loggingInfo.get(AgentCommonConstant.CATEGORY),loggingInfo.get(AgentCommonConstant.AGENTID),loggingInfo.get(EngineConstants.EXECID),message,e);
-			getChannel().basicReject(envelope.getDeliveryTag(), false);
+			throw new InsightsCustomException(e.getMessage());
 		}
 	}
 	

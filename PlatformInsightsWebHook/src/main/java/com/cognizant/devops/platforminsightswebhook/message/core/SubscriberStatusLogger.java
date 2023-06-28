@@ -27,16 +27,23 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platforminsightswebhook.application.AppProperties;
 import com.cognizant.devops.platforminsightswebhook.application.ServerProperties;
 import com.cognizant.devops.platforminsightswebhook.config.WebHookConstants;
-import com.cognizant.devops.platforminsightswebhook.config.WebHookMessagePublisher;
+import com.cognizant.devops.platforminsightswebhook.message.factory.WebHookMessagePublisherMQ;
+import com.cognizant.devops.platforminsightswebhook.message.factory.WebhookMessageFactory;
+import com.cognizant.devops.platforminsightswebhook.message.factory.WebhookMessagePublisherSQS;
 import com.google.gson.JsonObject;
 
 public class SubscriberStatusLogger {
 
 	private static Logger log = LogManager.getLogger(SubscriberStatusLogger.class);
 	static SubscriberStatusLogger instance = null;
-
+	private WebhookMessageFactory messageFactory;
+	
 	private SubscriberStatusLogger() {
-
+		if (AppProperties.getProviderName().equals("AWSSQS")) {
+			messageFactory = new WebhookMessagePublisherSQS();
+		} else {
+			messageFactory = new WebHookMessagePublisherMQ();
+		}
 	}
 
 	public static SubscriberStatusLogger getInstance() {
@@ -79,10 +86,8 @@ public class SubscriberStatusLogger {
 			for (Map.Entry<String, String> entry : parameter.entrySet()) {
 				jsonObj.addProperty(entry.getKey(), entry.getValue());
 			}
-			log.debug("  message {}", jsonObj.toString());
-			WebHookMessagePublisher.getInstance().publishHealthData(jsonObj.toString().getBytes(),
-					WebHookConstants.WEBHOOK_SUBSCRIBER_HEALTH_QUEUE,
-					WebHookConstants.WEBHOOK_SUBSCRIBER_HEALTH_ROUTING_KEY);
+			log.debug("  message {}", jsonObj.toString());		
+			messageFactory.publishHealthData(jsonObj.toString(),WebHookConstants.WEBHOOK_SUBSCRIBER_HEALTH_QUEUE);
 			response = Boolean.TRUE;
 		} catch (Exception e) {
 			log.error("Unable to create Node  createComponentStatusNode {}", e.getMessage());

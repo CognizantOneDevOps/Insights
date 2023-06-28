@@ -34,12 +34,16 @@
 		"c3pMaxStatements": "300"
 	},
 	"messageQueue": {
+		"providerName": "RabbitMQ",
 		"host": "localhost",
 		"port": 5672,
 		"user": "",
 		"password": "",
 		"prefetchCount": 5,
-		"enableDeadLetterExchange":false
+		"enableDeadLetterExchange": false,
+		"awsAccessKey": "",
+		"awsSecretKey": "",
+		"awsRegion": ""
 	},
 	"agentDetails": {
 		"isOnlineRegistration": true,
@@ -49,8 +53,8 @@
 		"agentExchange": "iAgent",
 		"agentPkgQueue": "INSIGHTS.AGENTS.PACKAGE",
 		"githubAPI": "",
-    	"githubAccessToken": "",
-		"repoUrl" : ""
+		"githubAccessToken": "",
+		"repoUrl": ""
 	},
 	"endpointData": {
 		"elasticSearchEndpoint": "http://localhost:9200"
@@ -102,9 +106,7 @@
 		"defaultTargetUrl": "defaultTargetUrl",
 		"postLogoutURL": "logoutURL",
 		"tokenSigningKey": "insights_IDP_CogDevops_SSO_Token_string",
-		"servicePrincipalKerberos": "",
-		"keyTabLocationKerberos": "C:\\InSights_Windows\\Server2\\INSIGHTS_HOME\\.InSights\\kerberos_keytab_file.keytab",
-		"jwtTokenOriginServerURL":""
+		"jwtTokenOriginServerURL": ""
 	},
 	"mlConfiguration": {
 		"h2oEndpoint": ""
@@ -130,12 +132,11 @@
 			"PlatformRegressionTest": "DEBUG"
 		}
 	},
-	"proxyConfiguration":{
-		"isEnableProxy":false,
-		"proxyHost":"",
-		"proxyPort":0,
-		"proxyUsername":"",
-		"proxyPassword":""
-	
+	"proxyConfiguration": {
+		"isEnableProxy": false,
+		"proxyHost": "",
+		"proxyPort": 0,
+		"proxyUsername": "",
+		"proxyPassword": ""
 	}
 }

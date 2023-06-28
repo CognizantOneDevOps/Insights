@@ -52,5 +52,15 @@ public interface IBaseDAL {
 
 	int executeUpdate(String query, Map<String, Object> parameters);
 	
+	int executeUpdateWithSQLQueryWithParameter(String createQuery,Map<String, Object> parameters);
+
+	/** Used to get result list of entity from Hibernate 
+	 * @param query Hibernate query to be executed 
+	 * @param parameters list of parameter in key value pair, 
+	 *	this will be use to set parameter placeholder in query if any 
+	 *	@return List of entity object 
+	 */
+	<T> List<T> getResultListCriteria(Class<T> type, Map<String, Object> parameters, Map<String, String> orderbyParams);
+	
 
 }

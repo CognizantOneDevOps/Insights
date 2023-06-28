@@ -51,6 +51,7 @@ import com.cognizant.devops.platformservice.security.config.InsightsCrossScripti
 import com.cognizant.devops.platformservice.security.config.InsightsCustomCsrfFilter;
 import com.cognizant.devops.platformservice.security.config.InsightsExternalAPIAuthenticationFilter;
 import com.cognizant.devops.platformservice.security.config.InsightsResponseHeaderWriterFilter;
+import com.cognizant.devops.platformservice.security.config.grafana.SpringAccessDeniedHandler;
 
 @ComponentScan(basePackages = { "com.cognizant.devops" })
 @Configuration
@@ -62,7 +63,7 @@ public class InsightsSecurityConfigurationAdapterJWT {
 	private static Logger log = LogManager.getLogger(InsightsSecurityConfigurationAdapterJWT.class);
 
 	@Autowired
-	private SpringJWTAccessDeniedHandler springAccessDeniedHandler;
+	private SpringAccessDeniedHandler springAccessDeniedHandler;
 
 	@Autowired
 	private AuthenticationUtils authenticationUtils;

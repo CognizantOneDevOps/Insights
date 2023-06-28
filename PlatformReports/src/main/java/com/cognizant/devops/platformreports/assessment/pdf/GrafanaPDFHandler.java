@@ -65,7 +65,10 @@ import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflo
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum.WorkflowType;
 import com.cognizant.devops.platformcommons.core.util.AES256Cryptor;
+import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
+import com.cognizant.devops.platformcommons.exception.InsightsJobFailedException;
+import com.cognizant.devops.platformcommons.util.InsightsReportPdfTableConfig;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentConfiguration;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfig;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfigDAL;
@@ -77,10 +80,8 @@ import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformreports.assessment.dal.ReportGraphDataHandler;
 import com.cognizant.devops.platformreports.assessment.datamodel.GrafanaReportConfigurationDTO;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsAssessmentConfigurationDTO;
-import com.cognizant.devops.platformreports.assessment.datamodel.InsightsReportPdfTableConfig;
 import com.cognizant.devops.platformreports.assessment.util.PdfReportTableUtil;
 import com.cognizant.devops.platformreports.assessment.util.ReportEngineUtils;
-import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -373,7 +374,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			pdfOptions.setScale(1);
 			pdfOptions.setDisplayHeaderFooter(true);
 			pdfOptions.setHeaderTemplate(updateLogoImgInHeaderTemplate(false));
-			pdfOptions.setFooterTemplate(fetchTemplate(FOOTER_HTML));
+			pdfOptions.setFooterTemplate(fetchFooterTemplate(FOOTER_HTML));
 			pdfOptions.setMargin(new Margin().setTop("90").setRight("0").setBottom("50").setLeft("0"));
 			page.emulateMedia(new Page.EmulateMediaOptions().setMedia(Media.SCREEN));
 			byte[] dashboardPdf = page.pdf(pdfOptions);
@@ -400,7 +401,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			modifyFrontPageTemplate(frontPagePath, theme);
 			page.navigate(FILE_TRANSFER_PROTOCOL + new File(frontPagePath).getAbsolutePath());
 			pdfOptions.setHeaderTemplate(updateLogoImgInHeaderTemplate(true));
-			pdfOptions.setFooterTemplate(fetchTemplate("frontPagefooter.html"));
+			pdfOptions.setFooterTemplate(fetchFooterTemplate("frontPagefooter.html"));
 			pdfOptions.setHeight("1600px");
 			byte[] frontPagePdf = page.pdf(pdfOptions);
 
@@ -575,7 +576,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			pdfOptions.setDisplayHeaderFooter(true);
 			pdfOptions.setWidth("793.92px");
 			pdfOptions.setHeaderTemplate(updateLogoImgInHeaderTemplate(false));
-			pdfOptions.setFooterTemplate(fetchTemplate(FOOTER_HTML));
+			pdfOptions.setFooterTemplate(fetchFooterTemplate(FOOTER_HTML));
 			pdfOptions.setMargin(new Margin().setTop("85").setRight("10").setBottom("5").setLeft("10"));
 			byte[] dashboardPdf = page.pdf(pdfOptions);
 
@@ -586,7 +587,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			page.navigate(FILE_TRANSFER_PROTOCOL + new File(frontPagePath).getAbsolutePath());
 			pdfOptions.setHeaderTemplate(updateLogoImgInHeaderTemplate(true));
 			pdfOptions.setWidth("793.92px");
-			pdfOptions.setFooterTemplate(fetchTemplate("frontPagefooter.html"));
+			pdfOptions.setFooterTemplate(fetchFooterTemplate("frontPagefooter.html"));
 			byte[] frontPagePdf = page.pdf(pdfOptions);
 
 			browser.close();
@@ -733,9 +734,6 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 		try {
 
 			InsightsReportPdfTableConfig insightsReportPdfTableConfig = new InsightsReportPdfTableConfig();
-			String templateHtmlPath = assessmentReportDTO.getPdfReportDirPath() + File.separator
-					+ assessmentReportDTO.getAsseementreportname() + "." + ReportEngineUtils.HTML_EXTENSION;
-			File render = new File(templateHtmlPath);
 			String reportDirPath = assessmentReportDTO.getPdfReportDirPath() + File.separator;
 			PdfReportTableUtil pdfReportTableUtil = new PdfReportTableUtil();
 			doc = new PDDocument();
@@ -1108,6 +1106,29 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			log.error("Workflow Detail ==== Error fetching template ", e);
 		}
 		return render.toString();
+	}
+	
+	/**
+	 * Method use to fetch footer template file from resource.
+	 * 
+	 * @param templateFileName
+	 * @return
+	 */
+	private String fetchFooterTemplate(String templateFileName) {
+		InputStream templateStream = getClass().getClassLoader().getResourceAsStream(templateFileName);
+		BufferedReader r = new BufferedReader(new InputStreamReader(templateStream));
+		String line;
+		StringBuilder render = new StringBuilder();
+		try {
+			while ((line = r.readLine()) != null) {
+				render.append(line);
+			}
+			r.close();
+		} catch (IOException e) {
+			log.error("Workflow Detail ==== Error fetching template ", e);
+		}
+		return render.toString().replace("<span class=\"pageNumber\"></span> of <span class=\"totalPages\"></span>", "")
+				.replace("<span class=\"date\"></span>", InsightsUtils.getLocalDateTime("MM/dd/yyyy"));
 	}
 
 	/**

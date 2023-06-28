@@ -17,12 +17,9 @@ package com.cognizant.devops.platformservice.assessmentreport.service;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -31,7 +28,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import javax.persistence.NoResultException;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
@@ -40,8 +39,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
+import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.constants.ReportChartCollection;
 import com.cognizant.devops.platformcommons.constants.ReportStatusConstants;
@@ -1309,7 +1310,7 @@ public class AssesmentReportServiceImpl {
 		try {
 			Resource resource = resourceLoaderService.getResource("classpath:dashboardandpaneltemplate/" + filename);
 			InputStream fileInputStream = resource.getInputStream();
-			String template = new String(fileInputStream.readAllBytes(), StandardCharsets.UTF_8);
+			String template = new String(fileInputStream.readAllBytes(), MQMessageConstants.MESSAGE_ENCODING);
 			templateJson = JsonUtils.parseStringAsJsonObject(template);
 		} catch (Exception e) {
 			log.error("Error while fetching template JSON ====", e);
@@ -1721,4 +1722,19 @@ public class AssesmentReportServiceImpl {
 		}
 		return templateTypeList;
 	}
+	
+	/**
+	 * Method to refresh Grafana Org Token
+	 * 
+	 */
+	public String refreshGrafanaOrgToken(int orgId) throws InsightsCustomException {
+		try {
+			grafanaUtilities.refreshGrafanaToken(orgId);
+			return "Token refreshed successfully";
+		} catch (Exception e) {
+			log.error("Error while refreshing grafana token ... ", e);
+			throw new InsightsCustomException(e.toString());
+		}
+	}
+
 }

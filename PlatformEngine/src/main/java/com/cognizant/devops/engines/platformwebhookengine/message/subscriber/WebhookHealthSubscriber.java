@@ -15,24 +15,21 @@
  ******************************************************************************/
 package com.cognizant.devops.engines.platformwebhookengine.message.subscriber;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.constants.ServiceStatusConstants;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.healthutil.HealthUtil;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.rabbitmq.client.AMQP.BasicProperties;
-import com.rabbitmq.client.Envelope;
-import com.cognizant.devops.platformcommons.constants.ServiceStatusConstants;
 
 public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 	private static Logger log = LogManager.getLogger(WebhookHealthSubscriber.class);
@@ -45,11 +42,8 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 	}
 
 	@Override
-	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body)
-			throws IOException {
-		String message = new String(body, StandardCharsets.UTF_8);
-		String routingKey = envelope.getRoutingKey();
-		log.debug(" {}  Received  {} : {}", consumerTag, routingKey, message);
+	public void handleDelivery(String routingKey, String message) throws InsightsCustomException {
+		log.debug("  Received  {} : {}", routingKey, message);
 		List<JsonObject> dataList = new ArrayList<>();
 		JsonElement json = JsonUtils.parseString(message);
 		if (json.isJsonObject()) {
@@ -61,14 +55,12 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 		String status = JsonUtils.getValueFromJson(messageObj, "status");
 		String healthMessage = JsonUtils.getValueFromJson(messageObj , "message");
 		String version = JsonUtils.getValueFromJson(messageObj , "version");
-		//WebhookHealthSubscriber.class.getPackage().getImplementationVersion();				
 		
 		try {		
 			log.debug("Type=WebhookHealth {} routingKey={} status={} serverPort={}",message,routingKey,status,messageObj.get("serverPort").getAsString());
 			if (!dataList.isEmpty()) {				
 				healthUtil.createComponentHealthDetails(componentName,version,healthMessage,status);				
 				log.debug("Insights WebhookHealthSubscriber Health Record updated");
-				getChannel().basicAck(envelope.getDeliveryTag(), false);				
 			} else {
 				log.error(" Data List is empty for webhook health record ");
 				EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
@@ -78,7 +70,7 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 		} catch (InsightsCustomException e) {
 			log.error("Type=WebhookHealth routingKey={} message={}  status={} serverPort={} error={}"
 					,routingKey,message,status,messageObj.get("serverPort").getAsString(),e.getMessage());
-			getChannel().basicReject(envelope.getDeliveryTag(), false);
+			throw new InsightsCustomException(e.getMessage());
 		}
 	}
 

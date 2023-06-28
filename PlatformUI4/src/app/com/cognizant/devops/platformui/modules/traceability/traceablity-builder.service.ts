@@ -44,14 +44,14 @@ export class TraceabiltyService implements ITraceablityService {
     getIssuesPipeline(issue:string): Promise<any>{
         var restHandler = this.restCallHandlerService;
        // return restHandler.get("GET_ISSUES_PIPELINE", {'issue': issue});
-       return this.restCallHandlerService.postWithData("GET_ISSUES_PIPELINE", issue, { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
+        return this.restCallHandlerService.postWithData("GET_ISSUES_PIPELINE", issue, { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
     }
 
     public getToolDisplayProperties()  {
        return this.restCallHandlerService.get("GET_TOOL_PROPERTIES", {});
     }
 
-
+    
     getAsssetDetails(toolName: string, cachestring: string) {
         var restHandler = this.restCallHandlerService;
         return restHandler.get("GET_TOOL_DETAILS", {'toolName': toolName, 'cacheKey': cachestring });
@@ -65,5 +65,11 @@ export class TraceabiltyService implements ITraceablityService {
     {
         var restHandler = this.restCallHandlerService;
         return restHandler.get("GET_TOOL_KEYSET", {'toolName': toolName });   
+    }
+
+    downloadTraceabiltyPDF(toolName: string, toolField: string, toolValue: string, type: string, file: any) {
+        var restHandler = this.restCallHandlerService;
+        var bodyObj = { 'toolName': toolName, 'fieldName': toolField, 'fieldValue': toolValue, 'type': type, 'file': file };
+        return restHandler.postWithPDFData("GET_TRACEABILITY_PDF", JSON.stringify(bodyObj), {}, { 'Content-Type': 'application/json' }, { 'responseType': 'blob' }).toPromise();
     }
 }

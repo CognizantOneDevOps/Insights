@@ -24,12 +24,12 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.ReportStatusConstants;
 import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
+import com.cognizant.devops.platformcommons.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsContentConfig;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
 import com.cognizant.devops.platformreports.assessment.content.ContentExecutor;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsKPIConfigDTO;
 import com.cognizant.devops.platformreports.assessment.util.ReportEngineEnum;
-import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 

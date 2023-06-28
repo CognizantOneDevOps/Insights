@@ -19,9 +19,9 @@ import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformreports.assessment.datamodel.ContentConfigDefinition;
 import com.cognizant.devops.platformreports.assessment.util.ReportEngineEnum;
-import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 
 public class AssessmentReportContentProcesser {
 

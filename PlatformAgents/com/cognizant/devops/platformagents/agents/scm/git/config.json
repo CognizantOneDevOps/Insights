@@ -6,11 +6,15 @@
 		"vaultUrl": "http://Vault_Host:port/v1/"
 	},
 	"mqConfig": {
+		"providerName": "RabbitMQ",
 		"user": "username for RabbitMq",
 		"password": "",
 		"host": "127.0.0.1",
 		"exchange": "iSight",
-		"agentControlXchg": "iAgent"
+		"agentControlXchg": "iAgent",
+		"awsAccessKey": "",
+		"awsSecretKey": "",
+		"awsRegion": ""
 	},
 	"subscribe": {
 		"config": "SCM.GIT.config"
@@ -211,7 +215,7 @@
 	},
 	"labelName": "GIT",
 	"toolName": "GIT",
-	"auditing": false,
+	 
     "enableProxy":false,
     "proxies":{
     	"http":"",

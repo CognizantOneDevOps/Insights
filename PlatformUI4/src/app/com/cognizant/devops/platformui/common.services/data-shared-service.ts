@@ -63,7 +63,6 @@ export class DataSharedService {
   public setUserName(userNameStr: String): string {
     let userName = "";
     if (InsightsInitService.autheticationProtocol == AutheticationProtocol.SAML.toString()
-      || InsightsInitService.autheticationProtocol == AutheticationProtocol.Kerberos.toString()
       || InsightsInitService.autheticationProtocol == AutheticationProtocol.JWT.toString()) {
       userName = this.getSSOUserName();
     } else if (InsightsInitService.autheticationProtocol == AutheticationProtocol.NativeGrafana.toString()) {
@@ -148,7 +147,6 @@ export class DataSharedService {
 
   public setAuthorizationToken(strAuthorization: string) {
     if (InsightsInitService.autheticationProtocol == AutheticationProtocol.SAML.toString()
-      || InsightsInitService.autheticationProtocol == AutheticationProtocol.Kerberos.toString()
       || InsightsInitService.autheticationProtocol == AutheticationProtocol.JWT.toString()) {
       this.storage.set("Authorization", strAuthorization);
     } else if (InsightsInitService.autheticationProtocol == AutheticationProtocol.NativeGrafana.toString()) {

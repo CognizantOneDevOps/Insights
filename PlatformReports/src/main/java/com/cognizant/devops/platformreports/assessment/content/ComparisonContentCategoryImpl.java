@@ -24,12 +24,12 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
+import com.cognizant.devops.platformcommons.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformreports.assessment.datamodel.ContentConfigDefinition;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsContentDetail;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsKPIResultDetails;
 import com.cognizant.devops.platformreports.assessment.util.ReportEngineEnum;
 import com.cognizant.devops.platformreports.assessment.util.ReportEngineUtils;
-import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 
 public class ComparisonContentCategoryImpl extends BaseContentCategoryImpl {
 	

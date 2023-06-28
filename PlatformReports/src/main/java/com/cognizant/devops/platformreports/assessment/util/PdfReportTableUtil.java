@@ -48,8 +48,8 @@ import org.w3c.dom.css.CSSStyleRule;
 import org.w3c.dom.css.CSSStyleSheet;
 
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
+import com.cognizant.devops.platformcommons.util.InsightsReportPdfTableConfig;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsAssessmentConfigurationDTO;
-import com.cognizant.devops.platformreports.assessment.datamodel.InsightsReportPdfTableConfig;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.steadystate.css.parser.CSSOMParser;
@@ -309,9 +309,6 @@ public class PdfReportTableUtil {
 				contentStream.setNonStrokingColor(0f,0f,0f); 
 				contentStream.newLineAtOffset(13, 10);
 				contentStream.setFont(font, 10);
-				
-				contentStream.showText("Page "+String.valueOf(page));
-				
 				contentStream.endText();
 				contentStream.beginText();
 				

@@ -213,6 +213,7 @@ public class GrafanaUtilities {
 		headers.put(AuthenticationUtils.AUTH_HEADER_KEY, token);
 		return headers;
 	}
+
 	/**
 	 * Method use to create API key in Grafana and save created key in database.
 	 * 
@@ -220,43 +221,95 @@ public class GrafanaUtilities {
 	 * @throws InsightsCustomException
 	 */
 	public void generateGrafanaToken(int orgId) throws InsightsCustomException {
-		try {				
-			GrafanaOrgToken grafanaOrgToken = new GrafanaOrgToken();
-			Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
-			String authString = ApplicationConfigProvider.getInstance().getGrafana().getAdminUserName() + ":"
-					+ ApplicationConfigProvider.getInstance().getGrafana().getAdminUserPassword();
-			String encodedString = Base64.getEncoder().encodeToString(authString.getBytes());
-			headers.put(AuthenticationUtils.AUTH_HEADER_KEY, BASICAUTH + encodedString);
-			headers.put("x-grafana-org-id", String.valueOf(orgId));
-			
-			//check if API key exists in Grafana
-			boolean keyExists = false;
-			String getApiKeyResponse = grafanaHandler.grafanaGet(PlatformServiceConstants.API_AUTH_KEYS, headers);
-			JsonArray getApiKeyResponseObj = JsonUtils.parseStringAsJsonArray(getApiKeyResponse);
-			for(JsonElement item: getApiKeyResponseObj) {
-				if(item.getAsJsonObject().get(NAME).getAsString().equalsIgnoreCase(PDFTOKEN)) {
-					keyExists = true;
-				}
+		try {
+			Map<String, String> headers = generateGrafanaHeaderForAPIToken(orgId);
+			int grafanaTokenId = checkGrafanaToken(headers);
+			if (grafanaTokenId == -1) {
+				generateGrafanaOrgToken(orgId, headers);
 			}
-			if(!keyExists) {
-				GrafanaOrgToken token = grafanaDashboardConfigDAL.getTokenByOrgId(orgId);
-				if(token != null) {
-					grafanaDashboardConfigDAL.deleteGrafanaOrgToken(orgId);
-				}
-				JsonObject json = new JsonObject();
-				json.addProperty(NAME, PDFTOKEN);
-				json.addProperty(ROLE, ADMIN);
-				String response = grafanaHandler.grafanaPost(PlatformServiceConstants.API_AUTH_KEYS,json, headers);
-				JsonObject apiObj = JsonUtils.parseStringAsJsonObject(response);
-				grafanaOrgToken.setOrgId(orgId);
-				grafanaOrgToken.setApiKey(AES256Cryptor.encrypt(apiObj.get("key").getAsString(), AssessmentReportAndWorkflowConstants.GRAFANA_PDF_TOKEN_SIGNING_KEY));
-				grafanaDashboardConfigDAL.saveGrafanaOrgToken(grafanaOrgToken);
-			}
-			
 		} catch (Exception e) {
 			log.error("Unable to generate Grafana token  {}", e.getMessage());
 			log.error(e);
 			throw new InsightsCustomException(e.getMessage());
 		}
 	}
+
+	private int checkGrafanaToken(Map<String, String> headers) throws InsightsCustomException {
+		// check if API key exists in Grafana
+		int grafanaTokenId = -1;
+		String getApiKeyResponse = grafanaHandler.grafanaGet(PlatformServiceConstants.API_AUTH_KEYS, headers);
+		JsonArray getApiKeyResponseObj = JsonUtils.parseStringAsJsonArray(getApiKeyResponse);
+		for (JsonElement jsonElement : getApiKeyResponseObj) {
+			if (jsonElement.getAsJsonObject().has("id")
+					&& jsonElement.getAsJsonObject().get("name").getAsString().equalsIgnoreCase(PDFTOKEN)) {
+				grafanaTokenId = jsonElement.getAsJsonObject().get("id").getAsInt();
+			}
+		}
+		return grafanaTokenId;
+	}
+
+	private void generateGrafanaOrgToken(int orgId, Map<String, String> headers) throws InsightsCustomException {
+		GrafanaOrgToken grafanaOrgToken = new GrafanaOrgToken();
+		GrafanaOrgToken token = grafanaDashboardConfigDAL.getTokenByOrgId(orgId);
+		if (token != null) {
+			grafanaDashboardConfigDAL.deleteGrafanaOrgToken(orgId);
+		}
+		JsonObject json = new JsonObject();
+		json.addProperty(NAME, PDFTOKEN);
+		json.addProperty(ROLE, ADMIN);
+		String response = grafanaHandler.grafanaPost(PlatformServiceConstants.API_AUTH_KEYS, json, headers);
+		JsonObject apiObj = JsonUtils.parseStringAsJsonObject(response);
+		grafanaOrgToken.setOrgId(orgId);
+		grafanaOrgToken.setApiKey(AES256Cryptor.encrypt(apiObj.get("key").getAsString(),
+				AssessmentReportAndWorkflowConstants.GRAFANA_PDF_TOKEN_SIGNING_KEY));
+		grafanaDashboardConfigDAL.saveGrafanaOrgToken(grafanaOrgToken);
+	}
+
+	private Map<String, String> generateGrafanaHeaderForAPIToken(int orgId) throws InsightsCustomException {
+		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
+		String authString = ApplicationConfigProvider.getInstance().getGrafana().getAdminUserName() + ":"
+				+ ApplicationConfigProvider.getInstance().getGrafana().getAdminUserPassword();
+		String encodedString = Base64.getEncoder().encodeToString(authString.getBytes());
+		headers.put(AuthenticationUtils.AUTH_HEADER_KEY, BASICAUTH + encodedString);
+		headers.put("x-grafana-org-id", String.valueOf(orgId));
+		return headers;
+	}
+
+	/**
+	 * Method use to refresh API key and Grafana Token.
+	 * 
+	 * @param orgId
+	 * @throws InsightsCustomException
+	 */
+	public void refreshGrafanaToken(int orgId) throws InsightsCustomException {
+		try {
+			Map<String, String> headers = generateGrafanaHeaderForAPIToken(orgId);
+			int grafanaTokenId = checkGrafanaToken(headers);
+			if (grafanaTokenId > -1) {
+				deleteApiKeys(grafanaTokenId, headers);
+			}
+			generateGrafanaOrgToken(orgId, headers);
+		} catch (Exception e) {
+			log.error("Unable to generate Grafana token  {}", e.getMessage());
+			log.error(e);
+			throw new InsightsCustomException(e.getMessage());
+		}
+	}
+
+	/**
+	 * Method use to delete an API key.
+	 * 
+	 * @param jsonElement, headers
+	 * @throws InsightsCustomException
+	 */
+	private void deleteApiKeys(int tokenId, Map<String, String> headers) throws InsightsCustomException {
+		try {
+			grafanaHandler.grafanaDelete("/api/auth/keys/" + tokenId, headers);
+		} catch (Exception e) {
+			log.error(" Unable to delete API key ", e);
+			throw new InsightsCustomException(e.getMessage());
+		}
+
+	}
+
 }

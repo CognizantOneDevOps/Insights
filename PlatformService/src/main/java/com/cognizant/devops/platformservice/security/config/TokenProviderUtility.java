@@ -40,7 +40,6 @@ import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;

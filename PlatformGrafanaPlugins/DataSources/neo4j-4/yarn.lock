@@ -1519,13 +1519,13 @@
   dependencies:
     tslib "^2.4.0"
 
-"@grafana/data@9.3.1":
-  version "9.3.1"
-  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-9.3.1.tgz#f8334edb2c4d1d19ff40ed82d252f1e9194b347c"
-  integrity sha512-XWhkX089kmHjk6jdG+6hYLbaRB6zB7TbxJOdERMjrW/gvRKbOpc5toKNIPA0TEYmcNTnmitDNc+vDaUuErzEGw==
+"@grafana/data@9.3.13":
+  version "9.3.13"
+  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-9.3.13.tgz#6aa1e8420b791b1bf22d41d32b6bc2e5d728a0cc"
+  integrity sha512-H2gBJuPtA+kkV7oYlMz20bVSpti9A3xWxYTbbd54LBA8XbeqAHq4UUPAzm5BPlUxD+hG3dAoTTnzrl3XcRK/CQ==
   dependencies:
     "@braintree/sanitize-url" "6.0.1"
-    "@grafana/schema" "9.3.1"
+    "@grafana/schema" "9.3.13"
     "@types/d3-interpolate" "^1.4.0"
     d3-interpolate "1.4.0"
     date-fns "2.29.3"
@@ -1542,13 +1542,13 @@
     rxjs "7.5.7"
     tinycolor2 "1.4.2"
     tslib "2.4.1"
-    uplot "1.6.22"
+    uplot "1.6.23"
     xss "1.0.14"
 
-"@grafana/e2e-selectors@9.3.1":
-  version "9.3.1"
-  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-9.3.1.tgz#a11acacd2c28e98542fbbb96a9bc0cf99146f7e9"
-  integrity sha512-aKEnMUyIfypoFjszpZEQl/SsPMsa5aPoGcM1JQ2s3iZsm8bGPBbEtReYCuPNxiYJmWxZt0iQL1xHlFD8JgNhug==
+"@grafana/e2e-selectors@9.3.13":
+  version "9.3.13"
+  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-9.3.13.tgz#1056e0cda0244b2c602c35609b2004748165fd87"
+  integrity sha512-avP2pDUoN2LfgMkrdRRZJcJh93O/TLyglbW5a5CXjCOEVACM2fgu0euzOR47L1oQQZB2Vxc/M3Q7944jkdMqcA==
   dependencies:
     "@grafana/tsconfig" "^1.2.0-rc1"
     tslib "2.4.1"
@@ -1586,15 +1586,15 @@
     ua-parser-js "^1.0.32"
     web-vitals "^3.0.4"
 
-"@grafana/runtime@9.3.1":
-  version "9.3.1"
-  resolved "https://registry.yarnpkg.com/@grafana/runtime/-/runtime-9.3.1.tgz#68a2bff3e377f6a94f496a53c1bf18f8f281666d"
-  integrity sha512-uDmmw/Em5UP9+wPt3dosSqchSnj62ZyDeAlovp9ynE6MxOovN7lxHL/A3a1b286TURXEW0g63SZaHQGA8ijORw==
+"@grafana/runtime@9.3.13":
+  version "9.3.13"
+  resolved "https://registry.yarnpkg.com/@grafana/runtime/-/runtime-9.3.13.tgz#45baffc8089400038abc1ce38a80b42a28bcf356"
+  integrity sha512-XgKWpS9A3gn8qiujti/UYwqMQi0pMdMPBDmc9Myy2v1EHMbRLGNUxRikmRD8sSEDozs7DPTL+geWWf2HSvD8zA==
   dependencies:
-    "@grafana/data" "9.3.1"
-    "@grafana/e2e-selectors" "9.3.1"
+    "@grafana/data" "9.3.13"
+    "@grafana/e2e-selectors" "9.3.13"
     "@grafana/faro-web-sdk" "1.0.0-beta2"
-    "@grafana/ui" "9.3.1"
+    "@grafana/ui" "9.3.13"
     "@sentry/browser" "6.19.7"
     history "4.10.1"
     lodash "4.17.21"
@@ -1602,17 +1602,17 @@
     systemjs "0.20.19"
     tslib "2.4.1"
 
-"@grafana/schema@9.3.1":
-  version "9.3.1"
-  resolved "https://registry.yarnpkg.com/@grafana/schema/-/schema-9.3.1.tgz#2e0f16a05765619eb2003e50b970948438002ded"
-  integrity sha512-MMOtC8yYLcvNrBI8rWeS+mlNM7YH5QWHycValzl5Hnzo7p9BueMiTUVvk/DF/ULh+OwRoa+bHN7ssOsTXLeXRg==
+"@grafana/schema@9.3.13":
+  version "9.3.13"
+  resolved "https://registry.yarnpkg.com/@grafana/schema/-/schema-9.3.13.tgz#a28486d9232d2b03f335b9c6ab012c04914e3701"
+  integrity sha512-HvX8IKjKbQOK/8FPqC7BD31fVQfhHmFVzHtCz4SJMrLQVaqAkL7z8UVas8yBto4W1jrPS30E6+kKawljU61drA==
   dependencies:
     tslib "2.4.1"
 
-"@grafana/toolkit@9.3.1":
-  version "9.3.1"
-  resolved "https://registry.yarnpkg.com/@grafana/toolkit/-/toolkit-9.3.1.tgz#8b91a7c37ec636f0606b1ae26eddc3a59eaa7aee"
-  integrity sha512-V9qvbhVsgDhOTMEkMuELCPSI1NxZO5oscJRdgMhWDjl0/gfNudhQ6L6LdHM52UYrSP8IGM5Cmh1Ur5WzUb34nQ==
+"@grafana/toolkit@9.3.13":
+  version "9.3.13"
+  resolved "https://registry.yarnpkg.com/@grafana/toolkit/-/toolkit-9.3.13.tgz#701e8fb6d80b8af0bcccfde96b2ba9f60ba04ab6"
+  integrity sha512-oksK0+TuumlnJObtyccbY82sIXYKvVH/9bQY+qlw7QS7/ZYRExvfg5WoDnpKqKlJeDxDWDC4V+LthMMcnEoX1A==
   dependencies:
     "@babel/core" "7.18.9"
     "@babel/plugin-proposal-class-properties" "7.18.6"
@@ -1626,10 +1626,10 @@
     "@babel/preset-env" "7.18.9"
     "@babel/preset-react" "7.18.6"
     "@babel/preset-typescript" "7.18.6"
-    "@grafana/data" "9.3.1"
+    "@grafana/data" "9.3.13"
     "@grafana/eslint-config" "5.0.0"
     "@grafana/tsconfig" "^1.2.0-rc1"
-    "@grafana/ui" "9.3.1"
+    "@grafana/ui" "9.3.13"
     "@jest/core" "27.5.1"
     "@types/command-exists" "^1.2.0"
     "@types/eslint" "8.4.1"
@@ -1704,16 +1704,16 @@
   resolved "https://registry.yarnpkg.com/@grafana/tsconfig/-/tsconfig-1.2.0-rc1.tgz#10973c978ec95b0ea637511254b5f478bce04de7"
   integrity sha512-+SgQeBQ1pT6D/E3/dEdADqTrlgdIGuexUZ8EU+8KxQFKUeFeU7/3z/ayI2q/wpJ/Kr6WxBBNlrST6aOKia19Ag==
 
-"@grafana/ui@9.3.1":
-  version "9.3.1"
-  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-9.3.1.tgz#b3ee34ba0ae90bf009b37390fb7ed751877195a5"
-  integrity sha512-QQS9yF/bRMqsTJKXkMTnHzZmnFErZu38etpGQMzE5x/j9zQxAAK4D5MMkcIebkXsH4GShDUInHD5O4EpdtZHSQ==
+"@grafana/ui@9.3.13":
+  version "9.3.13"
+  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-9.3.13.tgz#94da6bc3bee310092b6414aed0cd12a48133ba7f"
+  integrity sha512-5Tmvm42UHyJKXZXDWpKeVkMsVakHqkVAqvmHRQ4AiUBRkneNmU6+EcTGk9GRHUXOvoHSzJ84+xns+hvVonGVgQ==
   dependencies:
     "@emotion/css" "11.10.5"
     "@emotion/react" "11.10.5"
-    "@grafana/data" "9.3.1"
-    "@grafana/e2e-selectors" "9.3.1"
-    "@grafana/schema" "9.3.1"
+    "@grafana/data" "9.3.13"
+    "@grafana/e2e-selectors" "9.3.13"
+    "@grafana/schema" "9.3.13"
     "@leeoniya/ufuzzy" "0.8.0"
     "@monaco-editor/react" "4.4.6"
     "@popperjs/core" "2.11.6"
@@ -1757,7 +1757,7 @@
     react-i18next "^12.0.0"
     react-inlinesvg "3.0.1"
     react-popper "2.3.0"
-    react-popper-tooltip "^4.3.1"
+    react-popper-tooltip "4.4.2"
     react-router-dom "^5.2.0"
     react-select "5.6.0"
     react-select-event "^5.1.0"
@@ -1771,7 +1771,7 @@
     slate-react "0.22.10"
     tinycolor2 "1.4.2"
     tslib "2.4.1"
-    uplot "1.6.22"
+    uplot "1.6.23"
     uuid "9.0.0"
 
 "@humanwhocodes/config-array@^0.9.2":
@@ -8880,7 +8880,7 @@ react-lifecycles-compat@^3.0.4:
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
-react-popper-tooltip@^4.3.1:
+react-popper-tooltip@4.4.2:
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/react-popper-tooltip/-/react-popper-tooltip-4.4.2.tgz#0dc4894b8e00ba731f89bd2d30584f6032ec6163"
   integrity sha512-y48r0mpzysRTZAIh8m2kpZ8S1YPNqGtQPDrlXYSGvDS1c1GpG/NUXbsbIdfbhXfmSaRJuTcaT6N1q3CKuHRVbg==
@@ -10198,10 +10198,10 @@ update-browserslist-db@^1.0.9:
     escalade "^3.1.1"
     picocolors "^1.0.0"
 
-uplot@1.6.22:
-  version "1.6.22"
-  resolved "https://registry.yarnpkg.com/uplot/-/uplot-1.6.22.tgz#28a136c7c5fce92ce5e25f38f19314a029bec390"
-  integrity sha512-2jtSb/YHUgtmIUn0+QJjf7ggcJicb5PKe7ijBiRDTPsG/f8F/MFayZ+g6/0kATNkDyF/qQsHJDmCp6cxncg1EQ==
+uplot@1.6.23:
+  version "1.6.23"
+  resolved "https://registry.yarnpkg.com/uplot/-/uplot-1.6.23.tgz#3fdc341d9806cc15e95618a8d0f4ddfffa9c4ce7"
+  integrity sha512-zERH8HUbHE6kYyAqfP58SYuESp9M5jphSrMjsyckAM0DJ8C39SEI19YrpVvTCTLZB5joFUBPOwueRnJCdV2OdQ==
 
 uri-js@^4.2.2:
   version "4.4.1"

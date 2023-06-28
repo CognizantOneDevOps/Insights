@@ -17,9 +17,10 @@
 package com.cognizant.devops.platformreports.assessment.upshift.core;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import javax.jms.JMSException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,12 +28,12 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformcommons.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsAssessmentConfigurationDTO;
 import com.cognizant.devops.platformreports.assessment.dataprocess.BaseDataProcessor;
 import com.cognizant.devops.platformreports.assessment.upshift.handler.ReportDataProcessHandlerFactory;
-import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformworkflow.workflowtask.message.factory.WorkflowTaskSubscriberHandler;
 import com.google.gson.JsonObject;
 
@@ -43,15 +44,14 @@ public class UpshiftAssessmentExecutionSubscriber extends WorkflowTaskSubscriber
     InsightsAssessmentConfigurationDTO assessmentReportDTO = null;
     private WorkflowDAL workflowDAL = new WorkflowDAL();
 
-    public UpshiftAssessmentExecutionSubscriber(String routingKey) throws IOException, TimeoutException, InsightsCustomException {
+    public UpshiftAssessmentExecutionSubscriber(String routingKey) throws IOException, TimeoutException, InsightsCustomException, InterruptedException, JMSException {
         super(routingKey);
     }
 
     @Override
-    public void handleTaskExecution(byte[] body) throws IOException {
+    public void handleTaskExecution(String incomingTaskMessage) throws IOException {
         try {
         	long startTime = System.nanoTime();
-            String incomingTaskMessage = new String(body, StandardCharsets.UTF_8);
             log.debug("Worlflow Detail ==== UpshiftAssessmentExecutionSubscriber started ... "
                     + "routing key  message handleDelivery ===== {} ", incomingTaskMessage);
 

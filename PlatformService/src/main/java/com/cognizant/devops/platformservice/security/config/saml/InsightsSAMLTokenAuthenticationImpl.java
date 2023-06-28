@@ -20,7 +20,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.providers.ExpiringUsernameAuthenticationToken;
+import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticationToken;
 
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationToken;
@@ -33,7 +33,7 @@ public class InsightsSAMLTokenAuthenticationImpl implements AuthenticationProvid
     @Override
     public boolean supports(Class<?> authentication) {
         return InsightsAuthenticationToken.class.isAssignableFrom(authentication) 
-        		|| ExpiringUsernameAuthenticationToken.class.isAssignableFrom(authentication);
+        		|| Saml2AuthenticationToken.class.isAssignableFrom(authentication);
     }
     
 	/**

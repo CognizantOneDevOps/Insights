@@ -6,11 +6,15 @@
     "vaultUrl": "http://Vault_Host:port/v1/"
   },
   "mqConfig": {
+    "providerName": "RabbitMQ",
     "user": "user",
     "password": "-",
     "host": "localhost",
     "exchange": "iSight",
-    "agentControlXchg": "iAgent"
+    "agentControlXchg": "iAgent",
+	"awsAccessKey": "",
+	"awsSecretKey": "",
+	"awsRegion": ""
   },
   "subscribe": {
     "config": "ROI.NEWRELIC.config"
@@ -113,6 +117,6 @@
     "maxBytes": 5000000,
     "backupCount": 10
   },
-  "auditing": false,
+   
   "toolName": "NewRelic"
 }

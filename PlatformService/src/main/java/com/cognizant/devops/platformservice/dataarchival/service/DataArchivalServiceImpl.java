@@ -19,23 +19,27 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
+
+import javax.jms.JMSException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
+
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.DataArchivalConstants;
-import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
-import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
+import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
+import com.cognizant.devops.platformcommons.mq.core.AWSSQSProvider;
+import com.cognizant.devops.platformcommons.mq.core.RabbitMQProvider;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.cognizant.devops.platformdal.dataArchivalConfig.DataArchivalConfigDal;
 import com.cognizant.devops.platformdal.dataArchivalConfig.InsightsDataArchivalConfig;
 import com.google.gson.JsonObject;
-import com.rabbitmq.client.Channel;
 
 @Service("dataArchivalService")
 public class DataArchivalServiceImpl implements DataArchivalService {
@@ -262,20 +266,16 @@ public class DataArchivalServiceImpl implements DataArchivalService {
 	 * @throws IOException
 	 * @throws TimeoutException
 	 * @throws InsightsCustomException
+	 * @throws JMSException
 	 */
 	public void publishDataArchivalDetails(String routingKey, String publishDataJson)
-			throws IOException, TimeoutException, InsightsCustomException {
+			throws IOException, TimeoutException, InsightsCustomException, JMSException {
 		String queueName = routingKey.replace(".", "_");
-		Channel channel = null;
-		try {
-			
-			channel = RabbitMQConnectionProvider.getConnection().createChannel();
-			channel = RabbitMQConnectionProvider.initilizeChannel(channel, routingKey, queueName, MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE);
-			channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, publishDataJson.getBytes());
-		}finally {
-			if(channel != null) {
-				channel.close();
-			}
+		if (ApplicationConfigProvider.getInstance().getMessageQueue().getProviderName().equalsIgnoreCase("AWSSQS"))
+			AWSSQSProvider.publish(queueName, publishDataJson);
+		else {
+			RabbitMQProvider.publish(queueName, publishDataJson);
 		}
+
 	}
 }

@@ -15,20 +15,19 @@
  ******************************************************************************/
 package com.cognizant.devops.engines.platformengine.message.subscriber;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.rabbitmq.client.AMQP.BasicProperties;
-import com.rabbitmq.client.Envelope;
 
 public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 
@@ -38,12 +37,10 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 		super(routingKey);
 	}
 
-	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body)
-			throws IOException {
+	public void handleDelivery(String routingKey, String message) throws Exception
+			 {
 		try {
-			String message = new String(body, StandardCharsets.UTF_8);
-			String routingKey = envelope.getRoutingKey();
-			log.debug( " {} [x] Received '{} ':' {} '",consumerTag,routingKey,message);
+			log.debug( " [] Received '{} ':' {} '",routingKey,message);
 			List<String> labels = Arrays.asList(routingKey.split(MQMessageConstants.ROUTING_KEY_SEPERATOR));
 			JsonElement jsonElement = JsonUtils.parseString(message);			
 			
@@ -54,11 +51,10 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 						EngineStatusLogger.getInstance().extractAndStoreHealthRecord(e,labels);
 					}
 				}				
-				getChannel().basicAck(envelope.getDeliveryTag(), false);
 			}
 		} catch (Exception e) {
 			log.error(e);
-			getChannel().basicReject(envelope.getDeliveryTag(), false);
+			throw new InsightsCustomException(e.getMessage());
 		}
 	}
 }

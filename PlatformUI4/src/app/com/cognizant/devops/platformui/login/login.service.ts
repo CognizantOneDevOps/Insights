@@ -44,31 +44,11 @@ export class LoginService {
     return this.response.toPromise();
   }
 
-  public loginKerberosUserAuthentication(
-    username: string,
-    password: string
-  ): Promise<any> {
-    var token = this.dataShare.getAuthorizationToken();
-    this.response = this.restCallHandlerService.post(
-      "KERBEROS_LOGIN_URL",
-      {},
-      { Authorization: token }
-    );
-
-    return this.response.toPromise();
-  }
-
+  
   public loginSSOUserDetail(): Promise<any> {
     console.log("SSO Login Call " + InsightsInitService.autheticationProtocol);
     setTimeout(() => console.log("SSO Login Call"), 1);
-    if (InsightsInitService.autheticationProtocol == "Kerberos") {
-      this.dataShare.setAuthorizationToken(" ");
-      this.response = this.restCallHandlerService.getSSO(
-        "KERBEROS_USER_DETAIL",
-        {},
-        {}
-      );
-    } else if (InsightsInitService.autheticationProtocol == "SAML") {
+    if (InsightsInitService.autheticationProtocol == "SAML") {
       this.dataShare.setAuthorizationToken("user");
       this.response = this.restCallHandlerService.getSSO("SSO_DETAIL", {}, {});
     } else if (

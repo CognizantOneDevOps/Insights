@@ -24,9 +24,10 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.MDC;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -71,24 +72,21 @@ public class InsightsCustomCsrfFilter extends OncePerRequestFilter {
 			log.error(e);
 		} finally {
 			long processingTime = System.currentTimeMillis() - startTime;
-			MDC.put(LogMessageConstants.PROCESSINGTIME, processingTime);
+			ThreadContext.put(LogMessageConstants.PROCESSINGTIME, String.valueOf(processingTime));
 			log.debug(" processing time for method {} is {}",request.getRequestURI() , processingTime);
-			MDC.clear();
 		}
 		log.debug("Out doFilter CustomCsrfFilter ...............");
 	}
 
 	private void updateLogInformation(HttpServletRequest request) {
 		final String token;
-		if (request.getHeader(LogMessageConstants.TOKENREQUESTHEADER) !=null && !StringUtils.hasText(request.getHeader(LogMessageConstants.TOKENREQUESTHEADER))) {
-			token = request.getHeader(LogMessageConstants.TOKENREQUESTHEADER);
-		} else {
-			token = UUID.randomUUID().toString().toUpperCase().replace("-", "");
-		}
-		MDC.put(LogMessageConstants.PROCESSINGTIME, 0);
-		MDC.put(LogMessageConstants.TRACEID, token);
-		MDC.put(LogMessageConstants.TYPE, LogMessageConstants.APILOGSTYPE);
-		MDC.put(LogMessageConstants.HTTPMETHOD, request.getMethod());
-		MDC.put(LogMessageConstants.ENDPOINT, request.getRequestURI());
+		
+		token = UUID.randomUUID().toString().toUpperCase().replace("-", "");
+
+		ThreadContext.put(LogMessageConstants.PROCESSINGTIME, String.valueOf(0));
+		ThreadContext.put(LogMessageConstants.TRACEID, token);
+		ThreadContext.put(LogMessageConstants.TYPE, LogMessageConstants.APILOGSTYPE);
+		ThreadContext.put(LogMessageConstants.HTTPMETHOD, request.getMethod());
+		ThreadContext.put(LogMessageConstants.ENDPOINT, request.getRequestURI());
 	}
 }

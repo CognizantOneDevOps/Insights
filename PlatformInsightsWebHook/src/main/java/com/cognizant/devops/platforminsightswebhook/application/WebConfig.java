@@ -26,13 +26,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.annotation.Order;
 
-import com.cognizant.devops.platforminsightswebhook.config.WebHookMessagePublisher;
 import com.cognizant.devops.platforminsightswebhook.events.WebHookHandlerServlet;
+import com.cognizant.devops.platforminsightswebhook.message.factory.WebHookMessagePublisherMQ;
+import com.cognizant.devops.platforminsightswebhook.message.factory.WebhookMessageFactory;
+import com.cognizant.devops.platforminsightswebhook.message.factory.WebhookMessagePublisherSQS;
 
 @Configuration
 @ComponentScan(basePackages = { "com.cognizant.devops.platforminsightswebhook.*" })
 public class WebConfig {
-	
+
 	private static Logger LOG = LogManager.getLogger(WebConfig.class);
 
 	@Bean(name = "appPropertiesLoad")
@@ -43,8 +45,7 @@ public class WebConfig {
 	}
 
 	/**
-	 * Used to initilize Rabbitq Connection
-	 * Webhook Servlet initilizition
+	 * Used to initilize Rabbitq Connection Webhook Servlet initilizition
 	 * 
 	 * @throws Exception
 	 * 
@@ -52,15 +53,21 @@ public class WebConfig {
 	@Bean
 	@DependsOn("appPropertiesLoad")
 	public ServletRegistrationBean<HttpServlet> webhookServlet() {
+		WebhookMessageFactory messageFactory;
+		if (AppProperties.getProviderName().equals("AWSSQS")) {
+			messageFactory = new WebhookMessagePublisherSQS();
+		} else {
+			messageFactory = new WebHookMessagePublisherMQ();
+		}
 		LOG.debug(
-				" In webhookServlet  ======== instanceName ={} host = {} port = {} user = {} passcode = {} exchangeName= {} serverPort = {} context = {}",
-				AppProperties.instanceName, AppProperties.mqHost, AppProperties.port, AppProperties.mqUser, AppProperties.mqPassword,
-				AppProperties.mqExchangeName, 
-				ServerProperties.port, ServerProperties.contextPath);
+				" In webhookServlet  ======== instanceName ={} host = {} port = {} user = {}  exchangeName= {} serverPort = {} context = {}",
+				AppProperties.instanceName, AppProperties.mqHost, AppProperties.port, AppProperties.mqUser,
+				 AppProperties.mqExchangeName, ServerProperties.port,
+				ServerProperties.contextPath);
 		try {
-			WebHookMessagePublisher.getInstance().initilizeMq();
+			messageFactory.initializeConnection();
 		} catch (Exception e) {
-			LOG.error("Unable to connect to RabbitMQ, Please check RabbitMQ service ", e );
+			LOG.error("Unable to connect to RabbitMQ, Please check RabbitMQ service ", e);
 			throw new RuntimeException("Unable to connect to RabbitMQ, Please check RabbitMQ service ");
 		}
 		LOG.debug(" start servelet registration in webhookServlet ");
@@ -71,7 +78,5 @@ public class WebConfig {
 		servRegBean.setLoadOnStartup(1);
 		return servRegBean;
 	}
-
-
 
 }

@@ -59,7 +59,7 @@ export class ServerConfigurationComponent implements OnInit {
   receivedParam: any;
   ServerConfigItems: ServerConfigItem[] = [];
   isConfigAvailable: boolean = false;
-  authenticationProtocolList = ["SAML", "Kerberos", "NativeGrafana", "JWT"];
+  authenticationProtocolList = ["SAML", "NativeGrafana", "JWT"];
   requiredProperties = [
     "isVaultEnable",
     "vaultEndPoint",

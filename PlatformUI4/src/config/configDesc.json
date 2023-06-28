@@ -53,10 +53,6 @@
 		"loginURL": "/PlatformService/saml/login",
 		"logoutURL": "/PlatformService/saml/logout"
 	},
-	"Kerberos": {
-		"loginURL": "/PlatformService/user/insightsso/kerberosLogin",
-		"logoutURL": ""
-	},
 	"JWT": {
 		"loginURL": "/PlatformService/user/insightsso/authenticateJWT",
 		"logoutURL": "/PlatformService/user/insightsso/logout"

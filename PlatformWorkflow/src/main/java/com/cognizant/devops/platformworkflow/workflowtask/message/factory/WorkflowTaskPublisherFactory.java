@@ -18,13 +18,15 @@ package com.cognizant.devops.platformworkflow.workflowtask.message.factory;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
+import javax.jms.JMSException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
-import com.cognizant.devops.platformworkflow.workflowtask.utils.MQMessageConstants;
-import com.rabbitmq.client.Channel;
+import com.cognizant.devops.platformcommons.mq.core.AWSSQSProvider;
+import com.cognizant.devops.platformcommons.mq.core.RabbitMQProvider;
 
 public class WorkflowTaskPublisherFactory {
 	private static Logger LOG = LogManager.getLogger(WorkflowTaskPublisherFactory.class);
@@ -41,24 +43,16 @@ public class WorkflowTaskPublisherFactory {
 	 * @throws InsightsCustomException 
 	 * @throws TimeoutException 
 	 * @throws IOException 
+	 * @throws JMSException 
 	 * @throws Exception
 	 */
-	public static void publish(String routingKey, String data) throws InsightsCustomException, IOException, TimeoutException {
-		String queueName = routingKey.replace(".", "_");
-		Channel channel = null;
-		try {
-			
-			channel = RabbitMQConnectionProvider.getConnection().createChannel();
-			channel = RabbitMQConnectionProvider.initilizeChannel(channel, routingKey, queueName, MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE);
-			channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, data.getBytes());
-			LOG.debug("Worlflow Detail ==== data published time in queue {}", routingKey);
-			
-		} catch (IOException e) {
-			LOG.debug("data not publish in queue");
-		}finally {
-			if(channel != null) {
-				channel.close();
-			}
+	public static void publish(String routingKey, String data) throws InsightsCustomException, IOException, TimeoutException, JMSException {
+		LOG.info("inside workflow task publish");
+		String mqProviderName = ApplicationConfigProvider.getInstance().getMessageQueue().getProviderName();
+		if (mqProviderName.equalsIgnoreCase("AWSSQS"))
+			AWSSQSProvider.publish(routingKey, data);
+		else {
+			RabbitMQProvider.publish(routingKey, data);
 		}
 	}
 }

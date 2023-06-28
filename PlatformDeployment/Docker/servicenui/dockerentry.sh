@@ -101,6 +101,7 @@ then
  sh +x /etc/init.d/InsightsPromtail start
 fi
 
+sudo node UI.js  >UIlog.txt 2>UIerrorlog.txt
 #assign tails pid to docker to keep it running continuously
 tail -f /dev/null
 

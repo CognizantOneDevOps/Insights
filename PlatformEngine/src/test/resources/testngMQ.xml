@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="EngineMQSuite">
+	<test name="PlatformEngineMQTestCases" preserve-order="true">
+		<classes>
+		    <class name="com.cognizant.devops.engines.testngInitializer.TestngInitializerTest" /> 
+			<class name="com.cognizant.devops.engines.platformengine.message.subscriber.AgentDataSubscriberTest" />
+			<class name="com.cognizant.devops.engines.platformdataarchivalengine.test.engine.DataArchivalEngineTest" />
+			<class name="com.cognizant.devops.engines.platformengine.modules.correlation.CorrelationExecutorTest" />
+		 	<class name="com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing.OfflineDataProcessingExecutorTest" />
+			<class name="com.cognizant.devops.engines.platformengine.test.engine.EngineAggregatorCorelationModuleTest" />
+			<class name="com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing.OfflineDataProcessingFromDBTest" />
+			<class name="com.cognizant.devops.engines.platformroi.aggregator.test.engine.MileStoneExecutionAggregatorModuleTest" />
+			<class name="com.cognizant.devops.engines.platformwebhookengine.test.engine.WebhookEngineTest" />
+			<class name="com.cognizant.devops.engines.platformwebhookengine.test.parser.InsightsGeneralParserTest" />
+			<class name="com.cognizant.devops.engines.test.ScheduledJobExecutorTest" />
+		</classes>
+	</test> <!-- PlatformEngineMQTestCases -->
+</suite> <!-- EngineMQSuite -->

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2017 Cognizant Technology Solutions
+ * Copyright 2023 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -30,9 +30,10 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.cognizant.devops.engines.platformengine.message.subscriber.AgentDataSubscriber;
 import com.cognizant.devops.engines.platformengine.modules.aggregator.EngineAggregatorModule;
+import com.cognizant.devops.engines.platformengine.modules.correlation.CorrelationExecutorTestData;
 import com.cognizant.devops.engines.platformengine.modules.correlation.EngineCorrelatorModule;
-import com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing.OfflineDataProcessingExecutor;
 import com.cognizant.devops.engines.testngInitializer.TestngInitializerTest;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
@@ -40,7 +41,6 @@ import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfigDAL;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFilesDAL;
@@ -50,12 +50,11 @@ import com.google.gson.JsonObject;
 public class EngineAggregatorCorelationModuleTest {
 	private static Logger log = LogManager.getLogger(EngineAggregatorCorelationModuleTest.class.getName());
 
-	private AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 	CorrelationConfigDAL correlationConfigDAL = new CorrelationConfigDAL();
 	InsightsConfigFilesDAL configFilesDAL = new InsightsConfigFilesDAL();
 	private FileReader reader = null;
 	private Properties p = null;
-	
+	CorrelationExecutorTestData correlationTestData = new CorrelationExecutorTestData();
 	JsonObject testData = new JsonObject();
 	
 	@BeforeClass
@@ -66,16 +65,23 @@ public class EngineAggregatorCorelationModuleTest {
 		reader = new FileReader("src/test/resources/Properties.prop");
 		p = new Properties();
 		p.load(reader);
-
-
+		
+		String correlationConfig1 = testData.get("saveDataConfig").toString();
+		correlationTestData.saveConfig(correlationConfig1);
+		
 		/*
-		 * Publish Messages to MQ *
+		 * Publish Messages to Queue *
 		 */
-		EngineTestData.publishMessage(testData.get("gitQueueName").getAsString(), testData.get("gitRoutingKey").getAsString(),
-				testData.get("rabbitMQGITTestPlayload").toString());
-		EngineTestData.publishMessage(testData.get("jenkinQueueName").getAsString(), testData.get("jenkinsRoutingKey").getAsString(),
-		testData.get("rabbitMQJENKINSTestPayload").toString());
+		EngineTestData.publishMessage(testData.get("gitRoutingKey").getAsString(),
+		testData.get("GITTestPlayload").toString());
+		EngineTestData.publishMessage(testData.get("jenkinsRoutingKey").getAsString(),
+		testData.get("JENKINSTestPayload").toString());
 		Thread.sleep(1000);
+		
+		/* Start Engine for Correlation **/
+		ApplicationConfigProvider.getInstance().getCorrelations().setBatchSize(1000);
+		ApplicationConfigProvider.getInstance().getCorrelations().setCorrelationFrequency(1);
+		ApplicationConfigProvider.getInstance().getCorrelations().setCorrelationWindow(-1);
 
 		/*
 		 * Start Engine for Data Collection and Node Creation *
@@ -84,16 +90,6 @@ public class EngineAggregatorCorelationModuleTest {
 		em.executeJob();
 		Thread.sleep(1000);
 		
-		
-		OfflineDataProcessingExecutor oc = new OfflineDataProcessingExecutor();
-		oc.executeOfflineProcessing();
-		
-
-		/* Start Engine for Correlation **/
-		ApplicationConfigProvider.getInstance().getCorrelations().setBatchSize(1000);
-		ApplicationConfigProvider.getInstance().getCorrelations().setCorrelationFrequency(1);
-		ApplicationConfigProvider.getInstance().getCorrelations().setCorrelationWindow(-1);
-
 		log.debug("Test Data flow has been created successfully");
 	}
 
@@ -232,21 +228,43 @@ public class EngineAggregatorCorelationModuleTest {
 		}
 	}
 	
+	@Test(priority = 8)
+	public void testPublishAgentData() {
+		try {
+			String routingKey = testData.get("jenkinsRoutingKey").getAsString();
+			String data = testData.get("JENKINSTestPayload").toString();
+			AgentDataSubscriber ads = new AgentDataSubscriber(routingKey);
+			ads.handleDelivery(routingKey, data);
+			JsonObject jsonData = testData.get("JENKINSTestPayload").getAsJsonObject();
+			String value = jsonData.get("data").getAsJsonArray().get(0).getAsJsonObject().get("scmcommitId")
+					.toString();
+			int countOfRecords = correlationTestData.readNeo4JData("CI", value);
+			Assert.assertTrue(countOfRecords > 0);
+		} catch (Exception e) {
+			log.error(e);
+		}
+	}
+	
+	@Test(priority = 9)
+	public void testNeo4jData() {
+		GraphDBHandler dbHandler = new GraphDBHandler();
+		String query = "MATCH (n:JENKINS_UNTEST) where exists(n.scmcommitId) return count(n) as Total";
+		GraphResponse neo4jResponse;
+		try {
+			neo4jResponse = dbHandler.executeCypherQuery(query);
+			String finalJson = neo4jResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject()
+					.get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").toString().replace("[", "")
+					.replace("]", "");
+			/* Assert on Node Relationship */
+			log.debug("finalJson  {} ", finalJson);
+			Assert.assertTrue(Integer.parseInt(finalJson) > 0); //"true"
+		} catch (InsightsCustomException | AssertionError e) {
+			log.error("InsightsCustomException : or AssertionError " + e);
+		}
+	}
+	
    @AfterClass
 	public void cleanUp() {
-		/* Cleaning Postgre */
-		try {
-			agentConfigDAL.deleteAgentConfigurations("JENKINSTEST8800");
-			agentConfigDAL.deleteAgentConfigurations("GITTEST8800");
-			correlationConfigDAL.deleteCorrelationConfig("TEST_FROM_GIT_TO_JENKINS");
-		} catch (InsightsCustomException e1) {
-			log.error(e1);
-		}
-
-		ApplicationConfigProvider.getInstance().getCorrelations().setBatchSize(2000);
-		ApplicationConfigProvider.getInstance().getCorrelations().setCorrelationFrequency(3);
-		ApplicationConfigProvider.getInstance().getCorrelations().setCorrelationWindow(48);
-
 		/* Cleaning Neo4J */
 		GraphDBHandler dbHandler = new GraphDBHandler();
 		String query = "MATCH p=()-[r:TEST_FROM_GIT_TO_JENKINS]->() delete p";

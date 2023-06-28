@@ -19,7 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
+import com.cognizant.devops.platformcommons.exception.InsightsJobFailedException;
 import com.google.gson.JsonArray;
 
 public class PDFDataProcessor {

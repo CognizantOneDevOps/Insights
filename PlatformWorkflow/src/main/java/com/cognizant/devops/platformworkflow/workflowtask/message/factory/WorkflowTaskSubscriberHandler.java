@@ -15,123 +15,53 @@
  ******************************************************************************/
 package com.cognizant.devops.platformworkflow.workflowtask.message.factory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
+
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.TextMessage;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
-import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
-import com.cognizant.devops.platformworkflow.workflowtask.core.InsightsStatusProvider;
+import com.cognizant.devops.platformcommons.mq.core.AWSSQSProvider;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowDataHandler;
 import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowTaskInitializationException;
 import com.cognizant.devops.platformworkflow.workflowtask.utils.MQMessageConstants;
 import com.cognizant.devops.platformworkflow.workflowtask.utils.WorkflowUtils;
-import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Consumer;
-import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
+
+import jakarta.ws.rs.ProcessingException;
 
 public abstract class WorkflowTaskSubscriberHandler {
 	private static final Logger log = LogManager.getLogger(WorkflowTaskSubscriberHandler.class);
 	private Channel channel;
-	private WorkflowTaskSubscriberHandler engineSubscriberResponseHandler;
+	private WorkflowTaskSubscriberHandler responseHandler;
 	protected String statusLog = "{}";
 	WorkflowDataHandler workflowStateProcess;
 
 	public WorkflowTaskSubscriberHandler(String routingKey)
-			throws IOException, InsightsCustomException, TimeoutException {
-		engineSubscriberResponseHandler = this;
+			throws IOException, InsightsCustomException, TimeoutException, InterruptedException, JMSException {
+		responseHandler = this;
 		this.workflowStateProcess = new WorkflowDataHandler();
-		registerSubscriber(routingKey);
+		MessageFactory msgFactory;
+		String providerName = ApplicationConfigProvider.getInstance().getMessageQueue().getProviderName();
+		if (providerName.equalsIgnoreCase("AWSSQS"))
+			msgFactory = new MessageAWSSubsbriberFactory();
+		else
+			msgFactory = new MessageRabbitMQSubsbriberFactory();
+		msgFactory.registerSubscriber(routingKey, responseHandler);
 	}
 
-	public abstract void handleTaskExecution(byte[] body) throws IOException;
-
-	/**
-	 * Register workflow task as rabbit mq subscriber
-	 * 
-	 * @param routingKey
-	 * @throws TimeoutException
-	 * @throws InsightsCustomException
-	 * @throws Exception
-	 */
-	public void registerSubscriber(String routingKey) throws IOException, InsightsCustomException, TimeoutException {
-		
-		try {
-			String queueName = routingKey.replace(".", "_");
-			
-			channel = RabbitMQConnectionProvider.getConnection().createChannel();
-			channel = RabbitMQConnectionProvider.initilizeChannel(channel,routingKey, queueName, MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE);
-			setChannel(channel);
-
-			log.debug("prefetchCount {} ",
-					ApplicationConfigProvider.getInstance().getMessageQueue().getPrefetchCount());
-			// Executor shutdown
-			Consumer consumer = new DefaultConsumer(channel) {
-				@Override
-				public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties,
-						byte[] body) throws IOException {
-					int exectionHistoryId = -1;
-					setStatusLog("{}");
-					try(ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();) {						
-				
-						byteArrayOutputStream.write(body);
-						byte[] message = byteArrayOutputStream.toByteArray();
-						
-						log.debug("Worlflow Detail ==== before  workflowTaskPreProcesser ");
-						exectionHistoryId = workflowTaskPreProcesser(message);
-						log.debug("Worlflow Detail ==== before  handleTaskExecution ");
-						/* return */
-						engineSubscriberResponseHandler.handleTaskExecution(message);
-						log.debug("Worlflow Detail ==== after handleTaskExecution");
-
-						workflowTaskPostProcesser(message, exectionHistoryId,
-								WorkflowTaskEnum.WorkflowStatus.COMPLETED.toString());
-					} catch (Exception e) {
-						log.error("Worlflow Detail ==== Error in handle delivery  ", e);
-						workflowTaskErrorHandler(body, exectionHistoryId);
-
-					} finally {
-						log.debug("Worlflow Detail ==== handle delivery finally method ");
-						getChannel().basicAck(envelope.getDeliveryTag(), false);
-
-					}
-				}
-			};
-
-			channel.basicConsume(queueName, false, routingKey, consumer);
-		} catch (IOException e) {
-			log.error("Unable to registerSubscriber for routingKey {} error ", routingKey, e);
-			InsightsStatusProvider.getInstance().createInsightStatusNode(
-					"In WorkflowTaskSubscriberHandler,Unable to registerSubscriber for routingKey " + routingKey
-							+ " error " + e.getMessage(),
-					PlatformServiceConstants.FAILURE);
-		}
-	}
-
-	/**
-	 * Unregister workflow task subscriber
-	 * 
-	 * @param routingKey
-	 * @param responseHandler
-	 * @throws IOException
-	 * @throws TimeoutException
-	 */
-	public void unregisterSubscriber(String routingKey, final WorkflowTaskSubscriberHandler responseHandler)
-			throws IOException, TimeoutException {
-		responseHandler.getChannel().basicCancel(routingKey);
-		responseHandler.getChannel().close();
-	}
+	public abstract void handleTaskExecution(String message) throws IOException;
 
 	/**
 	 * Once task subscribe message from RabbitMq, Add record in workflow Execution
@@ -140,11 +70,10 @@ public abstract class WorkflowTaskSubscriberHandler {
 	 * @param body
 	 * @return
 	 */
-	private synchronized int workflowTaskPreProcesser(byte[] body) {
-		
+	private synchronized int workflowTaskPreProcesser(String message) {
+
 		int exectionHistoryId = -1;
 		try {
-			String message = new String(body, StandardCharsets.UTF_8);
 			Map<String, Object> requestMessage = WorkflowUtils.convertJsonObjectToMap(message);
 
 			boolean isWorkflowTaskRetry = (boolean) requestMessage.get(WorkflowUtils.RETRY_JSON_PROPERTY);
@@ -175,23 +104,22 @@ public abstract class WorkflowTaskSubscriberHandler {
 	 * @param exectionHistoryId
 	 * @param status
 	 */
-	private synchronized void workflowTaskPostProcesser(byte[] body, int exectionHistoryId, String status) {
-		
+	private synchronized void workflowTaskPostProcesser(String message, int exectionHistoryId, String status) {
+
 		String workflowId = "";
 		try {
-			String message = new String(body, StandardCharsets.UTF_8);
-
 			Map<String, Object> requestMessage = WorkflowUtils.convertJsonObjectToMap(message);
 
 			workflowId = (String) requestMessage.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID);
-			// update complete time in INSIGHTS_WORKFLOW_EXECUTION_ENTITY			
+			// update complete time in INSIGHTS_WORKFLOW_EXECUTION_ENTITY
 			workflowStateProcess.updateWorkflowExecutionHistory(exectionHistoryId, status, statusLog);
 			// send message to next task
 			if (status.equalsIgnoreCase(WorkflowTaskEnum.WorkflowStatus.COMPLETED.toString())) {
 				workflowStateProcess.publishMessageToNextInMQ(requestMessage);
 			} else {
-				log.error("Worlflow Detail ==== workflowId {} Current execution status not completed Status is {} message is {} ", workflowId,
-						status, message);
+				log.error(
+						"Worlflow Detail ==== workflowId {} Current execution status not completed Status is {} message is {} ",
+						workflowId, status, message);
 			}
 			// Mq ack message
 		} catch (WorkflowTaskInitializationException wtie) {
@@ -210,11 +138,11 @@ public abstract class WorkflowTaskSubscriberHandler {
 	 * 
 	 * @param body
 	 * @param exectionHistoryId
+	 * @throws Exception
 	 */
-	private synchronized void workflowTaskErrorHandler(byte[] body, int exectionHistoryId) {
-		
+	private synchronized void workflowTaskErrorHandler(String message, int exectionHistoryId) throws Exception {
+
 		try {
-			String message = new String(body, StandardCharsets.UTF_8);
 			log.debug("Worlflow Detail ==== Error Handler  ===== {} ", message);
 			Map<String, Object> requestMessage = WorkflowUtils.convertJsonObjectToMap(message);
 			String workflowId = String.valueOf(requestMessage.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID));
@@ -224,6 +152,7 @@ public abstract class WorkflowTaskSubscriberHandler {
 					false);
 		} catch (Exception e) {
 			log.error("Worlflow Detail ====  unable to update history and workflow config ", e);
+			throw new Exception(e.getMessage());
 		}
 
 	}
@@ -242,6 +171,54 @@ public abstract class WorkflowTaskSubscriberHandler {
 
 	public void setChannel(Channel channel) {
 		this.channel = channel;
+	}
+
+	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties props, byte[] body)
+			throws Exception {
+		String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
+		workflowTaskSubscriberCore(message);
+		log.debug("Worlflow Detail ==== handle delivery finally method ");
+		getChannel().basicAck(envelope.getDeliveryTag(), false);
+
+	}
+
+	public void onMessage(String routingKey, Message message) throws InsightsCustomException, JMSException {
+		String msgBody = ((TextMessage) message).getText();
+
+		try {
+			log.debug("Received: {} ", msgBody);
+			workflowTaskSubscriberCore(msgBody);
+			message.acknowledge();
+		}  catch (ProcessingException e) {
+			log.error(e);
+		} catch (JMSException e) {
+			log.error(e);
+		} catch (Exception e) {
+			log.error(e);
+			if (ApplicationConfigProvider.getInstance().getMessageQueue().isEnableDeadLetterExchange()) {
+				AWSSQSProvider.publishInDLQ(routingKey, msgBody);
+				message.acknowledge();
+			}
+		}
+	}
+
+	private void workflowTaskSubscriberCore(String message) throws Exception {
+		int exectionHistoryId = -1;
+		setStatusLog("{}");
+		try {
+			log.debug("Worlflow Detail ==== before  workflowTaskPreProcesser ");
+			exectionHistoryId = workflowTaskPreProcesser(message);
+			log.debug("Worlflow Detail ==== before  handleTaskExecution ");
+			/* return */
+			responseHandler.handleTaskExecution(message);
+			log.debug("Worlflow Detail ==== after handleTaskExecution");
+
+			workflowTaskPostProcesser(message, exectionHistoryId, WorkflowTaskEnum.WorkflowStatus.COMPLETED.toString());
+		} catch (Exception e) {
+			log.error("Worlflow Detail ==== Error in handle delivery  ", e);
+			workflowTaskErrorHandler(message, exectionHistoryId);
+
+		}
 	}
 
 }

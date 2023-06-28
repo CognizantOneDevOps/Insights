@@ -323,4 +323,8 @@ public class ApplicationConfigProvider implements Serializable {
 	public void setApplicationLogLevel(ApplicationLogLevel applicationLogLevel) {
 		this.applicationLogLevel = applicationLogLevel;
 	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
 }

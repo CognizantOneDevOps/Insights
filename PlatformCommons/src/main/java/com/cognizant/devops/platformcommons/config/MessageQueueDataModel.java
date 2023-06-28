@@ -35,6 +35,43 @@ public class MessageQueueDataModel implements Serializable {
 	private int prefetchCount = 10;
 	
 	private boolean enableDeadLetterExchange = false; 
+	
+	private String providerName = "RabbitMQ";
+	private String awsAccessKey = "";
+	private String awsSecretKey="";
+	private String awsRegion = "";
+
+	public String getAwsAccessKey() {
+		return awsAccessKey;
+	}
+
+	public void setAwsAccessKey(String awsAccessKey) {
+		this.awsAccessKey = awsAccessKey;
+	}
+
+	public String getAwsSecretKey() {
+		return awsSecretKey;
+	}
+
+	public void setAwsSecretKey(String awsSecretKey) {
+		this.awsSecretKey = awsSecretKey;
+	}
+
+	public String getAwsRegion() {
+		return awsRegion;
+	}
+
+	public void setAwsRegion(String awsRegion) {
+		this.awsRegion = awsRegion;
+	}
+
+	public String getProviderName() {
+		return providerName;
+	}
+
+	public void setProviderName(String providerName) {
+		this.providerName = providerName;
+	}
 
 	public String getHost() {
 		return host;

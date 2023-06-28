@@ -18,6 +18,7 @@ package com.cognizant.devops.platformservice.assessmentreport.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -572,6 +573,22 @@ public class InsightsAssessmentReportController {
 			return PlatformServiceUtil.buildSuccessResponseWithData(templateTypeList);
 		} catch (Exception e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+
+	}
+	
+	@GetMapping(value = "/refreshGrafanaOrgToken", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject generateNewGrafanaOrgToken(@RequestParam String orgId) {
+		try {
+			String validatedOrgId = StringEscapeUtils.escapeHtml(ValidationUtils.validateRequestBody(orgId));
+			String responseJson = assessmentReportService.refreshGrafanaOrgToken(Integer.parseInt(orgId));
+			return PlatformServiceUtil.buildSuccessResponseWithData(responseJson);
+		} catch (InsightsCustomException e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		} catch (Exception e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse("Unable to refresh grafana token");
 		}
 
 	}

@@ -15,13 +15,12 @@
  ******************************************************************************/
 package com.cognizant.devops.engines.platformwebhookengine.message.subscriber;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.engines.platformwebhookengine.parser.InsightsWebhookParserFactory;
@@ -32,8 +31,6 @@ import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.google.gson.JsonObject;
-import com.rabbitmq.client.AMQP.BasicProperties;
-import com.rabbitmq.client.Envelope;
 
 public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 
@@ -53,15 +50,13 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 	}
 
 	@Override
-	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body)
-			throws IOException {
-		String message = new String(body, StandardCharsets.UTF_8);
+	public void handleDelivery(String routingKey, String message) throws InsightsCustomException {
 		try {
 			long startTime = System.nanoTime();
 			
 			if (!message.equalsIgnoreCase("") || !message.isEmpty()) {
 				
-				insertIntoNeo4j(envelope,message);				
+				insertIntoNeo4j(message);				
 			
 			} else {
 				log.error(" No valid payload found for webhook  message{} {} ", this.webhookConfig.getWebHookName(),
@@ -74,12 +69,12 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 			log.error(" toolName={} agentId={} routingKey={} Error while storing Webhook data",this.webhookConfig.getToolName(),this.webhookConfig.getWebHookName(),this.webhookConfig.getMQChannel(),e);
 			EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
 					"Exception while pasring or DB issues " + e.getMessage(), PlatformServiceConstants.FAILURE,jobName);
-			getChannel().basicReject(envelope.getDeliveryTag(), false);
+			throw new InsightsCustomException(e.getMessage());
 		}
 	}
 	
 
-	private void insertIntoNeo4j(Envelope envelope, String message) throws Exception{
+	private void insertIntoNeo4j(String message) throws Exception{
 		
 		InsightsWebhookParserInterface webHookParser = InsightsWebhookParserFactory
 				.getParserInstance(this.webhookConfig.getToolName());
@@ -91,16 +86,13 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 				WebhookEventProcessing wep = new WebhookEventProcessing(toolData, webhookConfig,false);
 				boolean status = wep.doEvent();
 				if (status) {
-					getChannel().basicAck(envelope.getDeliveryTag(), false);
 				}
 			} else if (this.webhookConfig.getIsUpdateRequired().booleanValue()) {
 				updateNeo4jNode(toolData, this.webhookConfig);
-				getChannel().basicAck(envelope.getDeliveryTag(), false);
 			} else {
 				String query = "UNWIND $props AS properties " + "CREATE (n:RAW:"
 						+ this.webhookConfig.getLabelName().toUpperCase() + ") " + "SET n = properties";
 				dbHandler.bulkCreateNodes(toolData, query);
-				getChannel().basicAck(envelope.getDeliveryTag(), false);
 			}
 			
 		} else {

@@ -29,7 +29,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
+import com.cognizant.devops.platformcommons.mq.core.RabbitMQProvider;
 import com.cognizant.devops.platformregressiontest.test.common.LoginAndSelectModule;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -264,7 +264,7 @@ public class AddAgent extends AddAgentObjectRepository{
 		Connection connection = null;
 		Channel channel = null;
 		try {
-			connection = RabbitMQConnectionProvider.getConnection();
+			connection = RabbitMQProvider.getConnection();
 			channel = connection.createChannel();
 			channel.queueDeclarePassive(queueName);
 		} catch (Exception e) {

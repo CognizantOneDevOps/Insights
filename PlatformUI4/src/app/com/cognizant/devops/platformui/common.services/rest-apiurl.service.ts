@@ -147,7 +147,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("GET_EPIC_ISSUES", '/PlatformService/traceabilitydashboard/getEpicIssues');
         this.addEndPoint("GET_ISSUES_PIPELINE", '/PlatformService/traceabilitydashboard/getIssuePipeline');
         this.addEndPoint("GET_TOOL_PROPERTIES", '/PlatformService/traceabilitydashboard/getToolDisplayProperties');
-
+        this.addEndPoint("GET_TRACEABILITY_PDF", '/PlatformService/traceabilitydashboard/getTraceabilityPDF');
 
         //Audit Reporting
         this.addEndPoint("GET_ALL_ASSETS", '/PlatformService/traceability/getAllAssets');
@@ -183,8 +183,6 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("SSO_DETAIL", '/PlatformService/user/insightsso/getUserDetail');
         this.addEndPoint("SSO_INSIGHTS_URL_LOGOUT", '/PlatformService/user/insightsso/logout');
         this.addEndPoint("SSO_URL_LOGOUT", InsightsInitService.singleSignOnConfig.logoutURL);//
-        this.addEndPoint("KERBEROS_LOGIN_URL", "/PlatformService/user/insightsso/authenticateKerberos");
-        this.addEndPoint("KERBEROS_USER_DETAIL", '/PlatformService/user/insightsso/getKerberosUserDetail');
         this.addEndPoint("JWT_USER_DETAIL", '/PlatformService/user/insightsso/getJWTUserDetail');
 
         //data archival
@@ -217,7 +215,8 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("LIST_KPI", '/PlatformService/insights/report/getAllActiveKpiList');
         this.addEndPoint("DELETE_KPI", '/PlatformService/insights/report/deleteKpiDefinition');
         this.addEndPoint("UPLOAD_BULK_KPI", '/PlatformService/insights/report/saveBulkKpiDefinition');
- 
+        this.addEndPoint("REFRESH_GRAFANA_ORG_TOKEN", '/PlatformService/insights/report/refreshGrafanaOrgToken');
+        
         //content
         this.addEndPoint("LIST_CONTENT", '/PlatformService/insights/report/getAllActiveContentList');
         this.addEndPoint("SAVE_DATA_CONTENT", '/PlatformService/insights/report/saveContentDefinition');

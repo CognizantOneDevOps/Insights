@@ -16,7 +16,6 @@
 
 export enum AutheticationProtocol {
     SAML = "SAML",
-    Kerberos = "Kerberos",
     NativeGrafana = "NativeGrafana",
     JWT = "JWT"
 }

@@ -32,18 +32,15 @@ import javax.servlet.ServletRegistration;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 
-import org.apache.log4j.MDC;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.Assert;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
@@ -69,11 +66,11 @@ public class PlatformServiceInitializer implements ServletContextInitializer  {
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		long startTime = System.currentTimeMillis();
 		try {
-			MDC.put(LogMessageConstants.TYPE, LogMessageConstants.SERVICEINITIALIZATIONTYPE);
-			MDC.put(LogMessageConstants.PROCESSINGTIME, 0);
-			MDC.put(LogMessageConstants.TRACEID, "-");
-			MDC.put(LogMessageConstants.ENDPOINT, "-");
-			MDC.put(LogMessageConstants.HTTPMETHOD, "-");
+			ThreadContext.put(LogMessageConstants.TYPE, LogMessageConstants.SERVICEINITIALIZATIONTYPE);
+			ThreadContext.put(LogMessageConstants.PROCESSINGTIME, String.valueOf(0));
+			ThreadContext.put(LogMessageConstants.TRACEID, "-");
+			ThreadContext.put(LogMessageConstants.ENDPOINT, "-");
+			ThreadContext.put(LogMessageConstants.HTTPMETHOD, "-");
 			log.debug("Inside PlatformServiceInitializer onStartup ============================ ");
 			
 			AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
@@ -105,9 +102,9 @@ public class PlatformServiceInitializer implements ServletContextInitializer  {
 		} 
 		
 		long processingTime = System.currentTimeMillis() - startTime;
-		MDC.put(LogMessageConstants.PROCESSINGTIME, processingTime);
+		ThreadContext.put(LogMessageConstants.PROCESSINGTIME, String.valueOf(processingTime));
 		log.debug("Inside PlatformServiceInitializer onStartup completed ============================ ");
-		MDC.put(LogMessageConstants.PROCESSINGTIME, 0);
+		ThreadContext.put(LogMessageConstants.PROCESSINGTIME, String.valueOf(0));
 
 	}
 

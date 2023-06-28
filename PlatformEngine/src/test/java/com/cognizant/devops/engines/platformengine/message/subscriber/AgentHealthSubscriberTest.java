@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2017 Cognizant Technology Solutions
+ * Copyright 2023 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -15,55 +15,32 @@
  ******************************************************************************/
 package com.cognizant.devops.engines.platformengine.message.subscriber;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.testng.AssertJUnit;
-import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.cognizant.devops.engines.platformengine.modules.aggregator.BusinessMappingData;
 import com.cognizant.devops.engines.platformengine.modules.aggregator.EngineAggregatorModule;
 import com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing.OfflineDataProcessingExecutor;
-import com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing.model.DataEnrichmentModel;
-import com.cognizant.devops.engines.platformengine.test.engine.EngineAggregatorCorelationModuleTest;
 import com.cognizant.devops.engines.platformengine.test.engine.EngineTestData;
 import com.cognizant.devops.engines.testngInitializer.TestngInitializerTest;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
-import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
-import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfigDAL;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
-import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFilesDAL;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -150,9 +127,9 @@ public class AgentHealthSubscriberTest {
 		/*
 		 * Publish Messages to MQ *
 		 */
-		EngineTestData.publishMessage(engineAggregTestData.get("gitQueueName").getAsString(), engineAggregTestData.get("gitRoutingKey").getAsString(),
+		EngineTestData.publishMessage(engineAggregTestData.get("gitRoutingKey").getAsString(),
 				engineAggregTestData.get("rabbitMQGITTestPlayload").toString());
-		EngineTestData.publishMessage(engineAggregTestData.get("jenkinQueueName").getAsString(), engineAggregTestData.get("jenkinsRoutingKey").getAsString(),
+		EngineTestData.publishMessage(engineAggregTestData.get("jenkinsRoutingKey").getAsString(),
 				engineAggregTestData.get("rabbitMQJENKINSTestPayload").toString());
 		
 		Thread.sleep(1000);

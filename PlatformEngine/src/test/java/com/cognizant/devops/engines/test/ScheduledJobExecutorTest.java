@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2017 Cognizant Technology Solutions
+ * Copyright 2023 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -77,7 +77,22 @@ public class ScheduledJobExecutorTest {
 		} catch (Exception e) {
 			log.error(e);
 		}
-
+	}
+	
+	@Test(priority = 3)
+	public void testUpdateSchedularTaskDefinition() {
+		try {
+			JsonObject taskDefination = testData.get("schedulatTaskDefination2").getAsJsonObject();
+			InsightsSchedulerTaskDefinition schedular = new InsightsSchedulerTaskDefinition();
+			schedular.setTimerTaskId(taskDefination.get("timerTaskId").getAsInt());
+			schedular.setComponentName(taskDefination.get("componentName").toString());
+			schedular.setComponentClassDetail(taskDefination.get("componentClassDetail").toString());
+			schedular.setAction(taskDefination.get("action").toString());
+			boolean result = scheduledJobExecutor.updateSchedularTaskDefinition(schedular, "START");
+			Assert.assertEquals(true, result);;
+		} catch (Exception e) {
+			log.error(e);
+		}
 	}
 
 }

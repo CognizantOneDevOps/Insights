@@ -129,4 +129,8 @@ export class GrafanaAuthenticationService implements IAuthenticationService {
     return this.restCallHandlerService.get("GET_USER_PREFERENCE_THEME");
   }
 
+  public refreshToken(orgId: any): Promise<any> {
+    return this.restCallHandlerService.get("REFRESH_GRAFANA_ORG_TOKEN", { orgId: orgId });
+  }
+
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2017 Cognizant Technology Solutions
+ * Copyright 2023 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -24,10 +24,20 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
+
+import javax.jms.JMSException;
+import javax.jms.MessageProducer;
+import javax.jms.Queue;
+import javax.jms.Session;
+import javax.jms.TextMessage;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.amazon.sqs.javamessaging.AmazonSQSMessagingClientWrapper;
+import com.amazon.sqs.javamessaging.SQSConnection;
+import com.amazon.sqs.javamessaging.SQSSession;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
@@ -35,7 +45,8 @@ import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
+import com.cognizant.devops.platformcommons.mq.core.AWSSQSProvider;
+import com.cognizant.devops.platformcommons.mq.core.RabbitMQProvider;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFilesDAL;
@@ -43,12 +54,9 @@ import com.cognizant.devops.platformdal.outcome.InsightsTools;
 import com.cognizant.devops.platformdal.timertasks.InsightsSchedulerTaskDAL;
 import com.cognizant.devops.platformdal.timertasks.InsightsSchedulerTaskDefinition;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.rabbitmq.client.AMQP.Exchange.DeclareOk;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
 
 public class EngineTestData {
 	private static Logger log = LogManager.getLogger(EngineTestData.class);
@@ -75,51 +83,66 @@ public class EngineTestData {
 	public static String saveCorrelationConfig = "[{\"destination\":{\"toolName\":\"GIT\",\"toolCategory\":\"SCM\",\"labelName\":\"GIT_UNTEST\",\"fields\":[\"key\"]},\"source\":{\"toolName\":\"JIRA\",\"toolCategory\":\"ALM\",\"labelName\":\"JIRA_UNTEST\",\"fields\":[\"almkey\"]},\"relationName\":\"TEST_FROM_GIT_TO_JIRA\",\"relationship_properties\":[],\"isSelfRelation\":false}]";
 	static InsightsConfigFilesDAL configFilesDAL = new InsightsConfigFilesDAL();
 	static InsightsSchedulerTaskDAL schedularTaskDAL = new InsightsSchedulerTaskDAL();
-	
+
 	public static JsonObject getJsonObject(String jsonString) {
 		Gson gson = new Gson();
 		JsonElement jelement = gson.fromJson(jsonString.trim(), JsonElement.class);
 		return jelement.getAsJsonObject();
 	}
 
-	public static void publishMessage(String queueName, String routingKey, String playload) throws InsightsCustomException {
-		String exchangeName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentExchange();
-		Connection connection = null;
+	public static void publishMessage(String routingKey, String playload)
+			throws IOException, TimeoutException {
+		try {
+			if (ApplicationConfigProvider.getInstance().getMessageQueue().getProviderName().equalsIgnoreCase("AWSSQS"))
+				publishSQSMessage(routingKey, playload);
+			else
+				publishRMQMessage(routingKey, playload);
+		} catch (InsightsCustomException | JMSException e) {
+			log.error(e.getMessage());
+		}
+	}
+
+	public static void publishRMQMessage(String routingKey, String publishDataJson)
+			throws InsightsCustomException, IOException, TimeoutException {
+		String queueName = routingKey.replace(".", "_");
 		Channel channel = null;
 		try {
-			connection = RabbitMQConnectionProvider.getConnection();
-			channel = connection.createChannel();
+			channel = RabbitMQProvider.getConnection().createChannel();
+			channel = RabbitMQProvider.initilizeChannel(channel, routingKey, queueName,
+					MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE);
+			channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, publishDataJson.getBytes());
 		} catch (IOException e) {
+			log.debug("Message not published in queue", e);
+		}
+	}
+	
+	public static void publishSQSMessage(String routingKey, String data) throws InsightsCustomException, JMSException {
+
+		SQSConnection connection = AWSSQSProvider.getSQSConnectionFromFactory();
+		AmazonSQSMessagingClientWrapper client = AWSSQSProvider.getSQSClient(connection);
+		Session session = connection.createSession(false, SQSSession.UNORDERED_ACKNOWLEDGE);
+		String queueName = routingKey.replace(".", "_") + MQMessageConstants.FIFO_EXTENSION;
+		if (!client.queueExists(queueName)) {
+			AWSSQSProvider.createSQSQueue(queueName, client);
+		}
+		Queue queue = session.createQueue(queueName);
+		MessageProducer producer = session.createProducer(queue);
+		TextMessage message = session.createTextMessage(data);
+		message.setStringProperty("JMSXGroupID", routingKey);
+		producer.send(message);
+	}
+	
+	public static boolean isQueueExists(String routingKey) {
+		try {
+			SQSConnection connection = AWSSQSProvider.getSQSConnectionFromFactory();
+			AmazonSQSMessagingClientWrapper client = AWSSQSProvider.getSQSClient(connection);
+			String queueName = routingKey.replace(".", "_") + MQMessageConstants.FIFO_EXTENSION;
+			boolean result = client.queueExists(queueName);
+			return result;
+		} catch (Exception e) {
 			log.error(e);
 		}
-
-		String message = new GsonBuilder().disableHtmlEscaping().create().toJson(playload);
-		message = message.substring(1, message.length() - 1).replace("\\", "");
-		try {
-			DeclareOk exchangeResp = channel.exchangeDeclarePassive(exchangeName);
-			channel.queueDeclare(queueName, true, false, false, RabbitMQConnectionProvider.getQueueArguments());
-			channel.queueBind(queueName, exchangeName, routingKey);
-			channel.basicPublish(exchangeName, routingKey, null, message.getBytes());
-			//connection.close();
-		} catch (IOException e) {
-
-			/*
-			 * if exception raised means exchange doesen't exists creating exchange in next
-			 * block
-			 */
-
-			try {
-				channel.exchangeDeclare(exchangeName, MQMessageConstants.EXCHANGE_TYPE);
-				channel.queueDeclare(queueName, true, false, false, RabbitMQConnectionProvider.getQueueArguments());
-				channel.queueBind(queueName, exchangeName, routingKey);
-				channel.basicPublish(exchangeName, routingKey, null, message.getBytes());
-				//connection.close();
-			} catch (IOException e1) {
-				log.error(e1);
-			}
-
-		}
-
+		return false;
 	}
 
 	public static Map readNeo4JData(String nodeName, String compareFlag) {
@@ -188,7 +211,7 @@ public class EngineTestData {
 		configFile.setFileData(saveEnrichmentData.getBytes());
 		return configFile;
 	}
-	
+
 	public static InsightsConfigFiles createCorrelationData() {
 		InsightsConfigFiles configFile = new InsightsConfigFiles();
 		configFile.setFileName("CorrelationTest");
@@ -214,10 +237,10 @@ public class EngineTestData {
 
 		return configFile;
 	}
-	
-	public InsightsTools prepareInsightsToolData(int id, String toolName, String category, String agentCommunicationQueue,
-			String toolConfigJson, Boolean isActive) {
-		InsightsTools insightsTools= new InsightsTools();
+
+	public InsightsTools prepareInsightsToolData(int id, String toolName, String category,
+			String agentCommunicationQueue, String toolConfigJson, Boolean isActive) {
+		InsightsTools insightsTools = new InsightsTools();
 		insightsTools.setId(id);
 		insightsTools.setToolName(toolName);
 		insightsTools.setCategory(category);
@@ -226,17 +249,18 @@ public class EngineTestData {
 		insightsTools.setIsActive(isActive);
 		return insightsTools;
 	}
-	
+
 	public static void SaveSchedulatTaskDefination(JsonObject schedulatTaskDefination) {
 		InsightsSchedulerTaskDefinition insightsSchedulatTaskDefination = new InsightsSchedulerTaskDefinition();
 		insightsSchedulatTaskDefination.setTimerTaskId(schedulatTaskDefination.get("timerTaskId").getAsInt());
 		insightsSchedulatTaskDefination.setAction(schedulatTaskDefination.get("action").getAsString());
-		insightsSchedulatTaskDefination.setComponentClassDetail(schedulatTaskDefination.get("componentClassDetail").getAsString());
+		insightsSchedulatTaskDefination
+				.setComponentClassDetail(schedulatTaskDefination.get("componentClassDetail").getAsString());
 		insightsSchedulatTaskDefination.setComponentName(schedulatTaskDefination.get("componentName").getAsString());
 		insightsSchedulatTaskDefination.setSchedule(schedulatTaskDefination.get("schedule").getAsString());
 		schedularTaskDAL.save(insightsSchedulatTaskDefination);
 	}
-	
+
 	public static void saveToolsMappingLabel(String agentMappingJson) {
 		List<JsonObject> nodeProperties = new ArrayList<>();
 		try {

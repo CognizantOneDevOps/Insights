@@ -24,22 +24,24 @@ import org.springframework.context.annotation.PropertySource;
 
 import com.cognizant.devops.platforminsightswebhook.config.WebHookConstants;
 
-
 @Configuration
 @ConfigurationProperties(prefix = "app")
 @PropertySource("file:${properties.basedir}/" + WebHookConstants.WEBHOOK_PROPERTY_FILE_NAME)
 public class AppProperties {
 	private static Logger LOG = LogManager.getLogger(AppProperties.class);
-	
+
+	@Value("${app.providerName}")
+	public static String providerName;
+
 	@Value("${app.mqHost}")
 	public static String mqHost;
-	
+
 	@Value("${app.mqUser}")
 	public static String mqUser;
-	
+
 	@Value("${app.mqPassword}")
 	public static String mqPassword;
-	
+
 	@Value("${app.mqExchangeName}")
 	public static String mqExchangeName;
 
@@ -48,50 +50,106 @@ public class AppProperties {
 
 	@Value("${app.port}")
 	public static int port = 5672;
-	
+
 	@Value("${app.enableDeadLetterExchange}")
 	public static boolean enableDeadLetterExchange = false;
+
+	@Value("${app.awsAccessKey}")
+	public static String awsAccessKey;
+	
+	@Value("${app.awsSecretKey}")
+	public static String awsSecretKey;
+	
+	@Value("${app.awsRegion}")
+	public static String awsRegion;
 
 	public static String getMqHost() {
 		return mqHost;
 	}
-	public  void setMqHost(String mqHost) {
+
+	public void setMqHost(String mqHost) {
 		this.mqHost = mqHost;
 	}
-	public  String getMqUser() {
+
+	public String getMqUser() {
 		return mqUser;
 	}
-	public  void setMqUser(String mqUser) {
+
+	public void setMqUser(String mqUser) {
 		this.mqUser = mqUser;
 	}
-	public  String getMqPassword() {
+
+	public String getMqPassword() {
 		return mqPassword;
 	}
-	public  void setMqPassword(String mqPassword) {
+
+	public void setMqPassword(String mqPassword) {
 		this.mqPassword = mqPassword;
 	}
+
 	public String getMqExchangeName() {
 		return mqExchangeName;
 	}
+
 	public void setMqExchangeName(String mqExchangeName) {
 		this.mqExchangeName = mqExchangeName;
 	}
+
 	public String getInstanceName() {
 		return instanceName;
 	}
+
 	public void setInstanceName(String instanceName) {
 		this.instanceName = instanceName;
 	}
+
 	public static int getPort() {
 		return port;
 	}
+
 	public void setPort(int port) {
 		this.port = port;
 	}
-	public  boolean isEnableDeadLetterExchange() {
+
+	public boolean isEnableDeadLetterExchange() {
 		return enableDeadLetterExchange;
 	}
-	public  void setEnableDeadLetterExchange(boolean enableDeadLetterExchange) {
+
+	public void setEnableDeadLetterExchange(boolean enableDeadLetterExchange) {
 		this.enableDeadLetterExchange = enableDeadLetterExchange;
 	}
+
+	public static String getProviderName() {
+		return providerName;
+	}
+
+	public  void setProviderName(String providerName) {
+		this.providerName = providerName;
+	}
+
+	public static String getAwsAccessKey() {
+		return awsAccessKey;
+	}
+
+	public  void setAwsAccessKey(String awsAccessKey) {
+		this.awsAccessKey = awsAccessKey;
+	}
+
+	public static String getAwsSecretKey() {
+		return awsSecretKey;
+	}
+
+	public  void setAwsSecretKey(String awsSecretKey) {
+		this.awsSecretKey = awsSecretKey;
+	}
+
+	public static String getAwsRegion() {
+		return awsRegion;
+	}
+
+	public  void setAwsRegion(String awsRegion) {
+		this.awsRegion = awsRegion;
+	}
+	
+	
 }

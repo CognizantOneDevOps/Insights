@@ -5,12 +5,16 @@
 		"readToken": "vault_secret_token",
 		"vaultUrl": "http://Vault_Host:port/v1/"
 	},
-	"mqConfig": {
+	"mqConfig": {	
+		"providerName": "RabbitMQ",
 		"user": "",
 		"password": "",
 		"host": "127.0.0.1",
 		"exchange": "iSight",
-		"agentControlXchg": "iAgent"
+		"agentControlXchg": "iAgent",
+		"awsAccessKey": "",
+		"awsSecretKey": "",
+		"awsRegion": ""
 	},
 	"subscribe": {
 		"config": "FINOPS.AZURECSVPARSEREFINOPS.config",
@@ -287,7 +291,7 @@
 		"backupCount": 10
 	},
 	"webhookEnabled": false,
-	"auditing": false,
+	 
 	"enableProxy": false,
 	"proxies": {
 		"http": "",

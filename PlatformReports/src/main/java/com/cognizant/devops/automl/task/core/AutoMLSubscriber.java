@@ -31,11 +31,11 @@ import com.cognizant.devops.platformcommons.constants.ReportStatusConstants;
 import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
 import com.cognizant.devops.platformcommons.core.enums.AutoMLEnum;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
+import com.cognizant.devops.platformcommons.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformdal.autoML.AutoMLConfig;
 import com.cognizant.devops.platformdal.autoML.AutoMLConfigDAL;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
-import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformworkflow.workflowtask.message.factory.WorkflowTaskSubscriberHandler;
 import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadPool;
 import com.google.gson.Gson;
@@ -57,11 +57,10 @@ public class AutoMLSubscriber extends WorkflowTaskSubscriberHandler {
 	}
 
 	@Override
-	public void handleTaskExecution(byte[] body) throws IOException {
+	public void handleTaskExecution(String message) throws IOException {
 		List<JsonObject> failedJobs = new ArrayList<>();
 		long startTime = System.nanoTime();
 		try {
-			String message = new String(body, StandardCharsets.UTF_8);
 			JsonObject incomingTaskMessage = JsonUtils.parseStringAsJsonObject(message);
 			String workflowId = incomingTaskMessage.get("workflowId").getAsString();
 			executionId = incomingTaskMessage.get("executionId").getAsLong();

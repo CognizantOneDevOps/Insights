@@ -16,7 +16,6 @@
 package com.cognizant.devops.engines.platformengine.message.factory;
 
 import java.io.IOException;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,35 +23,40 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformcommons.mq.core.RabbitMQConnectionProvider;
+import com.cognizant.devops.platformcommons.mq.core.RabbitMQProvider;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
+/**
+ * @author 2048708
+ *
+ */
 public class MessageSubscriberFactory {
 	private static final Logger log = LogManager.getLogger(MessageSubscriberFactory.class);
-	private static MessageSubscriberFactory instance=null ;
+	private static MessageSubscriberFactory instance = null;
 
 	private MessageSubscriberFactory() {
-			
+		// Default-Constructor
 	}
 
 	public static MessageSubscriberFactory getInstance() throws InsightsCustomException {
-		if(instance != null) {
+		if (instance != null) {
 			return instance;
-		}else {
-			instance= new MessageSubscriberFactory();
+		} else {
+			instance = new MessageSubscriberFactory();
 			return instance;
 		}
 	}
 
+	
 	public void registerSubscriber(String routingKey, final EngineSubscriberResponseHandler responseHandler)
 			throws IOException, InsightsCustomException {
 		String queueName = routingKey.replace(".", "_");
-		Channel channel = RabbitMQConnectionProvider.getConnection().createChannel();
-		channel = RabbitMQConnectionProvider.initilizeChannel(channel,routingKey, queueName,MQMessageConstants.EXCHANGE_NAME,MQMessageConstants.EXCHANGE_TYPE);
+		Channel channel = RabbitMQProvider.getConnection().createChannel();
+		channel = RabbitMQProvider.initilizeChannel(channel,routingKey, queueName,MQMessageConstants.EXCHANGE_NAME,MQMessageConstants.EXCHANGE_TYPE);
 		responseHandler.setChannel(channel);
 		log.debug("prefetchCount {} for routingKey {} ",
 				ApplicationConfigProvider.getInstance().getMessageQueue().getPrefetchCount(), routingKey);
@@ -77,7 +81,7 @@ public class MessageSubscriberFactory {
 			responseHandler.getChannel().close();
 		} catch (Exception e) {
 			log.error(e);
-			throw new InsightsCustomException(" Error while unregistering subscriber "+e.getMessage());
-		} 
+			throw new InsightsCustomException(" Error while unregistering subscriber " + e.getMessage());
+		}
 	}
 }

@@ -22,7 +22,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 
 import com.cognizant.devops.platformservice.config.LoadServerConfig;
-import com.cognizant.devops.platformservice.config.PlatformServiceInitializer;
 
 @SpringBootApplication(exclude = {ErrorMvcAutoConfiguration.class})
 public class PlatformServiceApplication {

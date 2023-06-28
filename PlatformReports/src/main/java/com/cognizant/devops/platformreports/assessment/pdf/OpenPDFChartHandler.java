@@ -28,11 +28,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cognizant.devops.platformauditing.util.PdfTableUtil;
+import com.cognizant.devops.platformcommons.util.PdfTableUtil;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
+import com.cognizant.devops.platformcommons.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsAssessmentConfigurationDTO;
 import com.cognizant.devops.platformreports.assessment.util.ReportEngineUtils;
-import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 

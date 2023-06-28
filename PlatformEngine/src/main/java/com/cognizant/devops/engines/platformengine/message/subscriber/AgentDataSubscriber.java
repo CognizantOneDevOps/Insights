@@ -15,8 +15,6 @@
  ******************************************************************************/
 package com.cognizant.devops.engines.platformengine.message.subscriber;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,12 +38,9 @@ import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.rabbitmq.client.AMQP.BasicProperties;
-import com.rabbitmq.client.Envelope;
 
 import jakarta.ws.rs.ProcessingException;
 
@@ -92,14 +87,11 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 	}
 
 	@Override
-	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body)
-			throws IOException {
-		String message = new String(body, StandardCharsets.UTF_8);
+	public void handleDelivery(String routingKey, String message ) throws Exception {
 		try {
 			ApplicationConfigProvider.performSystemCheck();
 			long startTime = System.nanoTime();
 			boolean enableOnlineDatatagging = ApplicationConfigProvider.getInstance().isEnableOnlineDatatagging();
-			String routingKey = envelope.getRoutingKey();
 			log.debug(
 					" Type=AgentEngine toolName={} category={} agentId={} routingKey={} dataSize={} execId={} ProcessingTime={} Data ==== Routing key in data {} received data size {} ",
 					toolName, category, agentId, routingKey, message.length(), "-", 0, routingKey, message.length());
@@ -136,23 +128,22 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 				log.debug(
 						" Type=AgentEngine toolName={} category={} agentId={} routingKey={} dataSize={} execId={} ProcessingTime={} Data ==== Processingtime={} ms",
 						toolName, category, agentId, "-", 0, loggingInfo.get(EngineConstants.EXECID), processingTime, processingTime);
-				getChannel().basicAck(envelope.getDeliveryTag(), false);
 			}
 			
 		} catch (ProcessingException e) {
 			log.error(" toolName={} category={} agentId={} execId={} ProcessingException occured ", toolName, category,
 					agentId, loggingInfo.get(EngineConstants.EXECID), e);
-			getChannel().basicNack(envelope.getDeliveryTag(), false, true);
+			throw new ProcessingException(e.getMessage());
 		} catch (InsightsCustomException e) {
 			log.error("Error in payload {} ",message);
 			log.error(" toolName={} category={} agentId={} execId={} InsightsCustomException occured  ", toolName,
 					category, agentId, loggingInfo.get(EngineConstants.EXECID), e);
-			getChannel().basicReject(envelope.getDeliveryTag(), false);
+			throw new InsightsCustomException(e.getMessage());
 		} catch (Exception e) {
 			log.error("Error in payload {} ",message);
 			log.error(" toolName={} category={} agentId={} execId={} Exception occured  ", toolName, category, agentId,
 					loggingInfo.get(EngineConstants.EXECID), e);
-			getChannel().basicReject(envelope.getDeliveryTag(), false);
+			throw new Exception(e.getMessage());
 		}
 	}
 

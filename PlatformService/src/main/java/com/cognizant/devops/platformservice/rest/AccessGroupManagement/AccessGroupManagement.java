@@ -67,6 +67,9 @@ public class AccessGroupManagement {
 
 	private static final String PATH = "/api/users/lookup?loginOrEmail=";
 	private static final String USERDETAIL = "/api/users/search?&query=";
+	private static final String COLON = ":";
+	private static final String AUTHORIZATION = "Authorization";
+	private static final String BASIC = "Basic ";
 	
 	@GetMapping(value = "/getOrgs", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject getOrgs() throws InsightsCustomException {
@@ -337,6 +340,10 @@ public class AccessGroupManagement {
 			JsonObject requestRole = new JsonObject();
 			requestRole.addProperty("role", role);
 			Map<String, String> headersRole = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
+			String authString = ApplicationConfigProvider.getInstance().getGrafana().getAdminUserName() + COLON
+					+ ApplicationConfigProvider.getInstance().getGrafana().getAdminUserPassword();
+			String encodedString = Base64.getEncoder().encodeToString(authString.getBytes());
+			headersRole.put(AUTHORIZATION, BASIC + encodedString);
 			String responseRole = grafanaHandler.grafanaPatch(apiUrlRole, requestRole, headersRole);
 			message = responseRole;
 			return PlatformServiceUtil.buildSuccessResponseWithData(message);

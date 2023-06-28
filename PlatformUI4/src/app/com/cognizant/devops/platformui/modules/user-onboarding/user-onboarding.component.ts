@@ -74,7 +74,7 @@ export class UserOnboardingComponent implements OnInit {
   readOnlyOrg: boolean = false;
   assignUserData = {};
   role: any;
-  pass: string;
+  descp: string;
   username: string;
   searchUser: string;
   newresponse: string = "";
@@ -401,7 +401,7 @@ export class UserOnboardingComponent implements OnInit {
     userPropertyList["name"] = this.names;
     userPropertyList["email"] = this.email;
     userPropertyList["userName"] = this.username;
-    userPropertyList["password"] = this.pass;
+    userPropertyList["password"] = this.descp;
     userPropertyList["role"] = this.role;
     userPropertyList["orgName"] = this.selectedAdminOrg.name;
     userPropertyList["orgId"] = this.selectedAdminOrg.orgId;
@@ -419,7 +419,7 @@ export class UserOnboardingComponent implements OnInit {
     if (this.username == undefined) {
       this.isUsernameIncorrect = true;
     }
-    if (this.pass == undefined) {
+    if (this.descp == undefined) {
       this.isPasswordIncorrect = true;
     }
     if (this.names == undefined) {
@@ -574,7 +574,7 @@ export class UserOnboardingComponent implements OnInit {
     this.addRadioSelected = false;
     this.assignRadioSelected = false;
     this.assignuserSaveEnable = false;
-    //this.pass = null;
+    //this.descp = null;
     this.username = null;
     this.email = null;
     this.names = null;
@@ -605,7 +605,7 @@ export class UserOnboardingComponent implements OnInit {
     this.showDetail2 = true;
     this.assignRadioSelected = true;
     this.addRadioSelected = false;
-    this.pass = undefined;
+    this.descp = undefined;
     this.username = null;
     this.email = null;
     this.names = null;
@@ -821,7 +821,7 @@ export class UserOnboardingComponent implements OnInit {
   };
 
 
-  onPassChange(newVal) {
-    this.pass = newVal;
+  onChange(newVal) {
+    this.descp = newVal;
   }
 }

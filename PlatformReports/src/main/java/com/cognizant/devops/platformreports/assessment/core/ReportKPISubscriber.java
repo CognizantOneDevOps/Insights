@@ -34,6 +34,7 @@ import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
+import com.cognizant.devops.platformcommons.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsContentConfig;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsKPIConfig;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportsKPIConfig;
@@ -46,10 +47,8 @@ import com.cognizant.devops.platformreports.assessment.dal.ReportPostgresDataHan
 import com.cognizant.devops.platformreports.assessment.datamodel.ContentConfigDefinition;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsKPIConfigDTO;
 import com.cognizant.devops.platformreports.assessment.kpi.KPIExecutor;
-import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformworkflow.workflowtask.core.InsightsStatusProvider;
 import com.cognizant.devops.platformworkflow.workflowtask.message.factory.WorkflowTaskSubscriberHandler;
-import com.cognizant.devops.platformworkflow.workflowtask.utils.MQMessageConstants;
 import com.cognizant.devops.platformworkflow.workflowtask.utils.WorkflowUtils;
 import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadPool;
 import com.google.gson.Gson;
@@ -65,22 +64,17 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 	private InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfiguration();	
 	private long executionId;
 	
-	//private static final String strExpression="Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}";
-
 	public ReportKPISubscriber(String routingKey) throws Exception {
 		super(routingKey);
 	}	
 	
 	@Override
-	public void handleTaskExecution(byte[] body) throws IOException {
+	public void handleTaskExecution(String message) throws IOException {
 		try {
 			long startTime = System.nanoTime();
 			List<JsonObject> failedJobs = new ArrayList<>();
 			List<InsightsKPIConfig> kpiConfigList = new ArrayList<>();
 			List<Integer> contentList = new ArrayList<>();
-
-			String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
-
 			log.debug("Worlflow Detail ==== ReportKPISubscriber routing key  message handleDelivery ===== {} ",
 					message);
 
@@ -306,7 +300,6 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 		JsonArray contentArray = new JsonArray();
 
 		for (JsonObject failedJob : failedJobs) {
-			// JsonObject payload = failedJob
 			if (failedJob.has("kpiArray")) {
 				failedJob.get("kpiArray").getAsJsonArray().forEach(id -> kpiArray.add(id));
 

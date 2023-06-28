@@ -3,3 +3,7 @@ mqUser = iSight
 mqPassword = iSight
 mqExchangeName=iSight
 port=5672
+providerName=RabbitMQ
+awsAccessKey=
+awsSecretKey=
+awsRegion=

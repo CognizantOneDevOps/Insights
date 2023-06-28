@@ -32,7 +32,9 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platforminsightswebhook.application.AppProperties;
 import com.cognizant.devops.platforminsightswebhook.config.WebHookConstants;
-import com.cognizant.devops.platforminsightswebhook.config.WebHookMessagePublisher;
+import com.cognizant.devops.platforminsightswebhook.message.factory.WebHookMessagePublisherMQ;
+import com.cognizant.devops.platforminsightswebhook.message.factory.WebhookMessageFactory;
+import com.cognizant.devops.platforminsightswebhook.message.factory.WebhookMessagePublisherSQS;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -45,9 +47,15 @@ import com.google.gson.JsonParser;
 public class WebHookHandlerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static Logger log = LogManager.getLogger(WebHookHandlerServlet.class);
+	private WebhookMessageFactory messageFactory;
 
 	public WebHookHandlerServlet() {
 		super();
+		if (AppProperties.getProviderName().equals("AWSSQS")) {
+			messageFactory = new WebhookMessagePublisherSQS();
+		} else {
+			messageFactory = new WebHookMessagePublisherMQ();
+		}
 	}
 
 	/**
@@ -68,7 +76,7 @@ public class WebHookHandlerServlet extends HttpServlet {
 				response.getWriter().append("Served at: ").append(request.getContextPath())
 						.append(" with Instance Name " + AppProperties.instanceName);
 			} catch (Exception e) {
-				log.error("Error while appending at response in doGet method: ",e);
+				log.error("Error while appending at response in doGet method: ", e);
 			}
 		}
 	}
@@ -105,10 +113,12 @@ public class WebHookHandlerServlet extends HttpServlet {
 			String webHookMqChannelName = WebHookConstants.MQ_CHANNEL_PREFIX
 					.concat(dataWithReqParam.get(WebHookConstants.REQUEST_PARAM_KEY_WEBHOOKNAME).getAsString());
 			String res = dataWithReqParam.toString();
-			WebHookMessagePublisher.getInstance().publishEventAction(res.getBytes(), webHookMqChannelName);
+
+			messageFactory.publishEventAction(res, webHookMqChannelName);
 			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-			log.debug(" Data successfully published in webhook name as {} ",webHookMqChannelName);
-			log.debug("Type=Webhook  WebhookName={} MqChannel={} Size={} ProcessingTime={}",request.getParameter("webHookName"),webHookMqChannelName,res.getBytes().length,processingTime);
+			log.debug(" Data successfully published in webhook name as {} ", webHookMqChannelName);
+			log.debug("Type=Webhook  WebhookName={} MqChannel={} Size={} ProcessingTime={}",
+					request.getParameter("webHookName"), webHookMqChannelName, res.getBytes().length, processingTime);
 		} else {
 			log.debug(" Request body is empty ");
 		}
@@ -123,7 +133,6 @@ public class WebHookHandlerServlet extends HttpServlet {
 	 */
 	public JsonObject getBody(HttpServletRequest request) throws IOException {
 
-
 		JsonObject responceJson = null;
 		try {
 			String bodymessage = request.getReader().lines().collect(Collectors.joining());
@@ -133,18 +142,18 @@ public class WebHookHandlerServlet extends HttpServlet {
 				Map<String, String[]> parameterMap = request.getParameterMap();
 				int paramSize = parameterMap.size();
 				int maxParamCount = 1;
-				if(paramSize > maxParamCount){
-					parameterMap = parameterMap.entrySet().stream()
-					        .limit(maxParamCount).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+				if (paramSize > maxParamCount) {
+					parameterMap = parameterMap.entrySet().stream().limit(maxParamCount)
+							.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 				}
-				for (Map.Entry<String,String[]> entry : parameterMap.entrySet()) {
+				for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
 					String paramName = entry.getKey();
 					String[] paramValues = entry.getValue();
 					for (int i = 0; i < paramValues.length; i++) {
 						String paramValue = paramValues[i];
 						responceJson.addProperty(paramName, paramValue);
 					}
-					
+
 				}
 				responceJson.addProperty("iswebhookdata", Boolean.TRUE);
 			}
@@ -161,7 +170,7 @@ public class WebHookHandlerServlet extends HttpServlet {
 	 */
 	@Override
 	public void destroy() {
-		WebHookMessagePublisher.getInstance().releaseMqConnetion();
+
 	}
 
 	/**
@@ -178,12 +187,13 @@ public class WebHookHandlerServlet extends HttpServlet {
 			log.error("Error in setUnauthorizedResponse ", e);
 		}
 	}
+
 	private static JsonElement parseString(String requestText) {
 		JsonElement response = null;
-		try {			
+		try {
 			response = JsonParser.parseString(requestText);
 		} catch (Exception e) {
-			log.error(" Error in parseString {}",requestText);
+			log.error(" Error in parseString {}", requestText);
 			log.error(e);
 		}
 		return response;

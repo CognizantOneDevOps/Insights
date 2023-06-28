@@ -61,6 +61,7 @@ public class AuthenticationUtils {
 	public static final int UNAUTHORISE = 814;
 
 	public static final String GRAFANA_WEBAUTH_USERKEY = "X-WEBAUTH-USER";
+	
 	public static final String GRAFANA_WEBAUTH_HEADER_KEY = "user";
 	public static final String GRAFANA_WEBAUTH_USERKEY_NAME = "username";
 	public static final String GRAFANA_SESSION_KEY = "grafana_session";
@@ -83,7 +84,8 @@ public class AuthenticationUtils {
 	public static final String JTOKEN="jtoken";
 	public static final String AUTHORITY = "authority";
 	public static final String GRAFANA_DETAIL = "details";
-	public static final String KERBEROS_AUTH_HEADER_KEY = "authorization";
+	public static final String AUTHORIZATION = "Authorization";
+	public static final String BASIC = "Basic ";
 
 	public static final String NATIVE_AUTH_PROTOCOL = "NativeGrafana";
 	public static final boolean IS_NATIVE_AUTHENTICATION = NATIVE_AUTH_PROTOCOL
@@ -91,9 +93,12 @@ public class AuthenticationUtils {
 
 	public static final String CSRF_COOKIE_NAME = "XSRF-TOKEN";
 	public static final List<String> CSRF_IGNORE = Collections.unmodifiableList(Arrays.asList("/login/**", "/user/insightsso/authenticateSSO/**",
-			"/user/authenticate/**", "/user/insightsso/**", "/saml/**", "/externalApi/**"));
+			"/user/authenticate/**", "/user/insightsso/**", "/saml/**", "/externalApi/**", "/user/**", "/"));
 	
 	public static final List<String> WEB_IGNORE_URLS = Collections.unmodifiableList(Arrays.asList("/settings/getLogoImage"));
+	
+	public static final List<String> SAML_IGNORE_URLS = Collections.unmodifiableList(Arrays.asList( "/user/insightsso/authenticateSSO","/user/insightsso/getUserDetail"));
+
 	
 	public static final String EXTERNALAPI = "/externalApi/";
 	
@@ -113,7 +118,7 @@ public class AuthenticationUtils {
 	public static final String CSS_FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.css)$";
 	public static final String WEBP_FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.webp)$";
 
-	public static final List<String> SUPPORTED_TYPE = Collections.unmodifiableList(Arrays.asList("SAML", "Kerberos", NATIVE_AUTH_PROTOCOL, "JWT" ));
+	public static final List<String> SUPPORTED_TYPE = Collections.unmodifiableList(Arrays.asList("SAML", NATIVE_AUTH_PROTOCOL, "JWT" ));
 	public static final Set<String> AUTHENTICATION_PROTOCOL_LIST = Collections.unmodifiableSet(new HashSet<String>(SUPPORTED_TYPE));
 
 	protected static List<SecurityFilterChain> securityFilterchains = new ArrayList<>();

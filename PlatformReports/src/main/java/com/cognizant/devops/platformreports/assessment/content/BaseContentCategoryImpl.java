@@ -33,6 +33,7 @@ import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformcommons.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsKPIConfig;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
 import com.cognizant.devops.platformreports.assessment.dal.ReportDataHandler;
@@ -42,7 +43,6 @@ import com.cognizant.devops.platformreports.assessment.datamodel.InsightsContent
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsKPIResultDetails;
 import com.cognizant.devops.platformreports.assessment.util.ReportEngineEnum;
 import com.cognizant.devops.platformreports.assessment.util.ReportEngineUtils;
-import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;

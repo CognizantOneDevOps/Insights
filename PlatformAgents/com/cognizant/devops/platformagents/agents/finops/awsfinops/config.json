@@ -6,11 +6,15 @@
     "vaultUrl":"http://Vault_Host:port/v1/"
   },
   "mqConfig": {
+    "providerName": "RabbitMQ",
     "user": "",
     "password": "",
     "host": "127.0.0.1",
     "exchange": "",
-    "agentControlXchg": "iAgent"
+    "agentControlXchg": "iAgent",
+	"awsAccessKey": "",
+	"awsSecretKey": "",
+	"awsRegion": ""
   },
   "subscribe": {
     "config": "FINOPS.AWSFINOPS.config",
@@ -276,7 +280,7 @@
 		"backupCount": 10
 	},
 	"webhookEnabled": false,
-	"auditing": false,
+	 
 	"enableProxy": false,
 	"proxies": {
 		"http": "",

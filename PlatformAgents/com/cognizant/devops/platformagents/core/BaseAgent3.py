@@ -29,14 +29,6 @@ import sys
 import uuid
 from pytz import timezone
 import logging.handlers
-import hashlib
-import inspect
-import traceback
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.asymmetric import padding
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import serialization
-from base64 import b64encode, b64decode
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
 from pytz import timezone
@@ -78,17 +70,18 @@ class BaseAgent(object):
         self.fetchAgentCredentials()
         self.loadTrackingConfig()
         self.loadCommunicationFacade()
-        self.initializeMQ()
+        self.initializeDataProvider()
+
         self.setupLocalCache()
         self.extractToolName()
         self.subscriberForAgentControl()
         
-        if self.webhookEnabled:
-            self.subscriberForWebhookAgent()
-        elif self.isROIAgent:
-            self.subscriberForROIAgent()
+        if (self.isROIAgent) or (self.webhookEnabled):
+            self.isPollMessage = True
+            self.subscriberForWebhookAndROI()
             self.execute()
         else:
+            self.isPollMessage = False
             self.scheduleExtensions()
             self.execute()
         self.scheduleAgent()
@@ -159,7 +152,7 @@ class BaseAgent(object):
             self.toolName = self.config.get('toolName')
             self.webhookEnabled = self.config.get('webhookEnabled', False)
             self.isROIAgent = self.config.get('isROIAgent', False)
-            self.executionId = '--';
+            self.executionId = '--'
             self.funcName = '--'
             self.dataSize = 0
             self.dataCount = 0
@@ -251,128 +244,111 @@ class BaseAgent(object):
         self.communicationFacade = communicationFacade.getCommunicationFacade(facadeType, sslVerify, self.responseType,
                                                                               enableValueArray)
 
-    def initializeMQ(self):
-        self.baseLogger.info('Inside initializeMQ')
+        
+    def initializeDataProvider(self):
+        self.baseLogger.info('Inside initializeDataProvider')
         mqConfig = self.config.get('mqConfig', None)
+        
         if mqConfig == None:
-            raise ValueError('BaseAgent: unable to initialize MQ. mqConfig is not found')
+            raise ValueError('BaseAgent: unable to initialize Data Provide. mqConfig is not found')
+        
+        self.mqProviderName = mqConfig.get('providerName','RabbitMQ')
 
-        user = mqConfig.get('user', None)
-        mqPass = mqConfig.get('password', None)
-        host = mqConfig.get('host', None)
-        exchange = mqConfig.get('exchange', None)
-        agentCtrlXchg = mqConfig.get('agentControlXchg', None)
-        port = mqConfig.get('port', 5672)
-        enableDeadLetterExchange = mqConfig.get('enableDeadLetterExchange', False)
-        prefetchCount = mqConfig.get('prefetchCount', 10)
-
-        self.messageFactory = MessageFactory(user, mqPass, host, exchange, port, prefetchCount, enableDeadLetterExchange)
+        self.messageFactory = MessageFactory.messageQueueHandler(self, self.config)
+        #self.agentCtrlMessageFactory = MessageFactory.messageQueueHandler(self.config)
+        
         if self.messageFactory == None:
             raise ValueError('BaseAgent: unable to initialize MQ. messageFactory is Null')
-
-        self.agentCtrlMessageFactory = MessageFactory(user, mqPass, host, agentCtrlXchg, port, prefetchCount, enableDeadLetterExchange)
 
     '''
     Subscribe for Agent START/STOP exchange and queue
     '''
 
+    def processFetchedData(self, subRoutingKey, isAgentControl=False):
+
+        #routingKey = self.config.get('subscribe').get('agentCtrlQueue', '')
+        sub_queue_URL = self.messageFactory.getQueueURL(subRoutingKey)
+        fetchData= True
+        
+        while fetchData:
+            messages = self.messageFactory.subscribeMessages(subRoutingKey, sub_queue_URL)
+        
+            if (len(messages) == 0):
+                self.baseLogger.info('No message pending for process in processFetchData')
+                fetchData = False
+            for msg in messages:
+                messageBody = msg["Body"]
+                receipt_handle = msg['ReceiptHandle']
+                #logging.info("Received message: %s", messageBody)
+                
+                if isAgentControl:
+                    self.processAgentControlMessage(messageBody)
+                elif (self.isROIAgent):
+                    self.processROIAgent(messageBody)
+                elif(self.webhookEnabled):
+                    self.processWebhook(messageBody)
+                    
+                self.messageFactory.acknowledgeMessages(sub_queue_URL, receipt_handle)
+
+
     def subscriberForAgentControl(self):
+
         self.baseLogger.info('Inside subscriberForAgentControl')
-        routingKey = self.config.get('subscribe').get('agentCtrlQueue', '')
+        self.agentControlsubRoutingKey = self.config.get('subscribe').get('agentCtrlQueue', '')
+        self.messageFactory.subscribe(self.agentControlsubRoutingKey, self.callbackForAgentControl)
 
-        def callback(ch, method, properties, data):
-            # Update the config file and cache.
-            self.baseLogger.info('Inside subscriberForAgentControl message received '+str(data))
-            action = str(data.decode('utf-8'))
-            if "STOP" == action:
-                self.shouldAgentRun = False
-                self.publishHealthData(self.generateHealthData(note="Agent is in STOP mode"))
-            ch.basic_ack(delivery_tag=method.delivery_tag)
-
-        self.agentCtrlMessageFactory.subscribe(routingKey, callback)
-        
-    def subscriberForWebhookAgent(self):
-        
+    def subscriberForWebhookAndROI(self):
         self.baseLogger.info('Inside subscriberForWebhookAgent')
         self.executionStartTime = datetime.now()
-        routingKey = self.config.get('subscribe').get("webhookPayloadDataQueue")
 
-        # logging.debug("AgentId: " + str(self.agentId) + "exceId:" + str(self.executionId) + " " + str(data))
-        def callback(ch, method, properties, data):
-            # Update the config file and cache.
-            self.baseLogger.info('Inside subscriberForWebhookAgent callback')
-            try:
-                self.processWebhook(data)
-                ch.basic_ack(delivery_tag=method.delivery_tag)
-            except Exception as ex:
-                self.baseLogger.error(" subscriberForWebhookAgent ")
-                self.baseLogger.error(ex)
-                self.publishHealthDataForExceptions(ex)
-            finally:
-                '''If agent receive the STOP command, Python program should exit gracefully after current data collection is complete.  '''
-                if self.shouldAgentRun == False:
-                    self.baseLogger.info(' subscriberForWebhookAgent STOP message received, Stopping Agent ')
-                    os._exit(0)
+        if (self.isROIAgent):
+                self.subscriberRoutingKey = self.config.get('subscribe').get("roiExecutionQueue")
+                self.note = "ROI Agent is in START mode"
+        elif(self.webhookEnabled):
+                self.subscriberRoutingKey = self.config.get('subscribe').get("webhookPayloadDataQueue")
+                self.note = "Webhook Agent is in START mode"
         
-        #self.messageFactory.publish(routingKey, {})
-        self.messageFactory.subscribe(routingKey, callback)
+        self.messageFactory.subscribe(self.subscriberRoutingKey, self.callbackForWebhookAndROIAgent)
         self.logIndicator(self.EXECUTION_START, self.config.get('isDebugAllowed', False))
-        self.publishHealthData(self.generateHealthData(note="WebHook Agent is in START "))
+        self.publishHealthData(self.generateHealthData(note=self.note))
         
-    def subscriberForROIAgent(self):
-        
-        self.baseLogger.info('Inside subscriberForROIAgent')
-        self.executionStartTime = datetime.now()
-        routingKey = self.config.get('subscribe').get("roiExecutionQueue")
+    def callbackForWebhookAndROIAgent(self, ch, method, properties, data):
+        self.baseLogger.info('Inside callbackForWebhookAndROIAgent callback')
+        try:
 
-        def callback(ch, method, properties, data):
-            self.baseLogger.info('Inside subscriberForROIAgent callback')
-            try:
+            if (self.isROIAgent):
                 self.processROIAgent(data)
-                ch.basic_ack(delivery_tag=method.delivery_tag)
-            except Exception as ex:
-                self.baseLogger.error(" subscriberForROIAgent ")
-                self.baseLogger.error(ex)
-                self.publishROIAgentstatus(json.loads(data), "ERROR", str(ex))
-                self.publishHealthDataForExceptions(ex)
-            finally:
-                '''If agent receive the STOP command, Python program should exit gracefully after current data collection is complete.  '''
-                if self.shouldAgentRun == False:
-                    self.baseLogger.info(' subscriberForWebhookAgent STOP message received, Stopping Agent ')
-                    os._exit(0)
-        
-        self.messageFactory.subscribe(routingKey, callback)
-        self.logIndicator(self.EXECUTION_START, self.config.get('isDebugAllowed', False))
-        self.publishHealthData(self.generateHealthData(note="ROI Agent is in START "))
-    
-    
+            elif(self.webhookEnabled):
+                self.processWebhook(data)
 
-    '''
-    Subscribe for Engine Config Changes. Any changes to respective agent will be consumed and processed here.
-    '''
-
-    def configUpdateSubscriber(self):
-        self.baseLogger.info('Inside configUpdateSubscriber')
-        routingKey = self.config.get('subscribe').get('config')
-
-        def callback(ch, method, properties, data):
-            # Update the config file and cache.
-            updatedConfig = json.loads(data)
-            self.updateJsonFile(self.configFilePath, updatedConfig)
-            self.config = updatedConfig
-            self.setupLocalCache()
             ch.basic_ack(delivery_tag=method.delivery_tag)
+        except Exception as ex:
+            self.baseLogger.error(" callbackForWebhookAndROIAgent ")
+            self.baseLogger.error(ex)
+            self.publishROIAgentstatus(json.loads(data), "ERROR", str(ex))
+            self.publishHealthDataForExceptions(ex)
+        finally:
+            '''If agent receive the STOP command, Python program should exit gracefully after current data collection is complete.  '''
+            if self.shouldAgentRun == False:
+                self.baseLogger.info(' subscriber for the Agent STOP message received, Stopping Agent ')
+                os._exit(0)
+                    
+    
+    def callbackForAgentControl(self,ch, method, properties, data):
+        # Update the config file and cache.
+            self.baseLogger.info('Inside callbackForAgentControl message received '+str(data))
+            self.processAgentControlMessage(data)
+            ch.basic_ack(delivery_tag=method.delivery_tag)
+            
+    def processAgentControlMessage(self, data):
+        action = str(data.decode('utf-8'))
+        if "STOP" == action:
+            self.shouldAgentRun = False
+            self.publishHealthData(self.generateHealthData(note="Agent is in STOP mode"))
 
-        self.messageFactory.subscribe(routingKey, callback)
+    
 
-    '''
-        Supported metadata attributes:
-        {
-            labels : [] --> Array of additional labels to applied to data
-            dataUpdateSupported: true/false --> if the existing data node is supposed to be updated
-            uniqeKey: String --> comma separated node properties
-        }
-    '''
+   
     def getMQDataPktSize(self, data):
         self.baseLogger.info('Inside getMQDataPktSize')
         pckSize = 0
@@ -402,10 +378,7 @@ class BaseAgent(object):
                 data = self.validateData(data)
                 
             self.addExecutionId(data, self.executionId)
-            self.addTimeStampField(data, timeStampField, timeStampFormat, isEpochTime, isExtension)
-            auditing = self.config.get('auditing', False)
-            if auditing:
-                self.addDigitalSign(data)
+            self.addTimeStampField(data, timeStampField, timeStampFormat, isEpochTime, isExtension)            
             self.messageFactory.publish(self.dataRoutingKey, data, self.config.get('dataBatchSize', 100), metadata)
             self.logIndicator(self.PUBLISH_START, self.config.get('isDebugAllowed', False))
             self.dataSize = dataSize
@@ -505,48 +478,7 @@ class BaseAgent(object):
         for d in data:
             d['execId'] = executionId
 
-    def addDigitalSign(self, data):
-        self.baseLogger.info('Inside addDigitalSign')
-        dataString = ''
-        for d in data:
-            for key in sorted(d.keys()):
-                if (key != "digitalSignature" and d[key] != None):
-                    # print(key,"--->",d[key])
-                    if type(d[key]) == str:
-                        dataString += d[key]
-                    elif type(d[key]) == list:
-                        for each in d[key]:
-                            dataString += str(each)
-                    elif type(d[key]) == bool:
-                        dataString += str(d[key]).lower()
-                    else:
-                        dataString += str(d[key])
-            hex = hashlib.sha256(dataString.encode('utf-8')).hexdigest()
-            # print(hex)
-            hex_signature = self.rsaEncrypt(hex)
-
-            d['digitalSignature'] = hex_signature.decode('utf-8')
-            # print(d['digitalSignature'])
-            dataString = ''
-
-    def rsaEncrypt(self, hexdigest):
-        # print("+++++++++++++++++++++++++++++++++hexdigest")
-        # print(hexdigest)
-        if "INSIGHTS_HOME" in os.environ:
-            publicKeyPath = os.environ['INSIGHTS_HOME'] + '/.InSights/BlockChainCerts/public_key.pem'
-        with open(publicKeyPath, 'rb') as key_file:
-            public_key = serialization.load_pem_public_key(
-                key_file.read(),
-                backend=default_backend()
-            )
-        encrypted = public_key.encrypt(
-            hexdigest.encode('utf-8'),
-            padding.OAEP(
-                mgf=padding.MGF1(algorithm=hashes.SHA1()),
-                algorithm=hashes.SHA256(),
-                label=None
-            ))
-        return b64encode(encrypted)
+    
 
     def updateTrackingJson(self, data):
         # Update the tracking json file and cache.
@@ -577,6 +509,7 @@ class BaseAgent(object):
                         'categoryName': self.config.get('toolCategory', tokens[0]),
                         'agentId': self.config.get('agentId'), 'inSightsTimeX': currentTime['time'],
                         'inSightsTime': currentTime['epochTime'],
+
                         'executionTime': int((datetime.now() - self.executionStartTime).total_seconds() * 1000)}
         if additionalProperties != None:
             data_json = {key: value for (key, value) in (list(health_basic.items()) + list(additionalProperties.items()))}
@@ -606,8 +539,9 @@ class BaseAgent(object):
             self.scheduler = scheduler
             if self.runSchedule > 0:
                 self.scheduledJob = scheduler.add_job(self.execute, 'interval', seconds=60 * self.runSchedule)
+                if (self.mqProviderName != "RabbitMQ"):
+                    self.scheduledAgentControlJob = scheduler.add_job(self.processAgentControl, 'interval', seconds=300 )
             else:
-                #triggerDetail = CronTrigger(year="*", month="*", day="*", hour="*", minute="10", second="5") #'*/5 * * * *'
                 expression_trigger = CronTrigger.from_crontab(self.runCron)
                 self.scheduledJob = scheduler.add_job(self.execute, trigger=expression_trigger)
             try:
@@ -651,17 +585,20 @@ class BaseAgent(object):
     def execute(self):
         self.baseLogger.info('In execute method ======= ')
         try:
-            if not self.webhookEnabled:
+            #if not self.webhookEnabled:
                 self.executionStartTime = datetime.now()
                 self.logIndicator(self.EXECUTION_START, self.config.get('isDebugAllowed', False))
                 self.executionId = str(uuid.uuid1())
                 self.publishHealthData(self.generateHealthData(note="Agent is in START mode with execution id "+ self.executionId))
                 self.baseLogger.info('Inside execute executionId'+self.executionId)
                 self.process()
+                if self.isPollMessage:
+                    self.processFetchedData(self.subscriberRoutingKey, False)
+                #subscribe to be here somewhere
                 self.executeAgentExtensions()
                 self.publishHealthData(self.generateHealthData())
-            else:
-                self.baseLogger.info('WebhookEnabled no need to run execute method ')
+            #else:
+                #self.baseLogger.info('WebhookEnabled no need to run execute method ')
             
         except Exception as ex:
             self.baseLogger.error(ex)
@@ -671,6 +608,10 @@ class BaseAgent(object):
             if self.shouldAgentRun == False:
                 os._exit(0)
 
+    def processAgentControl(self):
+        
+        self.processFetchedData(self.agentControlsubRoutingKey, True)
+        
     '''
         This method publishes health node for an exception and
         Writes exception inside log file of corresponding Agent

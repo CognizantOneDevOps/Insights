@@ -25,13 +25,12 @@ import { ImageHandlerService } from '@insights/common/imageHandler.service';
 export class InsightsInitService {
 
     location: Location;
-    autheticationProtocolList = ["SAML", "NativeGrafana", "Kerberos", "JWT"]
+    autheticationProtocolList = ["SAML", "NativeGrafana", "JWT"]
     static serviceHost: String;
     static grafanaHost: String;
     static webhookHost: String;
     static agentsOsList = {};
-    static configDesc = {};
-    static showAuditReporting = false;
+    static configDesc = {};   
     static showWebhookConfiguration = false;
     static autheticationProtocol = "NativeGrafana";
     static singleSignOnConfig;
@@ -97,7 +96,7 @@ export class InsightsInitService {
             InsightsInitService.webhookHost = UIConfigResponse.webhookHost;
         }
 
-        InsightsInitService.showAuditReporting = UIConfigResponse.showAuditReporting;
+        
         InsightsInitService.showWebhookConfiguration = UIConfigResponse.showWebhookConfiguration;
         InsightsInitService.jwtTokenOriginServerURL = UIConfigResponse.jwtTokenOriginServerURL;
         InsightsInitService.jwtOriginServerLoginURL = UIConfigResponse.jwtOriginServerLoginURL;

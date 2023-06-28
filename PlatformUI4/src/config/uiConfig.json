@@ -1,5 +1,4 @@
-{
-	"showAuditReporting": true,
+{	
 	"showWebhookConfiguration": true,
 	"enableInsightsToolbar": true,
 	"enableLogoutButton": true,

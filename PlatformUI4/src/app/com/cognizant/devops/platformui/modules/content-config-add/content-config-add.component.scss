@@ -54,12 +54,11 @@ tr.mat-row-kpi {
 }
 
 .frmTxtarea {
-  width: 90%;
-  height: 200px;
+  width: 100%;
+  height: 100px;
+  resize: vertical;
   font-size: 14px;
   padding-left: 2px;
-  border: 1px !important;
-  border-style: solid !important;
   border-color: #9e9a9a !important;
   border-bottom-color: #9e9a9a !important;
 }
@@ -124,7 +123,7 @@ td.mat-cell {
 .section-body {
   padding: 24px 0 0 25px;
   border: 1px solid var(--brdr-clr);
-  height: 520px;
+  height: 630px;
   background: var(--bg-test);
 }
 

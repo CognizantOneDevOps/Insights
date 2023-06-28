@@ -39,7 +39,7 @@ export const GoogleCharts = ({
   useEffect(() => {
     google.charts.load('46', { 'packages': ['corechart', 'charteditor', 'gantt'] });
     google.charts.setOnLoadCallback(drawChart);
-  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
+  }, [data])  // eslint-disable-line react-hooks/exhaustive-deps
   const drawChart = () => {
     let chartDataArr: ChartData[] = [];
     for (let dt of data.series) {
