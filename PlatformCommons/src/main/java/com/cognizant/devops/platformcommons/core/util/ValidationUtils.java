@@ -22,9 +22,6 @@ import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.owasp.esapi.ESAPI;
-import org.owasp.esapi.Validator;
-import org.owasp.esapi.errors.ValidationException;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
@@ -353,9 +350,7 @@ public class ValidationUtils {
 		log.debug("In Authorization token processing ");
 		try {
 			if (authHeaderToken != null && !authHeaderToken.startsWith("Basic ")) {
-				String auth = authHeaderToken.substring(0, authHeaderToken.length() - 15);
-				String passkey = authHeaderToken.substring(authHeaderToken.length() - 15, authHeaderToken.length());
-				authTokenDecrypt = AES256Cryptor.decrypt(auth, passkey);
+				authTokenDecrypt = AES256Cryptor.decryptWeb(authHeaderTokenReq);
 			} else {
 				log.debug(" Token starts with basic ");
 				authTokenDecrypt=authHeaderToken;
@@ -368,15 +363,13 @@ public class ValidationUtils {
 		return authTokenDecrypt;
 	}
 
-	public static String getSealedObject(String userValue) {
-		String encryptedData = AES256Cryptor.encrypt(userValue, "123456$#@$^@1ERF");
-		return encryptedData;
-	}
+	public static String getSealedObject(String userValue, String genkey) {
+        return AES256Cryptor.encrypt(userValue, genkey);
+    }
 
-	public static String getDeSealedObject(String encryptedData) {
-		String decryptedData = AES256Cryptor.decrypt(encryptedData, "123456$#@$^@1ERF");
-		return decryptedData;
-	}
+    public static String getDeSealedObject(String encryptedData, String genkey) {
+        return AES256Cryptor.decrypt(encryptedData, genkey);
+    }
 
 	/**
 	 * Validate response data which doesnot contain any HTML String

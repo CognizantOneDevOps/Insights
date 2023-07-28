@@ -69,7 +69,7 @@ class SonarAgent(BaseAgent):
                     if timeMachineapi == "yes":
                         sonarExecutionsUrl = self.baseUrl+"api/timemachine/index?metrics="+metricsParam+"&resource="+projectKey+"&fromDateTime="+timestamp+"-0000&format=json"
                         sonarExecutions = self.getResponse(sonarExecutionsUrl, 'GET', self.userid, self.passwd, None)
-                        lastUpdatedDate = self.timeMachine(sonarExecutions)                        
+                        lastUpdatedDate = self.timeMachine(sonarExecutions,projectKey,projectName)                        
                     else:
                         #Find out the artifact version from sonar project analysis api. 
                         #This api is available from sonar 6.3 version onwards. max records for the api is 500 

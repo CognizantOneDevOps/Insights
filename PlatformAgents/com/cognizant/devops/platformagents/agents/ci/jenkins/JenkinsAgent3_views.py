@@ -55,10 +55,10 @@ class JenkinsAgent(BaseAgent):
                 
         else:
             self.currentJenkinsMaster = 'master'
-            if viewFilterRequired:
-                self.fetchViews(jenkinsMasters[jenkinsMaster])
-            else:
-                self.processFolder(jenkinsMasters[jenkinsMaster],"All")
+            #if viewFilterRequired:
+            #    self.fetchViews(jenkinsMasters[self.currentJenkinsMaster])
+            #else:
+            #    self.processFolder(jenkinsMasters[self.currentJenkinsMaster],"All")
         #self.publishToolsData(self.data)
         self.updateTrackingJson(self.tracking)
 
@@ -100,7 +100,7 @@ class JenkinsAgent(BaseAgent):
                         if lastBuildNumber:
                             self.getJobDetails(url, lastBuildNumber, jobName,view)
                 else:
-                    self.processFolder(url)
+                    self.processFolder(url,view)
         else:
             restUrl = url + 'api/json?tree=lastBuild%5Bnumber%5D,url,name'
             jenkinsProjects = self.getResponse(restUrl, 'GET', self.userid, self.passwd, None)

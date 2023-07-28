@@ -209,13 +209,9 @@ export class UserOnboardingComponent implements OnInit {
           usersResponseData.data != undefined &&
           usersResponseData.status == "success"
         ) {
-          var auth_uuid = usersResponseData.data.substring(0, 15);
-          var data = usersResponseData.data.substring(
-            15,
-            usersResponseData.data.length
-          );
           var dataValue = {};
-          dataValue["data"] = self.dataShare.decryptedData(auth_uuid, data);
+          let decodedData = self.dataShare.decryptedData( usersResponseData.data);
+          dataValue["data"] = JSON.parse(decodedData);
 
           self.showDetail = true;
           self.showThrobber = false;

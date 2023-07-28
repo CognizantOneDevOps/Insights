@@ -394,7 +394,7 @@ class BaseAgent(object):
             
         except Exception as ex:
             logging.error(ex)
-            self.publishHealthDataForExceptions(self,ex)
+            self.publishHealthDataForExceptions(ex)
         finally:
             '''If agent receive the STOP command, Python program should exit gracefully after current data collection is complete.  '''
             if self.shouldAgentRun == False:

@@ -96,19 +96,115 @@
         "timeformat": "%Y-%m-%dT%H:%M:%S."
       }
     },
+    "timeXFields": {
+      "insightsTimeXFieldMapping": {
+        "timefield": "consumptionTime",
+        "isEpoch": false,
+        "timeformat": "%Y-%m-%dT%H:%M:%SZ"
+      }
+    },
+    "relationMetadata": {
+      "groupUser": {
+        "relation": {
+          "properties": [
+            "accessLevel"
+          ],
+          "name": "GROUP_HAS_USER",
+          "source": {
+            "labels": [
+              "GITLAB_GROUP"
+            ],
+            "constraints": [
+              "groupId"
+            ]
+          },
+          "destination": {
+            "labels": [
+              "GITLAB_USER"
+            ],
+            "constraints": [
+              "userId",
+              "userName",
+              "license",
+              "state"
+            ],
+            "selectedProperties": [
+              "inSightsTimeX",
+              "inSightsTime"
+            ]
+          }
+        }
+      },
+      "projectUser": {
+        "relation": {
+          "properties": [
+            "accessLevel"
+          ],
+          "name": "PROJECT_HAS_USER",
+          "source": {
+            "labels": [
+              "GITLAB_PROJECT"
+            ],
+            "constraints": [
+              "projectId"
+            ]
+          },
+          "destination": {
+            "labels": [
+              "GITLAB_USER"
+            ],
+            "constraints": [
+              "userId",
+              "userName",
+              "license",
+              "state"
+            ],
+            "selectedProperties": [
+              "inSightsTimeX",
+              "inSightsTime"
+            ]
+          }
+        }
+      }
+    },
     "metaData": {
       "branch": {
         "labels": ["GITLAB_BRANCH"],
         "dataUpdateSupported": true,
-        "uniqueKey": ["projectName", "branchName"]
+        "uniqueKey": ["projectName","branchName"]
+      },
+      "group": {
+        "labels": [
+          "GITLAB_GROUP"
+        ],
+        "dataUpdateSupported": true,
+        "uniqueKey": [
+          "groupId"
+        ]
+      },
+      "project": {
+        "labels": [
+          "GITLAB_PROJECT"
+        ],
+        "dataUpdateSupported": true,
+        "uniqueKey": [
+          "projectId"
+        ]
+      },
+      "fileDetail": {
+        "labels": [
+          "GITLAB_FILE"
+        ],
+        "dataUpdateSupported": true,
+        "uniqueKey": ["projectId","fileId"]
       },
       "mergeRequest": {
         "dataUpdateSupported": true,
-        "uniqueKey": ["projectPath", "mergeReqId", "gitType"]
+        "uniqueKey": ["projectPath","mergeReqId","gitType"]
       },
       "commit": {
         "dataUpdateSupported": true,
-        "uniqueKey": ["projectPath", "commitId", "gitType"]
+        "uniqueKey": ["projectPath","commitId","gitType"]
       }
     }
   },

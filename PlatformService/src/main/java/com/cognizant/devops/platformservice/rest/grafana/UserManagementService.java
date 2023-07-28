@@ -99,7 +99,8 @@ public class UserManagementService {
 				restrictedArray.add(restrictedObject);
 			}
 			String passKey = UUID.randomUUID().toString().substring(0, 15);
-		    String encodedData = passKey+AES256Cryptor.encrypt(restrictedArray.toString(), passKey);
+//		    String encodedData = passKey + new String(Base64.getEncoder().encode(restrictedArray.toString().getBytes()));
+			 String encodedData = AES256Cryptor.encryptWeb(passKey, restrictedArray.toString());
 			return PlatformServiceUtil
 					.buildSuccessResponseWithData(encodedData);
 		} catch (JsonSyntaxException e) {

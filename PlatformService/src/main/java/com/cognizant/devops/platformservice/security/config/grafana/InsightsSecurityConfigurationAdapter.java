@@ -89,8 +89,10 @@ public class InsightsSecurityConfigurationAdapter  {
 			log.debug("message Inside InsightsSecurityConfigurationAdapter,HttpSecurity check **** ");
 			
 			http.cors();
-			http.csrf().ignoringRequestMatchers(AuthenticationUtils.CSRF_IGNORE.toArray(new String[0]))
-					.csrfTokenRepository(authenticationUtils.csrfTokenRepository());
+			
+			List<AntPathRequestMatcher> antMatchers = new ArrayList<>();
+            AuthenticationUtils.CSRF_IGNORE.forEach(str ->antMatchers.add(new AntPathRequestMatcher(str)));
+            http.csrf().ignoringRequestMatchers(antMatchers.toArray(new AntPathRequestMatcher[0])).csrfTokenRepository(authenticationUtils.csrfTokenRepository());
 					
 			http.exceptionHandling().accessDeniedHandler(springAccessDeniedHandler); 
 			http.headers().xssProtection().and().contentSecurityPolicy("script-src 'self'");
@@ -102,11 +104,11 @@ public class InsightsSecurityConfigurationAdapter  {
 			http.headers().frameOptions().sameOrigin();
 			
 			http.anonymous().disable().authorizeHttpRequests()
-			.requestMatchers("/datasources/**").permitAll()
-			.requestMatchers("/datasource/**").permitAll()
-			.requestMatchers("/admin/**").hasAuthority("Admin")
-			.requestMatchers("/traceability/**").hasAuthority("hasAuthority('Admin')")
-			.requestMatchers("/configure/loadConfigFromResources").permitAll()
+			.requestMatchers(new AntPathRequestMatcher("/datasources/**")).permitAll()
+			.requestMatchers(new AntPathRequestMatcher("/datasource/**")).permitAll()
+			.requestMatchers(new AntPathRequestMatcher("/admin/**")).hasAuthority("Admin")
+			.requestMatchers(new AntPathRequestMatcher("/traceability/**")).hasAuthority("hasAuthority('Admin')")
+			.requestMatchers(new AntPathRequestMatcher("/configure/loadConfigFromResources")).permitAll()
 			.anyRequest().authenticated();
 			
 			http.logout().logoutSuccessUrl("/");
@@ -120,7 +122,7 @@ public class InsightsSecurityConfigurationAdapter  {
 	 @Bean
 	    public WebSecurityCustomizer webSecurityCustomizer() {
 	        return (web) -> web.ignoring()
-	        		.requestMatchers("/datasource/**");
+	        		.requestMatchers(new AntPathRequestMatcher("/datasource/**"));
 	  }
 	
 	/**

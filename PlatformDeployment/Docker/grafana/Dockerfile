@@ -13,7 +13,7 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 #-------------------------------------------------------------------------------
-ARG BASE_IMAGE=grafana-oss:9.0.6
+ARG BASE_IMAGE=grafana-oss:9.5.5
 FROM grafana/${BASE_IMAGE} as grafanaalpine
 
 FROM alpine:latest

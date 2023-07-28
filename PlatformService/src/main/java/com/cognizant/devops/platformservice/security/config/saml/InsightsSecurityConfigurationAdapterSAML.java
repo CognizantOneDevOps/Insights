@@ -101,8 +101,9 @@ public class InsightsSecurityConfigurationAdapterSAML {
 			log.debug("Inside SAMLAuthConfig, check http security **** ");
 			http.cors();
 			
-			http.csrf().ignoringRequestMatchers(AuthenticationUtils.CSRF_IGNORE.toArray(new String[0]))
-			.csrfTokenRepository(authenticationUtils.csrfTokenRepository());
+			List<AntPathRequestMatcher> antMatchers = new ArrayList<>();
+            AuthenticationUtils.CSRF_IGNORE.forEach(str ->antMatchers.add(new AntPathRequestMatcher(str)));
+            http.csrf().ignoringRequestMatchers(antMatchers.toArray(new AntPathRequestMatcher[0])).csrfTokenRepository(authenticationUtils.csrfTokenRepository());
 			
 			http.headers().xssProtection().and().contentSecurityPolicy("script-src 'self'");
 			
@@ -111,10 +112,10 @@ public class InsightsSecurityConfigurationAdapterSAML {
 			http.addFilterAfter(samlFilter(), BasicAuthenticationFilter.class);
 
 			http.anonymous().disable().authorizeHttpRequests()
-			.requestMatchers("/admin/**").hasAuthority("Admin")
-			.requestMatchers("/traceability/**").hasAuthority("hasAuthority('Admin')") 
-			.requestMatchers("/configure/loadConfigFromResources").permitAll()
-			.anyRequest().authenticated().and().exceptionHandling().accessDeniedHandler(springAccessDeniedHandler);;
+			.requestMatchers(new AntPathRequestMatcher("/admin/**")).hasAuthority("Admin")
+			.requestMatchers(new AntPathRequestMatcher("/traceability/**")).hasAuthority("hasAuthority('Admin')") 
+			.requestMatchers(new AntPathRequestMatcher("/configure/loadConfigFromResources")).permitAll()
+			.anyRequest().authenticated().and().exceptionHandling().accessDeniedHandler(springAccessDeniedHandler);
 		}
 		return http.build();
 	}
@@ -210,7 +211,7 @@ public class InsightsSecurityConfigurationAdapterSAML {
 	 @Bean
 	    public WebSecurityCustomizer webSecurityCustomizer() {
 	        return web -> web.ignoring()
-	        		.requestMatchers("/datasource/**");
+	        		.requestMatchers(new AntPathRequestMatcher("/datasource/**"));
 	  }
 	
 	

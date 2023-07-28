@@ -15,13 +15,14 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.rest.AccessGroupManagement;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
 import javax.servlet.http.HttpServletRequest;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,15 +34,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
-import com.cognizant.devops.platformcommons.dal.RestApiHandler;
 import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformdal.grafana.pdf.GrafanaOrgToken;
 import com.cognizant.devops.platformservice.rest.es.models.DashboardResponse;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
@@ -50,8 +50,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
-import jakarta.ws.rs.core.NewCookie;
 
 @RestController
 @RequestMapping("/accessGrpMgmt")
@@ -66,7 +64,6 @@ public class AccessGroupManagement {
 	AccessGroupManagementServiceImpl accessGrpMgmtServiceImpl;
 
 	private static final String PATH = "/api/users/lookup?loginOrEmail=";
-	private static final String USERDETAIL = "/api/users/search?&query=";
 	private static final String COLON = ":";
 	private static final String AUTHORIZATION = "Authorization";
 	private static final String BASIC = "Basic ";
@@ -214,6 +211,7 @@ public class AccessGroupManagement {
 	public @ResponseBody JsonObject addUser(@RequestBody String requserPropertyList) {
 		String message = null;
 		try {
+			String genkey = UUID.randomUUID().toString();
 			String userPropertyList = ValidationUtils.validateRequestBody(requserPropertyList);
 			JsonObject updateAgentJson = JsonUtils.parseStringAsJsonObject(userPropertyList);
 			int orgId = updateAgentJson.get(PlatformServiceConstants.ORGID).getAsInt();
@@ -221,7 +219,7 @@ public class AccessGroupManagement {
 			String email = updateAgentJson.get(PlatformServiceConstants.EMAIL).getAsString();
 			String userName = updateAgentJson.get("userName").getAsString();
 			String role = updateAgentJson.get("role").getAsString();
-			String password = ValidationUtils.getSealedObject(updateAgentJson.get("password").getAsString());
+			String pwd = ValidationUtils.getSealedObject(updateAgentJson.get("password").getAsString(), genkey);
 			String orgName = updateAgentJson.get("orgName").getAsString();
 
 			Map<String, String> grafanaHeader = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
@@ -278,7 +276,7 @@ public class AccessGroupManagement {
 					requestCreate.addProperty("login", userName);
 					requestCreate.addProperty("email", email);
 					requestCreate.addProperty("role", role);
-					requestCreate.addProperty("password", ValidationUtils.getDeSealedObject(password));
+					requestCreate.addProperty("password", ValidationUtils.getDeSealedObject(pwd, genkey));
 					String responseCreate = grafanaHandler.grafanaPost("/api/admin/users", requestCreate,
 							grafanaHeader);
 

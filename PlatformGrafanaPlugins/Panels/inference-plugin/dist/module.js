@@ -10,7 +10,7 @@ define(["@grafana/data","@grafana/runtime","emotion","react"], (__WEBPACK_EXTERN
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "InferencePanel": () => (/* binding */ InferencePanel)
+/* harmony export */   InferencePanel: () => (/* binding */ InferencePanel)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
@@ -298,7 +298,7 @@ var InferencePanel = /*#__PURE__*/function (_React$Component) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "processData": () => (/* binding */ processData)
+/* harmony export */   processData: () => (/* binding */ processData)
 /* harmony export */ });
 function processData(props) {
   var jsonArrtoStr = [];
@@ -1184,7 +1184,7 @@ var __webpack_exports__ = {};
   \*******************/
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "plugin": () => (/* binding */ plugin)
+/* harmony export */   plugin: () => (/* binding */ plugin)
 /* harmony export */ });
 /* harmony import */ var _grafana_data__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @grafana/data */ "@grafana/data");
 /* harmony import */ var _grafana_data__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_grafana_data__WEBPACK_IMPORTED_MODULE_0__);

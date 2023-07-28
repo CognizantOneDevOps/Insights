@@ -111,10 +111,8 @@ export class ServerConfigurationComponent implements OnInit {
       await this.serverconfigService.loadServerConfigurations();
     if (configresponse.status == "success") {
       this.isConfigAvailable = true;
-      var auth_uuid = configresponse.data.substring(0, 15);
-      var data = configresponse.data.substring(15, configresponse.data.length);
-      var dataValue = this.dataShare.decryptedData(auth_uuid, data);
-      this.serverConfigData = dataValue;
+      var dataValue = this.dataShare.decryptedData(configresponse.data);
+      this.serverConfigData = JSON.parse(dataValue);
 
       this.getconfigDataParsed(this.serverConfigData);
     } else {

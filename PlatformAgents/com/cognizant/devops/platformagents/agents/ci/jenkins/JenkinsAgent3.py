@@ -34,6 +34,7 @@ class JenkinsAgent(BaseAgent):
         self.userid = self.getCredential("userid")
         self.passwd = self.getCredential("passwd")
         self.BaseUrl = self.config.get("baseUrl", '')
+        self.sslVerify = self.config.get("communication", '').get("sslVerify")
         startFrom = self.config.get("startFrom", '')
         startFrom = parser.parse(startFrom)
         startFrom = mktime(startFrom.timetuple()) + startFrom.microsecond/1000000.0
@@ -169,6 +170,10 @@ class JenkinsAgent(BaseAgent):
             buildUrl = build['buildUrl']
             logUrl = buildUrl + "consoleText"
             logResponse = self.getBuildLog(logUrl)
+            if logResponse.find('/ce/task?id=') != -1:
+                build["ceTaskId"] = logResponse.split('/ce/task?id=')[1].split(' ')[0]
+            if logResponse.find('?analysisId=') != -1:
+                build["analysisId"] = logResponse.split('?analysisId=')[1].split(' ')[0]
             if logResponse.find('Uploaded: ')!=-1:                
                 build["resourcekey"]=logResponse.split('Uploaded: ')[1].split('\n')[0]
                 build["resourcekey"]=build["resourcekey"][build["resourcekey"].find('repository/'):build["resourcekey"].rfind('/')] + build["resourcekey"][build["resourcekey"].rfind('.'):build["resourcekey"].rfind(' (')]                
@@ -240,9 +245,8 @@ class JenkinsAgent(BaseAgent):
         if self.userid == None and self.passwd ==  None:
             auth = None
         else:
-            auth =HTTPBasicAuth(self.userid,self.passwd)
-        sslVerify = self.config.get("communication", '').get("sslVerify")
-        xmlResponse = requests.get(configXmlUrl, auth=auth, verify=False)
+            auth =HTTPBasicAuth(self.userid,self.passwd)     
+        xmlResponse = requests.get(configXmlUrl, auth=auth, verify=self.sslVerify)
         root = ET.fromstring(xmlResponse.text.encode('UTF-8').strip())
         rootTag = root.tag
         rootTagLen = len(rootTag) + 1
@@ -260,12 +264,12 @@ class JenkinsAgent(BaseAgent):
         return injectData
     def getBuildLog(self,url):
         auth = HTTPBasicAuth(self.userid, self.passwd)
-        response = requests.get(url, auth=auth)
+        response = requests.get(url, auth=auth, verify=self.sslVerify)
         osversion = self.config.get('osversion', None)
         if osversion.lower() == 'windows':
-            return response.content.decode('cp1252')
+            return response.content.decode('cp1252',errors="ignore")
         else:
-            return response.content.decode('utf-8')
+            return response.content.decode('utf-8',errors="ignore")
 
 if __name__ == "__main__":
     JenkinsAgent()

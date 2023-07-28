@@ -70,9 +70,7 @@ public class ServerConfigServiceImpl {
 		
 		ApplicationConfigProvider config;
 		try {
-			String passkey = serverConfigJson.substring(0, 15);
-			String auth= serverConfigJson.substring( 15, serverConfigJson.length());
-			String serverConfigJsonDecrypt = AES256Cryptor.decrypt(auth, passkey);
+			String serverConfigJsonDecrypt =  AES256Cryptor.decryptWeb(serverConfigJson);
 			config = gson.fromJson(serverConfigJsonDecrypt, ApplicationConfigProvider.class);
 			JsonObject serverConfigReceivedJson = JsonUtils.parseStringAsJsonObject(serverConfigJsonDecrypt);
 			if (config.getVault().isVaultEnable()) {
@@ -142,7 +140,7 @@ public class ServerConfigServiceImpl {
 		    	serverConfigTempate.add(PlatformServiceConstants.TRUSTED_HOSTS, serverConfigJsonfromStorage.get(PlatformServiceConstants.TRUSTED_HOSTS));
 		    }
 		    String passKey = UUID.randomUUID().toString().substring(0, 15);
-		    encodededData = passKey+AES256Cryptor.encrypt(serverConfigJsonMerged.toString(), passKey);
+		    encodededData = AES256Cryptor.encryptWeb(passKey, serverConfigJsonMerged.toString());
 		} catch (Exception e) {
 			log.error("Error while reading report template ",e);
 			throw new InsightsCustomException("Error while reading report template "+e.getMessage());

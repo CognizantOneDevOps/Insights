@@ -76,13 +76,13 @@ public class GrafanaUserDetailsUtil {
 	}
 
 	private static UserDetails checkGrafanaAuthentication(String token,HttpServletRequest request) {
-		String authHeader = ValidationUtils.decryptAutharizationToken(token);
 		Map<String, String> headers = new HashMap<>();
 		String userName = null;
 		String credential = null;
 		// Validate if the Logged in user is same as that of grafana logged in user
 		try {
-			String decodedAuthHeader = new String(Base64.getDecoder().decode(authHeader.split(" ")[1]),
+			String authHeader = ValidationUtils.decryptAutharizationToken(token);
+			String decodedAuthHeader = new String(Base64.getDecoder().decode(authHeader),
 					StandardCharsets.UTF_8);
 			String[] authTokens = decodedAuthHeader.split(":");
 			userName = authTokens[0];
