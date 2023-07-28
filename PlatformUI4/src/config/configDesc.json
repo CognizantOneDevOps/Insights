@@ -50,7 +50,7 @@
 		"logoutURL": "/PlatformService/user/logout"
 	},
 	"SAML": {
-		"loginURL": "/PlatformService/saml/login",
+		"loginURL": "/PlatformService/saml2/authenticate/insights_saml2_sso",
 		"logoutURL": "/PlatformService/saml/logout"
 	},
 	"JWT": {

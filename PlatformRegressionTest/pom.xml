@@ -12,13 +12,13 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>10.1</version>
+		<version>10.2</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformRegressionTest</artifactId>
 	<packaging>jar</packaging>
-	<version>10.1</version>
+	<version>10.2</version>
 	<name>PlatformRegressionTest</name>
 	<url>http://maven.apache.org</url>
 	<properties>
@@ -44,13 +44,19 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>10.1</version>
+			<version>10.2</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/io.rest-assured/rest-assured -->
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
-			<version>4.4.0</version>
+			<version>5.3.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.ccil.cowan.tagsoup</groupId>
+					<artifactId>tagsoup</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
 		<dependency>
@@ -71,7 +77,7 @@
 		<dependency>
 		    <groupId>com.google.guava</groupId>
 		    <artifactId>guava</artifactId>
-		    <version>31.1-jre</version>
+		    <version>32.0.0-jre</version>
 		</dependency>
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
@@ -94,18 +100,28 @@
 					<groupId>io.netty</groupId>
 					<artifactId>netty-transport-native-epoll</artifactId>
 				</exclusion>
+				<exclusion>
+				   <groupId>io.netty</groupId>
+			       <artifactId>netty-common</artifactId>
+				</exclusion>
+				<exclusion>
+				   <groupId>io.netty</groupId>
+		           <artifactId>netty-transport</artifactId>
+				</exclusion>
+				<exclusion>
+				   <groupId>io.netty</groupId>
+		           <artifactId>netty-codec-http</artifactId>
+				</exclusion>
+				<exclusion>
+				   <groupId>io.netty</groupId>
+		           <artifactId>netty-buffer</artifactId>
+				</exclusion>
 			</exclusions>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/io.netty/netty-all -->
-		<dependency>
-		    <groupId>io.netty</groupId>
-		    <artifactId>netty-all</artifactId>
-		    <version>4.1.93.Final</version>
 		</dependency>
        <dependency>
            <groupId>com.google.guava</groupId>
            <artifactId>guava</artifactId>
-           	<version>31.1-jre</version>
+           	<version>32.0.0-jre</version>
 		</dependency>		
 		<dependency>
 		    <groupId>org.freemarker</groupId>
@@ -115,7 +131,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>10.1</version>
+			<version>10.2</version>
 		</dependency>
 	</dependencies>
 	<build>

@@ -126,17 +126,11 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
     }
 
     downloadPdf() {
-        this.list = [];
-        this.toolSummaryArray = [];
-        this.map = new Map<String, Object[]>();
-        this.cacheMap = new Map<String, Object[]>();
-        this.isEnable = false;
-        this.showDiv = false;
         if (this.isDownload) {
             this.createHTMLImage().then((imageString) => {
                 this.getTraceabilityPDF(this.selectedTool, this.selectedField, this.fieldValue, this.issueTypeSelected, imageString);
             });
-        }
+        } 
     }
 
     createHTMLImage(): Promise<String> {
@@ -181,7 +175,9 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
         else {
             this.getAssetHistoryDetails(this.selectedTool, this.selectedField, this.fieldValue, "Other");
         }
-        this.isDownload = true;
+
+
+        
     }
     filterValues(data, key) {
         let searchKey = data;
@@ -254,6 +250,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
                     this.messageDialog.openSnackBar("No data found for the given selection.",'error');
                     //this.messageDialog.showApplicationsMessage("No data found for the given selection.", "ERROR");
                     this.isDatainProgress = false;
+                    this.isDownload = false;
                 }
 
             }
@@ -418,17 +415,21 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
                         this.showAll = true;
                         this.workflow();
                         this.isDatainProgress = false;
+                        this.isDownload = true;
                     }
                     else {
                         this.messageDialog.openSnackBar("No data found for the given selection.",'error');
                         //this.messageDialog.showApplicationsMessage("No data found for the given selection.", "ERROR");
                         this.isDatainProgress = false;
+                        this.isDownload = false;
+
                     }
 
                 }
                 else {
                     this.messageDialog.showApplicationsMessage(data.message, "ERROR");
                     this.isDatainProgress = false;
+                    this.isDownload = false;
                 }
             });
 
@@ -660,6 +661,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
         this.cacheMap.clear();
         this.map.clear();
         this.list1 = [];
+        this.isDownload = false;
         console.log("clear" + this.map);
     }
     reset() {
@@ -675,6 +677,13 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
         console.log('tabChangeEvent => ', tabChangeEvent);
         console.log('index => ', tabChangeEvent.index);
         console.log('textLabel => ', tabChangeEvent.tab.textLabel);
-        this.selectedTabIndex = tabChangeEvent.index
+        this.selectedTabIndex = tabChangeEvent.index;
+        if(this.selectedTabIndex == 1) {
+            this.isDownload = false;
+        } else {
+            if(this.list1.length > 0) {
+                this.isDownload = true;
+            }
+        }
       }
 }

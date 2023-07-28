@@ -36,8 +36,7 @@ export class ServerConfigurationService implements IServerConfigurationService {
   saveServerConfigurations(serverConfigJson: string): Promise<any> {
     var auth_uuid = uuid();
     auth_uuid = auth_uuid.substring(0, 15);
-    var dataValue =
-      auth_uuid + this.dataShare.encryptData(auth_uuid, serverConfigJson);
+    var dataValue = this.dataShare.encryptAES(auth_uuid, serverConfigJson);
     return this.restCallHandlerService
       .postWithData("SAVE_SERVER_CONFIG", dataValue, "", {
         "Content-Type": "application/x-www-form-urlencoded",

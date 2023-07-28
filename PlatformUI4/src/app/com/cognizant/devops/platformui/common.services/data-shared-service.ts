@@ -36,6 +36,8 @@ export class DataSharedService {
   userName: String;
   private currOrg = new Subject<string>();
   currOrgTitle = this.currOrg.asObservable();
+  keySize = 128 / 32;
+  iterationCount = 1000;
 
   constructor(@Inject(SESSION_STORAGE) private storage: StorageService, private datePipe: DatePipe,
     private cookieService: CookieService, public router: Router,
@@ -153,10 +155,11 @@ export class DataSharedService {
       if (strAuthorization.indexOf("Basic") != -1) {
         var auth_uuid = uuid();
         auth_uuid = auth_uuid.substring(0, 15);
-        var auth = this.encryptData(auth_uuid, strAuthorization) + auth_uuid;
+        strAuthorization = strAuthorization.replace("Basic ", "");
+        var auth =  this.encryptAES(auth_uuid, strAuthorization);
         this.storage.set("Authorization", auth);
       } else {
-        this.storage.set("Authorization", strAuthorization)
+        this.storage.set("Authorization", strAuthorization )
       }
     }
   }
@@ -240,7 +243,6 @@ export class DataSharedService {
       if (InsightsInitService.autheticationProtocol == "NativeGrafana") {
         var varDateSessionExpirationTime = new Date(this.storage.get('dateSessionExpiration'));
         var date = new Date();
-        // console.log(dashboardSessionExpirationTime + "  ===== " + date);
         if (varDateSessionExpiration == undefined) {
           this.clearSessionData()
           return true;
@@ -250,7 +252,6 @@ export class DataSharedService {
           this.clearSessionData()
           return true;
         } else {
-          //console.log("session present");
           var minutes = 30;
           date.setTime(date.getTime() + (minutes * 60 * 1000));
           this.storage.set('Authorization', authToken);
@@ -293,17 +294,6 @@ export class DataSharedService {
     return dialogRef;
   }
 
-  public encryptData(keys, value): string {
-    var encryptedValue = CryptoJS.AES.encrypt(value, keys);
-    return encryptedValue.toString();
-  }
-
-  public decryptedData(keys, value): string {
-    const bytes = CryptoJS.AES.decrypt(value, keys);
-    if (bytes.toString()) {
-      return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-    }
-  }
 
   public getCurrentYear() {
     var Year = new Date().getFullYear();
@@ -363,6 +353,44 @@ export class DataSharedService {
       inSightsTimeX,
       "yyyy-MM-dd HH:mm:ss"
     );
+  }
+
+  public encryptAES (passPhrase, plainText) {
+    var iv = CryptoJS.lib.WordArray.random(128/8).toString(CryptoJS.enc.Hex);
+    var salt = CryptoJS.lib.WordArray.random(128/8).toString(CryptoJS.enc.Hex);
+    var key = this.generateKey(salt, passPhrase);
+    var encrypted = CryptoJS.AES.encrypt(
+        plainText,
+        key,
+        { iv: CryptoJS.enc.Hex.parse(iv) });
+    return encrypted.ciphertext.toString(CryptoJS.enc.Base64) + salt + iv + passPhrase;
+     
+  }
+
+  generateKey(salt, passPhrase) {
+    var key = CryptoJS.PBKDF2(
+        passPhrase,
+        CryptoJS.enc.Hex.parse(salt),
+        { keySize: this.keySize, iterations: this.iterationCount });
+    return key;
+  }
+
+  public decryptedData(cipherText) {
+    
+    var passPhrase = cipherText.substring(cipherText.length - 15, cipherText.length);
+    var iv = cipherText.substring(cipherText.length - (15+32), cipherText.length - 15);
+    var salt = cipherText.substring(cipherText.length - (15+32+32), cipherText.length - (15+32));
+    var cipher = cipherText.substring(0, cipherText.length - (15+32+32));
+
+    var key = this.generateKey(salt, passPhrase);
+    var cipherParams = CryptoJS.lib.CipherParams.create({
+        ciphertext: CryptoJS.enc.Base64.parse(cipher)
+    });
+    var decrypted = CryptoJS.AES.decrypt(
+        cipherParams,
+        key,
+        { iv: CryptoJS.enc.Hex.parse(iv) });
+    return decrypted.toString(CryptoJS.enc.Utf8);
   }
 
 

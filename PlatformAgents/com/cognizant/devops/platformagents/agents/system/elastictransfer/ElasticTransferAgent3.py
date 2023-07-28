@@ -150,7 +150,7 @@ def getCSVHeaderFromESIndex(esHelperObj,indexName1,indexType1,logs):
                 csvHeaderList[k] = k+colAppendType
                 logs.append('Old Type....'+k+'...new Type......'+csvHeaderList[k])
 
-    logs.append("Headers from ES Index::"+csvHeaderList)
+    logs.append("Headers from ES Index::{0}".format(csvHeaderList))
     
     return csvHeaderList
     #exit()

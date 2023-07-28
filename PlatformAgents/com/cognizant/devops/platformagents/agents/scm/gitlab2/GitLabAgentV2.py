@@ -46,10 +46,184 @@ class GitLabAgent2(BaseAgent):
         self.startFrom = parser.parse(startFromStr, ignoretz=True)
         self.dynamicTemplate = self.config.get("dynamicTemplate", {})
         self.metaData = self.dynamicTemplate.get("metaData", {})
-
+        self.groupUserData = []
+        self.fileData = []
+        self.projectUserData = []
+        
         self.setupTrackingCachePath("trackingCache")
-
+        self.processAllUserDetails()
+        self.processGroups()
         self.processProjects()
+
+    def processAllUserDetails(self):
+        self.baseLogger.info("Inside Process file Details")
+        pageNumber = 1
+        fetchNextPage = True
+        defaultParams = "?access_token=" + self.accessToken + "&recursive=true&per_page=100&page="
+        while fetchNextPage:
+            getAllUserDetailsURL = self.getCommitsBaseURL + "/users" + defaultParams + str(pageNumber)
+            try:
+                userDetails = self.getResponse(getAllUserDetailsURL, "GET", None, None, None)
+            except Exception as ex:
+                self.publishHealthDataForExceptions(ex)
+                userDetails = []
+            if len(userDetails) == 0:
+                fetchNextPage = False
+                break
+            for user in userDetails:
+                userDict = {
+                    "userId":user.get("id",""),
+                    "userName": user.get("username",""),
+                    "license":self.processUsersLicense(user.get("id","")),
+                    "state":user.get("state",""),
+                    "consumptionTime": self.timeStampNow()
+                }
+                self.allUsers.append(userDict)
+            if len(userDetails) == 100:
+                pageNumber = pageNumber + 1
+            else:
+                fetchNextPage = False
+                break
+        if self.allUsers:
+            insightTimeX = self.dynamicTemplate.get("timeXFields", {}).get("insightsTimeXFieldMapping", None)
+            metaData = self.metaData.get("user", {})
+            self.publishDetails(self.allUsers , metaData , insightTimeX )
+        self.baseLogger.info("allUsers details published")
+
+    def processGroups(self):
+        self.baseLogger.info("Inside Process Group Details")
+        pageNumber = 1
+        fetchNextPage = True
+        defaultParams = "?access_token=" + self.accessToken + "&per_page=100&page="
+        groupData=[]
+        groupUsers=[]
+        while fetchNextPage:
+            getGroupsURL = self.getCommitsBaseURL + "/groups" + defaultParams + str(pageNumber)
+            try:
+                groups = self.getResponse(getGroupsURL, "GET", None, None, None)
+            except Exception as ex:
+                self.publishHealthDataForExceptions(ex)
+                groups = []
+            if len(groups) == 0:
+                fetchNextPage = False
+                break
+            for group in groups:
+                groupDict = {
+                    "groupId": group.get("id",""),
+                    "groupFullName": group.get("full_name",""),
+                    "createdAt":group.get("created_at",""),
+                    "consumptionTime": self.timeStampNow()
+                }
+                groupData.append(groupDict)
+                baseAPI = self.getCommitsBaseURL + "/groups/"+ str(group.get("id",""))
+                injectData = {
+                    "groupId" : group.get("id","")
+                }
+                groupUsers += self.processUsers(baseAPI,injectData)
+            if len(groups) == 100:
+                pageNumber = pageNumber + 1
+            else:
+                fetchNextPage = False
+                break
+        if groupData:
+            insightTimeX = self.dynamicTemplate.get("timeXFields", {}).get("insightsTimeXFieldMapping", None)
+            metaData = self.metaData.get("group", {})
+            self.publishDetails(groupData , metaData , insightTimeX )
+            relationshipMetaData = self.dynamicTemplate.get("relationMetadata", {}).get("groupUser",{})
+            self.publishDetails(groupUsers , relationshipMetaData , insightTimeX )
+       
+    def processUsers(self,baseAPI,injectData):
+        self.baseLogger.info("Inside Process User Details")
+        pageNumber = 1
+        fetchNextPage = True
+        defaultParams = "?access_token=" + self.accessToken + "&per_page=100&page="
+        usersData=[]
+        while fetchNextPage:
+            getUsersURL = baseAPI +"/members/all" + defaultParams + str(pageNumber)
+            try:
+                users = self.getResponse(getUsersURL, "GET", None, None, None)
+            except Exception as ex:
+                self.publishHealthDataForExceptions(ex)
+                users = []
+            if len(users) == 0:
+                fetchNextPage = False
+                break
+            for user in users:
+                userDict = {
+                    "userId":user.get("id",""),
+                    "userName": user.get("username",""),
+                    "accessLevel":user.get("access_level",""),
+                    "license":self.processUsersLicense(user.get("id","")),
+                    "state":user.get("state",""),
+                    "consumptionTime": self.timeStampNow()
+                }
+                userDict.update(injectData)
+                usersData.append(userDict)
+            if len(users) == 100:
+                pageNumber = pageNumber + 1
+            else:
+                fetchNextPage = False
+                break
+        return usersData
+           
+    def processUsersLicense(self,id):
+        self.baseLogger.info("Inside Process License User Details")
+        defaultParams = "?access_token=" + self.accessToken
+        getUsersURL = self.getCommitsBaseURL + "/users/"+ str(id) + defaultParams
+        try:
+            userDetail = self.getResponse(getUsersURL, "GET", None, None, None)
+        except Exception as ex:
+            self.publishHealthDataForExceptions(ex)
+            userDetail = {}
+        return userDetail.get("using_license_seat",None)
+           
+    def processFileDetails(self, projectDict):
+        projectId=projectDict["projectId"]
+        self.baseLogger.info("Inside Process file Details")
+        pageNumber = 1
+        fetchNextPage = True
+        branch = projectDict["defaultBranch"]
+        defaultParams = "?access_token=" + self.accessToken + "&recursive=true&branch="+branch+"&per_page=100&page="
+        while fetchNextPage:
+            getfileDetailsURL = self.getCommitsBaseURL + "/projects/"+ str(projectId) +"/repository/tree" + defaultParams + str(pageNumber)
+            try:
+                fileDetails = self.getResponse(getfileDetailsURL, "GET", None, None, None)
+            except Exception as ex:
+                self.publishHealthDataForExceptions(ex)
+                fileDetails = []
+            if len(fileDetails) == 0:
+                fetchNextPage = False
+                break
+            for fileDetail in fileDetails:
+                if fileDetail.get("type") == "tree":
+                    continue
+                fileDict = {
+                    "projectId": projectId,
+                    "projectName":projectDict["name"],
+                    "branch": branch,
+                    "fileId": fileDetail.get("id",""),
+                    "fileName": fileDetail.get("name",""),
+                    "path": fileDetail.get("path",""),
+                    "consumptionTime": self.timeStampNow()
+                }
+                self.fileData.append(fileDict)
+            if len(fileDetails) == 100:
+                pageNumber = pageNumber + 1
+            else:
+                fetchNextPage = False
+                break
+        if self.fileData:
+            insightTimeX = self.dynamicTemplate.get("timeXFields", {}).get("insightsTimeXFieldMapping", None)
+            metaData = self.metaData.get("fileDetail", {})
+            self.publishDetails(self.fileData , metaData , insightTimeX )
+        self.baseLogger.info("file details published")  
+
+    def publishDetails(self, publishData , MetaData , insighstTimeX ):
+        """Publishes data to the rabbitmq"""
+        timestamp = insighstTimeX.get("timefield", None)
+        timeformat = insighstTimeX.get("timeformat", None)
+        isEpoch = insighstTimeX.get("isEpoch", False)
+        self.publishToolsData(publishData, MetaData, timestamp, timeformat, isEpoch, True)
 
     def processProjects(self):
         """Fetches the projects which has activity after the specified period and process them"""
@@ -58,7 +232,8 @@ class GitLabAgent2(BaseAgent):
         pageNumber = 1
         fetchNextPage = True
         defaultParams = "?access_token=" + self.accessToken + "&per_page=100&last_activity_after=" + startFromFilter + "&sort=asc&page="
-
+        projectUserData=[]
+        projectData=[]
         while fetchNextPage:
             try:
                 projects = self.getResponse(self.getProjectsURL + defaultParams + str(pageNumber), "GET", None, None, None)
@@ -72,6 +247,7 @@ class GitLabAgent2(BaseAgent):
                 projectPath = project.get("path_with_namespace", "")
                 projectName = project.get("name", "")
                 projectId = project.get("id", "")
+                createdAt = project.get("created_at", "")
                 encodedProjectName = urllib.parse.quote_plus(projectPath)
                 projectDefaultBranch = project.get("default_branch", None)
 
@@ -88,82 +264,103 @@ class GitLabAgent2(BaseAgent):
                 projectLastActivityAt = project.get("last_activity_at", None)
                 projectUpdatedAt = parser.parse(projectLastActivityAt, ignoretz=True)
                 if self.startFrom < projectUpdatedAt:
-                    projectDict = {
-                        "id": projectId,
-                        "name": projectName,
-                        "path": projectPath,
-                        "encodedName": encodedProjectName,
-                        "defaultBranch": urllib.parse.quote_plus(projectDefaultBranch)
-                    }
-                    self.processBranches(projectDict, projectTrackingCache)
+                    try:
+                        projectDict = {
+                            "projectId": projectId,
+                            "name": projectName,
+                            "path": projectPath,
+                            "createdAt":createdAt,
+                            "encodedName": encodedProjectName,
+                            "defaultBranch": urllib.parse.quote_plus(projectDefaultBranch)
+                        }
+                        projectData.append(projectDict)
+                        baseAPI = self.getCommitsBaseURL + "/projects/"+ str(project.get("id"))
+                        injectData = {
+                        "projectId" : project.get("id","")
+                        }
+                        projectUserData += self.processUsers(baseAPI,injectData)
+                        self.processBranches(projectDict, projectTrackingCache)
+                        #self.processFileDetails(projectDict)
+                    except Exception as ex:
+                        self.baseLogger.error(ex)
             if len(projects) == 100:
                 pageNumber = pageNumber + 1
             else:
                 fetchNextPage = False
                 break
+        if projectData:
+            insightTimeX = self.dynamicTemplate.get("timeXFields", {}).get("insightsTimeXFieldMapping", None)
+            metaData = self.metaData.get("project", {})
+            self.publishDetails(projectData , metaData , insightTimeX )
+            relationshipMetaData = self.dynamicTemplate.get("relationMetadata", {}).get("projectUser",{})
+            self.publishDetails(projectUserData , relationshipMetaData , insightTimeX )
+            self.baseLogger.info("Inside Process Branch Details")
 
     def processBranches(self, projectDict, projectTrackingCache):
-        """Fetches all the branches in the given projects and processes the data"""
-        self.baseLogger.info("Inside Process Branch Details")
-        pageNumber = 1
-        fetchNextPage = True
-        defaultParams = "?access_token=" + self.accessToken + "&per_page=100&page="
-        allBranches = {projectDict["defaultBranch"]: False}
-        branchesData = []
+        try:
+            """Fetches all the branches in the given projects and processes the data"""
+            self.baseLogger.info("Inside Process Branch Details")
+            pageNumber = 1
+            fetchNextPage = True
+            defaultParams = "?access_token=" + self.accessToken + "&per_page=100&page="
+            allBranches = {projectDict["defaultBranch"]: False}
+            branchesData = []
 
-        while fetchNextPage:
-            getBranchesURL = self.getCommitsBaseURL + projectDict["encodedName"] + "/repository/branches" + defaultParams + str(pageNumber)
-            try:
-                branches = self.getResponse(getBranchesURL, "GET", None, None, None)
-            except Exception as ex:
-                self.publishHealthDataForExceptions(ex)
-                branches = []
-            if len(branches) == 0:
-                fetchNextPage = False
-                break
-            for branch in branches:
-                branchName = branch["name"]
-                encodedBranchName = urllib.parse.quote_plus(branchName)
-                branchTrackingDetails = projectTrackingCache.get(encodedBranchName, {})
-                branchLatestCommit = branchTrackingDetails.get("latestCommitId", None)
+            while fetchNextPage:
+                getBranchesURL = self.getCommitsBaseURL +"/projects/" +projectDict["encodedName"] + "/repository/branches" + defaultParams + str(pageNumber)
+                try:
+                    branches = self.getResponse(getBranchesURL, "GET", None, None, None)
+                except Exception as ex:
+                    self.publishHealthDataForExceptions(ex)
+                    branches = []
+                if len(branches) == 0:
+                    fetchNextPage = False
+                    break
+                for branch in branches:
+                    branchName = branch["name"]
+                    encodedBranchName = urllib.parse.quote_plus(branchName)
+                    branchTrackingDetails = projectTrackingCache.get(encodedBranchName, {})
+                    branchLatestCommit = branchTrackingDetails.get("latestCommitId", None)
 
-                if branchLatestCommit is None or branchLatestCommit != branch.get("commit", {}).get("id", None):
-                    allBranches[encodedBranchName] = True
+                    if branchLatestCommit is None or branchLatestCommit != branch.get("commit", {}).get("id", None):
+                        allBranches[encodedBranchName] = True
+                    else:
+                        allBranches[encodedBranchName] = False
+                    if encodedBranchName not in projectTrackingCache:
+                        branchDict = {
+                            "branchName": branch["name"],
+                            "projectName": projectDict["name"],
+                            "projectPath": projectDict["path"],
+                            "projectId": projectDict["projectId"],
+                            "consumptionTime": self.timeStampNow()
+                        }
+                        branchesData.append(branchDict)
+                if len(branches) == 100:
+                    pageNumber = pageNumber + 1
                 else:
-                    allBranches[encodedBranchName] = False
-                if encodedBranchName not in projectTrackingCache:
-                    branchDict = {
-                        "branchName": branch["name"],
-                        "projectName": projectDict["name"],
-                        "projectPath": projectDict["path"],
-                        "projectId": projectDict["id"],
-                        "consumptionTime": self.timeStampNow()
-                    }
-                    branchesData.append(branchDict)
-            if len(branches) == 100:
-                pageNumber = pageNumber + 1
-            else:
-                fetchNextPage = False
-                break
-        if branchesData:
-            self.publishBranchDetails(branchesData)
-            self.baseLogger.info("Branches details published")
+                    fetchNextPage = False
+                    break
+            if branchesData:
+                self.publishBranchDetails(branchesData)
+                self.baseLogger.info("Branches details published")
 
-        for branch in allBranches:
-            injectData = {
-                "projectId": projectDict["id"],
-                "projectName": projectDict["name"],
-                "projectPath": projectDict["path"],
-                "branchName": branch,
-            }
+            for branch in allBranches:
+                injectData = {
+                    "projectId": projectDict["projectId"],
+                    "projectName": projectDict["name"],
+                    "projectPath": projectDict["path"],
+                    "branchName": branch,
+                }
 
-            if branch == projectDict["defaultBranch"]:
-                injectData["default"] = True
-            else:
-                injectData["default"] = False
-            if allBranches[branch]:
-                self.processCommits(projectDict["encodedName"], injectData, projectTrackingCache, projectDict["defaultBranch"])
-            self.processMergeRequestDetails(projectDict, branch, projectTrackingCache)
+                if branch == projectDict["defaultBranch"]:
+                    injectData["default"] = True
+                else:
+                    injectData["default"] = False
+                if allBranches[branch]:
+                    self.processCommits(projectDict["encodedName"], injectData, projectTrackingCache, projectDict["defaultBranch"])
+                self.processMergeRequestDetails(projectDict, branch, projectTrackingCache)
+        except Exception as ex:
+            self.baseLogger.error(ex)
 
     def publishBranchDetails(self, branchData):
         """Publishes branches data to the rabbitmq"""
@@ -194,7 +391,7 @@ class GitLabAgent2(BaseAgent):
         defaultParams = "?access_token=" + self.accessToken + "&ref_name=" + encodedBranchName + "&since=" + since + "&per_page=100&page="
         pageNumber = 1
         while fetchNextPage:
-            getCommitsURL = self.getCommitsBaseURL + encodedProjectName + "/repository/commits" + defaultParams + str(pageNumber)
+            getCommitsURL = self.getCommitsBaseURL +"/projects/" + encodedProjectName + "/repository/commits" + defaultParams + str(pageNumber)
             try:
                 commits = self.getResponse(getCommitsURL, "GET", None, None, None)
             except Exception as ex:
@@ -248,64 +445,71 @@ class GitLabAgent2(BaseAgent):
             projectTrackingCache[injectData["branchName"]]["defaultBranchCommitList"] = defaultBranchCommitList
 
     def processMergeRequestDetails(self, projectDict, branchName, projectTrackingCache):
-        """Fetches merge request details from the given branch and processes it"""
-        self.baseLogger.info("Processing Merge Request Details")
-        pageNumber = 1
-        fetchNextPage = True
-        branchTrackingDetails = projectTrackingCache.get(branchName, {})
-        latestMergeRequest = None
-        lastTrackedTimeStr = branchTrackingDetails.get("mergeReqModificationTime", self.startFrom)
-        mergeReqEndpoint = self.getCommitsBaseURL + projectDict["encodedName"] + "/merge_requests"
-        defaultParams = "?access_token=" + self.accessToken + "&state=all&sort=desc&order_by=updated_at&updated_after=" + str(lastTrackedTimeStr) + "&source_branch=" + branchName + "&per_page=100&page="
-        mergeReqData = []
-        mergeReqResponseTemplate = self.dynamicTemplate.get("mergeReqResponseTemplate", {})
-        mergeReqMetaData = self.dynamicTemplate.get("metaData", {}).get("mergeRequest", {})
+        try:
+            """Fetches merge request details from the given branch and processes it"""
+            self.baseLogger.info("Processing Merge Request Details")
+            pageNumber = 1
+            fetchNextPage = True
+            branchTrackingDetails = projectTrackingCache.get(branchName, {})
+            latestMergeRequest = None
+            lastTrackedTimeStr = branchTrackingDetails.get("mergeReqModificationTime", self.startFrom)
+            mergeReqEndpoint = self.getCommitsBaseURL +"/projects/" + projectDict["encodedName"] + "/merge_requests"
+            defaultParams = "?access_token=" + self.accessToken + "&state=all&sort=desc&order_by=updated_at&updated_after=" + str(lastTrackedTimeStr) + "&source_branch=" + branchName + "&per_page=100&page="
+            mergeReqData = []
+            mergeReqResponseTemplate = self.dynamicTemplate.get("mergeReqResponseTemplate", {})
+            mergeReqMetaData = self.dynamicTemplate.get("metaData", {}).get("mergeRequest", {})
 
-        while fetchNextPage:
-            mergeReqURL = mergeReqEndpoint + defaultParams + str(pageNumber)
-            try:
-                mergeRequestList = self.getResponse(mergeReqURL, "GET", None, None, None)
-            except Exception as ex:
-                self.publishHealthDataForExceptions(ex)
-                mergeRequestList = []
-            if len(mergeRequestList) == 0:
-                fetchNextPage = False
-                break
-            if latestMergeRequest is None and len(mergeRequestList) > 0:
-                latestMergeRequest = mergeRequestList[0]
-            for mergeRequest in mergeRequestList:
-                if "mergeReqModificationTime" in branchTrackingDetails and branchTrackingDetails["mergeReqModificationTime"] == mergeRequest["updated_at"]:
-                    continue
-                injectData = {
-                    "projectName": projectDict["name"],
-                    "projectId": projectDict["id"],
-                    "projectPath": projectDict["path"],
-                    "mergeRequestNumber": mergeRequest.get("iid", 0),
-                    "gitType": "mergeRequest",
-                    "consumptionTime": self.timeStampNow(),
-                    "authorName": mergeRequest.get("author", None).get("name", None),
-                }
+            while fetchNextPage:
+                mergeReqURL = mergeReqEndpoint + defaultParams + str(pageNumber)
+                try:
+                    mergeRequestList = self.getResponse(mergeReqURL, "GET", None, None, None)
+                except Exception as ex:
+                    self.publishHealthDataForExceptions(ex)
+                    mergeRequestList = []
+                if len(mergeRequestList) == 0:
+                    fetchNextPage = False
+                    break
+                if latestMergeRequest is None and len(mergeRequestList) > 0:
+                    latestMergeRequest = mergeRequestList[0]
+                for mergeRequest in mergeRequestList:
+                    if "mergeReqModificationTime" in branchTrackingDetails and branchTrackingDetails["mergeReqModificationTime"] == mergeRequest["updated_at"]:
+                        continue
+                    injectData = {
+                        "projectName": projectDict["name"],
+                        "projectId": projectDict["projectId"],
+                        "projectPath": projectDict["path"],
+                        "mergeRequestNumber": mergeRequest.get("iid", 0),
+                        "gitType": "mergeRequest",
+                        "consumptionTime": self.timeStampNow(),
+                        "authorName": mergeRequest.get("author", None).get("name", None),
+                    }
 
-                if mergeRequest.get("state", None) == "merged":
-                    injectData["mergedBy"] = mergeRequest.get("merged_by", {}).get("name", None)
+                    if mergeRequest.get("state", None) == "merged":
+                        mergeJson= mergeRequest.get("merged_by", {})
+                        if mergeJson:
+                            injectData["mergedBy"] =mergeJson.get("name", None)
+                        else:
+                            injectData["mergedBy"] = None
 
-                mergeReqData += self.parseResponse(mergeReqResponseTemplate, mergeRequest, injectData)
-                self.baseLogger.info("Merger req data")
-            if len(mergeRequestList) == 100:
-                pageNumber = pageNumber + 1
-            else:
-                fetchNextPage = False
-                break
+                    mergeReqData += self.parseResponse(mergeReqResponseTemplate, mergeRequest, injectData)
+                    self.baseLogger.info("Merger req data")
+                if len(mergeRequestList) == 100:
+                    pageNumber = pageNumber + 1
+                else:
+                    fetchNextPage = False
+                    break
 
-        if mergeReqData:
-            mergeReqinsighstTimeX = self.config.get("dynamicTemplate", {}).get("mergeRequest", {}).get("insightsTimeXFieldMapping", None)
-            timestamp = mergeReqinsighstTimeX.get("timefield", None)
-            timeformat = mergeReqinsighstTimeX.get("timeformat", None)
-            isEpoch = mergeReqinsighstTimeX.get("isEpoch", False)
-            self.publishToolsData(mergeReqData, mergeReqMetaData, timestamp, timeformat, isEpoch, True)
-            self.updateMergeRequestDetailsInTracking(branchName, latestMergeRequest, projectTrackingCache)
-            self.updateTrackingCache(injectData["projectPath"], projectTrackingCache)
-            self.baseLogger.info("Branch merge request details updated in tracking ")
+            if mergeReqData:
+                mergeReqinsighstTimeX = self.config.get("dynamicTemplate", {}).get("mergeRequest", {}).get("insightsTimeXFieldMapping", None)
+                timestamp = mergeReqinsighstTimeX.get("timefield", None)
+                timeformat = mergeReqinsighstTimeX.get("timeformat", None)
+                isEpoch = mergeReqinsighstTimeX.get("isEpoch", False)
+                self.publishToolsData(mergeReqData, mergeReqMetaData, timestamp, timeformat, isEpoch, True)
+                self.updateMergeRequestDetailsInTracking(branchName, latestMergeRequest, projectTrackingCache)
+                self.updateTrackingCache(injectData["projectPath"], projectTrackingCache)
+                self.baseLogger.info("Branch merge request details updated in tracking ")
+        except Exception as ex:
+            self.baseLogger.error(ex)
 
     def updateMergeRequestDetailsInTracking(self, branchName, latestMergeRequest, projectTrackingCache):
         """Updates the merge request details in project tracking cache"""

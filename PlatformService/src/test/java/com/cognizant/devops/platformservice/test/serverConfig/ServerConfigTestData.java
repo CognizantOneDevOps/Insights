@@ -24,15 +24,13 @@ public class ServerConfigTestData {
 	
 	public String extractServerConfig(JsonObject serverConfigStatus) {
 		String serverConfigStr = serverConfigStatus.get("data").getAsString();
-		String passkey = serverConfigStr.substring(0, 15);
-		String auth = serverConfigStr.substring(15, serverConfigStr.length());
-		String serverConfigJsonDecrypt = AES256Cryptor.decrypt(auth, passkey);
+		String serverConfigJsonDecrypt = AES256Cryptor.decryptWeb(serverConfigStr);
 		return serverConfigJsonDecrypt;
 	}
 
 	public String encryptServerConfig(String serverConfigNormal) {
 		String passKey = UUID.randomUUID().toString().substring(0, 15);
-		String serverConfigJsonEncrypt = passKey + AES256Cryptor.encrypt(serverConfigNormal, passKey);
+		String serverConfigJsonEncrypt = AES256Cryptor.encryptWeb(passKey, serverConfigNormal);
 		return serverConfigJsonEncrypt;
 	}
 }

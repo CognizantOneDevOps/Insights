@@ -292,7 +292,7 @@ public class PlatformServiceUtil {
 		Map<String, String> requestCookies = new HashMap<>(0);
 		String authHeader = ValidationUtils
 				.decryptAutharizationToken(AuthenticationUtils.extractAndValidateAuthToken(httpRequest));
-		String decodedAuthHeader = new String(Base64.getDecoder().decode(authHeader.split(" ")[1]), StandardCharsets.UTF_8);
+		String decodedAuthHeader = new String(Base64.getDecoder().decode(authHeader), StandardCharsets.UTF_8);
 		String[] authTokens = decodedAuthHeader.split(":");
 		JsonObject loginRequestParams = new JsonObject();
 		loginRequestParams.addProperty("user", authTokens[0]);

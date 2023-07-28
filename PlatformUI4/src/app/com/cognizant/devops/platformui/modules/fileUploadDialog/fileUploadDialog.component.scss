@@ -45,7 +45,10 @@
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  font: normal normal 600 14px/24px Open Sans;
+  font-weight: normal;
+  font-style: normal;
+  font-family: "Open Sans";
+  line-height: 24px;
 }
 .btnStyle {
   margin-top: 6%;

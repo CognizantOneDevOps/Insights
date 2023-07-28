@@ -18,7 +18,7 @@ import sys
 from dateutil.utils import today
 import time
 import os
-from core.BaseAgent3 import BaseAgent
+from ....core.BaseAgent3 import BaseAgent
 from datetime import datetime, timedelta, date
 from dateutil import parser
 import json
