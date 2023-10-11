@@ -153,7 +153,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
               logInfo['uid'] = dashboard.uid;
               logInfo['dashboardName'] = dashboard.title;
               logInfo['panelCount'] = dashboard.panels.length;
-             
+              logInfo['errors'] = res.data.errors;
               dashboard.panels.forEach(panel => {
                 if(panel.id === options.panelId){
                   logInfo['panelName'] = panel.title;
