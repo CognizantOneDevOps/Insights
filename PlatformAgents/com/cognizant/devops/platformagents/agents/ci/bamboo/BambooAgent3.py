@@ -27,11 +27,11 @@ class BambooAgent(BaseAgent):
         self.baseLogger.info('Inside process')
         BaseUrl = self.config.get("baseUrl", None)
         UserID = self.getCredential("userid")
-        Passwd = self.getCredential("passwd")
+        cred = self.getCredential("passwd")
         enableAllBranches = self.config.get("enableAllBranches", None)
         getCollectionUrl = BaseUrl + "rest/api/latest/"       
         buildsURL = getCollectionUrl +"plan.json"
-        builds = self.getResponse(buildsURL,'GET', UserID, Passwd, None,None)        
+        builds = self.getResponse(buildsURL,'GET', UserID, cred, None,None)        
         responseTemplate = self.getResponseTemplate()
         build_plan = builds["plans"]["plan"]
         for plan_Individual in build_plan:            
@@ -41,7 +41,7 @@ class BambooAgent(BaseAgent):
             alllBranches.append(jsonObj)
             if enableAllBranches:
                 listAllBranchesUrl = getCollectionUrl + "plan/" + plan_Individual_Key +"/branch.json?max-result=1000"
-                branch_list_data = self.getResponse(listAllBranchesUrl,'GET', UserID, Passwd, None,None)
+                branch_list_data = self.getResponse(listAllBranchesUrl,'GET', UserID, cred, None,None)
                 branch_list_data = branch_list_data.get('branches', {}).get('branch', [])
                 for branch in branch_list_data:
                     branchName = branch.get('name')
@@ -59,7 +59,7 @@ class BambooAgent(BaseAgent):
                 start_index = 0
                 Build_running_Complete = True
                 plan_Individual_Url = getCollectionUrl + "result/" + plan_Individual_Key +".json?start-index=" + str(start_index) + "&max-result=25"
-                plan_Individual_collection = self.getResponse(plan_Individual_Url,'GET', UserID, Passwd, None,None)
+                plan_Individual_collection = self.getResponse(plan_Individual_Url,'GET', UserID, cred, None,None)
                 if len(plan_Individual_collection["results"]["result"]) == 0:
                     self.tracking[plan_Individual_Key] = 0
                     continue
@@ -76,7 +76,7 @@ class BambooAgent(BaseAgent):
                                 plan_Individual_result = plan_Individual_collection["results"]["result"][plan_Individual_result_length]
                                 plan_Individual_result_key =  plan_Individual_result.get("key")
                                 plan_Individual_result_url = getCollectionUrl + "result/" + plan_Individual_result_key +".json"
-                                plan_Individual_result_details = self.getResponse(plan_Individual_result_url,'GET', UserID, Passwd, None,None)
+                                plan_Individual_result_details = self.getResponse(plan_Individual_result_url,'GET', UserID, cred, None,None)
 #                                 utc_time = datetime.strptime(plan_Individual_result_details["buildCompletedTime"].split(".")[0], "%Y-%m-%dT%H:%M:%S")
 #                                 epoch_time = (utc_time - datetime(1970, 1, 1)).total_seconds()
 #                                 injectData['buildCompletedTime'] = plan_Individual_result_details["buildCompletedTime"].split(".")[0]
@@ -88,7 +88,7 @@ class BambooAgent(BaseAgent):
                                 data += self.parseResponse(responseTemplate, plan_Individual_result_details, injectData)
                     start_index = start_index + plan_size
                     plan_Individual_Url = getCollectionUrl + "result/" + plan_Individual_Key +".json?start-index=" + str(start_index) + "&max-result=25"
-                    plan_Individual_collection = self.getResponse(plan_Individual_Url,'GET', UserID, Passwd, None,None)
+                    plan_Individual_collection = self.getResponse(plan_Individual_Url,'GET', UserID, cred, None,None)
                     if plan_Individual_collection["results"]["size"] > 0:
                         Build_running_Complete = True
                     else:

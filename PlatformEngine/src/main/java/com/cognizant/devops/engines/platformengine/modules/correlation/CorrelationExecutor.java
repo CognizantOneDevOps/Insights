@@ -140,8 +140,8 @@ public class CorrelationExecutor {
 		cypher.append("set destination.maxCorrelationTime=").append(maxCorrelationTime)
 				.append(" , destination.correlationTime=").append(maxCorrelationTime).append(" ");
 		cypher.append("return count(distinct destination) as count");
-		GraphDBHandler dbHandler = new GraphDBHandler();
-		try {
+		
+		try(GraphDBHandler dbHandler = new GraphDBHandler()) {
 			int processedRecords = 1;
 			while (processedRecords > 0) {
 				long st = System.currentTimeMillis();
@@ -152,6 +152,8 @@ public class CorrelationExecutor {
 			}
 		} catch (InsightsCustomException e) {
 			log.error(" execId={} correlationName={} sourceTool={} destinationTool={} Error occured while loading the destination data for correlations.",loggingInfo.get(EngineConstants.EXECID),loggingInfo.get(EngineConstants.CORRELATION_NAME),loggingInfo.get(EngineConstants.SOURCE_TOOL),loggingInfo.get(EngineConstants.DESTINATION_TOOL), e);
+		} catch (Exception ex) {
+			log.error(" execId={} correlationName={} sourceTool={} destinationTool={} Error occured while loading the destination data for correlations.",loggingInfo.get(EngineConstants.EXECID),loggingInfo.get(EngineConstants.CORRELATION_NAME),loggingInfo.get(EngineConstants.SOURCE_TOOL),loggingInfo.get(EngineConstants.DESTINATION_TOOL), ex);
 		}
 	}
 
@@ -205,8 +207,7 @@ public class CorrelationExecutor {
 		cypher.append("RETURN collect(data) as data");
 		log.debug(" Type=Correlator execId={} correlationName={} sourceTool={} destinationTool={} ProcessingTime={} processedRecords={} DestinationData {} ", loggingInfo.get(EngineConstants.EXECID),loggingInfo.get(EngineConstants.CORRELATION_NAME),loggingInfo.get(EngineConstants.SOURCE_TOOL),loggingInfo.get(EngineConstants.DESTINATION_TOOL),0,0,cypher);
 		
-		GraphDBHandler dbHandler = new GraphDBHandler();
-		try {
+		try (GraphDBHandler dbHandler = new GraphDBHandler()) {
 			
 			GraphResponse response = dbHandler.executeCypherQuery(cypher.toString());
 			
@@ -224,6 +225,8 @@ public class CorrelationExecutor {
 			
 		} catch (InsightsCustomException e) {
 			log.error(" execId={} correlationName={} sourceTool={} destinationTool={} Error occured while loading the destination data for correlations.",loggingInfo.get(EngineConstants.EXECID),loggingInfo.get(EngineConstants.CORRELATION_NAME),loggingInfo.get(EngineConstants.SOURCE_TOOL),loggingInfo.get(EngineConstants.DESTINATION_TOOL), e);
+		} catch (Exception ex) {
+			log.error(" execId={} correlationName={} sourceTool={} destinationTool={} Error occured while loading the destination data for correlations.",loggingInfo.get(EngineConstants.EXECID),loggingInfo.get(EngineConstants.CORRELATION_NAME),loggingInfo.get(EngineConstants.SOURCE_TOOL),loggingInfo.get(EngineConstants.DESTINATION_TOOL), ex);
 		}
 		return destinationDataList;
 	}
@@ -261,10 +264,10 @@ public class CorrelationExecutor {
 		correlationCypher.append("RETURN count(distinct destination) as count");
 		log.debug(" Type=Correlator execId={} correlationName={} sourceTool={} destinationTool={} ProcessingTime={} processedRecords={} CorrelationExecution Started executeCorrelations {} ",loggingInfo.get(EngineConstants.EXECID),loggingInfo.get(EngineConstants.CORRELATION_NAME),loggingInfo.get(EngineConstants.SOURCE_TOOL),loggingInfo.get(EngineConstants.DESTINATION_TOOL),0,0, correlationCypher);
 		
-		GraphDBHandler dbHandler = new GraphDBHandler();
+
 		JsonObject correlationExecutionResponse;
 		int processedRecords = 0;
-		try {
+		try(GraphDBHandler dbHandler = new GraphDBHandler()) {
 			
 			long st = System.currentTimeMillis();
 			
@@ -281,6 +284,11 @@ public class CorrelationExecutor {
 			log.error(" execId={} correlationName={} sourceTool={} destinationTool={} Error occured while executing correlations",loggingInfo.get(EngineConstants.EXECID),loggingInfo.get(EngineConstants.CORRELATION_NAME),loggingInfo.get(EngineConstants.SOURCE_TOOL),loggingInfo.get(EngineConstants.DESTINATION_TOOL),e);
 			EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
 					" Error occured while executing correlations for relation " + e.getMessage(),
+					PlatformServiceConstants.FAILURE, jobName);
+		} catch (Exception ex) {
+			log.error(" execId={} correlationName={} sourceTool={} destinationTool={} Error occured while executing correlations",loggingInfo.get(EngineConstants.EXECID),loggingInfo.get(EngineConstants.CORRELATION_NAME),loggingInfo.get(EngineConstants.SOURCE_TOOL),loggingInfo.get(EngineConstants.DESTINATION_TOOL), ex);
+			EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
+					" Error occured while executing correlations for relation " + ex.getMessage(),
 					PlatformServiceConstants.FAILURE, jobName);
 		}
 		return processedRecords;
@@ -328,11 +336,10 @@ public class CorrelationExecutor {
 				.append("remove destination.maxCorrelationTime, destination.correlationTime, destination:RAW ");
 		correlationCypher.append("return count(distinct destination) ");
 		
-		GraphDBHandler dbHandler = new GraphDBHandler();
 		JsonObject correlationExecutionResponse;
 		int processedRecords = 1;
 		
-		try {
+		try(GraphDBHandler dbHandler = new GraphDBHandler()) {
 			while (processedRecords > 0) {
 				long st = System.currentTimeMillis();
 				correlationExecutionResponse = dbHandler.executeCypherQuery(correlationCypher.toString()).getJson();
@@ -344,6 +351,8 @@ public class CorrelationExecutor {
 		} catch (InsightsCustomException e) {
 			log.error(" Error occured while removing RAW label from tool:{}",destination.getDestinationLabelName(),
 					e);
+		} catch (Exception ex) {
+			log.error(" Error occured while removing RAW label from tool:{}",destination.getDestinationLabelName(), ex);
 		}
 		
 		return processedRecords;

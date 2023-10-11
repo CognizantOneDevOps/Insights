@@ -234,6 +234,16 @@ export class MenuItem {
               parentMenuId :'Configuration'
             },
             {
+              displayName: 'Offline Alerting',
+              iconName: 'feature',
+              route: 'InSights/Home/offlineAlertingList',
+              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+              showMenu: this.getMenuShowAdmin(['Admin', 'Editor']),
+              title: "Offline Alerting",
+              menuId : "Offline Alerting",
+              parentMenuId :'Configuration'
+            },
+            {
               displayName: 'Task Management',
               iconName: 'feature',
               isToolbarDisplay: InsightsInitService.enableInsightsToolbar,

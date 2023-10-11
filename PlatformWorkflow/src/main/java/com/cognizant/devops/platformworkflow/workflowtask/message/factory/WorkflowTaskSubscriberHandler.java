@@ -31,6 +31,7 @@ import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflo
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformcommons.mq.core.AWSSQSProvider;
+
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowDataHandler;
 import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowTaskInitializationException;
 import com.cognizant.devops.platformworkflow.workflowtask.utils.MQMessageConstants;
@@ -105,7 +106,6 @@ public abstract class WorkflowTaskSubscriberHandler {
 	 * @param status
 	 */
 	private synchronized void workflowTaskPostProcesser(String message, int exectionHistoryId, String status) {
-
 		String workflowId = "";
 		try {
 			Map<String, Object> requestMessage = WorkflowUtils.convertJsonObjectToMap(message);
@@ -113,6 +113,7 @@ public abstract class WorkflowTaskSubscriberHandler {
 			workflowId = (String) requestMessage.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID);
 			// update complete time in INSIGHTS_WORKFLOW_EXECUTION_ENTITY
 			workflowStateProcess.updateWorkflowExecutionHistory(exectionHistoryId, status, statusLog);
+		
 			// send message to next task
 			if (status.equalsIgnoreCase(WorkflowTaskEnum.WorkflowStatus.COMPLETED.toString())) {
 				workflowStateProcess.publishMessageToNextInMQ(requestMessage);
@@ -212,8 +213,8 @@ public abstract class WorkflowTaskSubscriberHandler {
 			/* return */
 			responseHandler.handleTaskExecution(message);
 			log.debug("Worlflow Detail ==== after handleTaskExecution");
-
 			workflowTaskPostProcesser(message, exectionHistoryId, WorkflowTaskEnum.WorkflowStatus.COMPLETED.toString());
+
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== Error in handle delivery  ", e);
 			workflowTaskErrorHandler(message, exectionHistoryId);

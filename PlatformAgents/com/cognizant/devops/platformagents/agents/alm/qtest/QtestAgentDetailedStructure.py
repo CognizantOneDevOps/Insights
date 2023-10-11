@@ -26,12 +26,12 @@ class QtestAgent(BaseAgent):
     def process(self):
         baseUrl = self.config.get("baseUrl", None)
         username = self.config.get("username", None)
-        password = self.config.get("password", None)
+        cred = self.config.get("password", None)
         startFrom = self.config.get("startFrom", '')
         startFrom = parser.parse(startFrom, ignoretz=True)
         domainName = "InSightsAlmAgent" + ":"
-        authToken = base64.b64encode(domainName.encode('utf-8'))
-        token = self.login(authToken, username, password, baseUrl)
+        aTkn = base64.b64encode(domainName.encode('utf-8'))
+        token = self.login(aTkn, username, cred, baseUrl)
         headers = {"accept": "application/json","Authorization": "bearer "+str(token)+""}
         pagination = ["test-cases", "requirements", "test-runs"]
         #In this part we addthe module name where pagination is supported.
@@ -138,9 +138,9 @@ class QtestAgent(BaseAgent):
                     '''
         finally:
             self.logout(token, baseUrl)
-    def login(self, authToken, username, password, baseUrl):
-        headers_token = {'accept': "application/json",'content-type': "application/x-www-form-urlencoded",'authorization': "Basic "+str(authToken)+""}
-        payload = "grant_type=password&username="+str(username)+"&password="+str(password)
+    def login(self, aTkn, username, cred, baseUrl):
+        headers_token = {'accept': "application/json",'content-type': "application/x-www-form-urlencoded",'authorization': "Basic "+str(aTkn)+""}
+        payload = "grant_type=password&username="+str(username)+"&password="+str(cred)
         tokenResponse = self.getResponse(baseUrl+"/oauth/token", 'POST', None, None, payload, None, headers_token)
         return tokenResponse.get("access_token", None)
     def logout(self, token, baseUrl):

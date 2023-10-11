@@ -121,7 +121,7 @@ class SplunkAgent(BaseAgent):
         self.baseLogger.info("inside fetchOutcomeData")
         self.baseUrl = self.config.get("baseUrl", None)
         self.username = self.config.get("userName", None)
-        self.password = self.config.get("password", None)
+        self.cred = self.config.get("password", None)
         self.headers = {"Accept":"application/xml"} 
         endDate = outcomeDetails.get("endDate",None)
         startDate = outcomeDetails.get("intermediateDate",None)
@@ -130,7 +130,7 @@ class SplunkAgent(BaseAgent):
         if startDate is None:
             startDate = outcomeDetails.get("startDate",None)
         query = "search=search index="+outcomeDetails["indexName"]+" earliest="+str(startDate)+" latest="+str(endDate)+"&output_mode=json&exec_mode=oneshot"
-#         searchResponse = self.getResponse(self.baseUrl,'POST', self.username, self.password, data=query, reqHeaders=self.headers)
+#         searchResponse = self.getResponse(self.baseUrl,'POST', self.username, self.cred, data=query, reqHeaders=self.headers)
 #         responseXml = ET.fromstring(searchResponse)
 #         search_id = str(responseXml[0].text)
 #         self.baseLogger.info(" splunk outcome search id ======"+search_id)
@@ -139,7 +139,7 @@ class SplunkAgent(BaseAgent):
 #         timeout = time.time() + 15
 #         while True:
 #             if time.time() > timeout:
-#                 response = self.getResponse(url,'GET', self.username, self.password, None, reqHeaders=self.headers)
+#                 response = self.getResponse(url,'GET', self.username, self.cred, None, reqHeaders=self.headers)
 #                 xmlRes = ET.fromstring(response)
 #                 state = xmlRes.find(".//*[@name='dispatchState']").text
 #                 print("state",state)
@@ -152,7 +152,7 @@ class SplunkAgent(BaseAgent):
 #             metadata = self.config.get("dynamicTemplate", {}).get("metadata", {})
 #             resultUrl = self.baseUrl+'/'+search_id+'/results'
 #             outputMode = "output_mode=json"
-#             resultResponse = self.getResponse(resultUrl,'GET', self.username, self.password, data=outputMode, reqHeaders=self.headers).decode('utf-8')
+#             resultResponse = self.getResponse(resultUrl,'GET', self.username, self.cred, data=outputMode, reqHeaders=self.headers).decode('utf-8')
 #             jsonRes = json.loads(resultResponse)
 #             results = jsonRes.get("results", list())
 #             print("results")
@@ -172,7 +172,7 @@ class SplunkAgent(BaseAgent):
 #             raise ValueError('SplunkAgent: incorrect dispatch state for index name: '+outcomeDetails["indexName"])
         
         resultUrl = self.baseUrl+'/export'
-        resultResponse = self.getResponse(resultUrl,'POST', self.username, self.password, data=query, reqHeaders=self.headers).decode('utf-8')
+        resultResponse = self.getResponse(resultUrl,'POST', self.username, self.cred, data=query, reqHeaders=self.headers).decode('utf-8')
         if "result" not in resultResponse:
             self.baseLogger.error("SplunkAgent: no results returned, please check input parameters")
             raise ValueError("SplunkAgent: no results returned, please check input parameters")

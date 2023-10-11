@@ -32,12 +32,12 @@ class XLDeployAgent(BaseAgent):
         self.baseLogger.info('Inside process')
         baseEndPoint = self.config.get("baseEndPoint", '')
         userID = self.config.get("userID", '')
-        passwd = self.config.get("passwd", '')
+        cred = self.config.get("passwd", '')
         startFrom = self.config.get("startFrom", '')
         beginDate = self.tracking.get("startDate", startFrom)
         
         listtasksurl = baseEndPoint + "/task/query?begindate=" + beginDate                
-        tasks = self.getResponse(listtasksurl, 'GET', userID, passwd, None)
+        tasks = self.getResponse(listtasksurl, 'GET', userID, cred, None)
         
         data = []
         metadata ={"labels" : ["XLDEPLOY_TASKS"],"dataUpdateSupported" : True,"uniqueKey" : ["taskId"]}

@@ -96,9 +96,8 @@ public class GraphdbCorrelationConfiguration extends LoginAndSelectModule {
 	}
 
 	private boolean checkQuery(String query) {
-		GraphDBHandler dbHandler = new GraphDBHandler();
 		GraphResponse neo4jResponse;
-		try {
+		try(GraphDBHandler dbHandler = new GraphDBHandler()) {
 			neo4jResponse = dbHandler.executeCypherQuery(query);
 			String finalJson = neo4jResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject()
 					.get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").toString().replace("[", "")
@@ -113,15 +112,16 @@ public class GraphdbCorrelationConfiguration extends LoginAndSelectModule {
 		} catch (InsightsCustomException | AssertionError e) {
 
 			log.error("InsightsCustomException : or AssertionError {}", e);
+		} catch (Exception ex) {
+			log.error("Exception {}", ex);
 		}
 		return false;
 	}
 
 	private List<String> checkQueryData(String query) {
-		GraphDBHandler dbHandler = new GraphDBHandler();
 		GraphResponse neo4jResponse;
 		List<String> data = new ArrayList<>();
-		try {
+		try(GraphDBHandler dbHandler = new GraphDBHandler()) {
 			int i = 0;
 			neo4jResponse = dbHandler.executeCypherQuery(query);
 			log.debug("neo4j Response  {} ", neo4jResponse.getJson());
@@ -139,6 +139,8 @@ public class GraphdbCorrelationConfiguration extends LoginAndSelectModule {
 		} catch (InsightsCustomException | AssertionError e) {
 
 			log.error("InsightsCustomException : or AssertionError {}", e);
+		} catch (Exception ex) {
+			log.error("Exception {}", ex);
 		}
 		return data;
 	}

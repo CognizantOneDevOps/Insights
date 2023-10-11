@@ -166,8 +166,7 @@ public class BulkUploadService implements IBulkUpload {
 	 * @throws InsightsCustomException
 	 */
 	private void insertDataInDatabase(List<JsonObject> dataList, String cypherQuery) throws InsightsCustomException {
-		GraphDBHandler dbHandler = new GraphDBHandler();
-		try {
+		try(GraphDBHandler dbHandler = new GraphDBHandler()) {
 			List<List<JsonObject>> partitionList = partitionList(dataList, 1000);
 			for (List<JsonObject> chunk : partitionList) {
 				JsonObject graphResponse = dbHandler.bulkCreateNodes(chunk, cypherQuery);
@@ -179,6 +178,9 @@ public class BulkUploadService implements IBulkUpload {
 		} catch (InsightsCustomException ex) {
 			log.error("Neo4j is not responding {}..", ex.getMessage());
 			throw new InsightsCustomException("Error while uploading to Neo4j");
+		} catch (Exception e) {
+			log.error("Neo4j is not responding {}..", e.getMessage());
+			throw new InsightsCustomException("Error while Closing Neo4j");
 		}
 	}
 

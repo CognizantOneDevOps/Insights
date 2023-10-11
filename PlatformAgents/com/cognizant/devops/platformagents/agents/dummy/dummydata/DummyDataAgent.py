@@ -57,7 +57,7 @@ class DummyDataAgent(BaseAgent):
         
         # GIT Variables
         self.repo = ['Insights', 'Spinnaker', 'OnBot', 'BuildOn']
-        self.author = ['John', 'Bruno', 'Charlie', 'Tom', 'Wilson']
+        self.creator = ['John', 'Bruno', 'Charlie', 'Tom', 'Wilson']
         self.branches = ['NewModules', 'BugFixes', 'Enhancements', 'Testing']
         self.master_branches = ['InsightsEnterprise', 'master']
         
@@ -313,7 +313,7 @@ class DummyDataAgent(BaseAgent):
                 self.change_Log(releaseBug['key'], "status", "In Progress", "To Do", self.updatedAt) 
                 releaseBug['sprints']= self.sprintId
                 self.workingOnIssues(releaseBug, rangeNumber,None,None,None,None,None,True)
-                    #def workingOnIssues(self, detail, rangeNumber, git_repo=None, git_branch=None, git_toBranch=None, git_author=None, originalStory=None, forceCloseInCurrentSprint=False):   
+                    #def workingOnIssues(self, detail, rangeNumber, git_repo=None, git_branch=None, git_toBranch=None, git_creator=None, originalStory=None, forceCloseInCurrentSprint=False):   
 
             if self.isRollbackRelease:
                 sprintsAdded = []
@@ -346,7 +346,7 @@ class DummyDataAgent(BaseAgent):
                     spillStory['sprints'] = sprintsAdded
                     git_repo = spillStory["git_repo"] 
                     git_branch = spillStory["git_branch"] 
-                    git_author = spillStory['git_author'] 
+                    git_creator = spillStory['git_author'] 
                     spillStory.pop("git_branch", None)
                     spillStory.pop("git_author", None)
                     spillStory.pop("git_repo", None)
@@ -354,7 +354,7 @@ class DummyDataAgent(BaseAgent):
                     self.totalIssuesInRelease.append(spillStory) 
                     jiraMetadata = {"labels" : ["ALM", "JIRA", "DATA"], "dataUpdateSupported" : True, "uniqueKey" : ["key"]}                
                     self.publishToolsData(updateJiraNode, jiraMetadata)      
-                    self.workingOnIssues(spillStory, rangeNumber, git_repo, git_branch, None, git_author)
+                    self.workingOnIssues(spillStory, rangeNumber, git_repo, git_branch, None, git_creator)
                 # Started Working On Issues
                 for detail in self.detailsOfIssues: 
                     self.change_Log(detail['key'], "status", "In Progress", "To Do", self.updatedAt) 
@@ -377,7 +377,7 @@ class DummyDataAgent(BaseAgent):
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print((exc_type, fname, exc_tb.tb_lineno,ex))    
     
-    def workingOnIssues(self, detail, rangeNumber, git_repo=None, git_branch=None, git_toBranch=None, git_author=None, originalStory=None, forceCloseInCurrentSprint=False):   
+    def workingOnIssues(self, detail, rangeNumber, git_repo=None, git_branch=None, git_toBranch=None, git_creator=None, originalStory=None, forceCloseInCurrentSprint=False):   
         try :
             issueDetailData = []                                                       
             workingKey = detail['key']
@@ -386,16 +386,16 @@ class DummyDataAgent(BaseAgent):
             # Generating GIT Data for every issue
             git_totalCommits = random.randint(1, 5)
             git_count = 1                        
-            # Random Choosing of Author,Branch  and Repo done before calling git procressing function so that for 1 story, we have 1 branch,repo and author for n no. of commits
-            if git_repo is None and git_branch is None  and  git_author is None:
-                git_author = random.choice(self.author)
+            # Random Choosing of creator,Branch  and Repo done before calling git procressing function so that for 1 story, we have 1 branch,repo and creator for n no. of commits
+            if git_repo is None and git_branch is None  and  git_creator is None:
+                git_creator = random.choice(self.creator)
                 git_repo = random.choice(self.repo)
                 git_branch = random.choice(self.branches)
             if git_toBranch is None:
                 git_toBranch = random.choice(self.master_branches)                      
             while git_count <= git_totalCommits: 
                 isOrphanCommit = bool(random.getrandbits(1))                            
-                isBuildSuccess = self.gitProcessing(workingKey, self.updatedAt, git_author, git_repo, git_branch, isOrphanCommit)  
+                isBuildSuccess = self.gitProcessing(workingKey, self.updatedAt, git_creator, git_repo, git_branch, isOrphanCommit)  
                 git_count = git_count + 1 
                 
             if rangeNumber != self.numberofSprintInCurrentRelease :
@@ -406,9 +406,9 @@ class DummyDataAgent(BaseAgent):
             if isStoryClosingInCurrentSprint or forceCloseInCurrentSprint: 
                 self.totalIssuesInRelease.append(detail)                
                 if  isBuildSuccess == False:                                             
-                    isBuildSuccess = self.gitProcessing(workingKey, self.updatedAt, git_author, git_repo, git_branch, False, True)
-                self.pull_request(workingKey, git_repo, git_branch, git_toBranch, git_author, self.updatedAt, "Open") 
-                self.pull_request(workingKey, git_repo, git_branch, git_toBranch, git_author, self.updatedAt, "Merged")
+                    isBuildSuccess = self.gitProcessing(workingKey, self.updatedAt, git_creator, git_repo, git_branch, False, True)
+                self.pull_request(workingKey, git_repo, git_branch, git_toBranch, git_creator, self.updatedAt, "Open") 
+                self.pull_request(workingKey, git_repo, git_branch, git_toBranch, git_creator, self.updatedAt, "Merged")
                 isBuildSuccess = self.gitProcessing(workingKey, self.updatedAt, "root", git_repo, git_branch, False, True)                                               
                 self.change_Log(workingKey, "status", "Quality Assurance", "In Progress", self.updatedAt)
                 self.change_Log(workingKey, "status", "QA In Progress", "Quality Assurance", self.updatedAt)                      
@@ -447,12 +447,12 @@ class DummyDataAgent(BaseAgent):
                     metadata = {  "labels":["ALM", "JIRA", "DATA"], "dataUpdateSupported":True, "uniqueKey":["key"]}            
                     self.publishToolsData(issueDetailData, metadata) 
                     issueDetailData = []
-                    self.workingOnIssues(bugDetail, rangeNumber, git_repo, git_branch, git_toBranch, git_author, originalStory, True)                                         
+                    self.workingOnIssues(bugDetail, rangeNumber, git_repo, git_branch, git_toBranch, git_creator, originalStory, True)                                         
                                            
             else :
                 detail["git_repo"] = git_repo 
                 detail["git_branch"] = git_branch 
-                detail['git_author'] = git_author                                      
+                detail['git_author'] = git_creator                                      
                 self.spillOverStories.append(detail)                           
         except Exception as ex:
             logging.error(ex)
@@ -540,7 +540,7 @@ class DummyDataAgent(BaseAgent):
         # self.publishToolsData(testcase_data, metadata)   
         return testCaseId    
     
-    def gitProcessing (self, workingKey, updatedAt, git_author, git_repo, git_branch, isOrphanCommit, isForceSuccessRequired=False):
+    def gitProcessing (self, workingKey, updatedAt, git_creator, git_repo, git_branch, isOrphanCommit, isForceSuccessRequired=False):
         # git_totalCommits = random.randint(1, 12)
         # git_count = 0
         git_data = []
@@ -565,7 +565,7 @@ class DummyDataAgent(BaseAgent):
             gitSample['jiraKey'] = workingKey
             gitSample['message'] = 'Force Success : ' + workingKey  
             
-        gitSample['authorName'] = git_author
+        gitSample['authorName'] = git_creator
         gitSample['branchName'] = git_branch
         gitSample['repoName'] = git_repo
         gitSample['commitId'] = commitId
@@ -938,14 +938,14 @@ class DummyDataAgent(BaseAgent):
         metadata = {  "labels":["CHANGE_LOG", "DATA"]}  
         self.publishToolsData(changeLogData, metadata, "changeDate", "%Y-%m-%dT%H:%M:%S", False)                              
      
-    def pull_request(self, changeKey, git_repo, git_branch, git_toBranch, git_author, updatedAt, state)  :
+    def pull_request(self, changeKey, git_repo, git_branch, git_toBranch, git_creator, updatedAt, state)  :
         pullRequestData = []
         pullRequest = {}
         pullRequest["pullrequest_id"] = changeKey
         pullRequest["repo"] = git_repo
         pullRequest["fromBranch"] = git_branch
         pullRequest['toBranch'] = git_toBranch
-        pullRequest['author'] = git_author
+        pullRequest['author'] = git_creator
         pullRequest['state'] = state
         pullRequest ['jiraKey'] = changeKey
         time_offset_hours_change = (random.randint(0o1, 24))

@@ -32,7 +32,7 @@ class UrbanCodeDeployAgent(BaseAgent):
     def process(self):
         self.baseLogger.info('Inside process')
         userid = self.getCredential("userid")
-        passwd = self.getCredential("passwd")
+        cred = self.getCredential("passwd")
         baseUrl = self.config.get("baseUrl", '')
         reportType = self.config.get("reportType", '')
         startFrom = self.config.get("startFrom", '')
@@ -46,7 +46,7 @@ class UrbanCodeDeployAgent(BaseAgent):
             else:
                 startFrom = self.tracking.get("lastUpdated", None)
             ucdUrl = baseUrl+"/rest/report/adHoc?dateRange=custom&date_low="+str(startFrom)+"&date_hi="+str(timeNow)+"&orderField=date&sortType=desc&type="+str(reportType)
-            response = self.getResponse(ucdUrl, 'GET', userid, passwd, None)
+            response = self.getResponse(ucdUrl, 'GET', userid, cred, None)
             data = []
             responseTemplate = self.getResponseTemplate()
             for item in range(len(response["items"][0])):
@@ -62,14 +62,14 @@ class UrbanCodeDeployAgent(BaseAgent):
             while exitCondition:
                 componentUrl = baseUrl+"/rest/deploy/component/details?rowsPerPage="+str(rowsPerPage)+"&pageNumber="+str(pageNumber)+"&orderField=name&sortType=asc&filterFields=active&filterValue_active=true&filterType_active=eq&filterClass_active=Boolean&outputType=BASIC&outputType=SECURITY&outputType=LINKED"
                 print(("componentUrl - ", componentUrl))
-                componentResponse = self.getResponse(componentUrl, 'GET', userid, passwd, None)
+                componentResponse = self.getResponse(componentUrl, 'GET', userid, cred, None)
                 # for each component ID calling processDeploymentData to execute deployment URL to get the deployments detail.
                 for i in range(len(componentResponse)):
-                    self.processDeploymentData(baseUrl, componentResponse[i]["id"], userid, passwd, startFrom, timeNow)
+                    self.processDeploymentData(baseUrl, componentResponse[i]["id"], userid, cred, startFrom, timeNow)
                 pageNumber += 1
                 exitCondition = len(componentResponse) > 0
 
-    def processDeploymentData(self, baseUrl, componentId, userid, passwd, startFrom, timeNow):
+    def processDeploymentData(self, baseUrl, componentId, userid, cred, startFrom, timeNow):
         rowsPerPage = 10
         pageNumber = 1
         exitCondition = True
@@ -92,7 +92,7 @@ class UrbanCodeDeployAgent(BaseAgent):
         while exitCondition:
             deploymentUrl = baseUrl+"/rest/deploy/componentProcessRequest/table?rowsPerPage="+str(rowsPerPage)+"&pageNumber="+str(pageNumber)+"&orderField=calendarEntry.scheduledDate&sortType=desc&filterFields=component.id&filterValue_component.id="+str(componentId)+"&filterType_component.id=eq&filterClass_component.id=UUID&outputType=BASIC&outputType=LINKED&outputType=EXTENDED"
             print(("deploymentUrl -", deploymentUrl))
-            deploymentResponse = self.getResponse(deploymentUrl, 'GET', userid, passwd, None)
+            deploymentResponse = self.getResponse(deploymentUrl, 'GET', userid, cred, None)
             # Looping through response json to get deployment data array
             for i in range(len(deploymentResponse)):
                 if (deploymentResponse[i]["startTime"] > lastDeploymentDate) and (deploymentResponse[i]["startTime"] > startFrom):

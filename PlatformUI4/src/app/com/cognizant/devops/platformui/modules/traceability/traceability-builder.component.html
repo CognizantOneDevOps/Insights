@@ -72,20 +72,29 @@
 				</div>
 
 			</div>
+			<div class="button-section">
+				<section >
+					<mat-checkbox color="primary" 
+					[matTooltip]="isCheckedSelectedSprint ? 'Unchecking this will display all the sprints where all the issues have been worked' : 'Checking will display only the selected sprint'" 
+					[(ngModel)]="isCheckedSelectedSprint" 
+					*ngIf="showSprintCheckbox"
+						(change)="handleCheckboxEvent($event)"
+					>Show only selected Sprint</mat-checkbox>
+				</section>
+				<div class="button-section-actions ">
 
-			<div class="button-section-actions ">
-				
-				<button (click)="getDetails()" [disabled]="frmagentconfig.invalid"
-					class="button-save button-save-dimensions">
-					Search
-				</button>
-				<button (click)="clear()" class="button-cancel button-cancel-dimensions">
-					Clear
-				</button>
-				<button mat-button (click)="downloadPdf()" [disabled]="!this.isDownload"
-					class="button  downloadBtn" name="file" style="margin-right: 1%;">
-					Download
-				</button>
+					<button (click)="getDetails()" [disabled]="frmagentconfig.invalid"
+						class="button-save button-save-dimensions">
+						Search
+					</button>
+					<button (click)="clear()" class="button-cancel button-cancel-dimensions">
+						Clear
+					</button>
+					<button mat-button (click)="downloadPdf()" [disabled]="!this.isDownload" class="button  downloadBtn"
+						name="file" style="margin-right: 1%;">
+						Download
+					</button>
+				</div>
 			</div>
 			<div style="display: flex; justify-content: center; align-items: center">
 				<div class="loading-indicator">
@@ -180,7 +189,6 @@
 							<div class="scroll" id="traceId">
 								<div class="childCardList" *ngFor="let epic of data.value;let i=index">
 									<mat-card class="childCard" id="{{i}}">
-
 										<span (click)="onCardClickJira(i,$event,epic)" class="formatCardText"
 											title="{{disProp.value }} : {{epic[disProp.value]}}"
 											*ngFor="let disProp of displayProperty[data.key.split('_')[1]] | keyvalue">

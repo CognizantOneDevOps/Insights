@@ -32,7 +32,7 @@ class VersionOneAgent(BaseAgent):
     @BaseAgent.timed
     def process(self):
         userid = self.getCredential("userid")
-        passwd = self.getCredential("passwd")
+        cred = self.getCredential("passwd")
         baseUrl = self.config.get("baseUrl", '')
         project = self.config.get("project", '')
         startFrom = self.config.get("startFrom", '')
@@ -44,7 +44,7 @@ class VersionOneAgent(BaseAgent):
                       }
         responseTemplate = self.config.get('dynamicTemplate', {}).get('responseTemplate', None)
         hierachiesUrl = baseUrl+"Story?where=SecurityScope.Name='"+project+"'&sel=Name,Number,ChangeDate,Timebox.Name,Scope.Name,Status.Name,Estimate"
-        hierachies = self.getResponse(hierachiesUrl, 'GET', userid, passwd, None,reqHeaders=reqHeaders)
+        hierachies = self.getResponse(hierachiesUrl, 'GET', userid, cred, None,reqHeaders=reqHeaders)
         for hierarchy in hierachies["Assets"]:
             injectData = {}
             data = []

@@ -39,7 +39,7 @@ class BitBucketAgent(BaseAgent):
     def process(self):
         self.baseEndPoint = self.config.get("baseEndPoint", '')
         self.userId = self.getCredential("userid")
-        self.passwd = self.getCredential("passwd")
+        self.cred = self.getCredential("passwd")
         self.scanAllBranches = self.config.get("scanAllBranches", False)
         self.scanPullRequests = self.config.get("scanPullRequests", False)
         self.scanReleaseBranches = self.config.get("scanReleaseBranches", False)
@@ -54,7 +54,7 @@ class BitBucketAgent(BaseAgent):
         fetchNextPage = True
         while fetchNextPage:
             # get all bitbucket projects
-            bitBucketProjects = self.getResponse(getProjectsUrl+'?limit='+str(limit)+'&start='+str(start), 'GET', self.userId, self.passwd, None)
+            bitBucketProjects = self.getResponse(getProjectsUrl+'?limit='+str(limit)+'&start='+str(start), 'GET', self.userId, self.cred, None)
             numProjects = len(bitBucketProjects["values"])
             if numProjects == 0:
                 fetchNextPage = False
@@ -70,7 +70,7 @@ class BitBucketAgent(BaseAgent):
                 fetchNextRepoPage = True
                 while fetchNextRepoPage:
                     # get all repos under a project
-                    bitBicketRepos = self.getResponse(bitBicketReposUrl+'?limit='+str(limit)+'&start='+str(repoStart), 'GET', self.userId, self.passwd, None)
+                    bitBicketRepos = self.getResponse(bitBicketReposUrl+'?limit='+str(limit)+'&start='+str(repoStart), 'GET', self.userId, self.cred, None)
                     numRepos = len(bitBicketRepos["values"])
                     if numRepos == 0:
                         fetchNextRepoPage = False
@@ -89,7 +89,7 @@ class BitBucketAgent(BaseAgent):
                             branchStart = 0
                             fetchNextBranchPage = True
                             while fetchNextBranchPage:
-                                bitBicketBranches = self.getResponse(bitBicketBranchessUrl+'?limit='+str(limit)+'&start='+str(branchStart), 'GET', self.userId, self.passwd, None)
+                                bitBicketBranches = self.getResponse(bitBicketBranchessUrl+'?limit='+str(limit)+'&start='+str(branchStart), 'GET', self.userId, self.cred, None)
                                 numBranches = len(bitBicketBranches["values"])
                                 if numBranches == 0:
                                     fetchNextBranchPage = False
@@ -108,7 +108,7 @@ class BitBucketAgent(BaseAgent):
                             branchStart = 0
                             fetchNextBranchPage = True
                             while fetchNextBranchPage:
-                                bitBicketBranches = self.getResponse(bitBicketBranchessUrl+'?limit='+str(limit)+'&start='+str(branchStart), 'GET', self.userId, self.passwd, None)
+                                bitBicketBranches = self.getResponse(bitBicketBranchessUrl+'?limit='+str(limit)+'&start='+str(branchStart), 'GET', self.userId, self.cred, None)
                                 numBranches = len(bitBicketBranches["values"])
                                 if numBranches == 0:
                                     fetchNextBranchPage = False
@@ -158,7 +158,7 @@ class BitBucketAgent(BaseAgent):
             if branchTracking != None:
                 bitBucketCommitsUrl += '&since='+branchTracking
             try:
-                bitBucketCommits = self.getResponse(bitBucketCommitsUrl+'&limit='+str(limit)+'&start='+str(commitStart), 'GET', self.userId, self.passwd, None)
+                bitBucketCommits = self.getResponse(bitBucketCommitsUrl+'&limit='+str(limit)+'&start='+str(commitStart), 'GET', self.userId, self.cred, None)
                 i = 0
                 for commits in (bitBucketCommits["values"]):
                     authortimestamp = bitBucketCommits["values"][i]["authorTimestamp"]
@@ -202,7 +202,7 @@ class BitBucketAgent(BaseAgent):
         while fetchNextPRPage:
             pullRequestUrl = self.baseEndPoint+projKey+"/repos/"+repoName+"/pull-requests?state=All&order=NEWEST&limit="+str(limit)+'&start='+str(prStart)
             try:
-                pullRequests = self.getResponse(pullRequestUrl, 'GET', self.userId, self.passwd, None)
+                pullRequests = self.getResponse(pullRequestUrl, 'GET', self.userId, self.cred, None)
                 i = 0
                 for pullReq in (pullRequests["values"]):
                     createdDate = pullRequests["values"][i]["createdDate"]

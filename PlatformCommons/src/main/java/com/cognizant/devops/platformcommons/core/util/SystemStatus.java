@@ -33,9 +33,9 @@ public class SystemStatus {
 
 	public static JsonObject addSystemInformationInNeo4j( List<JsonObject> dataList,
 			List<String> labels) throws Exception {
-		GraphDBHandler graphDBHandler = new GraphDBHandler();
+		
 		JsonObject response = null;
-		try {
+		try(GraphDBHandler graphDBHandler = new GraphDBHandler()) {
 			StringBuilder queryLabel = new StringBuilder();
 			for (String label : labels) {
 				if (label != null && label.trim().length() > 0) {

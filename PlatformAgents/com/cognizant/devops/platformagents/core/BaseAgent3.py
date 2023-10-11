@@ -119,7 +119,7 @@ class BaseAgent(object):
             filePresent = os.path.isfile('config.json')
             agentDir = os.path.dirname(sys.modules[self.__class__.__module__].__file__) + os.path.sep
             if "INSIGHTS_HOME" in os.environ:
-                logDirPath = os.environ['INSIGHTS_HOME'] + '/logs/PlatformAgent'
+                logDirPath = os.path.abspath(os.environ['INSIGHTS_HOME']) + '/logs/PlatformAgent'
                 if not os.path.exists(logDirPath):
                     os.makedirs(logDirPath)
             else:
@@ -144,7 +144,7 @@ class BaseAgent(object):
             self.logFilePath = agentDir + '/' + 'log_' + type(self).__name__ + '.log'
             if self.config.get('agentId') != None and self.config.get('agentId') != '':
                 if "INSIGHTS_HOME" in os.environ:
-                    logDirPath = os.environ['INSIGHTS_HOME'] + '/logs/PlatformAgent'
+                    logDirPath = os.path.abspath(os.environ['INSIGHTS_HOME']) + '/logs/PlatformAgent'
                     if not os.path.exists(logDirPath):
                         os.makedirs(logDirPath)
                     self.logFilePath = logDirPath + '/' + 'log_' + self.config.get('agentId') + '.log'
@@ -399,13 +399,20 @@ class BaseAgent(object):
         showErrorMessage = False
         for each_json in data:
             errorFlag = False
-            for element in each_json:
-                if isinstance(each_json[element], dict):
+            filtered_json =  each_json.copy()
+            for element in filtered_json:
+                if element == "password":
+                    filtered_json.pop("password", None)
+                    continue
+                if element == "Authorization":
+                    filtered_json.pop("Authorization", None)
+                    continue
+                if isinstance(filtered_json[element], dict):
                     errorFlag = True
                     showErrorMessage = True
                     self.baseLogger.error(
-                        'Value is not in expected format, nested JSON encountered.Rejecting: ' + str(each_json))
-                    break;
+                        'Value is not in expected format, nested JSON encountered.Rejecting: ' + str(filtered_json))
+                    break
             if not errorFlag:
                 corrected_json_array.append(each_json)
         if showErrorMessage:
@@ -488,9 +495,9 @@ class BaseAgent(object):
         with open(jsonFile, 'w') as outfile:
             json.dump(data, outfile, indent=4, sort_keys=True)
 
-    def getResponse(self, url, method, userName, password, data, authType='BASIC', reqHeaders=None, responseTupple=None,
+    def getResponse(self, url, method, usr, cred, data, aType='BASIC', reqHeaders=None, responseTupple=None,
                     proxiesParam=None):
-        return self.communicationFacade.communicate(url, method, userName, password, data, authType, reqHeaders,
+        return self.communicationFacade.communicate(url, method, usr, cred, data, aType, reqHeaders,
                                                     responseTupple, proxies=self.proxies)
 
     def parseResponse(self, template, response, injectData={}):

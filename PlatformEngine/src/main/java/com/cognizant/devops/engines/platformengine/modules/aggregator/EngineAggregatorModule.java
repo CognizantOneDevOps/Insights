@@ -82,10 +82,9 @@ public class EngineAggregatorModule implements Job, ApplicationConfigInterface {
 	
 	public void executeJob() {
 		log.debug(" Engine Scheduled Job ==== EngineAggregatorModule start ====");
-		try {
+		try(GraphDBHandler graphDBHandler = new GraphDBHandler()) {
 			ApplicationConfigInterface.loadConfiguration();
 			ApplicationConfigProvider.performSystemCheck();
-			GraphDBHandler graphDBHandler = new GraphDBHandler();
 			AgentConfigDAL agentConfigDal = new AgentConfigDAL();
 			List<AgentConfig> allAgentConfigurations = agentConfigDal.getAllEngineAggregatorAgentConfigurations();
 			boolean enableOnlineDatatagging = ApplicationConfigProvider.getInstance().isEnableOnlineDatatagging();
@@ -105,6 +104,11 @@ public class EngineAggregatorModule implements Job, ApplicationConfigInterface {
 			log.error("Error while loading Engine Aggregator Module ",e);
 			EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
 					" Error occured while initializing Engine Aggregator Module  " + e.getMessage(),
+					PlatformServiceConstants.FAILURE,jobName);
+		} catch (Exception ex) {
+			log.error("Error while loading Engine Aggregator Module ", ex);
+			EngineStatusLogger.getInstance().createSchedularTaskStatusNode(
+					" Error occured while initializing Engine Aggregator Module  " + ex.getMessage(),
 					PlatformServiceConstants.FAILURE,jobName);
 		}
 		log.debug(" EngineAggregatorModule Completed ====");

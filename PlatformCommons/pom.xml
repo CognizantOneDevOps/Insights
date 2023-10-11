@@ -12,14 +12,14 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>10.2</version>
+		<version>10.3</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformCommons</artifactId>
-	<version>10.2</version>
+	<version>10.3</version>
 	<packaging>jar</packaging>
 
 	<name>PlatformCommons</name>
@@ -248,7 +248,7 @@
 		<dependency>
 			<groupId>org.apache.xmlgraphics</groupId>
 			<artifactId>batik-css</artifactId>
-			<version>1.16</version>
+			<version>1.17</version>
 		</dependency>
 		
 			<!-- Added bcprov-ext-jdk15on and velocity-engine-core to resolve spring 

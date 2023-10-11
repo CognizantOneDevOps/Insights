@@ -39,6 +39,13 @@
     width: 85px !important;
 }
 
+.button-section {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    align-items: center;
+}
+
 .button-section-actions {
     display: flex;
     flex-direction: row;

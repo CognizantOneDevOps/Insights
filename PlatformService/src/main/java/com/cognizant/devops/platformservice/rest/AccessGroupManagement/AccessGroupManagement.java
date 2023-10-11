@@ -462,8 +462,13 @@ public class AccessGroupManagement {
 	public JsonObject getTemplateQueryResults(@RequestBody String queryJson) throws InsightsCustomException {
 		log.debug("%n%nInside getTemplateQueryResults method call  ==== ");
 		JsonObject query = JsonUtils.parseStringAsJsonObject(queryJson);
-		GraphDBHandler dbHandler = new GraphDBHandler();
-		return dbHandler.executeCypherQueryForJsonResponse(query.get("query").getAsString());
+		JsonObject response = new JsonObject();
+		try(GraphDBHandler dbHandler = new GraphDBHandler()){
+			 response = dbHandler.executeCypherQueryForJsonResponse(query.get("query").getAsString());
+		} catch (Exception e) {
+			log.error("Error while executing neo4j query {}", e.getMessage());
+		}
+		return response;
 	}
 
 	@GetMapping(value = "/getDashboardByUid", produces = MediaType.APPLICATION_JSON_VALUE)

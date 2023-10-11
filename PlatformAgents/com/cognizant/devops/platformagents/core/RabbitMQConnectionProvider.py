@@ -28,7 +28,7 @@ class RabbitMQConnectionProvider(MessageAbstract):
         logging.debug('Inside init of RabbitMQConnectionProvider =======')
         mqConfig = config.get('mqConfig','None')
         self.user = mqConfig.get('user', None)
-        self.password = mqConfig.get('password', None)
+        self.cred = mqConfig.get('password', None)
         self.host = mqConfig.get('host', None)
         self.exchange = mqConfig.get('exchange', None)
         port = mqConfig.get('port', 5672)
@@ -47,7 +47,7 @@ class RabbitMQConnectionProvider(MessageAbstract):
             self.arguments={}
             
         try:    
-            self.credentials = pika.PlainCredentials(self.user, self.password)
+            self.credentials = pika.PlainCredentials(self.user, self.cred)
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=self.credentials,host=self.host,port=self.port))
         except pika.exceptions.ConnectionClosed as exc:
             logging.error('In init connection closed... and restarted '+exc.__class__.__name__)
@@ -58,7 +58,7 @@ class RabbitMQConnectionProvider(MessageAbstract):
             
     def subscribe(self, routingKey, callback, seperateThread=True):
         def subscriberThread():
-            credentials = pika.PlainCredentials(self.user, self.password)
+            credentials = pika.PlainCredentials(self.user, self.cred)
             subconnection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=self.host,port=self.port))
             channel = subconnection.channel()
             queueName = routingKey.replace('.','_')
@@ -79,19 +79,19 @@ class RabbitMQConnectionProvider(MessageAbstract):
     
     def publish(self, routingKey, data, batchSize=None, metadata=None):
         if data != None:
-            #credentials = pika.PlainCredentials(self.user, self.password)
+            #credentials = pika.PlainCredentials(self.user, self.cred)
             #connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=self.host,port=self.port))
             try:
                 if self.connection.is_closed:
                     logging.debug('In publish block, Connection close .... restarting connection')
-                    self.credentials = pika.PlainCredentials(self.user, self.password)
+                    self.credentials = pika.PlainCredentials(self.user, self.cred)
                     self.connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=self.credentials,host=self.host,port=self.port))
                     
                 channelpub = self.connection.channel()
             except Exception as ex:
                 logging.error('In publish block, for Exception connection closed and restarted ....'+ex.__class__.__name__)
                 logging.error(str(ex))
-                self.credentials = pika.PlainCredentials(self.user, self.password)
+                self.credentials = pika.PlainCredentials(self.user, self.cred)
                 self.connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=self.credentials,host=self.host,port=self.port))
                 channelpub = self.connection.channel()
             
@@ -123,7 +123,7 @@ class RabbitMQConnectionProvider(MessageAbstract):
             
     def declareDeadLetterExchange(self):
         
-        credentials = pika.PlainCredentials(self.user, self.password)
+        credentials = pika.PlainCredentials(self.user, self.cred)
         connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=self.host,port=self.port))
        
         #Create dead letter queue 

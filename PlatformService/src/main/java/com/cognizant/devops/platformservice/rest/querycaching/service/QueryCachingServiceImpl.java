@@ -18,6 +18,7 @@ package com.cognizant.devops.platformservice.rest.querycaching.service;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
+import java.util.stream.Stream;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.logging.log4j.LogManager;
@@ -28,19 +29,15 @@ import org.ehcache.config.CacheConfiguration;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
-import org.ehcache.config.units.EntryUnit;
-import org.ehcache.config.units.MemoryUnit;
 import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformservice.rest.querycaching.service.CustomExpiryPolicy;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import java.util.stream.Stream;
 
 @Service("queryCachingService")
 public class QueryCachingServiceImpl implements QueryCachingService {
@@ -109,11 +106,10 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 
 	private JsonObject getNeo4jDatasourceResults(String queryjson) throws InsightsCustomException {
 
-		GraphDBHandler graphDBHandler = new GraphDBHandler();
 		GraphResponse response = null;
 		JsonObject json = JsonUtils.parseStringAsJsonObject(queryjson);
 
-		try {
+		try(GraphDBHandler graphDBHandler = new GraphDBHandler()) {
 			StringBuilder stringBuilder = new StringBuilder();
 			Iterator<JsonElement> iterator = json.get(QueryCachingConstants.STATEMENTS).getAsJsonArray().iterator();
 	
@@ -128,6 +124,9 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 		} catch (InsightsCustomException e) {
 			log.error("Exception in neo4j query execution", e);
 			throw new InsightsCustomException(e.getMessage());
+		} catch (Exception ex) {
+			log.error("Exception in neo4j ", ex);
+			throw new InsightsCustomException(ex.getMessage());
 		}
 		return response.getJson();
 	}

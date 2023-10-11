@@ -31,7 +31,7 @@ class JenkinsAgent(BaseAgent):
     def process(self):
         self.baseLogger.info('Inside process')
         self.userid = self.config.get("userid", '')
-        self.passwd = self.config.get("passwd", '')
+        self.cred = self.config.get("passwd", '')
         self.BaseUrl = self.config.get("baseUrl", '')
         startFrom = self.config.get("startFrom", '')
         startFrom = parser.parse(startFrom)
@@ -70,7 +70,7 @@ class JenkinsAgent(BaseAgent):
 
     def processFolder(self,url):
         restUrl = url + 'api/json?tree=jobs[name,url,buildable,lastBuild[number]]'
-        jenkinsProjects = self.getResponse(restUrl, 'GET', self.userid, self.passwd, None)
+        jenkinsProjects = self.getResponse(restUrl, 'GET', self.userid, self.cred, None)
         jobs = jenkinsProjects.get('jobs', None);
         if jobs:
             for job in jobs:
@@ -96,7 +96,7 @@ class JenkinsAgent(BaseAgent):
             #        self.processFolder(folderUrl)
         else:
             restUrl = url + 'api/json?tree=lastBuild[number],url,name'
-            jenkinsProjects = self.getResponse(restUrl, 'GET', self.userid, self.passwd, None)
+            jenkinsProjects = self.getResponse(restUrl, 'GET', self.userid, self.cred, None)
             jobUrl = jenkinsProjects['url']
             jobName = jenkinsProjects.get('name', None)
             lastBuild = jenkinsProjects.get('lastBuild', None)
@@ -121,7 +121,7 @@ class JenkinsAgent(BaseAgent):
         else:
             while not buildsIdentified:
                 restUrl = url+'api/json?tree='+self.buildsApiName+'[number,timestamp,duration]{'+str(nextBatch)+','+str(nextBatch+100)+'},name'
-                jobDetails = self.getResponse(restUrl, 'GET', self.userid, self.passwd, None)
+                jobDetails = self.getResponse(restUrl, 'GET', self.userid, self.cred, None)
                 builds = jobDetails[self.buildsApiName]
                 for build in builds:
                     if self.startFrom < build["timestamp"]:
@@ -148,7 +148,7 @@ class JenkinsAgent(BaseAgent):
             if end > tillJobCount:
                 end = tillJobCount
             restUrl = url+'api/json?tree=' + self.buildsApiName + self.treeApiParams +'{'+str(start)+','+str(end)+'},name'
-            jobDetails = self.getResponse(restUrl, 'GET', self.userid, self.passwd, None)
+            jobDetails = self.getResponse(restUrl, 'GET', self.userid, self.cred, None)
             builds = jobDetails[self.buildsApiName]
             #add filter logic
             startIndex = 0
@@ -199,7 +199,7 @@ class JenkinsAgent(BaseAgent):
         if len(jobDetails) == 0:
             return injectData
         configXmlUrl = url+"config.xml"
-        auth = HTTPBasicAuth(self.userid, self.passwd)
+        auth = HTTPBasicAuth(self.userid, self.cred)
         xmlResponse = requests.get(configXmlUrl, auth=auth)
         root = ET.fromstring(xmlResponse.text.encode('UTF-8').strip())
         rootTag = root.tag

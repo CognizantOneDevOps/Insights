@@ -41,6 +41,16 @@ export class TraceabiltyService implements ITraceablityService {
         return restHandler.get("GET_EPIC_ISSUES", {'toolName': toolName, 'fieldName': toolField, 'fieldValue': toolValue,'type':type });
     }
 
+    getSprintIssues(toolName: string, toolField: string, toolValue: string,type:string): Promise<any> {
+        var restHandler = this.restCallHandlerService;
+        return restHandler.get("GET_SPRINT_ISSUES", {'toolName': toolName, 'fieldName': toolField, 'fieldValue': toolValue,'type':type });
+    }
+
+    getReleaseIssues(toolName: string, toolField: string, toolValue: string,type:string): Promise<any> {
+        var restHandler = this.restCallHandlerService;
+        return restHandler.get("GET_RELEASE_ISSUES", {'toolName': toolName, 'fieldName': toolField, 'fieldValue': toolValue,'type':type });
+    }
+
     getIssuesPipeline(issue:string): Promise<any>{
         var restHandler = this.restCallHandlerService;
        // return restHandler.get("GET_ISSUES_PIPELINE", {'issue': issue});

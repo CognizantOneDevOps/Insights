@@ -30,7 +30,7 @@ class ArtifactoryAgent(BaseAgent):
     @BaseAgent.timed
     def process(self):
         user = self.getCredential("userid")
-        passwd = self.getCredential("passwd")
+        cred = self.getCredential("passwd")
         BaseUrl = self.config.get("BaseUrl", '')
         FirstEndPoint = self.config.get("FirstEndPoint", '')
         self.startDate = None
@@ -47,7 +47,7 @@ class ArtifactoryAgent(BaseAgent):
             self.response_template = ['repo', 'path', 'created', 'createdBy', 'lastModified', 'modifiedBy', 'lastUpdated', 'uri', 'downloadUri' , 'mimeType', 'size']
         repo_list_url=BaseUrl+'repositories'
         json_headers = {"Content-Type":"application/json","Accept":"application/json"}
-        list_of_repos = self.getResponse(repo_list_url, 'GET', user, passwd, None, reqHeaders=json_headers)
+        list_of_repos = self.getResponse(repo_list_url, 'GET', user, cred, None, reqHeaders=json_headers)
         with open(self.trackingFilePath, 'r') as config_file:
             self.tracking = json.load(config_file)
         self.data = []
@@ -61,14 +61,14 @@ class ArtifactoryAgent(BaseAgent):
                 child_url=[]
                 for url in nexturl:
                     nextrepo=[]
-                    next_response = self.getResponse(url, 'GET', user, passwd, None, reqHeaders=json_headers)
+                    next_response = self.getResponse(url, 'GET', user, cred, None, reqHeaders=json_headers)
                     if next_response is not None:
                         for length in range(len(next_response['children'])):
                             repos=next_response['children'][length]['uri']
                             nextrepo.append(repos)
                         for repo in nextrepo:
                             child_link=url+repo
-                            child_reponse = self.getResponse(child_link, 'GET', user, passwd, None, reqHeaders=json_headers)
+                            child_reponse = self.getResponse(child_link, 'GET', user, cred, None, reqHeaders=json_headers)
                             if child_reponse is not None:
                                 if 'children' not in child_reponse:
                                     self.response(child_link, child_reponse)

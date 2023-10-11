@@ -50,8 +50,8 @@ class AwsFinOpsAgent(BaseAgent):
         self.baseLogger.info('Inside process')
         
         #Other data
-        self.accesskey = self.getCredential("awsAccesskey")
-        self.secretkey = self.getCredential("awsSecretkey")
+        self.acskey = self.getCredential("awsAccesskey")
+        self.scrtkey = self.getCredential("awsSecretkey")
         self.s3FilePath = self.config.get('s3FilePath')
         
         self.startFromConfig = (parser.parse(self.config.get("startFrom"), ignoretz=True)).date()
@@ -92,7 +92,7 @@ class AwsFinOpsAgent(BaseAgent):
         self.allResourcesList = []
         
         try:
-            self.s3ApiClient = boto3.client('s3', aws_access_key_id=self.accesskey, aws_secret_access_key=self.secretkey)
+            self.s3ApiClient = boto3.client('s3', aws_access_key_id=self.acskey, aws_secret_access_key=self.scrtkey)
                 
             self.processCsvFileFromS3Bucket()
             
@@ -347,8 +347,8 @@ class AwsFinOpsAgent(BaseAgent):
         costReqtimestamp = costReqinsighstTimeX.get('timefield',None)
         costReqtimeformat = costReqinsighstTimeX.get('timeformat',None)
         costReqisEpoch = costReqinsighstTimeX.get('isEpoch',False)
-        client = boto3.client('ce', aws_access_key_id=self.accesskey,
-                                     aws_secret_access_key=self.secretkey)
+        client = boto3.client('ce', aws_access_key_id=self.acskey,
+                                     aws_secret_access_key=self.scrtkey)
         start=(datetime.today() + timedelta(days=1)).strftime("%Y-%m-%d")
         frcstEndDt = (datetime.today() + relativedelta(months=1)).strftime("%Y-%m-%d")
         forecastRequest = self.dynamicTemplate.get("forecast","{}").get("forecastrequest","{}").get("Filter", "{}")
@@ -518,8 +518,8 @@ class AwsFinOpsAgent(BaseAgent):
     def callAndProcessMetricsAPI(self, metricDataQueryList, startFrom, enddate, eachregion, metricsList):
         metricDataDictList = []
         client = boto3.client('cloudwatch', 
-                              aws_access_key_id=self.accesskey,
-                              aws_secret_access_key=self.secretkey,
+                              aws_access_key_id=self.acskey,
+                              aws_secret_access_key=self.scrtkey,
                               region_name=eachregion)     
         self.baseLogger.info(" MetricQuery: Processing metric data query list of ======== "+str(len(metricDataQueryList)))  
         response = client.get_metric_data(

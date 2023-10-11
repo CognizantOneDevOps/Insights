@@ -27,14 +27,14 @@ class HpAlmAgent(BaseAgent):
     @BaseAgent.timed
     def getHpAlmSSOHeader(self, baseEndPoint):
         self.userid = self.getCredential("userid")
-        self.passwd = self.getCredential("passwd")
+        self.cred = self.getCredential("passwd")
         authEndPoint = baseEndPoint + '/qcbin/authentication-point/authenticate' 
         responseTupple = {}
         reqHeaders = {
                         "Content-Type" : "application/xml",
                         "Accept" :  "application/xml"
                       }
-        self.getResponse(authEndPoint, 'POST', userid, passwd, None, reqHeaders=reqHeaders, responseTupple=responseTupple)
+        self.getResponse(authEndPoint, 'POST', self.userid, self.cred, None, reqHeaders=reqHeaders, responseTupple=responseTupple)
         ssoCookie = responseTupple['cookies']['LWSSO_COOKIE_KEY']
         cookieHeader = {
                        "Cookie" : 'LWSSO_COOKIE_KEY='+ssoCookie+';'

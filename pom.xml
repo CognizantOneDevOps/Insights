@@ -14,7 +14,7 @@
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformParent</artifactId>
 	<packaging>pom</packaging>
-	<version>10.2</version>
+	<version>10.3</version>
 	<name>PlatformParent</name>
 
 	<dependencies>

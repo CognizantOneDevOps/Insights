@@ -27,10 +27,10 @@ class TFSDeploymentAgent(BaseAgent):
         self.baseLogger.info('Inside process')
         BaseUrl = self.config.get("baseUrl", '')
         UserID = self.getCredential("userid")
-        Passwd = self.getCredential("passwd")
-        Auth = self.config.get("auth", '')
+        cred = self.getCredential("passwd")
+        aType = self.config.get("auth", '')
         getCollectionsUrl = BaseUrl+"/_apis/_commom/GetJumpList?showTeamsOnly=false&__v=5&navigationContextPackage={}&showStoppedCollections=false"
-        collectionResponse = self.getResponse(getCollectionsUrl, 'GET', UserID, Passwd, None, authType=Auth)
+        collectionResponse = self.getResponse(getCollectionsUrl, 'GET', UserID, cred, None, aType=aType)
         collections = collectionResponse.get("__wrappedArray")
         responseTemplate = self.getResponseTemplate()
         data = []
@@ -38,7 +38,7 @@ class TFSDeploymentAgent(BaseAgent):
         for collection in range(colCount):            
             collectionName = collections[collection]["name"]
             getProjectsUrl = BaseUrl + "/" + collectionName +"/_apis/projects?api-version=4.1"
-            projects = self.getResponse(getProjectsUrl, 'GET', UserID, Passwd, None, authType=Auth)
+            projects = self.getResponse(getProjectsUrl, 'GET', UserID, cred, None, aType=aType)
             projCount = projects["count"]
             expandList = ["approvals", "artifacts","environments","manualInterventions","tags","variables"]
             expandListString = ','.join(expandList)
@@ -57,7 +57,7 @@ class TFSDeploymentAgent(BaseAgent):
                     getReleaseUrl = BaseUrl + "/" + collectionName + "/" + projectName + "/_apis/release/releases"\
                     "?$expand=" + expandListString + "&queryOrder=ascending&minCreatedTime=" + lastReleaseTime +\
                     "&$top=100&api-version=4.1-preview.6"
-                releases = self.getResponse(getReleaseUrl, 'GET', UserID, Passwd, None, authType=Auth)
+                releases = self.getResponse(getReleaseUrl, 'GET', UserID, cred, None, aType=aType)
                 rCount = releases["count"]
                 if not newProject and rCount > 0:
                     releases["value"].pop(0);

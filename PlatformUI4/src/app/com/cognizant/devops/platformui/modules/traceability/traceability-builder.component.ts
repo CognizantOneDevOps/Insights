@@ -61,6 +61,8 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
     issueTypeSelected: string;
     git = [];
     epicArr = [];
+    sprintArr = [];
+    releaseArr = [];
     jiraArr = [];
     jenkins = [];
     sonar = [];
@@ -68,7 +70,14 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
     showGit: boolean = false;
     epic: boolean;
     showAll: boolean;
-    issueTypes: string[] = ['Other', 'Epic', 'Issue'];
+    issueTypes: string[] = ['Other', 'Epic', 'Sprint', 'Release', 'Issue'];
+    issueTypesDefault: string[] = ['Other', 'Epic', 'Sprint', 'Release', 'Issue'];
+    issueTypesJIRA:any = {
+            "key" : ["Epic", "Issue"],
+            "sprintId" : ["Sprint"],
+            "versionId" : ["Release"]
+        
+    }
     globalData: any;
     filteredData = [];
     toolNameArr = [];
@@ -101,9 +110,11 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
     gChart: boolean;
     total: number;
     mapToolColor = new Map<String, Object[]>();
-    listOfColor: any[] = ['#FAE0E1', '#D4F9DF', '#D4F0F0', '#FFFFE3', '#FEE1ED', '#D4F0F0', '#CBEBCA', '#F2FAE0', '#F9E0FA', '#EAE0FA']
+    listOfColor: any[] = ['#FAE0E1', '#D4F9DF', '#D4F0F0', '#FFFFE3', '#ACB1D6',  '#CBEBCA', '#F2FAE0', '#F9E0FA', '#EAE0FA']
     selectedTabIndex: number = 0
     isDownload = false;
+    isCheckedSelectedSprint = true;
+    showSprintCheckbox = false;
 
     constructor(private dialog: MatDialog, public messageDialog: MessageDialogService,
         private traceablityService: TraceabiltyService, private imageHandeler: ImageHandlerService, private renderer: Renderer2, public dataShare: DataSharedService) {
@@ -159,6 +170,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
     }
 
     getDetails() {
+        this.isCheckedSelectedSprint = true;
         this.list = [];
         this.toolSummaryArray = [];
         this.map = new Map<String, Object[]>();
@@ -168,6 +180,14 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
         this.getToolDisplayProperties();
         if (this.issueTypeSelected == 'Epic') {
             this.getEpicIssuesDetails(this.selectedTool, this.selectedField, this.fieldValue, "Epic");
+        }
+        else if (this.issueTypeSelected == 'Sprint') {
+            this.getSprintIssuesDetails(this.selectedTool, this.selectedField, this.fieldValue, "Sprint");
+            this.showSprintCheckbox = true;
+        }
+        else if (this.issueTypeSelected == 'Release') {
+            this.getReleaseIssuesDetails(this.selectedTool, this.selectedField, this.fieldValue, "Release");
+            this.showSprintCheckbox = false;
         }
         else if (this.issueTypeSelected == 'Issue') {
             this.getAssetHistoryDetails(this.selectedTool, this.selectedField, this.fieldValue, "Issue");
@@ -183,7 +203,6 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
         let searchKey = data;
         if (this.map.has(key)) {
             let val = JSON.parse(JSON.stringify(this.map.get(key)));
-            console.log("val.includes(data)" + val.includes(data));
             if (val.includes(data)) {
                 this.map.delete(key);
                 this.map.set(key, val);
@@ -205,7 +224,9 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
         response.then((data) => {
             let res = data.data;
             this.displayProperty = res;
-                this.displayProperty['Epic'] = ["issueKey","toolstatus"];
+                this.displayProperty['Epic'] = ["epicName", "summary", "issueKey","toolstatus"];
+                this.displayProperty['Sprint'] = ["sprintId", "name", "startDate", "endDate", "completeDate", "state"];
+                this.displayProperty['Release'] = ["versionId","versionName", "released", "releaseDate"];
         });
     }
     getEpicIssuesDetails(toolName: string, toolField: string, toolValue: string, type: string) {
@@ -233,7 +254,6 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
 
                     if (data.data.combinedSummary.length > 0) {
                         this.list1 = data.data.combinedSummary;
-                        console.log(this.list1)
                     }
                     this.traceabilityData = data;
                     this.globalData = this.traceabilityData.data.pipeline;
@@ -260,7 +280,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
             }
         });
     }
-    constructObject(data) {
+    constructObject(data) {        
         data.data.pipeline.forEach(element => {
             this.showDiv = true;
             let key = element.order + "_" + element.toolName;
@@ -279,7 +299,8 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
             this.mapToolColor.set(key.split('_')[1],this.listOfColor[ii])
             ii = ii + 1
         }
-        this.globalMap = this.map;
+        
+        this.globalMap = this.map;        
     }
     prepareSummaryDetail(data){
 
@@ -290,13 +311,17 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
         }
     }
     onCardClickJira(index, event, key) {
-        this.isDatainProgress=true;
+        this.isCheckedSelectedSprint = false;
+        this.showSprintCheckbox = false;
         this.showModel = null;
         this.selectedJira = index
         let clickedElement = key;
         clickedElement['searchKey'] = this.selectedField;
+        if(clickedElement['toolName'] === 'Sprint') return;
+        if(clickedElement['toolName'] === 'Release') return;
+        this.isDatainProgress=true;
         this.cachestring = clickedElement['toolName'] + "." + clickedElement['searchKey'] + "." + clickedElement['issueKey'];
-        console.log(clickedElement);
+        
         if (this.map.size == 1) {
             this.messageDialog.openSnackBar("No further pipeline found for given selection.",'error');
             //this.messageDialog.showApplicationsMessage("No further pipeline found for given selection.", "ERROR");
@@ -315,15 +340,13 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
             });
             this.globalMap = this.map;
             this.isDatainProgress = false;
-        }
-        else {
+        } else {
             this.traceablityService.getIssuesPipeline(clickedElement)
                 .then((data) => {
                    // setTimeout(()=>{this.isDatainProgress=true},8000); 
                    this.map = new Map<String, Object[]>();
                     let res = data.data.pipeline;
                     this.cacheMap.set(clickedElement.uuid, res);
-                    console.log(data)
                     this.globalData = res;
                     /* res.forEach(element => {
                         let key = element.order + "_" + element.toolName;
@@ -345,7 +368,6 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
 
                 });
         }
-
     }
     onCardClick(inbex: number, event, key) {
         let cache;
@@ -354,12 +376,10 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
         let clickedElement = key;
         clickedElement['searchKey'] = this.selectedField;
         this.cachestring = clickedElement['toolName'] + "." + clickedElement['searchKey'] + "." + clickedElement['issueKey'];
-        console.log(clickedElement);
 
         this.traceablityService.getIssuesPipeline(clickedElement)
             .then((data) => {
                 let res = data.data.pipeline;
-                console.log(data)
                 this.globalData = res;
                 res.forEach(element => {
                     let key = element.order + "_" + element.toolName;
@@ -441,7 +461,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
     }
     drawPipe() {
         this.list = [];
-        let custMap = {};
+        let custMap = {};        
         this.traceabilityData.data.pipeline.map(element => {
             //element["moddate"] = new Date(element.timestamp*1000);
             if (custMap[element.toolName]) {
@@ -467,7 +487,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
                 child: []
             }
             orderlst.push(obj);
-        })
+        })        
         orderlst.forEach((a) => {
             clst[a.point].forEach((s) => {
                 if (a.child.length === 0) {
@@ -513,8 +533,6 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
             this.pipeheight = this.pipeheight < l.child.length ? l.child.length : this.pipeheight;
         })
 
-       // console.log(this.list)
-        //this.list1.push(this.list[0]);
     }
 
     sortArray(list) {
@@ -534,7 +552,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
     }
 
     onclick(index) {
-
+        
         let topElementIndex = index.split('-')[0];
         let childElementIndex = index.split('-')[1];
         let topElement = this.list[topElementIndex];
@@ -593,6 +611,7 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
         this.fieldPlaceVal = null;
         this.selectedField = null;
         this.fieldList = [];
+        this.showSprintCheckbox = false;
         this.traceablityService.getToolKeyset(this.selectedTool)
             .then((response) => {
                 if (response.status == 'success') {
@@ -609,12 +628,20 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
         var self = this;
         self.isToolSelected = true;
         self.isFieldSelected = false;
+
     }
     FieldOnChange(key, type): void {
         this.fieldValue = null;
+        this.showSprintCheckbox = false;
         var self = this;
         self.isFieldSelected = true;
         self.fieldPlaceVal = key + "_val";
+        
+        if(this.selectedTool === "JIRA"){
+            this.issueTypes = this.issueTypesJIRA[this.selectedField]
+        } else {
+            this.issueTypes = ["Other"]
+        }
     }
 
     showDetailsDialog(toolName: string) {
@@ -662,28 +689,144 @@ export class TraceabilityDashboardCompenent implements OnInit, AfterViewInit {
         this.map.clear();
         this.list1 = [];
         this.isDownload = false;
-        console.log("clear" + this.map);
+        this.showSprintCheckbox = false;
     }
     reset() {
         this.map = new Map<String, Object[]>();;
         this.getDetails();
     }
 
-    getToolColor(toolName){
+    getToolColor(toolName){        
        return this.mapToolColor.get(toolName);
     }
 
     tabChanged(tabChangeEvent: MatTabChangeEvent): void {
-        console.log('tabChangeEvent => ', tabChangeEvent);
-        console.log('index => ', tabChangeEvent.index);
-        console.log('textLabel => ', tabChangeEvent.tab.textLabel);
         this.selectedTabIndex = tabChangeEvent.index;
         if(this.selectedTabIndex == 1) {
             this.isDownload = false;
+            
         } else {
             if(this.list1.length > 0) {
                 this.isDownload = true;
             }
         }
       }
+
+      getSprintIssuesDetails(toolName: string, toolField: string, toolValue: string, type: string) {
+        this.isDatainProgress = true;
+        let response = this.traceablityService.getSprintIssues(toolName, toolField, toolValue, type);
+        this.cachestring = toolName + "." + toolField + "." + toolValue;
+        response.then((data) => {
+            if (data.status == "success") {
+                if (data.data.pipeline.length != 0) {
+                    for (var element of data.data.pipeline) {
+                        this.order[(element.order) - 1] = element.toolName;
+                    }
+                    let result = data.data.pipeline;
+                    let historyData = [];
+                    result.map((resultmap) => {
+                        Object.keys(resultmap).forEach(element => {
+                            const matchKey = element.match('AssetID');
+                            if (matchKey) {
+                                resultmap['assetID'] = resultmap[element];
+                            }
+                        })
+                        historyData.push(resultmap);
+                    });
+                    this.prepareSummaryDetail(data.data.summary);
+
+                    if (data.data.combinedSummary.length > 0) {
+                        this.list1 = data.data.combinedSummary;
+                    }
+                    this.traceabilityData = data;
+                    this.globalData = this.traceabilityData.data.pipeline;
+                    this.constructObject(this.traceabilityData);
+                    this.epic = false;
+                    this.showAll = true;
+                    this.epicArr = this.traceabilityData.data.pipeline.filter(x => x.toolName === 'Epic');
+                    this.sprintArr = this.traceabilityData.data.pipeline.filter(x => x.toolName === 'Sprint');
+                    this.jiraArr = this.traceabilityData.data.pipeline.filter(x => x.toolName === 'JIRA');
+                    this.workflow();
+                    this.isDatainProgress = false;
+                    this.isDownload = true;
+                    this.handleCheckboxEvent()
+                }
+                else {
+                    this.messageDialog.openSnackBar("No data found for the given selection.",'error');
+                    //this.messageDialog.showApplicationsMessage("No data found for the given selection.", "ERROR");
+                    this.isDatainProgress = false;
+                    this.isDownload = false;
+                }
+
+            }
+            else {
+                this.messageDialog.showApplicationsMessage(data.message, "ERROR");
+                this.isDatainProgress = false;
+            }
+        });
+    }
+
+    getReleaseIssuesDetails(toolName: string, toolField: string, toolValue: string, type: string) {
+        this.isDatainProgress = true;
+        let response = this.traceablityService.getReleaseIssues(toolName, toolField, toolValue, type);
+        this.cachestring = toolName + "." + toolField + "." + toolValue;
+        response.then((data) => {
+            if (data.status == "success") {
+                if (data.data.pipeline.length != 0) {
+                    for (var element of data.data.pipeline) {
+                        this.order[(element.order) - 1] = element.toolName;
+                    }
+                    let result = data.data.pipeline;
+                    let historyData = [];
+                    result.map((resultmap) => {
+                        Object.keys(resultmap).forEach(element => {
+                            const matchKey = element.match('AssetID');
+                            if (matchKey) {
+                                resultmap['assetID'] = resultmap[element];
+                            }
+                        })
+                        historyData.push(resultmap);
+                    });
+                    this.prepareSummaryDetail(data.data.summary);
+
+                    if (data.data.combinedSummary.length > 0) {
+                        this.list1 = data.data.combinedSummary;
+                    }
+                    this.traceabilityData = data;
+                    this.globalData = this.traceabilityData.data.pipeline;
+                    this.constructObject(this.traceabilityData);
+                    this.epic = false;
+                    this.showAll = true;
+                    this.epicArr = this.traceabilityData.data.pipeline.filter(x => x.toolName === 'Epic');
+                    this.sprintArr = this.traceabilityData.data.pipeline.filter(x => x.toolName === 'Sprint');
+                    this.releaseArr = this.traceabilityData.data.pipeline.filter(x => x.toolName === 'Release');
+                    this.jiraArr = this.traceabilityData.data.pipeline.filter(x => x.toolName === 'JIRA');
+                    this.workflow();
+                    this.isDatainProgress = false;
+                    this.isDownload = true;
+                }
+                else {
+                    this.messageDialog.openSnackBar("No data found for the given selection.",'error');
+                    //this.messageDialog.showApplicationsMessage("No data found for the given selection.", "ERROR");
+                    this.isDatainProgress = false;
+                    this.isDownload = false;
+                }
+
+            }
+            else {
+                this.messageDialog.showApplicationsMessage(data.message, "ERROR");
+                this.isDatainProgress = false;
+            }
+        });
+    }
+
+    handleCheckboxEvent(){            
+        let sprints = this.map.get("2_Sprint");
+        if(this.isCheckedSelectedSprint){
+            sprints = sprints.filter(sprint => sprint["sprintId"] === this.fieldValue);
+        } else {
+            sprints = this.traceabilityData.data.pipeline.filter((entry) => entry.order === "2");
+        }
+        this.map.set("2_Sprint", sprints);
+    }
 }

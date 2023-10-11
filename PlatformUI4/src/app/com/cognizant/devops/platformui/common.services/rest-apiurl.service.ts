@@ -145,6 +145,8 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("GET_TOOL_LIST", '/PlatformService/traceabilitydashboard/getAvailableTools');
         this.addEndPoint("GET_TOOL_KEYSET", '/PlatformService/traceabilitydashboard/getToolKeyset');
         this.addEndPoint("GET_EPIC_ISSUES", '/PlatformService/traceabilitydashboard/getEpicIssues');
+        this.addEndPoint("GET_SPRINT_ISSUES", '/PlatformService/traceabilitydashboard/getSprintIssues');
+        this.addEndPoint("GET_RELEASE_ISSUES", '/PlatformService/traceabilitydashboard/getReleaseIssues');
         this.addEndPoint("GET_ISSUES_PIPELINE", '/PlatformService/traceabilitydashboard/getIssuePipeline');
         this.addEndPoint("GET_TOOL_PROPERTIES", '/PlatformService/traceabilitydashboard/getToolDisplayProperties');
         this.addEndPoint("GET_TRACEABILITY_PDF", '/PlatformService/traceabilitydashboard/getTraceabilityPDF');
@@ -259,6 +261,14 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("DELETE_QUERY", '/PlatformService/insights/offlinedataprocessing/deleteOfflineDefinition');
         this.addEndPoint("UPDATE_OFFLINE_CONFIG_STATUS", '/PlatformService/insights/offlinedataprocessing/updateOfflineConfigStatus');
         
+        //Offline Alerting
+        this.addEndPoint("OFFLINE_ALERTS_LIST", '/PlatformService/insights/offlineAlerting/fetchOfflineAlertList');
+        this.addEndPoint("SAVE_ALERT_CONFIG",'/PlatformService/insights/offlineAlerting/saveAlertData')
+        this.addEndPoint("UPDATE_ALERT_CONFIG",'/PlatformService/insights/offlineAlerting/updateAlertData')
+        this.addEndPoint("DELETE_ALERT", '/PlatformService/insights/offlineAlerting/deleteOfflineAlert');
+        this.addEndPoint("UPDATE_OFFLINE_ALERT_STATUS", '/PlatformService/insights/offlineAlerting/updateOfflineAlertStatus');
+        this.addEndPoint("GET_ALERT_EXECUTION_RECORDS", '/PlatformService/insights/offlineAlerting/alertExecutionRecordsByWorkflowId');
+       
         //Outcome
         this.addEndPoint("SAVE_OUTCOME_CONFIG", '/PlatformService/outcome/saveOutcomeConfig');
         this.addEndPoint("FETCH_OUTCOME_TOOL_CONFIG", '/PlatformService/outcome/fetchMileStoneTools');

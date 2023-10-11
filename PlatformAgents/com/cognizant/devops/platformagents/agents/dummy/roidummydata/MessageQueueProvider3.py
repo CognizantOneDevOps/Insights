@@ -25,13 +25,13 @@ import sys
 
 class MessageFactory:
         
-    def __init__(self, user, password, host, exchange, port=None,enableDeadLetterExchange=False):
-        #credentials = pika.PlainCredentials(user, password)
+    def __init__(self, user, cred, host, exchange, port=None,enableDeadLetterExchange=False):
+        #credentials = pika.PlainCredentials(user, cred)
         #self.connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=host))
         #self.exchange = exchange
         #self.channels = {}
         self.user = user
-        self.password = password
+        self.cred = cred
         self.host = host
         self.exchange = exchange
         if port != None : 
@@ -46,7 +46,7 @@ class MessageFactory:
         
     def subscribe(self, routingKey, callback, seperateThread=True):
         def subscriberThread():
-            credentials = pika.PlainCredentials(self.user, self.password)
+            credentials = pika.PlainCredentials(self.user, self.cred)
             connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=self.host,port=self.port))
             channel = connection.channel()
             queueName = routingKey.replace('.','_')
@@ -63,7 +63,7 @@ class MessageFactory:
             
     def publish(self, routingKey, data, batchSize=None, metadata=None):
         if data != None:
-            credentials = pika.PlainCredentials(self.user, self.password)
+            credentials = pika.PlainCredentials(self.user, self.cred)
             connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=self.host,port=self.port))
             channel = connection.channel()
             
@@ -118,7 +118,7 @@ class MessageFactory:
         
     def declareDeadLetterExchange(self):
         
-        credentials = pika.PlainCredentials(self.user, self.password)
+        credentials = pika.PlainCredentials(self.user, self.cred)
         connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=self.host,port=self.port))
        
         #Create dead letter queue 

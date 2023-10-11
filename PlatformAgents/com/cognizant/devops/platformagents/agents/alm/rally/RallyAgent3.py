@@ -30,7 +30,7 @@ class RallyAgent(BaseAgent):
     @BaseAgent.timed
     def process(self):
         userid = self.getCredential("userid")
-        passwd = self.getCredential("passwd")
+        cred = self.getCredential("passwd")
         accesstoken = self.getCredential("accesstoken")
         baseUrl = self.config.get("baseUrl", '')
         pageSize = self.config.get("dataSize", '')

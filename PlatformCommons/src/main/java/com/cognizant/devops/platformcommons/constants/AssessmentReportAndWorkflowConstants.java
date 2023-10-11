@@ -80,6 +80,7 @@ public final class AssessmentReportAndWorkflowConstants {
 	public static final String WORKFLOW_RETRY_EXECUTOR = "WorkflowRetryExecutor";
 	public static final String WORKFLOW_IMMEDIATE_JOB_EXECUTOR = "WorkflowImmediateJobExecutor";
 	public static final String WORKFLOW_AUTOCORRECTION_EXECUTOR = "WorkflowAutoCorrectionExecutor";
+	public static final String WORKFLOW_OFFLINE_ALERT_EXECUTOR = "WorkflowOfflineAlertExecutor";
 	
 	public static final String TASK_ID= "taskId";
 	public static final String ENDTIME = "endTime";

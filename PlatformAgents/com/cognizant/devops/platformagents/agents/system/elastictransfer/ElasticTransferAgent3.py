@@ -729,12 +729,12 @@ class ElasticTransferAgent(BaseAgent):
             cli.remove_container(temp_container_id)      
 
             neo4j_user_id = self.config.get('neo4j_user_id', "")
-            neo4j_password = self.config.get('neo4j_password', "")
+            neo4j_cred = self.config.get('neo4j_password', "")
             #####creating conatiner and importing csv ######
             containerName = self.config.get('dockerImageName','')+':'+self.config.get('dockerImageTag','')
             containerPorts = self.config.get('dynamicTemplate', {}).get('bindPort','')
             containerVolumes = self.config.get('dynamicTemplate', {}).get('mountVolume','')
-            containerEnvironment = ['NEO4J_AUTH='+neo4j_user_id+"/"+neo4j_password]
+            containerEnvironment = ['NEO4J_AUTH='+neo4j_user_id+"/"+neo4j_cred]
             containerHostConfig = cli.create_host_config(binds=volume, port_bindings=port,privileged=True)
             #Creating the container
             container_id = cli.create_container(containerName, volumes= containerVolumes, ports=containerPorts,environment=containerEnvironment, host_config=containerHostConfig)
@@ -766,14 +766,14 @@ class ElasticTransferAgent(BaseAgent):
 
 
             boltAddress = 'bolt://' +container_details["NetworkSettings"]["Ports"][str(self.config.get('dynamicTemplate', {}).get('bindPort','')[0])+"/tcp"][0]["HostIp"]+":" + mq_response["boltPort"]
-            exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c','./bin/cypher-shell -a ' + boltAddress + ' -u '+neo4j_user_id+' -p '+neo4j_password+' "match(n) return count (n)"'])
+            exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c','./bin/cypher-shell -a ' + boltAddress + ' -u '+neo4j_user_id+' -p '+neo4j_cred+' "match(n) return count (n)"'])
             result=cli.exec_start(exec_id["Id"])
             self.baseLogger.info("INFO::Cypher Test Exec Result::"+str(result))
 
             while "Connection refused" in str(result):
                 self.baseLogger.info("Waiting another 10 seconds for neo4j to start")
                 time.sleep(10)
-                exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c','./bin/cypher-shell -a '+ boltAddress +' -u '+neo4j_user_id+' -p '+neo4j_password+' "match(n) return count (n)"'])
+                exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c','./bin/cypher-shell -a '+ boltAddress +' -u '+neo4j_user_id+' -p '+neo4j_cred+' "match(n) return count (n)"'])
                 result=cli.exec_start(exec_id["Id"])
 
             #self.baseLogger.info("INFO::DockerContainer Creation Success..."+mq_response["sourceUrl"])
@@ -803,16 +803,16 @@ class ElasticTransferAgent(BaseAgent):
                     createStatement =createStatements[0].replace("`", "")
                     indexCreationCommand += createStatement + ';'
                                    
-            indexCreationCommand += '" | ./bin/cypher-shell -a ' + boltAddress + ' -u ' + neo4j_user_id + ' -p ' + neo4j_password
+            indexCreationCommand += '" | ./bin/cypher-shell -a ' + boltAddress + ' -u ' + neo4j_user_id + ' -p ' + neo4j_cred
             exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c', indexCreationCommand])
             #Executing the index creation command
             result=cli.exec_start(exec_id["Id"]) 
 
             self.baseLogger.info("Waiting for index creation")
-            exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c',' ./bin/cypher-shell -a ' + boltAddress + ' -u '+neo4j_user_id+' -p '+neo4j_password+' "CALL db.awaitIndexes(36000)"'])
+            exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c',' ./bin/cypher-shell -a ' + boltAddress + ' -u '+neo4j_user_id+' -p '+neo4j_cred+' "CALL db.awaitIndexes(36000)"'])
             result=cli.exec_start(exec_id["Id"])
 
-            exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c',' ./bin/cypher-shell -a '+ boltAddress +  ' -u '+neo4j_user_id+' -p '+neo4j_password+' "match(n) return count (n)"'])
+            exec_id=cli.exec_create(container_id["Id"],cmd=['/bin/bash','-c',' ./bin/cypher-shell -a '+ boltAddress +  ' -u '+neo4j_user_id+' -p '+neo4j_cred+' "match(n) return count (n)"'])
             result=cli.exec_start(exec_id["Id"])
             self.baseLogger.info("INFO::Cypher Test Exec Result::"+str(result))
 

@@ -20,7 +20,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,8 +33,13 @@ public class GraphDBService {
 
 	@PostMapping(value = "/data",produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public String executeCypher(@RequestParam String cypher) throws InsightsCustomException{
-		GraphDBHandler dbHandler = new GraphDBHandler();
-		return dbHandler.executeCypherQueryRaw(cypher);
+		String response = "";
+		try(GraphDBHandler dbHandler = new GraphDBHandler()){
+			 response = dbHandler.executeCypherQueryRaw(cypher);
+		} catch (Exception e) {
+			log.error("Error while executing neo4j query {}", e.getMessage());
+		}
+		return response;
 	}
 	
 	

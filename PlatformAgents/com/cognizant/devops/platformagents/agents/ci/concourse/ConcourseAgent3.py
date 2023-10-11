@@ -27,9 +27,9 @@ class ConcourseAgent(BaseAgent):
         self.baseLogger.info('Inside process')
         BaseUrl = self.config.get("BaseUrl", '')
         UserID = self.getCredential("userid")
-        Passwd = self.getCredential("passwd")
+        cred = self.getCredential("passwd")
         reqHeaderToken = {"Content-Type": "application/x-www-form-urlencoded"}
-        data = {'username': UserID, 'password': Passwd, 'grant_type':'password', 'scope': 'openid profile email federated:id groups'}
+        data = {'username': UserID, 'password': cred, 'grant_type':'password', 'scope': 'openid profile email federated:id groups'}
         token = self.getResponse(BaseUrl+'/sky/token', 'POST', "fly" , "Zmx5", data, None, reqHeaderToken)
         #responseTemplate = self.config.get("responseTemplate", '')
         responseTemplate = self.getResponseTemplate()
@@ -38,17 +38,17 @@ class ConcourseAgent(BaseAgent):
         getPipelinesUrl = BaseUrl+"/api/v1/teams/main/pipelines"
         bearer =  "Bearer %s" % token["access_token"]
         headers = {"Authorization": bearer}
-        Projects = self.getResponse(getProjectUrl, 'GET', None, None, None, authType=None, reqHeaders=headers)
+        Projects = self.getResponse(getProjectUrl, 'GET', None, None, None, aType=None, reqHeaders=headers)
         for project in Projects:
             project_name = project['name']
             getPipelinesUrl = BaseUrl+"/api/v1/teams/"+project_name+"/pipelines"
-            Pipelines = self.getResponse(getPipelinesUrl, 'GET', None, None, None, authType=None, reqHeaders=headers)
+            Pipelines = self.getResponse(getPipelinesUrl, 'GET', None, None, None, aType=None, reqHeaders=headers)
             for pipeline in Pipelines:
                 pipeline_name = pipeline['name']
                 #trackingDetails = self.tracking.get(pipeline_name,None)
                 flag=0
                 pipeline_jobs_url = getPipelinesUrl+'/'+pipeline_name+'/jobs'
-                pipeline_jobs = self.getResponse(pipeline_jobs_url, 'GET', None, None, None, authType=None, reqHeaders=headers)
+                pipeline_jobs = self.getResponse(pipeline_jobs_url, 'GET', None, None, None, aType=None, reqHeaders=headers)
                 data = []
                 for pipeline_job in pipeline_jobs:
                     name= pipeline_job['name']
@@ -74,12 +74,12 @@ class ConcourseAgent(BaseAgent):
                     if pipeline_job['finished_build'] is not  None:
                         if int(pipeline_job['finished_build']['name']) > int(previous_build_number):
                             job_details_url=pipeline_jobs_url+'/'+name+'/builds?limit='+str(int(pipeline_job['finished_build']['name']) - int(previous_build_number))
-                            job_details = self.getResponse(job_details_url, 'GET', None, None, None, authType=None, reqHeaders=headers)
+                            job_details = self.getResponse(job_details_url, 'GET', None, None, None, aType=None, reqHeaders=headers)
                             for job in job_details:
                                 injectdata = {}
                                 job_resource_url = BaseUrl+'/api/v1/builds/'+str(job['id'])+'/resources'
                                 data_commit = {}
-                                job_resource = self.getResponse(job_resource_url, 'GET', None, None, None, authType=None, reqHeaders=headers)
+                                job_resource = self.getResponse(job_resource_url, 'GET', None, None, None, aType=None, reqHeaders=headers)
                                 if len(job_resource['inputs']) > 0:
                                     for len_inputs in range(0, len(job_resource['inputs'])):
                                         job_resource_1 = job_resource['inputs'][len_inputs]

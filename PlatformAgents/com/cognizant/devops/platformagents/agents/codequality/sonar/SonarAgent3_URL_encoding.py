@@ -36,11 +36,11 @@ class SonarAgent(BaseAgent):
         timeStampFormat = self.config.get('timeStampFormat')
         startFrom = startFrom.strftime(timeStampFormat)
         userId = self.getCredential("userid")
-        password = self.getCredential("passwd")
+        cred = self.getCredential("passwd")
         timeMachineapi = self.config.get("timeMachineapi", '')
-        sonarProjects = self.getResponse(projectsUrl, 'GET', userId, password, None)        
+        sonarProjects = self.getResponse(projectsUrl, 'GET', userId, cred, None)        
         activityUrl = baseUrl+"api/ce/activity"
-        activity = self.getResponse(activityUrl, 'GET', userId, password, None)        
+        activity = self.getResponse(activityUrl, 'GET', userId, cred, None)        
         activityTasks = activity["tasks"]        
         metrics = self.config.get('dynamicTemplate', {}).get("metrics", '')
         metricsParam = ''
@@ -55,7 +55,7 @@ class SonarAgent(BaseAgent):
             lastUpdatedDate = None
             if timeMachineapi == "yes":
                 sonarExecutionsUrl = baseUrl+"api/timemachine/index?metrics="+metricsParam+"&resource="+projectKey+"&fromDateTime="+timestamp+"%2B0530&format=json"
-                sonarExecutions = self.getResponse(sonarExecutionsUrl, 'GET', userId, password, None)
+                sonarExecutions = self.getResponse(sonarExecutionsUrl, 'GET', userId, cred, None)
                 for sonarExecution in sonarExecutions:
                     metricsColumns = []
                     cols = sonarExecution['cols']
@@ -84,7 +84,7 @@ class SonarAgent(BaseAgent):
                 projectDateVersionMap = {} # store map with data as key and project version as value
                 while pageIndex <= totalPages:
                     sonarProjectAnalysisUrl = baseUrl+"api/project_analyses/search?category=VERSION&project="+projectKey+"&from="+timestamp+"%2B0530&format=json&ps="+str(pageSize)+"&p="+str(pageIndex)
-                    projectAnalysis = self.getResponse(sonarProjectAnalysisUrl, 'GET', userId, password, None)
+                    projectAnalysis = self.getResponse(sonarProjectAnalysisUrl, 'GET', userId, cred, None)
                     totalRecords = projectAnalysis["paging"]["total"]
                     totalPages =  (totalRecords/pageSize) + 1
                     if (totalRecords%pageSize) == 0:
@@ -112,7 +112,7 @@ class SonarAgent(BaseAgent):
                 totalRecords = 0
                 while pageIndex <= totalPages:
                     sonarExecutionsUrl = baseUrl+"api/measures/search_history?metrics="+metricsParam+"&component="+projectKey+"&from="+timestamp+"%2B0530&format=json&ps="+str(pageSize)+"&p="+str(pageIndex)
-                    sonarExecutions = self.getResponse(sonarExecutionsUrl, 'GET', userId, password, None)
+                    sonarExecutions = self.getResponse(sonarExecutionsUrl, 'GET', userId, cred, None)
                     totalRecords = sonarExecutions["paging"]["total"]
                     totalPages =  (totalRecords/pageSize) + 1
                     if (totalRecords%pageSize) == 0:
