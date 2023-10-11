@@ -45,7 +45,7 @@ class JiraWebhookAgent(BaseAgent):
         # it's a one time call for metadata updation 
         if not metadataTrackingDetails and fetchProjectMetadata:
             userid=self.getCredential("userid")
-            passwd=self.getCredential("passwd")
+            cred=self.getCredential("passwd")
             projectTrackingDetails = self.tracking.get("projects", None)
             if projectTrackingDetails is None:
                 projectTrackingDetails = {}
@@ -53,7 +53,7 @@ class JiraWebhookAgent(BaseAgent):
             jiraProjectApiUrl = dynamicTemplate.get("extensions", {}).get("releaseDetails",{}).get('jiraProjectApiUrl', None)
             projectResponseTemplate = dynamicTemplate.get("extensions", {}).get("projectDetails",{}).get("jiraProjectResponseTemplate",{})
             self.baseLogger.info(" before fetching Jira project details ======")
-            jiraProjects = self.getResponse(jiraProjectApiUrl, 'GET',  userid, passwd, None)
+            jiraProjects = self.getResponse(jiraProjectApiUrl, 'GET',  userid, cred, None)
             self.baseLogger.info(" before parseResponse Jira project details ======")
             parsedJiraProjects = self.parseResponse(projectResponseTemplate, jiraProjects)
             for eachProject in parsedJiraProjects:
@@ -71,7 +71,7 @@ class JiraWebhookAgent(BaseAgent):
             boardApiUrl = self.config.get("dynamicTemplate",{}).get("extensions", {}).get("sprints", {}).get('boardApiUrl')
             boardResponseTemplate = dynamicTemplate.get("extensions", {}).get("boardResponseTemplate", {})
             self.baseLogger.info(" before Jira boards details ======")
-            jiraBoards = self.getResponse(boardApiUrl, 'GET', userid, passwd, None)
+            jiraBoards = self.getResponse(boardApiUrl, 'GET', userid, cred, None)
             boardsList = jiraBoards.get("values", list())
             parsedJiraBoards = self.parseResponse(boardResponseTemplate, boardsList)
             for eachBoard in parsedJiraBoards:

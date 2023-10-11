@@ -34,7 +34,7 @@ class JiraAgent(BaseAgent):
     @BaseAgent.timed
     def process(self):
          self.userid=self.getCredential("userid")
-         self.passwd=self.getCredential("passwd")
+         self.cred=self.getCredential("passwd")
          baseUrl=self.config.get("baseUrl",'')
          startFrom = self.config.get("startFrom",'')
          currentDate = dateTime2.combine(dateTime2.now().date(), dateTime2.min.time())
@@ -46,7 +46,7 @@ class JiraAgent(BaseAgent):
          issueStatusFilter = self.config.get('dynamicTemplate',dict()).get('issueStatusFilter',list())
          changeLog = self.config.get('dynamicTemplate',dict()).get('changeLog',None)
          versionUrl = self.config.get('dynamicTemplate',{}).get('versionUrl','')
-         self.versionData = self.getResponse(versionUrl,'GET',self.userid,self.passwd,None)
+         self.versionData = self.getResponse(versionUrl,'GET',self.userid,self.cred,None)
          self.selectedProjectList = self.config.get('dynamicTemplate','GET').get('selectedProject',None)
          self.projectDetailsData = []
          self.projectsData = []
@@ -106,7 +106,7 @@ class JiraAgent(BaseAgent):
                 workLogData = []
                 issueModificationTimeline = []
                 jiraIssuesUrlModified = jiraIssuesUrl.replace('prKey',projectKey,1)
-                response = self.getResponse(jiraIssuesUrlModified+'&startAt='+str(startAt + maxResults), 'GET', self.userid, self.passwd, None)
+                response = self.getResponse(jiraIssuesUrlModified+'&startAt='+str(startAt + maxResults), 'GET', self.userid, self.cred, None)
                 jiraIssues = response["issues"]
                 for issue in jiraIssues:
                     parsedIssue = self.parseResponse(responseTemplate, issue)
@@ -150,7 +150,7 @@ class JiraAgent(BaseAgent):
                         insighstTimeXFieldMapping = self.config.get('dynamicTemplate',dict()).get('changeLog', {}).get('insightsTimeXFieldMapping',None)
                         timeStampField=insighstTimeXFieldMapping.get('timefield',None)
                         timeStampFormat=insighstTimeXFieldMapping.get('timeformat',None)
-                        isEpoch=insighstTimeXFieldMapping.get('isEpoch',None); 
+                        isEpoch=insighstTimeXFieldMapping.get('isEpoch',None)
                         self.publishToolsData(workLogData, changeLogMetadata ,timeStampField,timeStampFormat,isEpoch,True)
                     if len(issueModificationTimeline) > 0:
                         self.publishToolsData(issueModificationTimeline, {"labels": ["LATEST"], "relation": {"properties": list(self.changedFields) + ['fields'], "name":"ISSUE_CHANGE_TIMELINE", "source": {"constraints":["key"]}, "destination": {"labels": ["TIMELINE"], "constraints":["timelineDate","timelineDateEpoch"]}}})
@@ -186,7 +186,7 @@ class JiraAgent(BaseAgent):
             projects = extensions.get('projects', None)
             projectUrl = projects.get('projectApiUrl','')
             projectMetaData = projects.get("projectMetaData")
-            allProjectaData = self.getResponse(projectUrl, 'GET',self.userid,self.passwd, None)
+            allProjectaData = self.getResponse(projectUrl, 'GET',self.userid,self.cred, None)
             for project in allProjectaData:
                 projectDict = {
                                "id": project["id"],
@@ -209,10 +209,10 @@ class JiraAgent(BaseAgent):
         try:
             self.baseLogger.info(" inside processUserDetails method=======")
             extensions = self.config.get('dynamicTemplate', {}).get('extensions', None)
-            userAccount = extensions.get('userAccount', None)
-            userUrl = userAccount.get('userApiUrl','')
-            userMetaData = userAccount.get("userMetaData")
-            allUserData = self.getResponse(userUrl, 'GET',self.userid,self.passwd, None)
+            usrAcc  = extensions.get('userAccount', None)
+            userUrl = usrAcc .get('userApiUrl','')
+            userMetaData = usrAcc .get("userMetaData")
+            allUserData = self.getResponse(userUrl, 'GET',self.userid,self.cred, None)
             for user in allUserData:
                 emailAddress = user["emailAddress"]
                 if user["emailAddress"]=='':
@@ -239,24 +239,24 @@ class JiraAgent(BaseAgent):
                 projectID = project["key"]
                 projectRoleUrl = roleApiUrl.replace("projectId",projectID)
                 try:
-                    projectroleData = self.getResponse(projectRoleUrl,'GET',self.userid,self.passwd,None)
+                    projectroleData = self.getResponse(projectRoleUrl,'GET',self.userid,self.cred,None)
                 except Exception as ex:
                         continue
                 for role in projectroleData:
                     roleUrl = projectroleData.get(role)
-                    roleData = self.getResponse(roleUrl,'GET',self.userid,self.passwd,None)
+                    roleData = self.getResponse(roleUrl,'GET',self.userid,self.cred,None)
                     allRoleUser = roleData.get('actors')
                     if len(allRoleUser)>0:
                         for user in allRoleUser:
-                            accountId = user["actorUser"]['accountId']
-                            email = self.getEmailAddress(accountId)
+                            accId = user["actorUser"]['accountId']
+                            email = self.getEmailAddress(accId)
                             if email=="":
                                 continue
                             roleUserDict = {
                                "role": role,
                                "projectID": projectID,
                                "emailAddress":email,
-                               "accountId": accountId,
+                               "accountId": accId,
                                "displayName": user["displayName"]
                               }
                             self.roleUserData.append(roleUserDict)
@@ -264,9 +264,9 @@ class JiraAgent(BaseAgent):
         except Exception as ex:
             self.baseLogger.error(ex)
 
-    def getEmailAddress(self,accountId):
+    def getEmailAddress(self,accId):
         try:            
-            return self.userEmail[accountId]
+            return self.userEmail[accId]
         except Exception as ex:
             return ""
 
@@ -313,7 +313,7 @@ class JiraAgent(BaseAgent):
             maxResults = 0
             startAt = 0
             while (startAt + maxResults) < total:
-                boardsData = self.getResponse(boardUrl+'?startAt='+str(startAt + maxResults),'GET',self.userid,self.passwd,None)
+                boardsData = self.getResponse(boardUrl+'?startAt='+str(startAt + maxResults),'GET',self.userid,self.cred,None)
                 allboards = boardsData.get("values",None)
                 for board in allboards:
                     totalProject = 1
@@ -321,7 +321,7 @@ class JiraAgent(BaseAgent):
                     startAtProject = 0
                     while (startAtProject + maxResultsProject) <totalProject:
                         boardProjectApiUrlModified = boardProjectApiUrl.replace("boardId",str(board["id"]))
-                        allBoardProjectsData = self.getResponse(boardProjectApiUrlModified+'?startAt='+str(startAtProject + maxResultsProject),'GET',self.userid,self.passwd,None)
+                        allBoardProjectsData = self.getResponse(boardProjectApiUrlModified+'?startAt='+str(startAtProject + maxResultsProject),'GET',self.userid,self.cred,None)
                         projectsDetail = allBoardProjectsData.get("values",None)
                         for boardAttachedProject in projectsDetail:
                             #for boardAttachedProject in projectsDetail:
@@ -406,7 +406,7 @@ class JiraAgent(BaseAgent):
         if  remoteIssueLinksConfig:
             remoteIssueLinkRestUrl = remoteIssueLinksConfig.get("remoteIssueLinkRestUrl").format(issueKey)
             responseTemplate = remoteIssueLinksConfig.get("remoteIssueLinkResponseTemplate")
-            remoteIssueLinkResponse = self.getResponse(remoteIssueLinkRestUrl, 'GET', self.userid, self.passwd, None)
+            remoteIssueLinkResponse = self.getResponse(remoteIssueLinkRestUrl, 'GET', self.userid, self.cred, None)
             if remoteIssueLinkResponse:
                 parsedResponses = self.parseResponse(responseTemplate, remoteIssueLinkResponse)
                 for parsedResponse in parsedResponses:
@@ -509,7 +509,7 @@ class JiraAgent(BaseAgent):
                     boards = []
                     for sprint in sprintDetails:
                         Version =self.config.get('dynamicTemplate', {}).get('versionUrl','')
-                        VersionUrl = self.getResponse(Version, 'GET', self.userid, self.passwd, None)
+                        VersionUrl = self.getResponse(Version, 'GET', self.userid, self.cred, None)
                         deploymentType =VersionUrl.get('deploymentType','')
                         if (deploymentType) == 'Server':
                             sprintData = {}
@@ -524,7 +524,7 @@ class JiraAgent(BaseAgent):
                         else:
                             boardId = sprint.get('boardId')
                             sprintId = sprint.get('id')
-                        boardTracking = boardsTracking.get(boardId, None)
+                        boardTracking = boardsTracking.get(str(boardId), None)
                         if boardTracking is None:
                             boardTracking = {}
                             boardsTracking[str(boardId)] = boardTracking
@@ -532,7 +532,7 @@ class JiraAgent(BaseAgent):
                         if sprintTracking is None:
                             sprintTracking = {}
                             boardTracking['sprints'] = sprintTracking
-                        if sprintTracking.get(sprintId, None) is None:
+                        if sprintTracking.get(str(sprintId), None) is None:
                             sprintTracking[str(sprintId)] = {}
                         if boardId not in boards:
                             boards.append(boardId)
@@ -558,7 +558,7 @@ class JiraAgent(BaseAgent):
         insighstTimeXFieldMapping = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('sprints', {}).get('insightsTimeXFieldMapping',None)
         timeStampField=insighstTimeXFieldMapping.get('timefield',None)
         timeStampFormat=insighstTimeXFieldMapping.get('timeformat',None)
-        isEpoch=insighstTimeXFieldMapping.get('isEpoch',None);
+        isEpoch=insighstTimeXFieldMapping.get('isEpoch',None)
 		
         boardApiUrl = sprintDetails.get('boardApiUrl')
         boards = self.tracking.get('boards', None)
@@ -573,7 +573,7 @@ class JiraAgent(BaseAgent):
                     continue 
                 boardRestUrl = boardApiUrl + '/' + str(boardId)
                 try:
-                    boardResponse = self.getResponse(boardRestUrl, 'GET', self.userid, self.passwd, None)
+                    boardResponse = self.getResponse(boardRestUrl, 'GET', self.userid, self.cred, None)
                     board['name'] = boardResponse.get('name')
                     board['type'] = boardResponse.get('type')
                     board.pop('error', None)
@@ -584,10 +584,10 @@ class JiraAgent(BaseAgent):
                     for sprint in sprints:
                         sprintApiUrl = sprintDetails.get('sprintApiUrl')+'/'+sprint
                         try:
-                            sprintResponse = self.getResponse(sprintApiUrl, 'GET', self.userid, self.passwd, None)
+                            sprintResponse = self.getResponse(sprintApiUrl, 'GET', self.userid, self.cred, None)
                             data.append(self.parseResponse(responseTemplate, sprintResponse)[0])
                         except Exception:
-                            pass;
+                            pass
                     if len(data) > 0 : 
                         self.publishToolsData(data, sprintMetadata,timeStampField,timeStampFormat,isEpoch,True)
                     continue
@@ -597,7 +597,7 @@ class JiraAgent(BaseAgent):
                 injectData = {'boardName' : board['name']}
                 while not isLast:
                     try:
-                        sprintsResponse = self.getResponse(sprintsUrl+str(startAt), 'GET', self.userid, self.passwd, None)
+                        sprintsResponse = self.getResponse(sprintsUrl+str(startAt), 'GET', self.userid, self.cred, None)
                     except Exception as ex3:
                         #board['error'] = str(ex3)
                         break
@@ -623,7 +623,7 @@ class JiraAgent(BaseAgent):
                 board = boards[boardId]
                 boardRestUrl = boardApiUrl + '/' + str(boardId)
                 try:
-                    boardResponse = self.getResponse(boardRestUrl, 'GET', self.userid, self.passwd, None)
+                    boardResponse = self.getResponse(boardRestUrl, 'GET', self.userid, self.cred, None)
                     board['name'] = boardResponse.get('name')
                     board['type'] = boardResponse.get('type')
                     board.pop('error', None)
@@ -631,7 +631,7 @@ class JiraAgent(BaseAgent):
                     startAt = 0
                     isLast = False
                     while not isLast:
-                        backlogResponse = self.getResponse(backlogUrl+str(startAt), 'GET', self.userid, self.passwd, None)
+                        backlogResponse = self.getResponse(backlogUrl+str(startAt), 'GET', self.userid, self.cred, None)
                         isLast = (startAt + backlogResponse['maxResults']) > backlogResponse['total']
                         startAt = startAt + backlogResponse['maxResults']
                         backlogIssues = backlogResponse['issues']
@@ -667,7 +667,7 @@ class JiraAgent(BaseAgent):
                 if boardName is None:
                     boardRestUrl = boardApiUrl + '/' + str(boardId)
                     try:
-                        boardResponse = self.getResponse(boardRestUrl, 'GET', self.userid, self.passwd, None)
+                        boardResponse = self.getResponse(boardRestUrl, 'GET', self.userid, self.cred, None)
                         board['name'] = boardResponse.get('name')
                         board['type'] = boardResponse.get('type')
                         board.pop('error', None)
@@ -684,7 +684,7 @@ class JiraAgent(BaseAgent):
                         sprintReportRestUrl = sprintReportUrl + '?rapidViewId='+str(boardId)+'&sprintId='+str(sprintId)
                         sprintReportResponse = None
                         try:
-                            sprintReportResponse = self.getResponse(sprintReportRestUrl, 'GET', self.userid, self.passwd, None)
+                            sprintReportResponse = self.getResponse(sprintReportRestUrl, 'GET', self.userid, self.cred, None)
                         except Exception as ex:
                             sprint['error'] = str(ex)
                         if sprintReportResponse:
@@ -748,7 +748,7 @@ class JiraAgent(BaseAgent):
         insighstTimeXFieldMapping = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('releaseDetails', {}).get('insightsTimeXFieldMapping',None)
         timeStampField=insighstTimeXFieldMapping.get('timefield',None)
         timeStampFormat=insighstTimeXFieldMapping.get('timeformat',None)
-        isEpoch=insighstTimeXFieldMapping.get('isEpoch',None);
+        isEpoch=insighstTimeXFieldMapping.get('isEpoch',None)
 
         if releaseDetails:
             jiraProjectApiUrl = releaseDetails.get('jiraProjectApiUrl', None)
@@ -756,12 +756,12 @@ class JiraAgent(BaseAgent):
             jiraReleaseResponseTemplate = releaseDetails.get('jiraReleaseResponseTemplate', None)
             releaseVersionsMetadata = releaseDetails.get('releaseVersionsMetadata')
             if jiraProjectApiUrl and jiraProjectResponseTemplate and jiraReleaseResponseTemplate:
-                jiraProjects = self.getResponse(jiraProjectApiUrl, 'GET',  self.userid, self.passwd, None)
+                jiraProjects = self.getResponse(jiraProjectApiUrl, 'GET',  self.userid, self.cred, None)
                 parsedJiraProjects = self.parseResponse(jiraProjectResponseTemplate, jiraProjects)
                 for parsedJiraProject in parsedJiraProjects:
                     projectKey = parsedJiraProject['projectKey']
                     releaseApiUrl = jiraProjectApiUrl + '/' + projectKey + '/versions'
-                    releaseVersionsResponse = self.getResponse(releaseApiUrl, 'GET', self.userid, self.passwd, None)
+                    releaseVersionsResponse = self.getResponse(releaseApiUrl, 'GET', self.userid, self.cred, None)
                     parsedReleaseVersions = self.parseResponse(jiraReleaseResponseTemplate, releaseVersionsResponse,parsedJiraProject)
                     self.publishToolsData(parsedReleaseVersions, releaseVersionsMetadata,timeStampField,timeStampFormat,isEpoch,True)
 
@@ -772,13 +772,13 @@ class JiraAgent(BaseAgent):
         if sprintDeletionIdentifier and boards:
             sprintUrl = sprintDeletionIdentifier.get('sprintApiUrl','')
             userName = self.config.get("userid",'')
-            password = self.config.get("passwd",'')
+            cred = self.config.get("passwd",'')
             for boardId in boards:
                 boardMetaData = boards[boardId]
                 sprints = boardMetaData.get('sprints', {})
                 deletedSprints = dict()
                 for sprintId in list(sprints.keys()):
-                    sprintExists = self.checkingSprintExistence(sprintUrl, userName, password, sprintId)
+                    sprintExists = self.checkingSprintExistence(sprintUrl, userName, cred, sprintId)
                     if not sprintExists:
                         deletedSprints[sprintId] = sprints.pop(sprintId, dict())
                     if len(deletedSprints):
@@ -791,10 +791,10 @@ class JiraAgent(BaseAgent):
                 metaData  = sprintDeletionIdentifier.get('metadata', dict())
                 self.publishToolsData(deletedSprintsData, metaData)
                 self.updateTrackingJson(self.tracking)
-    def checkingSprintExistence(self, sprintUrl, userName, password, sprintId):
+    def checkingSprintExistence(self, sprintUrl, userName, cred, sprintId):
         try:
             url = sprintUrl +'/' +sprintId
-            self.getResponse(url, 'GET', userName, password, None)
+            self.getResponse(url, 'GET', userName, cred, None)
             return True 
         except Exception as err:
             if 'Sprint does not exist' in err.message:

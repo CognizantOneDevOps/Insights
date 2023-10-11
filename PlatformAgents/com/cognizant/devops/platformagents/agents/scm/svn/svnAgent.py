@@ -30,8 +30,8 @@ from ....core.BaseAgent import BaseAgent
 class SvnAgent(BaseAgent):
     def get_login(self, realm, username, may_save ):
         username = self.getCredential("userid")
-        password = self.getCredential("passwd")
-        return True, username, password, False
+        cred = self.getCredential("passwd")
+        return True, username, cred, False
 
     @BaseAgent.timed
     def process(self):
@@ -49,7 +49,7 @@ class SvnAgent(BaseAgent):
             self.trackingData()
             self.publishData()
             if self.data != []:
-                print self.data
+                #print self.data
                 self.publishToolsData(self.data)
             self.updateTrackingJson(self.trackingdata) 
         except Exception as e:
@@ -65,7 +65,7 @@ class SvnAgent(BaseAgent):
         for i in self.repoList:
             if i not in self.existingrepo:
                 self.newrepo.append(i)
-        print self.newrepo, self.existingrepo
+        #print self.newrepo, self.existingrepo
             
     def publishData(self):
         self.trackingdata = {}

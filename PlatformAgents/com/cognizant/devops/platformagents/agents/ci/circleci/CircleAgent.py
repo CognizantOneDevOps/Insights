@@ -28,7 +28,7 @@ class CircleAgent(BaseAgent):
     def process(self):
         self.baseLogger.info('Inside process')
         userid = self.getCredential("userid")
-        passwd = self.getCredential("passwd")
+        cred = self.getCredential("passwd")
         BaseUrl = self.config.get("baseUrl", '')
         Project = self.config.get("project", '')
         token = self.config.get("token", '')
@@ -42,7 +42,7 @@ class CircleAgent(BaseAgent):
         else:
             lastUpdated = since
         Url = BaseUrl+Project+"?circle-token="+token
-        Response = self.getResponse(Url, 'GET', userid, passwd, None)
+        Response = self.getResponse(Url, 'GET', userid, cred, None)
         data = []
         for url in Response:
             injectData = {}

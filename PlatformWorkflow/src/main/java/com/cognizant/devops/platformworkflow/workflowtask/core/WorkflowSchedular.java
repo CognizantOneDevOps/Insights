@@ -89,11 +89,23 @@ public class WorkflowSchedular {
 					.withSchedule(CronScheduleBuilder.cronSchedule(ApplicationConfigProvider.getInstance().getWorkflowDetails().getWorkflowAutoCorrectionSchedular()).inTimeZone(TimeZone.getTimeZone("UTC")))
 					.build();
 
+			JobDetail jobOfflineAlertWorkflow = JobBuilder.newJob(WorkflowOfflineAlertExecutor.class)
+					.withIdentity(AssessmentReportAndWorkflowConstants.WORKFLOW_OFFLINE_ALERT_EXECUTOR, AssessmentReportAndWorkflowConstants.WORKFLOW_OFFLINE_ALERT_EXECUTOR).build();
+
+			log.debug("Worlflow Detail ====  Workflow WorkflowOfflineAlertJobExecutor Executor corn created ==== {} ",
+					"0 */10 * ? * *");
+
+			CronTrigger triggeOfflineAlertWorkflow = TriggerBuilder.newTrigger()
+					.withIdentity(AssessmentReportAndWorkflowConstants.WORKFLOW_OFFLINE_ALERT_EXECUTOR, AssessmentReportAndWorkflowConstants.WORKFLOW_OFFLINE_ALERT_EXECUTOR)
+					.withSchedule(CronScheduleBuilder.cronSchedule("0 */10 * ? * *").inTimeZone(TimeZone.getTimeZone("UTC")))
+					.build();
+			
 			scheduler.start();
 			scheduler.scheduleJob(jobWorkflow, triggerWorkflow);
 			scheduler.scheduleJob(jobWorkflowRetry, triggeWorkflowRetry);
 			scheduler.scheduleJob(jobImmediateWorkflow, triggeImmediateWorkflow);
-			scheduler.scheduleJob(jobAutoWorkflowCorrection, triggeAutoWorkflowCorrection);        
+			scheduler.scheduleJob(jobAutoWorkflowCorrection, triggeAutoWorkflowCorrection);  
+			scheduler.scheduleJob(jobOfflineAlertWorkflow, triggeOfflineAlertWorkflow);
 		} catch (SchedulerException e) {
 			log.error("Error creating scheduler {}",e.getMessage());
 			InsightsStatusProvider.getInstance().createInsightStatusNode("Error creating scheduler "+e.getMessage(),

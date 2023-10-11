@@ -109,7 +109,7 @@ public class ProcessMasterData {
 	 */
 	public String executeTriggerStatement() throws InsightsCustomException {
 		String response = "";
-		try {
+		try(GraphDBHandler dbHandler = new GraphDBHandler()) {
 			Resource resource = resourceLoaderService.getResource("classpath:triggerStatements.json");
 			InputStream triggerStatementsInputStream = resource.getInputStream();
 //			Path path = triggerStatementFile.toPath();
@@ -120,7 +120,6 @@ public class ProcessMasterData {
 					.replace(PlatformServiceConstants.TAB, PlatformServiceConstants.EMPTY);
 
 			String validatedstr = ValidationUtils.cleanXSS(template);
-			GraphDBHandler dbHandler = new GraphDBHandler();
 			response = dbHandler.executeCypherQueryRaw(validatedstr);
 			log.debug(response);
 		} catch (IOException e) {

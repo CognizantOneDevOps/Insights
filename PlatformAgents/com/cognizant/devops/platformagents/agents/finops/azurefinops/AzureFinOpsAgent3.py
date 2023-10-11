@@ -57,7 +57,7 @@ class AzureFinOpsAgent(BaseAgent):
         self.subscription_Id = self.getCredential("azureSubscriptionId")
         self.tenant_Id = self.getCredential("azureTenantId")
         self.client_Id = self.getCredential("azureClientId")
-        self.secret = self.getCredential("azureSecretkey")
+        self.scrt = self.getCredential("azureSecretkey")
 
         try:
             

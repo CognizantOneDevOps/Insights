@@ -1,3 +1,4 @@
+import { OfflineAlertHistoryDetailsDialogComponent } from './offline-alerting/offline-alert-history-details-dialog/offline-alert-history-details-dialog.component';
 /*******************************************************************************
  * Copyright 2019 Cognizant Technology Solutions
  * 
@@ -143,6 +144,10 @@ import { SnackbarComponent } from './application-dialog/snackbar-message';
 import { AgentDownloadDialogComponent } from './admin/agent-management/agent-download-dialog/agent-download-dialog.component';
 import { MultipleEmailConfigurationComponent } from '@insights/app/modules/multiple-email-configuration/multiple-email-configuration.component';
 import { AddComponent } from '@insights/app/modules/multiple-email-configuration/dialogs/add/add.component';
+import { OfflineAlertListComponent } from '@insights/app/modules/offline-alerting/offline-alert-list/offline-alert-list.component';
+import { OfflineAlertConfigurationComponent } from '@insights/app/modules/offline-alerting/offline-alert-configuration/offline-alert-configuration.component';
+import { OfflineAlertingService } from '@insights/app/modules/offline-alerting/offline-alerting-service';
+
 
 @NgModule({
     declarations: [
@@ -223,7 +228,11 @@ import { AddComponent } from '@insights/app/modules/multiple-email-configuration
         ScheduleTaskManagmentComponent,
         TaskHistoryDetailsDialog,
         SnackbarComponent,
-        AgentDownloadDialogComponent
+        AgentDownloadDialogComponent,
+        OfflineAlertListComponent,
+        OfflineAlertConfigurationComponent,
+        OfflineAlertHistoryDetailsDialogComponent 
+
     ],
     imports: [
         HomeRouting,
@@ -276,7 +285,8 @@ import { AddComponent } from '@insights/app/modules/multiple-email-configuration
         OutcomeProvider,
         FileSystemService,
         TaskManagementService,
-        OfflineService
+        OfflineService,
+        OfflineAlertingService
     ]
 })
 export class HomeModules { }

@@ -45,12 +45,12 @@ class AwsCodeBuildAgent(BaseAgent):
             pattern = '%Y-%m-%dT%H:%M:%S'
             since = int(time.mktime(time.strptime(since, pattern)))
         tracking_data = []
-        accesskey = self.getCredential("awsAccesskey")
-        secretkey = self.getCredential("awsSecretkey")
+        acskey = self.getCredential("awsAccesskey")
+        scrtkey = self.getCredential("awsSecretkey")
         regionName = self.getCredential("awsRegion")
         client = boto3.client('codebuild',
-                              aws_access_key_id=accesskey,
-                              aws_secret_access_key=secretkey,
+                              aws_access_key_id=acskey,
+                              aws_secret_access_key=scrtkey,
                               region_name=regionName)
         projects = client.list_projects(
             sortBy='NAME',

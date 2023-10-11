@@ -194,6 +194,26 @@ public class WorkflowDAL extends BaseDAL {
 			throw e;
 		}
 	}
+	
+	/**
+	 * Method to delete Execution History using workflowId
+	 * 
+	 * @param workflowId
+	 * @return String
+	 */
+	public String deleteWorkflowExecutionHistoryRecordsByWorkflowId(String workflowId) throws InsightsCustomException {
+		try {
+		
+			String validatedworkflowId = ValidationUtils.validateDynamicValue(workflowId, ValidationUtils.ID_STRING_PATTERN);
+			Map<String, Object> parameters = new HashMap<>();
+			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, validatedworkflowId);
+			String query = "DELETE from \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\" IWEH where IWEH.workflowid=:workflowId " ;
+			return executeUpdateWithSQLQueryWithParameter(query, parameters) >= 0 ? PlatformServiceConstants.SUCCESS:PlatformServiceConstants.FAILURE;
+		} catch (Exception e) {
+			log.error(e);
+			throw new InsightsCustomException("Error while deleting workflow execution history records.  ");
+		}
+	}
 
 	/**
 	 * Method to get task using TaskId
@@ -298,7 +318,25 @@ public class WorkflowDAL extends BaseDAL {
 			throw e;
 		}
 	}
-
+	
+	/**
+	 * Method to get all Active Alert Configurations
+	 * 
+	 * @return List<InsightsWorkflowConfiguration>
+	 */
+	public List<InsightsWorkflowConfiguration> getAllScheduledAndActiveOfflineAlertWorkflowConfig(String workflowType) {
+		try {
+			Map<String, Object> parameters = new HashMap<>();
+			parameters.put("workflowType", workflowType);
+			return getResultList(
+					"FROM InsightsWorkflowConfiguration WC WHERE WC.isActive = true and WC.workflowType = :workflowType  ",
+					InsightsWorkflowConfiguration.class, parameters);
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
+	}
+	
 	/**
 	 * Method to get all Active Workflow Configurations
 	 * 
@@ -507,7 +545,7 @@ public class WorkflowDAL extends BaseDAL {
 					+ "FROM \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\" IWHU "
 					+ "inner join \"INSIGHTS_WORKFLOW_TASK\" IWT ON IWHU.currenttask=IWT.taskid WHERE executionid IN "
 					+ "(SELECT DISTINCT(executionid) "
-					+ "FROM  \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\" IWH where IWH.workflowid = :workflowID ORDER BY executionid DESC limit 5 ) "
+					+ "FROM  \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\" IWH where IWH.workflowid = :workflowID ORDER BY executionid DESC limit 10 ) "
 					+ "order by IWHU.executionid desc,IWHU.starttime";
 			scalarList.put("executionid", StandardBasicTypes.LONG);
 			scalarList.put("startTime", StandardBasicTypes.LONG);

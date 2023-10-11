@@ -26,10 +26,10 @@ class TFSAgent(BaseAgent):
     def process(self):
         BaseUrl = self.config.get("baseUrl", '')
         UserID = self.getCredential("userid")
-        Passwd = self.getCredential("passwd")
-        Auth = self.config.get("auth", '')
+        cred = self.getCredential("passwd")
+        aType = self.config.get("auth", '')
         getCollectionsUrl = BaseUrl+"/_apis/projectcollections"
-        collections = self.getResponse(getCollectionsUrl, 'GET', UserID, Passwd, None, authType=Auth)
+        collections = self.getResponse(getCollectionsUrl, 'GET', UserID, cred, None, aType=aType)
         #print(collections)
         responseTemplate = self.getResponseTemplate()
         data = []
@@ -37,7 +37,7 @@ class TFSAgent(BaseAgent):
         for collection in range(colCount):            
             collectionName = collections["value"][collection]["name"]
             getProjectsUrl = BaseUrl + "/" +collectionName+"/_apis/projects/"
-            projects = self.getResponse(getProjectsUrl, 'GET', UserID, Passwd, None, authType=Auth)
+            projects = self.getResponse(getProjectsUrl, 'GET', UserID, cred, None, aType=aType)
             #print(projects)
             projCount = projects["count"]
             for project in range(projCount):
@@ -55,7 +55,7 @@ class TFSAgent(BaseAgent):
                     lastID = self.tracking.get(collectionName+ "/" + projectName,None)
                     getChangesetsUrl = BaseUrl + "/" + collectionName + "/" + projectName + "/_apis/tfvc/changesets?fromId=" + str(lastID)                    
                 #print(getChangesetsUrl)
-                changesets = self.getResponse(getChangesetsUrl, 'GET', UserID, Passwd, None, authType=Auth)
+                changesets = self.getResponse(getChangesetsUrl, 'GET', UserID, cred, None, aType=aType)
                 #print(changesets)
                 csCount = changesets["count"]
                 #print(csCount)
@@ -66,7 +66,7 @@ class TFSAgent(BaseAgent):
                     #print(changesetDetail)
                     data += self.parseResponse(responseTemplate, changesetDetail, injectData)
                     #getChangesetDetailsUrl = BaseUrl + "/" +collectionName + "/" + projectName + "/_apis/tfvc/changesets/" + str(changesets["value"][changeset]["changesetId"])
-                    #changesetDetails = self.getResponse(getChangesetDetailsUrl, 'GET', UserID, Passwd, None, authType=Auth)
+                    #changesetDetails = self.getResponse(getChangesetDetailsUrl, 'GET', UserID, cred, None, aType=aType)
                     #print(changesetDetails)
                 self.tracking[collectionName + "/" + projectName] = changesets["value"][0]["changesetId"]
         #print(data)

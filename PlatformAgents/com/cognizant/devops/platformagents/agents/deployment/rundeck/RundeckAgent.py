@@ -28,25 +28,25 @@ class RundeckAgent(BaseAgent):
     def process(self):
         self.baseLogger.info('Inside process')
         getProjects = self.config.get("baseEndPoint", '')
-        authtoken = self.getCredential("authtoken")
+        tkn = self.getCredential("authtoken")
         ExecutionsBaseEndPoint = self.config.get("executionsBaseEndPoint", '')
         startFrom = self.config.get("startFrom", '')
         startFrom = parser.parse(startFrom)
         startFrom = mktime(startFrom.timetuple()) + startFrom.microsecond/1000000.0
         startFrom = long(startFrom * 1000)
         startFrom = str(startFrom)
-        getProjectsUrl = getProjects+"?authtoken="+authtoken
+        getProjectsUrl = getProjects+"?authtoken="+tkn
         projects = self.getResponse(getProjectsUrl, 'GET', None, None, None)
         responseTemplate = self.getResponseTemplate()
         data = []
         for project in range(len(projects)):
             ProjName = projects[project]["name"]
             if not self.tracking.get(ProjName, ''):
-                getProjectDetailsUrl = ExecutionsBaseEndPoint+"/"+ProjName+"/executions?authtoken="+authtoken+"&begin="+startFrom
+                getProjectDetailsUrl = ExecutionsBaseEndPoint+"/"+ProjName+"/executions?authtoken="+tkn+"&begin="+startFrom
             else:
                 TimeStamp = self.tracking.get(ProjName, '')
                 TimeStamp = str(TimeStamp)
-                getProjectDetailsUrl = ExecutionsBaseEndPoint+"/"+ProjName+"/executions?authtoken="+authtoken+"&begin="+TimeStamp
+                getProjectDetailsUrl = ExecutionsBaseEndPoint+"/"+ProjName+"/executions?authtoken="+tkn+"&begin="+TimeStamp
             rundeckProjectDetails = self.getResponse(getProjectDetailsUrl, 'GET', None, None, None)
             for executions in rundeckProjectDetails["executions"]:
                 data += self.parseResponse(responseTemplate, executions)

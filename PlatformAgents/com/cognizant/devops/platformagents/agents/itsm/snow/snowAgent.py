@@ -42,7 +42,7 @@ class snowAgent(BaseAgent):
             self.IN_Url = self.config.get("IN_Url", '')
             self.IN_Approval_Url = self.config.get("IN_Approval_Url", '')
             self.username = self.getCredential("userid")
-            self.password = self.getCredential("passwd")
+            self.cred = self.getCredential("passwd")
             self.tracking_time={}
             self.CR_sys_id=[]
             self.IN_sys_id=[]
@@ -62,8 +62,8 @@ class snowAgent(BaseAgent):
             CR_sys_url = self.BaseUrl + self.CR_sysid_url + '%27' + self.start_time + '%27)%40javascript%3Ags.dateGenerate(%27' + self.end_time + '%27)'
             IN_sys_url = self.BaseUrl + self.IN_sysid_url + '%27' + self.start_time + '%27)%40javascript%3Ags.dateGenerate(%27' + self.end_time + '%27)'
             json_headers = {"Content-Type":"application/json","Accept":"application/json"}
-            CR_sys_response = requests.get(CR_sys_url, auth=(self.username, self.password), headers=json_headers )
-            IN_sys_response = requests.get(IN_sys_url, auth=(self.username, self.password), headers=json_headers )
+            CR_sys_response = requests.get(CR_sys_url, auth=(self.username, self.cred), headers=json_headers )
+            IN_sys_response = requests.get(IN_sys_url, auth=(self.username, self.cred), headers=json_headers )
             CR_sys_data = CR_sys_response.json()
             IN_sys_data = IN_sys_response.json()
             
@@ -80,11 +80,11 @@ class snowAgent(BaseAgent):
                     CR_response_data={}
                     CR_approval_data={}
                     CR_url = self.BaseUrl + self.CR_Url + i
-                    CR_response = requests.get(CR_url, auth=(self.username, self.password), headers=json_headers )
+                    CR_response = requests.get(CR_url, auth=(self.username, self.cred), headers=json_headers )
                     CR_data = CR_response.json()
                     CR_response_data["data"]=CR_data['result'][0]
                     CR_approval_url = self.BaseUrl + self.CR_Approval_Url + i
-                    CR_approval_response = requests.get(CR_approval_url, auth=(self.username, self.password), headers=json_headers )
+                    CR_approval_response = requests.get(CR_approval_url, auth=(self.username, self.cred), headers=json_headers )
                     CR_app_data = CR_approval_response.json()
                     CR_approval_data["approval_details"]=CR_app_data['result']
                     CR_response_data["data"].update(CR_approval_data)
@@ -95,11 +95,11 @@ class snowAgent(BaseAgent):
                     IN_response_data={}
                     IN_approval_data={}
                     IN_url = self.BaseUrl + self.IN_Url + i
-                    IN_response = requests.get(IN_url, auth=(self.username, self.password), headers=json_headers )
+                    IN_response = requests.get(IN_url, auth=(self.username, self.cred), headers=json_headers )
                     IN_data = IN_response.json()
                     IN_response_data["data"]=IN_data['result'][0]
                     IN_approval_url = self.BaseUrl + self.IN_Approval_Url + i
-                    IN_approval_response = requests.get(IN_approval_url, auth=(self.username, self.password), headers=json_headers )
+                    IN_approval_response = requests.get(IN_approval_url, auth=(self.username, self.cred), headers=json_headers )
                     IN_app_data = IN_approval_response.json()
                     IN_approval_data["approval_details"]=IN_app_data['result']
                     IN_response_data["data"].update(IN_approval_data)

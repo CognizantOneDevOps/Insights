@@ -9,22 +9,22 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>10.2</version>
+		<version>10.3</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>PlatformService</artifactId>
 	<groupId>com.cognizant.devops</groupId>
 	<packaging>jar</packaging>
-	<version>10.2</version>
+	<version>10.3</version>
 	<name>PlatformService</name>
 
 	<properties>
 		<jersey.version>2.28</jersey.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<springframework.boot.version>2.7.13</springframework.boot.version>
+		<springframework.boot.version>2.7.15</springframework.boot.version>
 		<spring.version>5.3.25</spring.version>
-		<spring.security.version>5.8.5</spring.security.version>
+		<spring.security.version>5.8.7</spring.security.version>
 		<junit.version>4.13.1</junit.version>
 		<testng.version>7.7.1</testng.version>
 			</properties>
@@ -227,13 +227,13 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>10.2</version>
+			<version>10.3</version>
 		</dependency>		
 
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>10.2</version>
+			<version>10.3</version>
 		</dependency>
 
 
@@ -299,12 +299,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>commons-fileupload</groupId>
-			<artifactId>commons-fileupload</artifactId>
-			<version>1.5</version>
-		</dependency>
-
+		
 	</dependencies>
 	<build>		
 		<resources>

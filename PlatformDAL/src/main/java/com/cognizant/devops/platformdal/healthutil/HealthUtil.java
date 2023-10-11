@@ -361,9 +361,8 @@ public class HealthUtil {
 	private String getNeo4jDBSize(String hostEndPoint, String username, String password, String authToken) {
 		long totalStoreSize = 0L;
 		String returnSize = "";
-		try {
-			if (ApplicationConfigProvider.getInstance().getGraph().getVersion().contains("4.")) {
-				GraphDBHandler dbHandler = new GraphDBHandler();
+		try (GraphDBHandler dbHandler = new GraphDBHandler()) {
+			if (ApplicationConfigProvider.getInstance().getGraph().getVersion().contains("4.")) {				
 				String storeSizeQuery = "CALL apoc.monitor.store() YIELD logSize, totalStoreSize RETURN sum(logSize+totalStoreSize)";
 				JsonObject storeSizeResponse = dbHandler.executeCypherQueryForJsonResponse(storeSizeQuery);
 				log.debug("Neo4j database store size Response ====== {} ", storeSizeResponse);

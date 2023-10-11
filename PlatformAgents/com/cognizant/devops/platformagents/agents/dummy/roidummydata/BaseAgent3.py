@@ -64,7 +64,7 @@ class BaseAgent(object):
         filePresent = os.path.isfile('config.json')
         agentDir = os.path.dirname(sys.modules[self.__class__.__module__].__file__) + os.path.sep
         if "INSIGHTS_HOME" in os.environ:
-            logDirPath = os.environ['INSIGHTS_HOME']+'/logs/PlatformAgent'
+            logDirPath = os.path.abspath(os.environ['INSIGHTS_HOME']) + '/logs/PlatformAgent'
             if not os.path.exists(logDirPath):
                 os.makedirs(logDirPath)
         else:
@@ -86,7 +86,7 @@ class BaseAgent(object):
         self.logFilePath = agentDir +'/'+ 'log_'+type(self).__name__+'.log'
         if self.config.get('agentId') != None and self.config.get('agentId') != '':
             if "INSIGHTS_HOME" in os.environ:
-                logDirPath = os.environ['INSIGHTS_HOME']+'/logs/PlatformAgent'
+                logDirPath = os.path.abspath(os.environ['INSIGHTS_HOME']) + '/logs/PlatformAgent'
                 if not os.path.exists(logDirPath):
                     os.makedirs(logDirPath)
                 self.logFilePath = logDirPath +'/'+ 'log_'+self.config.get('agentId')+'.log'
@@ -313,8 +313,8 @@ class BaseAgent(object):
         with open(jsonFile, 'w') as outfile:
             json.dump(data, outfile, indent=4, sort_keys=True)
         
-    def getResponse(self, url, method, userName, password, data, authType='BASIC', reqHeaders=None, responseTupple=None,proxies=None):
-        return self.communicationFacade.communicate(url, method, userName, password, data, authType, reqHeaders, responseTupple,proxies)        
+    def getResponse(self, url, method, userName, cred, data, aType='BASIC', reqHeaders=None, responseTupple=None,proxies=None):
+        return self.communicationFacade.communicate(url, method, userName, cred, data, aType, reqHeaders, responseTupple,proxies)        
    
     def parseResponse(self, template, response, injectData={}):
         return self.communicationFacade.processResponse(template, response, injectData, self.config.get('useResponseTemplate',False))

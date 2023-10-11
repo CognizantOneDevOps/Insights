@@ -194,7 +194,7 @@ class GitWebhookAgent(BaseAgent):
         repoName = dataReceived.get("repository",dict()).get("name")
         ref = dataReceived.get("ref",None)
         branchName = ref.rsplit('/',1)[1]
-        authorName = dataReceived.get("pusher",dict()).get("name")
+        creatorName = dataReceived.get("pusher",dict()).get("name")
         branchData = []
         if(dataReceived["created"]):
             status = "created"
@@ -204,7 +204,7 @@ class GitWebhookAgent(BaseAgent):
         branchDetailsDict = {
                 "repoName":repoName,
                 "branchName":branchName,
-                "authorName":authorName,
+                "authorName":creatorName,
                 "status":status,
                 'consumptionTime' : timeStampNow()
             }
@@ -241,7 +241,7 @@ class GitWebhookAgent(BaseAgent):
         isForked = originRepo.get('fork', False)
         commits = pullReqDetails.get("commits",None)
         changed_files = pullReqDetails.get("changed_files",None)
-        author = dataReceived.get("sender",dict()).get("login", None)
+        creator = dataReceived.get("sender",dict()).get("login", None)
         
         injectData = {
             'repoName': repoName,
@@ -250,7 +250,7 @@ class GitWebhookAgent(BaseAgent):
             "changed_files": changed_files,
             'gitType': 'pullRequest', 
             'consumptionTime': timeStampNow(),
-            'authorName': author
+            'authorName': creator
             }
         
         dynamicTemplate = self.config.get('dynamicTemplate', {})

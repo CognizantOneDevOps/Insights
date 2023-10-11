@@ -27,10 +27,10 @@ class TFSCIAgent(BaseAgent):
         self.baseLogger.info('Inside process')
         BaseUrl = self.config.get("baseUrl", '')
         UserID = self.getCredential("userid")
-        Passwd = self.getCredential("passwd")
-        Auth = self.config.get("auth", '')
+        cred = self.getCredential("passwd")
+        aType = self.config.get("auth", '')
         getCollectionsUrl = BaseUrl+"/_apis/_commom/GetJumpList?showTeamsOnly=false&__v=5&navigationContextPackage={}&showStoppedCollections=false"
-        collectionResponse = self.getResponse(getCollectionsUrl, 'GET', UserID, Passwd, None, authType=Auth)
+        collectionResponse = self.getResponse(getCollectionsUrl, 'GET', UserID, cred, None, aType=aType)
         collections = collectionResponse.get("__wrappedArray")
         responseTemplate = self.getResponseTemplate()
         data = []
@@ -38,7 +38,7 @@ class TFSCIAgent(BaseAgent):
         for collection in range(colCount):            
             collectionName = collections[collection]["name"]
             getProjectsUrl = BaseUrl + "/" + collectionName +"/_apis/projects?api-version=4.1"
-            projects = self.getResponse(getProjectsUrl, 'GET', UserID, Passwd, None, authType=Auth)
+            projects = self.getResponse(getProjectsUrl, 'GET', UserID, cred, None, aType=aType)
             projCount = projects["count"]
             for project in range(projCount):
                 injectData = {}                
@@ -54,7 +54,7 @@ class TFSCIAgent(BaseAgent):
                     lastBuildTime = self.tracking.get(collectionName + "/" + projectName, None)
                     getBuildsUrl = BaseUrl + "/" + collectionName + "/" + projectName + "/_apis/build/builds"\
                     "?queryOrder=finishTimeAscending&minTime=" + str(lastBuildTime) + "&$top=100&api-version=4.1"
-                builds = self.getResponse(getBuildsUrl, 'GET', UserID, Passwd, None, authType=Auth)
+                builds = self.getResponse(getBuildsUrl, 'GET', UserID, cred, None, aType=aType)
                 bCount = builds["count"]
                 if not newProject and bCount > 0:
                     builds["value"].pop(0);

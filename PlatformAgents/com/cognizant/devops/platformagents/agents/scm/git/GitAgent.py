@@ -174,7 +174,7 @@ class GitAgent(BaseAgent):
                         if 'pullReqBranches' in repoTrackingCache:
                             pullReqBranches = repoTrackingCache['pullReqBranches']
                             for branch in branches:
-                                print branch
+                                # print branch
                                 if branch in pullReqBranches:
                                     branchesFound.append(branch)
                                 else:
@@ -656,7 +656,7 @@ class GitAgent(BaseAgent):
         commitFileDetails =self.getResponse(commitFileDetailsUrl,'GET', None, None,None, reqHeaders=headers)
         commitSHA = commitFileDetails.get('sha', None)
         commitMessage = commitFileDetails.get('commit',dict()).get('message','')
-        author = commitFileDetails.get('commit',dict()).get('author',dict()).get('name','')
+        creator = commitFileDetails.get('commit',dict()).get('author',dict()).get('name','')
         commitTime = commitFileDetails.get('commit',dict()).get('author',dict()).get('date','')
         commitFiles = commitFileDetails.get('files',list())
         parentsCount = len(commitFileDetails.get('parents',list()))
@@ -678,7 +678,7 @@ class GitAgent(BaseAgent):
             fileDetailsDict = {
                 "commitId":commitSHA,
                 "commitMessage":commitMessage,
-                "authorName":author,
+                "authorName":creator,
                 "commitTime":commitTime,
                 "filename":filename,
                 "status":status,

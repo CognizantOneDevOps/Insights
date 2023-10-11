@@ -27,8 +27,8 @@ class AzureRepoAgent(BaseAgent):
     @BaseAgent.timed
     def process(self):
         UserID = self.getCredential("userid")
-        Passwd = self.getCredential("passwd")
-        Auth = self.config.get("auth", '')
+        cred = self.getCredential("passwd")
+        aType = self.config.get("auth", '')
         getRepos = self.config.get("getRepos", '')
         accessToken = self.config.get("accessToken", '')
         commitsBaseEndPoint = self.config.get("commitsBaseEndPoint", '')
@@ -37,7 +37,7 @@ class AzureRepoAgent(BaseAgent):
         getReposUrl = getRepos
         enableBranches = self.config.get("enableBranches", False)
         enableBrancheDeletion = self.config.get("enableBrancheDeletion", False)
-        reposs = self.getResponse(getReposUrl,'GET', UserID, Passwd, None, authType=Auth)
+        reposs = self.getResponse(getReposUrl,'GET', UserID, cred, None, aType=aType)
         repos = reposs.get('value', None)
         responseTemplate = self.getResponseTemplate()
         repoPageNum = 1
@@ -54,7 +54,7 @@ class AzureRepoAgent(BaseAgent):
                 if repoModificationTime is None:
                     repoModificationTime = startFrom
                 getRepoPushUrl = getReposUrl+ '/' + repoName + '/pushes'
-                reposPushes = self.getResponse(getRepoPushUrl,'GET', UserID, Passwd, None, authType=Auth)
+                reposPushes = self.getResponse(getRepoPushUrl,'GET', UserID, cred, None, aType=aType)
                 #Avoid Empty repo with no Pushes
                 if(reposPushes.get('count',None) != 0):
                   repoUpdatedAt = reposPushes.get('value',None)[0].get('date',None)
@@ -74,7 +74,7 @@ class AzureRepoAgent(BaseAgent):
                             fetchNextBranchPage = True
                             while fetchNextBranchPage:
                                 getBranchesRestUrl = commitsBaseEndPoint+repoName+'/refs'
-                                branchDetailss = self.getResponse(getBranchesRestUrl,'GET', UserID, Passwd, None, authType=Auth).get('value',None)
+                                branchDetailss = self.getResponse(getBranchesRestUrl,'GET', UserID, cred, None, aType=aType).get('value',None)
                                 branchDetails = []
                                 for branchs in branchDetailss:
                                     if(branchs.get('name',None)[:11] == 'refs/heads/'):
@@ -128,7 +128,7 @@ class AzureRepoAgent(BaseAgent):
                                 getCommitDetailsUrl += '&searchCriteria.fromDate='+since
                             latestCommit = None
                             try:
-                                commits = self.getResponse(getCommitDetailsUrl, 'GET', UserID, Passwd, None, authType=Auth).get('value',None)
+                                commits = self.getResponse(getCommitDetailsUrl, 'GET', UserID, cred, None, aType=aType).get('value',None)
                                 if latestCommit is None and len(commits) > 0:
                                     latestCommit = commits[0]
                                 for commit in commits:

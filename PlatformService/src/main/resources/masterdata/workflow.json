@@ -24,6 +24,10 @@
 		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TYPE\"(id, workflowtype) SELECT nextval('hibernate_sequence'), 'GROUP_EMAIL' WHERE NOT EXISTS(SELECT id from public.\"INSIGHTS_WORKFLOW_TYPE\" WHERE workflowtype = 'GROUP_EMAIL');"
 	},
 	{
+		"queryName": "Add workflow type",
+		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TYPE\"(id, workflowtype) SELECT nextval('hibernate_sequence'), 'OFFLINE_ALERT' WHERE NOT EXISTS(SELECT id from public.\"INSIGHTS_WORKFLOW_TYPE\" WHERE workflowtype = 'OFFLINE_ALERT');"
+	},
+	{
 		"queryName": "REPORT_KPI_Execute",
 		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TASK\"(taskid, componentname, dependency, description, mqchannel, workflowtype) SELECT nextval('hibernate_sequence'), 'com.cognizant.devops.platformreports.assessment.core.ReportKPISubscriber', 1, 'REPORT_KPI_Execute', 'WORKFLOW.TASK.KPI.EXCECUTION', 'Report' WHERE NOT EXISTS (SELECT taskid FROM public.\"INSIGHTS_WORKFLOW_TASK\" WHERE description = 'REPORT_KPI_Execute');"
 	},
@@ -62,5 +66,9 @@
 	{
 		"queryName": "GROUP_EMAIL_Execute",
 		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TASK\"(taskid, componentname, dependency, description, mqchannel, workflowtype) SELECT nextval('hibernate_sequence'), 'com.cognizant.devops.platformreports.assessment.core.GroupEmailSubscriber', 1, 'GROUP_EMAIL_Execute', 'WORKFLOW.TASK.GROUP_EMAIL.EXECUTION', 'GROUP_EMAIL' WHERE NOT EXISTS (SELECT taskid FROM public.\"INSIGHTS_WORKFLOW_TASK\" WHERE description = 'GROUP_EMAIL_Execute');"
+	},
+	{
+		"queryName": "OFFLINE_ALERT_Execute",
+		"sqlQuery": "INSERT INTO public.\"INSIGHTS_WORKFLOW_TASK\"(taskid, componentname, dependency, description, mqchannel, workflowtype) SELECT nextval('hibernate_sequence'), 'com.cognizant.devops.platformreports.assessment.core.OfflineAlertSubscriber', 0, 'OFFLINE_ALERT_Execute', 'WORKFLOW.TASK.ALERT.EXCECUTION', 'OFFLINE_ALERT' WHERE NOT EXISTS (SELECT taskid FROM public.\"INSIGHTS_WORKFLOW_TASK\" WHERE description = 'OFFLINE_ALERT_Execute');"
 	}
 ]

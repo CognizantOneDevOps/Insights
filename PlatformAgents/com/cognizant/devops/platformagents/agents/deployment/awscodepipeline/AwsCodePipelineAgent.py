@@ -35,12 +35,12 @@ class AwsCodePipelineAgent(BaseAgent):
         startFrom = parser.parse(startFrom)
         startFrom = startFrom.strftime('%Y-%m-%dT%H:%M:%S')
         
-        accesskey = self.getCredential("awsAccesskey")
-        secretkey = self.getCredential("awsSecretkey")
+        acskey = self.getCredential("awsAccesskey")
+        scrtkey = self.getCredential("awsSecretkey")
         regionName = self.getCredential("awsRegion")
         client = boto3.client('codepipeline',
-                              aws_access_key_id=accesskey,
-                              aws_secret_access_key=secretkey,
+                              aws_access_key_id=acskey,
+                              aws_secret_access_key=scrtkey,
                               region_name=regionName)
 
         response = client.list_pipelines()

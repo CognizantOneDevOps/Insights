@@ -40,7 +40,7 @@ class BitBucketCloudAgent(BaseAgent):
     def process(self):
         self.baseEndPoint = self.config.get("baseEndPoint", '')
         self.userId = self.getCredential("userid")
-        self.passwd = self.getCredential("passwd")
+        self.cred = self.getCredential("passwd")
         self.scanAllBranches = self.config.get("scanAllBranches", False)
         self.scanPullRequests = self.config.get("scanPullRequests", False)
         self.scanReleaseBranches = self.config.get("scanReleaseBranches", False)
@@ -57,7 +57,7 @@ class BitBucketCloudAgent(BaseAgent):
                 nexturl=self.baseEndPoint+'/'+'?pagelen=100&fields=values.slug'+'&limit='+str(limit)+'&page='+str(repoStart+1)
                 self.baseLogger.info('nexturl to fetch repository ==== '+nexturl)
                 bitBucketRepos ={}          
-                bitBucketRepos = self.getResponse(nexturl,'GET', self.userId, self.passwd, None,None)
+                bitBucketRepos = self.getResponse(nexturl,'GET', self.userId, self.cred, None,None)
                 self.baseLogger.info(bitBucketRepos['values'])
                 numOfRepos = len(bitBucketRepos["values"])
                 if numOfRepos == 0:
@@ -92,7 +92,7 @@ class BitBucketCloudAgent(BaseAgent):
                 
                 while fetchNextBranchPage:
                     #ogging.info('bitBicketBranchessUrl  ==== '+bitBicketBranchessUrl)
-                    bitBicketBranches = self.getResponse(bitBicketBranchessUrl+'?limit='+str(limit)+'&page='+str(branchStart+1), 'GET', self.userId, self.passwd, None)
+                    bitBicketBranches = self.getResponse(bitBicketBranchessUrl+'?limit='+str(limit)+'&page='+str(branchStart+1), 'GET', self.userId, self.cred, None)
                     numBranches = len(bitBicketBranches["values"])
                     if numBranches == 0:
                         fetchNextBranchPage = False
@@ -151,12 +151,12 @@ class BitBucketCloudAgent(BaseAgent):
             lastCommitTimeEpoch = int(lastCommitTimeEpoch * 1000)
             #self.baseLogger.info('bitBucketCommitsUrl debug === '+bitBucketCommitsUrl)
             try:
-                bitBucketCommits = self.getResponse(bitBucketCommitsUrl, 'GET', self.userId, self.passwd, None)
+                bitBucketCommits = self.getResponse(bitBucketCommitsUrl, 'GET', self.userId, self.cred, None)
                 i = 0
                 for commits in (bitBucketCommits["values"]):
-                    authortimestamp = bitBucketCommits["values"][i]["date"]
-                    #self.baseLogger.info('lastCommitTimeEpoch ==== '+lastCommitTime+'   authortimestamp === '+authortimestamp +' commitId '+bitBucketCommits["values"][i]["hash"])
-                    authortimestampEpoch = parser.parse(authortimestamp)
+                    creatortimestamp = bitBucketCommits["values"][i]["date"]
+                    #self.baseLogger.info('lastCommitTimeEpoch ==== '+lastCommitTime+'   creatortimestamp === '+creatortimestamp +' commitId '+bitBucketCommits["values"][i]["hash"])
+                    authortimestampEpoch = parser.parse(creatortimestamp)
                     authortimestampEpoch = mktime(authortimestampEpoch.timetuple()) + authortimestampEpoch.microsecond/1000000.0
                     authortimestampEpoch = int(authortimestampEpoch * 1000)
                     if  authortimestampEpoch > lastCommitTimeEpoch:
@@ -167,7 +167,7 @@ class BitBucketCloudAgent(BaseAgent):
                             repoTracking[branchName] = updatetracking
                             isTrackingUpdated = True
                     else :
-                        self.baseLogger.info(' No commit found for repo Name '+repoName +'  branch name '+branchName+' time check lastCommitTime ==== '+lastCommitTime+'   commit_timestamp === '+authortimestamp +' commitId '+bitBucketCommits["values"][i]["hash"])
+                        self.baseLogger.info(' No commit found for repo Name '+repoName +'  branch name '+branchName+' time check lastCommitTime ==== '+lastCommitTime+'   commit_timestamp === '+creatortimestamp +' commitId '+bitBucketCommits["values"][i]["hash"])
                         fetchNextComitPage= False;
                         break;
                     i = i + 1
@@ -222,7 +222,7 @@ class BitBucketCloudAgent(BaseAgent):
             pullRequestUrl = self.baseEndPoint+"/"+repoName+"/pullrequests?state=All&order=NEWEST&pagelen="+str(limit)+'&page='+str(prStart+1)
             try:
                 #self.baseLogger.info("pullRequestUrl ===== "+pullRequestUrl)
-                pullRequests = self.getResponse(pullRequestUrl, 'GET', self.userId, self.passwd, None)
+                pullRequests = self.getResponse(pullRequestUrl, 'GET', self.userId, self.cred, None)
                 i = 0
                 numOfPullRequest = len(pullRequests["values"])
                 self.baseLogger.info("repoName ===== "+repoName+" for page number "+str(prStart+1) +" numOfPullRequest ==== "+str(numOfPullRequest))

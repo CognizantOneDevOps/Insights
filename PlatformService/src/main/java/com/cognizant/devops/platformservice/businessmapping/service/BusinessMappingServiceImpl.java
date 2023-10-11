@@ -46,9 +46,9 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 	@Override
 	public JsonObject saveToolsMappingLabel(String agentMappingJson) {
 		List<JsonObject> nodeProperties = new ArrayList<>();
-		try {
+		try(GraphDBHandler dbHandler = new GraphDBHandler()) {
 			String validatedResponse = ValidationUtils.validateRequestBody(agentMappingJson);
-			GraphDBHandler dbHandler = new GraphDBHandler();
+			
 			String constraintQuery = "CREATE CONSTRAINT ON (n:METADATA) ASSERT n.metadata_id  IS UNIQUE";
 			if(ApplicationConfigProvider.getInstance().getGraph().getVersion().contains("4.")) {
 				constraintQuery = "CREATE CONSTRAINT IF NOT EXISTS FOR (n:METADATA) REQUIRE n.metadata_id IS UNIQUE";
@@ -67,18 +67,19 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 		} catch (InsightsCustomException e) {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		} catch (Exception ex) {
+			log.error(ex);
 		}
 		return PlatformServiceUtil.buildSuccessResponse();
 	}
 
 	@Override
 	public JsonObject getToolsMappingLabel(String agentName) {
-		GraphDBHandler dbHandler = new GraphDBHandler();
 		String query = "MATCH (n:METADATA:BUSINESSMAPPING) where n.toolName ='" + agentName
 				+ "' return n order by n.inSightsTime desc"; // 'GIT'
 		GraphResponse response;
 		List<Map<String, String>> propertyList = new ArrayList<>();
-		try {
+		try(GraphDBHandler dbHandler = new GraphDBHandler()) {
 			response = dbHandler.executeCypherQuery(query);
 			int size = response.getNodes().size();
 			log.debug("arg0 size {}", size);
@@ -88,15 +89,16 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 		} catch (InsightsCustomException e) {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
+		} catch (Exception ex) {
+			log.error(ex);
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(propertyList); // response.getNodes()
 	}
 
 	@Override
 	public JsonObject editToolsMappingLabel(String agentMappingJson) {
-		try {
+		try(GraphDBHandler dbHandler = new GraphDBHandler()) {
 			String validatedResponse = ValidationUtils.validateRequestBody(agentMappingJson);
-			GraphDBHandler dbHandler = new GraphDBHandler();
 			JsonObject json = JsonUtils.parseStringAsJsonObject(validatedResponse);
 			String uuid = json.get("uuid").getAsString();
 			log.debug("arg0 {} uuid  ", uuid);
@@ -125,10 +127,9 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 
 	@Override
 	public JsonObject deleteToolsMappingLabel(String uuid) {
-		GraphDBHandler dbHandler = new GraphDBHandler();
 		GraphResponse graphresponce = new GraphResponse();
-		try {
-
+		try(GraphDBHandler dbHandler = new GraphDBHandler()) {
+			
 			String cypherQuery = "MATCH (n:METADATA:BUSINESSMAPPING) where n.uuid= '" + uuid + "'  detach delete n";
 			graphresponce = dbHandler.executeCypherQuery(cypherQuery);
 

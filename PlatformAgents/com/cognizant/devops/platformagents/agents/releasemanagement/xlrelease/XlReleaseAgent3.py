@@ -31,7 +31,7 @@ class XlReleaseAgent(BaseAgent):
         timeStampNow = lambda: dateTime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
         self.baseEndPoint = self.config.get("baseEndPoint", '')
         self.userID = self.config.get("userID", '')
-        self.passwd = self.config.get("passwd", '')
+        self.cred = self.config.get("passwd", '')
         timeStampFormat = self.config.get("timeStampFormat", '')
         dynamicTemplate = self.config.get('dynamicTemplate', {})
         releasesReqData = list()
@@ -85,7 +85,7 @@ class XlReleaseAgent(BaseAgent):
         foldersListUrl = self.baseEndPoint + "/folders/list?depth=10"
         foldersList = ''
         try:
-            foldersList = self.getResponse(foldersListUrl, 'GET', self.userID, self.passwd, None)
+            foldersList = self.getResponse(foldersListUrl, 'GET', self.userID, self.cred, None)
         except Exception as ex:   
             self.publishHealthDataForExceptions(ex)
         self.foldersLabelList = []
@@ -97,7 +97,7 @@ class XlReleaseAgent(BaseAgent):
             self.getSubFoldersTitles(folder, 2, folderId)
         foldersReqData += self.parseResponse(foldersReqResponseTemplate, self.foldersLabelList)
         try:
-            listReleases = self.getResponse(self.baseEndPoint + '/releases/search?page=0&resultsPerPage=100', 'POST', self.userID, self.passwd, json.dumps(releasesPayloadTemplate), 'None', apiHeaders)
+            listReleases = self.getResponse(self.baseEndPoint + '/releases/search?page=0&resultsPerPage=100', 'POST', self.userID, self.cred, json.dumps(releasesPayloadTemplate), 'None', apiHeaders)
         except Exception as ex:   
             self.publishHealthDataForExceptions(ex)
         releasesData = []
@@ -132,7 +132,7 @@ class XlReleaseAgent(BaseAgent):
                             tasksReqData += self.parseResponse(tasksReqResponseTemplate, taskData,  {'releaseId': releaseId, 'phaseId': phaseId, 'consumptionTime': timeStampNow()})
                             tasksData.append(tasksReqData)
             releasePageNum = releasePageNum + 1
-            listReleases = self.getResponse(self.baseEndPoint + '/releases/search?page='+str(releasePageNum)+'&resultsPerPage=100', 'POST', self.userID, self.passwd, json.dumps(releasesPayloadTemplate), 'None', apiHeaders)
+            listReleases = self.getResponse(self.baseEndPoint + '/releases/search?page='+str(releasePageNum)+'&resultsPerPage=100', 'POST', self.userID, self.cred, json.dumps(releasesPayloadTemplate), 'None', apiHeaders)
             self.publishToolsData(releasesReqData, releasesMetaData, releasestimestamp, releasestimeformat, releasesisEpoch, True)
             self.publishToolsData(phasesReqData, phasesMetaData, phasestimestamp, phasestimeformat, phasesisEpoch, True)
             self.publishToolsData(tasksReqData, tasksMetaData, taskstimestamp, taskstimeformat, tasksisEpoch, True)
@@ -157,7 +157,7 @@ class XlReleaseAgent(BaseAgent):
                 foldersPath = foldersPath + str(folderTitle[-2]) + '/'
             else:
                 try:
-                    self.folderResponse = self.getResponse(getFoldersUrl + pathPrefix, 'GET', self.userID, self.passwd, None)
+                    self.folderResponse = self.getResponse(getFoldersUrl + pathPrefix, 'GET', self.userID, self.cred, None)
                 except Exception as ex:   
                     self.publishHealthDataForExceptions(ex)
                 foldersPath = foldersPath + self.folderResponse['title'] + '/'

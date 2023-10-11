@@ -28,29 +28,29 @@ class TeamCityAgent(BaseAgent):
         self.baseLogger.info('Inside process')
         BaseUrl = self.config.get("baseUrl", '')
         UserID = self.getCredential("userid")
-        Passwd = self.getCredential("passwd")
+        cred = self.getCredential("passwd")
         if not self.tracking.get("sinceBuild",None):
             getBuildsUrl = BaseUrl + '/httpAuth/app/rest/builds/'
         else:
             sinceBuild = self.tracking.get("sinceBuild",None)
             getBuildsUrl = BaseUrl + '/httpAuth/app/rest/builds/?sinceBuild='+ str(sinceBuild)   
-        teamcityBuilds = self.getResponse(getBuildsUrl, 'GET', UserID, Passwd, None, None)
+        teamcityBuilds = self.getResponse(getBuildsUrl, 'GET', UserID, cred, None, None)
         responseTemplate = self.getResponseTemplate()
         data = []
         buildCount = teamcityBuilds["count"]
         for build in range(buildCount):
             injectData = {}
             getBuildDetailsUrl = BaseUrl+"/httpAuth/app/rest/builds/"+ str(teamcityBuilds["build"][build]["id"])
-            teamcityBuildDetails = self.getResponse(getBuildDetailsUrl, 'GET', UserID, Passwd, None)
+            teamcityBuildDetails = self.getResponse(getBuildDetailsUrl, 'GET', UserID, cred, None)
             if "lastChanges" in teamcityBuildDetails:
                 getBuildChangesUrl = BaseUrl+"/httpAuth/app/rest/changes?locator=build:"+str(teamcityBuilds["build"][build]["id"])
-                teamcityBuildChanges = self.getResponse(getBuildChangesUrl, 'GET', UserID, Passwd, None)
+                teamcityBuildChanges = self.getResponse(getBuildChangesUrl, 'GET', UserID, cred, None)
                 changeCount = teamcityBuildChanges["count"]
                 version = []
                 for change in range(changeCount):
                     version.append(teamcityBuildChanges["change"][change]["version"])
 #                     getChangeDetailsUrl = BaseUrl+"/httpAuth/app/rest/changes/"+ str(teamcityBuildChanges["change"][change]["id"])
-#                     teamcityChangeDetails = self.getResponse(getChangeDetailsUrl, 'GET', UserID, Passwd, None)
+#                     teamcityChangeDetails = self.getResponse(getChangeDetailsUrl, 'GET', UserID, cred, None)
 #                     version.append(teamcityChangeDetails["version"])
                 injectData["version"]=version
             data += self.parseResponse(responseTemplate, teamcityBuildDetails, injectData)

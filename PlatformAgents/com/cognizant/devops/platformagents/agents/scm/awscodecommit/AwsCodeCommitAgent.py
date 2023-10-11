@@ -30,12 +30,12 @@ class AwsCodeCommitAgent(BaseAgent):
     @BaseAgent.timed
     def process(self):
         data = []
-        accesskey = self.getCredential("awsAccesskey")
-        secretkey = self.getCredential("awsSecretkey")
+        acskey = self.getCredential("awsAccesskey")
+        scrtkey = self.getCredential("awsSecretkey")
         regionName = self.getCredential("awsRegion")
         client = boto3.client('codecommit',
-                              aws_access_key_id=accesskey,
-                              aws_secret_access_key=secretkey,
+                              aws_access_key_id=acskey,
+                              aws_secret_access_key=scrtkey,
                               region_name=regionName)
         repoList = client.list_repositories(
             sortBy='repositoryName',

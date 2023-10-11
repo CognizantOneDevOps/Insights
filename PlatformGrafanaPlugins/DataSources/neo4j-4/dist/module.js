@@ -12,18 +12,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   AnnotationQueryEditor: () => (/* binding */ AnnotationQueryEditor)
 /* harmony export */ });
-function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var AnnotationQueryEditor = /*#__PURE__*/_createClass(function AnnotationQueryEditor() {
   _classCallCheck(this, AnnotationQueryEditor);
+
   _defineProperty(this, "annotation", void 0);
+
   this.annotation.rawQuery = this.annotation.rawQuery || '';
 });
+
 _defineProperty(AnnotationQueryEditor, "templateUrl", 'partials/annotations.editor.html');
 
 /***/ }),
@@ -43,11 +47,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 var _h;
 
+
 var examples = [{
   title: 'Fetch top 25 nodes of JIRA',
   expression: 'MATCH (n:JIRA) RETURN n LIMIT 25',
   label: 'TOP JIRA NODES'
 }];
+
 var CheatSheet = function CheatSheet(props) {
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null, _h || (_h = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("h2", null, "Cheat Sheet")), examples.map(function (item, index) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
@@ -68,6 +74,7 @@ var CheatSheet = function CheatSheet(props) {
     }, item.label));
   }));
 };
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (CheatSheet);
 
 /***/ }),
@@ -87,67 +94,87 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _grafana_ui__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @grafana/ui */ "@grafana/ui");
 /* harmony import */ var _grafana_ui__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_grafana_ui__WEBPACK_IMPORTED_MODULE_1__);
-var _h, _h2;
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
+var _h, _h2;
+
 function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
-
-//const { SecretFormField, FormField } = LegacyForms;
 
 var logapi = window.location.protocol + "//localhost:8080/PlatformService/externalApi/Neo4jPluginLog/logDashboardInfo";
+
 if (document.domain !== 'localhost') {
   logapi = window.location.protocol + "//" + document.domain + "/PlatformService/externalApi/Neo4jPluginLog/logDashboardInfo";
 }
+
 var ConfigEditor = /*#__PURE__*/function (_PureComponent) {
   _inherits(ConfigEditor, _PureComponent);
+
   var _super = _createSuper(ConfigEditor);
+
   function ConfigEditor() {
     var _this;
+
     _classCallCheck(this, ConfigEditor);
+
     for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
       args[_key] = arguments[_key];
     }
+
     _this = _super.call.apply(_super, [this].concat(args));
+
     _defineProperty(_assertThisInitialized(_this), "onPathChange", function (event) {
       var _this$props = _this.props,
-        onOptionsChange = _this$props.onOptionsChange,
-        options = _this$props.options;
+          onOptionsChange = _this$props.onOptionsChange,
+          options = _this$props.options;
+
       var jsonData = _extends({}, options.jsonData, {
         path: event.target.value
       });
+
       onOptionsChange(_extends({}, options, {
         jsonData: jsonData
       }));
     });
-    // Secure field (only sent to the backend)
+
     _defineProperty(_assertThisInitialized(_this), "onAPIKeyChange", function (event) {
       var _this$props2 = _this.props,
-        onOptionsChange = _this$props2.onOptionsChange,
-        options = _this$props2.options;
+          onOptionsChange = _this$props2.onOptionsChange,
+          options = _this$props2.options;
       onOptionsChange(_extends({}, options, {
         secureJsonData: {
           apiKey: event.target.value
         }
       }));
     });
+
     _defineProperty(_assertThisInitialized(_this), "onResetAPIKey", function () {
       var _this$props3 = _this.props,
-        onOptionsChange = _this$props3.onOptionsChange,
-        options = _this$props3.options;
+          onOptionsChange = _this$props3.onOptionsChange,
+          options = _this$props3.options;
       onOptionsChange(_extends({}, options, {
         secureJsonFields: _extends({}, options.secureJsonFields, {
           apiKey: false
@@ -157,61 +184,75 @@ var ConfigEditor = /*#__PURE__*/function (_PureComponent) {
         })
       }));
     });
+
     _defineProperty(_assertThisInitialized(_this), "onServiceUrlChange", function (event) {
       var _this$props4 = _this.props,
-        onOptionsChange = _this$props4.onOptionsChange,
-        options = _this$props4.options;
+          onOptionsChange = _this$props4.onOptionsChange,
+          options = _this$props4.options;
+
       var jsonData = _extends({}, options.jsonData, {
         serviceUrl: event.target.value
       });
+
       onOptionsChange(_extends({}, options, {
         jsonData: jsonData
       }));
     });
+
     _defineProperty(_assertThisInitialized(_this), "onSwitched", function (event) {
       var _this$props5 = _this.props,
-        onOptionsChange = _this$props5.onOptionsChange,
-        options = _this$props5.options;
+          onOptionsChange = _this$props5.onOptionsChange,
+          options = _this$props5.options;
+
       var jsonData = _extends({}, options.jsonData, {
         logging: event.target.checked
       });
+
       onOptionsChange(_extends({}, options, {
         jsonData: jsonData
       }));
     });
+
     _defineProperty(_assertThisInitialized(_this), "onBasicPwdChange", function (event) {
       var _this$props6 = _this.props,
-        onOptionsChange = _this$props6.onOptionsChange,
-        options = _this$props6.options;
+          onOptionsChange = _this$props6.onOptionsChange,
+          options = _this$props6.options;
+
       var jsonData = _extends({}, options.jsonData, {
         basicPassword: event.target.value
       });
+
       onOptionsChange(_extends({}, options, {
         jsonData: jsonData
       }));
     });
+
     _defineProperty(_assertThisInitialized(_this), "onAuthEnable", function (event) {
       var _this$props7 = _this.props,
-        onOptionsChange = _this$props7.onOptionsChange,
-        options = _this$props7.options;
+          onOptionsChange = _this$props7.onOptionsChange,
+          options = _this$props7.options;
+
       var jsonData = _extends({}, options.jsonData, {
         authToken: event.target.checked
       });
+
       onOptionsChange(_extends({}, options, {
         jsonData: jsonData
       }));
     });
+
     return _this;
   }
+
   _createClass(ConfigEditor, [{
     key: "render",
     value: function render() {
       console.log(this.props.options.jsonData);
       var _this$props8 = this.props,
-        options = _this$props8.options,
-        onOptionsChange = _this$props8.onOptionsChange;
+          options = _this$props8.options,
+          onOptionsChange = _this$props8.onOptionsChange;
       var jsonData = options.jsonData,
-        secureJsonFields = options.secureJsonFields;
+          secureJsonFields = options.secureJsonFields;
       var secureJsonData = options.secureJsonData || {};
       options.jsonData.serviceUrl = options.jsonData.serviceUrl === undefined ? logapi : options.jsonData.serviceUrl;
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
@@ -275,6 +316,7 @@ var ConfigEditor = /*#__PURE__*/function (_PureComponent) {
       })));
     }
   }]);
+
   return ConfigEditor;
 }(react__WEBPACK_IMPORTED_MODULE_0__.PureComponent);
 
@@ -299,46 +341,77 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(rxjs__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var Utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! Utils */ "./Utils.ts");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
-function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
+
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return generator._invoke = function (innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; }(innerFn, self, context), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; this._invoke = function (method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); }; } function maybeInvokeDelegate(delegate, context) { var method = delegate.iterator[context.method]; if (undefined === method) { if (context.delegate = null, "throw" === context.method) { if (delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method)) return ContinueSentinel; context.method = "throw", context.arg = new TypeError("The iterator does not provide a 'throw' method"); } return ContinueSentinel; } var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) { if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; } return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, define(Gp, "constructor", GeneratorFunctionPrototype), define(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (object) { var keys = []; for (var key in object) { keys.push(key); } return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) { "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); } }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
+
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
 function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
 
 var DataSource = /*#__PURE__*/function (_DataSourceApi) {
   _inherits(DataSource, _DataSourceApi);
+
   var _super = _createSuper(DataSource);
+
   function DataSource(instanceSettings, templateSrv, dashboardSrv, timeSrv) {
     var _this;
+
     _classCallCheck(this, DataSource);
+
     _this = _super.call(this, instanceSettings);
+
     _defineProperty(_assertThisInitialized(_this), "type", void 0);
+
     _defineProperty(_assertThisInitialized(_this), "url", void 0);
+
     _defineProperty(_assertThisInitialized(_this), "name", void 0);
+
     _defineProperty(_assertThisInitialized(_this), "serviceUrl", void 0);
+
     _defineProperty(_assertThisInitialized(_this), "datasourceId", void 0);
+
     _defineProperty(_assertThisInitialized(_this), "datasourceType", void 0);
+
     _defineProperty(_assertThisInitialized(_this), "datasourceName", void 0);
+
     _defineProperty(_assertThisInitialized(_this), "logging", void 0);
+
     _defineProperty(_assertThisInitialized(_this), "tokenEnabled", void 0);
+
     _this.templateSrv = templateSrv;
     _this.dashboardSrv = dashboardSrv;
     _this.timeSrv = timeSrv;
@@ -351,8 +424,9 @@ var DataSource = /*#__PURE__*/function (_DataSourceApi) {
     _this.tokenEnabled = instanceSettings.jsonData.authToken;
     return _this;
   }
-
   /**provides ability to test connection from connection settings page . */
+
+
   _createClass(DataSource, [{
     key: "testDatasource",
     value: function testDatasource() {
@@ -368,15 +442,18 @@ var DataSource = /*#__PURE__*/function (_DataSourceApi) {
       };
       var testQuery = JSON.stringify(queryJson);
       var routePath = this.url;
+
       if (this.tokenEnabled) {
         routePath = this.url + "/platformservice";
       }
+
       return (0,_grafana_runtime__WEBPACK_IMPORTED_MODULE_1__.getBackendSrv)().datasourceRequest({
         url: routePath,
         method: 'POST',
         data: testQuery
       }).then(function (res) {
         var data = res.data;
+
         if (res.status === 200) {
           if (data && data.results.length > 0) {
             return {
@@ -398,6 +475,7 @@ var DataSource = /*#__PURE__*/function (_DataSourceApi) {
         }
       })["catch"](function (err) {
         console.log(err);
+
         if (err.data && err.data.errors[0].message) {
           return {
             status: 'error',
@@ -415,6 +493,7 @@ var DataSource = /*#__PURE__*/function (_DataSourceApi) {
     key: "query",
     value: function query(options) {
       var _this2 = this;
+
       var queries = [];
       var streams = [];
       var range = options.range;
@@ -432,17 +511,20 @@ var DataSource = /*#__PURE__*/function (_DataSourceApi) {
       logInfo['datasourceId'] = this.datasourceId;
       logInfo['datasourceType'] = this.type;
       logInfo['datasourceName'] = this.name;
-      logInfo['timestamp'] = new Date().toISOString();
-      // Start streams and prepare queries
+      logInfo['timestamp'] = new Date().toISOString(); // Start streams and prepare queries
+
       var _iterator = _createForOfIteratorHelper(options.targets),
-        _step;
+          _step;
+
       try {
         for (_iterator.s(); !(_step = _iterator.n()).done;) {
           var target = _step.value;
+
           if (target.hide) {
             continue;
-          }
-          //let query = target.queryText;
+          } //let query = target.queryText;
+
+
           var query = this.templateSrv.replace(target.queryText, options.scopedVars, Utils__WEBPACK_IMPORTED_MODULE_3__.applyTemplateVariables);
           query = (0,Utils__WEBPACK_IMPORTED_MODULE_3__.addTimestampToQuery)(query, options);
           var resultDataContents = [];
@@ -471,14 +553,18 @@ var DataSource = /*#__PURE__*/function (_DataSourceApi) {
       } finally {
         _iterator.f();
       }
+
       console.log(this.url);
       logInfo['query'] = cypherQuery;
       var startTime = Date.now();
+
       if (queries.length) {
         var routePath = this.url;
+
         if (this.tokenEnabled) {
           routePath = this.url + "/platformservice";
         }
+
         var req = (0,_grafana_runtime__WEBPACK_IMPORTED_MODULE_1__.getBackendSrv)().datasourceRequest({
           method: 'POST',
           url: routePath,
@@ -488,6 +574,7 @@ var DataSource = /*#__PURE__*/function (_DataSourceApi) {
           logInfo['time_ms'] = endTime - startTime;
           logInfo['panelQuery'] = true;
           logInfo['requestId'] = options.requestId;
+
           if (_this2.logging) {
             try {
               var user = _grafana_runtime__WEBPACK_IMPORTED_MODULE_1__.config.bootData.user;
@@ -500,17 +587,20 @@ var DataSource = /*#__PURE__*/function (_DataSourceApi) {
               logInfo['uid'] = dashboard.uid;
               logInfo['dashboardName'] = dashboard.title;
               logInfo['panelCount'] = dashboard.panels.length;
+              logInfo['errors'] = res.data.errors;
               dashboard.panels.forEach(function (panel) {
                 if (panel.id === options.panelId) {
                   logInfo['panelName'] = panel.title;
                   logInfo['chartType'] = panel.type;
                 }
               });
+
               _this2.logDashboardInfo(logInfo);
             } catch (e) {
               console.log(e);
             }
           }
+
           if (queries[0].table) {
             return (0,Utils__WEBPACK_IMPORTED_MODULE_3__.convertResponseToDataFramesTable)(queries, res);
           } else if (queries[0].graph) {
@@ -529,6 +619,7 @@ var DataSource = /*#__PURE__*/function (_DataSourceApi) {
         });
         streams.push((0,rxjs__WEBPACK_IMPORTED_MODULE_2__.from)(req));
       }
+
       return rxjs__WEBPACK_IMPORTED_MODULE_2__.merge.apply(void 0, streams);
     }
   }, {
@@ -546,16 +637,19 @@ var DataSource = /*#__PURE__*/function (_DataSourceApi) {
     key: "metricFindQuery",
     value: function metricFindQuery(query, options) {
       var _this3 = this;
+
       var cypherQuery = {};
       var statements = [];
       cypherQuery['statements'] = statements;
+
       if (this.timeSrv && this.timeSrv.timeRange()) {
         var _options = {
           range: this.timeSrv.timeRange()
         };
         query = (0,Utils__WEBPACK_IMPORTED_MODULE_3__.addTimestampToQuery)(query, _options);
-      }
-      //query = addTimestampToQuery(query, null);
+      } //query = addTimestampToQuery(query, null);
+
+
       query = this.templateSrv.replace(query, {}, Utils__WEBPACK_IMPORTED_MODULE_3__.applyTemplateVariables);
       var resultDataContents = ["row"];
       var statement = {
@@ -572,16 +666,21 @@ var DataSource = /*#__PURE__*/function (_DataSourceApi) {
         }).then(function (res) {
           if (res.status === 200 && res.data.errors.length === 0) {
             var result = res.data.results[0];
+
             if (result) {
               var data = result.data;
+
               if (data) {
                 var metrics = [];
+
                 var _iterator2 = _createForOfIteratorHelper(data),
-                  _step2;
+                    _step2;
+
                 try {
                   for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
                     var row = _step2.value;
                     var record = row.row;
+
                     if (record && record.length > 0) {
                       metrics.push({
                         text: record[0],
@@ -594,6 +693,7 @@ var DataSource = /*#__PURE__*/function (_DataSourceApi) {
                 } finally {
                   _iterator2.f();
                 }
+
                 return resolve(metrics);
               }
             }
@@ -602,6 +702,7 @@ var DataSource = /*#__PURE__*/function (_DataSourceApi) {
           }
         })["catch"](function (err) {
           console.log(err);
+
           if (err.data && err.data.message) {
             return {
               status: 'error',
@@ -616,37 +717,43 @@ var DataSource = /*#__PURE__*/function (_DataSourceApi) {
         });
       });
     }
-
     /**
      * 
      *  all Below methods need improvisation.
      */
+
   }, {
     key: "annotationQuery",
     value: function () {
       var _annotationQuery = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(options) {
         var events, date, event;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
-          while (1) switch (_context.prev = _context.next) {
-            case 0:
-              events = []; //const expression = options.annotation.queryText;
-              date = new Date();
-              event = {
-                time: date.valueOf(),
-                text: 'foo',
-                tags: ['bar', 'foo']
-              };
-              events.push(event);
-              return _context.abrupt("return", events);
-            case 5:
-            case "end":
-              return _context.stop();
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                events = []; //const expression = options.annotation.queryText;
+
+                date = new Date();
+                event = {
+                  time: date.valueOf(),
+                  text: 'foo',
+                  tags: ['bar', 'foo']
+                };
+                events.push(event);
+                return _context.abrupt("return", events);
+
+              case 5:
+              case "end":
+                return _context.stop();
+            }
           }
         }, _callee);
       }));
+
       function annotationQuery(_x) {
         return _annotationQuery.apply(this, arguments);
       }
+
       return annotationQuery;
     }()
     /* annotationQuery(options) {
@@ -673,7 +780,9 @@ var DataSource = /*#__PURE__*/function (_DataSourceApi) {
            return result.data;
          });
     }*/
+
   }]);
+
   return DataSource;
 }(_grafana_data__WEBPACK_IMPORTED_MODULE_0__.DataSourceApi);
 
@@ -697,22 +806,34 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./types */ "./types.ts");
 /* harmony import */ var _grafana_ui__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @grafana/ui */ "@grafana/ui");
 /* harmony import */ var _grafana_ui__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_grafana_ui__WEBPACK_IMPORTED_MODULE_3__);
-var _div, _div2, _label, _label2, _label3, _div3;
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
+var _div, _div2, _label, _label2, _label3, _div3;
+
 function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -746,14 +867,20 @@ var varianeTime = [{
 }];
 var QueryEditor = /*#__PURE__*/function (_PureComponent) {
   _inherits(QueryEditor, _PureComponent);
+
   var _super = _createSuper(QueryEditor);
+
   function QueryEditor() {
     var _this;
+
     _classCallCheck(this, QueryEditor);
+
     for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
       args[_key] = arguments[_key];
     }
+
     _this = _super.call.apply(_super, [this].concat(args));
+
     _defineProperty(_assertThisInitialized(_this), "state", {
       graph: false,
       timeseries: false,
@@ -766,32 +893,37 @@ var QueryEditor = /*#__PURE__*/function (_PureComponent) {
       cacheType: '',
       cacheValue: ''
     });
+
     _defineProperty(_assertThisInitialized(_this), "onQueryTextChange", function (event) {
       var _this$props = _this.props,
-        onChange = _this$props.onChange,
-        query = _this$props.query,
-        onRunQuery = _this$props.onRunQuery;
+          onChange = _this$props.onChange,
+          query = _this$props.query,
+          onRunQuery = _this$props.onRunQuery;
       onChange(_extends({}, query, {
         queryText: event.target.value
       }));
       onRunQuery();
     });
+
     _defineProperty(_assertThisInitialized(_this), "onConstantChange", function (event) {
       var _this$props2 = _this.props,
-        onChange = _this$props2.onChange,
-        query = _this$props2.query,
-        onRunQuery = _this$props2.onRunQuery;
+          onChange = _this$props2.onChange,
+          query = _this$props2.query,
+          onRunQuery = _this$props2.onRunQuery;
       onChange(_extends({}, query, {
         constant: parseFloat(event.target.value)
       }));
       onRunQuery(); // executes the query
     });
+
     _defineProperty(_assertThisInitialized(_this), "onCacheChanged", function (_ref) {
       var value = _ref.value;
+
       if (value === 'Fixed Time' && _this.props.query["cache"]) {
         _this.props.query["fixTime"] = true;
         _this.props.query["varTime"] = false;
         _this.props.query["cacheType"] = 'Fixed Time';
+
         _this.setState({
           fixTime: true,
           varTime: false,
@@ -801,6 +933,7 @@ var QueryEditor = /*#__PURE__*/function (_PureComponent) {
         _this.props.query["varTime"] = true;
         _this.props.query["fixTime"] = false;
         _this.props.query["cacheType"] = 'Variance Time';
+
         _this.setState({
           varTime: true,
           fixTime: false,
@@ -808,8 +941,10 @@ var QueryEditor = /*#__PURE__*/function (_PureComponent) {
         });
       }
     });
+
     return _this;
   }
+
   _createClass(QueryEditor, [{
     key: "componentDidMount",
     value: function componentDidMount() {
@@ -819,9 +954,11 @@ var QueryEditor = /*#__PURE__*/function (_PureComponent) {
     key: "onChanged",
     value: function onChanged(type, e) {
       var _this2 = this;
+
       //const { query } = this.props;
       //throw new Error("Method not implemented.");
       var obj = {};
+
       if (type === 'cache') {
         obj['cache'] = !this.props.query[type];
         this.props.query['cache'] = !this.props.query[type];
@@ -830,8 +967,7 @@ var QueryEditor = /*#__PURE__*/function (_PureComponent) {
           if (c === type) {
             obj[type] = !_this2.props.query[type];
             _this2.props.query[type] = !_this2.props.query[type];
-          } else if (c === 'constant' || c === 'queryText' || c === 'cypherQuery' || c === 'refId') {
-            // do nothing
+          } else if (c === 'constant' || c === 'queryText' || c === 'cypherQuery' || c === 'refId') {// do nothing
           } else {
             if (c !== 'cache') {
               obj[c] = false;
@@ -840,6 +976,7 @@ var QueryEditor = /*#__PURE__*/function (_PureComponent) {
           }
         });
       }
+
       this.setState(obj);
     }
   }, {
@@ -863,6 +1000,7 @@ var QueryEditor = /*#__PURE__*/function (_PureComponent) {
     key: "render",
     value: function render() {
       var _this3 = this;
+
       var query = lodash_defaults__WEBPACK_IMPORTED_MODULE_0___default()(this.props.query, _types__WEBPACK_IMPORTED_MODULE_2__.defaultQuery);
       var queryText = query.queryText;
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement((react__WEBPACK_IMPORTED_MODULE_1___default().Fragment), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
@@ -953,6 +1091,7 @@ var QueryEditor = /*#__PURE__*/function (_PureComponent) {
       }, "Please note that when Fixed Time is selected, the time selector would be disabled for selected fixed time interval.")))));
     }
   }]);
+
   return QueryEditor;
 }(react__WEBPACK_IMPORTED_MODULE_1__.PureComponent);
 
@@ -973,27 +1112,41 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _CheatSheet__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CheatSheet */ "./CheatSheet.tsx");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
-function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+
 
 
 var QueryEditorHelp = /*#__PURE__*/function (_PureComponent) {
   _inherits(QueryEditorHelp, _PureComponent);
+
   var _super = _createSuper(QueryEditorHelp);
+
   function QueryEditorHelp() {
     _classCallCheck(this, QueryEditorHelp);
+
     return _super.apply(this, arguments);
   }
+
   _createClass(QueryEditorHelp, [{
     key: "render",
     value: function render() {
@@ -1002,8 +1155,10 @@ var QueryEditorHelp = /*#__PURE__*/function (_PureComponent) {
       });
     }
   }]);
+
   return QueryEditorHelp;
 }(react__WEBPACK_IMPORTED_MODULE_0__.PureComponent);
+
 
 ;
 
@@ -1033,6 +1188,7 @@ var convertResponseToDataFramesTable = function convertResponseToDataFramesTable
   var dataArray1 = [];
   var columnArray1 = [];
   var rows1;
+
   if (res.data) {
     for (var index = 0; index < res.data.results.length; index++) {
       dataArray1 = res.data.results[index].data;
@@ -1052,14 +1208,14 @@ var convertResponseToDataFramesTable = function convertResponseToDataFramesTable
         target: queries[index]
       });
     }
-  }
-
-  //console.log('datahere ----',data);
+  } //console.log('datahere ----',data);
 
   /*let dataArray = res.data.results[0].data;
   let columnArray = res.data.results[0].columns.map(x => { return { text: x } });
   const rows = dataArray.map(c => c.row);
   data.push({ columns: columnArray, rows: rows, refId: 'A', name: undefined,target: queries });*/
+
+
   return {
     data: data,
     error: error
@@ -1072,9 +1228,11 @@ var convertResponseToDataFramesGraph = function convertResponseToDataFramesGraph
   var multiSeriesResponse = false;
   var response = [];
   var timestamp = new Date().getTime() * 1000;
+
   if (res.options && res.options.range && res.options.range.to) {
     timestamp = res.options.range.to.valueOf();
   }
+
   var targetResponse = {
     target: queries[0].refId,
     datapoints: datapoints
@@ -1082,13 +1240,16 @@ var convertResponseToDataFramesGraph = function convertResponseToDataFramesGraph
   var targetDatapointsMap = {};
   var dataArray = res.data.results[0].data;
   var columns = res.data.results[0].columns;
+
   for (var r in dataArray) {
     var row = dataArray[r].row;
+
     if (columns.length === 1) {
       datapoints.push([row[0], timestamp]);
     } else if (columns.length === 3) {
       var targetName = row[2];
       var targetDataPoints = targetDatapointsMap[targetName];
+
       if (targetDataPoints === undefined) {
         targetDataPoints = [];
         targetDatapointsMap[targetName] = targetDataPoints;
@@ -1098,16 +1259,19 @@ var convertResponseToDataFramesGraph = function convertResponseToDataFramesGraph
         });
         multiSeriesResponse = true;
       }
+
       targetDataPoints.push([row[1], row[0] * 1000]);
     } else {
       //Assuming the first column will be the time and second column will be the data.
       datapoints.push([row[1], row[0] * 1000]);
     }
   }
+
   if (!multiSeriesResponse) {
     response.push(targetResponse);
     data.push(response[0]);
   }
+
   return {
     data: data,
     error: error
@@ -1133,13 +1297,16 @@ var convertResponseToDataFramesTimeSeries = function convertResponseToDataFrames
   var error = undefined;
   var datapoints = [];
   var results = res.data.results;
+
   for (var i in results) {
     var targetDatapointsMap = {};
     var response = [];
     var result = results[i];
     var rows = result.data;
+
     for (var r in rows) {
       var row = rows[r].row;
+
       if (result.columns.length === 1) {
         datapoints.push([row[0], timestamp]);
         data.push({
@@ -1151,6 +1318,7 @@ var convertResponseToDataFramesTimeSeries = function convertResponseToDataFrames
       } else if (result.columns.length === 3) {
         var targetName = row[2];
         var targetDataPoints = targetDatapointsMap[targetName];
+
         if (targetDataPoints === undefined) {
           targetDataPoints = [];
           targetDatapointsMap[targetName] = targetDataPoints;
@@ -1159,6 +1327,7 @@ var convertResponseToDataFramesTimeSeries = function convertResponseToDataFrames
             datapoints: targetDataPoints
           });
         }
+
         targetDataPoints.push([row[1], row[0] * 1000]);
         data.push({
           target: results[i].refId,
@@ -1178,6 +1347,7 @@ var convertResponseToDataFramesTimeSeries = function convertResponseToDataFrames
       }
     }
   }
+
   return {
     data: data,
     error: error
@@ -1210,28 +1380,35 @@ function checkCypherQueryModificationKeyword(cypherQuery) {
   keywords = ["create", "delete", "set", "update", "merge", "detach"];
   var flag = 0;
   var queryCorrect = true;
+
   if (cypherQuery.statements[0].statement === undefined) {
     return queryCorrect;
   }
+
   var j;
+
   for (j in keywords) {
     var query = cypherQuery.statements[0].statement.toString().toLowerCase();
+
     if (query.indexOf(" " + keywords[j] + " ") >= 0) {
       console.log(keywords[j] + " is present as an individual word.");
       flag = 1;
       break;
     }
+
     if (query.indexOf("\n" + keywords[j]) >= 0 && query.indexOf("\n" + keywords[j] + " ") >= 0) {
       console.log(keywords[j] + " is present after new line.");
       flag = 1;
       break;
     }
+
     if (query.indexOf(keywords[j] + ")") >= 0 || query.indexOf(keywords[j] + "(") >= 0 || query.indexOf(")" + keywords[j]) >= 0 || query.indexOf("(" + keywords[j]) >= 0 || query.indexOf(" " + keywords[j] + "\n") >= 0 || query.indexOf("\n" + keywords[j] + "\n") >= 0) {
       console.log(keywords[j] + " is present.");
       flag = 1;
       break;
     }
   }
+
   if (flag === 0) {
     return queryCorrect;
   } else {
@@ -1242,22 +1419,28 @@ function checkCypherQueryModificationKeyword(cypherQuery) {
 function addTimestampToQuery(query, options) {
   if (query && options) {
     var range = options.range;
+
     if (range === undefined) {
       return query;
     }
+
     if (range.from) {
       var fromTime = range.from.valueOf() / 1000;
+
       if (query.indexOf('?START_TIME?') > -1) {
         query = query.replace(/\?START_TIME\?/g, fromTime.toString());
       }
     }
+
     if (range.to) {
       var toTime = range.to.valueOf() / 1000;
+
       if (query.indexOf('?END_TIME?') > -1) {
         query = query.replace(/\?END_TIME\?/g, toTime.toString());
       }
     }
   }
+
   return query;
 }
 function applyTemplateVariables(value, variable, formatValue) {
@@ -1266,6 +1449,7 @@ function applyTemplateVariables(value, variable, formatValue) {
     values.push(value);
     value = values;
   }
+
   return JSON.stringify(value);
 }
 
@@ -1298,13 +1482,8 @@ var defaultQuery = {
   cacheType: undefined,
   cacheValue: undefined
 };
-
 /**
  * These are options configured for each DataSource instance
- */
-
-/**
- * Value that is used in the backend, but never sent over HTTP to the frontend
  */
 
 /** changes*/
@@ -3147,14 +3326,13 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+ //import { AnnotationsQueryCtrl } from './AnnotationsQueryCtrl';
 
-//import { AnnotationsQueryCtrl } from './AnnotationsQueryCtrl';
-
-//import ExploreQueryEditor from './ExploreQueryEditor';
+ //import ExploreQueryEditor from './ExploreQueryEditor';
 //import ExploreStartPage from './ExploreStartPage';
 
-var plugin = new _grafana_data__WEBPACK_IMPORTED_MODULE_0__.DataSourcePlugin(_DataSource__WEBPACK_IMPORTED_MODULE_1__.DataSource).setConfigEditor(_ConfigEditor__WEBPACK_IMPORTED_MODULE_2__.ConfigEditor).setQueryEditor(_QueryEditor__WEBPACK_IMPORTED_MODULE_3__.QueryEditor).setAnnotationQueryCtrl(_AnnotationQueryEditor__WEBPACK_IMPORTED_MODULE_4__.AnnotationQueryEditor)
-//.setExploreQueryField(ExploreQueryEditor)
+
+var plugin = new _grafana_data__WEBPACK_IMPORTED_MODULE_0__.DataSourcePlugin(_DataSource__WEBPACK_IMPORTED_MODULE_1__.DataSource).setConfigEditor(_ConfigEditor__WEBPACK_IMPORTED_MODULE_2__.ConfigEditor).setQueryEditor(_QueryEditor__WEBPACK_IMPORTED_MODULE_3__.QueryEditor).setAnnotationQueryCtrl(_AnnotationQueryEditor__WEBPACK_IMPORTED_MODULE_4__.AnnotationQueryEditor) //.setExploreQueryField(ExploreQueryEditor)
 .setQueryEditorHelp(_QueryEditorHelp__WEBPACK_IMPORTED_MODULE_5__["default"]);
 })();
 

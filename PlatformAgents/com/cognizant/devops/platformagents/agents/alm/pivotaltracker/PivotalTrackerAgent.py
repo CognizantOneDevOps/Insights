@@ -51,7 +51,7 @@ class PivotalTrackerAgent(BaseAgent):
         for project in self.all_projects:
             projectId = str(project.get('projectId'))
             memberships = self.getResponse(self.baseEndPoint +  "/services/v5/projects/"+ projectId +"/memberships",
-                                     'GET', self.userid, self.password, None, reqHeaders=self.reqHeaders)
+                                     'GET', self.userid, self.cred, None, reqHeaders=self.reqHeaders)
             for member in memberships:
                 injectData = {}
                 injectData['projectId'] = projectId
@@ -72,7 +72,7 @@ class PivotalTrackerAgent(BaseAgent):
             while activityCollection:
                 activities = self.getResponse(self.baseEndPoint +  "/services/v5/projects/"+ projectId + "/activity"
                                               +"?occurred_after=" + startFrom + "&limit=200&offset=" + str(offset),
-                                     'GET', self.userid, self.password, None, reqHeaders=self.reqHeaders)
+                                     'GET', self.userid, self.cred, None, reqHeaders=self.reqHeaders)
                 offset = offset + 200
                 if len(activities) > 0:
                     latest_update_time = int(time.mktime(time.strptime(activities[0]['occurred_at'], self.timeStampFormat)))
@@ -127,7 +127,7 @@ class PivotalTrackerAgent(BaseAgent):
         for project in self.all_projects:
             projectId = str(project.get('projectId'))
             epics = self.getResponse(self.baseEndPoint +  "/services/v5/projects/"+ projectId + "/epics" ,
-                                     'GET', self.userid, self.password, None, reqHeaders=self.reqHeaders)
+                                     'GET', self.userid, self.cred, None, reqHeaders=self.reqHeaders)
             epic_list = []
             for epic in epics:
                 epic_list.append(epic.get('label', {}).get('name', ''))
@@ -144,7 +144,7 @@ class PivotalTrackerAgent(BaseAgent):
             while dataCollection:
                 storyDetails = self.getResponse(self.baseEndPoint + "/services/v5/projects/"+ projectId +
                                 "/stories?updated_after=" + startFrom + "&limit=200&offset=" + str(offset)
-                                                 ,'GET', self.userid, self.password, None, reqHeaders=self.reqHeaders)
+                                                 ,'GET', self.userid, self.cred, None, reqHeaders=self.reqHeaders)
                 
                 offset = offset + 200
                 self.storyPublishData = []
@@ -174,7 +174,7 @@ class PivotalTrackerAgent(BaseAgent):
             projectId = str(project.get('projectId'))
             backlogData = self.getResponse(self.baseEndPoint + "/services/v5/projects/" + projectId +
                                            '/iterations?scope=backlog',
-                                            'GET', self.userid, self.password, None, reqHeaders=self.reqHeaders)
+                                            'GET', self.userid, self.cred, None, reqHeaders=self.reqHeaders)
             if len(backlogData) > 0 and len(backlogData[0]['stories']) > 0:
                 stories = []
                 for story in backlogData[0]['stories']:
@@ -189,7 +189,7 @@ class PivotalTrackerAgent(BaseAgent):
                                 '&fields=number%2C' \
                                 'project_id%2Clength%2Cteam_strength%2Cstories%2C' \
                                 'start%2Cfinish%2Ckind%2Cvelocity%2Canalytics',
-                                     'GET', self.userid, self.password, None, reqHeaders=self.reqHeaders)
+                                     'GET', self.userid, self.cred, None, reqHeaders=self.reqHeaders)
                
                 lastIteration = lastIteration + 20
                 for iteration in iterations:
@@ -219,7 +219,7 @@ class PivotalTrackerAgent(BaseAgent):
         trackingData = {}
        
         allWorkspaces = self.getResponse(self.baseEndPoint + "/services/v5/my/workspaces" ,
-                                            'GET', self.userid, self.password, None, reqHeaders=self.reqHeaders)
+                                            'GET', self.userid, self.cred, None, reqHeaders=self.reqHeaders)
         for workspace in allWorkspaces:
             for project_id in workspace.get('project_ids', []):
                 tempDict = {}
@@ -229,7 +229,7 @@ class PivotalTrackerAgent(BaseAgent):
                 if project_id:
                     trackingData[project_id] = {}
         all_projects = self.getResponse(self.baseEndPoint + "/services/v5/projects" ,
-                                            'GET', self.userid, self.password, None, reqHeaders=self.reqHeaders)
+                                            'GET', self.userid, self.cred, None, reqHeaders=self.reqHeaders)
        
         for project in all_projects:
             tempDict = {}
@@ -247,7 +247,7 @@ class PivotalTrackerAgent(BaseAgent):
 
     def setUpVariables(self):
         self.userid = self.config.get('userid', '')
-        self.password = self.config.get('passwd', '')
+        self.cred = self.config.get('passwd', '')
         accessToken = self.config.get('token')
         self.baseEndPoint = self.config.get('baseEndPoint', '')
         self.reqHeaders = {'x-trackertoken': accessToken}
@@ -266,14 +266,14 @@ class PivotalTrackerAgent(BaseAgent):
         self.activityMetadata = self.config.get('dynamicTemplate', {}).get('activityResponseTemplate', {}).get('ActivityMetadata', None)
     def login(self):
         userid = self.getCredential("userid")
-        password = self.getCredential("passwd")
+        cred = self.getCredential("passwd")
         accessToken = self.getCredential("accesstoken")
         baseEndPoint = self.config.get('baseEndPoint', '')
         reqHeaders = {'x-trackertoken': accessToken}
         trackingDetails = self.tracking
 
         loginResponse = self.getResponse(baseEndPoint + "/services/v5/me" ,
-                                         'GET', userid, password, None, reqHeaders=reqHeaders)
+                                         'GET', userid, cred, None, reqHeaders=reqHeaders)
         if loginResponse:
             currentState = str(time.time()) + " - Logged in successfully"
         else:

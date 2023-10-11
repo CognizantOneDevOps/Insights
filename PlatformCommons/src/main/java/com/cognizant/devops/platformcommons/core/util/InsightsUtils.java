@@ -32,6 +32,7 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.enums.JobSchedule;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -247,6 +248,49 @@ public class InsightsUtils {
 		}
 		return time;
 	}
+	
+	public static Long getEpochTimeInSecBasedOnSchedule(String schedule, long timeValue) {
+		long time = 0;
+		Long currentNextTime = InsightsUtils.getCurrentTimeInSeconds();
+
+		if (JobSchedule.HOURLY.name().equalsIgnoreCase(schedule)) {
+			ZonedDateTime currentTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(currentNextTime), zoneIdUTC);
+			ZonedDateTime nextRunTime = currentTime.minusHours(timeValue);
+			time = nextRunTime.toInstant().getEpochSecond();
+		}
+		else if (JobSchedule.DAILY.name().equalsIgnoreCase(schedule)) {
+			ZonedDateTime currentTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(currentNextTime), zoneIdUTC);
+			ZonedDateTime nextRunTime = currentTime.minusDays(timeValue);
+			time = nextRunTime.toInstant().getEpochSecond();
+		}
+		else if (JobSchedule.MONTHLY.name().equalsIgnoreCase(schedule)) {
+			ZonedDateTime currentTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(currentNextTime), zoneIdUTC);
+			ZonedDateTime nextRunTime = currentTime.minusMonths(timeValue);
+			time = nextRunTime.toInstant().getEpochSecond();
+		}
+		else if (JobSchedule.YEARLY.name().equalsIgnoreCase(schedule)) {
+			ZonedDateTime currentTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(currentNextTime), zoneIdUTC);
+			ZonedDateTime nextRunTime = currentTime.minusYears(timeValue);
+			time = nextRunTime.toInstant().getEpochSecond();
+		}
+		return time;
+	}
+	
+	public static Long getAlertNextRunTime(long currentNextTime, String schedule) {
+		long currentTime = ZonedDateTime.now(zoneIdUTC).toInstant().getEpochSecond();
+		int scheduleSeconds = Integer.parseInt(JobSchedule.valueOf(schedule).toString());
+		int count = (int) Math.ceil((currentTime - currentNextTime) / scheduleSeconds == 0 ? 1 : scheduleSeconds);
+		log.debug("currentTime: {}, scheduleSeconds: {}, count: {}", currentTime, scheduleSeconds, count);
+		for (int i = 0; i <= count; i++) {
+			if (currentTime > currentNextTime) {
+				currentNextTime = getNextRunTime(currentNextTime, schedule, false);
+			} else {
+				break;
+			}
+		}
+		log.debug("currentNextTime: {}", currentNextTime);
+		return currentNextTime;
+	}
 
 	public static Long getNextRunTime(long currentNextTime, String schedule, boolean isInitialNextRunTime) {
 		long time = 0;
@@ -255,7 +299,22 @@ public class InsightsUtils {
 			long todayStartOfTheDay = getStartDay(currentNextTime, schedule);
 			currentNextTime = todayStartOfTheDay;
 		}
-		if (JobSchedule.DAILY.name().equalsIgnoreCase(schedule)) {
+		if (JobSchedule.HOURLY.name().equalsIgnoreCase(schedule)) {
+			ZonedDateTime currentTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(currentNextTime), zoneIdUTC);
+			ZonedDateTime nextRunTime = currentTime.plusHours(1);
+			time = nextRunTime.toInstant().getEpochSecond();
+		} 
+		else if (JobSchedule.EVERY_6_HOUR.name().equalsIgnoreCase(schedule)) {
+			ZonedDateTime currentTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(currentNextTime), zoneIdUTC);
+			ZonedDateTime nextRunTime = currentTime.plusHours(6);
+			time = nextRunTime.toInstant().getEpochSecond();
+		} 
+		else if (JobSchedule.EVERY_12_HOUR.name().equalsIgnoreCase(schedule)) {
+			ZonedDateTime currentTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(currentNextTime), zoneIdUTC);
+			ZonedDateTime nextRunTime = currentTime.plusHours(12);
+			time = nextRunTime.toInstant().getEpochSecond();
+		} 
+		else if (JobSchedule.DAILY.name().equalsIgnoreCase(schedule)) {
 			ZonedDateTime currentTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(currentNextTime), zoneIdUTC);
 			ZonedDateTime nextRunTime = currentTime.plusDays(1);
 			time = nextRunTime.toInstant().getEpochSecond();
@@ -340,9 +399,6 @@ public class InsightsUtils {
 		}
 		return time;
 	}
-
-	
-	
 
 	public static Long getTodayTime() {
 		ZonedDateTime now = ZonedDateTime.now(zoneIdUTC);
@@ -623,4 +679,5 @@ public class InsightsUtils {
 		LocalDateTime utcTime=ZonedDateTime.ofInstant(Instant.ofEpochSecond(date), zoneIdUTC).toLocalDateTime();
 		return utcTime.format(DateTimeFormatter.ofPattern(format));
 	}
+	
 }

@@ -1,0 +1,347 @@
+{
+    "JIRA": {
+        "uuid": "uuid",
+        "order": 4,
+        "displayText": "Issues",
+        "category": "ALM",
+        "issueKey": "key",
+        "sprintId": "sprintId",
+        "property": "categoryName",
+        "epicKey": "epicKey",
+        "epicName": "epicName",
+        "summary": "summary",
+        "issueType": "issueType",
+        "toolName": "toolName",
+        "creationDate": "creationDate",
+        "resolutionsdate": "resolutionsdate",
+        "issueStatus": "status",
+        "author": "reporterDisplayName",
+        "projectName": "projectName",
+        "timestamp": "inSightsTime",
+        "priority": "priority",
+        "inSightsTimeX": "inSightsTimeX",
+        "eventKey": "eventKey",
+        "sprints": "sprints",
+        "name": "sprintName",
+        "startDate": "sprintStartDate",
+        "endDate": "sprintEndDate",
+        "completeDate": "sprintCompleteDate",
+        "state": "state",
+        "versionId": "versionId",
+        "fixVersions": "fixVersions",
+        "releaseDate": "releaseDate",
+        "released": "released",
+        "versionName": "versionName",
+        "uptool": [
+            "EPIC",
+            "SPRINT",
+            "RELEASE"
+        ],
+        "downtool": [
+            "GITHUB2"
+        ],
+        "messages": [
+            {
+                "Message": "Total {0} in JIRA",
+                "Operation": "PROPERTY_COUNT",
+                "OperandName": "issueType",
+                "OperandValue": []
+            },
+            {
+                "Message": "Worked across {0} various Sprints",
+                "Operation": "DISTINCT_COUNT",
+                "OperandName": "sprintId",
+                "OperandValue": []
+            },
+            {
+                "Message": "Total {0} Release",
+                "Operation": "DISTINCT_COUNT",
+                "OperandName": "versionId",
+                "OperandValue": []
+            }
+        ],
+        "uifilter": [
+            "key",
+            "sprintId",
+            "versionId"
+        ],
+        "cardDisplayProps": [
+            "issueKey",
+            "author",
+            "issueStatus",
+            "priority"
+        ],
+        "excludeLabels": []
+    },
+    "GITHUB2": {
+        "uuid": "uuid",
+        "category": "SCM",
+        "order": 5,
+        "displayText": "Commits",
+        "inSightsTimeX": "inSightsTimeX",
+        "commitId": "commitId",
+        "property": "categoryName",
+        "toolName": "toolName",
+        "commitStatus": "status",
+        "author": "authorName",
+        "repositoryName": "repoName",
+        "timestamp": "inSightsTime",
+        "message": "message",
+        "gitCommiTime": "gitCommitTime",
+        "uptool": [
+            "JIRA"
+        ],
+        "downtool": [
+            "JENKINS"
+        ],
+        "messages": [
+            {
+                "Message": "Total {0} Developers ",
+                "Operation": "DISTINCT_COUNT",
+                "OperandName": "author",
+                "OperandValue": []
+            }
+        ],
+        "uifilter": [
+            "commitId"
+        ],
+        "cardDisplayProps": [
+            "commitId",
+            "message",
+            "author",
+            "inSightsTimeX"
+        ],
+        "excludeLabels": [
+            "FILE_CHANGE",
+            "GIT_BRANCH"
+        ]
+    },
+    "JENKINS": {
+        "uuid": "uuid",
+        "category": "CI",
+        "inSightsTimeX": "inSightsTimeX",
+        "order": 6,
+        "displayText": "Builds",
+        "buildNumber": "buildNumber",
+        "property": "categoryName",
+        "resourcekey": "resourcekey",
+        "toolName": "toolName",
+        "buildStatus": "result",
+        "projectName": "projectName",
+        "timestamp": "inSightsTime",
+        "environment": "environment",
+        "buildUrl": "buildUrl",
+        "scmcommitId": "scmcommitId",
+        "jobName": "jobName",
+        "uptool": [
+            "GITHUB2"
+        ],
+        "downtool": [
+            "SONAR",
+            "NEXUS",
+            "RUNDECK"
+        ],
+        "timelagParam": [
+            "startTime",
+            "endTime"
+        ],
+        "messages": [
+            {
+                "Message": "Build Information - {0} Passed, {1} Failed",
+                "Operation": "SUM",
+                "OperandName": "toolstatus",
+                "OperandValue": [
+                    "Success"
+                ]
+            }
+        ],
+        "uifilter": [
+            "buildNumber",
+            "scmcommitId"
+        ],
+        "cardDisplayProps": [
+            "buildNumber",
+            "buildUrl",
+            "jobName",
+            "buildStatus"
+        ]
+    },
+    "SONAR": {
+        "uuid": "uuid",
+        "category": "CODEQUALITY",
+        "inSightsTimeX": "inSightsTimeX",
+        "order": 7,
+        "displayText": "Code Quality Executions",
+        "analysisId": "analysisId",
+        "branchName": "branchName",
+        "property": "categoryName",
+        "toolName": "toolName",
+        "status": "status",
+        "executionStatus": "sonarQualityGateStatus",
+        "projectName": "projectName",
+        "resourceKey": "resourcekey",
+        "complexity": "complexity",
+        "coverage": "coverage",
+        "timestamp": "inSightsTime",
+        "totalNo.OfTests": "tests",
+        "testErrors": "test_errors",
+        "code_coverage": "code_coverage",
+        "sonarDuplicateCode": "sonarDuplicateCode",
+        "jenkinsBuildNumber": "jenkinsBuildNumber",
+        "metricDate": "metricdate",
+        "vulnerabilities": "vulnerabilities",
+        "uptool": [
+            "JENKINS"
+        ],
+        "downtool": [
+            "null"
+        ],
+        "uifilter": [
+            "analysisId",
+            "projectName"
+        ],
+        "timelagParam": [
+            "startTime",
+            "endTime"
+        ],
+        "cardDisplayProps": [
+            "analysisId",
+            "projectName",
+            "status"
+        ],
+        "messages": [
+            {
+                "Message": "Sonar Executions - {0} Success, {1} Failed",
+                "Operation": "SUM",
+                "OperandName": "toolstatus",
+                "OperandValue": [
+                    "OK"
+                ]
+            }
+        ]
+    },
+    "NEXUS":{
+        "uuid":"uuid",
+        "category":"ARTIFACTMANAGEMENT",
+        "inSightsTimeX":"inSightsTimeX",
+        "order":6,
+        "displayText":" Total Artifacts",
+        "repoName":"repoName",
+        "jenkinsBuildNumber":"jenkinsBuildNumber",
+        "property":"categoryName",
+        "toolName":"toolName",
+        "toolstatus":"status",
+        "timestamp":"inSightsTime",
+        "artifactName":"artifactName",
+        "uptool":[
+           "JENKINS"
+        ],
+        "downtool":[
+           "null"
+        ],
+        "startTime":"startTime",
+        "endTime":"endTime",
+        "timelagParam":[
+           "startTime",
+           "endTime"
+        ],
+        "uifilter":[
+           "jenkinsBuildNumber"
+        ],
+        "cardDisplayProps":[
+           "repoName",
+           "jenkinsBuildNumber",
+           "artifactName",
+           "toolstatus"
+        ],
+        "messages":[
+           {
+              "Message":"Nexus  - {0} Success, {1} Failed",
+              "Operation":"SUM",
+              "OperandName":"toolstatus",
+              "OperandValue":[
+                 "succeeded"
+              ]
+           }
+        ]
+     },
+     "RUNDECK":{
+        "uuid":"uuid",
+        "category":"DEPLOYMENT",
+        "inSightsTimeX":"inSightsTimeX",
+        "order":7,
+        "displayText":"Total Deployment",
+        "executionId":"run_ExecutionId",
+        "jenkinsBuildNumber":"jenkinsBuildNumber",
+        "property":"categoryName",
+        "projectName":"run_ProjectName",
+        "phase":"Deployment",
+        "toolName":"toolName",
+        "toolstatus":"status",
+        "author":"run_User",
+        "timestamp":"inSightsTime",
+        "environment":"environment",
+        "uptool":[
+           "JENKINS"
+        ],
+        "downtool":[
+           "null"
+        ],
+        "startTime":"startTime",
+        "endTime":"endTime",
+        "timelagParam":[
+           "startTime",
+           "endTime"
+        ],
+        "messages":[
+           {
+              "Message":"Deployment - {0} Successful Deployments,  {1} Failed Deployments",
+              "Operation":"SUM",
+              "OperandName":"toolstatus",
+              "OperandValue":[
+                 "succeeded"
+              ]
+           }
+        ],
+        "uifilter":[
+           "jenkinsBuildNumber"
+        ],
+        "cardDisplayProps":[
+           "environment",
+           "jenkinsBuildNumber",
+           "toolstatus"
+        ]
+     },
+     "QTEST":{
+        "uuid":"uuid",
+        "category":"ALM",
+        "inSightsTimeX":"inSightsTimeX",
+        "order":8,
+        "displayText":"Test Executions",
+        "module":"module",
+        "requirement_id":"requirement_id",
+        "projectName":"projectName",
+        "property":"categoryName",
+        "toolName":"toolName",
+        "toolstatus":"status",
+        "timestamp":"inSightsTime",
+        "uptool":[
+           "JIRA"
+        ],
+        "downtool":[
+           "null"
+        ],
+        "startTime":"startTime",
+        "endTime":"endTime",
+        "timelagParam":[
+           "startTime",
+           "endTime"
+        ],
+        "uifilter":[
+           "requirement_id"
+        ],
+        "cardDisplayProps":[
+           "requirement_id"
+        ]
+     }
+}

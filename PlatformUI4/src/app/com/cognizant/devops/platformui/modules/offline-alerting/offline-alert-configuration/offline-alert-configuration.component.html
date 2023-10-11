@@ -1,0 +1,796 @@
+<!--
+*******************************************************************************
+ * Copyright 2023 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+
+<div class="cardCss">
+  <div layout layout-align="left" class="main-section-title">
+    <div style="color: var(--text-clr1)">
+      <b
+        >Configuration |
+        <span class="blueTitleTxt" style="color: #2d67ff"
+          >Offline Alert Configuration
+        </span></b
+      >
+    </div>
+  </div>
+  <div class="sectionHeadingStyle">
+    <span style="padding-top: 3px; margin-left: 3px">
+      <button
+        mat-icon-button
+        (click)="redirectToLandingPage()"
+        style="vertical-align: super"
+      >
+        <mat-icon svgIcon="backButton" matTooltip="Back" id="backButton">
+        </mat-icon>
+      </button>
+    </span>
+
+    <span class="alignSubHeader1" style="font-size: 14px"
+      ><b>Offline Alert Configuration</b> (Configure an alert)</span
+    >
+    <div class="btnAlign" style="margin-top: 0px">
+      <button mat-icon-button (click)="onPreviewClick()">
+        <mat-icon
+          matTooltip="Save"
+          svgIcon="save"
+          class="mat-icon material-icons"
+          style="color: #2d67ff"
+          id="Save OfflineData"
+        >
+        </mat-icon>
+      </button>
+
+      <button *ngIf="!onEdit" mat-icon-button (click)="refreshData()">
+        <mat-icon
+          matTooltip="Reset"
+          class="mat-icon material-icons"
+          svgIcon="exit"
+        >
+        </mat-icon>
+      </button>
+      <button *ngIf="onEdit" mat-icon-button (click)="reset()">
+        <mat-icon
+          matTooltip="Reset"
+          class="mat-icon material-icons"
+          svgIcon="exit"
+        >
+        </mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="tableHeaderCss">
+    <span *ngIf="!onEdit" class="mainHeaderText">Add Alert Details </span>
+    <span *ngIf="onEdit" class="mainHeaderText">Edit Alert Details </span>
+    <span class="infoHeaderText"
+      >(Please provide accurate details. Fields marked "<span
+        class="asteriskText"
+        >*</span
+      >" are mandatory)
+    </span>
+  </div>
+  <div class="section-body" style="margin-bottom: 15px">
+    <div class="two-grid-section">
+      <div class="grid-item">
+        <div class="lblCss">Alert <span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <input
+            matInput
+            maxlength="100"
+            [(ngModel)]="alertName"
+            type="text"
+            name="alertName"
+            autocomplete="off"
+            placeholder="Enter Alert Name"
+            id="Enter Alert Name"
+            [disabled]="onEdit"
+          />
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item">
+        <div class="lblCss">
+          Organisation <span class="asteriskText">*</span>
+        </div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            [(ngModel)]="organisation"
+            required
+            id="organisation"
+            name="organisation"
+            placeholder="Select Organisation"
+            color="primary"
+            (selectionChange)="getDashboardsByOrg(organisation)"
+            [disabled]="onEdit"
+          >
+            <mat-option *ngFor="let org of orgArr" value="{{ org.orgId }}">
+              {{ org.name }}
+            </mat-option>
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item">
+        <div class="lblCss">Dashboard <span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            [(ngModel)]="dashboard"
+            required
+            id="dashboard"
+            name="dashboard"
+            color="primary"
+            placeholder="Select Dashboard"
+            (selectionChange)="getDashboardJson(dashboard)"
+            [disabled]="onEdit"
+          >
+            <mat-option *ngFor="let dash of dashOptions" value="{{ dash.uid }}">
+              {{ dash.title }}
+            </mat-option>
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item">
+        <div class="lblCss">Panel <span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            [(ngModel)]="panel"
+            required
+            id="panel"
+            name="panel"
+            color="primary"
+            placeholder="Select Panel"
+            (selectionChange)="getPanelJson(panel)"
+            [disabled]="onEdit"
+          >
+            <mat-option
+              *ngFor="let panel of panelUrlArray"
+              value="{{ panel.title }}"
+            >
+              {{ panel.title }}
+            </mat-option>
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+      
+      <div class="grid-item">
+        <div class="lblCss">Threshold <span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <input
+            matInput
+            maxlength="100"
+            [(ngModel)]="threshold"
+            type="text"
+            name="threshold"
+            autocomplete="off"
+            placeholder="Enter Threshold Value"
+            id="Enter Threshold"
+          />
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item">
+        <div class="lblCss">Trend <span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            required
+            [(ngModel)]="expectedTrend"
+            name="expectedTrend"
+            placeholder="Select Trend"
+            color="primary"
+          >
+            <mat-option *ngFor="let data of trend" value="{{ data }}">
+              {{ data }}</mat-option
+            >
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div *ngIf="showTimeRangeFlag" class="grid-item">
+        <div class="lblCss">
+          Relative TimeRange <span class="asteriskText">*</span>
+        </div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            id="relative"
+            required
+            color="primary"
+            [(ngModel)]="relativeValue"
+            placeholder="Select TimeRange"
+            (selectionChange)="onTimeChange($event)"
+          >
+            <mat-option
+              *ngFor="let relativeTime of relativeRange"
+              [value]="relativeTime.text"
+            >
+              {{ relativeTime.text }}
+            </mat-option>
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item">
+        <div class="lblCss">Schedule <span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <mat-select
+            required
+            [(ngModel)]="scheduleType"
+            name="schedule"
+            placeholder="Select Schedule"
+            color="primary"
+          >
+            <mat-option
+              *ngFor="let schedule of scheduleList"
+              value="{{ schedule }}"
+            >
+              {{ schedule }}</mat-option
+            >
+          </mat-select>
+          <mat-icon
+            matSuffix
+            svgIcon="arrow-down"
+            class="arrow-icon"
+            style="width: 12px !important; height: 12px !important"
+          ></mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item">
+        <div class="lblCss">Creation Time <span class="asteriskText">*</span></div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <input
+            matInput
+            type="text"
+            onfocus="(this.type='datetime-local')"
+            onblur="(this.type='text')"
+            [(ngModel)]="scheduleDateTime"
+            min="{{ getCurrentDateTime() }}"
+            autocomplete="off"
+            placeholder="Select Creation Time"
+            [disabled]="onEdit"
+          />
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item">
+        <div class="lblCss">
+          Breach Frequency <span class="asteriskText">*</span>
+        </div>
+        <mat-form-field appearance="fill" class="columnComponent">
+          <input
+            matInput
+            maxlength="100"
+            [(ngModel)]="frequency"
+            type="text"
+            name="frequency"
+            autocomplete="off"
+            placeholder="Enter Breach Frequency"
+            id="Enter Frequency"
+          />
+        </mat-form-field>
+        <span class="comments"
+          >After how many successful breaches, alert would be triggred!</span
+        >
+      </div>
+
+      <div
+        class="grid-item"
+        *ngIf="templateVariableArr.length > 0 && panelFilterFlag"
+      >
+        <div class="lblCss">Filters <span class="asteriskText">*</span></div>
+        <div class="columnComponent">
+          <form [formGroup]="variableForm">
+            <div *ngFor="let list of templateVariableArr">
+              <div *ngIf="list.hide !== 2">
+                <div
+                  class="align-element"
+                  *ngIf="list.type === 'query' && list.multi"
+                >
+                  <label class="block">{{
+                    list.label ? list.label : list.name
+                  }}</label>
+                  <mat-form-field appearance="fill" class="columnComponent">
+                    <mat-select
+                      id="{{ list.name }}"
+                      (selectionChange)="onChangeVariables($event, list)"
+                      formControlName="{{ list.name }}"
+                      required
+                      color="primary"
+                      multiple
+                      placeholder="Select values"
+                    >
+                      <div *ngIf="list.includeAll">
+                        <mat-option #allSelected value="All"> All </mat-option>
+                      </div>
+                      <mat-option
+                        *ngFor="let option of list.options"
+                        value="{{ option }}"
+                      >
+                        {{ option }}</mat-option
+                      >
+                    </mat-select>
+                    <mat-icon
+                      matSuffix
+                      svgIcon="arrow-down"
+                      class="arrow-icon"
+                      style="width: 12px !important; height: 12px !important"
+                    ></mat-icon>
+                  </mat-form-field>
+                </div>
+                <div
+                  class="align-element"
+                  *ngIf="list.type === 'query' && !list.multi && !onEdit"
+                >
+                  <label class="block">{{
+                    list.label ? list.label : list.name
+                  }}</label>
+                  <mat-form-field appearance="fill" class="columnComponent">
+                    <mat-select
+                      id="{{ list.name }}"
+                      formControlName="{{ list.name }}"
+                      (selectionChange)="onChangeVariables($event, list)"
+                      required
+                      color="primary"
+                      [(value)]="list.selectedValue"
+                      placeholder="Select value"
+                    >
+                      <div *ngIf="list.includeAll">
+                        <mat-option value="All" #allSelected> All </mat-option>
+                      </div>
+                      <mat-option
+                        *ngFor="let option of list.options"
+                        value="{{ option }}"
+                      >
+                        {{ option }}</mat-option
+                      >
+                    </mat-select>
+                    <mat-icon
+                      matSuffix
+                      svgIcon="arrow-down"
+                      class="arrow-icon"
+                      style="width: 12px !important; height: 12px !important"
+                    ></mat-icon>
+                  </mat-form-field>
+                </div>
+                <div
+                  class="align-element"
+                  *ngIf="list.type === 'query' && !list.multi && onEdit"
+                >
+                  <label class="block">{{
+                    list.label ? list.label : list.name
+                  }}</label>
+                  <mat-form-field appearance="fill" class="columnComponent">
+                    <mat-select
+                      id="{{ list.name }}"
+                      formControlName="{{ list.name }}"
+                      (selectionChange)="onChangeVariables($event, list)"
+                      required
+                      color="primary"
+                      placeholder="Select value"
+                      [(ngModel)]="list.selectedValue[0]"
+                    >
+                      <div *ngIf="list.includeAll">
+                        <mat-option value="All" #allSelected> All </mat-option>
+                      </div>
+                      <mat-option
+                        *ngFor="let option of list.options"
+                        value="{{ option }}"
+                      >
+                        {{ option }}</mat-option
+                      >
+                    </mat-select>
+                    <mat-icon
+                      matSuffix
+                      svgIcon="arrow-down"
+                      class="arrow-icon"
+                      style="width: 12px !important; height: 12px !important"
+                    ></mat-icon>
+                  </mat-form-field>
+                </div>
+                <div
+                  class="align-element"
+                  *ngIf="list.type === 'custom' && list.multi"
+                >
+                  <label class="block">{{
+                    list.label ? list.label : list.name
+                  }}</label>
+                  <mat-form-field appearance="fill" class="columnComponent">
+                    <mat-select
+                      id="{{ list.name }}"
+                      formControlName="{{ list.name }}"
+                      required
+                      color="primary"
+                      multiple
+                      [(value)]="list.selectedValue"
+                      placeholder="Select values"
+                      (selectionChange)="onChangeVariables($event, list)"
+                    >
+                      <mat-option
+                        *ngFor="let option of list.options"
+                        value="{{ option.value }}"
+                      >
+                        {{ option.text }}</mat-option
+                      >
+                    </mat-select>
+                    <mat-icon
+                      matSuffix
+                      svgIcon="arrow-down"
+                      class="arrow-icon"
+                      style="width: 12px !important; height: 12px !important"
+                    ></mat-icon>
+                  </mat-form-field>
+                </div>
+
+                <div
+                  class="align-element"
+                  *ngIf="list.type === 'custom' && !list.multi && !onEdit"
+                >
+                  <label class="block">{{
+                    list.label ? list.label : list.name
+                  }}</label>
+                  <mat-form-field appearance="fill" class="columnComponent">
+                    <mat-select
+                      id="{{ list.name }}"
+                      formControlName="{{ list.name }}"
+                      required
+                      color="primary"
+                      [(value)]="list.selectedValue"
+                    >
+                      <div *ngIf="list.includeAll">
+                        <mat-option value="All" #allSelected> All </mat-option>
+                      </div>
+                      <mat-option
+                        *ngFor="let option of list.options"
+                        value="{{ option.value }}"
+                      >
+                        {{ option.text }}</mat-option
+                      >
+                    </mat-select>
+                    <mat-icon
+                      matSuffix
+                      svgIcon="arrow-down"
+                      class="arrow-icon"
+                      style="width: 12px !important; height: 12px !important"
+                    ></mat-icon>
+                  </mat-form-field>
+                </div>
+                <div
+                  class="align-element"
+                  *ngIf="list.type === 'custom' && !list.multi && onEdit"
+                >
+                  <label class="block">{{
+                    list.label ? list.label : list.name
+                  }}</label>
+                  <mat-form-field appearance="fill" class="columnComponent">
+                    <mat-select
+                      id="{{ list.name }}"
+                      style="margin: 1%"
+                      formControlName="{{ list.name }}"
+                      required
+                      color="primary"
+                      [(ngModel)]="list.selectedValue[0]"
+                    >
+                      <div *ngIf="list.includeAll">
+                        <mat-option value="All" #allSelected> All </mat-option>
+                      </div>
+                      <mat-option
+                        *ngFor="let option of list.options"
+                        value="{{ option.value }}"
+                      >
+                        {{ option.text }}</mat-option
+                      >
+                    </mat-select>
+                    <mat-icon
+                      matSuffix
+                      svgIcon="arrow-down"
+                      class="arrow-icon"
+                      style="width: 12px !important; height: 12px !important"
+                    ></mat-icon>
+                  </mat-form-field>
+                </div>
+                <div
+                  class="align-element"
+                  *ngIf="
+                    list.type === 'textbox' ||
+                    (list.type === 'constant' && !onEdit)
+                  "
+                >
+                  <label class="block">{{
+                    list.label ? list.label : list.name
+                  }}</label>
+                  <mat-form-field appearance="fill" class="columnComponent">
+                    <input
+                      matInput
+                      id="{{ list.name }}"
+                      formControlName="{{ list.name }}"
+                      type="text"
+                      [(value)]="list.selectedValue"
+                      value="{{ list.options[0].value }}"
+                    />
+                  </mat-form-field>
+                </div>
+                <div
+                  class="align-element"
+                  *ngIf="
+                    list.type === 'textbox' ||
+                    (list.type === 'constant' && onEdit)
+                  "
+                >
+                  <label class="block">{{
+                    list.label ? list.label : list.name
+                  }}</label>
+                  <mat-form-field appearance="fill" class="columnComponent">
+                    <input
+                      matInput
+                      id="{{ list.name }}"
+                      style="margin: 1%"
+                      formControlName="{{ list.name }}"
+                      type="text"
+                      [(ngModel)]="list.selectedValue"
+                      value="{{ list.options[0].value }}"
+                    />
+                  </mat-form-field>
+                </div>
+                <div
+                  class="align-element"
+                  *ngIf="list.type === 'interval' && !onEdit"
+                >
+                  <label class="block">{{
+                    list.label ? list.label : list.name
+                  }}</label>
+                  <mat-form-field appearance="fill" class="columnComponent">
+                    <mat-select
+                      id="{{ list.name }}"
+                      formControlName="{{ list.name }}"
+                      required
+                      color="primary"
+                      [(value)]="list.selectedValue"
+                    >
+                      <mat-option
+                        *ngFor="let option of list.options"
+                        value="{{ option.value }}"
+                        selected="{{ option.selected }}"
+                      >
+                        {{ option.text }}</mat-option
+                      >
+                    </mat-select>
+                    <mat-icon
+                      matSuffix
+                      svgIcon="arrow-down"
+                      class="arrow-icon"
+                      style="width: 12px !important; height: 12px !important"
+                    ></mat-icon>
+                  </mat-form-field>
+                </div>
+                <div
+                  class="align-element"
+                  *ngIf="list.type === 'interval' && onEdit"
+                >
+                  <label class="block">{{
+                    list.label ? list.label : list.name
+                  }}</label>
+                  <mat-form-field appearance="fill" class="columnComponent">
+                    <mat-select
+                      id="{{ list.name }}"
+                      style="margin: 1%"
+                      formControlName="{{ list.name }}"
+                      required
+                      color="primary"
+                      [(ngModel)]="list.selectedValue[0]"
+                    >
+                      <mat-option
+                        *ngFor="let option of list.options"
+                        value="{{ option.value }}"
+                        selected="{{ option.selected }}"
+                      >
+                        {{ option.text }}</mat-option
+                      >
+                    </mat-select>
+                    <mat-icon
+                      matSuffix
+                      svgIcon="arrow-down"
+                      class="arrow-icon"
+                      style="width: 12px !important; height: 12px !important"
+                    ></mat-icon>
+                  </mat-form-field>
+                </div>
+                <div
+                  class="align-element"
+                  *ngIf="list.type === 'datasource' && list.multi && !onEdit"
+                >
+                  <label class="block">{{
+                    list.label ? list.label : list.name
+                  }}</label>
+                  <mat-form-field appearance="fill" class="columnComponent">
+                    <mat-select
+                      id="{{ list.name }}"
+                      formControlName="{{ list.name }}"
+                      required
+                      color="primary"
+                      multiple
+                    >
+                      <div *ngIf="list.includeAll">
+                        <mat-option value="All"> All </mat-option>
+                      </div>
+                      <mat-option
+                        *ngFor="let option of list.current.value"
+                        value="{{ option }}"
+                      >
+                        {{ option }}</mat-option
+                      >
+                    </mat-select>
+                    <mat-icon
+                      matSuffix
+                      svgIcon="arrow-down"
+                      class="arrow-icon"
+                      style="width: 12px !important; height: 12px !important"
+                    ></mat-icon>
+                  </mat-form-field>
+                </div>
+                <div
+                  class="align-element"
+                  *ngIf="list.type === 'datasource' && list.multi && onEdit"
+                >
+                  <label class="block">{{
+                    list.label ? list.label : list.name
+                  }}</label>
+                  <mat-form-field appearance="fill" class="columnComponent">
+                    <mat-select
+                      id="{{ list.name }}"
+                      style="margin: 1%"
+                      formControlName="{{ list.name }}"
+                      required
+                      color="primary"
+                      (selectionChange)="toggleAllSelection($event, list)"
+                      multiple
+                    >
+                      <div *ngIf="list.includeAll">
+                        <mat-option value="All"> All </mat-option>
+                      </div>
+                      <mat-option
+                        *ngFor="let option of list.current.value"
+                        value="{{ option }}"
+                      >
+                        {{ option }}</mat-option
+                      >
+                    </mat-select>
+                    <mat-icon
+                      matSuffix
+                      svgIcon="arrow-down"
+                      class="arrow-icon"
+                      style="width: 12px !important; height: 12px !important"
+                    ></mat-icon>
+                  </mat-form-field>
+                </div>
+                <div
+                  class="align-element"
+                  *ngIf="list.type === 'datasource' && !list.multi"
+                >
+                  <label class="block">{{
+                    list.label ? list.label : list.name
+                  }}</label>
+                  <mat-form-field appearance="fill" class="columnComponent">
+                    <mat-select
+                      id="{{ list.name }}"
+                      formControlName="{{ list.name }}"
+                      required
+                      color="primary"
+                      (selectionChange)="toggleAllSelection($event, list)"
+                    >
+                      <div *ngIf="list.includeAll">
+                        <mat-option value="All"> All </mat-option>
+                      </div>
+                      <mat-option
+                        *ngFor="let option of list.current.value"
+                        value="{{ option }}"
+                      >
+                        {{ option }}</mat-option
+                      >
+                    </mat-select>
+                    <mat-icon
+                      matSuffix
+                      svgIcon="arrow-down"
+                      class="arrow-icon"
+                      style="width: 12px !important; height: 12px !important"
+                    ></mat-icon>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="grid-item" *ngIf="dispalyQueryPanel">
+        <div class="lblCss">Panel Query</div>
+        <div class="text-area">
+          <mat-form-field appearance="fill" class="columnComponent">
+            <textarea
+              matInput
+              value="{{ dbQuery }}"
+              disabled
+              name="dbQuery"
+              required
+              style="width: 100%; resize: vertical; height: 69px"
+              rows="10"
+            ></textarea>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="grid-item">
+        <div class="lblCss">
+          Mailing Details <span class="asteriskText">*</span>
+        </div>
+        <button mat-icon-button>
+          <mat-icon
+          *ngIf="!emailDetails && !onEdit"
+            (click)="addEmailConfig()"
+            matTooltip="Add Email"
+            class="mailCss"
+            svgIcon="add"
+            id="Add Email"
+          >
+          </mat-icon>
+          <mat-icon
+          *ngIf="emailDetails && !onEdit"
+            (click)="editEmailConfig()"
+            matTooltip="Edit email"
+            svgIcon="edit"
+            id="Edit email"
+          >
+          </mat-icon>
+          <mat-icon
+            *ngIf="emailDetails && onEdit"
+            (click)="editEmailConfig()"
+            matTooltip="Edit email"
+            svgIcon="edit"
+            id="Edit email"
+          >
+          </mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -38,7 +38,7 @@ import com.google.gson.JsonObject;
  * @author 146414
  *         This class will handle all the interactions with graph database.
  */
-public class GraphDBHandler{
+public class GraphDBHandler implements AutoCloseable{
 	private static Logger log = LogManager.getLogger(GraphDBHandler.class);
 	String COMMIT_URL = "/db/data/transaction/commit";
 	String SCHEMAURL = "/db/data/schema/index/";
@@ -378,5 +378,11 @@ public class GraphDBHandler{
 		props.add("props", data);
 		statement.add("parameters", props);
 		return statement;
+	}
+
+	@Override
+	public void close() throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 }

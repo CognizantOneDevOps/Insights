@@ -28,7 +28,7 @@ class AzureReleaseAgent(BaseAgent):
         self.baseLogger.info('Inside process')
         BaseUrl = self.config.get("baseUrl", '')
         UserID = self.getCredential("userid")
-        Passwd = self.getCredential("passwd")
+        cred = self.getCredential("passwd")
         collectionName = self.config.get("collectionName", '')
         isStartFromDateEnabled = self.config.get("isStartFromDateEnabled", False)
         startFromDate = self.config.get("startFromDate", None)
@@ -43,7 +43,7 @@ class AzureReleaseAgent(BaseAgent):
         if isStartFromDateEnabled and startFromDate is not None:
             minStartedDate = "&minStartedTime=" + str(startFromDate)
         data = []
-        projects = self.getResponse(getProjectUrl, 'GET', UserID, Passwd, None)
+        projects = self.getResponse(getProjectUrl, 'GET', UserID, cred, None)
         projCount = projects["count"]
         for project in range(projCount):
             injectData = {}
@@ -58,7 +58,7 @@ class AzureReleaseAgent(BaseAgent):
             additionalQueryParameter = ''
             if startFrom is not None:
                 additionalQueryParameter = '&minModifiedTime=' + startFrom
-            deployments = self.getResponse(getDeploymentsUrl + additionalQueryParameter, 'GET', UserID, Passwd, None)
+            deployments = self.getResponse(getDeploymentsUrl + additionalQueryParameter, 'GET', UserID, cred, None)
             deploymentCount = deployments["count"]
             while deploymentCount > 0:
                 for deploymentIterator in range(0, deploymentCount):
@@ -76,7 +76,7 @@ class AzureReleaseAgent(BaseAgent):
                     additionalQueryParameter = ''
                     if startFrom is not None:
                         additionalQueryParameter = '&minModifiedTime=' + startFrom
-                    deployments = self.getResponse(getDeploymentsUrl + additionalQueryParameter, 'GET', UserID, Passwd,
+                    deployments = self.getResponse(getDeploymentsUrl + additionalQueryParameter, 'GET', UserID, cred,
                                                    None)
                     deploymentCount = deployments["count"]
 

@@ -28,13 +28,13 @@ class BitBucketAgentBranchesUserDefined(BaseAgent):
     def process(self):
         BaseEndPoint = self.config.get("baseEndPoint", '')
         UserId = self.config.get("userID", '')
-        Passwd = self.config.get("passwd", '')
+        cred = self.config.get("passwd", '')
         startFrom = self.config.get("startFrom", '')
         startFrom = parser.parse(startFrom)
         startFrom = mktime(startFrom.timetuple()) + startFrom.microsecond/1000000.0
         startFrom = long(startFrom * 1000)
         getProjectsUrl = BaseEndPoint
-        bitBucketProjects = self.getResponse(getProjectsUrl, 'GET', UserId, Passwd, None)
+        bitBucketProjects = self.getResponse(getProjectsUrl, 'GET', UserId, cred, None)
         responseTemplate = self.getResponseTemplate()
         data = []
         self.userInputBranches = self.config.get('dynamicTemplate', {}).get("userInputBranches")
@@ -43,7 +43,7 @@ class BitBucketAgentBranchesUserDefined(BaseAgent):
             bitBicketReposUrl = BaseEndPoint+ProjKey+"/repos"
             injectData = {}
             injectData['projectKey'] = ProjKey
-            bitBicketRepos = self.getResponse(bitBicketReposUrl, 'GET', UserId, Passwd, None)
+            bitBicketRepos = self.getResponse(bitBicketReposUrl, 'GET', UserId, cred, None)
             for repos in range(len(bitBicketRepos["values"])):
                 repoName = bitBicketRepos["values"][repos]["slug"]
                 injectData['repoName'] = repoName
@@ -61,7 +61,7 @@ class BitBucketAgentBranchesUserDefined(BaseAgent):
                         trackingUpdated = False
                         commitData = []
                         while not isLastPage:
-                            bitBucketCommits = self.getResponse(bitBucketCommitsUrl+'&start='+str(start)+'&limit=500', 'GET', UserId, Passwd, None)
+                            bitBucketCommits = self.getResponse(bitBucketCommitsUrl+'&start='+str(start)+'&limit=500', 'GET', UserId, cred, None)
                             commits = bitBucketCommits["values"]
                             if not trackingUpdated and len(commits) > 0: 
                                 self.tracking[trackingToken] = commits[0]["id"]

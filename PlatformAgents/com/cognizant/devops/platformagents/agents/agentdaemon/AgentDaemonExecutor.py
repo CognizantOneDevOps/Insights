@@ -35,6 +35,8 @@ import uuid
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
 import tzlocal
+import shlex
+from pathvalidate import sanitize_filepath
 
 class AgentDaemonExecutor:
     def __init__(self):
@@ -177,7 +179,10 @@ class AgentDaemonExecutor:
             #Code for handling subscribed messages
             basePath = self.config.get('baseExtractionPath')
             scriptPath = basePath + os.path.sep + agentToolName + os.path.sep + agentId
-            installagentFilePath = os.environ['INSIGHTS_AGENT_HOME'] + os.path.sep + 'AgentDaemon'
+            installagentFilePath = os.path.abspath(os.environ['INSIGHTS_AGENT_HOME'])
+            installagentFilePath = installagentFilePath + os.path.sep + 'AgentDaemon'
+
+            installagentFilePath = sanitize_filepath(installagentFilePath)
             if ((action == "REGISTER" or action == "UPDATE") and (encodedData != None)):
                 data = base64.b64decode(encodedData)
                 f = open(basePath + os.path.sep + pkgFileName, 'wb')
@@ -195,15 +200,19 @@ class AgentDaemonExecutor:
                     p = subprocess.Popen(['net', action, agentId], shell=True)
                 else:
                     scriptFile = installagentFilePath + os.path.sep + 'installagent.bat'
-                    p = subprocess.Popen([scriptFile, action, agentToolName, agentId], cwd=installagentFilePath, shell=True)
+                    scriptFile = sanitize_filepath(scriptFile)
+                    command = [scriptFile, action, agentToolName, agentId]                    
+                    p = subprocess.run(command, cwd=installagentFilePath)
             elif (action == "START" or action == "STOP"):
-                p = subprocess.Popen(['service ' + agentId + ' ' + action.lower()], shell=True)
+                p = subprocess.Popen(['service ' + agentId + ' ' + action.lower()])
             else:
                 scriptFile = installagentFilePath + os.path.sep + 'installagent.sh'
-                p = subprocess.Popen(['chmod 777 ' + scriptFile, scriptFile], shell=True)
-                p = subprocess.Popen(['chmod -R 777 ' + scriptFile, scriptFile], shell=True)
-                p = subprocess.Popen(['chmod -R 777 ' + basePath + os.path.sep + agentToolName, basePath + os.path.sep + agentToolName], shell=True)
-                p = subprocess.Popen([scriptFile + ' ' + osType + ' ' + action + ' ' + agentToolName + ' ' + agentId], cwd=installagentFilePath, shell=True)
+                scriptFile = sanitize_filepath(scriptFile)
+                quotedScriptFile = shlex.quote(scriptFile)
+                p = subprocess.run(['chmod', '777', quotedScriptFile])
+                os.chmod(basePath + os.path.sep + agentToolName,0o777)
+                command = [scriptFile, osType, action, agentToolName, agentId]                
+                p = subprocess.run(command, cwd=installagentFilePath)                
                 logging.info('Process id - ' + str(p.returncode))
         except Exception as ex:
             logging.error("Error While processing message/packet in  processMessage")

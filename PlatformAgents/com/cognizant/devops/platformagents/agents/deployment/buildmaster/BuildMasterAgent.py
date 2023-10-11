@@ -27,7 +27,7 @@ class BuildMasterAgent(BaseAgent):
         apiKey = str(self.config.get("apiKey", ''))
         baseurl = self.config.get("endpoint", '')
         userid = self.getCredential("userid")
-        passwd = self.getCredential("passwd")
+        cred = self.getCredential("passwd")
         appIds = self.config.get('dynamicTemplate', {}).get('applicationIds', [])
         timeStampFormat = self.config.get('timeStampFormat')
         responseTemplate = self.config.get('dynamicTemplate', {}).get('responseTemplate', None)
@@ -36,14 +36,14 @@ class BuildMasterAgent(BaseAgent):
         for appId in appIds:
             allReleases = []
             individualReleaseUrl = baseurl + "Builds_GetBuilds?API_Key=" + apiKey + "&Application_Id=" + appId + "&ReleaseStatus_Name=Active"
-            releases = self.getResponse(individualReleaseUrl, 'GET', userid, passwd, None)
+            releases = self.getResponse(individualReleaseUrl, 'GET', userid, cred, None)
             for release in releases:
                 release_name = release.get('Release_Number', '')
                 if release_name not in allReleases:
                     allReleases.append(release_name)
             for release in allReleases:
                 individualReleaseUrl = baseurl + "Builds_GetBuilds?API_Key=" + apiKey + "&Application_Id=" + appId + "&ReleaseStatus_Name=Active&Release_Number=" + release
-                releaseRelatedDetails = self.getResponse(individualReleaseUrl, 'GET', userid, passwd, None)
+                releaseRelatedDetails = self.getResponse(individualReleaseUrl, 'GET', userid, cred, None)
                 publishToolData = []
                 track = appId + "-" + release
                 for detailData in releaseRelatedDetails:

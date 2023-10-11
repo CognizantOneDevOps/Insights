@@ -63,6 +63,9 @@ import { AddComponent } from './multiple-email-configuration/dialogs/add/add.com
 import { OfflineDataListComponent } from '@insights/app/modules/offline-data-processing/offline-data-list/offline-data-list.component';
 import { OfflineConfigurationComponent } from '@insights/app/modules/offline-data-processing/offline-configuration/offline-configuration.component';
 import { OfflineDetailsComponent } from '@insights/app/modules/offline-data-processing/offline-details/offline-details.component';
+import { OfflineAlertListComponent } from '@insights/app/modules/offline-alerting/offline-alert-list/offline-alert-list.component';
+import { OfflineAlertConfigurationComponent } from '@insights/app/modules/offline-alerting/offline-alert-configuration/offline-alert-configuration.component';
+
 
 const homeRoutes: Routes = [
   {
@@ -116,7 +119,9 @@ const homeRoutes: Routes = [
       { path : 'email-configuration',component : MultipleEmailConfigurationComponent },
       { path: 'add-component', component: AddComponent },
       { path: 'offlineDataList', component:OfflineDataListComponent },
-      { path: 'offlineConfiguration', component:OfflineConfigurationComponent }
+      { path: 'offlineConfiguration', component:OfflineConfigurationComponent },
+      { path: 'offlineAlertingList', component:OfflineAlertListComponent },
+      { path: 'offlineAlertingConfig', component:OfflineAlertConfigurationComponent}
     ],
     canActivate: [AuthGuard]
   }

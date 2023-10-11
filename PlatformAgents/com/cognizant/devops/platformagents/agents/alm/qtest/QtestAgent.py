@@ -26,7 +26,7 @@ class QtestAgent (BaseAgent):
     def process(self):
         baseUrl = self.config.get('baseUrl', '')
         userName = self.getCredential('userid')
-        password = self.getCredential('passwd')
+        cred = self.getCredential('passwd')
         startFrom = self.config.get('startFrom') + '+00:00'
         startFromDate = parser.parse(startFrom, ignoretz=True)
         pageSize = self.config.get('responsePageSize', 100)
@@ -62,8 +62,8 @@ class QtestAgent (BaseAgent):
             payloadConfig[entityType]['payload'] = json.dumps(payload)
             payloadConfig[entityType]['entity'] = entity
         encodeKey = 'InSightsAlmAgent:'
-        authKey = base64.b64encode(encodeKey.encode('utf-8'))
-        token = self.login(baseUrl, userName, password, authKey)
+        aKey  = base64.b64encode(encodeKey.encode('utf-8'))
+        token = self.login(baseUrl, userName, cred, aKey )
         bearerToken = 'bearer ' + token if token else None
         apiHeaders = {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': bearerToken}
         projectData = self.getResponse(baseUrl + "/api/v3/projects?assigned=false", 'GET', None, None, None, None, apiHeaders)
@@ -151,9 +151,9 @@ class QtestAgent (BaseAgent):
             if linkedArtifacts:
                 self.registerExtension('linkedArtifacts', self.retrieveLinkedArtifacts, linkedArtifacts.get('runSchedule'))
 
-    def login(self, baseUrl, userName, password, authKey):
-        headers = {'accept': 'application/json', 'content-type': 'application/x-www-form-urlencoded', 'authorization': 'Basic ' + authKey}
-        payload = 'grant_type=password&username=' + userName + '&password=' + password
+    def login(self, baseUrl, userName, cred, aKey ):
+        headers = {'accept': 'application/json', 'content-type': 'application/x-www-form-urlencoded', 'authorization': 'Basic ' + aKey }
+        payload = 'grant_type=password&username=' + userName + '&password=' + cred
         response = self.getResponse(baseUrl + '/oauth/token', 'POST', None, None, payload, None, headers)
         if "error" in response:
             self.baseLogger.error(response)
@@ -240,13 +240,13 @@ class QtestAgent (BaseAgent):
     def retrieveLinkedArtifacts(self):
         baseUrl = self.config.get('baseUrl', '')
         userName = self.config.get('username', '')
-        password = self.config.get('password', '')
+        cred = self.config.get('password', '')
         pageSize = self.config.get('responsePageSize', 100)
         dynamicTemplate = self.config.get("dynamicTemplate", {})
         linkedArtifacts = dynamicTemplate.get('extensions', {}).get('linkedArtifacts', None)
         encodeKey = 'InSightsAlmAgent:'
-        authKey = base64.b64encode(encodeKey.encode('utf-8'))
-        token = self.login(baseUrl, userName, password, authKey)
+        aKey  = base64.b64encode(encodeKey.encode('utf-8'))
+        token = self.login(baseUrl, userName, cred, aKey )
         bearerToken = 'bearer ' + token if token else None
         apiHeaders = {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': bearerToken}
         trackingDetails = self.tracking

@@ -33,13 +33,13 @@ class SonarAgent(BaseAgent):
         timeStampFormat = self.config.get('timeStampFormat')    
         startFrom = parser.parse(self.config.get("startFrom", '')).strftime(timeStampFormat)
         self.userid = self.getCredential("userid")
-        self.passwd = self.getCredential("passwd")
+        self.cred = self.getCredential("passwd")
         timeMachineapi = self.config.get("timeMachineapi", '')
         self.isActivityNeeded = self.config.get('dynamicTemplate', {}).get("isActivityNeeded",'') 
         self.activityTasks = {}
         if self.isActivityNeeded:
             activityUrl = self.baseUrl+"api/ce/activity"
-            activity = self.getResponse(activityUrl, 'GET', self.userid, self.passwd, None)
+            activity = self.getResponse(activityUrl, 'GET', self.userid, self.cred, None)
             self.activityTasks = activity["tasks"]
         metrics = self.config.get('dynamicTemplate', {}).get("metrics", '')
         projectsList = self.config.get('dynamicTemplate', {}).get("projects", [])
@@ -54,7 +54,7 @@ class SonarAgent(BaseAgent):
             nextPageResponse = True
             while nextPageResponse:
                 projectsUrl = self.baseUrl+"api/components/search?qualifiers=TRK&format=json&ps={}&p={}"
-                sonarProjects = self.getResponse(projectsUrl.format(projectsPageSize, projectsPageIndex), 'GET', self.userid, self.passwd, None)
+                sonarProjects = self.getResponse(projectsUrl.format(projectsPageSize, projectsPageIndex), 'GET', self.userid, self.cred, None)
                 projectsTotalRecords = sonarProjects["paging"]["total"]
                 for project in sonarProjects["components"]: 
                     if len(projectsList)>0 and projectsList[0]!="all" and not project["name"] in projectsList:
@@ -68,7 +68,7 @@ class SonarAgent(BaseAgent):
                     lastUpdatedDate = None
                     if timeMachineapi == "yes":
                         sonarExecutionsUrl = self.baseUrl+"api/timemachine/index?metrics="+metricsParam+"&resource="+projectKey+"&fromDateTime="+timestamp+"-0000&format=json"
-                        sonarExecutions = self.getResponse(sonarExecutionsUrl, 'GET', self.userid, self.passwd, None)
+                        sonarExecutions = self.getResponse(sonarExecutionsUrl, 'GET', self.userid, self.cred, None)
                         lastUpdatedDate = self.timeMachine(sonarExecutions,projectKey,projectName)                        
                     else:
                         #Find out the artifact version from sonar project analysis api. 
@@ -77,7 +77,7 @@ class SonarAgent(BaseAgent):
                       
                         # Get the Sonar Project branch Detail past executions from history api. 
                         sonarProjectBranchUrl = self.baseUrl+"api/project_branches/list?project="+projectKey
-                        sonarBranchsExecutions = self.getResponse(sonarProjectBranchUrl, 'GET', self.userid, self.passwd, None)
+                        sonarBranchsExecutions = self.getResponse(sonarProjectBranchUrl, 'GET', self.userid, self.cred, None)
                         branchsArray = sonarBranchsExecutions['branches']
                         for branch in branchsArray:
                             branchName = branch['name']
@@ -130,7 +130,7 @@ class SonarAgent(BaseAgent):
         try:
             while nextPageResponse:
                 sonarProjectAnalysisUrl = self.baseUrl+"api/project_analyses/search?category=VERSION&project="+projectKey+"&from="+timestamp+"-0000&format=json&ps="+str(pageSize)+"&p="+str(pageIndex)
-                projectAnalysis = self.getResponse(sonarProjectAnalysisUrl, 'GET', self.userid, self.passwd, None) 
+                projectAnalysis = self.getResponse(sonarProjectAnalysisUrl, 'GET', self.userid, self.cred, None) 
                 totalRecords = projectAnalysis["paging"]["total"]
                
                 analysisArray = projectAnalysis["analyses"]
@@ -162,7 +162,7 @@ class SonarAgent(BaseAgent):
         try:            
             while nextPageResponse:
                 sonarExecutionsUrl = self.baseUrl+"api/measures/search_history?metrics="+metricsParam+"&component="+projectKey+"&from="+timestamp+"-0000&format=json&ps="+str(pageSize)+"&p="+str(pageIndex)+"&branch="+branchName
-                sonarExecutions = self.getResponse(sonarExecutionsUrl, 'GET', self.userid, self.passwd, None)
+                sonarExecutions = self.getResponse(sonarExecutionsUrl, 'GET', self.userid, self.cred, None)
                 totalRecords = sonarExecutions["paging"]["total"]
                 
                 for historydata in range(0,len(sonarExecutions['measures'][0]['history'])):

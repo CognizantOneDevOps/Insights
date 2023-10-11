@@ -275,6 +275,7 @@ export class DashboardPdfDownloadComponent implements OnInit {
         this.templateVariableArr[query.index].options = optionData;
       }
     }
+    console.log("280 ==== ", this.globalMap, this.totalMap);
     this.isDatainProgress = false;
   }
   public async getDashboardJson(dashboardUUID) {
@@ -546,6 +547,7 @@ export class DashboardPdfDownloadComponent implements OnInit {
    
     
     this.queryVaribles =  dashboard.templating.list;
+    console.log("552 ==== ", this.queryVaribles);
   
   }
   onPreviewClick() {

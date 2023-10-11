@@ -29,10 +29,10 @@ class NexusAgent(BaseAgent):
     @BaseAgent.timed
     def process(self):
         self.userid = self.getCredential("userid")
-        self.passwd = self.getCredential("passwd")
+        self.cred = self.getCredential("passwd")
         BaseUrl = self.config.get("baseUrl", '')
         FirstEndPoint = self.config.get("firstEndPoint", '')
-        nexIDs = self.getResponse(FirstEndPoint, 'GET', self.userid, self.passwd, None)
+        nexIDs = self.getResponse(FirstEndPoint, 'GET', self.userid, self.cred, None)
         previousname = nexIDs["items"][0]["repository"]
         fetchNextPage = True           
         while fetchNextPage:  
@@ -45,7 +45,7 @@ class NexusAgent(BaseAgent):
                     previousname = repoid
                     groupid = nexIDs["items"][artifacts]["group"].replace(".", "/", 3)
                     request = urllib.request.Request(self.config.get("baseUrl", '')+"repository/"+repoid+"/"+groupid+"/"+nexIDs["items"][artifacts]["name"]+"/maven-metadata.xml")
-                    request.add_header('Authorization', 'Basic %s' % self.getBase64Value(self.userid,self.passwd))
+                    request.add_header('Authorization', 'Basic %s' % self.getBase64Value(self.userid,self.cred))
                     mavenmetafile = urllib.request.urlopen(request)#reading base mavenmetadata file to fetch main version
                     #mavenmetafile = urllib2.urlopen(self.config.get("baseUrl", '')+"repository/"+repoid+"/"+groupid+"/"+nexIDs["items"][artifacts]["name"]+"/maven-metadata.xml")#reading base mavenmetadata file to fetch main version
                     mavenmetadata = xmltodict.parse(mavenmetafile.read())
@@ -60,14 +60,14 @@ class NexusAgent(BaseAgent):
             else :
                 fetchNextPage= True;
                 newFirstEndPoint = FirstEndPoint+'&continuationToken='+str(continuationToken)
-                nexIDs = self.getResponse(newFirstEndPoint, 'GET', self.userid, self.passwd, None)
+                nexIDs = self.getResponse(newFirstEndPoint, 'GET', self.userid, self.cred, None)
                 
     def prepareAndPublish(self, nexIDs, tracking):
         repoid = nexIDs["repository"]
         artifactid = nexIDs["name"]
         groupid = nexIDs["group"].replace(".", "/", 3)
         request = urllib.request.Request(self.config.get("baseUrl", '')+"repository/"+repoid+"/"+groupid+"/"+nexIDs["name"]+"/maven-metadata.xml")
-        request.add_header('Authorization', 'Basic %s' % self.getBase64Value(self.userid,self.passwd))
+        request.add_header('Authorization', 'Basic %s' % self.getBase64Value(self.userid,self.cred))
         mavenmetafile = urllib.request.urlopen(request)#reading base mavenmetadata file to fetch main version
         mavenmetadata = xmltodict.parse(mavenmetafile.read())
         mavenmetafile.close()
@@ -88,7 +88,7 @@ class NexusAgent(BaseAgent):
         data = []
         print(self.config.get("baseUrl", '')+"repository/"+repoid+"/"+groupid+"/"+nexIDs["name"]+"/"+version+"/"+nexIDs["name"]+"-"+version+".pom")
         request = urllib.request.Request(self.config.get("baseUrl", '')+"repository/"+repoid+"/"+groupid+"/"+nexIDs["name"]+"/"+version+"/"+nexIDs["name"]+"-"+version+".pom")
-        request.add_header('Authorization', 'Basic %s' % self.getBase64Value(self.userid,self.passwd))
+        request.add_header('Authorization', 'Basic %s' % self.getBase64Value(self.userid,self.cred))
         mainmavenxml = urllib.request.urlopen(request)#reading mavenmetadata file inside main version folder
         #mainmavenxml = urllib.request.urlopen(self.config.get("baseUrl", '')+"repository/"+repoid+"/"+groupid+"/"+nexIDs["name"]+"/"+version+"/"+nexIDs["name"]+"-"+version+".pom")#reading mavenmetadata file inside main version folder
         mainmavendata = mainmavenxml.read()
@@ -108,8 +108,8 @@ class NexusAgent(BaseAgent):
         #print (logResponse)
         return
         
-    def getBase64Value(self,userid,passwd):
-        userpass = '%s:%s' % (userid,passwd)
+    def getBase64Value(self,userid,cred):
+        userpass = '%s:%s' % (userid,cred)
         base64string = base64.standard_b64encode(userpass.encode('utf-8'))
         return base64string.decode('utf-8')
 

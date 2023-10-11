@@ -112,6 +112,31 @@ public class TraceabilityDashboardController {
 
 	}
 	
+	@GetMapping(value = "/getSprintIssues", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public JsonObject getSprintIssues(@RequestParam String toolName, @RequestParam String fieldName,
+			@RequestParam String fieldValue,@RequestParam String type) {
+		try {			
+			JsonObject response = traceabilityDashboardServiceImpl.getPipeline(toolName, fieldName, Arrays.asList(fieldValue),type);
+		    return PlatformServiceUtil.buildSuccessResponseWithData(response);
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage()); 
+		}
+
+	}
+	@GetMapping(value = "/getReleaseIssues", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public JsonObject getReleaseIssues(@RequestParam String toolName, @RequestParam String fieldName,
+			@RequestParam String fieldValue,@RequestParam String type) {
+		try {			
+			JsonObject response = traceabilityDashboardServiceImpl.getPipeline(toolName, fieldName, Arrays.asList(fieldValue),type);
+			return PlatformServiceUtil.buildSuccessResponseWithData(response);
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage()); 
+		}
+		
+	}
+	
 	@PostMapping(value="/getIssuePipeline", produces=MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public JsonObject getIssuePipeline(@RequestBody String issue)

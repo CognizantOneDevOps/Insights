@@ -27,7 +27,7 @@ class AzurePipelineAgent(BaseAgent):
         self.baseLogger.info('Inside process')
         BaseUrl = self.config.get("baseUrl", '')
         UserID = self.getCredential("userid")
-        Passwd = self.getCredential("passwd")
+        cred = self.getCredential("passwd")
         collectionName = self.config.get("collectionName", '')
         isStartFromDateEnabled = self.config.get("isStartFromDateEnabled", False)
         startFromDate = self.config.get("startFromDate", None)
@@ -38,7 +38,7 @@ class AzurePipelineAgent(BaseAgent):
         responseTemplate = self.getResponseTemplate()
         getProjectUrl = BaseUrl + "/" + collectionName + "/_apis/projects?api-version=5.1"
         data = []
-        projects = self.getResponse(getProjectUrl, 'GET', UserID, Passwd, None)
+        projects = self.getResponse(getProjectUrl, 'GET', UserID, cred, None)
         projCount = projects["count"]
         for project in range(projCount):
             injectData = {}
@@ -53,7 +53,7 @@ class AzurePipelineAgent(BaseAgent):
                 additionalQueryParameter = '&minTime=' + startFrom
             elif isStartFromDateEnabled and startFromDate is not None:
                 additionalQueryParameter = "&minTime=" + startFromDate
-            builds = self.getResponse(getBuildsUrl + additionalQueryParameter, 'GET', UserID, Passwd, None)
+            builds = self.getResponse(getBuildsUrl + additionalQueryParameter, 'GET', UserID, cred, None)
             buildCount = builds["count"]
             for buildIterator in range(0, buildCount):
                 buildDetail = builds['value'][buildIterator]

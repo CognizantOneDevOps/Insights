@@ -30,7 +30,7 @@ class BitBucketAgentAllBranches(BaseAgent):
     def process(self):
         BaseEndPoint = self.config.get("baseEndPoint", '')
         UserId = self.getCredential("userid")
-        Passwd = self.getCredential("passwd")
+        cred = self.getCredential("passwd")
         startFrom = self.config.get("startFrom", '')
         startFrom = parser.parse(startFrom)
         startFrom = mktime(startFrom.timetuple()) + startFrom.microsecond/1000000.0
@@ -43,7 +43,7 @@ class BitBucketAgentAllBranches(BaseAgent):
         fetchNextPage = True
         while fetchNextPage:
             # get all bitbucket projects
-            bitBucketProjects = self.getResponse(getProjectsUrl+'?limit='+str(limit)+'&start='+str(start), 'GET', UserId, Passwd, None)
+            bitBucketProjects = self.getResponse(getProjectsUrl+'?limit='+str(limit)+'&start='+str(start), 'GET', UserId, cred, None)
             numProjects = len(bitBucketProjects["values"])
             if numProjects == 0:
                 fetchNextPage = False
@@ -59,7 +59,7 @@ class BitBucketAgentAllBranches(BaseAgent):
                 fetchNextRepoPage = True
                 while fetchNextRepoPage:
                     # get all repos under a project
-                    bitBicketRepos = self.getResponse(bitBicketReposUrl+'?limit='+str(limit)+'&start='+str(repoStart), 'GET', UserId, Passwd, None)
+                    bitBicketRepos = self.getResponse(bitBicketReposUrl+'?limit='+str(limit)+'&start='+str(repoStart), 'GET', UserId, cred, None)
                     numRepos = len(bitBicketRepos["values"])
                     if numRepos == 0:
                         fetchNextRepoPage = False
@@ -75,7 +75,7 @@ class BitBucketAgentAllBranches(BaseAgent):
                         branchStart = 0
                         fetchNextBranchPage = True
                         while fetchNextBranchPage:
-                            bitBicketBranches = self.getResponse(bitBicketBranchessUrl+'?limit='+str(limit)+'&start='+str(branchStart), 'GET', UserId, Passwd, None)
+                            bitBicketBranches = self.getResponse(bitBicketBranchessUrl+'?limit='+str(limit)+'&start='+str(branchStart), 'GET', UserId, cred, None)
                             numBranches = len(bitBicketBranches["values"])
                             if numBranches == 0:
                                 fetchNextBranchPage = False
@@ -97,7 +97,7 @@ class BitBucketAgentAllBranches(BaseAgent):
                                     if branchTracking != None:
                                         bitBucketCommitsUrl += '&since='+branchTracking
                                     try:
-                                        bitBucketCommits = self.getResponse(bitBucketCommitsUrl+'&limit='+str(limit)+'&start='+str(commitStart), 'GET', UserId, Passwd, None)
+                                        bitBucketCommits = self.getResponse(bitBucketCommitsUrl+'&limit='+str(limit)+'&start='+str(commitStart), 'GET', UserId, cred, None)
                                         i = 0
                                         for commits in (bitBucketCommits["values"]):
                                             authortimestamp = bitBucketCommits["values"][i]["authorTimestamp"]

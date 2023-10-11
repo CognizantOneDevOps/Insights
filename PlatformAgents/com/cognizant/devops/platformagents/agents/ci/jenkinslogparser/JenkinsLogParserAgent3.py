@@ -80,7 +80,7 @@ class JenkinsLogParserAgent(JenkinsAgent):
                 build["deploymentStatus"] = 'Not Found'
             if retrieveAllStages:
                 try:
-                    stageResponse = self.getResponse(stageUrl, 'GET', self.userid, self.passwd, None)
+                    stageResponse = self.getResponse(stageUrl, 'GET', self.userid, self.cred, None)
                     if stageResponse:
                         stages = stageResponse.get('stages', None)
                         if stages:
@@ -98,7 +98,7 @@ class JenkinsLogParserAgent(JenkinsAgent):
                 buildStageDetails = {}
                 deployStageToEnvMap = {}
                 if b'[Pipeline]' in logResponse:
-                    stageResponse = self.getResponse(stageUrl, 'GET', self.userid, self.passwd, None)
+                    stageResponse = self.getResponse(stageUrl, 'GET', self.userid, self.cred, None)
                     if stageResponse:
                         stages = stageResponse.get('stages', None)
                         if stages:
@@ -154,7 +154,7 @@ class JenkinsLogParserAgent(JenkinsAgent):
         return dataList
     
     def getBuildLog(self, url):
-        auth = HTTPBasicAuth(self.userid, self.passwd)
+        auth = HTTPBasicAuth(self.userid, self.cred)
         response = requests.get(url, auth=auth)
         return response.content.decode('utf8')
 

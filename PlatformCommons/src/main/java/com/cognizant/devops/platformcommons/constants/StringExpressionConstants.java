@@ -30,5 +30,7 @@ public final class StringExpressionConstants {
 	public static final String STR_EXP_TASKRETRYCOUNT="TaskRetryCount={} TaskDescription={} TaskMQChannel={} WorkflowType={} processingTime={} status ={} message={}";
 	public static final String STR_EXP_WORKFLOWINITIALIZER="Type=WorkFlowInitializer TaskDescription={} TaskMQChannel={} componentName{} WorkflowType={} processingTime={} status ={} message={}";
 	public static final String STR_EXP_TASK = "Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}";
-
+	public static final String STR_EXP_ALERT_WORKFLOW="Type=AlertWorkFlow executionId={} workflowId={}  AlertName={} trend={} threshold={} count={} ProcessingTime={} message={} ";
+	public static final String STR_EXP_ALERT_EMAIL_EXECUTION="Type=AlertEmailExecution executionId={} workflowId={}  AlertName={} mailto={} mailFrom={} ProcessingTime={} message={} ";
+	
 }

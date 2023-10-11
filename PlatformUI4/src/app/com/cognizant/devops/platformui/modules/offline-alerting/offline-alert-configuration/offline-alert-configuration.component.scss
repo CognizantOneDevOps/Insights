@@ -1,0 +1,169 @@
+/*
+*******************************************************************************
+ * Copyright 2023 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *******************************************************************************/
+
+table,
+mat-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.tableHeaderCss {
+  background-color: var(--backgnd-clr7);
+  padding-top: 1%;
+  padding-bottom: 1%;
+  padding-left: 2%;
+  margin-top: 2%;
+}
+
+tr.mat-footer-row,
+tr.mat-row-kpi {
+  height: 45px !important;
+  text-align: left !important;
+  vertical-align: middle;
+  padding-right: 65px !important;
+  padding-left: 65px !important;
+}
+.mat-select-value {
+  color: #9e9a9a;
+}
+
+::ng-deep .mat-select-value {
+  background: none !important;
+}
+
+.loading-indicator {
+  position: fixed;
+  z-index: 999;
+  height: 2em;
+  width: 2em;
+  overflow: show;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+.align-element {
+  margin-left: 1%;
+  margin-bottom: 0.5%;
+}
+
+.inline-fields label {
+  display: inline-block !important;
+}
+.block {
+  margin-top: 0.5rem;
+  margin-bottom: 0rem;
+}
+
+.infoText {
+  font-size: 13px;
+  color: #ff8f1c;
+  padding-left: 0px;
+}
+
+.mainHeaderText {
+  font-size: 15px;
+  color: #ffffff;
+}
+.infoHeaderText {
+  font-size: 12px;
+  color: #ffffff;
+  padding-left: 43%;
+}
+.mat-select-panel {
+  width: 400px !important;
+  max-width: none !important;
+  min-width: auto !important;
+}
+
+.mat-select-panel-wrap {
+  width: 400px !important;
+  min-width: 400px !important;
+}
+
+.columnComponent {
+  margin: 2% 0 0 0;
+  width: 374px;
+}
+
+.radioComponent{
+margin-left: 5px;
+margin-right: 10px;
+}
+
+.btnAlign {
+  margin-right: 7px;
+  float: right;
+  color: #0033a0;
+}
+
+.mat-date-range-input-start-wrapper {
+  position: relative;
+  width: 13vh;
+}
+
+.mat-form-field-appearance-fill .mat-form-field-infix {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  font-size: 14px !important;
+  width: 190px !important;
+  height: 40px;
+}
+
+.section-body {
+  padding: 25px;
+  border: 1px solid var(--brdr-clr);
+  background: var(--bg-test);
+}
+
+.two-grid-section {
+  display: grid;
+  grid-template-columns: 45% 45%;
+  column-gap: 86px;
+  row-gap: 24px;
+}
+
+.grid-item {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  font: normal normal normal 14px/24px "Open Sans";
+}
+
+.lblCss {
+  color: var(--lblText);
+  font: normal normal normal 14px/17px Open Sans;
+}
+.mailCss > svg {
+  vertical-align: super !important;
+}
+
+::ng-deep .mat-radio-label-content {
+  margin-left: 10px;
+}
+
+.formfield-custom {
+  width: 100%;
+}
+
+.text-area {
+  ::ng-deep .mat-form-field-appearance-fill .mat-form-field-flex {
+    height: 100%;
+  }
+}

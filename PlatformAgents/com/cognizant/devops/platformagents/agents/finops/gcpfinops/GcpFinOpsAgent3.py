@@ -42,12 +42,12 @@ class GcpFinOpsAgent(BaseAgent):
     def process(self):
         key_path = self.config.get('credentials', '{}')  
         self.baseLogger.info('Inside process')        
-        self.credentials = service_account.Credentials.from_service_account_file(
+        self.cred = service_account.Credentials.from_service_account_file(
             key_path, scopes=[ "https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/monitoring.read", "https://www.googleapis.com/auth/admin.directory.user","https://www.googleapis.com/auth/cloud-billing","https://www.googleapis.com/auth/cloud-platform"],
         ) 
         self.dynamicTemplate = self.config.get('dynamicTemplate', '{}')  
         self.agentBaseDir = os.path.dirname(sys.modules[self.__class__.__module__].__file__) + os.path.sep  
-        self.monitoringclient = monitoring_v3.MetricServiceClient(credentials=self.credentials) 
+        self.monitoringclient = monitoring_v3.MetricServiceClient(credentials=self.cred) 
         self.map = defaultdict(list)       
         self.metricDescriptorFileName = "metricdescriptors"  
         self.startFromConfig = self.config.get("startFrom")
@@ -61,8 +61,8 @@ class GcpFinOpsAgent(BaseAgent):
         self.budgetMetadata = self.dynamicTemplate.get("budget", "{}").get("budgetMetadata", "{}")
         self.billingMetadata = self.dynamicTemplate.get("billing", "{}").get("billingMetadata", "{}")
         self.costMetadata = self.dynamicTemplate.get("costManagement","{}").get("costMetadata","{}")
-        self.billingclient = discovery.build('cloudbilling', 'v1', credentials=self.credentials)
-        self.service = discovery.build('cloudresourcemanager', 'v1', credentials=self.credentials)
+        self.billingclient = discovery.build('cloudbilling', 'v1', credentials=self.cred)
+        self.service = discovery.build('cloudresourcemanager', 'v1', credentials=self.cred)
         self.allResourcesList = []
         self.projectList = []
         self.billingList = []
@@ -164,7 +164,7 @@ class GcpFinOpsAgent(BaseAgent):
         datasetdet = self.dynamicTemplate.get("datasetdetails",{})
         projectName=projectid+"."+datasetdet[projectid]["datasetname"]+"."+datasetdet[projectid]["datareporttablename"]
          
-        BQ = bigquery.Client(credentials=self.credentials, project=projectid,)
+        BQ = bigquery.Client(credentials=self.cred, project=projectid,)
         queryProperties = self.dynamicTemplate.get("QueryProperties",{})
         groupbyProperties = self.dynamicTemplate.get("GroupByProperties",{})
         
@@ -261,7 +261,7 @@ class GcpFinOpsAgent(BaseAgent):
         
         try:
             projectName = "projects/"+projectId
-            client = asset_v1.AssetServiceClient(credentials=self.credentials)
+            client = asset_v1.AssetServiceClient(credentials=self.cred)
             results = client.search_all_resources(scope=projectName,asset_types=["compute.googleapis.com/Instance","bigquery.googleapis.com/Dataset","bigquery.googleapis.com/Table","cloudfunctions.googleapis.com/CloudFunction","iam.googleapis.com/ServiceAccount"])
             reslist = []
             t1 = MessageToDict(results._pb)
@@ -428,7 +428,7 @@ class GcpFinOpsAgent(BaseAgent):
     def getBudgetDetails(self):
         budgetList = [] 
         
-        client = budgets_v1.BudgetServiceClient(credentials=self.credentials)
+        client = budgets_v1.BudgetServiceClient(credentials=self.cred)
         for billingInfo in self.billingList:
             billingacc = "billingAccounts/"+billingInfo["id"]
             request = budgets_v1.ListBudgetsRequest(
@@ -453,8 +453,8 @@ class GcpFinOpsAgent(BaseAgent):
    
     def getOrgHierarchy(self):
         
-        v1client = build('cloudresourcemanager', 'v1', credentials=self.credentials, cache_discovery=False)
-        v2client = build('cloudresourcemanager', 'v2', credentials=self.credentials, cache_discovery=False) 
+        v1client = build('cloudresourcemanager', 'v1', credentials=self.cred, cache_discovery=False)
+        v2client = build('cloudresourcemanager', 'v2', credentials=self.cred, cache_discovery=False) 
         ORGANIZATION_ID = self.organizationId      
 
         filter='parent.type="organization" AND parent.id="{}"'.format(ORGANIZATION_ID)
@@ -487,7 +487,7 @@ class GcpFinOpsAgent(BaseAgent):
 
     def recommendations(self,projectName):
         recommendationsMetadata = self.dynamicTemplate.get("recommendations", "{}").get("recommendationsMetadata", "{}")
-        client = recommender.RecommenderClient(credentials=self.credentials)
+        client = recommender.RecommenderClient(credentials=self.cred)
         zones = self.dynamicTemplate.get("recommendationzones",[])
         recommendationsList = []
         for location in zones:

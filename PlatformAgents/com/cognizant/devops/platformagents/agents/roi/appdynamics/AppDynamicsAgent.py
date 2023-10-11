@@ -119,12 +119,12 @@ class AppDynamicsAgent(BaseAgent):
     def getEncodedAuth(self):
         self.baseUrl = self.config.get("baseUrl", '')
         self.username = self.config.get("username", '')
-        self.password = self.config.get("password", '')
-        self.account = self.config.get("account", '')
-        auth = self.username + '@' + self.account, self.password
-        #encodedAuth = base64.encodestring('%s:%s' % auth).replace('\n', '')
-        encodedAuth = base64.encodebytes(('%s:%s' % auth).encode()).decode().replace('\n', '')
-        return encodedAuth
+        self.cred = self.config.get("password", '')
+        self.acc = self.config.get("account", '')
+        tkn = self.username + '@' + self.acc, self.cred
+        #encodedTkn = base64.encodestring('%s:%s' % tkn).replace('\n', '')
+        encodedTkn = base64.encodebytes(('%s:%s' % tkn).encode()).decode().replace('\n', '')
+        return encodedTkn
 
 
     def getEpochInMillis(self, date):
@@ -134,8 +134,8 @@ class AppDynamicsAgent(BaseAgent):
 
     def fetchOutcomeData(self, outcomeDetails):
         self.baseLogger.info(" inside fetchOutcomeData ======")
-        encodedAuth = self.getEncodedAuth()
-        self.headers = {"Authorization": "Basic {0}".format(encodedAuth)}
+        encodedTkn = self.getEncodedAuth()
+        self.headers = {"Authorization": "Basic {0}".format(encodedTkn)}
         endDate = outcomeDetails.get("endDate",None)
         startDate = outcomeDetails.get("intermediateDate",None)
 #         appNames = outcomeDetails.get("appName",None)

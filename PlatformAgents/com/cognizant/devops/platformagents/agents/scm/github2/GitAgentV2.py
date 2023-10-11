@@ -197,7 +197,7 @@ class GitAgentV2(BaseAgent):
         commitFileDetails =self.getResponse(commitFileDetailsUrl,'GET', None, None,None, reqHeaders=self.headers)
         commitSHA = commitFileDetails.get('sha', None)
         commitMessage = commitFileDetails.get('commit',dict()).get('message','')
-        author = commitFileDetails.get('commit',dict()).get('author',dict()).get('name','')
+        creator = commitFileDetails.get('commit',dict()).get('author',dict()).get('name','')
         commitTime = commitFileDetails.get('commit',dict()).get('author',dict()).get('date','')
         commitFiles = commitFileDetails.get('files',list())
         parentsCount = len(commitFileDetails.get('parents',list()))
@@ -218,7 +218,7 @@ class GitAgentV2(BaseAgent):
             fileDetailsDict = {
                 "commitId":commitSHA,
                 "commitMessage":commitMessage,
-                "authorName":author,
+                "authorName":creator,
                 "commitTime":commitTime,
                 "filename":filename,
                 "status":status,
@@ -269,7 +269,7 @@ class GitAgentV2(BaseAgent):
                     pullRequest['originbranchAlmKeys']= branchAlmKeys
                     
                 originRepo = pullRequest.get('head', dict()).get('repo', dict())
-                author = pullRequest.get("user",dict()).get("login", None)
+                creator = pullRequest.get("user",dict()).get("login", None)
                 
                 injectData = {
                 'repoName': repoName,
@@ -278,7 +278,7 @@ class GitAgentV2(BaseAgent):
                 "changed_files": "",
                 'gitType': 'pullRequest', 
                 'consumptionTime': self.timeStampNow(),
-                'authorName': author
+                'authorName': creator
                 }
                 
                 pullReqData += self.parseResponse(responseTemplate, pullRequest, injectData)

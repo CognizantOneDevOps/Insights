@@ -200,11 +200,10 @@ public class OfflineDataProcessingExecutor implements Job, ApplicationConfigInte
 	 * @param jsonObject
 	 */
 	public boolean executeCypherQuery(String cypherQuery, DataEnrichmentModel dataEnrichmentModel) {
-		GraphDBHandler dbHandler = new GraphDBHandler();
 		int processedRecords = 1;
 		int recordCount = 0;
 		long queryExecutionStartTime = System.currentTimeMillis();
-		try {
+		try(GraphDBHandler dbHandler = new GraphDBHandler()) {
 			while (processedRecords > 0) {
 				GraphResponse sprintResponse = dbHandler.executeCypherQuery(cypherQuery);
 				JsonObject sprintResponseJson = sprintResponse.getJson();
@@ -222,6 +221,9 @@ public class OfflineDataProcessingExecutor implements Job, ApplicationConfigInte
 			log.debug(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} ProcessingTime={} processedRecords={} Offline Query processed records={} ",loggingInfo.get(MilestoneConstants.EXECID),loggingInfo.get(EngineConstants.FILENAME),loggingInfo.get(EngineConstants.QUERYNAME), queryProcessingTime,processedRecords,processedRecords);
 		} catch (UnsupportedOperationException | IllegalStateException | IndexOutOfBoundsException | InsightsCustomException ex) {
 			log.error(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} {} - query processing failed",loggingInfo.get(MilestoneConstants.EXECID),loggingInfo.get(EngineConstants.FILENAME),loggingInfo.get(EngineConstants.QUERYNAME),cypherQuery, ex);
+			return false;
+		} catch (Exception e) {
+			log.error(" Type=OfflineDataProcessing execId={} offlineProcessingFileName={} queryName={} {} - query processing failed", loggingInfo.get(MilestoneConstants.EXECID),loggingInfo.get(EngineConstants.FILENAME),loggingInfo.get(EngineConstants.QUERYNAME),cypherQuery, e);
 			return false;
 		} 
 		return true;

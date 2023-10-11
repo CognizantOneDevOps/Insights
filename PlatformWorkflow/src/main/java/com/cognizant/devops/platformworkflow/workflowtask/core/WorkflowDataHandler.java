@@ -63,7 +63,7 @@ public class WorkflowDataHandler {
 			List<InsightsWorkflowConfiguration> workflowConfigs = workflowDAL
 					.getAllScheduledAndActiveWorkflowConfiguration();
 			for (InsightsWorkflowConfiguration workflowConfig : workflowConfigs) {
-
+                if(!workflowConfig.getWorkflowType().equalsIgnoreCase("Offline_Alert")) {
 				if (workflowConfig.getStatus().equalsIgnoreCase(WorkflowTaskEnum.WorkflowStatus.COMPLETED.name())
 						&& workflowConfig.isReoccurence()) {
 					if (isWorkflowScheduledToRun(workflowConfig.getNextRun())) {
@@ -92,6 +92,7 @@ public class WorkflowDataHandler {
 					readyToRunReports.add(workflowConfig);
 				}
 			}
+		  }
 		} catch (Exception e) {
 			log.error("Error while preparing workflows for execution ", e);
 			log.error(
@@ -122,6 +123,7 @@ public class WorkflowDataHandler {
 			List<InsightsWorkflowConfiguration> workflowImmediateConfigs = workflowDAL
 					.getImmediateWorkflowConfiguration();
 			for (InsightsWorkflowConfiguration worflowImmediateConfig : workflowImmediateConfigs) {
+				if(!worflowImmediateConfig.getWorkflowType().equalsIgnoreCase("OFFLINE_ALERT")) {
 				if (worflowImmediateConfig.getStatus()
 						.equalsIgnoreCase(WorkflowTaskEnum.WorkflowStatus.NOT_STARTED.name())
 						|| worflowImmediateConfig.getStatus()
@@ -140,6 +142,7 @@ public class WorkflowDataHandler {
 							,WorkflowId,lastruntime,nextruntime,schedule,"-","-","-","-",
 							WorkflowType,processingTime ,status,"-");
 				}
+			  }
 			}
 		} catch (Exception e) {
 			log.error("Error while preparing getImmediateWorkFlowConfigs for execution ", e);
@@ -147,6 +150,52 @@ public class WorkflowDataHandler {
 			
 		}
 		return readyToRunReports;
+	}
+	
+	/**
+	 * Get list of all ready to run Active Alerts. NOT_STARTED and RESTART are
+	 * awalys eligible for run.
+	 * If alert is COMPLETED and is active then workflow alert pick up
+	 * based on specified schedule item due to run .
+	 * 
+	 * @return
+	 */
+	
+	public List<InsightsWorkflowConfiguration> getReadyToRunAlertWorkFlowConfigs() {
+		List<InsightsWorkflowConfiguration> readyToRunAlerts = new ArrayList<>();
+		try {
+			List<InsightsWorkflowConfiguration> workflowConfigs = workflowDAL
+					.getAllScheduledAndActiveOfflineAlertWorkflowConfig("OFFLINE_ALERT");
+			for (InsightsWorkflowConfiguration workflowConfig : workflowConfigs) {
+				if (workflowConfig.getStatus().equalsIgnoreCase(WorkflowTaskEnum.WorkflowStatus.NOT_STARTED.name())
+						|| workflowConfig.getStatus().equalsIgnoreCase(WorkflowTaskEnum.WorkflowStatus.COMPLETED.name()) 
+								|| workflowConfig.getStatus().equalsIgnoreCase(WorkflowTaskEnum.WorkflowStatus.ERROR.name())
+								&& workflowConfig.isActive()) {
+					if (isWorkflowScheduledToRun(workflowConfig.getNextRun())) {
+						readyToRunAlerts.add(workflowConfig);
+						log.debug(
+								"Type=WorkFlow executionId={} workflowId={} LastRunTime={} NextRunTime={} schedule={} isTaskRetry={} TaskRetryCount={} TaskDescription={} "
+										+ StringExpressionConstants.STR_EXP_TASKMQ,
+								"-", workflowConfig.getWorkflowId(), workflowConfig.getLastRun(),
+								workflowConfig.getNextRun(), workflowConfig.getScheduleType(), "-", "-", "-", "-",
+								workflowConfig.getWorkflowType(), 0, "Completed", "-");
+					} else {
+						log.debug(
+								"Type=WorkFlow executionId={} workflowId={} LastRunTime={} NextRunTime={} schedule={} WorkflowType={} message={}",
+								"-", workflowConfig.getWorkflowId(), workflowConfig.getLastRun(),
+								workflowConfig.getNextRun(), workflowConfig.getScheduleType(),
+								workflowConfig.getWorkflowType(), "Not due for scheduled");
+					}
+				}
+			}
+		} catch (Exception e) {
+			log.error("Error while preparing workflows for execution ", e);
+			log.error(
+					"Type=WorkFlow executionId={} WorkflowId={} LastRunTime={} NextRunTime={} schedule={} isTaskRetry={} TaskRetryCount={} TaskDescription={}"
+							+ StringExpressionConstants.STR_EXP_TASKMQ,
+					"-", "-", "-", "-", "-", "-", "-", "-", "-", "-", 0, "-", e.getMessage());
+		}
+		return readyToRunAlerts;
 	}
 
 	/**
@@ -346,8 +395,7 @@ public class WorkflowDataHandler {
 			if (currentTaskSequence.getNextTask() == -1) {
 				log.debug("Worlflow Detail ==== workflowId {} This is last task update workflow config ", workflowId);
 				updateWorkflowDetails(workflowId, WorkflowTaskEnum.WorkflowTaskStatus.COMPLETED.toString(), true);
-				
-			} else {
+			}else {
 				JsonObject mqRequestJson = new JsonObject();
 				createTaskRequestJson((long) requestMessage.get(AssessmentReportAndWorkflowConstants.EXECUTIONID), workflowId,
 						(int) requestMessage.get("nextTaskId"), nextTaskSequence.getNextTask(),
@@ -393,10 +441,17 @@ public class WorkflowDataHandler {
 		if (isUpdateLastRunTime) {
 			long workflowlastRunTime = InsightsUtils.getCurrentTimeInSeconds();
 			log.debug(" Worlflow Detail ==== workflowId {} Last nextruntime: {} ", workflowId, workflowConfig.getNextRun());
-			long nextRunTime = InsightsUtils.getNextRunTime(workflowConfig.getNextRun(),
-					workflowConfig.getScheduleType(), false);
-			log.debug(" Worlflow Detail ==== workflowId {} Next nextruntime: {} ", workflowId, nextRunTime);
-			workflowConfig.setNextRun(nextRunTime);
+			if(workflowConfig.getWorkflowType().equalsIgnoreCase("OFFLINE_ALERT")) {
+				long nextRunTime = InsightsUtils.getAlertNextRunTime(workflowConfig.getNextRun(),
+						workflowConfig.getScheduleType());
+				log.debug(" Worlflow Detail ==== workflowId {} Next nextruntime: {} ", workflowId, nextRunTime);
+				workflowConfig.setNextRun(nextRunTime);
+			} else {
+				long nextRunTime = InsightsUtils.getNextRunTime(workflowConfig.getNextRun(),
+						workflowConfig.getScheduleType(), false);
+				log.debug(" Worlflow Detail ==== workflowId {} Next nextruntime: {} ", workflowId, nextRunTime);
+				workflowConfig.setNextRun(nextRunTime);
+			}
 			workflowConfig.setLastRun(workflowlastRunTime);
 		}
 		if (status.equalsIgnoreCase("ERROR") || status.equalsIgnoreCase("ABORTED")) {
@@ -408,7 +463,7 @@ public class WorkflowDataHandler {
 		workflowDAL.updateWorkflowConfig(workflowConfig);
 		log.debug(" Worlflow Detail ==== worlflowId {} updateWorkflowStatus completed ", workflowId);
 	}
-
+	
 	/**
 	 * Update WorkflowExecutionHistory for retry flow.
 	 * If retry count exceeded beyound maxWorkflowRetries then change task status
@@ -465,6 +520,5 @@ public class WorkflowDataHandler {
 	public static void setRegistry(Map<Integer, WorkflowTaskSubscriberHandler> registry) {
 		WorkflowDataHandler.registry = registry;
 	}
-	
 	
 }

@@ -34,13 +34,13 @@ class RestCommunicationFacade(object):
         self.responseType = responseType
         self.enableValueArray = enableValueArray
         
-    def communicate(self, url, method, userName, password, data, authType='BASIC', reqHeaders=None, responseTupple=None, proxies=None):
+    def communicate(self, url, method, userName, cred, data, aType='BASIC', reqHeaders=None, responseTupple=None, proxies=None):
         auth = None
-        if(userName != None and password != None):
-            if(authType == 'NTLM'):
-                auth = HttpNtlmAuth(userName, password)
+        if(userName != None and cred != None):
+            if(aType == 'NTLM'):
+                auth = HttpNtlmAuth(userName, cred)
             else:
-                auth = HTTPBasicAuth(userName, password)
+                auth = HTTPBasicAuth(userName, cred)
 
         if reqHeaders == None:
             reqHeaders = RestCommunicationFacade.headers

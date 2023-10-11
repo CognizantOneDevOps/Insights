@@ -32,7 +32,7 @@ class AzureBoardAgent(BaseAgent):
     @BaseAgent.timed
     def process(self):
         self.userid = self.getCredential("userid")
-        self.passwd = self.getCredential("passwd")
+        self.cred = self.getCredential("passwd")
         baseUrl = self.config.get("baseUrl", '')
         wiqlUrl = self.config.get("wiqlUrl", '')
 
@@ -56,14 +56,14 @@ class AzureBoardAgent(BaseAgent):
         updatetimestamp = None
         sprintField = self.config.get("sprintField", None)
         workLogData = []
-        wiqlResponse = self.getResponse(WIQL_URL, 'POST', self.userid, self.passwd, newWorkItemQuery, None, headers)
+        wiqlResponse = self.getResponse(WIQL_URL, 'POST', self.userid, self.cred, newWorkItemQuery, None, headers)
         for workItemIterator in range(0, len(wiqlResponse["workItems"])):
             workItem = wiqlResponse["workItems"][workItemIterator]
             data = []
             newWorkItemData = {}
             workItemUrl = baseUrl + "_apis/wit/workItems/" + \
                 str(workItem["id"]) + "?$expand=all"
-            workItemData = self.getResponse(workItemUrl, 'GET', self.userid, self.passwd, None)
+            workItemData = self.getResponse(workItemUrl, 'GET', self.userid, self.cred, None)
 
             injectData = {}
             Parent = []
@@ -108,7 +108,7 @@ class AzureBoardAgent(BaseAgent):
     def processChangeLog(self, baseUrl, issue, workLogFields, responseTemplate, startFromDate):
         workItemChangeUrl = baseUrl + \
             "_apis/wit/workItems/" + str(issue) + "/updates"
-        workItemDataUpdate = self.getResponse(workItemChangeUrl, 'GET', self.userid, self.passwd, None)
+        workItemDataUpdate = self.getResponse(workItemChangeUrl, 'GET', self.userid, self.cred, None)
         workLogData = []
         injectData = {'issueKey': str(issue)}
         if workItemDataUpdate:
@@ -189,14 +189,14 @@ class AzureBoardAgent(BaseAgent):
         responseTemplate = sprintDetails.get('sprintResponseTemplate', None)
         sprintMetadata = sprintDetails.get('sprintMetadata')
         userid = self.config.get('userid', None)
-        passwd = self.config.get('passwd', None)
-        teams = self.getResponse(teamApiUrl, 'GET', userid, passwd, None)["value"]
+        cred = self.config.get('passwd', None)
+        teams = self.getResponse(teamApiUrl, 'GET', userid, cred, None)["value"]
         for team in teams:
             sprintApiUrl = sprintDetails.get("sprintApiUrl", None)
             if sprintApiUrl:
                 sprintApiUrl = sprintApiUrl.replace("<<team>>", team["name"].replace(" ", "%20"))
                 injectData = {"teamName": team["name"] }
-                sprints = self.getResponse(sprintApiUrl, 'GET', userid, passwd, None)["value"]
+                sprints = self.getResponse(sprintApiUrl, 'GET', userid, cred, None)["value"]
                 for sprint in sprints:
                     self.publishToolsData(self.parseResponse(responseTemplate, sprint, injectData), sprintMetadata,timeStampField,timeStampFormat,isEpoch,True)
 
