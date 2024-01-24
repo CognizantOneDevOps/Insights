@@ -120,11 +120,28 @@
       </div>
 
       <div class="grid-item">
+        <form [formGroup]="formGroup">
+          <div class="select-label">Query Group <span class="asteriskText">*</span></div>
+          <mat-form-field appearance="fill" class="formfield-custom columnComponent">
+            <div class="autocomplete">
+              <input matAutocompletePosition="below" placeholder="Select Query Group" formControlName="queryGroup" matInput
+                type="text" [matAutocomplete]="auto" />
+              <mat-autocomplete position="below" [style.width.%]="100" color="primary" #auto="matAutocomplete">
+                <mat-option class="optionCss" *ngFor="let item of filteredOptions" [value]="item">
+                  {{item}}
+                </mat-option>
+              </mat-autocomplete>
+            </div>
+          </mat-form-field>
+        </form>
+      </div>
+
+      <div class="grid-item">
         <div class="lblText">Query Name <span class="asteriskText">*</span></div>
         <mat-form-field appearance="fill" class="columnComponent">
           <input
             matInput
-            maxlength="50"
+            maxlength="300"
             type="text"
             [(ngModel)]="queryName"
             name="queryName"
@@ -170,12 +187,14 @@
               [(ngModel)]="cypherQuery"
               name="cypherQuery"
               required
+              (input)="checkForDeleteKeyword()"
               placeholder="Input a query"
               style="width: 100%; resize: vertical; height: 135px"
               rows="10"
             ></textarea>
           </mat-form-field>
         </div>
+        <span *ngIf="showCaution" class="caution">Caution: Be cautious while using 'DELETE' keyword </span>
       </div>
     </div>
   </div>

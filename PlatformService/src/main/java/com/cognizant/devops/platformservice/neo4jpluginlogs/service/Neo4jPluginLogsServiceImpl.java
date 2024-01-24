@@ -35,7 +35,7 @@ public class Neo4jPluginLogsServiceImpl implements Neo4jPluginLogsService{
 		JsonArray recordData = new JsonArray();
 		records.stream().forEach(record -> {
 			JsonObject rec = new JsonObject();
-			rec.addProperty("id",(int) record[0]);
+			rec.addProperty("uid",(String) record[0]);
 			rec.addProperty("dashboard",(String) record[1]);
 			recordData.add(rec);
 		});

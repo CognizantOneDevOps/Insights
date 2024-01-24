@@ -1,4 +1,3 @@
-import { OfflineAlertHistoryDetailsDialogComponent } from './offline-alerting/offline-alert-history-details-dialog/offline-alert-history-details-dialog.component';
 /*******************************************************************************
  * Copyright 2019 Cognizant Technology Solutions
  * 
@@ -147,6 +146,7 @@ import { AddComponent } from '@insights/app/modules/multiple-email-configuration
 import { OfflineAlertListComponent } from '@insights/app/modules/offline-alerting/offline-alert-list/offline-alert-list.component';
 import { OfflineAlertConfigurationComponent } from '@insights/app/modules/offline-alerting/offline-alert-configuration/offline-alert-configuration.component';
 import { OfflineAlertingService } from '@insights/app/modules/offline-alerting/offline-alerting-service';
+import { OfflineAlertHistoryDetailsDialogComponent } from '@insights/app/modules/offline-alerting/offline-alert-history-details-dialog/offline-alert-history-details-dialog.component';
 
 
 @NgModule({

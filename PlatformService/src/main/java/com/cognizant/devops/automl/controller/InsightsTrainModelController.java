@@ -144,8 +144,9 @@ public class InsightsTrainModelController {
 		try {
 			String validatedModelName = ValidationUtils.validateRequestBody(modelName);
 			String validatedUsecase = ValidationUtils.validateRequestBody(usecase);
+			if(ValidationUtils.checkAgentIdString(validatedUsecase)) {
 			response = trainModelsService.getPrediction(validatedModelName, validatedUsecase);
-		} catch (InsightsCustomException e) {
+			}} catch (InsightsCustomException e) {
 			log.error(e.getMessage());
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}

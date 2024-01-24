@@ -24,7 +24,6 @@ import { DataSharedService } from "@insights/common/data-shared-service";
   styleUrls: ["email-configuration-dialog.scss", "./../../home.module.scss"],
 })
 export class EmailConfigurationDialog {
-  senderEmailAddress: string = "";
   receiverEmailAddress: string = "";
   mailSubject: string = "";
   mailBodyTemplate: string = "";
@@ -44,7 +43,6 @@ export class EmailConfigurationDialog {
   initializeVariables() {
     if (this.data.type == "edit" && this.data.emailDetails) {
       console.log("Details: ", this.data.emailDetails);
-      this.senderEmailAddress = this.data.emailDetails.senderEmailAddress;
       this.receiverEmailAddress = this.data.emailDetails.receiverEmailAddress;
       this.receiverCCEmailAddress =
         this.data.emailDetails.receiverCCEmailAddress;
@@ -56,7 +54,6 @@ export class EmailConfigurationDialog {
         .replace(/~/g, ">");
       this.buttonName = "EDIT";
     } else {
-      this.senderEmailAddress = "";
       this.receiverEmailAddress = "";
       this.receiverCCEmailAddress = "";
       this.receiverBCCEmailAddress = "";
@@ -86,17 +83,11 @@ export class EmailConfigurationDialog {
       isValidated = false;
       messageDialogText = "Please enter one of the recipient email address";
     } else if (
-      this.senderEmailAddress === "" ||
       this.mailSubject === "" ||
       this.mailBodyTemplate === ""
     ) {
       isValidated = false;
       messageDialogText = "Please fill mandatory fields";
-    } else if (
-      !this.dataShare.validateEmailAddresses(self.senderEmailAddress)
-    ) {
-      isValidated = false;
-      messageDialogText = "Error in From email address format.";
     } else {
       if (self.receiverEmailAddress) {
         isValidated = self.dataShare.validateEmailAddresses(
@@ -137,7 +128,6 @@ export class EmailConfigurationDialog {
         .replace(/</g, "#")
         .replace(/>/g, "~");
       let emailDetailsJson = {
-        senderEmailAddress: self.senderEmailAddress,
         receiverEmailAddress: self.receiverEmailAddress,
         mailSubject: self.mailSubject,
         mailBodyTemplate: self.mailBodyTemplate,

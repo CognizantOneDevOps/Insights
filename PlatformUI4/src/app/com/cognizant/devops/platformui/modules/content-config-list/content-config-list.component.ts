@@ -23,6 +23,8 @@ import { MatTableDataSource } from "@angular/material/table";
 import { KpiService } from "../kpi-addition/kpi-service";
 import { MessageDialogService } from "../application-dialog/message-dialog-service";
 import { ContentService } from "./content-service";
+import { InsightsUtilService } from "@insights/common/insights-util.service";
+import { Sort } from "@angular/material/sort";
 
 @Component({
   selector: "app-content-config",
@@ -50,16 +52,14 @@ export class ContentConfigComponent implements OnInit {
   action: any;
   MAX_ROWS_PER_TABLE = 5;
   selectedIndex: number = -1;
-  currentPageIndex: number = -1;
-  totalPages: number = -1;
-  currentPageValue: number;
 
   constructor(
     public messageDialog: MessageDialogService,
     public router: Router,
     public dialog: MatDialog,
     public kpiService: KpiService,
-    public contentService: ContentService
+    public contentService: ContentService,
+    public insightsUtil : InsightsUtilService
   ) {}
 
   ngOnInit() {
@@ -72,8 +72,6 @@ export class ContentConfigComponent implements OnInit {
       "ExpectedTrend",
       "ResultField",
     ];
-    this.currentPageValue = this.paginator.pageIndex * this.MAX_ROWS_PER_TABLE;
-    this.currentPageIndex = this.paginator.pageIndex + 1;
   }
   ngAfterViewInit() {
     this.contentDatasource.paginator = this.paginator;
@@ -82,13 +80,11 @@ export class ContentConfigComponent implements OnInit {
   goToNextPage() {
     this.paginator.nextPage();
     this.selectedIndex = -1;
-    this.currentPageIndex = this.paginator.pageIndex + 1;
   }
 
   goToPrevPage() {
     this.paginator.previousPage();
     this.selectedIndex = -1;
-    this.currentPageIndex = this.paginator.pageIndex + 1;
   }
 
   addnewContent() {
@@ -138,6 +134,7 @@ export class ContentConfigComponent implements OnInit {
   }
   applyFilter(filterValue: string) {
     this.contentDatasource.filter = filterValue.trim();
+    this.selectedIndex = -1;
   }
   refresh() {
     this.getAllActiveContent();
@@ -146,7 +143,6 @@ export class ContentConfigComponent implements OnInit {
   }
   enableButtons(element) {
     this.onRadioBtnSelect = true;
-    this.currentPageIndex = this.paginator.pageIndex + 1;
   }
   public async getAllActiveContent() {
     var self = this;
@@ -156,9 +152,6 @@ export class ContentConfigComponent implements OnInit {
     if (this.contentList != null && this.contentList.status == "success") {
       this.contentDatasource.data = this.contentList.data.sort(
         (a, b) => a.kpiId > b.kpiId
-      );
-      this.totalPages = Math.ceil(
-        this.contentDatasource.data.length / this.MAX_ROWS_PER_TABLE
       );
       this.contentDatasource.paginator = this.paginator;
     }
@@ -213,5 +206,19 @@ export class ContentConfigComponent implements OnInit {
           });
       }
     });
+  }
+
+  sortData(sort: Sort) {
+    const data = this.contentList.data.slice();
+    if (!sort.active || sort.direction === '') {
+      this.contentDatasource.data = data;
+      return;
+    }
+
+    this.contentDatasource.data = data.sort((a, b) => {
+      const isAsc = sort.direction === 'asc';
+      return this.insightsUtil.compare(a[sort.active], b[sort.active], isAsc)
+    });
+    this.contentDatasource.paginator = this.paginator;
   }
 }

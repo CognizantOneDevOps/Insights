@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: platformagents
+  name: platformagents
+spec:
+  selector:
+    matchLabels:
+      app: platformagents
+  template:
+    metadata:
+      labels:
+        app: platformagents
+    spec:
+      containers:
+        - name: platformagents
+          image: devopsbasservice/onedevopsinsights:agentwebhook10.2
+          envFrom:
+            - configMapRef:
+              name: app-configs          
+          volumeMounts:
+            - mountPath: /usr/INSIGHTS_HOME/logs
+              name: agentspv
+              subpath: agentslogs
+            - mountPath: /opt/insightsagents/PlatformAgents
+              name: agentspv              
+
+      volumes:
+        - name: agentspv
+          persistentVolumeClaim:
+            claimName: agentspvc

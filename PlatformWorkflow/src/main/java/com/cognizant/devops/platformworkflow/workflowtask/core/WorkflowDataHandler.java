@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.StringExpressionConstants;
+import com.cognizant.devops.platformcommons.core.enums.JobSchedule;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
@@ -447,10 +448,15 @@ public class WorkflowDataHandler {
 				log.debug(" Worlflow Detail ==== workflowId {} Next nextruntime: {} ", workflowId, nextRunTime);
 				workflowConfig.setNextRun(nextRunTime);
 			} else {
-				long nextRunTime = InsightsUtils.getNextRunTime(workflowConfig.getNextRun(),
-						workflowConfig.getScheduleType(), false);
-				log.debug(" Worlflow Detail ==== workflowId {} Next nextruntime: {} ", workflowId, nextRunTime);
-				workflowConfig.setNextRun(nextRunTime);
+				if (!(JobSchedule.DAILY.name().equalsIgnoreCase(workflowConfig.getScheduleType())
+						&& workflowConfig.getLastRun() == 0)) {
+					long nextRunTime = InsightsUtils.getNextRunTime(workflowConfig.getNextRun(),
+							workflowConfig.getScheduleType(), false);
+					workflowConfig.setNextRun(nextRunTime);
+				}
+				log.debug(" Worlflow Detail ==== workflowId {} Next nextruntime: {} ", workflowId,
+						workflowConfig.getNextRun());
+
 			}
 			workflowConfig.setLastRun(workflowlastRunTime);
 		}

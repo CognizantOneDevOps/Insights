@@ -152,12 +152,17 @@ var addStyleTag = function () {
 		var style = "<style type=\"text/css\">" +
 			".sidemenu {display : none !important;}\n" +
 			".main-view{position:absolute;width:100%;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;)}\n" +
+			".main-view:not(.main-view--search-bar-hidden) > *:first-child > *:first-child:not([class*=\"Nav toolbar\"]) {display: none !important;}\n"+
+			".main-view > *:nth-child(2) {padding-top: 40px ;}\n"+
 			".scroll-canvas{position:fixed;width:100%;overflow:auto;-webkit-overflow-scrolling:touch}\n" +
 			".navbar-brand-btn {display : none !important;}\n" +
 			".page-header-canvas {display : none !important;}\n" +
 			".search-item-dash-home {display : none !important;}" +
 			".search-button-row-explore-link {display : none !important;}" +
 			".footer {display : none !important;}" +
+			"nav[aria-label=\"Breadcrumbs\"] ol > li:first-child {display: none !important;}\n" +
+			"button[aria-label=\"Toggle menu\"] {display: none !important;}\n"+
+			"[class*=\"NavToolbar-actions\"] > button:last-child {display: none !important;}\n" +
 			"</style>";
 		//dropdown-menu
 		$(style).appendTo(head);

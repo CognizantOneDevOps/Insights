@@ -269,7 +269,7 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
             this.dataShare.setAuthorizationToken(token);
             this.dataShare.setSession();
             this.cookies = "";
-            console.log(grafcookies);
+           // console.log(grafcookies);
             for (var key in grafcookies) {
               if (
                 key != "jtoken" &&

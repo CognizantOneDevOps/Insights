@@ -25,6 +25,8 @@ import { MatRadioChange } from "@angular/material/radio";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 import { OfflineAlertingService } from "@insights/app/modules/offline-alerting/offline-alerting-service";
 import { OfflineAlertHistoryDetailsDialogComponent } from "@insights/app/modules/offline-alerting/offline-alert-history-details-dialog/offline-alert-history-details-dialog.component";
+import { InsightsUtilService } from "@insights/common/insights-util.service";
+import { Sort } from "@angular/material/sort";
 
 @Component({
   selector: "app-offline-alert-list",
@@ -65,7 +67,6 @@ export class OfflineAlertListComponent implements OnInit {
   changeState: boolean;
   isActive: boolean;
   currentPageIndex: number = -1;
-  totalPages: number = -1;
   enableEmail: boolean = false;
   dateObj: Date;
   timeZoneAbbr: String = "";
@@ -75,7 +76,8 @@ export class OfflineAlertListComponent implements OnInit {
     private offlineAlertService: OfflineAlertingService,
     public dataShare: DataSharedService,
     public router: Router,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    public insightsUtil : InsightsUtilService,
   ) {}
 
   ngOnInit() {
@@ -202,15 +204,8 @@ export class OfflineAlertListComponent implements OnInit {
       });
       this.alertDatasource.data = this.dashConfigList.data;
       this.isDatainProgress = false;
-      this.totalPages = Math.ceil(
-        this.alertDatasource.data.length / this.MAX_ROWS_PER_TABLE
-      );
       this.alertDatasource.paginator = this.paginator;
     }
-  }
-
-  applyFilter(filterValue: string) {
-    this.alertDatasource.filter = filterValue.trim();
   }
 
   list() {
@@ -341,4 +336,19 @@ export class OfflineAlertListComponent implements OnInit {
       }
     });
   }
+
+  sortData(sort: Sort) {
+    const data = this.dashConfigList.data.slice();
+    if (!sort.active || sort.direction === '') {
+      this.alertDatasource.data = data;
+      return;
+    }
+
+    this.alertDatasource.data = data.sort((a, b) => {
+      const isAsc = sort.direction === 'asc';
+      return this.insightsUtil.compare(a[sort.active], b[sort.active], isAsc)
+    });
+    this.alertDatasource.paginator = this.paginator;
+  }
+
 }

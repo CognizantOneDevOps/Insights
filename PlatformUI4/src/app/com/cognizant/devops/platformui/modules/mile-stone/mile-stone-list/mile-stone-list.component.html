@@ -64,6 +64,7 @@
     <mat-radio-group [(ngModel)]="milestone">
       <table
         mat-table
+        matSort (matSortChange)="sortData($event)"
         [dataSource]="mileStoneDatasource"
         style="margin-top: 2% !important"
       >
@@ -83,7 +84,7 @@
           </td>
         </ng-container>
         <ng-container matColumnDef="mileStoneName">
-          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="mileStoneName">
             MileStone
           </th>
           <td mat-cell *matCellDef="let element" style="width: 18% !important">
@@ -91,7 +92,7 @@
           </td>
         </ng-container>
         <ng-container matColumnDef="milestoneReleaseID">
-          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="milestoneReleaseID">
             MileStone Release ID
           </th>
           <td mat-cell *matCellDef="let element" style="width: 18% !important">
@@ -99,7 +100,7 @@
           </td>
         </ng-container>
         <ng-container matColumnDef="startDate">
-          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="startDate">
             Start Date
           </th>
           <td mat-cell *matCellDef="let element" style="width: 12% !important">
@@ -107,7 +108,7 @@
           </td>
         </ng-container>
         <ng-container matColumnDef="endDate">
-          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="endDate">
             End Date
           </th>
           <td mat-cell *matCellDef="let element" style="width: 12% !important">
@@ -115,7 +116,7 @@
           </td>
         </ng-container>
         <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="status">
             Data Collection Status
           </th>
           <td mat-cell *matCellDef="let element" style="width: 15% !important">
@@ -123,7 +124,7 @@
           </td>
         </ng-container>
         <ng-container matColumnDef="details">
-          <th mat-header-cell *matHeaderCellDef class="tableHeader">Details</th>
+          <th mat-header-cell *matHeaderCellDef class="tableHeader" >Details</th>
           <td
             mat-cell
             *matCellDef="let element; let i = index"
@@ -182,7 +183,7 @@
         </mat-icon>
       </div>
       <div class="paginatorElement paginatorIndexElement">
-        {{ currentPageIndex }}
+        {{ (this.mileStoneDatasource.paginator && (this.mileStoneDatasource.paginator.length === 0)) ? 0 : this.paginator.pageIndex + 1}}
       </div>
       <div
         class="paginatorElement"
@@ -207,7 +208,7 @@
         >
         </mat-icon>
       </div>
-      <div>of {{ totalPages }}</div>
+      <div>of {{ this.paginator.getNumberOfPages() }}</div>
     </div>
   </div>
 </div>

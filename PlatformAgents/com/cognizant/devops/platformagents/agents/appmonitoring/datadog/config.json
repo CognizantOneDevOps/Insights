@@ -1,0 +1,91 @@
+{
+	"vault": {
+		"getFromVault": false,
+		"secretEngine": "insights-kv",
+		"readToken": "vault_secret_token",
+		"vaultUrl": "http://Vault_Host:port/v1/"
+	},
+	"mqConfig": {
+		"providerName": "RabbitMQ",
+		"user": "username for RabbitMq",
+		"password": "",
+		"host": "127.0.0.1",
+		"exchange": "iSight",
+		"agentControlXchg": "iAgent",
+		"awsAccessKey": "",
+		"awsSecretKey": "",
+		"awsRegion": ""
+	},
+	"subscribe": {
+		"config": "APPMONITORING.DATADOG.config"
+	},
+	"publish": {
+		"data": "APPMONITORING.DATADOG.DATA",
+		"health": "APPMONITORING.DATADOG.HEALTH"
+	},
+	"communication": {
+		"type": "REST",
+		"sslVerify": false,
+		"responseType": "JSON"
+	},
+	"dynamicTemplate": {
+		"eventMetaData": {
+			"labels": [
+				"EVENT"
+			],
+			"dataUpdateSupported": true,
+			"uniqueKey": [
+				"eventId"
+			]
+		},
+		"monitorMetaData": {
+			"labels": [
+				"MONITOR"
+			],
+			"dataUpdateSupported": true,
+			"uniqueKey": [
+				"monitorId"
+			],
+			"tags": []
+		},
+		"timeFieldMapping": {
+			"startDate": "%Y-%m-%d"
+		},
+		"responseTemplate": {
+			
+		}
+	},
+	"agentId": "",
+	"toolCategory": "APPMONITORING",
+	"toolsTimeZone": "Asia/Kolkata",
+	"insightsTimeZone": "Asia/Kolkata",
+	"useResponseTemplate": true,
+	"enableValueArray": false,
+	"enableDataValidation": true,
+	"auth": "base64",
+	"runSchedule": 30,
+	"timeStampField": "lastUpdated",
+	"timeStampFormat": "%Y-%m-%dT%H:%M:%S",
+	"isEpochTimeFormat": false,
+	"agentSecretDetails": [
+		"apiKey",
+		"applicationKey"
+	],
+	"startFrom": "2024-01-05 11:00:00",
+	"baseUrl": "https://api.us3.datadoghq.com",
+	"apiKey": "",
+	"applicationKey": "",
+	"isDebugAllowed": false,
+	"loggingSetting": {
+		"logLevel": "INFO",
+		"maxBytes": 5000000,
+		"backupCount": 10
+	},
+	"enableProxy": false,
+	"proxies": {
+		"http": "",
+		"https": ""
+	},
+	"toolName": "DATADOG",
+	"labelName": "DATADOG"
+}

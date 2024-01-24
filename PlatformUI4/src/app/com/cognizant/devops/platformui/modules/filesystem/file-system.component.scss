@@ -14,6 +14,10 @@
  * the License.
  ****************************************************************************** */
 
+ .tableHeader{
+     text-align: unset !important;
+ }
+
 .agent-categories-grid {
     display: grid;
     grid-template-columns: 32% 32% 36%;
@@ -43,20 +47,6 @@ height: 20px;
     width: 210px !important;
 }
 
-.tableHeaderCss {
-    background-color: var(--backgnd-clr7);
-    color: white;
-    font-size: 14px;
-    margin: 0px;
-    flex: 0 0 10px;
-    text-align: left;
-    margin-top: 16px;
-    height: 40px;
-    padding-top: 10px;
-    padding-left: 22px;
-    display: flex;
-    justify-content: space-between;
-  }
 
   .infoHeaderText {
     font-size: 12px;
@@ -68,6 +58,3 @@ height: 20px;
     margin-bottom: 16px !important;
   }
 
-th.mat-header-cell:first-of-type, td.mat-cell:first-of-type, td.mat-footer-cell:first-of-type {
-    padding-left: 10px !important;
-  }

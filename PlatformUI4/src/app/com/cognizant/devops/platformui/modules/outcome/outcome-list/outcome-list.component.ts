@@ -24,6 +24,8 @@ import { DataSharedService } from "@insights/common/data-shared-service";
 import { OutcomeService } from "../outcome.service";
 import { OutcomeProvider } from "../outcome.provider";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
+import { Sort } from "@angular/material/sort";
+import { InsightsUtilService } from "@insights/common/insights-util.service";
 
 @Component({
   selector: "app-outcome-list",
@@ -56,9 +58,8 @@ export class OutcomeListComponent implements OnInit {
   timeZone: string = "";
   count: number;
   selectedIndex: -1;
-  currentPageIndex: number = -1;
   currentPageValue: number;
-  totalPages: number = -1;
+  outcomeList : any = {};
 
   constructor(
     public messageDialog: MessageDialogService,
@@ -67,7 +68,8 @@ export class OutcomeListComponent implements OnInit {
     public dialog: MatDialog,
     public reportmanagementService: ReportManagementService,
     private outcomeService: OutcomeService,
-    private outcomeProvider: OutcomeProvider
+    private outcomeProvider: OutcomeProvider,
+    public insightsUtil : InsightsUtilService
   ) {}
 
   ngOnInit() {
@@ -80,7 +82,6 @@ export class OutcomeListComponent implements OnInit {
       "isActive",
     ];
     this.currentPageValue = this.paginator.pageIndex * this.MAX_ROWS_PER_TABLE;
-    this.currentPageIndex = this.paginator.pageIndex + 1;
   }
 
   ngAfterViewInit() {
@@ -146,16 +147,13 @@ export class OutcomeListComponent implements OnInit {
     this.isDatainProgress = true;
     var self = this;
     self.refreshRadio = false;
-    let outcomeList = await this.outcomeService.loadOutcomeList();
-    if (outcomeList.status === "success") {
+    this.outcomeList = await this.outcomeService.loadOutcomeList();
+    if (this.outcomeList.status === "success") {
       this.count = 0;
-      this.outcomeDatasource.data = outcomeList.data;
+      this.outcomeDatasource.data = this.outcomeList.data;
     }
     this.isDatainProgress = false;
     this.outcomeDatasource.paginator = this.paginator;
-    this.totalPages = Math.ceil(
-      this.outcomeDatasource.data.length / this.MAX_ROWS_PER_TABLE
-    );
   }
 
   applyFilter(filterValue: string) {
@@ -254,14 +252,29 @@ export class OutcomeListComponent implements OnInit {
 
   goToNextPage() {
     this.paginator.nextPage();
-    this.currentPageIndex = this.paginator.pageIndex + 1;
     this.selectedIndex = -1;
     this.currentPageValue = this.paginator.pageIndex * this.MAX_ROWS_PER_TABLE;
   }
   goToPrevPage() {
     this.paginator.previousPage();
-    this.currentPageIndex = this.paginator.pageIndex + 1;
     this.selectedIndex = -1;
     this.currentPageValue = this.paginator.pageIndex * this.MAX_ROWS_PER_TABLE;
+  }
+
+  sortData(sort: Sort) {
+    const data = this.outcomeList.data.slice();
+    if (!sort.active || sort.direction === '') {
+      this.outcomeDatasource.data = data;
+      return;
+    }
+
+    this.outcomeDatasource.data = data.sort((a, b) => {
+      const isAsc = sort.direction === 'asc';
+      if(sort.active === "toolName")
+        return this.insightsUtil.compare(a.insightsTools.toolName, b.insightsTools.toolName, isAsc)
+      else
+        return this.insightsUtil.compare(a[sort.active], b[sort.active], isAsc)
+    });
+    this.outcomeDatasource.paginator = this.paginator;
   }
 }

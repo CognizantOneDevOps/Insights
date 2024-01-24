@@ -23,7 +23,7 @@ import {
 } from "@angular/material/dialog";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
-import { MatSort } from "@angular/material/sort";
+import { MatSort, Sort } from "@angular/material/sort";
 import { MatTableDataSource } from "@angular/material/table";
 import { ShowDetailsDialog } from "@insights/app/modules/healthcheck/healthcheck-show-details-dialog";
 import { CommonModule, DatePipe } from "@angular/common";
@@ -31,6 +31,7 @@ import { WorkflowHistoryDetailsDialog } from "@insights/app/modules/reportmanage
 import { DataSharedService } from "@insights/common/data-shared-service";
 import { MessageDialogService } from "@insights/app/modules/application-dialog/message-dialog-service";
 import { saveAs as importedSaveAs } from "file-saver";
+import { InsightsUtilService } from "@insights/common/insights-util.service";
 
 @Component({
   selector: "app-healthcheck",
@@ -58,7 +59,8 @@ export class HealthCheckComponent implements OnInit {
     private dialog: MatDialog,
     public dataShare: DataSharedService,
     private messageDialog: MessageDialogService,
-    private config: InsightsInitService
+    private config: InsightsInitService,
+    public insightsUtil : InsightsUtilService
   ) {
     this.loadOtherHealthCheckInfo();
     this.loadHealthNotificationStatus();   
@@ -119,6 +121,7 @@ export class HealthCheckComponent implements OnInit {
           "details",
         ];
       }
+      this.dataListDatasource = this.dataComponentDataSource;
     } catch (error) {
       this.showContent = false;
       console.log(error);
@@ -274,5 +277,18 @@ export class HealthCheckComponent implements OnInit {
         },
       });
     }
+  }
+
+  sortData(sort: Sort) {
+    const data = this.dataListDatasource.slice();
+    if (!sort.active || sort.direction === '') {
+      this.dataComponentDataSource = data;
+      return;
+    }
+
+    this.dataComponentDataSource = data.sort((a, b) => {
+      const isAsc = sort.direction === 'asc';
+      return this.insightsUtil.compare(a[sort.active], b[sort.active], isAsc)
+    });
   }
 }

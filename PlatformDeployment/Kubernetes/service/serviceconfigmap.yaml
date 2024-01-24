@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-configs
+  namespace: test
+data:
+  grafanaDBPass: ""
+  grafanaDBUser: 
+  grafanaPort: 
+  hostPublicIP: 
+  hostPrivateIP: 
+  neo4jBoltPort: 
+  neo4jHttpPort: 
+  neo4jIP: 
+  neo4jPassword: 
+  neo4jUser: 
+  postgresIP: 
+  postgresPort: 
+  servicePort: 
+  uiPort: 
+  rabbitmqIP: 
+  rabbitMqPort: 
+  rabbitMqUser: 
+  rabbitMqPassword: 
+  LOKI_HOST: 
+  LOKI_PORT: 
+  PROMTAIL_LISTEN_PORT: 
+  enablePromtail: 
+  enableLoki: 

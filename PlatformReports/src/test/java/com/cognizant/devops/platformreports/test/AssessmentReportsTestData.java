@@ -503,7 +503,8 @@ public class AssessmentReportsTestData {
 	}
 	public Map<String, String> getGrafanaHeaders(int orgId) {
 		GrafanaOrgToken grafanaOrgToken = grafanaDashboardConfigDAL.getTokenByOrgId(orgId);
-		String token = "Bearer "+AES256Cryptor.decrypt(grafanaOrgToken.getApiKey(), AssessmentReportAndWorkflowConstants.GRAFANA_PDF_TOKEN_SIGNING_KEY);
+		String token = "Bearer "+AES256Cryptor.decrypt(grafanaOrgToken.getApiKey(), ApplicationConfigProvider.getInstance().getSingleSignOnConfig()
+				.getTokenSigningKey());
 		Map<String, String> headers = new HashMap<>();
 		headers.put("Authorization", token);
 		return headers;
@@ -593,7 +594,8 @@ public class AssessmentReportsTestData {
 			String response = grafanaHandler.grafanaPost(PlatformServiceConstants.API_AUTH_KEYS,json, headers);
 			JsonObject apiObj = JsonUtils.parseStringAsJsonObject(response);
 			grafanaOrgToken.setOrgId(orgId);
-			grafanaOrgToken.setApiKey(AES256Cryptor.encrypt(apiObj.get("key").getAsString(), AssessmentReportAndWorkflowConstants.GRAFANA_PDF_TOKEN_SIGNING_KEY));		
+			grafanaOrgToken.setApiKey(AES256Cryptor.encrypt(apiObj.get("key").getAsString(), ApplicationConfigProvider.getInstance().getSingleSignOnConfig()
+					.getTokenSigningKey()));		
 			grafanaDashboardConfigDAL.saveGrafanaOrgToken(grafanaOrgToken);
 					 
 		}catch (Exception e) {

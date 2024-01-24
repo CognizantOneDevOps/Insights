@@ -68,6 +68,16 @@ tr.mat-row-kpi {
   color: var(--text-clr);
 }
 
+.caution {
+  text-align: left;
+  font: normal normal normal 12px/24px Open Sans;
+  letter-spacing: 0px;
+  color: #ff1a1a;
+  opacity: 1;
+  font-weight: bold;
+  margin-top: 13px;
+}
+
 .btnAlign {
   margin-right: 7px;
   float: right;

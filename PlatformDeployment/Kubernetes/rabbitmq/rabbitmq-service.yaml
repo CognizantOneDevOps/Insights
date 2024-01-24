@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-rabbitmq
+  namespace: insights
+spec:
+  selector:
+    app: rabbit-mq
+  ports:
+    - name: rabbitmq-amqp
+      port: 5672

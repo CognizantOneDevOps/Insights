@@ -91,7 +91,7 @@
     </div>
   </div>
 
-  <div style="margin-top: 2%">
+  <div style="margin-top: 2%;">
     <mat-form-field appearance="fill" class="columnComponent">
       <input
         matInput
@@ -119,6 +119,7 @@
   <div class="offlineData-table">
     <mat-radio-group [(ngModel)]="selectedOfflineData">
       <table
+        matSort (matSortChange)="sortData($event)"
         mat-table
         [dataSource]="offlineDatasource"
         class="mat-elevation-z8"
@@ -130,7 +131,7 @@
           <td
             mat-cell
             *matCellDef="let element; let i = index"
-            style="width: 5%; text-align: center !important"
+            style="width: 5% !important;"
           >
             <mat-radio-button
               [value]="element"
@@ -142,27 +143,38 @@
 
         <!-- Query Id Column -->
         <ng-container matColumnDef="toolName">
-          <th mat-header-cell *matHeaderCellDef class="tableHeader">Tool</th>
+          <th mat-header-cell *matHeaderCellDef class="tableHeader"  mat-sort-header="toolName">Tool</th>
           <td
             mat-cell
             *matCellDef="let element"
-            style="width: 10% !important; text-align: center"
+            style="width: 10% !important;"
           >
             {{ element.toolName }}
           </td>
         </ng-container>
 
+        <!-- Query Group Column -->
+        <ng-container matColumnDef="queryGroup">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="queryGroup">
+            Query Group
+          </th>
+          <td mat-cell *matCellDef="let element" style="width: 10% !important;" matTooltip="{{element.queryGroup}}">
+            {{hideTextOverflow(element.queryGroup)}}
+          </td>
+        </ng-container>
+
         <!-- Query Name Column -->
         <ng-container matColumnDef="queryName">
-          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="queryName">
             Query Name
           </th>
           <td
             mat-cell
             *matCellDef="let element"
-            style="width: 10% !important; text-align: center"
+            style="width: 10% !important;"
+            matTooltip="{{element.queryName}}"
           >
-            {{ element.queryName }}
+            {{hideTextOverflow(element.queryName)}}
           </td>
         </ng-container>
 
@@ -178,7 +190,7 @@
           <td
             mat-cell
             *matCellDef="let element"
-            style="width: 10% !important; text-align: center"
+            style="width: 10% !important;"
             [title]="getTitle(element.cronSchedule)"
           >
             {{ element.cronSchedule }}
@@ -187,11 +199,11 @@
  
         <!-- Active Column -->
         <ng-container matColumnDef="active">
-          <th mat-header-cell *matHeaderCellDef class="tableHeader">Active</th>
+          <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="isActive">Active</th>
           <td
             mat-cell
             *matCellDef="let element; let i = index"
-            style="width: 10% !important; text-align: center"
+            style="width: 10% !important;"
           >
             <mat-slide-toggle
               (change)="updateOfflineQueryStatus($event, element)"
@@ -206,7 +218,7 @@
         </ng-container>
 
          <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef class="tableHeader">Status</th>
+          <th mat-header-cell *matHeaderCellDef class="tableHeader"  mat-sort-header="status">Status</th>
           <td mat-cell *matCellDef="let element" style="text-align: center; padding: 0 10px">
             <mat-icon svgIcon="success_status" *ngIf="element.status == 'Success'" matTooltip="Success">
             </mat-icon>
@@ -217,14 +229,14 @@
         </ng-container>
 
         <!-- Last Execution Time Column -->
-        <ng-container matColumnDef="lastExecutionTime">
-          <th mat-header-cell *matHeaderCellDef class="tableHeader" style="white-space: nowrap !important">
+        <ng-container matColumnDef="lastExecutionTime" >
+          <th mat-header-cell *matHeaderCellDef class="tableHeader" style="white-space: nowrap !important" mat-sort-header="lastExecutionTime">
             Last Execution Time ({{ timeZoneAbbr }})
           </th>
           <td
             mat-cell
             *matCellDef="let element"
-            style="width: 10% !important; text-align: center"
+            style="width: 10% !important;"
           >
             {{ element.lastExecutionTime }}
           </td>
@@ -237,13 +249,14 @@
             *matHeaderCellDef
             class="tableHeader"
             style="white-space: pre-wrap !important"
+            mat-sort-header="queryProcessingTime"
           >
             Query Processing Time (sec)
           </th>
           <td
             mat-cell
             *matCellDef="let element"
-            style="width: 10% !important; text-align: center"
+            style="width: 10% !important;"
           >
             {{ element.queryProcessingTime }}
           </td>
@@ -256,13 +269,14 @@
             *matHeaderCellDef
             class="tableHeader"
             style="white-space: pre-wrap !important"
+            mat-sort-header="recordsProcessed"
           >
             Records Processed
           </th>
           <td
             mat-cell
             *matCellDef="let element"
-            style="width: 10% !important; text-align: center"
+            style="width: 10% !important;"
           >
             {{ element.recordsProcessed }}
           </td>
@@ -283,7 +297,6 @@
             *matCellDef="let element; let i = index"
             style="
               width: 10%;
-              text-align: center;
               padding-right: 5px !important;
             "
           >
@@ -341,7 +354,7 @@
         </mat-icon>
       </div>
       <div class="paginatorElement paginatorIndexElement">
-        {{ currentPageIndex }}
+        {{ (this.offlineDatasource.paginator && (this.offlineDatasource.paginator.length === 0 ))? 0 : this.paginator.pageIndex + 1 }}
       </div>
       <div
         class="paginatorElement"
@@ -367,7 +380,7 @@
         >
         </mat-icon>
       </div>
-      <div>of {{ totalPages }}</div>
+      <div>of {{ this.paginator.getNumberOfPages() }}</div>
     </div>
   </div>
 </div>

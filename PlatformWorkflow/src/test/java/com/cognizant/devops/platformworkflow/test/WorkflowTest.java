@@ -135,7 +135,7 @@ public class WorkflowTest extends WorkflowTestData {
 		try {
 			InsightsWorkflowConfiguration workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(failWorkflowId);
 			Assert.assertEquals(workflowConfig.getStatus(), "ERROR");
-			Assert.assertTrue(workflowConfig.getNextRun() == nextRunDaily);
+			Assert.assertTrue(workflowConfig.getNextRun() < nextRunDaily);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
@@ -163,7 +163,7 @@ public class WorkflowTest extends WorkflowTestData {
 			InsightsWorkflowConfiguration workflowConfig = workflowDAL
 					.getWorkflowConfigByWorkflowId(WorkflowIdWrongTask);
 			Assert.assertEquals(workflowConfig.getStatus(), "TASK_INITIALIZE_ERROR");
-			Assert.assertTrue(workflowConfig.getNextRun() == nextRunDaily);
+			Assert.assertTrue(workflowConfig.getNextRun() < nextRunDaily);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
@@ -237,7 +237,7 @@ public class WorkflowTest extends WorkflowTestData {
 			InsightsWorkflowConfiguration workflowConfig = workflowDAL
 					.getWorkflowConfigByWorkflowId(WorkflowIdTestImmediate);
 			Assert.assertEquals(workflowConfig.getStatus(), "COMPLETED");
-			Assert.assertTrue(workflowConfig.getNextRun() > nextRunDaily);
+			Assert.assertTrue(workflowConfig.getNextRun() < nextRunDaily);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}

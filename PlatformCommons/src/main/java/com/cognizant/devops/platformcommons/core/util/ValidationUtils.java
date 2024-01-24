@@ -39,6 +39,7 @@ public class ValidationUtils {
 	private static final Logger log = LogManager.getLogger(ValidationUtils.class);
 	private static Pattern agentNamePattern = Pattern.compile("[^A-Za-z]", Pattern.CASE_INSENSITIVE);
 	private static Pattern agentIdPattern = Pattern.compile("[^A-Za-z0-9\\_]", Pattern.CASE_INSENSITIVE);
+	private static Pattern modelIdPattern = Pattern.compile("[^A-Za-z0-9\\_\\@]", Pattern.CASE_INSENSITIVE);
 	private static Pattern agentVersionPattern = Pattern.compile("[v0-9]", Pattern.CASE_INSENSITIVE);
 	private static Pattern LabelPattern = Pattern.compile("[^A-Za-z0-9\\_\\.]", Pattern.CASE_INSENSITIVE);
 	public static final String AGENT_URL_PATTERN = "^[a-zA-Z0-9:.=?_\\/\\/\\\\\\\\-]{1,300}$";
@@ -80,6 +81,15 @@ public class ValidationUtils {
 	public static boolean checkAgentIdString(String agentId) {
 		boolean returnBoolean = false;
 		Matcher m = agentIdPattern.matcher(agentId);
+		if (m.find()) {
+			returnBoolean = true;
+		}
+		return returnBoolean;
+	}
+	
+	public static boolean checkModelIdString(String agentId) {
+		boolean returnBoolean = false;
+		Matcher m = modelIdPattern.matcher(agentId);
 		if (m.find()) {
 			returnBoolean = true;
 		}
@@ -157,6 +167,28 @@ public class ValidationUtils {
 		}
 		return hasHTML;
 	}
+	
+	public static Boolean validateCypherQueryForHTMLContent(String data) {
+		String modifiedString = "";
+		Boolean hasHTML = Boolean.FALSE;
+
+		if (data instanceof String) {
+			modifiedString = data;
+			if (modifiedString != "") {
+				modifiedString = modifiedString.replaceAll(StringExpressionConstants.CYPHERQUERY_REGEX, "");
+				// replace &nbsp; with space
+				modifiedString = modifiedString.replace(ConfigOptions.NBSP, " ");
+				// replace &amp; with &
+				modifiedString = modifiedString.replace(ConfigOptions.AMP, "&");
+			}
+			if (!modifiedString.equalsIgnoreCase(data.toString())) {
+				log.error(" Invilid response data ");
+				log.error("Invalid html pattern found in data value validateCypherQueryForHTMLContent ==== ");
+				hasHTML = Boolean.TRUE;
+			}
+		}
+		return hasHTML;
+	}
 
 	/**
 	 * Pattern Array defination for XSS
@@ -176,6 +208,24 @@ public class ValidationUtils {
 			Pattern.compile("vbscript:", Pattern.CASE_INSENSITIVE),
 			Pattern.compile("onload(.*?)=", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL),
 			Pattern.compile(ConfigOptions.CRLF_PATTERN) };
+	
+	/**
+	 * Pattern Array defination for XSS for cypherQuery
+	 */
+	private static Pattern[] patterns2 = new Pattern[] {
+			// Script fragments
+			Pattern.compile("<script>(.*?)</script>", Pattern.CASE_INSENSITIVE),
+			Pattern.compile("src[\r\n]*=[\r\n]*\\\'(.*?)\\\'",
+					Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL),
+			Pattern.compile("src[\r\n]*=[\r\n]*\\\"(.*?)\\\"",
+					Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL),
+			Pattern.compile("</script>", Pattern.CASE_INSENSITIVE),
+			Pattern.compile("<script(.*?)>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL),
+			Pattern.compile("eval\\((.*?)\\)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL),
+			Pattern.compile("expression\\((.*?)\\)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL),
+			Pattern.compile("javascript:", Pattern.CASE_INSENSITIVE),
+			Pattern.compile("vbscript:", Pattern.CASE_INSENSITIVE),
+			Pattern.compile("onload(.*?)=", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL) };
 
 	/**
 	 * Strips any potential XSS threats out of the value
@@ -287,6 +337,21 @@ public class ValidationUtils {
 		}
 		return value;
 	}
+	
+	public static String cleanXSSWithHTMLCheckForCypherQuery(String value) {
+		String valueWithXSSPattern = "";
+		if (value != null) {
+			try {
+				valueWithXSSPattern = checkValidateCypherQueryString(value);
+			} catch (RuntimeException e) {
+				log.error("Invalid pattern found in data value ==== {} ", valueWithXSSPattern);
+				throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
+			}
+		} else {
+			log.debug("In cleanXSSWithHTMLCheckForCypherQuery , value is empty  ");
+		}
+		return value;
+	}
 
 	private static String checkValidateString(String value) {
 		boolean isXSSPattern = Boolean.FALSE;
@@ -297,6 +362,30 @@ public class ValidationUtils {
 		} else {
 			// match sections that match a pattern
 			for (Pattern scriptPattern : patterns) {
+				Matcher m = scriptPattern.matcher(value);
+				if (m.find()) {
+					isXSSPattern = true;
+					valueWithXSSPattern = value;
+					break;
+				}
+			}
+		}
+		
+		if (isXSSPattern) {
+			throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
+		}
+		return valueWithXSSPattern;
+	}
+	
+	private static String checkValidateCypherQueryString(String value) {
+		boolean isXSSPattern = Boolean.FALSE;
+		String valueWithXSSPattern = "";
+		boolean hasHTML = validateCypherQueryForHTMLContent(value);
+		if (hasHTML) {
+			isXSSPattern = true;
+		} else {
+			// match sections that match a pattern
+			for (Pattern scriptPattern : patterns2) {
 				Matcher m = scriptPattern.matcher(value);
 				if (m.find()) {
 					isXSSPattern = true;
@@ -403,6 +492,18 @@ public class ValidationUtils {
 			outputData = ValidationUtils.cleanXSSWithHTMLCheck(inputData);
 		} catch (RuntimeException e) {
 			log.error("validate Request Body has some issue === {}", e.getMessage());
+			throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST_BODY);
+		}
+		return outputData;
+	}
+	
+	public static String validateRequestBodyForCypherQuery(String inputData) {
+		log.debug(" In validateRequestBodyForCypherQuery ==== ");
+		String outputData = null;
+		try {
+			outputData = ValidationUtils.cleanXSSWithHTMLCheckForCypherQuery(inputData);
+		} catch (RuntimeException e) {
+			log.error("validate Request Body for Cypher Query has some issue === {}", e.getMessage());
 			throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST_BODY);
 		}
 		return outputData;

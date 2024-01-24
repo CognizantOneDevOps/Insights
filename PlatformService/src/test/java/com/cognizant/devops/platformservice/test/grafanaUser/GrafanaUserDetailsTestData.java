@@ -37,5 +37,5 @@ public class GrafanaUserDetailsTestData extends AbstractTestNGSpringContextTests
 	String authorizationException = "";
 	String host = "insights.cogdevops.com";
 	String contentTypeException = "application/json";
-	String invalidToken = "asfghjdvshagasdhkajs";
+//	String invalidToken = "asfghjdvshagasdhkajs";
 }

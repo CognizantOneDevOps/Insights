@@ -23,6 +23,8 @@ import { MessageDialogService } from '@insights/app/modules/application-dialog/m
 import { saveAs as importedSaveAs } from "file-saver";
 import { FileSystemService } from './file-system.service';
 import { DataSharedService } from "@insights/common/data-shared-service";
+import { Sort } from '@angular/material/sort';
+import { InsightsUtilService } from '@insights/common/insights-util.service';
 
 @Component({
   selector: 'app-filesystem-configuration',
@@ -47,11 +49,10 @@ export class FileSystemComponent implements OnInit {
   currentPageValue: number;
   currentPageIndex: number = -1;
   selectedIndex: -1;
-  totalPages: number = -1;
   timeZoneAbbr:String="";
   dateObj:Date;
 
-  constructor(public fileSystemService: FileSystemService, public router: Router, public dataShare: DataSharedService, public messageDialog: MessageDialogService) {
+  constructor(public fileSystemService: FileSystemService, public router: Router, public dataShare: DataSharedService, public messageDialog: MessageDialogService, public insightsUtil : InsightsUtilService) {
     this.displayedColumns = ['radio', 'fileName', 'fileType', 'fileModule', 'lastUpdatedTime'];
     this.getFileTypeList();
     this.getFileModuleList();
@@ -106,7 +107,6 @@ export class FileSystemComponent implements OnInit {
       }
       this.fileStorageDatasource.paginator = this.paginator;
     }
-    this.totalPages = Math.ceil(this.fileStorageDatasource.data.length / this.MAX_ROWS_PER_TABLE);
   }
 
   add() {
@@ -203,4 +203,19 @@ export class FileSystemComponent implements OnInit {
     this.paginator.previousPage();
     this.currentPageIndex = this.paginator.pageIndex + 1;
   }
+
+  sortData(sort: Sort) {
+    const data = this.configListResponse.data.slice();
+    if (!sort.active || sort.direction === '') {
+      this.fileStorageDatasource.data = data;
+      return;
+    }
+
+    this.fileStorageDatasource.data = data.sort((a, b) => {
+      const isAsc = sort.direction === 'asc';
+      return this.insightsUtil.compare(a[sort.active], b[sort.active], isAsc)
+    });
+    this.fileStorageDatasource.paginator = this.paginator;
+  }
+  
 }

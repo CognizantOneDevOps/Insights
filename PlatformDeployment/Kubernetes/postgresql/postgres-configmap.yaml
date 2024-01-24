@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  labels:
+    app: postgres
+data:
+  POSTGRES_DB: postgresdb
+  POSTGRES_USER: 
+  USER:
+  USER_GRAFANA_PASSWORD:
+  POSTGRES_PASSWORD:

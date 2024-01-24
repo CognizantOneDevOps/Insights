@@ -59,7 +59,7 @@ public class ProcessMasterData {
 	Resource[] resources;
 
 	public static final List<String> MASTER_FILE_LIST = Collections.unmodifiableList(Arrays.asList("agent.json",
-			"ROI_Tools.json", "ScheduledTask.json", "workflow.json", "FileManagement.json"));
+			"ROI_Tools.json", "ScheduledTask.json", "workflow.json", "FileManagement.json", "OfflineQuery.json"));
 
 	/**
 	 * Load json file for masterdata query processing

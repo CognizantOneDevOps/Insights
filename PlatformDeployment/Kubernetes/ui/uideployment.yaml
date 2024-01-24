@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: platformui
+  name: platformui
+spec:
+  selector:
+    matchLabels:
+      app: platformui
+  template:
+    metadata:
+      labels:
+        app: platformui
+    spec:
+      containers:
+        - name: platformui
+          image: devopsbasservice/onedevopsinsights:ui10.2
+          envFrom:
+            - configMapRef:
+                name: app-configs
+          ports:
+            - containerPort: 8081
+              name: http-ui
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /usr/INSIGHTS_HOME/logs
+              name: ui-pv
+              subPath: uilogs
+            - mountPath: /usr/INSIGHTS_HOME/.InSights
+              name: ui-pv
+              
+
+      volumes:
+        - name: ui-pv
+          persistentVolumeClaim:
+            claimName: ui-pvc

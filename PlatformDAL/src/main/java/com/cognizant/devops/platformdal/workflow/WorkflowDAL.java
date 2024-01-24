@@ -379,13 +379,14 @@ public class WorkflowDAL extends BaseDAL {
 	 * @param workflowId
 	 * @return List<InsightsWorkflowTaskSequence>
 	 */
-	public List<InsightsWorkflowTaskSequence> getAllWorkflowTaskSequenceByWorkflowId(String workflowId) {
+	public List<InsightsWorkflowTaskSequence> getAllWorkflowTaskSequenceByWorkflowId(String workflowId) throws Exception{
 		try {
+			String validatedworkflowId = ValidationUtils.validateDynamicValue(workflowId, ValidationUtils.ID_STRING_PATTERN);
 			Map<String, Object> parameters = new HashMap<>();
-			parameters.put(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-			return getResultList(
-					"FROM InsightsWorkflowTaskSequence WTS WHERE WTS.workflowConfig.workflowId = :workflowId ORDER BY sequence ASC ",
-					InsightsWorkflowTaskSequence.class, parameters);
+			parameters.put("workflowConfig.workflowId", validatedworkflowId);
+			Map<String, String> orderByParams = new HashMap<>();
+			orderByParams.put("asc", "sequence");
+			return getResultListCriteria(InsightsWorkflowTaskSequence.class, parameters, orderByParams);
 		} catch (Exception e) {
 			log.error(e);
 			throw e;

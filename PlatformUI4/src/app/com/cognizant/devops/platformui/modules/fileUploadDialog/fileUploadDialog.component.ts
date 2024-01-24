@@ -21,6 +21,7 @@ import { Router } from '@angular/router';
 import { KpiService } from '../kpi-addition/kpi-service';
 import { ContentService } from '../content-config-list/content-service';
 import { OfflineService } from '@insights/app/modules/offline-data-processing/offline-service';
+import { FormBuilder, FormControl, FormGroup,Validators,ReactiveFormsModule } from "@angular/forms";
 
 @Component({
   selector: "app-file-upload",
@@ -42,6 +43,13 @@ export class FileUploadDialog implements OnInit {
   validHtml: boolean = true;
   index: number = 0;
   fileNameArr = "";
+  flag:boolean =false;
+  options=[];
+  filteredOptions = this.options;
+  list:any;
+  isDeleteKeyword:boolean =false;
+  formGroup: FormGroup;
+  queryGroup = "";
 
   constructor(
     public router: Router,
@@ -52,9 +60,15 @@ export class FileUploadDialog implements OnInit {
     public kpiService: KpiService,
     public offlineService :OfflineService,
     public contentService: ContentService,
+    public formBuilder: FormBuilder,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.receivedData = data;
+    if (data.type == "OFFLINE_DATA") {
+      this.list = data.list;
+      this.initForm();
+      this.setQueryGroups();
+    }
     this.dialogHeader = data.header;
     if (data.type != null && data.type != undefined) {
       this.fileUploadType = data.type;
@@ -101,10 +115,19 @@ export class FileUploadDialog implements OnInit {
       );
       fileReader.onload = () => {
         this.validateJson(fileReader.result.toString());
+        if (this.fileUploadType == "OFFLINE_DATA") {
+          this.isDeleteKeyword = this.checkDeleteKeyword(fileReader.result.toString());
+        }
       };
       fileReader.readAsText(event.target.files[0]);
     }
     this.fileNameArr = event.target.files[0].name;
+    if (this.fileUploadType == "OFFLINE_DATA") {
+      console.log("DELETE", this.isDeleteKeyword)
+      const defaultQueryGRoup = this.fileNameArr.substring(0, this.fileNameArr.lastIndexOf('.'));
+      this.formGroup.get('queryGroup').setValue(defaultQueryGRoup);
+      this.flag = true;
+    }
   }
 
   validateJson(message) {
@@ -124,10 +147,52 @@ export class FileUploadDialog implements OnInit {
       return false;
     }
   }
+  
+
+  initForm(){
+this.formGroup=this.formBuilder.group({
+queryGroup: [""]
+})
+
+this.formGroup.get('queryGroup').valueChanges.subscribe(response => {
+  this.queryGroup=response;
+this.filterData(response);
+} )
+  }
+
+  filterData(enteredData){
+this.filteredOptions=this.options.filter(item => {
+  return item.toLowerCase().indexOf(enteredData.toLowerCase()) > -1
+})
+  }
+
+  setQueryGroups(){
+    if (this.list.data) {
+      if (this.list.data.length > 0) {
+        this.options = Array.from(new
+          Set(this.list.data
+            .filter(offlineData =>
+              offlineData.queryGroup !== undefined && offlineData.queryGroup !== null).map(offlineData => offlineData.queryGroup)
+            .filter(queryGroup => queryGroup.trim() !== ''))).sort();
+        this.filteredOptions = this.options;
+      }
+    }
+  }
 
   upload() {
     console.log("Inside Upload")
-    if (this.validJson === false) {
+    if (this.flag && this.queryGroup.trim().length === 0) {
+      this.messageDialog.openSnackBar(
+        "Please fill Query Group field",
+        "error"
+      );
+    } else if (this.flag && !this.validateQueryGroup(this.queryGroup)) {
+      this.messageDialog.openSnackBar(
+        "Please provide valid Query Group",
+        "error"
+      );
+    }
+    else if (this.validJson === false) {
       this.messageDialog.openSnackBar(
         "Uploaded file is not a valid JSON. " + this.jsonError,
         "error"
@@ -137,6 +202,8 @@ export class FileUploadDialog implements OnInit {
         "Attached HTML file contains script tag.",
         "error"
       );
+    } else if (this.isDeleteKeyword === true) {
+      this.alert();
     } else {
       if (this.fileUploadType === "CONTENT") {
         this.uploadFileContent();
@@ -179,6 +246,10 @@ export class FileUploadDialog implements OnInit {
   uploadFileOfflineData(){
     var self = this;
     if (this.formDataFiles.has("file")) {
+      self.dialogRef.close(true);
+      const fileExtension = this.fileNameArr.slice(this.fileNameArr.lastIndexOf("."));
+      const modifiedFileName = this.formGroup.value['queryGroup'] + fileExtension;
+      this.formDataFiles.set('file', this.formDataFiles.get('file'), modifiedFileName);
       this.restCallHandlerService
         .postFormData("UPLOAD_BULK_OFFLINE_DATA", this.formDataFiles)
         .toPromise()
@@ -315,6 +386,11 @@ export class FileUploadDialog implements OnInit {
     this.cancelFileUpload(); //Enters the cancelFile upload to remove image url and change if directive
     console.log("Inside cancelUpload");
     this.fileNameArr = null;
+    if (this.fileUploadType === "OFFLINE_DATA") {
+      this.flag = false;
+      this.isDeleteKeyword = false;
+      this.formGroup.get('queryGroup').setValue("");
+    }
   }
 
   onFileChangedUpload(event, index) {
@@ -334,5 +410,47 @@ export class FileUploadDialog implements OnInit {
         // called once readAsDataURL is completed Image
       };
     }
+  }
+
+  alert() {
+    var self = this;
+    var dialogmessage = "<b> Caution</b>: The file contains Cypher queries with the <b>'DELETE'</b> keyword. Uploading this file may lead to data deletion. Are you sure you want to continue? ";
+    var title = "Delete Keyword in Uploaded File ";
+    const dialogRef = this.messageDialog.showConfirmationMessage(
+      title,
+      dialogmessage,
+      "",
+      "ALERT",
+      "30%"
+    );
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result == "yes") {
+        this.uploadFileOfflineData();
+      } else {
+        self.dialogRef.close(true);
+      }
+    });
+  }
+
+  checkDeleteKeyword(jsonContent: string): boolean {
+    try {
+      const jsonData = JSON.parse(jsonContent);
+      if (Array.isArray(jsonData)) {
+        for (const item of jsonData) {
+          if (item.cypherQuery && item.cypherQuery.toLowerCase().includes('delete')) {
+            return true;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error parsing JSON:', error);
+    }
+    return false;
+  }
+
+  validateQueryGroup(queryGroup): boolean {
+    // Regular expression pattern for numbers, alphabets, underscore, space or hyphen
+    const pattern = /^(?=.*[a-zA-Z0-9_-])[\w\s-]+$/;
+    return pattern.test(queryGroup);
   }
 }

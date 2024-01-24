@@ -128,19 +128,15 @@ public class EmailConfigurationServiceImpl implements EmailConfigurationService 
 			if (source.equals(WorkflowTaskEnum.WorkflowType.REPORT.getValue())) {
 				List<InsightsAssessmentConfiguration> assessmentReportList = reportConfigDAL.getAllAssessmentConfig();
 				for (InsightsAssessmentConfiguration assessmentReport : assessmentReportList) {
-					if (assessmentReport.getWorkflowConfig().getEmailConfig() != null) {
 						JsonObject titleDetails = prepareReportTitleDetails(assessmentReport.getId(), assessmentReport.getAsseementreportname());
 						titleDetailsArray.add(titleDetails);
-					}
 				}
 
 			} else if (source.equals(WorkflowTaskEnum.WorkflowType.GRAFANADASHBOARDPDFREPORT.getValue())) {
 				List<GrafanaDashboardPdfConfig> result = grafanaDashboardConfigDAL.getAllGrafanaDashboardConfigs();
 				for (GrafanaDashboardPdfConfig dashboardConfig : result) {
-					if (dashboardConfig.getWorkflowConfig().getEmailConfig() != null) {
 						JsonObject titleDetails = prepareReportTitleDetails(dashboardConfig.getId(), dashboardConfig.getTitle());
 						titleDetailsArray.add(titleDetails);
-					}
 				}
 			} else {
 				throw new InsightsCustomException(INVALID_SOURCE_MESSAGE);

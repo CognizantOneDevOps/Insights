@@ -27,6 +27,8 @@ import { AuthInterceptor } from '@insights/common/rest-api-setting';
 import { AuthService } from '@insights/common/auth-service'
 import { AuthGuardService } from '@insights/common/auth-guard.service'
 import { CookieServiceInsights } from '@insights/common/cookiesService'
+import { InsightsUtilService } from '@insights/common/insights-util.service';
+
 
 @NgModule({
   declarations: [
@@ -49,7 +51,8 @@ export class SharedServices {
         AuthService,
         AuthInterceptor,
         AuthGuardService, 
-        CookieServiceInsights
+        CookieServiceInsights,
+        InsightsUtilService
       ]
     };
   }

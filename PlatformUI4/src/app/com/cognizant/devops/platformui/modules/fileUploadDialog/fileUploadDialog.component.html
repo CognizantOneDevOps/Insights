@@ -48,6 +48,22 @@
           <button class="button" (click)="fileUpload.click()">Add File</button>
         </div>
       </div>
+      <div *ngIf="flag" style="padding-left: 20px;padding-top: 8px;">
+        <form [formGroup]="formGroup">
+          <div class="select-label">Query Group <span class="asteriskText">*</span></div>
+          <mat-form-field appearance="fill" class="formfield-custom columnComponent" style="width:65%;">
+            <div class="autocomplete">
+              <input matAutocompletePosition="below" placeholder="Select Query Group" formControlName="queryGroup" matInput
+                type="text" [matAutocomplete]="auto" />
+              <mat-autocomplete [style.width.%]="100" color="primary" #auto="matAutocomplete">
+                <mat-option class="optionCss" *ngFor="let item of filteredOptions" [value]="item">
+                  {{item}}
+                </mat-option>
+              </mat-autocomplete>
+            </div>
+          </mat-form-field>
+        </form>
+      </div>
       <br />
       <div style="border: 1px solid #d9d9d9; margin-left: 20px; width: 303px">
         <div

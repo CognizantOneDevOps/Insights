@@ -1,0 +1,62 @@
+apiVersion: apps/v1 ## Kubernetes API Version
+kind: StatefulSet ## Type of resource
+metadata:
+  labels:
+    app: neo4j-db ## Labels given by user
+  name: neo4j-db ## Name given to the <kind> resource
+  namespace: insights ## Namespace in which to deploy the resource
+spec:
+  replicas: 1
+  selector:
+    matchLabels: ## Should be same as spec.template.labels
+      app: neo4j-db
+  template:
+    metadata:
+      labels: ## Should be same as spec.selector.matchLabels
+        app: neo4j-db
+    spec:
+      containers:
+        - image: neo4j:4.4.4-community ## Image Name
+          name: neo4j ## Name of container
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NEO4JLABS_PLUGINS
+              value: '["apoc"]'
+            - name: NEO4J_apoc_trigger_enabled
+              value: 'true'
+          envFrom:
+            - secretRef:
+                name: neo4j-auth
+          ports: ## Ports to map
+            - containerPort: 7474
+              name: http
+            - containerPort: 7687
+              name: bolt
+            - containerPort: 7473
+              name: https
+          volumeMounts: ## Volumes to mount
+            - name: neo4j-data
+              mountPath: "/var/lib/neo4j/data"
+            - name: neo4j-log
+              mountPath: "/var/lib/neo4j/logs"
+            - name: neo4jconf
+              mountPath: "/var/lib/neo4j/conf"
+          livenessProbe:
+            exec:
+              command:
+                - cypher-shell
+                - match (n) return count(n)
+            failureThreshold: 20
+            periodSeconds: 10
+            timeoutSeconds: 10
+
+      volumes:
+        - name: neo4j-data
+          persistentVolumeClaim:
+            claimName: neo4j-data-claim
+        - name: neo4j-log
+          persistentVolumeClaim:
+            claimName: neo4j-logs-claim
+        - name: neo4jconf
+          persistentVolumeClaim:
+            claimName: neo4j-conf-claim

@@ -38,6 +38,7 @@ import com.cognizant.devops.platformcommons.core.enums.AutoMLEnum;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.ai.H2oApiCommunicator;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
@@ -126,10 +127,7 @@ public class TrainModelsServiceImpl implements ITrainModelsService {
         JsonArray data = h2oApiCommunicator.getDataFrame(usecaseName+"_part1.hex");
         JsonObject response = new JsonObject();
         JsonArray fields = new JsonArray();
-        Set<Map.Entry<String, JsonElement>> es = data.get(0).getAsJsonObject().entrySet();
-        for (Iterator<Map.Entry<String, JsonElement>> it = es.iterator(); it.hasNext(); ) {
-            fields.add(it.next().getKey());
-        }
+		data.get(0).getAsJsonObject().entrySet().stream().map(Map.Entry::getKey).forEach(fields::add);
         if (data.size() == prediction.getAsJsonArray("predict").size()) {
          
             prepareData(prediction, data, fields);	           
@@ -170,27 +168,31 @@ public class TrainModelsServiceImpl implements ITrainModelsService {
     public JsonObject downloadMojo(String usecase, String modelId) throws InsightsCustomException {
 		JsonObject response = new JsonObject();
 		try {
-			InputStream fileStream = h2oApiCommunicator.downloadMojo(usecase, modelId);
-			if (fileStream != null) {
-				ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-			    int nRead;
-			    byte[] data = new byte[4];
-			    while ((nRead = fileStream.read(data, 0, data.length)) != -1) {
-			        buffer.write(data, 0, nRead);
-			    }
-			    buffer.flush();
-				byte[] mojoByteArray = buffer.toByteArray();
-				response = new JsonObject();
-				response.addProperty("Message", "Mojo has been saved successfully.");
-				AutoMLConfig mlConfig = autoMLConfigDAL.getMLConfigByUsecase(usecase);
-				mlConfig.setMojoDeployed(modelId);
-				mlConfig.setStatus(AutoMLEnum.Status.MOJO_DEPLOYED.name());
-				mlConfig.setMojoDeployedZip(mojoByteArray);
-				autoMLConfigDAL.updateMLConfig(mlConfig);
-				return response;
+			if (!ValidationUtils.checkModelIdString(modelId)) {
+				InputStream fileStream = h2oApiCommunicator.downloadMojo(usecase, modelId);
+				if (fileStream != null) {
+					ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+					int nRead;
+					byte[] data = new byte[4];
+					while ((nRead = fileStream.read(data, 0, data.length)) != -1) {
+						buffer.write(data, 0, nRead);
+					}
+					buffer.flush();
+					byte[] mojoByteArray = buffer.toByteArray();
+					response = new JsonObject();
+					response.addProperty("Message", "Mojo has been saved successfully.");
+					AutoMLConfig mlConfig = autoMLConfigDAL.getMLConfigByUsecase(usecase);
+					mlConfig.setMojoDeployed(modelId);
+					mlConfig.setStatus(AutoMLEnum.Status.MOJO_DEPLOYED.name());
+					mlConfig.setMojoDeployedZip(mojoByteArray);
+					autoMLConfigDAL.updateMLConfig(mlConfig);
+					return response;
+				} else {
+					log.error("Error downloading Mojo:{} ", usecase);
+					throw new InsightsCustomException("Unable to download mojo. Refer logs for more information");
+				}
 			} else {
-				log.error("Error downloading Mojo:{} ", usecase);
-				throw new InsightsCustomException("Unable to download mojo. Refer logs for more information");
+				throw new InsightsCustomException("Invalid ModelId.");
 			}
 		} catch (Exception e) {
 			log.error("Error updating MOJO details in Postgres:{} due to {} ", usecase, e.getMessage());

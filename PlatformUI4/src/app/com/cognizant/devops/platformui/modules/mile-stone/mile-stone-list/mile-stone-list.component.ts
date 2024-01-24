@@ -24,6 +24,8 @@ import { DataSharedService } from "@insights/common/data-shared-service";
 import { MileStoneService } from "../mile-stone.service";
 import { MileStoneDialog } from "../mile-stone-dialog/milestone-dialog";
 import { MatRadioChange } from "@angular/material/radio";
+import { Sort } from "@angular/material/sort";
+import { InsightsUtilService } from "@insights/common/insights-util.service";
 
 @Component({
   selector: "app-mile-stone-list",
@@ -58,8 +60,7 @@ export class MileStoneListComponent implements OnInit {
   disableRestart = true;
   selectedIndex = -1;
   currentPageValue: number;
-  currentPageIndex: number = -1;
-  totalPages: number = -1;
+  mileStoneList : any = {};
 
   constructor(
     public messageDialog: MessageDialogService,
@@ -67,6 +68,7 @@ export class MileStoneListComponent implements OnInit {
     public router: Router,
     public dialog: MatDialog,
     public reportmanagementService: ReportManagementService,
+    public insightsUtil : InsightsUtilService,
     private mileStoneService: MileStoneService
   ) {}
 
@@ -82,7 +84,6 @@ export class MileStoneListComponent implements OnInit {
       "details",
     ];
     this.currentPageValue = this.paginator.pageIndex * this.MAX_ROWS_PER_TABLE;
-    this.currentPageIndex = this.paginator.pageIndex + 1;
   }
 
   ngAfterViewInit() {
@@ -156,10 +157,10 @@ export class MileStoneListComponent implements OnInit {
     this.isDatainProgress = true;
     var self = this;
     self.refreshRadio = false;
-    let mileStoneList = await this.mileStoneService.fetchMileStoneConfig();
-    if (mileStoneList.status === "success") {
+    this.mileStoneList = await this.mileStoneService.fetchMileStoneConfig();
+    if (this.mileStoneList.status === "success") {
       this.count = 0;
-      this.mileStoneDatasource.data = mileStoneList.data;
+      this.mileStoneDatasource.data = this.mileStoneList.data;
       for (var element of this.mileStoneDatasource.data) {
         if (this.count < this.mileStoneDatasource.data.length) {
           this.mileStoneDatasource.data[this.count].startDate =
@@ -182,9 +183,6 @@ export class MileStoneListComponent implements OnInit {
     }
     this.isDatainProgress = false;
     this.mileStoneDatasource.paginator = this.paginator;
-    this.totalPages = Math.ceil(
-      this.mileStoneDatasource.data.length / this.MAX_ROWS_PER_TABLE
-    );
   }
 
   applyFilter(filterValue: string) {
@@ -303,15 +301,27 @@ export class MileStoneListComponent implements OnInit {
 
   goToNextPage() {
     this.paginator.nextPage();
-    this.currentPageIndex = this.paginator.pageIndex + 1;
     this.selectedIndex = -1;
     this.currentPageValue = this.paginator.pageIndex * this.MAX_ROWS_PER_TABLE;
   }
 
   goToPrevPage() {
     this.paginator.previousPage();
-    this.currentPageIndex = this.paginator.pageIndex + 1;
     this.selectedIndex = -1;
     this.currentPageValue = this.paginator.pageIndex * this.MAX_ROWS_PER_TABLE;
+  }
+
+  sortData(sort: Sort) {
+    const data = this.mileStoneList.data.slice();
+    if (!sort.active || sort.direction === '') {
+      this.mileStoneDatasource.data = data;
+      return;
+    }
+
+    this.mileStoneDatasource.data = data.sort((a, b) => {
+      const isAsc = sort.direction === 'asc';
+      return this.insightsUtil.compare(a[sort.active], b[sort.active], isAsc)
+    });
+    this.mileStoneDatasource.paginator = this.paginator;
   }
 }

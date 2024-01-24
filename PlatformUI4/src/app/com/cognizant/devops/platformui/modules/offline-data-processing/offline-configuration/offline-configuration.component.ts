@@ -18,6 +18,7 @@ import { OfflineService } from "@insights/app/modules/offline-data-processing/of
 import { MessageDialogService } from "@insights/app/modules/application-dialog/message-dialog-service";
 import { Component, OnInit } from "@angular/core";
 import { Router, NavigationExtras, ActivatedRoute } from "@angular/router";
+import { FormBuilder, FormControl, FormGroup,Validators,ReactiveFormsModule } from "@angular/forms";
 
 @Component({
   selector: "app-offline-configuration",
@@ -36,19 +37,28 @@ export class OfflineConfigurationComponent implements OnInit {
   inputDataJson: any;
   cronSchedule: any;
   dataSource: any;
+  showCaution: boolean = false;
   toolsArr = [];
   toolsDetail = [];
   offlineList: any;
+  list: any;
+  queryGroup: String="";
+  options=[]
+  filteredOptions = this.options;
+  formGroup: FormGroup;
+
 
   constructor(
     public router: Router,
     public messageDialog: MessageDialogService,
     public offlineService: OfflineService,
-    public route: ActivatedRoute
+    public route: ActivatedRoute,
+    public formBuilder: FormBuilder
   ) {}
 
   ngOnInit() {
     this.type = this.offlineService.getType();
+    this.initForm();
     if (this.type != "EDIT") {
       this.getAllQueryName();
     }
@@ -56,16 +66,38 @@ export class OfflineConfigurationComponent implements OnInit {
       this.onEdit = true;
     }
     this.route.queryParams.subscribe((params) => {
-      if (params) {
+      if (params && this.type==='EDIT') {
         this.inputDataJson = params;
         this.toolName = params.toolName;
         this.queryName = params.queryName;
         this.cronSchedule = params.cronSchedule;
         this.cypherQuery = params.cypherQuery;
+        this.list = JSON.parse(decodeURIComponent(params.list));
+        this.queryGroup = params.queryGroup;
+      } else if (params) {
+        this.list = JSON.parse(decodeURIComponent(params.list));
       }
     });
+    this.setQueryGroups();
     this.getLabelTools();
   }
+
+  initForm(){
+this.formGroup=this.formBuilder.group({
+queryGroup: [""]
+})
+
+this.formGroup.get('queryGroup').valueChanges.subscribe(response => {
+this.filterData(response);
+} )
+  }
+
+  filterData(enteredData){
+this.filteredOptions=this.options.filter(item => {
+  return item.toLowerCase().indexOf(enteredData.toLowerCase()) > -1
+})
+  }
+
   redirectToLandingPage() {
     let navigationExtras: NavigationExtras = {
       skipLocationChange: true,
@@ -95,12 +127,31 @@ export class OfflineConfigurationComponent implements OnInit {
     }
   }
 
+  setQueryGroups() {
+    if (this.list.data) {
+      if (this.list.data.length > 0) {
+        this.options = Array.from(new Set(this.list.data
+          .filter((offlineData: any) => offlineData.queryGroup !== undefined && offlineData.queryGroup !== null)
+          .map((offlineData: any) => offlineData.queryGroup)
+          .filter(queryGroup => queryGroup.trim() !== ''))).sort((a, b) => (a as string).toLowerCase().localeCompare((b as string).toLowerCase()));
+
+        this.filteredOptions = this.options;
+      }
+    }
+    if (this.onEdit)
+      this.formGroup.get('queryGroup').setValue(this.queryGroup);
+
+  }
+
   validateOfflineData() {
     var isValidated = true;
+    this.queryGroup=this.formGroup.value["queryGroup"];
     if (this.dataSource !== "HYPERLEDGER") {
       if (
         this.toolName === "" ||
         this.toolName === undefined ||
+        this.queryGroup === "" ||
+        this.queryGroup === undefined ||
         this.queryName === "" ||
         this.queryName === undefined ||
         this.cypherQuery === "" ||
@@ -114,10 +165,16 @@ export class OfflineConfigurationComponent implements OnInit {
           "error"
         );
       }
+      else if (!this.validateQueryGroup(this.queryGroup)) {
+        isValidated = false;
+        this.messageDialog.openSnackBar("Please provide valid Query Group", "error");
+      }
     } else {
       if (
         this.toolName === "" ||
         this.toolName === undefined ||
+        this.queryGroup === "" ||
+        this.queryGroup === undefined ||
         this.queryName === "" ||
         this.queryName === undefined ||
         this.cypherQuery === "" ||
@@ -130,6 +187,10 @@ export class OfflineConfigurationComponent implements OnInit {
           "Please fill mandatory fields",
           "error"
         );
+      }
+      else if(!this.validateQueryGroup(this.queryGroup)){
+        isValidated = false;
+        this.messageDialog.openSnackBar("Please provide valid Query Group", "error");
       }
     }
 
@@ -146,10 +207,10 @@ export class OfflineConfigurationComponent implements OnInit {
       });
     }
 
-    if (this.cypherQuery.match(/INDEX/i)) {
+    if (this.cypherQuery.search(/\bINDEX\b/i) >= 0) {
       isValidated = false;
       this.messageDialog.openSnackBar(
-        "Please provide valid cypher query",
+        "Please provide valid cypher query without Index",
         "error"
       );
     }
@@ -171,6 +232,7 @@ export class OfflineConfigurationComponent implements OnInit {
     var self = this;
     var offlineAPIRequestJson = {};
     offlineAPIRequestJson["toolName"] = this.toolName;
+    offlineAPIRequestJson["queryGroup"] = this.queryGroup;
     offlineAPIRequestJson["queryName"] = this.queryName;
     offlineAPIRequestJson["cronSchedule"] =
       this.cronSchedule === undefined ? "" : this.cronSchedule;
@@ -300,6 +362,7 @@ export class OfflineConfigurationComponent implements OnInit {
     this.queryName = "";
     this.cronSchedule = "";
     this.cypherQuery = "";
+    this.formGroup.get('queryGroup').setValue("");
   }
 
   reset() {
@@ -307,5 +370,16 @@ export class OfflineConfigurationComponent implements OnInit {
     this.queryName = this.inputDataJson.queryName;
     this.cronSchedule = this.inputDataJson.cronSchedule;
     this.cypherQuery = this.inputDataJson.cypherQuery;
+    this.formGroup.get('queryGroup').setValue(this.inputDataJson.queryGroup);
+  }
+
+  checkForDeleteKeyword() {
+    this.showCaution = this.cypherQuery.toLowerCase().includes('delete');
+  }
+
+  validateQueryGroup(queryGroup): boolean {
+    // Regular expression pattern for numbers, alphabets, underscore, or hyphen
+    const pattern = /^(?=.*[a-zA-Z0-9_-])[\w\s-]+$/;
+    return pattern.test(queryGroup);
   }
 }

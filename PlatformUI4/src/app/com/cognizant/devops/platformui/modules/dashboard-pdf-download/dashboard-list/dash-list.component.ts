@@ -28,6 +28,8 @@ import { WorkflowHistoryDetailsDialog } from "../../reportmanagement/workflow-hi
 import { DataSharedService } from "@insights/common/data-shared-service";
 import { MatRadioChange } from "@angular/material/radio";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
+import { Sort } from "@angular/material/sort";
+import { InsightsUtilService } from "@insights/common/insights-util.service";
 
 @Component({
   selector: "app-dash-list",
@@ -52,7 +54,7 @@ export class DashboardListComponent implements OnInit {
   showConfirmMessage: string;
   type: string;
   enableRefresh: boolean = false;
-  MAX_ROWS_PER_TABLE = 6;
+  MAX_ROWS_PER_TABLE = 5;
   orgArr = [];
   isDatainProgress: boolean = false;
   disablebutton = [];
@@ -74,6 +76,7 @@ export class DashboardListComponent implements OnInit {
     public dataShare: DataSharedService,
     public router: Router,
     public dialog: MatDialog,
+    public insightsUtil : InsightsUtilService,
     public reportmanagementService: ReportManagementService
   ) {}
 
@@ -164,6 +167,7 @@ export class DashboardListComponent implements OnInit {
     this.refreshRadio = false;
     this.onRadioBtnSelect = false;
     this.disableDownload = true;
+    this.currentPageIndex = 1;
   }
   refreshToken() {
     this.generateNewToken();
@@ -224,6 +228,7 @@ export class DashboardListComponent implements OnInit {
 
   applyFilter(filterValue: string) {
     this.dashboardDatasource.filter = filterValue.trim();
+    this.selectedIndex = -1;
   }
 
   list() {
@@ -293,6 +298,8 @@ export class DashboardListComponent implements OnInit {
       });
     }
   }
+
+
 
   goToNextPage() {
     this.paginator.nextPage();
@@ -393,4 +400,20 @@ export class DashboardListComponent implements OnInit {
       }
     });
   }
+
+
+  sortData(sort: Sort) {
+    const data = this.dashConfigList.data.slice();
+    if (!sort.active || sort.direction === '') {
+      this.dashboardDatasource.data = data;
+      return;
+    }
+
+    this.dashboardDatasource.data = data.sort((a, b) => {
+      const isAsc = sort.direction === 'asc';
+      return this.insightsUtil.compare(a[sort.active], b[sort.active], isAsc)
+    });
+    this.dashboardDatasource.paginator = this.paginator;
+  }
+  
 }

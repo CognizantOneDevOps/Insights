@@ -99,6 +99,8 @@ export class AgentConfigurationComponent implements OnInit {
     "neo4j_password",
     "elasticsearch_passwd",
     "docker_repo_passwd",
+    "apiKey",
+    "applicationKey"
   ];
   fileName: String = "";
   fileNameTooltip: String = "";

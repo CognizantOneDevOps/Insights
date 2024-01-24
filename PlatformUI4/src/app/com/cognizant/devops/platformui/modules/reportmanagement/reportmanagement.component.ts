@@ -21,13 +21,14 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatRadioChange } from "@angular/material/radio";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
-import { MatSort } from "@angular/material/sort";
+import { MatSort, Sort } from "@angular/material/sort";
 import { MatTableDataSource } from "@angular/material/table";
 import { Router, NavigationExtras } from "@angular/router";
 import { DataSharedService } from "@insights/common/data-shared-service";
 import { ReportManagementService } from "@insights/app/modules/reportmanagement/reportmanagement.service";
 import { WorkflowHistoryDetailsDialog } from "@insights/app/modules/reportmanagement/workflow-history-details/workflow-history-details-dialog";
 import { saveAs as importedSaveAs } from "file-saver";
+import { InsightsUtilService } from "@insights/common/insights-util.service";
 
 @Component({
   selector: "app-reportmanagement",
@@ -73,7 +74,6 @@ export class ReportManagementComponent implements OnInit {
   scheduleList = [];
   selectedIndex: number;
   currentPageIndex: number = -1;
-  totalPages: number = -1;
 
   constructor(
     private dialog: MatDialog,
@@ -81,6 +81,7 @@ export class ReportManagementComponent implements OnInit {
     private messageDialog: MessageDialogService,
     public router: Router,
     public reportmanagementService: ReportManagementService,
+    public insightsUtil : InsightsUtilService,
     public datePipe: DatePipe
   ) {
     this.showThrobber = true;
@@ -178,11 +179,6 @@ export class ReportManagementComponent implements OnInit {
       });
       this.userDataSource.data = this.detailedRecords;
       this.userDataSource.paginator = this.paginator;
-      this.totalPages = Math.ceil(
-        this.userDataSource.data.length / this.MAX_ROWS_PER_TABLE
-      );
-
-      this.detailedRecords = [];
     }
     this.userDataSource.data.forEach((element) => {
       this.clicked.push(true);
@@ -557,4 +553,20 @@ export class ReportManagementComponent implements OnInit {
     this.selectedIndex = -1;
     this.currentPageIndex = this.paginator.pageIndex + 1;
   }
+
+  sortData(sort: Sort) {
+    const data = this.detailedRecords.slice();
+    console.log(data);
+    if (!sort.active || sort.direction === '') {
+      this.userDataSource.data = data;
+      return;
+    }
+
+    this.userDataSource.data = data.sort((a, b) => {
+      const isAsc = sort.direction === 'asc';
+      return this.insightsUtil.compare(a[sort.active], b[sort.active], isAsc)
+    });
+    this.userDataSource.paginator = this.paginator;
+  }
+  
 }

@@ -51,7 +51,7 @@ public class InsightsOfflineDataProcessingController {
 		try {
 			JsonObject offlineResponse = new JsonObject();
 			registerOfflineJson = registerOfflineJson.replace("\n", "").replace("\r", "");
-			String validatedResponse = ValidationUtils.validateRequestBody(registerOfflineJson);
+			String validatedResponse = ValidationUtils.validateRequestBodyForCypherQuery(registerOfflineJson);
 			JsonObject offlineJson = JsonUtils.parseStringAsJsonObject(validatedResponse);
 			String resultQueryName = offlineDataProcessingService.saveOfflineDefinition(offlineJson);
 			offlineResponse.addProperty(PlatformServiceConstants.MESSAGE,
@@ -85,7 +85,7 @@ public class InsightsOfflineDataProcessingController {
 		try {
 			JsonObject offlineResponse = new JsonObject();
 			updateOfflineRequest = updateOfflineRequest.replace("\n", "").replace("\r", "");
-			String validatedEditResponse = ValidationUtils.validateRequestBody(updateOfflineRequest);
+			String validatedEditResponse = ValidationUtils.validateRequestBodyForCypherQuery(updateOfflineRequest);
 			JsonObject updateOfflineJson = JsonUtils.parseStringAsJsonObject(validatedEditResponse);
 			String resultOfflineQuery = offlineDataProcessingService.updateOfflineDefinition(updateOfflineJson);
 			offlineResponse.addProperty(PlatformServiceConstants.MESSAGE,
@@ -118,7 +118,7 @@ public class InsightsOfflineDataProcessingController {
 		try {
 			JsonObject offlineResponse = new JsonObject();
 			deleteOfflineRequest = deleteOfflineRequest.replace("\n", "").replace("\r", "");
-			String validatedEditResponse = ValidationUtils.validateRequestBody(deleteOfflineRequest);
+			String validatedEditResponse = ValidationUtils.validateRequestBodyForCypherQuery(deleteOfflineRequest);
 			JsonObject offlineJson = JsonUtils.parseStringAsJsonObject(validatedEditResponse);
 			boolean isRecordDeleted = offlineDataProcessingService.deleteOfflineDefinition(offlineJson);
 			if (isRecordDeleted) {
@@ -143,7 +143,7 @@ public class InsightsOfflineDataProcessingController {
 	public @ResponseBody JsonObject getAllOfflineDataList() {
 		try {
 			List<InsightsOfflineConfig> offlineDataList = offlineDataProcessingService.getOfflineDataList();
-			return PlatformServiceUtil.buildSuccessResponseWithData(offlineDataList);
+			return PlatformServiceUtil.buildSuccessResponseWithHtmlData(offlineDataList);
 		} catch (Exception e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}

@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: platformservice
+  name: platformservice
+spec:
+  selector:
+    matchLabels:
+      app: platformservice
+  template:
+    metadata:
+      labels:
+        app: platformservice
+    spec:
+      containers:
+        - name: platformservice
+          image: devopsbasservice/onedevopsinsights:service10.2
+          envFrom:
+            - configMapRef:
+                name: app-configs
+          ports:
+            - containerPort: 8080
+              name: http-service
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /usr/INSIGHTS_HOME/logs
+              name: service-pv
+              subPath: servicelogs
+            - mountPath: /usr/INSIGHTS_HOME/.InSights
+              name: serverconfig
+
+      volumes:
+        - name: service-pv
+          persistentVolumeClaim:
+            claimName: service-pvc
+        - name: serverconfig
+          persistentVolumeClaim:
+            claimName: service-pvc

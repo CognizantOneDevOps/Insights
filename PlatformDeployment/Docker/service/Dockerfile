@@ -30,7 +30,6 @@ RUN apk update && \
     apk --no-cache add procps && \
     apk add --no-cache bash && \
     apk add --update openjdk11 && \
-    apk add --update nodejs npm && \
     set -ex && apk --no-cache add sudo && \
     mkdir /opt/offlineAgent && \
     mkdir /opt/PlatformAgent && \
@@ -61,15 +60,6 @@ ENV INSIGHTS_HOME=/usr/INSIGHTS_HOME
 WORKDIR /opt/PlatformService
 RUN wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${INSIGHTSRELEASE}/PlatformService-${INSIGHTSRELEASE}.jar -O PlatformService.jar
 EXPOSE 8080/tcp
-
-
-WORKDIR /opt
-RUN wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${INSIGHTSRELEASE}/PlatformUI4-${INSIGHTSRELEASE}.zip -O /opt/UI.zip && \
-    unzip /opt/UI.zip -d /opt/UI && \
-    rm -rf /opt/UI.zip && \
-    cd /opt/UI/UI && \
-    npm install -save express
-EXPOSE 8081/tcp
 
 WORKDIR /opt/InSights/Promtail
 RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2 && \

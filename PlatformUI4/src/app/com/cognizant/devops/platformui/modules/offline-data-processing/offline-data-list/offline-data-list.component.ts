@@ -17,7 +17,7 @@ import { OfflineDetailsComponent } from "@insights/app/modules/offline-data-proc
 import { DataSharedService } from "@insights/common/data-shared-service";
 import { MatRadioChange } from "@angular/material/radio";
 import { OfflineService } from "@insights/app/modules/offline-data-processing/offline-service";
-import { Component, OnInit } from "@angular/core";
+import { Component,  OnInit } from "@angular/core";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 import { MessageDialogService } from "@insights/app/modules/application-dialog/message-dialog-service";
 import { FileUploadDialog } from "@insights/app/modules/fileUploadDialog/fileUploadDialog.component";
@@ -28,6 +28,8 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatTableDataSource } from "@angular/material/table";
 import cronstrue from "cronstrue";
+import {Sort} from '@angular/material/sort';
+import { InsightsUtilService } from "@insights/common/insights-util.service";
 
 @Component({
   selector: "app-offline-data-list",
@@ -36,6 +38,7 @@ import cronstrue from "cronstrue";
 })
 export class OfflineDataListComponent implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
+  
   offlineDatasource = new MatTableDataSource<any>();
   displayedColumns = [];
   onRadioBtnSelect: boolean = false;
@@ -43,7 +46,6 @@ export class OfflineDataListComponent implements OnInit {
   MAX_ROWS_PER_TABLE = 5;
   selectedIndex: number = -1;
   currentPageIndex: number = -1;
-  totalPages: number = 1;
   currentPageValue: number;
   offlineList: any;
   toolName: string;
@@ -66,7 +68,8 @@ export class OfflineDataListComponent implements OnInit {
     private messageDialog: MessageDialogService,
     public contentService: ContentService,
     public offlineService: OfflineService,
-    public dataShare: DataSharedService
+    public dataShare: DataSharedService,
+    public insightsUtil : InsightsUtilService
   ) {}
 
   ngOnInit(): void {
@@ -74,6 +77,7 @@ export class OfflineDataListComponent implements OnInit {
     this.displayedColumns = [
       "radio",
       "toolName",
+      "queryGroup",
       "queryName",
       "schedule",
       "active",
@@ -100,9 +104,13 @@ export class OfflineDataListComponent implements OnInit {
 
   addnewOfflineData() {
     this.offlineService.setType("ADD");
-    this.router.navigate(["InSights/Home/offlineConfiguration"], {
+    let navigationExtras: NavigationExtras = {
       skipLocationChange: true,
-    });
+      queryParams: {
+        list: encodeURIComponent(JSON.stringify(this.offlineList))
+      },
+    };
+    this.router.navigate(["InSights/Home/offlineConfiguration"], navigationExtras);
   }
 
   uploadFile() {
@@ -110,12 +118,13 @@ export class OfflineDataListComponent implements OnInit {
     const dialogRef = this.dialog.open(FileUploadDialog, {
       panelClass: "custom-dialog-container",
       width: "40%",
-      height: "40%",
+      height: "45%",
       disableClose: true,
       data: {
         type: "OFFLINE_DATA",
         multipleFileAllowed: false,
         header: "Upload Json File",
+        list: this.offlineList
       },
     });
     dialogRef.afterClosed().subscribe((result) => {
@@ -134,6 +143,8 @@ export class OfflineDataListComponent implements OnInit {
         queryName: this.selectedOfflineData.queryName,
         cronSchedule: this.selectedOfflineData.cronSchedule,
         cypherQuery: this.selectedOfflineData.cypherQuery,
+        queryGroup: this.selectedOfflineData.queryGroup,
+        list: encodeURIComponent(JSON.stringify(this.offlineList))
       },
     };
 
@@ -160,8 +171,16 @@ export class OfflineDataListComponent implements OnInit {
     this.currentPageValue = this.paginator.pageIndex * this.MAX_ROWS_PER_TABLE;
   }
 
+
   applyFilter(filterValue: string) {
+    if(filterValue === ""){
+      this.offlineDatasource.data = this.offlineList.data;
+    }
+    
     this.offlineDatasource.filter = filterValue.trim();
+    
+    this.currentPageIndex = this.paginator.pageIndex + 1;
+    this.changeCurrentPageValue()
   }
 
   changeLastExecution(x: any) {
@@ -191,11 +210,10 @@ export class OfflineDataListComponent implements OnInit {
       });
       this.offlineDatasource.data = this.offlineList.data;
 
-      this.totalPages = Math.ceil(
-        this.offlineDatasource.data.length / this.MAX_ROWS_PER_TABLE
-      );
       this.offlineDatasource.paginator = this.paginator;
+
     }
+
   }
 
   updateOfflineQueryStatus(event: MatSlideToggleChange, element) {
@@ -311,4 +329,29 @@ export class OfflineDataListComponent implements OnInit {
     this.selectedIndex = -1;
     this.currentPageIndex = this.paginator.pageIndex + 1;
   }
+
+  hideTextOverflow(text: any) {
+    if (text !== undefined && text.length > 20) {
+      return text.slice(0, 20) + "...";
+    } else {
+      return text;
+    }
+  }
+
+  sortData(sort: Sort) {
+    const data = this.offlineList.data.slice();
+    if (!sort.active || sort.direction === '') {
+      this.offlineDatasource.data = data;
+      return;
+    }
+
+    this.offlineDatasource.data = data.sort((a, b) => {
+      const isAsc = sort.direction === 'asc';
+      return this.insightsUtil.compare(a[sort.active], b[sort.active], isAsc)
+    });
+    this.offlineDatasource.paginator = this.paginator;
+  }
+  
+
+  
 }

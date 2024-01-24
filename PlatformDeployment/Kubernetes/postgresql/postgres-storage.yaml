@@ -1,0 +1,11 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: postgres-pv-claim
+spec: 
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ebs-sc
+  resources: 
+    requests:
+      storage: 2Gi

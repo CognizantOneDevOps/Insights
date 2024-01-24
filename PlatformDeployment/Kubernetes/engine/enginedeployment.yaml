@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: platformengine
+  name: platformengine
+spec:
+  selector:
+    matchLabels:
+      app: platformengine
+  template:
+    metadata:
+      labels:
+        app: platformengine
+    spec:
+      containers:
+        - name: platformengine
+          image: devopsbasservice/onedevopsinsights:engine10.2
+          envFrom:
+            - configMapRef:
+              name: app-configs 
+          volumeMounts:
+            - mountPath: /usr/INSIGHTS_HOME/logs
+              name: enginepv
+              subpath: enginelogs            
+      volumes:
+        - name: enginepv
+          persistentVolumeClaim:
+            claimName: enginepvc

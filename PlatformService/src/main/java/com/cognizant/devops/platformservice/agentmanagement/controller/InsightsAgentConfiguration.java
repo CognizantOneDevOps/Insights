@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,7 +115,11 @@ public class InsightsAgentConfiguration {
 			@RequestParam String osversion, @RequestParam String action) {
 		String message = null;
 		try {
-			message = agentManagementService.startStopAgent(agentId, toolName, osversion, action);
+			if (!ValidationUtils.checkAgentIdString(agentId)) {
+				message = agentManagementService.startStopAgent(agentId, toolName, osversion, action);
+			} else {
+				throw new InsightsCustomException("Invalid AgentId. AgentId can't conatin special characters.");
+			}
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}

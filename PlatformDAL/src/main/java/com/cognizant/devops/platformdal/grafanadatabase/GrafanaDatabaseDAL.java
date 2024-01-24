@@ -31,9 +31,9 @@ public class GrafanaDatabaseDAL extends BaseDAL {
 	public List<Object[]> fetchDashboardDetails() {
 		Map<String,Object> parameters = new HashMap<>();
 		Map<String,Type> scalarList = new LinkedHashMap<>();
-		scalarList.put("id", StandardBasicTypes.INTEGER);
+		scalarList.put("uid", StandardBasicTypes.STRING);
 		scalarList.put("data", StandardBasicTypes.STRING);
-		return executeGrafanaSQLQueryAndRetunList("SELECT id,data FROM dashboard",scalarList, parameters);
+		return executeGrafanaSQLQueryAndRetunList("SELECT uid,data FROM dashboard",scalarList, parameters);
 	}
 
 	public List<Object[]> fetchOrgDetails() {

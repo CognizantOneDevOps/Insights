@@ -453,7 +453,8 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 		GrafanaOrgToken grafanaOrgToken = grafanaDashboardConfigDAL
 				.getTokenByOrgId(config.getAsJsonObject().get(ORGANISATION).getAsInt());
 		String token = "Bearer " + AES256Cryptor.decrypt(grafanaOrgToken.getApiKey(),
-				AssessmentReportAndWorkflowConstants.GRAFANA_PDF_TOKEN_SIGNING_KEY);
+				ApplicationConfigProvider.getInstance().getSingleSignOnConfig()
+				.getTokenSigningKey());
 		Map<String, String> headers = new HashMap<>();
 		headers.put("Authorization", token);
 		return headers;

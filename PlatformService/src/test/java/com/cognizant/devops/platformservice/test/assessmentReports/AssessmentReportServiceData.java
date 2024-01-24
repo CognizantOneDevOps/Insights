@@ -622,7 +622,7 @@ public class AssessmentReportServiceData extends AbstractTestNGSpringContextTest
 		}
 		return response;
 	}
-	
+
 	public JsonObject deleteGrafanaAPIToken(int orgId) throws InsightsCustomException {
 		String response = null;
 		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
@@ -632,29 +632,53 @@ public class AssessmentReportServiceData extends AbstractTestNGSpringContextTest
 		headers.put(AuthenticationUtils.AUTH_HEADER_KEY, "Basic " + encodedString);
 		headers.put("x-grafana-org-id", String.valueOf(orgId));
 
-		//check if API key exists in Grafana
-		String id="";
-		boolean keyExists = false;
-		String getApiKeyResponse = grafanaHandler.grafanaGet(PlatformServiceConstants.API_AUTH_KEYS, headers);
-		JsonArray getApiKeyResponseObj = JsonUtils.parseStringAsJsonArray(getApiKeyResponse);
-		for(JsonElement item: getApiKeyResponseObj) {
-			if(item.getAsJsonObject().get(NAME).getAsString().equalsIgnoreCase(PDFTOKEN)) {
-				keyExists = true;
-				id = item.getAsJsonObject().get("id").getAsString();
-			}
-		}
-		if(keyExists) {	
-			String path = PlatformServiceConstants.API_AUTH_KEYS;
-			 path = path + "/" +id;
-			 String GRAFANA_END_POINT = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint();
-			 try {
+		// check if API key exists in Grafana
+		String USER = ApplicationConfigProvider.getInstance().getGrafana().getAdminUserName();
+		int serviceAccId = checkServiceAccount(headers, orgId, USER);
+		int tokenId = checkApiToken(serviceAccId, headers);
+		if (tokenId > -1) {
+			String GRAFANA_END_POINT = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint();
+			String path = "/api/serviceaccounts/" + serviceAccId + "/tokens/" + tokenId;
+			try {
 				String url = GRAFANA_END_POINT + path;
 				response = RestApiHandler.doDelete(url, headers);
-			 } catch (InsightsCustomException e) {
+			} catch (InsightsCustomException e) {
 				return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 			}
 		}
-	  return PlatformServiceUtil.buildSuccessResponseWithData(response);
-	
+		return PlatformServiceUtil.buildSuccessResponseWithData(response);
 	}
+
+	private int checkServiceAccount(Map<String, String> headers, int orgId, String USER)
+			throws InsightsCustomException {
+		int serviceId = -1;
+		String serviceAccResponse = grafanaHandler.grafanaGet(PlatformServiceConstants.API_SERVICE_ACCOUNT, headers);
+		JsonObject serviceObj = JsonUtils.parseStringAsJsonObject(serviceAccResponse);
+		JsonArray serviceAccounts = serviceObj.get("serviceAccounts").getAsJsonArray();
+		for (JsonElement jsonElement : serviceAccounts) {
+			if (jsonElement.getAsJsonObject().has("id")
+					&& jsonElement.getAsJsonObject().get("name").getAsString().equalsIgnoreCase(USER + "-" + orgId)) {
+				serviceId = jsonElement.getAsJsonObject().get("id").getAsInt();
+			}
+		}
+
+		return serviceId;
+	}
+
+	private int checkApiToken(int serviceAccId, Map<String, String> headers) throws InsightsCustomException {
+		int grafanaTokenId = -1;
+		if (serviceAccId > -1) {
+			String tokenResponse = grafanaHandler.grafanaGet(
+					PlatformServiceConstants.API_TOKEN.replace(":id", Integer.toString(serviceAccId)), headers);
+			JsonArray tokens = JsonUtils.parseStringAsJsonArray(tokenResponse);
+			for (JsonElement jsonElement : tokens) {
+				if (jsonElement.getAsJsonObject().has("id")
+						&& jsonElement.getAsJsonObject().get("name").getAsString().equalsIgnoreCase(PDFTOKEN)) {
+					grafanaTokenId = jsonElement.getAsJsonObject().get("id").getAsInt();
+				}
+			}
+		}
+		return grafanaTokenId;
+	}
+
 }

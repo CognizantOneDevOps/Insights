@@ -1,0 +1,7 @@
+[
+	
+	{
+		"queryName":"update QueryGroup Column",
+		"sqlQuery":"UPDATE public.\"INSIGHTS_OFFLINE_DATA_CONFIGURATION\" SET queryGroup=toolname || '_' || 'QUERY_GRP' where queryGroup is null;"
+	}
+] 
