@@ -118,7 +118,7 @@ public class InsightsOfflineConfigDAL extends BaseDAL {
 	public List<InsightsOfflineConfig> getAllOfflineConfig() {
 		try {
 			Map<String, Object> parameters = new HashMap<>();
-			return getResultList("FROM InsightsOfflineConfig IOC ORDER BY IOC.lastRunTime desc", InsightsOfflineConfig.class,
+			return getResultList("FROM InsightsOfflineConfig IOC ORDER BY IOC.id desc", InsightsOfflineConfig.class,
 					parameters);
 		} catch (Exception e) {
 			log.error(e);

@@ -28,7 +28,7 @@ import {
   MAT_DIALOG_DATA,
 } from "@angular/material/dialog";
 import { MatPaginator } from "@angular/material/paginator";
-import { MatSort } from "@angular/material/sort";
+import { MatSort, Sort } from "@angular/material/sort";
 import { MatTableDataSource } from "@angular/material/table";
 import { ConfirmationMessageDialog } from "@insights/app/modules/application-dialog/confirmation-message-dialog";
 import { AddGroupMessageDialog } from "@insights/app/modules/user-onboarding/add-group-message-dialog";
@@ -49,6 +49,7 @@ import {
   NgForm,
 } from "@angular/forms";
 import { HomeComponent } from "@insights/app/modules/home/home.component";
+import { InsightsUtilService } from "@insights/common/insights-util.service";
 
 @Component({
   selector: "app-user-onboarding",
@@ -75,7 +76,7 @@ export class UserOnboardingComponent implements OnInit {
   assignUserData = {};
   role: any;
   descp: string;
-  username: string;
+  usrnme: string;
   searchUser: string;
   newresponse: string = "";
   email: string;
@@ -131,6 +132,7 @@ export class UserOnboardingComponent implements OnInit {
   ];
   emailRegex = /(\w{1})[\w.-]+@([\w.]+\w)/;
   loginRegex = /\S(?=\S{2})/g;
+  dataValue :any = {};
 
   constructor(
     private fb: FormBuilder,
@@ -139,7 +141,8 @@ export class UserOnboardingComponent implements OnInit {
     private sanitizer: DomSanitizer,
     public dialog: MatDialog,
     public messageDialog: MessageDialogService,
-    private dataShare: DataSharedService
+    private dataShare: DataSharedService,
+    public insightsUtil : InsightsUtilService,
   ) {
     var self = this;
     this.userForm();
@@ -209,9 +212,8 @@ export class UserOnboardingComponent implements OnInit {
           usersResponseData.data != undefined &&
           usersResponseData.status == "success"
         ) {
-          var dataValue = {};
           let decodedData = self.dataShare.decryptedData( usersResponseData.data);
-          dataValue["data"] = JSON.parse(decodedData);
+          self.dataValue["data"] = JSON.parse(decodedData);
 
           self.showDetail = true;
           self.showThrobber = false;
@@ -223,7 +225,7 @@ export class UserOnboardingComponent implements OnInit {
             "Role",
           ];
 
-          self.userDataSource.data = dataValue["data"]; //new MatTableDataSource( )
+          self.userDataSource.data = self.dataValue["data"]; //new MatTableDataSource( )
           self.userDataSource.paginator = self.paginator;
         } else if (
           usersResponseData.message ==
@@ -396,7 +398,7 @@ export class UserOnboardingComponent implements OnInit {
 
     userPropertyList["name"] = this.names;
     userPropertyList["email"] = this.email;
-    userPropertyList["userName"] = this.username;
+    userPropertyList["userName"] = this.usrnme;
     userPropertyList["password"] = this.descp;
     userPropertyList["role"] = this.role;
     userPropertyList["orgName"] = this.selectedAdminOrg.name;
@@ -405,14 +407,14 @@ export class UserOnboardingComponent implements OnInit {
     userBMparameter = JSON.stringify(userPropertyList);
 
     var checkname = this.regex.test(this.email);
-    var checkid = this.usernameRegex.test(this.username);
+    var checkid = this.usernameRegex.test(this.usrnme);
     if (!checkid) {
       this.isUsernameIncorrect = true;
     }
     if (!checkname) {
       this.isEmailIncorrect = true;
     }
-    if (this.username == undefined) {
+    if (this.usrnme == undefined) {
       this.isUsernameIncorrect = true;
     }
     if (this.descp == undefined) {
@@ -571,7 +573,7 @@ export class UserOnboardingComponent implements OnInit {
     this.assignRadioSelected = false;
     this.assignuserSaveEnable = false;
     //this.descp = null;
-    this.username = null;
+    this.usrnme = null;
     this.email = null;
     this.names = null;
     this.role = null;
@@ -602,7 +604,7 @@ export class UserOnboardingComponent implements OnInit {
     this.assignRadioSelected = true;
     this.addRadioSelected = false;
     this.descp = undefined;
-    this.username = null;
+    this.usrnme = null;
     this.email = null;
     this.names = null;
     this.searchUser = null;
@@ -819,5 +821,19 @@ export class UserOnboardingComponent implements OnInit {
 
   onChange(newVal) {
     this.descp = newVal;
+  }
+
+  sortData(sort: Sort) {
+    const data = this.dataValue["data"].slice();
+    if (!sort.active || sort.direction === '') {
+      this.userDataSource.data = data;
+      return;
+    }
+
+    this.userDataSource.data = data.sort((a, b) => {
+      const isAsc = sort.direction === 'asc';
+      return this.insightsUtil.compare(a[sort.active], b[sort.active], isAsc)
+    });
+    this.userDataSource.paginator = this.paginator;
   }
 }

@@ -60,6 +60,11 @@ public final class PlatformServiceConstants {
 	public static final String SEARCH_DASHBOARD_PATH = "/api/search?query=";
 	public static final String API_DASHBOARDS_UID = "/api/dashboards/uid/";
 	public static final String API_AUTH_KEYS = "/api/auth/keys";
+	public static final String API_MIGRATE = "/api/serviceaccounts/migrate";
+	public static final String API_SERVICE_ACCOUNT = "/api/serviceaccounts/search";
+	public static final String API_CREATE_SERVICE_ACCOUNT = "/api/serviceaccounts";
+	public static final String API_TOKEN = "/api/serviceaccounts/:id/tokens";
+	public static final String API_TOKEN_DELETE = "/api/serviceaccounts/:id/tokens/:tokenId";
 	public static final String LF = "\n";
 	public static final String CR = "\r";
 	public static final String TAB = "\t";

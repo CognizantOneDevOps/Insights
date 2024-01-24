@@ -93,6 +93,7 @@
         <mat-radio-group [(ngModel)]="selectedAlertData">
           <table
             mat-table
+            matSort (matSortChange)="sortData($event)"
             [dataSource]="alertDatasource"
             class="mat-elevation-z8"
             style="margin-top: 2% !important; box-shadow: none !important"
@@ -119,7 +120,7 @@
               </td>
             </ng-container>
             <ng-container matColumnDef="Alert">
-              <th mat-header-cell *matHeaderCellDef class="tableHeader">
+              <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="alertName">
                 Alert Name
               </th>
               <td
@@ -131,7 +132,7 @@
               </td>
             </ng-container>
             <ng-container matColumnDef="Dashboard">
-              <th mat-header-cell *matHeaderCellDef class="tableHeader">
+              <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="dashboardName">
                 Dashboard Name
               </th>
               <td
@@ -143,7 +144,7 @@
               </td>
             </ng-container>
             <ng-container matColumnDef="Panel">
-              <th mat-header-cell *matHeaderCellDef class="tableHeader">
+              <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="panelName">
                 Panel Name
               </th>
               <td
@@ -167,7 +168,7 @@
               </td>
             </ng-container>
             <ng-container matColumnDef="Schedule">
-              <th mat-header-cell *matHeaderCellDef class="tableHeader">
+              <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="scheduleType">
                 Schedule
               </th>
               <td
@@ -184,6 +185,7 @@
                 *matHeaderCellDef
                 class="tableHeader"
                 style="white-space: nowrap !important;"
+                mat-sort-header="nextRunTime"
               >
                 Next Schedule ({{ timeZoneAbbr }})
               </th>
@@ -196,7 +198,7 @@
               </td>
             </ng-container>
             <ng-container matColumnDef="Active">
-              <th mat-header-cell *matHeaderCellDef class="tableHeader">
+              <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="isActive">
                 Active
               </th>
               <td
@@ -215,7 +217,7 @@
               </td>
             </ng-container>
             <ng-container matColumnDef="Status">
-              <th mat-header-cell *matHeaderCellDef class="tableHeader">
+              <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="status">
                 Status
               </th>
               <td
@@ -331,7 +333,7 @@
           </mat-icon>
         </div>
         <div *ngIf="enableEmail" class="paginatorElement paginatorIndexElement">
-          {{ currentPageIndex }}
+          {{ (this.alertDatasource.paginator && (this.alertDatasource.paginator.length === 0)) ? 0 : this.paginator.pageIndex + 1 }}
         </div>
         <div
           *ngIf="enableEmail"
@@ -358,7 +360,7 @@
           >
           </mat-icon>
         </div>
-        <div *ngIf="enableEmail">of {{ totalPages }}</div>
+        <div *ngIf="enableEmail">of {{ this.paginator.getNumberOfPages() }}</div>
       </div>
     </div>
   </div>

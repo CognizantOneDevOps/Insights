@@ -94,17 +94,16 @@ public class DataDictionaryServiceImpl implements DataDictionaryService {
 			String toolPropertiesQuery = DataDictionaryConstants.GET_TOOL_PROPERTIES_QUERY;
 			GraphResponse graphResponse = graphDBHandler.executeCypherQuery(
 					toolPropertiesQuery.replace("__labelName__", labelName).replace("__CategoryName__", categoryName));
-			JsonObject jsonResponse = graphResponse.getJson();
-			Iterator<JsonElement> iterator = jsonResponse.get("results").getAsJsonArray().iterator().next()
-					.getAsJsonObject().get("data").getAsJsonArray().iterator().next().getAsJsonObject().get("row")
-					.getAsJsonArray().iterator().next().getAsJsonArray().iterator();
-			while (iterator.hasNext()) {
-				String element = iterator.next().getAsString();
-				if (!(element.equalsIgnoreCase(DataDictionaryConstants.EXEC_ID)
-						|| element.equalsIgnoreCase(DataDictionaryConstants.UUID))) {
-					keysArrayJson.add(element);
-				}
-			}
+			 JsonObject jsonResponse = graphResponse.getJson();
+
+		        for (JsonElement element : jsonResponse.getAsJsonArray("results").get(0).getAsJsonObject().getAsJsonArray("data")
+		                .get(0).getAsJsonObject().getAsJsonArray("row").get(0).getAsJsonArray()) {
+		            String elementValue = element.getAsString();
+		            if (!(elementValue.equalsIgnoreCase(DataDictionaryConstants.EXEC_ID)
+		                    || elementValue.equalsIgnoreCase(DataDictionaryConstants.UUID))) {
+		                keysArrayJson.add(elementValue);
+		            }
+		        }
 			if (keysArrayJson.size() > 0) {
 				return PlatformServiceUtil.buildSuccessResponseWithData(keysArrayJson);
 			} else {
@@ -126,24 +125,19 @@ public class DataDictionaryServiceImpl implements DataDictionaryService {
 					.replace("__StartToolCategory__", startToolCategory).replace("__StartLabelName__", startLabelName)
 					.replace("__EndToolCategory__", endToolCatergory).replace("__EndLabelName__", endLabelName));
 			JsonObject jsonResponse = graphResponse.getJson();
-			Iterator<JsonElement> dataIterator = jsonResponse.get("results").getAsJsonArray().iterator().next()
-					.getAsJsonObject().get("data").getAsJsonArray().iterator();
-
-			while (dataIterator.hasNext()) {
-				Iterator<JsonElement> rowIterator = dataIterator.next().getAsJsonObject().get("row").getAsJsonArray()
-						.iterator();
-				while (rowIterator.hasNext()) {
-					String relationName = rowIterator.next().getAsString();
-					JsonObject relationJson = new JsonObject();
-					relationJson.addProperty("relationName", relationName);
-					toolsRealtionJson.add(relationJson);
-				}
-			}
+	        for (JsonElement data : jsonResponse.getAsJsonArray("results").get(0).getAsJsonObject().getAsJsonArray("data")) {
+	            for (JsonElement row : data.getAsJsonObject().getAsJsonArray("row")) {
+	                String relationName = row.getAsString();
+	                JsonObject relationJson = new JsonObject();
+	                relationJson.addProperty("relationName", relationName);
+	                toolsRealtionJson.add(relationJson);
+	            }
+	        }
 			return PlatformServiceUtil.buildSuccessResponseWithData(toolsRealtionJson);
 		} catch (Exception e) {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
 		
-	}
+	}	
 }

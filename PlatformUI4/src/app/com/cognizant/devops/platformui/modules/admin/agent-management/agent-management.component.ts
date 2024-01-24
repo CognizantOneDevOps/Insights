@@ -32,6 +32,8 @@ import { InsightsInitService } from "@insights/common/insights-initservice";
 import { HealthCheckService } from "@insights/app/modules/healthcheck/healthcheck.service";
 import { ShowDetailsDialog } from "@insights/app/modules/healthcheck/healthcheck-show-details-dialog";
 import { AgentDownloadDialogComponent } from "./agent-download-dialog/agent-download-dialog.component";
+import { Sort } from "@angular/material/sort";
+import { InsightsUtilService } from "@insights/common/insights-util.service";
 
 @Component({
   selector: "app-agent-management",
@@ -66,8 +68,6 @@ export class AgentManagementComponent implements OnInit {
   timeZoneAbbr: string = "";
   selectedIndex: number;
   currentPageValue: number;
-  currentPageIndex: number = -1;
-  totalPages: number = -1;
 
   constructor(
     public agentService: AgentService,
@@ -77,15 +77,15 @@ export class AgentManagementComponent implements OnInit {
     public messageDialog: MessageDialogService,
     private changeDetectorRefs: ChangeDetectorRef,
     private dataShare: DataSharedService,
+    private insightsUtil : InsightsUtilService,
     private _clipboardService: ClipboardService,
     public initConfig: InsightsInitService,
-    private healthCheckService: HealthCheckService
+    private healthCheckService: HealthCheckService,
   ) {
     this.getRegisteredAgents();
   }
 
   ngOnInit() {
-    this.currentPageIndex = this.paginator.pageIndex + 1;
     this.timeZone = this.dataShare.getTimeZone();
     this.timeZoneAbbr = this.dataShare.getTimeZoneAbbr();
     this.route.queryParams.subscribe((params) => {
@@ -157,9 +157,6 @@ export class AgentManagementComponent implements OnInit {
         "error"
       );
     }
-    this.totalPages = Math.ceil(
-      this.agentListDatasource.data.length / this.MAX_ROWS_PER_TABLE
-    );
     self.selectTool = " ";
   }
   private consolidatedArr(detailArr): void {
@@ -189,14 +186,7 @@ export class AgentManagementComponent implements OnInit {
     }
     this.agentListDatasource.data = agentListDatasourceSelected;
     this.agentListDatasource.paginator = this.paginator;
-    this.totalPages = Math.ceil(
-      this.agentListDatasource.filteredData.length / this.MAX_ROWS_PER_TABLE
-    );
-    if (this.totalPages < this.currentPageIndex) {
-      this.currentPageIndex = this.paginator.pageIndex;
-    } else {
-      this.currentPageIndex = this.paginator.pageIndex + 1;
-    }
+
     this.changeDetectorRefs.detectChanges();
   }
 
@@ -399,20 +389,10 @@ export class AgentManagementComponent implements OnInit {
   goToNextPage() {
     this.selectedIndex = -1;
     this.paginator.nextPage();
-    if (this.totalPages === 0) {
-      this.currentPageIndex = 0;
-    } else {
-      this.currentPageIndex = this.paginator.pageIndex + 1;
-    }
   }
   goToPrevPage() {
     this.selectedIndex = -1;
     this.paginator.previousPage();
-    if (this.totalPages === 0) {
-      this.currentPageIndex = 0;
-    } else {
-      this.currentPageIndex = this.paginator.pageIndex + 1;
-    }
   }
 
   showAgentDownloadDialog() {
@@ -426,5 +406,19 @@ export class AgentManagementComponent implements OnInit {
         data: {},
       });
     }
+  }
+
+  sortData(sort: Sort) {
+    const data = this.agentList.data.slice();
+    if (!sort.active || sort.direction === '') {
+      this.agentListDatasource.data = data;
+      return;
+    }
+
+    this.agentListDatasource.data = data.sort((a, b) => {
+      const isAsc = sort.direction === 'asc';
+      return this.insightsUtil.compare(a[sort.active], b[sort.active], isAsc)
+    });
+    this.agentListDatasource.paginator = this.paginator;
   }
 }

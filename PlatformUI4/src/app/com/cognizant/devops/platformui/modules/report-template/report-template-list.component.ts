@@ -27,6 +27,8 @@ import { MessageDialogService } from "@insights/app/modules/application-dialog/m
 import { KpiService } from "../kpi-addition/kpi-service";
 import { FileUploadDialog } from "../fileUploadDialog/fileUploadDialog.component";
 import { ContentService } from "../content-config-list/content-service";
+import { InsightsUtilService } from "@insights/common/insights-util.service";
+import { Sort } from "@angular/material/sort";
 
 @Component({
   selector: "app-report-template",
@@ -56,8 +58,6 @@ export class ReportTemplateComponent implements OnInit {
   enableAttachFile: boolean = false;
   MAX_ROWS_PER_TABLE = 6;
   selectedIndex: number = -1;
-  currentPageIndex: number = -1;
-  totalPages: number = -1;
   currentPageValue: number;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   isEdit: boolean;
@@ -69,7 +69,8 @@ export class ReportTemplateComponent implements OnInit {
     private messageDialog: MessageDialogService,
     public router: Router,
     public kpiService: KpiService,
-    public contentService: ContentService
+    public contentService: ContentService,
+    public insightsUtil : InsightsUtilService
   ) {
     this.showThrobber = true;
     this.displayedColumns = [
@@ -89,7 +90,6 @@ export class ReportTemplateComponent implements OnInit {
   ngOnInit() {
     console.log(this.paginator);
     this.currentPageValue = this.paginator.pageIndex * this.MAX_ROWS_PER_TABLE;
-    this.currentPageIndex = this.paginator.pageIndex + 1;
   }
 
   ngAfterViewInit() {
@@ -99,13 +99,11 @@ export class ReportTemplateComponent implements OnInit {
   goToNextPage() {
     this.paginator.nextPage();
     this.selectedIndex = -1;
-    this.currentPageIndex = this.paginator.pageIndex + 1;
   }
 
   goToPrevPage() {
     this.paginator.previousPage();
     this.selectedIndex = -1;
-    this.currentPageIndex = this.paginator.pageIndex + 1;
   }
 
   async getVisualizationUtilList() {
@@ -151,9 +149,6 @@ export class ReportTemplateComponent implements OnInit {
     if (this.reportList != null && this.reportList.status == "success") {
       this.showThrobber = false;
       this.templateDatasource.data = this.reportList.data;
-      this.totalPages = Math.ceil(
-        this.templateDatasource.data.length / this.MAX_ROWS_PER_TABLE
-      );
       this.templateDatasource.paginator = this.paginator;
     }
   }
@@ -382,5 +377,19 @@ export class ReportTemplateComponent implements OnInit {
         element.isActive = !event.checked;
       }
     });
+  }
+
+  sortData(sort: Sort) {
+    const data = this.reportList.data.slice();
+    if (!sort.active || sort.direction === '') {
+      this.templateDatasource.data = data;
+      return;
+    }
+
+    this.templateDatasource.data = data.sort((a, b) => {
+      const isAsc = sort.direction === 'asc';
+      return this.insightsUtil.compare(a[sort.active], b[sort.active], isAsc)
+    });
+    this.templateDatasource.paginator = this.paginator;
   }
 }

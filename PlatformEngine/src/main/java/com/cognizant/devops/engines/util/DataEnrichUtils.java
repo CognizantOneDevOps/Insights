@@ -17,27 +17,29 @@ package com.cognizant.devops.engines.util;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class DataEnrichUtils {
 	
-	private static Pattern p = Pattern.compile("((?<!([A-Z]{1,10})-?)(#|)+[A-Z]+(-|.)\\d+)");
+	private static Pattern p = Pattern.compile("((?<!([A-Z]{1,10})-?)(#|)+[A-Z]+(-|.)\\d{1,10})");
 	
 	private DataEnrichUtils() {
 	}
 	
 	public static String dataExtractor(String message, String keyPattern) {
-		String enrichDataValue = null;
-		if (message != null) {
-			while (message.contains(keyPattern)) {
-				Matcher m = p.matcher(message);
-				if (m.find()) {
-					enrichDataValue = (m.group());
-					message = message.replaceAll(m.group(), "");
-				} else {
-					break;
-				}
-			}
+		   String enrichDataValue = null;
+		    if (message != null&& keyPattern != null && !keyPattern.isEmpty()) {
+		        Matcher m = p.matcher(message);
+		        StringBuffer sb = new StringBuffer();
+		        
+		        while (m.find()) {
+		            enrichDataValue = m.group();
+		            m.appendReplacement(sb, "");
+		        }
+		        
+		        m.appendTail(sb);
+		        message = sb.toString();
+		    }
+		    return enrichDataValue;
 		}
-		return enrichDataValue;
-	}
 }

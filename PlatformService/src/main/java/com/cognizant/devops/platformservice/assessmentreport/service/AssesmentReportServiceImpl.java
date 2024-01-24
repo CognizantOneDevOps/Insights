@@ -598,8 +598,9 @@ public class AssesmentReportServiceImpl {
 	 *
 	 * @param assessmentReport
 	 * @return JsonObject
+	 * @throws Exception 
 	 */
-	public JsonObject createAssessmentReportJsonForUI(InsightsAssessmentConfiguration assessmentReport) {
+	public JsonObject createAssessmentReportJsonForUI(InsightsAssessmentConfiguration assessmentReport) throws Exception {
 		JsonObject jsonobject = new JsonObject();
 		jsonobject.addProperty("configId", assessmentReport.getId());
 		jsonobject.addProperty(AssessmentReportAndWorkflowConstants.REPORTNAME,

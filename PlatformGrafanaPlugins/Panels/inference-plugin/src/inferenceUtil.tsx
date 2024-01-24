@@ -3,7 +3,20 @@ export function processData(props) {
     let jsonArrtoStr= [] as any;
     if(props.data.state === 'Done'){
       if (props.data.series.length > 0) {
-        jsonArrtoStr = props.data.series[0].source;
+        if(props.data.series[0].source){
+          // For Grafana version < 10.0.0
+          jsonArrtoStr = props.data.series[0].source;
+        } else {
+          // For Grafana version >= 10.0.0
+          props.data.series.forEach(element => {
+            let newObj = {
+              "heading" : element.fields.find(e => e.name === "heading").values,
+              "inferenceDetails" : element.fields.find(e => e.name === "inferenceDetails").values[0],
+              "ranking" : element.fields.find(e => e.name === "ranking").values
+            }
+            jsonArrtoStr.push(newObj)
+          }); 
+        }
       }
     }
     let googleChartData = {} as any;

@@ -343,13 +343,14 @@ public class WorkflowServiceImpl {
 	 */
 	public InsightsEmailTemplates createEmailTemplateObject(JsonObject emailDetails,
 			InsightsWorkflowConfiguration workflowConfig) {
+		EmailConfiguration emailConfig = ApplicationConfigProvider.getInstance().getEmailConfiguration();
 		InsightsEmailTemplates emailTemplateConfig = workflowConfig.getEmailConfig();
 		if (emailTemplateConfig == null) {
 			emailTemplateConfig = new InsightsEmailTemplates();
 		}
 		String mailBody = emailDetails.get("mailBodyTemplate").getAsString();
 		mailBody = mailBody.replace("#", "<").replace("~", ">");
-		emailTemplateConfig.setMailFrom(emailDetails.get("senderEmailAddress").getAsString());
+		emailTemplateConfig.setMailFrom(emailConfig.getMailFrom());
 		if (!emailDetails.get(AssessmentReportAndWorkflowConstants.RECEIVEREMAILADDRESS).getAsString().isEmpty()) {
 			emailTemplateConfig.setMailTo(
 					emailDetails.get(AssessmentReportAndWorkflowConstants.RECEIVEREMAILADDRESS).getAsString());

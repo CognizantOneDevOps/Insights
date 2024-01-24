@@ -155,6 +155,10 @@ table {
 	text-align: center;
 }
 
+::ng-deep .mat-sort-header-arrow {
+	color: var(--text-clr3) !important;
+}
+
 .title {
 	background-color: var(--backgnd-clr7);
 	color: var(--text-clr3) !important;
@@ -430,6 +434,20 @@ input, textarea{
 	max-height: 200px;
 }
 
+::ng-deep .mat-autocomplete-panel {
+	color: var(--text-clr) !important;
+	background-color: var(--backgnd-clr10) !important;
+	border: 1px solid var(--select-panel-border) !important;
+	border-radius: 0px !important;
+	transform: translate(0%, 0%) !important;
+	overflow-y: auto;
+	overflow-x: auto;
+	max-height: 200px;
+}
+::ng-deep .mat-autocomplete-panel {
+	position: fixed !important;
+	
+ }
 ::ng-deep .mat-select-panel-wrap {
 	transform: translateX(6px) translateY(38px) !important;
 	margin: -11px 0 0 -16px;
@@ -539,6 +557,26 @@ table tr:last-child td:last-child {
 }
 
 ::ng-deep .mat-select-panel::-webkit-scrollbar {
+	width: 5px;
+	height: 6px;
+}
+
+::ng-deep .mat-autocomplete-panel::-webkit-scrollbar-thumb {
+	background-image: initial;
+	background-position-y: initial;
+	background-size: initial;
+	background-attachment: initial;
+	background-origin: initial;
+	background-clip: initial;
+	background-color: #296dfa;
+	cursor: pointer;
+}
+
+::ng-deep .mat-autocomplete-panel::-webkit-scrollbar-track {
+	border-radius: 20px;
+}
+
+::ng-deep .mat-autocomplete-panel::-webkit-scrollbar {
 	width: 5px;
 	height: 6px;
 }

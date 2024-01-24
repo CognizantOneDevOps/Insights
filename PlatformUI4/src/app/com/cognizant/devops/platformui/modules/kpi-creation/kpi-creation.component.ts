@@ -22,6 +22,8 @@ import { MatTableDataSource } from "@angular/material/table";
 import { KpiService } from "../kpi-addition/kpi-service";
 import { MessageDialogService } from "../application-dialog/message-dialog-service";
 import { ContentService } from "../content-config-list/content-service";
+import { Sort } from "@angular/material/sort";
+import { InsightsUtilService } from "@insights/common/insights-util.service";
 
 @Component({
   selector: "app-kpi-creation",
@@ -48,16 +50,14 @@ export class KpiCreationComponent implements OnInit {
   enableRefresh: boolean = false;
   MAX_ROWS_PER_TABLE = 5;
   selectedIndex: number = -1;
-  currentPageIndex: number = -1;
-  totalPages: number = -1;
-  currentPageValue: number;
 
   constructor(
     public messageDialog: MessageDialogService,
     public router: Router,
     public dialog: MatDialog,
     public kpiService: KpiService,
-    public contentService: ContentService
+    public contentService: ContentService,
+    public insightsUtil : InsightsUtilService
   ) {}
 
   ngOnInit() {
@@ -71,8 +71,6 @@ export class KpiCreationComponent implements OnInit {
       "Category",
       "ResultField",
     ];
-    this.currentPageValue = this.paginator.pageIndex * this.MAX_ROWS_PER_TABLE;
-    this.currentPageIndex = this.paginator.pageIndex + 1;
 
     this.kpiService.fileUploadSubject.subscribe((res) => {
       if (res === "REFRESH") {
@@ -88,13 +86,11 @@ export class KpiCreationComponent implements OnInit {
   goToNextPage() {
     this.paginator.nextPage();
     this.selectedIndex = -1;
-    this.currentPageIndex = this.paginator.pageIndex + 1;
   }
 
   goToPrevPage() {
     this.paginator.previousPage();
     this.selectedIndex = -1;
-    this.currentPageIndex = this.paginator.pageIndex + 1;
   }
 
   hideTextOverflow(text: any) {
@@ -153,7 +149,6 @@ export class KpiCreationComponent implements OnInit {
   }
   enableButtons() {
     this.onRadioBtnSelect = true;
-    this.currentPageIndex = this.paginator.pageIndex + 1;
   }
 
   public async getAllActiveKpi() {
@@ -171,15 +166,13 @@ export class KpiCreationComponent implements OnInit {
         (a, b) => a.kpiId > b.kpiId
       );
 
-      this.totalPages = Math.ceil(
-        this.kpiDatasource.data.length / this.MAX_ROWS_PER_TABLE
-      );
       this.kpiDatasource.paginator = this.paginator;
       console.log(this.kpiDatasource.paginator);
     }
   }
   applyFilter(filterValue: string) {
     this.kpiDatasource.filter = filterValue.trim();
+    this.selectedIndex = -1;
   }
 
   list() {
@@ -231,5 +224,19 @@ export class KpiCreationComponent implements OnInit {
           });
       }
     });
+  }
+
+  sortData(sort: Sort) {
+    const data = this.kpiList.data.slice();
+    if (!sort.active || sort.direction === '') {
+      this.kpiDatasource.data = data;
+      return;
+    }
+
+    this.kpiDatasource.data = data.sort((a, b) => {
+      const isAsc = sort.direction === 'asc';
+      return this.insightsUtil.compare(a[sort.active], b[sort.active], isAsc)
+    });
+    this.kpiDatasource.paginator = this.paginator;
   }
 }

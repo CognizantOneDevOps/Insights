@@ -12,34 +12,24 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-import { StringMapWithRename } from "@angular/compiler/src/compiler_facade_interface";
 import { Component, Injectable, OnInit, ViewChild } from "@angular/core";
 import { Sort } from "@angular/material/sort";
 
 import { MatDialog } from "@angular/material/dialog";
 
-import { HttpClient } from "@angular/common/http";
 
-import {
-  animate,
-  state,
-  style,
-  transition,
-  trigger,
-} from "@angular/animations";
-import { MatButton } from "@angular/material/button";
-import { Observable } from "rxjs";
+
 import { MatPaginator } from "@angular/material/paginator";
 import { MatTableDataSource } from "@angular/material/table";
-import { DataSource } from "@angular/cdk/collections";
 import { MessageDialogService } from "../application-dialog/message-dialog-service";
 import { MatRadioChange } from "@angular/material/radio";
 import { AddComponent } from "./dialogs/add/add.component";
 import { MultipleEmailConfigService } from "./multiple-email-config.service";
-import { ActivatedRoute, NavigationExtras, Router } from "@angular/router";
+import { ActivatedRoute,  Router } from "@angular/router";
 import { DataSharedService } from "@insights/common/data-shared-service";
 import { WorkflowHistoryDetailsDialog } from "@insights/app/modules/reportmanagement/workflow-history-details/workflow-history-details-dialog";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
+import { InsightsUtilService } from "@insights/common/insights-util.service";
 
 @Component({
   selector: "multiple-email-configuration",
@@ -60,6 +50,7 @@ export class MultipleEmailConfigurationComponent implements OnInit {
     public messageDialog: MessageDialogService,
     public multiEmailConfig: MultipleEmailConfigService,
     public router: Router,
+    public insightsUtil : InsightsUtilService,
     public route: ActivatedRoute
   ) {}
 
@@ -67,7 +58,6 @@ export class MultipleEmailConfigurationComponent implements OnInit {
   emailDatasource = new MatTableDataSource<any>();
   isDatainProgress: boolean = false;
   currentPageIndex: number = -1;
-  totalPages: number = -1;
   disableDelete: boolean = true;
   disableEdit: boolean = true;
   currentPageValue: number;
@@ -121,9 +111,6 @@ export class MultipleEmailConfigurationComponent implements OnInit {
   async getAllConfig() {
     this.isDatainProgress = true;
     
-    this.totalPages = Math.ceil(
-      this.emailDatasource.data.length / this.MAX_ROWS_PER_TABLE
-    );
 
     this.emailDatasource.paginator = this.paginator;
     
@@ -178,11 +165,7 @@ export class MultipleEmailConfigurationComponent implements OnInit {
 
         this.userDataSource.data = this.detailedRecords;
         this.userDataSource.paginator = this.paginator;
-        this.totalPages = Math.ceil(
-          this.userDataSource.data.length / this.MAX_ROWS_PER_TABLE
-        );
 
-        this.detailedRecords = [];
       }
     } else {
       this.messageDialog.openSnackBar(
@@ -430,5 +413,18 @@ export class MultipleEmailConfigurationComponent implements OnInit {
   changeCurrentPageValue() {
     this.selectedIndex = -1;
     this.currentPageIndex = this.paginator.pageIndex * this.MAX_ROWS_PER_TABLE;
+  }
+  sortData(sort: Sort) {
+    const data =  this.detailedRecords.slice();
+    if (!sort.active || sort.direction === '') {
+      this.userDataSource.data = data;
+      return;
+    }
+
+    this.userDataSource.data = data.sort((a, b) => {
+      const isAsc = sort.direction === 'asc';
+      return this.insightsUtil.compare(a[sort.active], b[sort.active], isAsc)
+    });
+    this.userDataSource.paginator = this.paginator;
   }
 }

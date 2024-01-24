@@ -68,6 +68,9 @@ public class InsightsOfflineConfig {
 	
 	@Column(name = "message", length = 3000)
 	private String message;
+	
+	@Column(name = "queryGroup")
+	private String queryGroup;
 
 	public int getId() {
 		return id;
@@ -164,5 +167,13 @@ public class InsightsOfflineConfig {
 
 	public void setMessage(String message) {
 		this.message = message;
+	}
+	
+	public String getqueryGroup() {
+		return queryGroup;
+	}
+
+	public void setqueryGroup(String queryGroup) {
+		this.queryGroup = queryGroup;
 	}
 }

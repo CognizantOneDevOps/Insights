@@ -133,14 +133,16 @@ public class InsightsDynamicJsonParser {
 	public List<JsonObject> parseResponseChildArray(JsonNode jsonChildResponseNode, JsonNode jsonArrayNode,
 			JsonObject responceData, String jsonKey) {
 		List<JsonObject> responceDataList = new ArrayList<>(0);
+		if(isValidJsonArrayNode(jsonArrayNode)) {
 		Iterator<JsonNode> datasetElements = jsonArrayNode.iterator();
 		int nodeCount = 0;
+		int maxLoop = jsonArrayNode.size();
 		boolean isArrayContainOnlyValueNode = isArrayContainOnlyValueNode(jsonArrayNode);
 
 		// LOG.debug(" inside parseResponseChildArray Array check isArrayContainOnlyValueNode {}  ", isArrayContainOnlyValueNode);
 
-		if (!isArrayContainOnlyValueNode) {
-			while (datasetElements.hasNext()) {
+		if (!isArrayContainOnlyValueNode && jsonArrayNode.isArray() && jsonArrayNode!=null) {
+			for(int loopCount =0;loopCount < maxLoop ;loopCount++) {
 				JsonObject childJsonObject;
 				nodeCount = nodeCount + 1;
 				if (nodeCreationType.equals(ResultOutputType.INDIVIDUAL_NODE.getValue())) {
@@ -165,13 +167,25 @@ public class InsightsDynamicJsonParser {
 			// LOG.debug("Array contain only values {} ", jsonArrayNode);
 			getNodeValue(jsonChildResponseNode.asText(), jsonArrayNode, jsonChildResponseNode, responceData);
 		}
+		}
+		else {
+			//log.error("Invalid JsonArrayNode");
+		}
 		// LOG.debug("Array for build " + responceDataList.toString());
 		return responceDataList;
+	}
+	
+	private boolean isValidJsonArrayNode(JsonNode jsonArrayNode) {
+	    // Validate jsonArrayNode here based on your specific criteria
+	    // Return true if the jsonArrayNode is considered valid, otherwise return false
+	    // You might want to check for null, empty, or other conditions depending on your application logic
+	    return jsonArrayNode != null && jsonArrayNode.isArray() && jsonArrayNode.size() > 0;
 	}
 
 	private void parseChildDatasetElement(JsonNode jsonChildResponseNode, String jsonKey, JsonObject childJsonObject,
 			JsonNode datasetElement, Iterator<String> datasetElementFields) {
-		while (datasetElementFields.hasNext()) {
+		int maxloop=datasetElement.size();
+		for (int loop=0;loop<maxloop;loop++) {
 			String datasetElementField = datasetElementFields.next();
 			JsonNode jsonChildNode = datasetElement.get(datasetElementField);
 			JsonNode jsonChildNodeResponse = jsonChildResponseNode.get(datasetElementField);

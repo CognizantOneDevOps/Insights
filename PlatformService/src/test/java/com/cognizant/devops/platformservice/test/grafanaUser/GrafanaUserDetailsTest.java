@@ -37,6 +37,7 @@ import com.cognizant.devops.platformservice.security.config.grafana.GrafanaUserD
 import com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
 @Test
@@ -119,7 +120,7 @@ public class GrafanaUserDetailsTest extends GrafanaUserDetailsTestData {
 	@Test(priority = 4)
 	public void testGetUserDetailsWithInvalidToken() throws Exception {
 
-		UserDetails actualResponse = GrafanaUserDetailsUtil.getUserDetails(invalidToken);
+		UserDetails actualResponse = GrafanaUserDetailsUtil.getUserDetails(testAuthData.get("invalidToken"));
 		Assert.assertNull(actualResponse);
 	}
 

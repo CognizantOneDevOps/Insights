@@ -247,7 +247,7 @@ public class RestApiHandler {
 					errorResponse.addProperty(PlatformServiceConstants.STATUS, response.getStatus());
 					errorResponse.addProperty(PlatformServiceConstants.DATA, returnStr);
 					throw new RestAPI404Exception(errorResponse.toString());
-				} else if (!(response.getStatus() == 200 || response.getStatus() == 204)) {
+				} else if (!(response.getStatus() == 200 || response.getStatus() == 204 || response.getStatus() == 201)) {
 					JsonObject errorResponse = new JsonObject();
 					errorResponse.addProperty(PlatformServiceConstants.STATUS, response.getStatus());
 					errorResponse.addProperty(PlatformServiceConstants.DATA, returnStr);

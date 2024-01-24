@@ -8,7 +8,7 @@
 			"() => {for (el of document.getElementsByClassName('react-resizable-handle')) {return el.hidden = true; };  }",
 			"() => {for (el of document.getElementsByClassName('panel-info-corner')) {return el.hidden = true; };  }",
 			"() => {document.querySelector(\"div.submenu-controls\")? document.querySelector(\"div.submenu-controls\").remove():'';  }",
-			"() => {document.getElementById('ngRoot').parentNode.style.padding = '0 0 0 0'; }"
+			"() => {for (el of document.querySelectorAll('[class*=page-panes]')) {el.parentNode.style.paddingTop ='0px'; };return true; }"
 		],
 		"width": "() => { return document.getElementsByClassName('react-grid-layout')[0].getBoundingClientRect().width; }",
 		"height": "() => { return document.getElementsByClassName('react-grid-layout')[0].getBoundingClientRect().bottom; }",

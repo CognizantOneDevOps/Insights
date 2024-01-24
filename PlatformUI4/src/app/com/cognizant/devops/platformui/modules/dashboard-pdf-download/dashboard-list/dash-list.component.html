@@ -121,6 +121,30 @@
       </button>
     </span>
   </div>
+  <div style="margin-top: 2%">
+    <mat-form-field appearance="fill" class="columnComponent">
+      <input
+        matInput
+        (keyup)="applyFilter($event.target.value)"
+        placeholder="Search"
+        class="inputColCss"
+        id="searchButton"
+      />
+      <button
+        matSuffix
+        class="searchCss"
+        style="border: none; background: transparent"
+      >
+        <mat-icon
+          title="Search"
+          svgIcon="searchIcon"
+          style="height: 14px !important; width: 14px !important"
+          id="Search"
+        >
+        </mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
   <div>
     <div style="display: flex; justify-content: center; align-items: center">
       <div class="loading-indicator">
@@ -137,6 +161,7 @@
       <mat-radio-group [(ngModel)]="selectedDashboard">
         <table
           mat-table
+          matSort (matSortChange)="sortData($event)"
           [dataSource]="dashboardDatasource"
           class="mat-elevation-z8"
           style="margin-top: 2% !important; box-shadow: none !important"
@@ -163,7 +188,7 @@
             </td>
           </ng-container>
           <ng-container matColumnDef="Title">
-            <th mat-header-cell *matHeaderCellDef class="tableHeader">Title</th>
+            <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="title">Title</th>
             <td
               mat-cell
               *matCellDef="let element"
@@ -173,7 +198,7 @@
             </td>
           </ng-container>
           <ng-container matColumnDef="Organisation">
-            <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="orgName">
               Organisation
             </th>
             <td
@@ -185,7 +210,7 @@
             </td>
           </ng-container>
           <ng-container matColumnDef="PdfType">
-            <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="pdfType">
               Pdf Type
             </th>
             <td
@@ -197,7 +222,7 @@
             </td>
           </ng-container>
           <ng-container matColumnDef="ScheduleType">
-            <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="scheduleType">
               Schedule
             </th>
             <td
@@ -209,7 +234,7 @@
             </td>
           </ng-container>
           <ng-container matColumnDef="Status">
-            <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="status">
               Status
             </th>
             <td
@@ -221,7 +246,7 @@
             </td>
           </ng-container>
           <ng-container matColumnDef="Active">
-            <th mat-header-cell *matHeaderCellDef class="tableHeader">
+            <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="isActive">
               Active
             </th>
             <td
@@ -304,7 +329,7 @@
           </mat-icon>
         </div>
         <div class="paginatorElement paginatorIndexElement">
-          {{ currentPageIndex }}
+          {{ (this.dashboardDatasource.paginator && (this.dashboardDatasource.paginator.length === 0)) ? 0 : this.paginator.pageIndex + 1}}
         </div>
         <div
           class="paginatorElement"
@@ -330,7 +355,7 @@
           >
           </mat-icon>
         </div>
-        <div>of {{ totalPages }}</div>
+        <div>of {{ this.paginator.getNumberOfPages() }}</div>
       </div>
     </div>
   </div>

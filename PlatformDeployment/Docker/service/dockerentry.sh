@@ -28,7 +28,6 @@ neo4jToken=$(echo -n $neo4jUser:$neo4jPassword | base64)
 grafanaDBEndpoint=jdbc:postgresql://$postgresIP:$postgresPort/grafana
 insightsDBUrl=jdbc:postgresql://$postgresIP:$postgresPort/insight
 grafanaDBUrl=jdbc:postgresql://$postgresIP:$postgresPort/grafana
-grafanaPublicHost=http://$hostPublicIP:$grafanaPort
 
 if [[ ! -z $enablespin ]]
 then
@@ -38,18 +37,18 @@ else
 fi
 
 ServiceEndpoint=http://$hostname:$servicePort
-insightsServiceURL=http://$hostname:$servicePort/app
+insightsServiceURL=http://$hostname:$servicePort/
+insightsUIURL=http://$hostname:$uiPort/
 grafanaEndpoint=http://$hostPrivateIP:$grafanaPort
 
 #UPDATE ServiceEndpoint - uiConfig.json and server-config.json
 configPath='/usr/INSIGHTS_HOME/.InSights/server-config.json'
 dos2unix $configPath
-uiConfigPath='/opt/UI/insights/config/uiConfig.json'
-# dos2unix $uiConfigPath
+
 
 jq --arg grafanaEndpoint $grafanaEndpoint '(.grafana.grafanaEndpoint) |= $grafanaEndpoint' $configPath  > INPUT.tmp && mv INPUT.tmp $configPath
 jq --arg grafanaDBEndpoint $grafanaDBEndpoint '(.grafana.grafanaDBEndpoint) |= $grafanaDBEndpoint' $configPath  > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg postgresIP $postgresIP --arg hostPublicIP $hostPublicIP '(.trustedHosts) |= .+ [$postgresIP,$hostPublicIP]' $configPath  > INPUT.tmp && mv INPUT.tmp $configPath
+jq --arg postgresIP $postgresIP --arg hostPublicIP $hostPublicIP --arg insightsUIURL $insightsUIURL '(.trustedHosts) |= .+ [$postgresIP,$hostPublicIP,$insightsUIURL]' $configPath  > INPUT.tmp && mv INPUT.tmp $configPath
 jq --arg neo4jEndpoint $neo4jEndpoint '(.graph.endpoint) |= $neo4jEndpoint' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
 jq --arg neo4jToken $neo4jToken '(.graph.authToken) |= $neo4jToken' $configPath  > INPUT.tmp && mv INPUT.tmp $configPath
 jq --arg neo4jBoltEndpoint $neo4jBoltEndpoint '(.graph.boltEndPoint) |= $neo4jBoltEndpoint' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
@@ -64,13 +63,6 @@ jq --arg rabbitMqPort $rabbitMqPort '(.messageQueue.port) |= $rabbitMqPort' $con
 jq --arg insightsServiceURL $ServiceEndpoint '(.insightsServiceURL) |= $insightsServiceURL' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
 
 sed -i "s/\r$//g" $configPath
-
-#update uiconfig
-echo $(jq --arg serviceHost $ServiceEndpoint '(.serviceHost) |= $serviceHost' $uiConfigPath) > $uiConfigPath
-echo $(jq --arg grafanaHost $grafanaPublicHost '(.grafanaHost) |= $grafanaHost' $uiConfigPath) > $uiConfigPath
-
-jq . $uiConfigPath > $uiConfigPath.tmp
-mv $uiConfigPath.tmp $uiConfigPath
 
 PROMTAIL_PORT=${PROMTAIL_LISTEN_PORT} yq e  -i '.server.http_listen_port = env(PROMTAIL_PORT)' /opt/InSights/Promtail/promtail-local-config.yaml
 LOKI="http://${LOKI_HOST}:${LOKI_PORT}/loki/api/v1/push" yq e  -i '.clients[0].url = strenv(LOKI)' /opt/InSights/Promtail/promtail-local-config.yaml
@@ -101,7 +93,6 @@ then
  sh +x /etc/init.d/InsightsPromtail start
 fi
 
-sudo node UI.js  >UIlog.txt 2>UIerrorlog.txt
 #assign tails pid to docker to keep it running continuously
 tail -f /dev/null
 

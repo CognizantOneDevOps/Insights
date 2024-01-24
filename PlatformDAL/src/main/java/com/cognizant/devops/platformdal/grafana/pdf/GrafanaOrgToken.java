@@ -60,6 +60,8 @@ public class GrafanaOrgToken {
 	public void setApiKey(String apiKey) {
 		this.apiKey = apiKey;
 	}
+
+	
 	
 	
 }

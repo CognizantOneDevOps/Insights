@@ -96,9 +96,9 @@ services:
       - 5671:5671
 
 
-  serviceui:
+  service:
     build:
-      context: ./servicenui
+      context: ./service
       dockerfile: Dockerfile
       args:
         INSIGHTSRELEASE: $INSIGHTS_VERSION
@@ -109,10 +109,22 @@ services:
       - neo4j
       - rabbitmq
     volumes:
-      -  $VOL_PATH/InsightsData/servicenui/logs:/usr/INSIGHTS_HOME/logs
+      -  $VOL_PATH/InsightsData/PlatformService/logs:/usr/INSIGHTS_HOME/logs
       -  serverconfig:/usr/INSIGHTS_HOME/.InSights
     ports:
       - 38080:8080
+
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+      args:
+        INSIGHTSRELEASE: $INSIGHTS_VERSION
+    env_file:
+      - ./config.env
+    depends_on:
+      - service
+    ports:
       - 38081:8081
 
   engine:

@@ -45,6 +45,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 @NgModule({
     imports: [],
@@ -54,6 +55,7 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
         MatToolbarModule,
         MatNativeDateModule,
         MatTableModule,
+        MatAutocompleteModule,
         MatIconModule,
         MatListModule,
         MatCardModule,

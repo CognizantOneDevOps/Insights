@@ -86,7 +86,7 @@
         </div>
         <div *ngIf="showWebhook">
             <div *ngIf="showWebhook" style="overflow-x: auto; width: 100%;">
-                <table mat-table [dataSource]="webhookDatasource" matSort style="overflow-x: auto;">
+                <table mat-table [dataSource]="webhookDatasource" matSort (matSortChange)="sortData($event)" style="overflow-x: auto;">
                     <mat-radio-group [(ngModel)]="selectedWebhook" style="padding: 16px;">
                         <!-- Radio Button Column -->
                         <ng-container matColumnDef="radio">
@@ -98,34 +98,34 @@
                             </td>
                         </ng-container>
                         <ng-container matColumnDef="WebHookName">
-                            <th mat-header-cell *matHeaderCellDef class="tableHeader">Webhook Name</th>
+                            <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="webhookName">Webhook Name</th>
                             <td mat-cell *matCellDef="let element">
                                 {{element.webhookName}} </td>
                         </ng-container>
                         <ng-container matColumnDef="ToolName">
-                            <th mat-header-cell *matHeaderCellDef class="tableHeader">Tool Name</th>
+                            <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="toolName">Tool Name</th>
                             <td mat-cell *matCellDef="let element">
                                 {{element.toolName}}
                             </td>
                         </ng-container>
                         <ng-container matColumnDef="LabelName">
-                            <th mat-header-cell *matHeaderCellDef class="tableHeader">Label Name</th>
+                            <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="labelDisplay">Label Name</th>
                             <td mat-cell *matCellDef="let element" style="width:20% !important">
                                 {{element.labelDisplay}}
                             </td>
                         </ng-container>
                         <ng-container matColumnDef="DataType">
-                            <th mat-header-cell *matHeaderCellDef class="tableHeader">Data Format</th>
+                            <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="dataFormat">Data Format</th>
                             <td mat-cell *matCellDef="let element" style="width:10% !important">
                                 {{element.dataFormat}} </td>
                         </ng-container>
                         <ng-container matColumnDef="MqChannel">
-                            <th mat-header-cell *matHeaderCellDef class="tableHeader">MQ Channel</th>
+                            <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="mqChannel">MQ Channel</th>
                             <td mat-cell *matCellDef="let element" style="width:20% !important">
                                 {{element.mqChannel}} </td>
                         </ng-container>
                         <ng-container matColumnDef="Status">
-                            <th mat-header-cell *matHeaderCellDef class="tableHeader">Subscription Status</th>
+                            <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="subscribeStatus">Subscription Status</th>
                             <td mat-cell *matCellDef="let element" style="width:10% !important">
                                 {{element.subscribeStatus}} </td>
                         </ng-container>
@@ -147,7 +147,7 @@
                         *ngIf="!this.paginator.hasPreviousPage()">
                     </mat-icon>
                 </div>
-                <div class="paginatorElement paginatorIndexElement">{{currentPageIndex}}</div>
+                <div class="paginatorElement paginatorIndexElement">{{(this.webhookDatasource.paginator && (this.webhookDatasource.paginator.length === 0)) ? 0 : this.paginator.pageIndex + 1  }}</div>
                 <div class="paginatorElement" (click)="goToNextPage()" [attr.disabled]="!this.paginator.hasNextPage()"
                     [ngStyle]="!this.paginator.hasNextPage() ? {'cursor': 'not-allowed'} : ''">
                     <mat-icon svgIcon="next-page" class="pageIcons  cursorDisplay" *ngIf="this.paginator.hasNextPage()">
@@ -157,7 +157,7 @@
                     </mat-icon>
                 </div>
                 <div style="margin-right: 5px;white-space: nowrap">
-                    of {{totalPages}}
+                    of {{this.paginator.getNumberOfPages()}}
                 </div>
             </div>
         </div>

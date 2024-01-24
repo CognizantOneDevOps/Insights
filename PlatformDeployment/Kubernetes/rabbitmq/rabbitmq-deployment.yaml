@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: rabbit-mq
+  name: rabbit-mq
+  namespace: insights
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbit-mq
+  strategy:
+
+    type: RollingUpdate
+
+  template:
+    metadata:
+      labels:
+         app: rabbit-mq
+    spec:
+      containers:
+
+      - image: devopsbasservice/onedevopsinsights:rabbitmq3.9
+        lifecycle:
+          postStart:
+            exec:
+              command : ["/bin/sh", "-c", "rabbitmq-plugins --offline enable rabbitmq_management"]
+        name: rabbit-mq
+        imagePullPolicy: "IfNotPresent"
+
+        ports:
+        - containerPort: 15672
+        - containerPort: 5671
+        volumeMounts:
+        - mountPath: /etc/rabbitmq
+          name: rabbit-mq-data
+
+        livenessProbe:
+          exec:
+            command: ["rabbitmq-diagnostics", "status"]
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 15
+        readinessProbe:
+          exec:
+            command: ["rabbitmq-diagnostics", "ping"]
+          initialDelaySeconds: 20
+          periodSeconds: 60
+          timeoutSeconds: 10
+      restartPolicy: Always
+      volumes:
+      - name: rabbit-mq-data
+        persistentVolumeClaim:
+          claimName: rabbitmq-data-claim

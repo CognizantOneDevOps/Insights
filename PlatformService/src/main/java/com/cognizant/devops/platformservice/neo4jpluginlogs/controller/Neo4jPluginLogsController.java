@@ -48,7 +48,7 @@ public class Neo4jPluginLogsController {
 	private static final String PANELS = "panels";
 	private static final String EVENT_NAME = "eventName";
 	private static final String ORG_NAME = "orgName";
-	Cache<Integer, String> dashboardCache;
+	Cache<String, String> dashboardCache;
 	Cache<Integer, String> orgCache;
 	Cache<String, String> dashboardEventCache;
 
@@ -69,7 +69,7 @@ public class Neo4jPluginLogsController {
 		cacheManager.init();
 		dashboardCache = cacheManager.createCache("dashboard",
 				CacheConfigurationBuilder
-				.newCacheConfigurationBuilder(Integer.class, String.class,
+				.newCacheConfigurationBuilder(String.class, String.class,
 						ResourcePoolsBuilder.heap(GRAFANA_DASHBOARD_CACHE_HEAP_SIZE_BYTES))
 				.withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofHours(1L))));
 
@@ -91,14 +91,14 @@ public class Neo4jPluginLogsController {
 	@PostMapping(value = "/Neo4jPluginLog/logDashboardInfo", produces = MediaType.APPLICATION_JSON_VALUE)
 	public void logDashboardInfo(@RequestBody JsonObject dashboardDetails) {
 		String panelId = dashboardDetails.get("panelId").getAsString();
-		int dashboardId = dashboardDetails.get("dashboardId").getAsInt();
+		String dashboardUId = dashboardDetails.get("uid").getAsString();
 		if(dashboardDetails.get("orgId") != null) {
 			int orgId = dashboardDetails.get("orgId").getAsInt();
 			if (!dashboardDetails.has(ORG_NAME)) {
-				if(dashboardCache.get(dashboardId) == null ) {
+				if(dashboardCache.get(dashboardUId) == null) {
 					JsonObject dashboardJson = neo4jPluginLogsService.getDashboardDetails();
 					JsonArray recordArray = dashboardJson.get("records").getAsJsonArray();
-					recordArray.forEach(record -> dashboardCache.put(record.getAsJsonObject().get("id").getAsInt(),record.getAsJsonObject().get("dashboard").getAsString()));
+					recordArray.forEach(record -> dashboardCache.put(record.getAsJsonObject().get("uid").getAsString(),record.getAsJsonObject().get("dashboard").getAsString()));
 					if(orgCache.get(orgId) == null ) {
 						JsonObject orgJson = neo4jPluginLogsService.fetchOrgDetails();
 						JsonArray orgArray = orgJson.get("records").getAsJsonArray();
@@ -107,35 +107,35 @@ public class Neo4jPluginLogsController {
 					}else {
 						dashboardDetails.addProperty(ORG_NAME, orgCache.get(orgId));
 					}
-					processDashboardJsonForLog(dashboardDetails, panelId, dashboardCache.get(dashboardId));
+					processDashboardJsonForLog(dashboardDetails, panelId, dashboardCache.get(dashboardUId));
 				}else {
 					String orgName = orgCache.get(orgId);
 					dashboardDetails.addProperty(ORG_NAME, orgName);
-					String dashboardJson = dashboardCache.get(dashboardId);
+					String dashboardJson = dashboardCache.get(dashboardUId);
 					processDashboardJsonForLog(dashboardDetails, panelId, dashboardJson);
 				}
-				logDashboardView(dashboardDetails, dashboardId);
+				logDashboardView(dashboardDetails, dashboardUId);
 			}else {
 				log.info(dashboardDetails);
-				logDashboardView(dashboardDetails, dashboardId);
+				logDashboardView(dashboardDetails, dashboardUId);
 			}
 		}
 	}
 
 
-	private synchronized void logDashboardView(JsonObject dashboardDetails, int dashboardId) {
+	private synchronized void logDashboardView(JsonObject dashboardDetails, String dashboardUId) {
 		String cacheUserId = dashboardDetails.get("userId").getAsString();
 		String cacheDashboardId = "-1";
 		if(dashboardEventCache.get(cacheUserId) != null) {
 			cacheDashboardId = dashboardEventCache.get(cacheUserId);
 		}
-		if(!cacheDashboardId.equals(String.valueOf(dashboardId))) {
+		if(!cacheDashboardId.equals(dashboardUId)) {
 			JsonObject jsonObject = JsonUtils.parseStringAsJsonObject(dashboardDetails.toString());
 			jsonObject.addProperty(EVENT_NAME, "dashboard-view");
 			jsonObject.addProperty(PANEL_NAME, "");
 			jsonObject.addProperty(CHART_TYPE, "");
 			jsonObject.addProperty("query", "");
-			dashboardEventCache.put(cacheUserId, String.valueOf(dashboardId));
+			dashboardEventCache.put(cacheUserId, dashboardUId);
 			log.info(jsonObject);
 		}
 	}

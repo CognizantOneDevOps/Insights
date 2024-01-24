@@ -104,7 +104,7 @@ export function googlechartutilities(theme: any, transformDataInstruction: strin
         } else {
             dataIter = dataRows
         }
-        let dataRow: any;
+        let dataRow: any= [];
         for (let refD of dataIter) {
             if (refD.refId === typeMapping[0].refId) {
                 dataRow = refD
@@ -114,7 +114,13 @@ export function googlechartutilities(theme: any, transformDataInstruction: strin
             let row: any = [];
             for (let fields of dataRow.fields) {
                 let columnObj = typeMapping.find(o => o.label === fields.name)
-                row.push(convertToType(fields.values.buffer[i], columnObj?.type));
+                if(fields.values.buffer) {
+                    // For Grafana version < 10.0.0
+                    row.push(convertToType(fields.values.buffer[i], columnObj?.type));
+                } else {
+                    // For Grafana version >= 10.0.0
+                    row.push(convertToType(fields.values[i], columnObj?.type));
+                }
             }
             rowArr.push(row);
         }

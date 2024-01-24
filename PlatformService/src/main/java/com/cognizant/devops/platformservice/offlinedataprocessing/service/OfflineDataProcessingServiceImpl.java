@@ -60,13 +60,17 @@ public class OfflineDataProcessingServiceImpl implements OfflineDataProcessingSe
 		String returnMessage = "";
 		String originalFilename = StringEscapeUtils.escapeHtml(ValidationUtils.cleanXSS(file.getOriginalFilename()));
 		String fileExt = FilenameUtils.getExtension(originalFilename);
+		String fileName = FilenameUtils.removeExtension(originalFilename);
 		try {
 			if (fileExt.equalsIgnoreCase("json")) {
 				String offlineJson = readMultipartFileAndCreateJson(file);
 				JsonArray offlineJsonArray = JsonUtils.parseStringAsJsonArray(offlineJson);
+				for (JsonElement jsonElement : offlineJsonArray) {
+					jsonElement.getAsJsonObject().addProperty("queryGroup", fileName);
+				}
 				returnMessage = saveBulkOfflineDefinition(offlineJsonArray);
 			} else {
-				log.error("Invalid file format. ");
+				log.error("Invalid file format. ");	
 				throw new InsightsCustomException("Invalid Offline Data file format.");
 			}
 		} catch (Exception ex) {
@@ -148,7 +152,7 @@ public class OfflineDataProcessingServiceImpl implements OfflineDataProcessingSe
 	 * @throws InsightsCustomException
 	 */
 	public boolean offlineValidation(JsonObject registerOfflineJson) {
-		Pattern pattern = Pattern.compile("INDEX", Pattern.CASE_INSENSITIVE);
+		Pattern pattern = Pattern.compile("\\bINDEX\\b", Pattern.CASE_INSENSITIVE);
 		if (registerOfflineJson.get("queryName") == null
 				|| registerOfflineJson.get("queryName").getAsString().isEmpty()) {
 			return false;
@@ -200,6 +204,11 @@ public class OfflineDataProcessingServiceImpl implements OfflineDataProcessingSe
 			if(!cronSchedule.isEmpty() && !org.quartz.CronExpression.isValidExpression(cronSchedule)) {
 				throw new InsightsCustomException("Cron Expression is invalid");
 			}
+			String queryGroup = null;
+			if(!registerOfflineJson.get("queryGroup").getAsString().isEmpty()) {
+				queryGroup = registerOfflineJson.get("queryGroup").getAsString();
+			}
+			
 
 			offlineConfig.setIsActive(true);
 			offlineConfig.setQueryName(queryName);
@@ -211,6 +220,7 @@ public class OfflineDataProcessingServiceImpl implements OfflineDataProcessingSe
 			offlineConfig.setQueryProcessingTime(null);
 			offlineConfig.setStatus(null);
 			offlineConfig.setMessage(null);
+			offlineConfig.setqueryGroup(queryGroup);
 
 			insightsOfflineConfigDAL.saveOfflineDataConfig(offlineConfig);
 		} catch (Exception e) {
@@ -241,8 +251,10 @@ public class OfflineDataProcessingServiceImpl implements OfflineDataProcessingSe
 				if (!org.quartz.CronExpression.isValidExpression(cronSchedule)) {
 					throw new InsightsCustomException("Cron Expression is invalid!");
 				}
+				String queryGroup = updateOfflineJson.get("queryGroup").getAsString();
 				offlineExistingConfig.setCronSchedule(cronSchedule);
 				offlineExistingConfig.setCypherQuery(cypherQuery);
+				offlineExistingConfig.setqueryGroup(queryGroup);
 				insightsOfflineConfigDAL.updateOfflineConfig(offlineExistingConfig);
 			}
 		} catch (Exception e) {

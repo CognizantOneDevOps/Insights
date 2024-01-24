@@ -26,6 +26,8 @@ import { InsightsInitService } from "@insights/common/insights-initservice";
 import { ClipboardService } from "ngx-clipboard";
 import { DerivedOperations } from "./derivedOperationsConfig";
 import { ConditionalExpr } from "@angular/compiler";
+import { InsightsUtilService } from "@insights/common/insights-util.service";
+import { Sort } from "@angular/material/sort";
 export interface DataType {
   value: string;
   viewValue: string;
@@ -94,10 +96,7 @@ export class WebHookComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   dataformats: DataType[] = [{ value: "json", viewValue: "Json" }];
   showThrobber: boolean = false;
-  currentPageValue: number;
-  currentPageIndex: number = 1;
   selectedIndex: -1;
-  totalPages: number = -1;
   isEdit: boolean = false;
   constructor(
     private router: Router,
@@ -107,15 +106,14 @@ export class WebHookComponent implements OnInit {
     private webhookService: WebHookService,
     private dialog: MatDialog,
     public messageDialog: MessageDialogService,
-    private dataShare: DataSharedService
+    private dataShare: DataSharedService,
+    public insightsUtil : InsightsUtilService
   ) {
     this.getLabelTools();
     this.getRegisteredWebHooks();
   }
   ngOnInit() {
     this.getRegisteredWebHooks();
-    this.currentPageValue = this.paginator.pageIndex * this.MAX_ROWS_PER_TABLE;
-    this.currentPageIndex = this.paginator.pageIndex +1;
   }
 
   ngAfterViewInit(){
@@ -192,7 +190,6 @@ export class WebHookComponent implements OnInit {
         this.showConfirmMessage = "";
       }, 3000);
       this.webhookDatasource.paginator = this.paginator;
-      this.totalPages = Math.ceil(this.webhookDatasource.data.length / this.MAX_ROWS_PER_TABLE);
     } else {
       self.showMessage = "Something wrong with Service.Please try again.";
       self.messageDialog.openSnackBar("Something wrong with Service.Please try again.", "error");
@@ -768,20 +765,28 @@ export class WebHookComponent implements OnInit {
     this.derivedOperationList.splice(indexToRemove, 1);
   }
 
-  changeCurrentPageValue() {
-    this.selectedIndex = -1;
-    this.currentPageIndex = this.paginator.pageIndex * this.MAX_ROWS_PER_TABLE;
-  }
 
   goToNextPage() {
     this.paginator.nextPage();
     this.selectedIndex = -1;
-    this.currentPageIndex = this.paginator.pageIndex + 1;
   }
 
   goToPrevPage() {
     this.paginator.previousPage();
     this.selectedIndex = -1;
-    this.currentPageIndex = this.paginator.pageIndex + 1;
+  }
+
+  sortData(sort: Sort) {
+    const data = this.webhookList.data.slice();
+    if (!sort.active || sort.direction === '') {
+      this.webhookDatasource.data = data;
+      return;
+    }
+
+    this.webhookDatasource.data = data.sort((a, b) => {
+      const isAsc = sort.direction === 'asc';
+      return this.insightsUtil.compare(a[sort.active], b[sort.active], isAsc)
+    });
+    this.webhookDatasource.paginator = this.paginator;
   }
 }

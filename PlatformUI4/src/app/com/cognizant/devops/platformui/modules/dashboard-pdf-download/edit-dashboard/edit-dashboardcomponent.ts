@@ -687,8 +687,7 @@ export class EditDashboardComponent implements OnInit {
       );
     this.saveUrl =
       "GRAFANA_URL" +
-      "/dashboard/db/" +
-      this.asyncResult.data.meta.slug +
+      dashboardUri +
       "?orgId=" +
       this.organisation +
       "&" +

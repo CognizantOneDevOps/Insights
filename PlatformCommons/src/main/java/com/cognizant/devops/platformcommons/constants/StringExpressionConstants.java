@@ -19,6 +19,7 @@ public final class StringExpressionConstants {
 
 	public static final String STR_EXP_TASKEXECUTION= "Type=TaskExecution executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}";
 	public static final String STR_REGEX = "<[^>]*>";
+	public static final String CYPHERQUERY_REGEX ="<\\/[^>]*>|<[^>]*\\/>";
 	public static final String STR_EXP_TASKEXECUTION_1="Type=TaskExecution  executionId={} workflowId={} ConfigId={} WorkflowType={} KpiId={} Category={} ProcessingTime={} message={}";
 	public static final String STR_EXP_WORKFLOW="Type=WorkFlow ExecutionId={} WorkflowId={} WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetry={} isTaskRetry={} processingTime={} message={}";
 	public static final String STR_EXP_WORKFLOW_1="Type=WorkFlow ExecutionId={} WorkflowId={} WorkflowType={} TaskDescription={} TaskMQChannel={} status ={} LastRunTime ={} NextRunTime ={} Schedule={} TaskRetryCount={} isTaskRetry={} processingTime={} message={}";

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+# Deployment object
+kind: Deployment
+metadata:
+  # The name of the Deployment
+  name: postgres
+spec:
+  # Replicas for this Deployment
+  replicas: 1
+  selector:
+    # labels the pods
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        # The label the pods created from the pod template should have
+        app: postgres
+    spec:
+      containers:
+        # The container name to execute pods
+        - name: postgres
+          # pull postgresimage from docker hub
+          image: devopsbasservice/onedevopsinsights:postgres12.7
+          imagePullPolicy: Always
+          ports:
+            # Assign ports to expose container
+            - containerPort: 5432
+          envFrom:
+            - configMapRef:
+                name: postgres-config
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgredb
+              subPath: postgres
+      # Volumes attached to the pod
+      volumes:
+        - name: postgredb
+          persistentVolumeClaim:
+            claimName: postgres-pv-claim

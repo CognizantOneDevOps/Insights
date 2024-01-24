@@ -316,8 +316,8 @@ public class WorkflowTestData {
 		InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfiguration();
 		workflowConfig.setWorkflowId(workflowId);
 		workflowConfig.setActive(isActive);
+		workflowConfig.setNextRun(InsightsUtils.getCurrentTimeInSeconds());
 		nextRunDaily = InsightsUtils.getNextRunTime(InsightsUtils.getCurrentTimeInSeconds(), schedule, true);
-		workflowConfig.setNextRun(nextRunDaily);
 		workflowConfig.setLastRun(0L);
 		workflowConfig.setReoccurence(reoccurence);
 		workflowConfig.setScheduleType(schedule);

@@ -304,7 +304,26 @@ function processData(props) {
   var jsonArrtoStr = [];
   if (props.data.state === 'Done') {
     if (props.data.series.length > 0) {
-      jsonArrtoStr = props.data.series[0].source;
+      if (props.data.series[0].source) {
+        // For Grafana version < 10.0.0
+        jsonArrtoStr = props.data.series[0].source;
+      } else {
+        // For Grafana version >= 10.0.0
+        props.data.series.forEach(function (element) {
+          var newObj = {
+            "heading": element.fields.find(function (e) {
+              return e.name === "heading";
+            }).values,
+            "inferenceDetails": element.fields.find(function (e) {
+              return e.name === "inferenceDetails";
+            }).values[0],
+            "ranking": element.fields.find(function (e) {
+              return e.name === "ranking";
+            }).values
+          };
+          jsonArrtoStr.push(newObj);
+        });
+      }
     }
   }
   var googleChartData = {};

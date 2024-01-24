@@ -111,6 +111,7 @@
     <mat-radio-group [(ngModel)]="selCont">
       <table
         mat-table
+        matSort (matSortChange)="sortData($event)"
         [dataSource]="contentDatasource"
         class="mat-elevation-z8"
         style="margin-top: 2% !important; box-shadow: none !important"
@@ -128,7 +129,7 @@
           </td>
         </ng-container>
         <ng-container matColumnDef="ContentId">
-          <th mat-header-cell *matHeaderCellDef class="tableHeader1">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader1" mat-sort-header="contentId">
             Content Id
           </th>
           <td mat-cell *matCellDef="let element" style="width: 10% !important">
@@ -136,7 +137,7 @@
           </td>
         </ng-container>
         <ng-container matColumnDef="ContentName">
-          <th mat-header-cell *matHeaderCellDef class="tableHeader1">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader1" mat-sort-header="contentName">
             Content Name
           </th>
           <td mat-cell *matCellDef="let element" style="width: 30% !important">
@@ -144,13 +145,13 @@
           </td>
         </ng-container>
         <ng-container matColumnDef="KpiId">
-          <th mat-header-cell *matHeaderCellDef class="tableHeader1">Kpi Id</th>
+          <th mat-header-cell *matHeaderCellDef class="tableHeader1" mat-sort-header="kpiId">Kpi Id</th>
           <td mat-cell *matCellDef="let element" style="width: 10% !important">
             {{ element.kpiId }}
           </td>
         </ng-container>
         <ng-container matColumnDef="ExpectedTrend">
-          <th mat-header-cell *matHeaderCellDef class="tableHeader1">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader1" mat-sort-header="expectedTrend">
             Expected Trend
           </th>
           <td mat-cell *matCellDef="let element" style="width: 15% !important">
@@ -158,7 +159,7 @@
           </td>
         </ng-container>
         <ng-container matColumnDef="ResultField">
-          <th mat-header-cell *matHeaderCellDef class="tableHeader1">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader1" mat-sort-header="resultField">
             Result Field
           </th>
           <td mat-cell *matCellDef="let element" style="width: 15% !important">
@@ -203,7 +204,7 @@
           </mat-icon>
         </div>
         <div class="paginatorElement paginatorIndexElement">
-          {{ currentPageIndex }}
+          {{ (this.contentDatasource.paginator && (this.contentDatasource.paginator.length === 0)) ? 0 : this.paginator.pageIndex + 1  }}
         </div>
         <div
           class="paginatorElement"
@@ -229,7 +230,7 @@
           >
           </mat-icon>
         </div>
-        <div>of {{ totalPages }}</div>
+        <div>of {{ this.paginator.getNumberOfPages()  }}</div>
       </div>
     </div>
   </div>

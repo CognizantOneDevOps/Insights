@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq-config
+  namespace: insights
+  labels:
+    app: rabbitmq
+data:
+  RABBITMQ_USER: 
+  RABBITMQ_PASSWORD: 

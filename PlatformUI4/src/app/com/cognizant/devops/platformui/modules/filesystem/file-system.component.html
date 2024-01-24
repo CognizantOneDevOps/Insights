@@ -49,7 +49,7 @@
         </span>
     </div>
     <div class="add-agent-section add-agent-section-dimensions">
-        <table mat-table [dataSource]="fileStorageDatasource">
+        <table mat-table [dataSource]="fileStorageDatasource" matSort (matSortChange)="sortData($event)">
             <mat-radio-group [(ngModel)]="selectedRow">
                 <!-- Radio Button Column -->
                 <ng-container matColumnDef="radio">
@@ -61,19 +61,19 @@
                 </ng-container>
 
                 <ng-container matColumnDef="fileName">
-                    <th mat-header-cell *matHeaderCellDef class="tableHeader">File Name</th>
+                    <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="fileName">File Name</th>
                     <td mat-cell *matCellDef="let element">
                         {{element.fileName}}
                     </td>
                 </ng-container>
                 <ng-container matColumnDef="fileType">
-                    <th mat-header-cell *matHeaderCellDef class="tableHeader">File Type</th>
+                    <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="fileType">File Type</th>
                     <td mat-cell *matCellDef="let element">
                         {{(element.fileType)}}
                     </td>
                 </ng-container>
                 <ng-container matColumnDef="fileModule">
-                    <th mat-header-cell *matHeaderCellDef class="tableHeader">Module</th>
+                    <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="fileModule">Module</th>
                     <td mat-cell *matCellDef="let element">
                         {{element.fileModule}}
                     </td>
@@ -84,6 +84,7 @@
                       *matHeaderCellDef
                       class="tableHeader"
                       style="white-space: pre-wrap !important"
+                      mat-sort-header="lastUpdatedTime"
                     >
                       Last Updated ({{ timeZoneAbbr }})
                     </th>
@@ -108,7 +109,7 @@
                     *ngIf="!this.paginator.hasPreviousPage()">
                 </mat-icon>
             </div>
-            <div class="paginatorElement paginatorIndexElement">{{currentPageIndex}}</div>
+            <div class="paginatorElement paginatorIndexElement">{{(this.fileStorageDatasource.paginator && (this.fileStorageDatasource.paginator.length === 0 )) ? 0 : this.paginator.pageIndex + 1}}</div>
             <div class="paginatorElement" (click)="goToNextPage()" [attr.disabled]="!this.paginator.hasNextPage()"
                 [ngStyle]="!this.paginator.hasNextPage() ? {'cursor': 'not-allowed'} : ''">
                 <mat-icon svgIcon="next-page" class="pageIcons  cursorDisplay" *ngIf="this.paginator.hasNextPage()">
@@ -118,7 +119,7 @@
                 </mat-icon>
             </div>
             <div style="margin-right: 15px;">
-                of {{totalPages}}
+                of {{this.paginator.getNumberOfPages()}}
             </div>
         </div>
     </div>

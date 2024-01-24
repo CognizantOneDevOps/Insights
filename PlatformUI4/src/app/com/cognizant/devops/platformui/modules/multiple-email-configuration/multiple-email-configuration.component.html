@@ -17,7 +17,7 @@
 
  <div class ="cardCss">
   <div layout layout-align="left" class="titleStyle" style="cursor: pointer">
-    <div> Email Configuration</div>
+    <div> Email Batch Reports</div>
   </div>
   <div layout layout-align="left" class="sectionHeadingStyle">
 
@@ -27,7 +27,7 @@
       </button>
     </span>
     <span class="alignSubHeader" style="margin-left: 5px"
-      ><b>Email Configuration</b> (Configure an Email)
+      ><b>Email Batch Reports</b> (Configure Batch Report)
     </span>
     <span class="btnAlign" style="margin-top: 0px; margin-bottom: 0px">
       <button mat-icon-button (click)="addEmailConfig()">
@@ -84,6 +84,7 @@
       <mat-radio-group [(ngModel)] = "selectedEmailConfig">
         <table
           mat-table
+          matSort (matSortChange)="sortData($event)"
           [dataSource]="userDataSource"          
           class=""
         >
@@ -109,7 +110,7 @@
           </td>
         </ng-container>
         <ng-container matColumnDef="batchname">
-          <th mat-header-cell *matHeaderCellDef class="tableHeader">Name</th>
+          <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="batchName">Name</th>
           <td
             mat-cell
             *matCellDef="let element"
@@ -120,7 +121,7 @@
         </ng-container>
         
         <ng-container matColumnDef="schedule">
-          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="schedule">
             Schedule
           </th>
           <td
@@ -132,7 +133,7 @@
           </td>
         </ng-container>
         <ng-container matColumnDef="lastrun">
-          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader" mat-sort-header="lastRun">
             Last Email Sent ({{ timeZoneAbbr }})
           </th>
           <td
@@ -144,7 +145,7 @@
           </td>
         </ng-container>
         <ng-container matColumnDef="nextrun">
-          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader"  mat-sort-header="nextRun"> 
             Next Schedule ({{ timeZoneAbbr }})
           </th>
           <td
@@ -156,7 +157,7 @@
           </td>
         </ng-container>
         <ng-container matColumnDef="Active">
-          <th mat-header-cell *matHeaderCellDef class="tableHeader">
+          <th mat-header-cell *matHeaderCellDef class="tableHeader"  mat-sort-header="isActive">
             Active
           </th>
           <td
@@ -244,7 +245,7 @@
           </mat-icon>
         </div>
         <div class="paginatorElement paginatorIndexElement">
-          {{ currentPageIndex }}
+          {{ (this.userDataSource.paginator && (this.userDataSource.paginator.length === 0)) ? 0 : this.paginator.pageIndex + 1 }}
         </div>
         <div
           class="paginatorElement"
@@ -270,7 +271,7 @@
           >
           </mat-icon>
         </div>
-        <div>of {{ totalPages }}</div>
+        <div>of {{ this.paginator.getNumberOfPages() }}</div>
       </div>
     </div>
   </div>

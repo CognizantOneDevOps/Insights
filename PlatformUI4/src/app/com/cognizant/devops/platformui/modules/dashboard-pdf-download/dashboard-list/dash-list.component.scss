@@ -110,3 +110,28 @@ td.mat-cell {
 .footer {
   justify-content: flex-end;
 }
+
+.columnComponent {
+  width: 40%;
+}
+
+.columnComponent {
+  width: 400px;
+
+  ::ng-deep .mat-form-field-infix {
+    padding: 0 !important;
+    border-top: 0 !important;
+  }
+}
+
+.inputColCss {
+  font: normal normal normal 14px/24px Open Sans;
+}
+
+.searchCss {
+  border: none;
+  padding: 7px 7px 8px 5px;
+  border-bottom: 1px solid #000000;
+  background: var(--backgnd-clr8) 0% 0% no-repeat padding-box;
+  color: var(--text-clr);
+}

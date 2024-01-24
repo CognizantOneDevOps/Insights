@@ -21,12 +21,14 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatRadioChange } from "@angular/material/radio";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
+import { Sort } from "@angular/material/sort";
 import { MatTableDataSource } from "@angular/material/table";
 import { MessageDialogService } from "@insights/app/modules/application-dialog/message-dialog-service";
 import { DataArchiveConfigureURLDialog } from "@insights/app/modules/settings/dataarchiving/data-archive-configureurl/data-archive-configureurl-dialog";
 import { DataArchiveDetailsDialog } from "@insights/app/modules/settings/dataarchiving/data-archive-details/data-archive-details-dialog";
 import { DataArchivingService } from "@insights/app/modules/settings/dataarchiving/dataarchiving-service";
 import { DataSharedService } from "@insights/common/data-shared-service";
+import { InsightsUtilService } from "@insights/common/insights-util.service";
 
 @Component({
   selector: "app-dataarchiving",
@@ -86,7 +88,8 @@ export class DataArchivingComponent implements OnInit {
     private datepipe: DatePipe,
     private dialog: MatDialog,
     public messageDialog: MessageDialogService,
-    private dataShare: DataSharedService
+    private dataShare: DataSharedService,
+    public insightsUtil : InsightsUtilService,
   ) {
     this.getExistingArchivedData();
   }
@@ -592,5 +595,19 @@ export class DataArchivingComponent implements OnInit {
     this.startDateInput = null;
     this.endDateInput = null;
     this.noOfDays = null;
+  }
+
+  sortData(sort: Sort) {
+    const data = this.archiveList.data.slice();
+    if (!sort.active || sort.direction === '') {
+      this.archivalDatasource.data = data;
+      return;
+    }
+
+    this.archivalDatasource.data = data.sort((a, b) => {
+      const isAsc = sort.direction === 'asc';
+      return this.insightsUtil.compare(a[sort.active], b[sort.active], isAsc)
+    });
+    this.archivalDatasource.paginator = this.paginator;
   }
 }
