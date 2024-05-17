@@ -341,7 +341,8 @@ class BaseAgent(object):
             ch.basic_ack(delivery_tag=method.delivery_tag)
             
     def processAgentControlMessage(self, data):
-        action = str(data.decode('utf-8'))
+        actionData = json.loads(data.decode('utf-8'))
+        action = actionData["action"]
         if "STOP" == action:
             self.shouldAgentRun = False
             self.publishHealthData(self.generateHealthData(note="Agent is in STOP mode"))
@@ -411,7 +412,7 @@ class BaseAgent(object):
                     errorFlag = True
                     showErrorMessage = True
                     self.baseLogger.error(
-                        'Value is not in expected format, nested JSON encountered.Rejecting: ' + str(filtered_json))
+                        'Value is not in expected format, nested JSON encountered.Rejecting')
                     break
             if not errorFlag:
                 corrected_json_array.append(each_json)

@@ -32,6 +32,7 @@ import javax.mail.internet.InternetAddress;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import com.google.gson.JsonParser;
 
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
@@ -43,6 +44,8 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformcommons.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsEmailTemplates;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
+import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfig;
+import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfigDAL;
 import com.cognizant.devops.platformdal.groupemail.GroupEmailConfigDAL;
 import com.cognizant.devops.platformdal.groupemail.InsightsGroupEmailConfiguration;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
@@ -53,6 +56,7 @@ import com.cognizant.devops.platformworkflow.workflowtask.message.factory.Workfl
 import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadPool;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 /**
@@ -69,6 +73,7 @@ public class GroupEmailSubscriber extends WorkflowTaskSubscriberHandler {
 	private long executionId;
 	private String workflowId;
 	MailReport mailReportDTO = new MailReport();
+	GrafanaDashboardPdfConfigDAL grafanaDashboardConfigDAL = new GrafanaDashboardPdfConfigDAL();
 
 	public GroupEmailSubscriber(String routingKey) throws IOException, InsightsCustomException, TimeoutException, InterruptedException, JMSException {
 		super(routingKey);
@@ -85,6 +90,7 @@ public class GroupEmailSubscriber extends WorkflowTaskSubscriberHandler {
 			executionId = incomingTaskMessage.get(AssessmentReportAndWorkflowConstants.EXECUTIONID).getAsLong();
 			InsightsGroupEmailConfiguration groupEmailConfig = groupEmailConfigDAL
 					.getConfigByGroupEmailWorkflowId(workflowId);
+			
 			String source = groupEmailConfig.getSource();
 			String reportsString = groupEmailConfig.getMapIdList();
 			JsonArray reportsJsonArray = JsonUtils.parseStringAsJsonArray(reportsString);
@@ -155,6 +161,7 @@ public class GroupEmailSubscriber extends WorkflowTaskSubscriberHandler {
 					String[] recipientBCCList = emailTemplate.getMailBCC().split(",");
 					recipientBCCAddress = createRecipientAddress(recipientBCCList);
 				}
+				
 				mailReportDTO.setTimeOfReportGeneration(InsightsUtils.insightsTimeXFormat(this.executionId));
 				mailReportDTO.setMailTo(recipientAddress);
 				mailReportDTO.setMailCC(recipientCCAddress);
@@ -183,6 +190,9 @@ public class GroupEmailSubscriber extends WorkflowTaskSubscriberHandler {
 	public Map<String, byte[]> getAttachmentsForMailReport(List<String> reportIds, String source) {
 		Map<String, byte[]> attachments = new HashMap<>();
 		try {
+			GrafanaDashboardPdfConfig grafanaPdfConfig;
+			String reportType="";
+			String attachmentName ="";
 			String reportsIdString = String.join(",", reportIds);
 			/* Fetching the latest attachment for that report */
 			List<Object[]> latestVisualizationConfigs = workflowDAL.getAttachmentDataForReportIds(reportsIdString,
@@ -190,8 +200,18 @@ public class GroupEmailSubscriber extends WorkflowTaskSubscriberHandler {
 			if (latestVisualizationConfigs.isEmpty()) {
 				throw new InsightsCustomException("Error while fetching Latest Reports");
 			}
-			latestVisualizationConfigs.stream()
-					.forEach(config -> attachments.put((String) config[0], (byte[]) config[1]));
+			
+			for (int i = 0; i < latestVisualizationConfigs.size(); i++) {
+			    Object[] config = latestVisualizationConfigs.get(i);
+			    grafanaPdfConfig = grafanaDashboardConfigDAL.fetchGrafanaDashboardDetailsByTitle((String)config[0]);
+			    reportType=grafanaPdfConfig.getPdfType();
+			    if (reportType.equalsIgnoreCase("Spreadsheet")) {
+			        attachmentName = (String)config[0] + ".xlsx" ;
+			        attachments.put(attachmentName , (byte[]) config[1]);
+			    }
+			    else
+			    	attachments.put((String) config[0], (byte[]) config[1]);
+			}
 			return attachments;
 		} catch (Exception e) {
 			log.error("Workflow Detail ==== GroupEmailSubscriberEmail Error while Fetching Attachments ===== ", e);

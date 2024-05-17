@@ -5,6 +5,7 @@ export class ChartModel {
         public container: ContainerModel,
         public transformDataInstruction: string,
         public joinInstructions: string,
+        public enableTrend: boolean,
         public columnModel: ColumnModel[]
     ) {
     }

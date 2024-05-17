@@ -64,6 +64,16 @@ public class GraphDBHandler implements AutoCloseable{
 		SCHEMA_INDEX_URL = inputDataSource + SCHEMAURL;
 		TRANSACTION_COMMIT_URL = inputDataSource + COMMIT_URL;
 	}
+	
+	public GraphDBHandler(String version, String ip) {
+		if(version!= null && version.contains("4.")) {
+			String databaseName = ApplicationConfigProvider.getInstance().getGraph().getDatabaseName();
+			COMMIT_URL = "/db/"+databaseName+"/tx/commit";
+		}
+		parser = new DocumentParser();
+		SCHEMA_INDEX_URL = ip + SCHEMAURL;
+		TRANSACTION_COMMIT_URL = ip + COMMIT_URL;
+	}
 
 	/**
 	 * @param dataList

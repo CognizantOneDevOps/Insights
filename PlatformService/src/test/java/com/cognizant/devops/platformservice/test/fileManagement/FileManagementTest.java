@@ -47,19 +47,20 @@ import com.google.gson.JsonObject;
 @WebAppConfiguration
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
 public class FileManagementTest extends FileManagementTestData {
-	
+
 	@Autowired
 	FileManagementController fileManagementController;
 	@Autowired
 	FileManagementServiceImpl fileManagementService;
 	InsightsConfigFilesDAL configFilesDAL = new InsightsConfigFilesDAL();
-	JsonObject testData = new JsonObject();	
+	JsonObject testData = new JsonObject();
 	private static Logger log = LogManager.getLogger(FileManagementTest.class);
 
 	@BeforeClass
 	public void prepareData() throws InsightsCustomException {
 		try {
-			String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + TestngInitializerTest.TESTNG_TESTDATA + File.separator
+			String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator
+					+ TestngInitializerTest.TESTNG_TESTDATA + File.separator
 					+ TestngInitializerTest.TESTNG_PLATFORMSERVICE + File.separator + "FileManagement.json";
 			testData = JsonUtils.getJsonData(path).getAsJsonObject();
 		} catch (Exception e) {
@@ -68,7 +69,7 @@ public class FileManagementTest extends FileManagementTestData {
 	}
 
 	@Test(priority = 1)
-	public void testGetFileTypeList() throws InsightsCustomException{
+	public void testGetFileTypeList() throws InsightsCustomException {
 		try {
 			JsonObject response = fileManagementController.getFileTypeList();
 			String actual = response.get("status").getAsString().replace("\"", "");
@@ -77,9 +78,9 @@ public class FileManagementTest extends FileManagementTestData {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 2)
-	public void testGetFileModuleList() throws InsightsCustomException{
+	public void testGetFileModuleList() throws InsightsCustomException {
 		try {
 			JsonObject response = fileManagementController.getModuleList();
 			String actual = response.get("status").getAsString().replace("\"", "");
@@ -88,51 +89,51 @@ public class FileManagementTest extends FileManagementTestData {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 3)
-	public void testUploadConfigurationFilewithWrongModule() throws InsightsCustomException, IOException{
-		try {
-			FileInputStream input = new FileInputStream(file);
+	public void testUploadConfigurationFilewithWrongModule() throws InsightsCustomException, IOException {
+		try (FileInputStream input = new FileInputStream(file)) {
 			MultipartFile multipartConfigFile = new MockMultipartFile("file", file.getName(), "text/plain",
 					IOUtils.toByteArray(input));
-			JsonObject response = fileManagementController.saveConfigurationFile(multipartConfigFile,fileName, fileType, module1, false);
+			JsonObject response = fileManagementController.saveConfigurationFile(multipartConfigFile, fileName,
+					fileType, module1, false);
 			String actual = response.get("status").getAsString().replace("\"", "");
 			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 4)
-	public void testUploadConfigurationFile() throws InsightsCustomException, IOException{
-		try {
-			FileInputStream input = new FileInputStream(file);
+	public void testUploadConfigurationFile() throws InsightsCustomException, IOException {
+		try (FileInputStream input = new FileInputStream(file)) {
 			MultipartFile multipartConfigFile = new MockMultipartFile("file", file.getName(), "text/plain",
 					IOUtils.toByteArray(input));
-			JsonObject response = fileManagementController.saveConfigurationFile(multipartConfigFile,fileName, fileType, module, false);
+			JsonObject response = fileManagementController.saveConfigurationFile(multipartConfigFile, fileName,
+					fileType, module, false);
 			String actual = response.get("status").getAsString().replace("\"", "");
 			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 5)
-	public void testUploadConfigurationFileAgain() throws InsightsCustomException, IOException{
-		try {
-			FileInputStream input = new FileInputStream(file);
+	public void testUploadConfigurationFileAgain() throws InsightsCustomException, IOException {
+		try (FileInputStream input = new FileInputStream(file)) {
 			MultipartFile multipartConfigFile = new MockMultipartFile("file", file.getName(), "text/plain",
 					IOUtils.toByteArray(input));
-			JsonObject response = fileManagementController.saveConfigurationFile(multipartConfigFile,fileName, fileType, module, false);
+			JsonObject response = fileManagementController.saveConfigurationFile(multipartConfigFile, fileName,
+					fileType, module, false);
 			String actual = response.get("status").getAsString().replace("\"", "");
 			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 6)
-	public void testGetConfigurationFiles() throws InsightsCustomException{
+	public void testGetConfigurationFiles() throws InsightsCustomException {
 		try {
 			JsonObject response = fileManagementController.getConfigurationFiles();
 			String actual = response.get("status").getAsString().replace("\"", "");
@@ -141,36 +142,39 @@ public class FileManagementTest extends FileManagementTestData {
 			Assert.fail(e.getMessage());
 		}
 	}
+
 	// last updated time
 	@Test(priority = 7)
-    public void testGetLastUpdatedTime() throws InsightsCustomException{
-        try {
-            JsonObject response = fileManagementController.getConfigurationFiles();
-            String actual = response.get("data").getAsJsonArray().get(0).getAsJsonObject().get("lastUpdatedTime").getAsString();
-            Assert.assertNotNull(actual, PlatformServiceConstants.SUCCESS);
-        } catch (AssertionError e) {
-            Assert.fail(e.getMessage());
-        }
-    }
-	
-	@Test(priority = 8)
-	public void testUpdateConfigFile() throws InsightsCustomException, IOException{
+	public void testGetLastUpdatedTime() throws InsightsCustomException {
 		try {
-			FileInputStream input = new FileInputStream(file);
+			JsonObject response = fileManagementController.getConfigurationFiles();
+			String actual = response.get("data").getAsJsonArray().get(0).getAsJsonObject().get("lastUpdatedTime")
+					.getAsString();
+			Assert.assertNotNull(actual, PlatformServiceConstants.SUCCESS);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test(priority = 8)
+	public void testUpdateConfigFile() throws InsightsCustomException, IOException {
+		try (FileInputStream input = new FileInputStream(file)) {
 			MultipartFile multipartConfigFile = new MockMultipartFile("file", file.getName(), "text/plain",
 					IOUtils.toByteArray(input));
-			JsonObject response = fileManagementController.saveConfigurationFile(multipartConfigFile,fileName, fileType, module, true);
+			JsonObject response = fileManagementController.saveConfigurationFile(multipartConfigFile, fileName,
+					fileType, module, true);
 			String actual = response.get("status").getAsString().replace("\"", "");
 			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 9)
-	public void testDownloadConfigFile() throws InsightsCustomException{
+	public void testDownloadConfigFile() throws InsightsCustomException {
 		try {
-			String encodeString = new String(Base64.getEncoder().encodeToString(testData.get("fileDetails").toString().getBytes()));
+			String encodeString = new String(
+					Base64.getEncoder().encodeToString(testData.get("fileDetails").toString().getBytes()));
 			ResponseEntity<byte[]> response = fileManagementController.downloadConfigFile(encodeString);
 			Boolean actual = response.toString().isEmpty();
 			Assert.assertEquals(actual, false);
@@ -178,9 +182,9 @@ public class FileManagementTest extends FileManagementTestData {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 10)
-	public void testDeleteConfigurationFile() throws InsightsCustomException{
+	public void testDeleteConfigurationFile() throws InsightsCustomException {
 		try {
 			JsonObject response = fileManagementController.deleteConfigurationFile(fileName);
 			String actual = response.get("status").getAsString().replace("\"", "");
@@ -191,18 +195,20 @@ public class FileManagementTest extends FileManagementTestData {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 11)
-	public void testGetFileDataException() throws InsightsCustomException{
-			JsonObject response = fileManagementController.deleteConfigurationFile(testData.get("fileDetails").getAsJsonObject().get("fileName").getAsString());
-			String actual = response.get("status").getAsString().replace("\"", "");
-			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
+	public void testGetFileDataException() throws InsightsCustomException {
+		JsonObject response = fileManagementController
+				.deleteConfigurationFile(testData.get("fileDetails").getAsJsonObject().get("fileName").getAsString());
+		String actual = response.get("status").getAsString().replace("\"", "");
+		Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
 	}
-	
+
 	@Test(priority = 12)
-	public void testDownloadConfigFileException() throws InsightsCustomException, IOException{
-		String encodeString = new String(Base64.getEncoder().encodeToString(testData.get("fileDetails").toString().getBytes()));	
+	public void testDownloadConfigFileException() throws InsightsCustomException, IOException {
+		String encodeString = new String(
+				Base64.getEncoder().encodeToString(testData.get("fileDetails").toString().getBytes()));
 		ResponseEntity<byte[]> response = fileManagementController.downloadConfigFile(encodeString);
-			Assert.assertEquals(response, null);
+		Assert.assertEquals(response, null);
 	}
 }

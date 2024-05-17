@@ -41,6 +41,8 @@ import com.cognizant.devops.platformcommons.core.util.JsonUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsEmailTemplates;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
+import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfig;
+import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfigDAL;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformworkflow.workflowtask.core.InsightsStatusProvider;
@@ -55,6 +57,7 @@ import com.google.gson.JsonObject;
 public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 	private static Logger log = LogManager.getLogger(ReportEmailSubscriber.class.getName());
 	private WorkflowDAL workflowDAL = new WorkflowDAL();
+	private static final String SPREADSHEET = "Spreadsheet";
 
 	MailReport mailReportDTO = new MailReport();
 
@@ -172,13 +175,19 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 				String[] recipientBCCList = emailHistory.getMailBCC().split(",");
 				recipientBCCAddress = createRecipientAddress(recipientBCCList);
 			}
+			GrafanaDashboardPdfConfigDAL grafanaDashboardConfigDAL = new GrafanaDashboardPdfConfigDAL();
+			GrafanaDashboardPdfConfig grafanaPdfConfig = grafanaDashboardConfigDAL.fetchGrafanaDashboardDetailsByWorkflowId(workflowId);
+			String type = grafanaPdfConfig.getPdfType();
+			String attachmentName =emailHistory.getMailAttachmentName();
+			if(type.equalsIgnoreCase(SPREADSHEET))
+				attachmentName=attachmentName+".xlsx";
 			mailReportDTO.setMailTo(recipientAddress);
 			mailReportDTO.setMailCC(recipientCCAddress);
 			mailReportDTO.setMailBCC(recipientBCCAddress);
 			mailReportDTO.setMailFrom(emailHistory.getMailFrom());
 			mailReportDTO.setSubject(emailHistory.getSubject());
 			mailReportDTO.setMailBody(emailHistory.getMailBody());
-			attachments.put(emailHistory.getMailAttachmentName(), emailHistory.getAttachmentData());
+			attachments.put(attachmentName, emailHistory.getAttachmentData());
 			mailReportDTO.setMailAttachments(attachments);
 			return mailReportDTO;
 		} catch (Exception e) {

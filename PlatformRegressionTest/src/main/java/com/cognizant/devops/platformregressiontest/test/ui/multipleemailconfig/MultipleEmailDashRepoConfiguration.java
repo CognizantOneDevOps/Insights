@@ -162,6 +162,7 @@ public class MultipleEmailDashRepoConfiguration extends MultipleEmailDashRepoObj
 			} catch (Exception e) {
 				closeDialog.click();
 				log.info("Details functionality not found.");
+				return false;
 			}
 			return true;
 	}

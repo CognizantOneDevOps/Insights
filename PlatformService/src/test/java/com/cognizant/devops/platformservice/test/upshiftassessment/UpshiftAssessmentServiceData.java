@@ -38,79 +38,77 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileInputStream;
 
-public class UpshiftAssessmentServiceData extends AbstractTestNGSpringContextTests{
-    private static final Logger log = LogManager.getLogger(UpshiftAssessmentServiceData.class);
-    ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-    UpshiftAssessmentConfigDAL upshiftAssessmentConfigDAL = new UpshiftAssessmentConfigDAL();
-    @Autowired
-    WorkflowServiceImpl workflowService;// = new WorkflowServiceImpl();
-    WorkflowDAL workflowConfigDAL = new WorkflowDAL();
-    JsonObject testData = new JsonObject();
+public class UpshiftAssessmentServiceData extends AbstractTestNGSpringContextTests {
+	private static final Logger log = LogManager.getLogger(UpshiftAssessmentServiceData.class);
+	ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+	UpshiftAssessmentConfigDAL upshiftAssessmentConfigDAL = new UpshiftAssessmentConfigDAL();
+	@Autowired
+	WorkflowServiceImpl workflowService;// = new WorkflowServiceImpl();
+	WorkflowDAL workflowConfigDAL = new WorkflowDAL();
+	JsonObject testData = new JsonObject();
 
-	
-    int taskID = 0;
-    int relationTaskID = 0;
-    MultipartFile testFile, testFile1;
+	int taskID = 0;
+	int relationTaskID = 0;
+	MultipartFile testFile, testFile1;
 
-    void prepareAssessmentData() throws InsightsCustomException {
-    	try {
-		    String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + TestngInitializerTest.TESTNG_TESTDATA + File.separator
-                    + TestngInitializerTest.TESTNG_PLATFORMSERVICE + File.separator + "UpshiftAssementService.json";
+	void prepareAssessmentData() throws InsightsCustomException {
+		try {
+			String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator
+					+ TestngInitializerTest.TESTNG_TESTDATA + File.separator
+					+ TestngInitializerTest.TESTNG_PLATFORMSERVICE + File.separator + "UpshiftAssementService.json";
 			testData = JsonUtils.getJsonData(path).getAsJsonObject();
-			
+
 		} catch (Exception e) {
 			log.error(e);
 		}
-        try {
-            InsightsWorkflowType type = new InsightsWorkflowType();
-            type.setWorkflowType(WorkflowTaskEnum.WorkflowType.UPSHIFTASSESSMENT.getValue());
-            workflowConfigDAL.saveWorkflowType(type);
-        } catch (Exception e) {
-            log.error("Error preparing data at WorkflowServiceTest workflowtype record ", e);
-        }
+		try {
+			InsightsWorkflowType type = new InsightsWorkflowType();
+			type.setWorkflowType(WorkflowTaskEnum.WorkflowType.UPSHIFTASSESSMENT.getValue());
+			workflowConfigDAL.saveWorkflowType(type);
+		} catch (Exception e) {
+			log.error("Error preparing data at WorkflowServiceTest workflowtype record ", e);
+		}
 
-        try {
-            String workflowTaskTest = testData.get("workflowTaskTest1").toString();
-            JsonObject workflowTaskJson = convertStringIntoJson(workflowTaskTest);
-            int response = workflowService.saveWorkflowTask(workflowTaskJson);
-            InsightsWorkflowTask tasks = workflowConfigDAL
-                    .getTaskbyTaskDescription(workflowTaskJson.get("description").getAsString());
-            taskID = tasks.getTaskId();
-        } catch (Exception e) {
-            log.error("Error preparing UpshiftAssessmentServiceData task ", e);
-        }
+		try {
+			String workflowTaskTest = testData.get("workflowTaskTest1").toString();
+			JsonObject workflowTaskJson = convertStringIntoJson(workflowTaskTest);
+			int response = workflowService.saveWorkflowTask(workflowTaskJson);
+			InsightsWorkflowTask tasks = workflowConfigDAL
+					.getTaskbyTaskDescription(workflowTaskJson.get("description").getAsString());
+			taskID = tasks.getTaskId();
+		} catch (Exception e) {
+			log.error("Error preparing UpshiftAssessmentServiceData task ", e);
+		}
 
-        try {
-            String workflowTaskTest = testData.get("workflowTaskTest2").toString();
-            JsonObject workflowTaskJson = convertStringIntoJson(workflowTaskTest);
-            int response = workflowService.saveWorkflowTask(workflowTaskJson);
-            InsightsWorkflowTask tasks = workflowConfigDAL
-                    .getTaskbyTaskDescription(workflowTaskJson.get("description").getAsString());
-            relationTaskID = tasks.getTaskId();
-        } catch (Exception e) {
-            log.error("Error preparing UpshiftReportServiceData KPI task ", e);
-        }
-        try {
-            File upshiftReportFile = new File(classLoader.getResource("UpshiftAssessment.json").getFile());
-            FileInputStream input = new FileInputStream(upshiftReportFile);
-            testFile = new MockMultipartFile("file",
-                    upshiftReportFile.getName(), "text/plain", IOUtils.toByteArray(input));
-        }catch (Exception e){
-            log.error("Error reading test upshift Report ", e);
-        }
-        try {
-            File upshiftReportFile = new File(classLoader.getResource("UpshiftAssessmentTest.xml").getFile());
-            FileInputStream input = new FileInputStream(upshiftReportFile);
-            testFile1 = new MockMultipartFile("file",
-                    upshiftReportFile.getName(), "text/plain", IOUtils.toByteArray(input));
-        }catch (Exception e){
-            log.error("Error reading test upshift Report ", e);
-        }
-    }
+		try {
+			String workflowTaskTest = testData.get("workflowTaskTest2").toString();
+			JsonObject workflowTaskJson = convertStringIntoJson(workflowTaskTest);
+			int response = workflowService.saveWorkflowTask(workflowTaskJson);
+			InsightsWorkflowTask tasks = workflowConfigDAL
+					.getTaskbyTaskDescription(workflowTaskJson.get("description").getAsString());
+			relationTaskID = tasks.getTaskId();
+		} catch (Exception e) {
+			log.error("Error preparing UpshiftReportServiceData KPI task ", e);
+		}
+		File upshiftReportFile = new File(classLoader.getResource("UpshiftAssessment.json").getFile());
+		try (FileInputStream input = new FileInputStream(upshiftReportFile);) {
+			testFile = new MockMultipartFile("file", upshiftReportFile.getName(), "text/plain",
+					IOUtils.toByteArray(input));
+		} catch (Exception e) {
+			log.error("Error reading test upshift Report ", e);
+		}
+		File upshiftReportFileXML = new File(classLoader.getResource("UpshiftAssessmentTest.xml").getFile());
+		try (FileInputStream input = new FileInputStream(upshiftReportFileXML)) {
+			testFile1 = new MockMultipartFile("file", upshiftReportFileXML.getName(), "text/plain",
+					IOUtils.toByteArray(input));
+		} catch (Exception e) {
+			log.error("Error reading test upshift Report ", e);
+		}
+	}
 
-    public JsonObject convertStringIntoJson(String convertregisterkpi) {
-        JsonObject objectJson = new JsonObject();
-        objectJson = JsonUtils.parseStringAsJsonObject(convertregisterkpi);
-        return objectJson;
-    }
+	public JsonObject convertStringIntoJson(String convertregisterkpi) {
+		JsonObject objectJson = new JsonObject();
+		objectJson = JsonUtils.parseStringAsJsonObject(convertregisterkpi);
+		return objectJson;
+	}
 }

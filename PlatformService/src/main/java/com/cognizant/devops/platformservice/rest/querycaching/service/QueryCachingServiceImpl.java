@@ -154,14 +154,11 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 
 				int cachingValue = dataJson.get(QueryCachingConstants.CACHING_VALUE).getAsInt();
 
-				Long startTime = Long.parseLong(dataJson.get(QueryCachingConstants.START_TIME).getAsString().replace(".", ""));
+				log.debug("Caching Type {} Caching Value {}  startTimeStr {} endTimeStr {} ", cachingType, cachingValue,
+						dataJson.get(QueryCachingConstants.START_TIME).getAsString(),
+						dataJson.get(QueryCachingConstants.END_TIME).getAsString());
 
-				Long endTime = Long.parseLong(dataJson.get(QueryCachingConstants.END_TIME).getAsString().replace(".", ""));
-
-				log.debug("Caching Type {} Caching Value {}  startTimeStr {} endTimeStr {} ", cachingType,
-						cachingValue, startTime, endTime);
-
-				String cacheKey = getQueryHash(requestJson, cachingType, cachingValue, startTime, endTime);
+				String cacheKey = getQueryHash(requestJson, cachingType, cachingValue);
 
 				JsonObject ehResponse = null;
 
@@ -172,7 +169,8 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 							: getNeo4jDatasourceResults(requestPayload));
 					return ehResponse;
 				} else {
-					Long durationSeconds = endTime - startTime;
+					Long durationSeconds = (long) (dataJson.get(QueryCachingConstants.END_TIME).getAsDouble()
+							- dataJson.get(QueryCachingConstants.START_TIME).getAsDouble());
 					log.debug("Fetching Results From Neo4j and storing in cache");
 					return fetchRecordFromGraphDBAndsaveInEH(requestPayload, cacheKey, durationSeconds,cachingValue,cachingType);
 				}
@@ -194,8 +192,7 @@ public class QueryCachingServiceImpl implements QueryCachingService {
      *
      * It returns unique alphanumeric value which can be used as a cache key
      */
-	private String getQueryHash(JsonObject requestJson, String cachingType, int cachingValue, Long startTime,
-			Long endTime) {
+	private String getQueryHash(JsonObject requestJson, String cachingType, int cachingValue) {
 		String queryHash;
 		
 		JsonObject dataJson = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray()

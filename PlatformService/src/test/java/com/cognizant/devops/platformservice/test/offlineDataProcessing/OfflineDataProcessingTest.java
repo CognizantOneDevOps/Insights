@@ -70,9 +70,8 @@ public class OfflineDataProcessingTest extends OfflineDataProcessingTestData {
 
 	@Test(priority = 1)
 	public void testUploadOfflineDefinition() throws InsightsCustomException, IOException {
-		try {
+		try (FileInputStream input = new FileInputStream(offlineFile)) {
 			String expectedOutcome = "All Offline Data records are inserted successfully. ";
-			FileInputStream input = new FileInputStream(offlineFile);
 			MultipartFile multipartFile = new MockMultipartFile("file", offlineFile.getName(), "text/plain",
 					IOUtils.toByteArray(input));
 			JsonObject response = offlineDataProcessingController.saveBulkOfflineData(multipartFile);

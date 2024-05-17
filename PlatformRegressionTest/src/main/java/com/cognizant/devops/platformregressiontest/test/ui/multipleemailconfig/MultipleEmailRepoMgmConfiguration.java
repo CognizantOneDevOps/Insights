@@ -162,6 +162,7 @@ public class MultipleEmailRepoMgmConfiguration extends MultipleEmailRepoMgmObjec
 			} catch (Exception e) {
 				closeDialog.click();
 				log.info("Details functionality not found.");
+				return false;
 			}
 			return true;
 	}

@@ -3,7 +3,8 @@
  "version": "9.9",
  "description": "insights_ui",
  "dependencies": {
-  "express": "^4.18.2"
+  "express": "^4.18.2",
+  "helmet": "^7.1.0"
  },
  "engine": "node >=12.x.x",
  "scripts": {

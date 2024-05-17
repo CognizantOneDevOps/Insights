@@ -1,8 +1,24 @@
+#-------------------------------------------------------------------------------
+# Copyright 2024 Cognizant Technology Solutions
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License.  You may obtain a copy
+# of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+# License for the specific language governing permissions and limitations under
+# the License.
+#-------------------------------------------------------------------------------
+
 version: '3.8'
 
 services:
   postgres:
-    image: devopsbasservice/onedevopsinsights:postgres12
+    image: docker-postgres:latest
     healthcheck:
       test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "postgres" ]
       timeout: 45s
@@ -19,43 +35,25 @@ services:
       - 35432:5432
     command: postgres -c config_file=/etc/postgresql.conf -c hba_file=/etc/pg_hba.conf
 
-  neo4j:
-    image: neo4j:4.4.4-community
-    volumes:
-      - $VOL_PATH/InsightsData/neo4j/data:/data
-      - $VOL_PATH/InsightsData/neo4j/logs:/logs
-      - $VOL_PATH/InsightsData/neo4j/conf:/conf
-    env_file:
-      - ./config.env
-    healthcheck:
-      test: ["CMD", "cypher-shell", "match (n) return count(n)"]
-      interval: 10s
-      timeout: 10s
-      retries: 20
-      start_period: 40s
-    ports:
-      - 7474:7474
-      - 7687:7687
-
   grafana:
-    image: devopsbasservice/onedevopsinsights:grafana10.0.0
+    image: docker-grafana:latest
     env_file:
       - ./config.env
     healthcheck:
-      test: curl --fail -s http://localhost:30000/api/healthy || exit 1
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider localhost:3000/api/health && echo 'ready'"]
       interval: 1m30s
       timeout: 10s
       retries: 3
-    volumes:
-       - $VOL_PATH/InsightsData/grafana/logs:/usr/INSIGHTS_HOME/logs
     depends_on:
       - postgres
+    volumes:
+       - $VOL_PATH/InsightsData/grafana/logs:/usr/INSIGHTS_HOME/logs
     ports:
       - 30000:3000
       - 31000:3100
 
   rabbitmq:
-    image: devopsbasservice/onedevopsinsights:rabbitmq3.9
+    image: docker-rabbitmq:latest
     volumes:
       - $VOL_PATH/InsightsData/rabbitmq/data:/var/lib/rabbitmq
       - $VOL_PATH/InsightsData/rabbitmq/log:/var/log/rabbitmq
@@ -73,35 +71,33 @@ services:
       - 25672:25672
       - 5671:5671
 
-
   service:
-    image: devopsbasservice/onedevopsinsights:service$INSIGHTS_VERSION
+    image: docker-service:latest
     env_file:
       - ./config.env
     depends_on:
       - grafana
-      - neo4j
       - rabbitmq
     volumes:
       -  $VOL_PATH/InsightsData/PlatformService/logs:/usr/INSIGHTS_HOME/logs
       -  serverconfig:/usr/INSIGHTS_HOME/.InSights
     ports:
       - 38080:8080
-      - 38081:8081
 
   ui:
-    image: devopsbasservice/onedevopsinsights:ui$INSIGHTS_VERSION
+    image: docker-ui:latest
     env_file:
       - ./config.env
     depends_on:
       - service
+    volumes:
+      -  $VOL_PATH/InsightsData/UI:/opt/UI/insights/config
     ports:
       - 38081:8081
 
   engine:
-    image: devopsbasservice/onedevopsinsights:engine$INSIGHTS_VERSION
+    image: docker-engine:latest
     depends_on:
-      - neo4j
       - rabbitmq
     volumes:
       -  $VOL_PATH/InsightsData/engine/logs:/usr/INSIGHTS_HOME/logs
@@ -110,15 +106,16 @@ services:
       - ./config.env
 
   agentwebhook:
-    image: devopsbasservice/onedevopsinsights:agentwebhook$INSIGHTS_VERSION
+    image: docker-agentwebhook:latest
+    depends_on:
+      - rabbitmq
+      - service
     volumes:
-      - $VOL_PATH/InsightsData/agentswebhook/data:/opt/insightsagents/PlatformAgents
+      - $VOL_PATH/InsightsData/agentswebhook/data/PlatformAgents:/opt/insightsagents/PlatformAgents
       - $VOL_PATH/InsightsData/agentswebhook/logs:/usr/INSIGHTS_HOME/logs
       - agentinitscripts:/etc/init.d
     env_file:
       - ./config.env
-    depends_on:
-      - rabbitmq
     ports:
       - 8981:8981
 
@@ -126,4 +123,3 @@ services:
 volumes:
   serverconfig:
   agentinitscripts:
-

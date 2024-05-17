@@ -162,7 +162,7 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 8)
 	public void testDeleteReportTemplate() throws InsightsCustomException {
 		try {
@@ -202,8 +202,7 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 
 	@Test(priority = 10)
 	public void testUploadedReportTemplateWithWrongFile() throws InsightsCustomException, IOException {
-		try {
-			FileInputStream input = new FileInputStream(configFileTxt);
+		try (FileInputStream input = new FileInputStream(configFileTxt)) {
 			MultipartFile multipartFile = new MockMultipartFile("file", configFileTxt.getName(), "text/plain",
 					IOUtils.toByteArray(input));
 			JsonObject response = insightsAssessmentReportController.uploadReportTemplate(multipartFile);
@@ -220,8 +219,7 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 
 	@Test(priority = 11)
 	public void testUploadReportTemplateDesignFilesWithWrongFile() throws InsightsCustomException, IOException {
-		try {
-			FileInputStream input = new FileInputStream(configFileTxt);
+		try (FileInputStream input = new FileInputStream(configFileTxt)) {
 			MultipartFile multipartFile = new MockMultipartFile("file", configFileTxt.getName(), "text/plain",
 					IOUtils.toByteArray(input));
 			MultipartFile[] files = new MultipartFile[1];

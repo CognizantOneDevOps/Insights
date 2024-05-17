@@ -12,13 +12,13 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>10.4</version>
+		<version>10.5</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformRegressionTest</artifactId>
 	<packaging>jar</packaging>
-	<version>10.4</version>
+	<version>10.5</version>
 	<name>PlatformRegressionTest</name>
 	<url>http://maven.apache.org</url>
 	<properties>
@@ -44,7 +44,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>10.4</version>
+			<version>10.5</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/io.rest-assured/rest-assured -->
 		<dependency>
@@ -62,12 +62,12 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>5.2.3</version>
+			<version>5.2.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>5.2.3</version>
+			<version>5.2.5</version>
 		</dependency>
 		<dependency>
 			<groupId>com.mchange</groupId>
@@ -127,7 +127,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>10.4</version>
+			<version>10.5</version>
 		</dependency>
 	</dependencies>
 	<build>

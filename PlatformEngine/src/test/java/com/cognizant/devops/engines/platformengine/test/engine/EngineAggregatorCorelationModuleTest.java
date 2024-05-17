@@ -94,7 +94,7 @@ public class EngineAggregatorCorelationModuleTest {
 	}
 
 	@Test(priority = 1)
-	public void testNeo4JData() {
+	public void testNeo4JGITData() {
 		try {
 			/*
 			 * Test GIT node is created *

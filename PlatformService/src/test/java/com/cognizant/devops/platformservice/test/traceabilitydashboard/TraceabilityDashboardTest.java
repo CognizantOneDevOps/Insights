@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformservice.test.traceabilitydashboard; 
+package com.cognizant.devops.platformservice.test.traceabilitydashboard;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -63,27 +63,29 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 	@Autowired
 	FileManagementServiceImpl fileManagementServiceImpl;
 	String traceabilityFileName = "TraceabilityTest";
-	InsightsConfigFiles config=new InsightsConfigFiles();
+	InsightsConfigFiles config = new InsightsConfigFiles();
 	JsonObject testData = new JsonObject();
+
 	@BeforeClass
-	public void beforeMethod() throws InsightsCustomException {		
+	public void beforeMethod() throws InsightsCustomException {
 		graphDBHandler = new GraphDBHandler();
 		deleteNodeInNeo4j();
 		insertNodeInNeo4j();
-		try {
-			 String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + TestngInitializerTest.TESTNG_TESTDATA + File.separator
-	                    + TestngInitializerTest.TESTNG_PLATFORMSERVICE + File.separator + "TraceabilityDashboard.json";
-				testData = JsonUtils.getJsonData(path).getAsJsonObject();
-				
 		ClassLoader classLoader = ClassLoader.getSystemClassLoader();
 		File traceabilityFile = new File(classLoader.getResource("TraceabilityTest.json").getFile());
-		FileInputStream input = new FileInputStream(traceabilityFile);
-		MultipartFile multipartTraceabilityFile = new MockMultipartFile("file", traceabilityFile.getName(), "text/plain",
-					IOUtils.toByteArray(input));
-		String response = fileManagementServiceImpl.uploadConfigurationFile(multipartTraceabilityFile, traceabilityFileName, "JSON", "TRACEABILITY", false);
-		if(response.equals("File uploaded"))
-			isDeleteFile=true;
-		}catch(Exception e) {
+		try (FileInputStream input = new FileInputStream(traceabilityFile)) {
+			String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator
+					+ TestngInitializerTest.TESTNG_TESTDATA + File.separator
+					+ TestngInitializerTest.TESTNG_PLATFORMSERVICE + File.separator + "TraceabilityDashboard.json";
+			testData = JsonUtils.getJsonData(path).getAsJsonObject();
+
+			MultipartFile multipartTraceabilityFile = new MockMultipartFile("file", traceabilityFile.getName(),
+					"text/plain", IOUtils.toByteArray(input));
+			String response = fileManagementServiceImpl.uploadConfigurationFile(multipartTraceabilityFile,
+					traceabilityFileName, "JSON", "TRACEABILITY", false);
+			if (response.equals("File uploaded"))
+				isDeleteFile = true;
+		} catch (Exception e) {
 			log.error("File already exists");
 		}
 	}
@@ -103,9 +105,9 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 		}
 		Assert.assertNotEquals(dataModel, null);
 	}
-	
+
 	@Test(priority = 2)
-	public void testAvailableTools() throws InsightsCustomException{
+	public void testAvailableTools() throws InsightsCustomException {
 		try {
 			JsonObject response = TraceabilityDashboardController.getAvailableTools();
 			String actual = response.get("status").getAsString().replace("\"", "");
@@ -116,7 +118,7 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 	}
 
 	@Test(priority = 3)
-	public void testToolKeySet() throws InsightsCustomException{
+	public void testToolKeySet() throws InsightsCustomException {
 		try {
 			toolName = "JIRA";
 			JsonObject response = TraceabilityDashboardController.getToolKeyset(toolName);
@@ -126,29 +128,31 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 4)
 	public void testPipelineResponse() throws InsightsCustomException {
+		JsonObject response = TraceabilityDashboardController.getPipeline(toolName, fieldName, fieldVal);
+		String actual = response.get("status").getAsString().replace("\"", "");
+		Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
+		Assert.assertEquals(response.get("data").getAsJsonObject().get("pipeline").getAsJsonArray().get(0)
+				.getAsJsonObject().isJsonNull(), false);
+	}
+
+	@Test(priority = 5)
+	public void testSummaryResponse() throws InsightsCustomException {
+		try {
 			JsonObject response = TraceabilityDashboardController.getPipeline(toolName, fieldName, fieldVal);
 			String actual = response.get("status").getAsString().replace("\"", "");
 			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
-			Assert.assertEquals(response.get("data").getAsJsonObject().get("pipeline").getAsJsonArray().get(0).getAsJsonObject().isJsonNull(), false);	
-	}
-	
-	@Test(priority = 5)
-	public void testSummaryResponse() throws InsightsCustomException{
-		try {
-			JsonObject response = TraceabilityDashboardController.getPipeline(toolName,fieldName,fieldVal);
-			String actual = response.get("status").getAsString().replace("\"", "");
-			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
-			Assert.assertEquals(response.get("data").getAsJsonObject().get("summary").getAsJsonArray().isEmpty(), false);
+			Assert.assertEquals(response.get("data").getAsJsonObject().get("summary").getAsJsonArray().isEmpty(),
+					false);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 6)
-	public void testGetToolDisplayProperties() throws InsightsCustomException{
+	public void testGetToolDisplayProperties() throws InsightsCustomException {
 		try {
 			JsonObject response = TraceabilityDashboardController.getToolDisplayProperties();
 			String actual = response.get("status").getAsString().replace("\"", "");
@@ -158,9 +162,9 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 7)
-	public void testGetToolSummary() throws InsightsCustomException{
+	public void testGetToolSummary() throws InsightsCustomException {
 		try {
 			JsonObject response = TraceabilityDashboardController.getToolSummary(toolName, cacheKey);
 			String actual = response.get("status").getAsString().replace("\"", "");
@@ -170,119 +174,128 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 8)
-	public void testGetEpicIssues() throws InsightsCustomException{
+	public void testGetEpicIssues() throws InsightsCustomException {
 		try {
-			JsonObject response = TraceabilityDashboardController.getEpicIssues(toolName, fieldName, fieldVal,type);
+			JsonObject response = TraceabilityDashboardController.getEpicIssues(toolName, fieldName, fieldVal, type);
 			String actual = response.get("status").getAsString().replace("\"", "");
 			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
-			Assert.assertEquals(response.get("data").getAsJsonObject().get("pipeline").getAsJsonArray().isJsonNull(), false);
+			Assert.assertEquals(response.get("data").getAsJsonObject().get("pipeline").getAsJsonArray().isJsonNull(),
+					false);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 9)
-	public void testGetPipelineForSelectedNode() throws InsightsCustomException{
+	public void testGetPipelineForSelectedNode() throws InsightsCustomException {
 		try {
 			JsonObject response = TraceabilityDashboardController.getIssuePipeline(testData.get("data").toString());
 			String actual = response.get("status").getAsString().replace("\"", "");
 			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
-			Assert.assertEquals(response.get("data").getAsJsonObject().get("pipeline").getAsJsonArray().isJsonNull(), false);
+			Assert.assertEquals(response.get("data").getAsJsonObject().get("pipeline").getAsJsonArray().isJsonNull(),
+					false);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 10)
-	public void testGetPipelineForSelectedNodeWithoutEpicIssueType() throws InsightsCustomException{
+	public void testGetPipelineForSelectedNodeWithoutEpicIssueType() throws InsightsCustomException {
 		try {
-			JsonObject response = TraceabilityDashboardController.getIssuePipeline(testData.get("dataWithoutEpicIssueType").toString());
+			JsonObject response = TraceabilityDashboardController
+					.getIssuePipeline(testData.get("dataWithoutEpicIssueType").toString());
 			String actual = response.get("status").getAsString().replace("\"", "");
 			Assert.assertEquals(actual, PlatformServiceConstants.SUCCESS);
-			Assert.assertEquals(response.get("data").getAsJsonObject().get("pipeline").getAsJsonArray().isJsonNull(), false);
+			Assert.assertEquals(response.get("data").getAsJsonObject().get("pipeline").getAsJsonArray().isJsonNull(),
+					false);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 11)
-	public void testOperationNameCount() throws InsightsCustomException{
+	public void testOperationNameCount() throws InsightsCustomException {
 		try {
-			String actual="PROPERTY_COUNT";
-			for (String operation : operation) 
-			{ 
+			String actual = "PROPERTY_COUNT";
+			for (String operation : operation) {
 				getOperationData(actual, operation);
 				actual = operation;
 				service.clearAllCacheValue();
 				toolName = "JIRA";
 				JsonObject response = TraceabilityDashboardController.getPipeline(toolName, fieldName, fieldVal);
-				Assert.assertEquals(response.get("status").getAsString().replace("\"", ""), PlatformServiceConstants.SUCCESS);
+				Assert.assertEquals(response.get("status").getAsString().replace("\"", ""),
+						PlatformServiceConstants.SUCCESS);
 			}
-			} catch (AssertionError e) {
+		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 12)
-	public void testGetUptoolValueException() throws InsightsCustomException{
+	public void testGetUptoolValueException() throws InsightsCustomException {
 		try {
 			getConfigData("uptool");
 			service.clearAllCacheValue();
 			JsonObject response = TraceabilityDashboardController.getPipeline(toolName, fieldName, fieldVal);
-			Assert.assertEquals(response.get("status").getAsString().replace("\"", ""), PlatformServiceConstants.FAILURE);
+			Assert.assertEquals(response.get("status").getAsString().replace("\"", ""),
+					PlatformServiceConstants.FAILURE);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 13)
-	public void testGetUptoolException() throws InsightsCustomException{
+	public void testGetUptoolException() throws InsightsCustomException {
 		try {
-			getOperationData("uptool","uptoolll");
+			getOperationData("uptool", "uptoolll");
 			JsonObject response = TraceabilityDashboardController.getPipeline(toolName, fieldName, fieldVal);
-			Assert.assertEquals(response.get("status").getAsString().replace("\"", ""), PlatformServiceConstants.FAILURE);
-			getOperationData("uptoolll","uptool");
-			getOperationData("\"EPIC\"","[\r\n"+ "         \"EPIC\"\r\n"+ "      ]");
+			Assert.assertEquals(response.get("status").getAsString().replace("\"", ""),
+					PlatformServiceConstants.FAILURE);
+			getOperationData("uptoolll", "uptool");
+			getOperationData("\"EPIC\"", "[\r\n" + "         \"EPIC\"\r\n" + "      ]");
 			service.clearAllCacheValue();
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 14)
-	public void testGetDowntoolValueException() throws InsightsCustomException{
+	public void testGetDowntoolValueException() throws InsightsCustomException {
 		try {
 			getConfigData("downtool");
 			service.clearAllCacheValue();
 			JsonObject response = TraceabilityDashboardController.getPipeline(toolName, fieldName, fieldVal);
-			Assert.assertEquals(response.get("status").getAsString().replace("\"", ""), PlatformServiceConstants.FAILURE);	
+			Assert.assertEquals(response.get("status").getAsString().replace("\"", ""),
+					PlatformServiceConstants.FAILURE);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 15)
-	public void testGetDowntoolException() throws InsightsCustomException{
+	public void testGetDowntoolException() throws InsightsCustomException {
 		try {
-			getOperationData("downtool","downtoolll");
+			getOperationData("downtool", "downtoolll");
 			service.clearAllCacheValue();
 			JsonObject response = TraceabilityDashboardController.getPipeline(toolName, fieldName, fieldVal);
-			Assert.assertEquals(response.get("status").getAsString().replace("\"", ""), PlatformServiceConstants.FAILURE);
+			Assert.assertEquals(response.get("status").getAsString().replace("\"", ""),
+					PlatformServiceConstants.FAILURE);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 16)
-	public void testGetPipelineNoCategoryDataMember() throws InsightsCustomException{
+	public void testGetPipelineNoCategoryDataMember() throws InsightsCustomException {
 		try {
-		    getOperationData("category","categoryy");
-		    getOperationData("uifilter","uifiltter");
+			getOperationData("category", "categoryy");
+			getOperationData("uifilter", "uifiltter");
 			service.clearAllCacheValue();
 			JsonObject response = TraceabilityDashboardController.getPipeline(toolName, fieldName, fieldVal);
-			JsonObject response1 = TraceabilityDashboardController.getEpicIssues(toolName, fieldName, fieldVal, "Others");
+			JsonObject response1 = TraceabilityDashboardController.getEpicIssues(toolName, fieldName, fieldVal,
+					"Others");
 			String actual = response.get("status").getAsString().replace("\"", "");
 			Assert.assertEquals(actual, PlatformServiceConstants.FAILURE);
 			String actual1 = response1.get("status").getAsString().replace("\"", "");
@@ -291,9 +304,9 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@Test(priority = 17)
-	public void testToolKeySetInvalidTool() throws InsightsCustomException{
+	public void testToolKeySetInvalidTool() throws InsightsCustomException {
 		try {
 			JsonObject response = TraceabilityDashboardController.getToolKeyset(toolName);
 			Assert.assertEquals(response.get("data").getAsJsonArray().isEmpty(), true);
@@ -301,15 +314,15 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
+
 	@AfterClass
 	public void cleanUp() throws InsightsCustomException {
 		deleteNodeInNeo4j();
 		try {
-			if(isDeleteFile) {
+			if (isDeleteFile) {
 				fileManagementServiceImpl.deleteConfigurationFile(traceabilityFileName);
 			}
-		}catch(Exception e) {
+		} catch (Exception e) {
 			log.error("File already exists");
 		}
 	}

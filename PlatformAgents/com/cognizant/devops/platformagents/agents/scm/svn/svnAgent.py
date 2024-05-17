@@ -46,7 +46,7 @@ class SvnAgent(BaseAgent):
             self.date_time = self.config.get("startFrom", '')
             self.pattern = self.config.get("timeStampFormat", '')
             self.baseLogger.info('List of Repositories : %s ' % self.repoList)
-            self.trackingData()
+            self.trackingDataUpdate()
             self.publishData()
             if self.data != []:
                 #print self.data
@@ -55,7 +55,7 @@ class SvnAgent(BaseAgent):
         except Exception as e:
             self.baseLogger.error(e)
         
-    def trackingData(self):
+    def trackingDataUpdate(self):
         with open(self.trackingFilePath, 'r') as config_file:    
             self.tracking = json.load(config_file)
         for k,v in self.tracking.items():

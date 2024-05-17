@@ -37,39 +37,21 @@ services:
       - 35432:5432
     command: postgres -c config_file=/etc/postgresql.conf -c hba_file=/etc/pg_hba.conf
 
-  neo4j:
-    image: neo4j:4.4.4-community
-    volumes:
-      - $VOL_PATH/InsightsData/neo4j/data:/data
-      - $VOL_PATH/InsightsData/neo4j/logs:/logs
-      - $VOL_PATH/InsightsData/neo4j/conf:/conf
-    env_file:
-      - ./config.env
-    healthcheck:
-      test: ["CMD", "cypher-shell", "match (n) return count(n)"]
-      interval: 10s
-      timeout: 10s
-      retries: 20
-      start_period: 40s
-    ports:
-      - 7474:7474
-      - 7687:7687
-
   grafana:
     build:
       context: ./grafana
       dockerfile: Dockerfile
+      args:
+        INSIGHTSRELEASE: $INSIGHTS_VERSION
     env_file:
       - ./config.env
     healthcheck:
-      test: curl --fail -s http://localhost:30000/api/healthy || exit 1
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider localhost:3000/api/health && echo 'ready'"]
       interval: 1m30s
       timeout: 10s
       retries: 3
     volumes:
        - $VOL_PATH/InsightsData/grafana/logs:/usr/INSIGHTS_HOME/logs
-    depends_on:
-      - postgres
     ports:
       - 30000:3000
       - 31000:3100
@@ -95,7 +77,6 @@ services:
       - 25672:25672
       - 5671:5671
 
-
   service:
     build:
       context: ./service
@@ -104,10 +85,6 @@ services:
         INSIGHTSRELEASE: $INSIGHTS_VERSION
     env_file:
       - ./config.env
-    depends_on:
-      - grafana
-      - neo4j
-      - rabbitmq
     volumes:
       -  $VOL_PATH/InsightsData/PlatformService/logs:/usr/INSIGHTS_HOME/logs
       -  serverconfig:/usr/INSIGHTS_HOME/.InSights
@@ -122,8 +99,8 @@ services:
         INSIGHTSRELEASE: $INSIGHTS_VERSION
     env_file:
       - ./config.env
-    depends_on:
-      - service
+    volumes:
+      -  $VOL_PATH/InsightsData/UI:/opt/UI/insights/config
     ports:
       - 38081:8081
 
@@ -133,9 +110,6 @@ services:
       dockerfile: Dockerfile
       args:
         INSIGHTSRELEASE: $INSIGHTS_VERSION
-    depends_on:
-      - neo4j
-      - rabbitmq
     volumes:
       -  $VOL_PATH/InsightsData/engine/logs:/usr/INSIGHTS_HOME/logs
       -  serverconfig:/usr/INSIGHTS_HOME/.InSights
@@ -149,35 +123,33 @@ services:
       args:
         INSIGHTSRELEASE: $INSIGHTS_VERSION
     volumes:
-      - $VOL_PATH/InsightsData/agentswebhook/data:/opt/insightsagents/PlatformAgents
+      - $VOL_PATH/InsightsData/agentswebhook/data/PlatformAgents:/opt/insightsagents/PlatformAgents
       - $VOL_PATH/InsightsData/agentswebhook/logs:/usr/INSIGHTS_HOME/logs
       - agentinitscripts:/etc/init.d
     env_file:
       - ./config.env
-    depends_on:
-      - rabbitmq
     ports:
       - 8981:8981
 
-  h2o:
-    build:
-      context: ./h2o
-      dockerfile: Dockerfile
-    volumes:
-      - $VOL_PATH/InsightsData/h2o/logs:/usr/INSIGHTS_HOME/logs
-    ports:
-      - 54321:54321
+  # h2o:
+  #   build:
+  #     context: ./h2o
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - $VOL_PATH/InsightsData/h2o/logs:/usr/INSIGHTS_HOME/logs
+  #   ports:
+  #     - 54321:54321
 
-  elasticsearch:
-    build:
-      context: ./elasticsearch
-      dockerfile: Dockerfile
-    volumes:
-      - $VOL_PATH/InsightsData/elasticsearch/logs:/usr/share/elasticsearch/logs
-      - ./elasticsearch/log4j2.properties:/usr/share/elasticsearch/config/log4j2.properties
-      - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-    ports:
-      - 9200:9200
+  # elasticsearch:
+  #   build:
+  #     context: ./elasticsearch
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - $VOL_PATH/InsightsData/elasticsearch/logs:/usr/share/elasticsearch/logs
+  #     - ./elasticsearch/log4j2.properties:/usr/share/elasticsearch/config/log4j2.properties
+  #     - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+  #   ports:
+  #     - 9200:9200
 
 
 volumes:

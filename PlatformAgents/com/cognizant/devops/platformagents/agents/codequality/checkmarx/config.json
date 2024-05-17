@@ -1,0 +1,148 @@
+{
+	"vault": {
+		"getFromVault": false,
+		"secretEngine": "insights-kv",
+		"readToken": "vault_secret_token",
+		"vaultUrl": "http://Vault_Host:port/v1/"
+	},
+	"mqConfig": {
+    "providerName": "",
+    "user": "",
+    "password": "",
+    "host": "127.0.0.1",
+    "exchange": "iSight",
+    "agentControlXchg": "iAgent",
+    "awsAccessKey": "",
+    "awsSecretKey": "",
+    "awsRegion": "",
+    "port": 5672,
+    "enableDeadLetterExchange": true,
+    "prefetchCount": 5
+	},
+	"subscribe": {
+		"config": "CODEQUALITY.CHECKMARX.config"
+	},
+	"publish": {
+		"data": "CODEQUALITY.CHECKMARX.DATA",
+		"health": "CODEQUALITY.CHECKMARX.HEALTH"
+	},
+	"communication": {
+		"type": "REST",
+		"sslVerify": false,
+		"responseType": "JSON"
+	},
+  "dynamicTemplate": {
+    "timeFieldMapping": {
+      "creationDate": "%Y-%m-%dT%H:%M:%S"
+    },
+    "projectResponseTemplate": {
+      "id": "projectId",
+      "name": "projectName",
+      "teamId":"teamId",
+      "isPublic":"isPublic",
+      "owner":"owner"
+    },
+    "scanResponseTemplate": {
+      "scanId": "scanId",
+      "projectId": "projectId",
+      "highSeverity":"highSeverity",
+      "mediumSeverity":"mediumSeverity",
+      "lowSeverity":"lowSeverity",
+      "infoSeverity":"infoSeverity",
+      "statisticsCalculationDate":"statisticsCalculationDate",
+      "scanFinishedOn":"scanFinishedOn"
+      
+    },
+    "scans": {
+      "insightsTimeXFieldMapping": {
+        "timefield": "scanFinishedOn",
+        "isEpoch": false,
+        "timeformat": "%Y-%m-%dT%H:%M:%S"
+      }
+    },
+	"relationMetadata": {
+      "projectScan": {
+        "relation": {
+          "properties": ["statisticsCalculationDate"],
+          "name": "PROJECT_HAS_SCANS",
+          "source": {
+            "labels": [
+              "CHECKMARX_PROJECT"
+            ],
+            "constraints": [
+              "projectId"
+            ]
+          },
+          "destination": {
+            "labels": [
+              "CHECKMARX_SCAN"
+            ],
+            "constraints": [
+              "projectId",
+              "scanId"
+              
+            ],
+            "selectedProperties": [
+              "highSeverity",
+              "mediumSeverity",
+              "lowSeverity",
+              "infoSeverity",
+              "scanFinishedOn",
+              "inSightsTimeX",
+              "inSightsTime"
+            ]
+          }
+        }
+      }
+    },
+    "selectedProjects": [],
+    "metaData": {
+      "project": {
+        "labels": [
+          "CHECKMARX_PROJECT"
+        ],
+        "dataUpdateSupported": true,
+        "uniqueKey": [
+          "projectId"
+        ]
+      }
+    }
+  },
+  "agentId": "",
+  "enableDataValidation": true,
+  "toolCategory": "CODEQUALITY",
+  "toolsTimeZone": "UTC",
+  "insightsTimeZone": "Asia/Kolkata",
+  "enableValueArray": false,
+  "useResponseTemplate": true,
+  "auth": "base64",
+  "runSchedule": 30,
+  "timeStampField": "",
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%S.",
+  "isEpochTimeFormat": false,
+  "startFrom": "2023-08-01 00:00:00",
+  "scanFetchCount":"",
+  "clientId": "",
+  "clientToken": "",
+  "userName": "",
+  "userToken": "",
+  "baseEndPoint": "",
+  "isDebugAllowed": false,
+  "labelName": "",
+  "toolName": "CHECKMARX",
+	"agentSecretDetails": [
+		"userid",
+		"passwd"
+	],
+	"loggingSetting": {
+		"logLevel": "INFO",
+		"maxBytes": 5000000,
+		"backupCount": 10
+	},
+	"auditing": false,
+	"enableProxy":false,
+  	"proxies":{
+    	"http":"",
+    	"https":""
+    }
+}

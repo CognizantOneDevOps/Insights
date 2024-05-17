@@ -20,7 +20,7 @@
 		"boltEndPoint": "bolt://localhost:7687",
 		"maxIdleConnections": 25,
 		"logQueryIfProcessingTimeGreaterThanInMS": 5,
-		"version": "3.5.26",
+		"version": "4.4.4",
 		"databaseName": "neo4j"
 	},
 	"postgre": {
@@ -46,7 +46,7 @@
 		"awsRegion": ""
 	},
 	"agentDetails": {
-		"isOnlineRegistration": true,
+		"isOnlineRegistration": false,
 		"onlineRegistrationMode": "nexus",
 		"offlineAgentPath": "C:\\InSights_Windows\\Agents\\offlineAgent",
 		"unzipPath": "C:\\InSights_Windows\\Agents\\PlatformAgents\\unzip",

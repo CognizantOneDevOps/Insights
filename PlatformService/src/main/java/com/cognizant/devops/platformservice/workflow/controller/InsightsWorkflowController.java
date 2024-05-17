@@ -21,6 +21,7 @@ import java.util.Base64;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -143,25 +144,39 @@ public class InsightsWorkflowController {
 			String validatedResponse =  ValidationUtils.validateRequestBody(decodedString);
 			JsonObject pdfDetailsJson = JsonUtils.parseStringAsJsonObject(validatedResponse);
 			byte[] fileContent = workflowService.getReportPDF(pdfDetailsJson);
-			
+			String pdfType = pdfDetailsJson.get("pdfType").getAsString();
 			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 			byteArrayOutputStream.write(fileContent);
-			org.apache.pdfbox.pdmodel.PDDocument document = org.apache.pdfbox.Loader.loadPDF(fileContent, "12345");
-			
-			if (document == null) {
-				throw new InsightsCustomException("Invalid file ");
+			HttpHeaders headers = new HttpHeaders();
+			headers.add("Access-Control-Allow-Methods", "POST");
+			headers.add("Access-Control-Allow-Headers", "Content-Type");
+			headers.add("Cache-Control", "no-cache, no-store, must-revalidate,post-check=0, pre-check=0");
+			headers.add("Pragma", "no-cache");
+			headers.add("Expires", "0");
+			if (pdfType.equalsIgnoreCase("Spreadsheet")) {
+				Workbook document = WorkflowServiceImpl.byteArrayToWorkbook(fileContent);
+				if (document == null) {
+					throw new InsightsCustomException("Invalid file ");
+				}else {
+					String workbookName = pdfDetailsJson.get("pdfName").getAsString() + ".xlsx";
+					headers.setContentType(MediaType.parseMediaType("application/xlsx"));
+					headers.add("Content-Disposition", "attachment; filename=" + workbookName);
+					response = new ResponseEntity<>(byteArrayOutputStream.toByteArray(), headers, HttpStatus.OK);
+				}
+				
 			}else {
-				String pdfName = pdfDetailsJson.get("pdfName").getAsString() + ".pdf";
-				HttpHeaders headers = new HttpHeaders();
-				headers.setContentType(MediaType.parseMediaType("application/pdf"));
-				headers.add("Access-Control-Allow-Methods", "POST");
-				headers.add("Access-Control-Allow-Headers", "Content-Type");
-				headers.add("Content-Disposition", "attachment; filename=" + pdfName);
-				headers.add("Cache-Control", "no-cache, no-store, must-revalidate,post-check=0, pre-check=0");
-				headers.add("Pragma", "no-cache");
-				headers.add("Expires", "0");
-				response = new ResponseEntity<>(byteArrayOutputStream.toByteArray(), headers, HttpStatus.OK);
+				
+				org.apache.pdfbox.pdmodel.PDDocument document = org.apache.pdfbox.Loader.loadPDF(fileContent, "12345");
+				if (document == null) {
+					throw new InsightsCustomException("Invalid file ");
+				}else {
+					String pdfName = pdfDetailsJson.get("pdfName").getAsString() + ".pdf";
+					headers.setContentType(MediaType.parseMediaType("application/pdf"));
+					headers.add("Content-Disposition", "attachment; filename=" + pdfName);
+					response = new ResponseEntity<>(byteArrayOutputStream.toByteArray(), headers, HttpStatus.OK);
+				}
 			}
+			
 		} catch (Exception e) {
 			log.error("Error, Failed to download pdf -- {} ", e.getMessage());
 		}

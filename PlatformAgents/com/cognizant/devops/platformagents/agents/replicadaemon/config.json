@@ -1,0 +1,36 @@
+{
+  "baseExtractionPath":"C:\\Agents\\PlatformAgents",  
+  "insightsTimeZone": "Asia/Kolkata",
+  "loggingSetting": {
+    "logLevel": "WARN"
+  },
+  "mqConfig": {
+    "providerName": "RabbitMQ",
+    "host": "",
+    "port": 5672,
+    "user": "",
+    "password": "",
+    "exchange": "iSight",
+    "agentExchange":"iAgent",
+    "enableDeadLetterExchange":false,
+	"awsAccessKey": "",
+	"awsSecretKey": "",
+	"awsRegion": ""
+  },
+  "publish": {
+    "data": "DAEMONAGENT.REPLICADAEMON.DATA",
+    "health": "DAEMONAGENT.REPLICADAEMON.HEALTH"
+  },
+  "isDebugAllowed": false,
+  "subscribe": {
+    "agentPkgQueue": "INSIGHTS.REPLICA.PACKAGE"
+  },
+  "enableProxy":true,
+  "proxies":{
+    	"http":"",
+    	"https":""
+    },
+  "toolCategory" : "REPLICADAEMON",
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
+  "toolsTimeZone": "GMT"
+}
