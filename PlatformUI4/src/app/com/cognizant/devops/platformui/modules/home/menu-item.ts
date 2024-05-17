@@ -244,6 +244,16 @@ export class MenuItem {
               parentMenuId :'Configuration'
             },
             {
+              displayName: 'Neo4j Scaling',
+              iconName: 'feature',
+              route: 'InSights/Home/kafkaNeo4jList',
+              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+              showMenu: this.getMenuShowAdmin(['Admin']),
+              title: "Neo4j Scaling",
+              menuId : "Neo4j Scaling",
+              parentMenuId :'Configuration'
+            },
+            {
               displayName: 'Task Management',
               iconName: 'feature',
               isToolbarDisplay: InsightsInitService.enableInsightsToolbar,

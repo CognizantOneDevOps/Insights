@@ -50,7 +50,7 @@ sudo unzip PlatformUI4.zip && sudo rm -rf PlatformUI4.zip
 sudo cp -R ./UI $INSIGHTS_APP_ROOT_DIRECTORY/
 sudo rm -rf PlatformUI4
 cd $INSIGHTS_APP_ROOT_DIRECTORY/UI/
-npm install express
+npm install
 jq --arg serviceHost $ServiceEndpoint '(.serviceHost) |= $serviceHost' $INSIGHTS_APP_ROOT_DIRECTORY/UI/insights/config/uiConfig.json >  $INSIGHTS_APP_ROOT_DIRECTORY/UI/insights/config/uiConfig.json.tmp && mv $INSIGHTS_APP_ROOT_DIRECTORY/UI/insights/config/uiConfig.json.tmp $INSIGHTS_APP_ROOT_DIRECTORY/UI/insights/config/uiConfig.json -f
 jq --arg grafanaHost $grafanaEndpoint '(.grafanaHost) |= $grafanaHost' $INSIGHTS_APP_ROOT_DIRECTORY/UI/insights/config/uiConfig.json >  $INSIGHTS_APP_ROOT_DIRECTORY/UI/insights/config/uiConfig.json.tmp && mv $INSIGHTS_APP_ROOT_DIRECTORY/UI/insights/config/uiConfig.json.tmp $INSIGHTS_APP_ROOT_DIRECTORY/UI/insights/config/uiConfig.json -f
 

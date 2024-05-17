@@ -61,6 +61,6 @@ python3 --version
 sudo python3 get-pip.py
 sudo python3 -m pip install setuptools -U
 sudo python3 -m pip install pika
-sudo python3 -m pip install requests apscheduler python-dateutil xmltodict pytz requests_ntlm boto3 urllib3 neotime neo4j neobolt elasticsearch
+sudo python3 -m pip install requests apscheduler python-dateutil xmltodict pytz requests_ntlm boto3 urllib3 neotime neo4j neobolt elasticsearch pathvalidate
 python3 --version
 sleep 5

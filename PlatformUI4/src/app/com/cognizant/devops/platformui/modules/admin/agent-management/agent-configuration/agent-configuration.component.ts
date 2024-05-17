@@ -100,7 +100,9 @@ export class AgentConfigurationComponent implements OnInit {
     "elasticsearch_passwd",
     "docker_repo_passwd",
     "apiKey",
-    "applicationKey"
+    "applicationKey",
+    "userToken",
+    "clientToken"
   ];
   fileName: String = "";
   fileNameTooltip: String = "";

@@ -147,7 +147,10 @@ import { OfflineAlertListComponent } from '@insights/app/modules/offline-alertin
 import { OfflineAlertConfigurationComponent } from '@insights/app/modules/offline-alerting/offline-alert-configuration/offline-alert-configuration.component';
 import { OfflineAlertingService } from '@insights/app/modules/offline-alerting/offline-alerting-service';
 import { OfflineAlertHistoryDetailsDialogComponent } from '@insights/app/modules/offline-alerting/offline-alert-history-details-dialog/offline-alert-history-details-dialog.component';
-
+import { KafkaNeo4jConfigurationComponent } from './kafka-neo4j/kafka-neo4j-configuration/kafka-neo4j-configuration.component';
+import { KafkaNeo4jService } from './kafka-neo4j/kafka-neo4j.service';
+import { KafkaNeo4jListComponent } from './kafka-neo4j/kafka-neo4j-list/kafka-neo4j-list.component';
+import { KafkaNeo4jDetailsComponent } from './kafka-neo4j/kafka-neo4j-details/kafka-neo4j-details.component';
 
 @NgModule({
     declarations: [
@@ -231,7 +234,10 @@ import { OfflineAlertHistoryDetailsDialogComponent } from '@insights/app/modules
         AgentDownloadDialogComponent,
         OfflineAlertListComponent,
         OfflineAlertConfigurationComponent,
-        OfflineAlertHistoryDetailsDialogComponent 
+        OfflineAlertHistoryDetailsDialogComponent,
+        KafkaNeo4jListComponent,
+        KafkaNeo4jConfigurationComponent,
+        KafkaNeo4jDetailsComponent 
 
     ],
     imports: [
@@ -286,7 +292,8 @@ import { OfflineAlertHistoryDetailsDialogComponent } from '@insights/app/modules
         FileSystemService,
         TaskManagementService,
         OfflineService,
-        OfflineAlertingService
+        OfflineAlertingService,
+        KafkaNeo4jService
     ]
 })
 export class HomeModules { }

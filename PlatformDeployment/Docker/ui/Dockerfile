@@ -43,7 +43,7 @@ RUN wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${INS
     unzip /opt/UI.zip -d /opt/UI && \
     rm -rf /opt/UI.zip && \
     cd /opt/UI/UI && \
-    npm install -save express
+    npm install
 EXPOSE 8081/tcp
 
 # Running entry script

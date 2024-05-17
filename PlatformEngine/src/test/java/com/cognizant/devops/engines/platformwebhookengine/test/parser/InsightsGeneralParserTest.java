@@ -43,7 +43,7 @@ import com.google.gson.JsonObject;
 public class InsightsGeneralParserTest extends InsightsParserTestData {
 	private static Logger log = LogManager.getLogger(InsightsGeneralParserTest.class.getName());
 	public static final InsightsGeneralParser generalparser = new InsightsGeneralParser();
-	public static final InsightsParserTestData testdata = new InsightsParserTestData();
+	public static final InsightsParserTestData parsertestdata = new InsightsParserTestData();
 	WebHookEngineAggregatorModule testapp = new WebHookEngineAggregatorModule();
 	WebhookEngineTestData webhookEngineTestData = new WebhookEngineTestData();
 	JsonObject parserTestData = new JsonObject();
@@ -146,7 +146,7 @@ public class InsightsGeneralParserTest extends InsightsParserTestData {
 		WebHookConfig webhookConfig = new WebHookConfig();
 		WebhookEngineTest webhookEngineTest = new WebhookEngineTest();
 		webhookConfig.setResponseTemplate(parserTestData.get("fieldNotFoundinToolData").getAsString());
-		webhookConfig.setDynamicTemplate(testdata.emptyDynamicTemplate);
+		webhookConfig.setDynamicTemplate(parsertestdata.emptyDynamicTemplate);
 		webhookConfig.setLabelName(testData.get("labelName").getAsString());
 		webhookConfig.setMQChannel(webhookEngineTestData.mqChannel);
 		webhookConfig.setToolName(testData.get("toolName").getAsString());
@@ -166,7 +166,7 @@ public class InsightsGeneralParserTest extends InsightsParserTestData {
 		WebHookConfig webhookConfig = new WebHookConfig();
 		WebhookEngineTest webhookEngineTest = new WebhookEngineTest();
 		webhookConfig.setResponseTemplate(testData.get("responseTemplate").getAsString());
-		webhookConfig.setDynamicTemplate(testdata.emptyDynamicTemplate);
+		webhookConfig.setDynamicTemplate(parsertestdata.emptyDynamicTemplate);
 		webhookConfig.setLabelName(testData.get("labelName").getAsString());
 		webhookConfig.setMQChannel(webhookEngineTestData.mqChannel);
 		webhookConfig.setToolName(testData.get("toolName").getAsString());
@@ -189,11 +189,11 @@ public class InsightsGeneralParserTest extends InsightsParserTestData {
 		webhookConfig.setDynamicTemplate(parserTestData.get("dynamicTemplateWithArray").toString());
 		webhookConfig.setLabelName(parserTestData.get("labelName").getAsString());
 		webhookConfig.setMQChannel(parserTestData.get("mqChannel").getAsString());
-		webhookConfig.setToolName(testdata.toolName);
+		webhookConfig.setToolName(parsertestdata.toolName);
 		webhookConfig.setWebHookName(parserTestData.get("webhookName").getAsString());
 		webhookConfig.setSubscribeStatus(true);
 		webhookConfig.setIsUpdateRequired(true);
-		webhookConfig.setFieldUsedForUpdate(testdata.fieldUsedForUpdate);
+		webhookConfig.setFieldUsedForUpdate(parsertestdata.fieldUsedForUpdate);
 		webhookConfig.setDataFormat(webhookEngineTestData.dataFormat);
 		webhookConfig.setWebhookDerivedConfig(derivedOperationsArrayWithoutEpochPivotal);
 		List<JsonObject> nullresponse = generalparser.parseToolData(webhookConfig,
@@ -211,11 +211,11 @@ public class InsightsGeneralParserTest extends InsightsParserTestData {
 		webhookConfig.setDynamicTemplate(parserTestData.get("dynamicTemplateWithArray").toString());
 		webhookConfig.setLabelName(parserTestData.get("labelName").getAsString());
 		webhookConfig.setMQChannel(parserTestData.get("mqChannel").getAsString());
-		webhookConfig.setToolName(testdata.toolName);
+		webhookConfig.setToolName(parsertestdata.toolName);
 		webhookConfig.setWebHookName(parserTestData.get("webhookName").getAsString());
 		webhookConfig.setSubscribeStatus(true);
 		webhookConfig.setIsUpdateRequired(true);
-		webhookConfig.setFieldUsedForUpdate(testdata.fieldUsedForUpdate);
+		webhookConfig.setFieldUsedForUpdate(parsertestdata.fieldUsedForUpdate);
 		webhookConfig.setDataFormat(webhookEngineTestData.dataFormat);
 		webhookConfig.setWebhookDerivedConfig(derivedOperationsArrayWithoutEpoch);
 		List<JsonObject> nullresponse = generalparser.parseToolData(webhookConfig,

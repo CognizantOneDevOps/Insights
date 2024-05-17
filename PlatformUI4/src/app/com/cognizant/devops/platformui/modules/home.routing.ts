@@ -1,3 +1,5 @@
+import { KafkaNeo4jConfigurationComponent } from './kafka-neo4j/kafka-neo4j-configuration/kafka-neo4j-configuration.component';
+import { KafkaNeo4jListComponent } from './kafka-neo4j/kafka-neo4j-list/kafka-neo4j-list.component';
 /*******************************************************************************
  * Copyright 2019 Cognizant Technology Solutions
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -121,7 +123,9 @@ const homeRoutes: Routes = [
       { path: 'offlineDataList', component:OfflineDataListComponent },
       { path: 'offlineConfiguration', component:OfflineConfigurationComponent },
       { path: 'offlineAlertingList', component:OfflineAlertListComponent },
-      { path: 'offlineAlertingConfig', component:OfflineAlertConfigurationComponent}
+      { path: 'offlineAlertingConfig', component:OfflineAlertConfigurationComponent},
+      { path: 'kafkaNeo4jList', component:KafkaNeo4jListComponent },
+      { path: 'KafkaNeo4jConfigurationComponent', component:KafkaNeo4jConfigurationComponent}
     ],
     canActivate: [AuthGuard]
   }

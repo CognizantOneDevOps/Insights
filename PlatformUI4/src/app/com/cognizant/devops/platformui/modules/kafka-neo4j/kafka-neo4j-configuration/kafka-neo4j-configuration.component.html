@@ -1,0 +1,203 @@
+<!--
+*******************************************************************************
+ * Copyright 2024 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+
+ <div class="cardCss">
+  <div layout layout-align="left" class="main-section-title">
+    <div style="color: var(--text-clr1)">
+      <b>Configuration |
+        <span class="blueTitleTxt" style="color: #2d67ff">Replica Configuration
+        </span></b>
+    </div>
+  </div>
+  <div class="sectionHeadingStyle">
+    <span style="padding-top: 3px; margin-left: 3px">
+      <button mat-icon-button (click)="back()" style="vertical-align: super">
+        <mat-icon svgIcon="backButton" matTooltip="Back" id="backButton">
+        </mat-icon>
+      </button>
+    </span>
+    <span class="alignSubHeader1" style="font-size: 14px"><b>Neo4j Scaling Configuration</b> (Configure Source &
+      replica)</span>
+    <div class="btnAlign" style="margin-top: 0px">
+      <button mat-icon-button (click)="save()">
+        <mat-icon matTooltip="Save" svgIcon="save" class="mat-icon material-icons" style="color: #2d67ff"
+          id="Save OfflineData">
+        </mat-icon>
+      </button>
+      <button *ngIf="onEdit" mat-icon-button (click)="reset()">
+        <mat-icon matTooltip="Reset" class="mat-icon material-icons" svgIcon="exit">
+        </mat-icon>
+      </button>
+    </div>
+  </div>
+  <!-- Source Section -->
+  <div class="tableHeaderCss">
+    <span class="mainHeaderText">Source Configuration
+    </span>
+    <span class="infoHeaderText">(Please provide accurate details. Fields marked "<span class="asteriskText">*</span>"
+      are mandatory)
+    </span>
+  </div>
+  <div class="section-body">
+    <form [formGroup]="sourceForm">
+      <div class="two-grid-section">
+        <div class="grid-item">
+          <div class="lblText">
+            Kafka Endpoint <span class="asteriskText">*</span>
+          </div>
+          <mat-form-field appearance="fill" style="width: 100%" class="formfield-custom columnComponent">
+            <input matInput maxlength="300" type="text" required formControlName="kafkaEndpoint" name="kafkaEndpoint"
+              placeholder="Input kafka endpoint" [disabled]="onEdit" />
+          </mat-form-field>
+          <span *ngIf="!(sourceForm.controls['kafkaEndpoint'].hasError('whitespace'))" class="comments">Eg. 0.0.0.0:9092
+          </span>
+          <span class="comments" style="color: red;"
+            *ngIf="(sourceForm.controls['kafkaEndpoint'].hasError('whitespace'))">Value Cannot contain white
+            spaces</span>
+
+        </div>
+        <div class="grid-item">
+          <div class="lblText">
+            Topic Name <span class="asteriskText">*</span>
+          </div>
+          <mat-form-field appearance="fill" style="width: 100%" class="formfield-custom columnComponent">
+            <input matInput maxlength="300" type="text" required formControlName="topicName" name="topicName"
+              placeholder="Input kafka topic name" [disabled]="onEdit" />
+          </mat-form-field>
+          <span
+            *ngIf="!(sourceForm.controls['topicName'].hasError('whitespace') || sourceForm.controls['topicName'].hasError('pattern'))"
+            class="comments">Please provide unique Topic name </span>
+          <span class="comments" style="color: red;"
+            *ngIf="(sourceForm.controls['topicName'].hasError('whitespace'))">Value Cannot contain white spaces</span>
+          <span class="comments" style="color: red;"
+            *ngIf="(sourceForm.controls['topicName'].hasError('pattern'))">Invalid topic name</span>
+        </div>
+
+      </div>
+      <br>
+      <div class="two-grid-section">
+        <div class="grid-item">
+          <div class="lblText">
+            Node Labels <span class="asteriskText">*</span>
+          </div>
+          <div class="text-area">
+            <mat-form-field appearance="fill" class="formfield-custom">
+              <textarea matInput formControlName="nodeLabels" name="nodeLabels" required
+                placeholder="Input node labels seperared by ';' if more than 1"
+                style="width: 100%; resize: vertical; height: 50px" rows="10"></textarea>
+            </mat-form-field>
+          </div>
+          <span *ngIf="!(sourceForm.controls['nodeLabels'].hasError('whitespace'))" class="comments">Note:
+            {{nodeLabelExample}}</span>
+          <span class="comments" style="color: red;"
+            *ngIf="(sourceForm.controls['nodeLabels'].hasError('whitespace'))">Value Cannot contain white spaces</span>
+        </div>
+
+        <div class="grid-item">
+          <div class="lblText">
+            Relationship Labels <span class="asteriskText">*</span>
+          </div>
+          <div class="text-area">
+            <mat-form-field appearance="fill" class="formfield-custom">
+              <textarea matInput formControlName="relationshipLabels" name="relationshipLabels" required
+                placeholder="Input relationship labels seperared by ';' if more than 1"
+                style="width: 100%; resize: vertical; height: 50px" rows="10"></textarea>
+            </mat-form-field>
+          </div>
+          <span *ngIf="!(sourceForm.controls['relationshipLabels'].hasError('whitespace'))" class="comments">Eg. {{relationshipLabelExample}}</span>
+          <span class="comments" style="color: red;"
+            *ngIf="(sourceForm.controls['relationshipLabels'].hasError('whitespace'))">Value Cannot contain white spaces</span>
+
+        </div>
+      </div>
+      <br />
+    </form>
+  </div>
+  <!-- Replica Section -->
+  <div class="tableHeaderCss">
+    <span class="mainHeaderText">Replicas Configuration
+    </span>
+    <span class="infoHeaderText">(Please provide accurate details. Fields marked "<span class="asteriskText">*</span>"
+      are mandatory)
+    </span>
+  </div>
+  <div class="section-body">
+    <form [formGroup]="replicasForm" (ngSubmit)="save()">
+      <div formArrayName="replicas">
+        <div class="select-label">Replicas <span class="asteriskText">*</span></div>
+        <div class="req-param">
+          <div class="grid-row">
+            <div class="replicas-container" *ngFor="
+              let replica of replicasForm['controls'].replicas['controls'];
+              let i = index
+            " [formGroupName]="i">
+              <div class="flex-item">
+                <label class="input-label">Replica Name <span class="asteriskText">*</span></label>
+                <mat-form-field appearance="fill" class="formfield-custom">
+                  <input matInput formControlName="replicaName" type="text" placeholder="Enter replica name" required />
+                </mat-form-field>
+                <span *ngIf="!(replica.controls['replicaName'].hasError('pattern')) " class="comments">Special
+                  Characters except '-' are not allowed</span>
+                <span class="comments" style="color: red;"
+                  *ngIf="(replica.controls['replicaName'].hasError('pattern'))">Invalid replica name</span>
+
+              </div>
+              <div class="flex-item" style="margin-left:3% ;">
+                <label class="input-label">Replica IP <span class="asteriskText">*</span></label>
+                <mat-form-field appearance="fill" class="formfield-custom">
+                  <input matInput formControlName="replicaIP" type="text" placeholder="Enter replica IP address"
+                    required />
+                </mat-form-field>
+                <span *ngIf="!(replica.controls['replicaIP'].hasError('whitespace'))" class="comments">Eg.
+                  0.0.0.0</span>
+                <span class="comments" style="color: red;"
+                  *ngIf="(replica.controls['replicaIP'].hasError('whitespace'))">Value Cannot contain white
+                  spaces</span>
+              </div>
+              <div class="flex-item" style="margin-left:3% ;">
+                <label class="input-label">Replica Endpoint <span class="asteriskText">*</span></label>
+                <mat-form-field appearance="fill" class="formfield-custom">
+                  <input matInput formControlName="replicaEndpoint" type="text" placeholder="Enter replica endpoint"
+                    required />
+                </mat-form-field>
+                <span *ngIf="!(replica.controls['replicaEndpoint'].hasError('whitespace'))" class="comments">Eg.
+                  http://0.0.0.0:7474 </span>
+                <span class="comments" style="color: red;"
+                  *ngIf="(replica.controls['replicaEndpoint'].hasError('whitespace'))">Value Cannot contain white
+                  spaces</span>
+              </div>
+              <ng-container *ngIf="!(replica.status === 'DISABLED')">
+                <div class="flex-item minus-button">
+                  <button type="button" mat-icon-button (click)="removeReplica(i)">
+                    <mat-icon matTooltip="Remove Replica" svgIcon="minus"> </mat-icon>
+                  </button>
+                </div>
+              </ng-container>
+
+            </div>
+          </div>
+          <ng-container *ngIf="(replicasLength < MAX_REPLICA_COUNT)">
+            <button type="button" mat-icon-button (click)="addReplica()">
+              <mat-icon matTooltip="Add Replica" svgIcon="add"> </mat-icon>
+            </button>
+          </ng-container>
+        </div>
+      </div>
+    </form>
+  </div>
+
+</div>

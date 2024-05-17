@@ -132,6 +132,7 @@
 	"accessToken": "",
 	"baseEndPoint": "baseEndPoint",
 	"isDebugAllowed": false,
+	"labelName": "GITLABPIPELINE",
 	"toolName": "GITLABPIPELINE",
 	"loggingSetting": {
 		"logLevel": "INFO",

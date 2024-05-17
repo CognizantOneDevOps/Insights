@@ -45,7 +45,7 @@ public class BulkUploadTest extends BulkUploadTestData {
 
 	@Autowired
 	FileManagementServiceImpl fileManagementService;
-	
+
 	boolean isDeleteFile = false;
 	private static Logger log = LogManager.getLogger(BulkUploadTest.class);
 
@@ -54,8 +54,7 @@ public class BulkUploadTest extends BulkUploadTestData {
 
 	@BeforeClass
 	public void onInit() {
-		try {
-			FileInputStream input = new FileInputStream(toolDetailsFile);
+		try (FileInputStream input = new FileInputStream(toolDetailsFile)) {
 			MultipartFile multipartToolDetailsFile = new MockMultipartFile("file", toolDetailsFile.getName(),
 					"text/plain", IOUtils.toByteArray(input));
 			String response = fileManagementService.uploadConfigurationFile(multipartToolDetailsFile,

@@ -44,9 +44,13 @@ import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaDashboardPdfConfig;
 import com.cognizant.devops.platformdal.grafana.pdf.GrafanaOrgToken;
 import com.cognizant.devops.platformdal.groupemail.InsightsGroupEmailConfiguration;
+import com.cognizant.devops.platformdal.healthutil.InsightsAgentHealthDetails;
+import com.cognizant.devops.platformdal.healthutil.InsightsComponentHealthDetails;
 import com.cognizant.devops.platformdal.icon.Icon;
 import com.cognizant.devops.platformdal.milestone.InsightsMileStoneOutcomeConfig;
 import com.cognizant.devops.platformdal.milestone.MileStoneConfig;
+import com.cognizant.devops.platformdal.neo4jScaling.InsightsReplicaConfig;
+import com.cognizant.devops.platformdal.neo4jScaling.InsightsStreamsSourceConfig;
 import com.cognizant.devops.platformdal.offlineAlerting.InsightsOfflineAlerting;
 import com.cognizant.devops.platformdal.offlineDataProcessing.InsightsOfflineConfig;
 import com.cognizant.devops.platformdal.outcome.InsightsOutcomeTools;
@@ -62,8 +66,6 @@ import com.cognizant.devops.platformdal.workflow.InsightsWorkflowExecutionHistor
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowType;
-import com.cognizant.devops.platformdal.healthutil.InsightsAgentHealthDetails;
-import com.cognizant.devops.platformdal.healthutil.InsightsComponentHealthDetails;
 
 public class PlatformDALSessionFactoryProvider {
 	private static SessionFactory sessionFactory;
@@ -117,8 +119,9 @@ public class PlatformDALSessionFactoryProvider {
 		    configuration.addAnnotatedClass(InsightsComponentHealthDetails.class);
 		    configuration.addAnnotatedClass( InsightsOfflineConfig.class);
 		    configuration.addAnnotatedClass( InsightsOfflineAlerting.class);
-		    
-		    
+		    configuration.addAnnotatedClass( InsightsStreamsSourceConfig.class);
+		    configuration.addAnnotatedClass( InsightsReplicaConfig.class);
+
 			PostgreData postgre = ApplicationConfigProvider.getInstance().getPostgre();
 			if(postgre != null){				
 				configuration.setProperty(AvailableSettings.USER, postgre.getUserName());

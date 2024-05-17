@@ -21,81 +21,33 @@
 source /etc/environment
 source /etc/profile
 
-#Framing Endpoint Url
-neo4jEndpoint=http://$neo4jIP:$neo4jHttpPort
-neo4jBoltEndpoint=http://$neo4jIP:$neo4jBoltPort
-neo4jToken=$(echo -n $neo4jUser:$neo4jPassword | base64)
-grafanaDBEndpoint=jdbc:postgresql://$postgresIP:$postgresPort/grafana
-insightsDBUrl=jdbc:postgresql://$postgresIP:$postgresPort/insight
-grafanaDBUrl=jdbc:postgresql://$postgresIP:$postgresPort/grafana
-
-
-if [[ ! -z $enablespin ]]
-then
-    hostname="insightsdomain.subdomain.com"
-else
-    hostname=$hostPublicIP
-fi
-
-ServiceEndpoint=http://$hostname:$servicePort
-insightsServiceURL=http://$hostname:$servicePort/app
-grafanaEndpoint=http://$hostPrivateIP:$grafanaPort
-
-#UPDATE ServiceEndpoint - uiConfig.json and server-config.json
-configPath='/usr/INSIGHTS_HOME/.InSights/server-config.json'
-dos2unix $configPath
-#cat $configPath
-jq --arg grafanaEndpoint $grafanaEndpoint '(.grafana.grafanaEndpoint) |= $grafanaEndpoint' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
-#cat $configPath
-jq --arg grafanaDBEndpoint $grafanaDBEndpoint '(.grafana.grafanaDBEndpoint) |= $grafanaDBEndpoint' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg postgresIP $postgresIP --arg hostPublicIP $hostPublicIP '(.trustedHosts) |= .+ [$postgresIP,$hostPublicIP]' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg neo4jEndpoint $neo4jEndpoint '(.graph.endpoint) |= $neo4jEndpoint' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg neo4jToken $neo4jToken '(.graph.authToken) |= $neo4jToken' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg neo4jBoltEndpoint $neo4jBoltEndpoint '(.graph.boltEndPoint) |= $neo4jBoltEndpoint' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg grafanaDBUser $grafanaDBUser '(.postgre.userName) |= $grafanaDBUser' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg grafanaDBPass $grafanaDBPass '(.postgre.password) |= $grafanaDBPass' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg insightsDBUrl $insightsDBUrl '(.postgre.insightsDBUrl) |= $insightsDBUrl' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg grafanaDBUrl $grafanaDBUrl '(.postgre.grafanaDBUrl) |= $grafanaDBUrl' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg rabbitmqIP $rabbitmqIP '(.messageQueue.host) |= $rabbitmqIP' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg rabbitMqUser $rabbitMqUser '(.messageQueue.user) |= $rabbitMqUser' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg rabbitMqPassword $rabbitMqPassword '(.messageQueue.password) |= $rabbitMqPassword' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg rabbitMqPort $rabbitMqPort '(.messageQueue.port) |= $rabbitMqPort' $configPath > INPUT.tmp && mv INPUT.tmp $configPath 
-jq --arg insightsServiceURL $ServiceEndpoint '(.insightsServiceURL) |= $insightsServiceURL' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
-
-sed -i "s/\r$//g" $configPath
-
-jq . $configPath > $configPath.tmp
-mv $configPath.tmp $configPath
-#cat $configPath | jq "."
-cat $configPath
-
 PROMTAIL_PORT=${PROMTAIL_LISTEN_PORT} yq e  -i '.server.http_listen_port = env(PROMTAIL_PORT)' /opt/InSights/Promtail/promtail-local-config.yaml
-LOKI="http://${LOKI_HOST}:${LOKI_PORT}/loki/api/v1/push" yq e  -i '.clients[0].url = strenv(LOKI)' /opt/InSights/Promtail/promtail-local-config.yaml
+LOKI="$LOKI_ENDPOINT/loki/api/v1/push" yq e  -i '.clients[0].url = strenv(LOKI)' /opt/InSights/Promtail/promtail-local-config.yaml
 
-
-if [ -n "$neo4jIP" ]; then
-#  ./wait-for-it.sh "$neo4jIP:${neo4jHttpPort}" --timeout=0 --strict
-  until `nc -z $neo4jIP $neo4jHttpPort`; do
+if [ -n "$INSIGHTS_NEO4J_HOST" ]; then
+  until `nc -z $INSIGHTS_NEO4J_HOST $INSIGHTS_NEO4J_PORT`; do
     echo "Waiting on neo4j to come up..."
     sleep 10
   done
 fi
-if [ -n "$rabbitmqIP" ]; then
- # ./wait-for-it.sh "$neo4jIP:${neo4jHttpPort}" --timeout=0 --strict
-  until `nc -z $rabbitmqIP $rabbitMqPort`; do
+if [ -n "$RABBITMQ_HOST" ]; then
+  until `nc -z $RABBITMQ_HOST $RABBITMQ_PORT`; do
     echo "Waiting on rabbitmq to come up..."
     sleep 10
   done
 fi
+until `nc -z $SERVICE_HOST $SERVICE_PORT`; do
+    echo "Waiting on Platform Service to come up..."
+    sleep 10
+done
+
 
 cd /opt/insightsengine/ && nohup java  -Xmx1024M -Xms512M  -jar /opt/insightsengine/PlatformEngine.jar  > /dev/null 2>&1 &
-#cd /opt/insightsWorkflow/ && nohup java -Xmx1024M -Xms512M -jar /opt/insightsWorkflow/PlatformWorkflow.jar  > /dev/null 2>&1 &
 sh +x /etc/init.d/InSightsWorkflow start
-if [ "$enablePromtail" == true ]
+if [ "$PROMTAIL_ENABLE" == true ]
 then
  sh +x /etc/init.d/InsightsPromtail start
 fi
-
 
 #assign tails pid to docker to keep it running continuously
 tail -f /dev/null

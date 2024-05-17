@@ -35,7 +35,7 @@ case "$1" in
     else
      echo "Starting UI"
      cd $INSIGHTS_APP_ROOT_DIRECTORY/UI
-     sudo node UI.js  >UIlog.txt 2>UIerrorlog.txt
+     sudo node UI.js & >UIlog.txt 2>UIerrorlog.txt
      echo $! > UI-pid.txt
      sleep 10
     fi
@@ -68,7 +68,7 @@ case "$1" in
      echo "UI stopped"
      echo "UI starting"
      cd $INSIGHTS_APP_ROOT_DIRECTORY/UI
-     sudo node UI.js  >UIlog.txt 2>UIerrorlog.txt
+     sudo node UI.js & >UIlog.txt 2>UIerrorlog.txt
      echo $! > UI-pid.txt
 	 sleep 10
      echo "UI started"

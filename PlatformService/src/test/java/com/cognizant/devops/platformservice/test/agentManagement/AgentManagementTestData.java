@@ -38,6 +38,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.util.FileCopyUtils;
 
@@ -46,8 +48,9 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.outcome.InsightsTools;
 import com.cognizant.devops.platformdal.outcome.OutComeConfigDAL;
 
-public class AgentManagementTestData extends AbstractTestNGSpringContextTests{
+public class AgentManagementTestData extends AbstractTestNGSpringContextTests {
 	ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+	private static final Logger log = LogManager.getLogger(AgentManagementTestData.class);
 
 	String osversion = "Windows";
 	String typeAgent = "agent";
@@ -57,7 +60,7 @@ public class AgentManagementTestData extends AbstractTestNGSpringContextTests{
 
 	String trackingDetails = "";
 	String ROIAgentId = "ROI_testing";
-	
+
 	Date updateDate = Timestamp.valueOf(LocalDateTime.now());
 
 	String agentIdTrackingDetails = "git_testng_trackingDetails";
@@ -125,36 +128,41 @@ public class AgentManagementTestData extends AbstractTestNGSpringContextTests{
 		if (!destDir.exists()) {
 			destDir.mkdir();
 		}
-		ZipInputStream zipIn = new ZipInputStream(new FileInputStream(new File(zipFilePath).getCanonicalPath()));
-		ZipEntry entry = zipIn.getNextEntry();
-		// iterates over entries in the zip file
-		while (entry != null) {
-			String entryName = entry.getName();
-			entryName = entryName.replaceFirst("agents/", "");
-			String filePath = new File(destDirectory + File.separator + entryName).getCanonicalPath();
-			if (!entry.isDirectory()) {
-				// if the entry is a file, extracts it
-				extractFile(zipIn, filePath);
-			} else {
-				// if the entry is a directory, make the directory
-				File dir = new File(filePath);
-				dir.mkdirs();
+		try (ZipInputStream zipIn = new ZipInputStream(new FileInputStream(new File(zipFilePath).getCanonicalPath()))) {
+			ZipEntry entry = zipIn.getNextEntry();
+			// iterates over entries in the zip file
+			while (entry != null) {
+				String entryName = entry.getName();
+				entryName = entryName.replaceFirst("agents/", "");
+				String filePath = new File(destDirectory + File.separator + entryName).getCanonicalPath();
+				if (!entry.isDirectory()) {
+					// if the entry is a file, extracts it
+					extractFile(zipIn, filePath);
+				} else {
+					// if the entry is a directory, make the directory
+					File dir = new File(filePath);
+					dir.mkdirs();
+				}
+				zipIn.closeEntry();
+				entry = zipIn.getNextEntry();
 			}
-			zipIn.closeEntry();
-			entry = zipIn.getNextEntry();
+		} catch (Exception e) {
+			log.error("Error while unzipping {}", e.getMessage());
 		}
-		zipIn.close();
 	}
 
 	private void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
-		BufferedOutputStream bos = new BufferedOutputStream(
-				new FileOutputStream(new File(filePath).getCanonicalPath()));
-		byte[] bytesIn = new byte[4096];
-		int read = 0;
-		while ((read = zipIn.read(bytesIn)) != -1) {
-			bos.write(bytesIn, 0, read);
+		try (BufferedOutputStream bos = new BufferedOutputStream(
+				new FileOutputStream(new File(filePath).getCanonicalPath()));) {
+
+			byte[] bytesIn = new byte[4096];
+			int read = 0;
+			while ((read = zipIn.read(bytesIn)) != -1) {
+				bos.write(bytesIn, 0, read);
+			}
+		} catch (Exception e) {
+			log.error("Error while extracting File {}", e.getMessage());
 		}
-		bos.close();
 	}
 
 	public void prepareROIAgentToolData() {

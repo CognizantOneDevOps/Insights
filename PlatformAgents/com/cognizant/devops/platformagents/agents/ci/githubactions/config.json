@@ -1,0 +1,206 @@
+{
+  "vault": {
+    "getFromVault": false,
+    "secretEngine": "insights-kv",
+    "readToken": "vault_secret_token",
+    "vaultUrl": "http://Vault_Host:port/v1/"
+  },
+  "mqConfig": {
+    "providerName": "RabbitMQ",
+    "user": "username for RabbitMQ",
+    "password": "",
+    "host": "127.0.0.1",
+    "exchange": "iSight",
+    "agentControlXchg": "iAgent",
+    "port": 5672,
+    "enableDeadLetterExchange": false,
+    "prefetchCount": 5,
+    "awsAccessKey": "",
+    "awsSecretKey": "",
+    "awsRegion": ""
+  },
+  "subscribe": {
+    "config": "CI.GITHUBACTIONS.config"
+  },
+  "publish": {
+    "data": "CI.GITHUBACTIONS.DATA",
+    "health": "CI.GITHUBACTIONS.HEALTH"
+  },
+  "communication": {
+    "type": "REST",
+    "sslVerify": false,
+    "responseType": "JSON"
+  },
+  "dynamicTemplate": {
+    "timeFieldMapping": {
+      "startDate": "%Y-%m-%d",
+      "workFlowCreatedAt": "%Y-%m-%dT%H:%M:%S.%fZ",
+      "workFlowUpdatedAt": "%Y-%m-%dT%H:%M:%S.",
+      "runUpdatedAt": "%Y-%m-%dT%H:%M:%S.%fZ",
+      "completedAt":"%Y-%m-%dT%H:%M:%SZ",
+      "stepCompletedAt":"%Y-%m-%dT%H:%M:%S.",
+      "closedAt": "%Y-%m-%dT%H:%M:%S.%fZ",
+      "since": "%Y-%m-%dT%H:%M:%S.%fZ",
+      "until": "%Y-%m-%dT%H:%M:%S.%fZ",
+      "consumptionTime": "%Y-%m-%dT%H:%M:%SZ"
+    },
+    "workflowResponseTemplate" :{
+      "name":"workflowName",
+      "url": "workflowURL",
+      "state": "workflowState",
+      "html_url": "workflowHTMLURL",
+      "badge_url":"workflowBadgeURL"
+    },
+    "runsResponseTemplate" :{
+      "id": "runID",
+      "run_number": "runNumber",
+      "workflow_id": "workflowID",
+      "name" : "runName",
+      "head_branch" : "runHeadBranch",
+      "display_title" : "runDisplayTitle",
+      "event" : "runEvent",
+      "status" :  "runStatus",
+      "conclusion": "runSuccessOrFailureStatus",
+      "run_attempt":"runAttempt",
+      "jobs_url":"jobsURL"
+    },
+    "jobsResponseTemplate" :{
+      "id": "jobID",
+      "run_id":"runID",
+      "runner_id":"runnerID",
+      "runner_group_id":"runnerGroupID",
+      "runner_name":"runnerName",
+      "runner_group_name":"runnerGroupName", 
+      "labels":"label",
+      "workflow_name":"workflowName",
+      "head_branch":"headBranch",
+      "url":"jobURL",
+      "status":"status",
+      "created_at":"createdAt",
+      "started_at":"startedAt"
+    },
+    "jobStepsResponseTemplate" : {
+      "name":"stepName",
+      "status":"completionStatus",
+      "conclusion":"conclusion",
+      "number":"stepNumber",
+      "started_at":"stepStartedAt",
+      "completed_at":"stepCompletedAt"
+    },
+    "relationMetadata": {
+      "jobSteps": {
+        "relation": {
+          "properties": ["jobID"],
+          "name": "JOB_HAS_STEPS",
+          "source": {
+            "labels": [
+              "GITHUBACTIONS_JOBS"
+            ],
+            "constraints": [
+              "jobID"
+            ]
+          },
+          "destination": {
+            "labels": [
+              "GITHUBACTIONS_JOBS_STEPS"
+            ],
+            "constraints": [
+              "jobID",
+              "runID" 
+            ],
+            "selectedProperties": [
+              "stepName",
+              "completionStatus",
+              "conclusion",
+              "stepNumber",
+              "stepStartedAt",
+              "stepCompletedAt",
+              "inSightsTimeX",
+              "inSightsTime"
+            ]
+          }
+        }
+      }
+    },
+    "workflows": {
+      "insightsTimeXFieldMapping": {
+        "timefield": "workflowUpdatedAt",
+        "isEpoch": false,
+        "timeformat": "%Y-%m-%dT%H:%M:%S."
+      }
+    },
+    "runs": {
+      "insightsTimeXFieldMapping": {
+        "timefield": "runUpdatedAt",
+        "isEpoch": false,
+        "timeformat": "%Y-%m-%dT%H:%M:%SZ"
+      }
+    },
+    "jobs": {
+      "insightsTimeXFieldMapping": {
+        "timefield": "completedAt",
+        "isEpoch": false,
+        "timeformat": "%Y-%m-%dT%H:%M:%SZ"
+      }
+    },
+    "steps": {
+      "insightsTimeXFieldMapping": {
+        "timefield": "stepCompletedAt",
+        "isEpoch": false,
+        "timeformat": "%Y-%m-%dT%H:%M:%S."
+      }
+    },
+    "selectedRepositories": [],
+    "metaData": {
+      "workflows": {
+        "labels": ["GITHUBACTIONS_WORKFLOW"],
+        "dataUpdateSupported": true,
+        "uniqueKey": ["workflowID"]
+      },
+      "runs": {
+        "labels": ["GITHUBACTIONS_RUNS"],
+        "dataUpdateSupported": true,
+        "uniqueKey": ["runID"]
+      },
+      "jobs": {
+        "labels": ["GITHUBACTIONS_JOBS"],
+        "dataUpdateSupported": true,
+        "uniqueKey": ["jobID"]
+      },
+      "steps": {
+        "labels": ["GITHUBACTIONS_JOBS_STEPS"],
+        "dataUpdateSupported": true,
+        "uniqueKey": ["jobID"]
+      }
+    }
+  },
+  "agentId": "",
+  "enableDataValidation": true,
+  "toolCategory": "CI",
+  "toolsTimeZone": "UTC",
+  "insightsTimeZone": "Asia/Kolkata",
+  "enableValueArray": false,
+  "useResponseTemplate": true,
+  "auth": "base64",
+  "runSchedule": 30,
+  "timeStampField": "",
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%S.",
+  "isEpochTimeFormat": false,
+  "startFrom": "2022-08-01 00:00:00",
+  "accessToken": "",
+  "baseEndPoint": "https://api.github.com/orgs/<ORG>/repos",
+  "isDebugAllowed": false,
+  "labelName": "GITHUBACTIONS",
+  "toolName": "GITHUBACTIONS",
+  "loggingSetting": {
+    "logLevel": "INFO",
+    "maxBytes": 5000000,
+    "backupCount": 10
+  },
+  "auditing": false,
+  "enableProxy": false,
+  "proxies": {
+    "http": "",
+    "https": ""
+  }
+}

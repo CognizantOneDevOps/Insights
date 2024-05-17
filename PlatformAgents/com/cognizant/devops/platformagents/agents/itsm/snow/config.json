@@ -1,80 +1,100 @@
 {
 	"vault": {
 		"getFromVault": false,
-		"secretEngine":"insights-kv",
-		"readToken":"vault_secret_token",
-		"vaultUrl":"http://Vault_Host:port/v1/"
+		"secretEngine": "insights-kv",
+		"readToken": "vault_secret_token",
+		"vaultUrl": "http://Vault_Host:port/v1/"
 	},
-	"mqConfig" : {
+	"mqConfig": {
 		"providerName": "RabbitMQ",
-		"user" : "username for RabbitMq", 
-		"password" : "", 
-		"host" : "127.0.0.1", 
-		"exchange" : "iSight",
-		"agentControlXchg":"iAgent",
+		"user": "username for RabbitMq",
+		"password": "",
+		"host": "127.0.0.1",
+		"exchange": "iSight",
+		"agentControlXchg": "iAgent",
 		"awsAccessKey": "",
 		"awsSecretKey": "",
 		"awsRegion": ""
 	},
-	"subscribe" : {
-		"config" : "ITSM.SNOW.config"
+	"subscribe": {
+		"config": "ITSM.SNOW.config"
 	},
-	"publish" : {
-		"data" : "ITSM.SNOW.DATA",
-		"health" : "ITSM.SNOW.HEALTH"
+	"publish": {
+		"data": "ITSM.SNOW.DATA",
+		"health": "ITSM.SNOW.HEALTH"
 	},
-	"communication":{
-		"type" : "REST",
-    	"sslVerify": true,
-    	"responseType": "JSON" 
+	"communication": {
+		"type": "REST",
+		"sslVerify": false,
+		"responseType": "JSON"
 	},
 	"dynamicTemplate": {
-		"timeFieldMapping" : {
-			"startDate" : "%Y-%m-%d"
-  		},
-	  "responseTemplate" : {
+		"incidentMetaData": {
+			"labels": [
+				"INCIDENT"
+			],
+			"dataUpdateSupported": true,
+			"uniqueKey": [
+				"incidentNumber"
+			]
+		},
+		"changeResponseMetaData": {
+			"labels": [
+				"CHANGE_RESPONSE"
+			],
+			"dataUpdateSupported": true,
+			"uniqueKey": [
+				"number"
+			]
+		},
+		"timeFieldMapping": {
+			"startDate": "%Y-%m-%d"
+		},
+		"responseTemplate": {
 			"sha": "commitId",
-			"commit" : {
-				"author" : {
+			"commit": {
+				"author": {
 					"name": "authorName",
 					"date": "commitTime"
 				}
 			}
-	  }
+		}
 	},
-	"agentId" : "",
-	"toolCategory" : "ITSM",
-	"toolsTimeZone" : "GMT",
-	"insightsTimeZone" : "Asia/Kolkata",
-	"useResponseTemplate" : false,
+	"agentId": "",
+	"toolCategory": "ITSM",
+	"toolsTimeZone": "GMT",
+	"insightsTimeZone": "Asia/Kolkata",
+	"useResponseTemplate": false,
 	"enableValueArray": false,
 	"enableDataValidation": true,
-	"auth" : "base64",
-	"runSchedule" : 2,
-	"timeStampField":"commitTime",
-	"timeStampFormat":"%Y-%m-%d %H:%M:%S",
-	"isEpochTimeFormat" : false,
-	"agentSecretDetails": ["userid","passwd"],
-	"startFrom" : "2017-07-23 15:00:25",
+	"auth": "base64",
+	"runSchedule": 2,
+	"timeStampField": "commitTime",
+	"timeStampFormat": "%Y-%m-%d %H:%M:%S",
+	"isEpochTimeFormat": false,
+	"agentSecretDetails": [
+		"userid",
+		"passwd"
+	],
+	"startFrom": "2017-07-23 15:00:25",
 	"CR_Url": "/api/now/table/change_request?sysparm_display_value=true&sysparm_exclude_reference_link=true&sysparm_fields=number%2Capproval%2Crisk%2Ccategory%2Csys_id%2Copened_at%2Csys_updated_by%2Csys_updated_on%2Ccmdb_ci%2Crequested_by_date%2Copened_by%2Cassigned_to%2Cpriority%2Cimpact%2Csys_created_by%2Csys_mod_count%2Ctype%2Creason%2Cassignment_group%2Cdue_date%2Curgency%2Ccorrelation_id%2Creview_status%2Cshort_description%2Cphase%2Cstate&sysparm_query=sys_id%3D",
-	"CR_Approval_Url":	"/api/now/table/sysapproval_approver?sysparm_display_value=true&sysparm_fields=sysapproval%2Csys_updated_by%2Csys_id%2Cstate%2Cdue_date%2Csys_updated_on%2Csys_created_on&sysparm_query=sysapproval%3D",
+	"CR_Approval_Url": "/api/now/table/sysapproval_approver?sysparm_display_value=true&sysparm_fields=sysapproval%2Csys_updated_by%2Csys_id%2Cstate%2Cdue_date%2Csys_updated_on%2Csys_created_on&sysparm_query=sysapproval%3D",
 	"CR_sysid_url": "/api/now/table/change_request?sysparm_display_value=true&sysparm_exclude_reference_link=true&sysparm_fields=sys_id&sysparm_query=active%3Dtrue%5Esys_updated_onBETWEENjavascript%3Ags.dateGenerate(",
-	"IN_Url":"/api/now/table/incident?sysparm_display_value=true&sysparm_exclude_reference_link=true&sysparm_fields=number%2Ccaller_id%2Ccontact_type%2Cstate%2Clocation%2Cassignment_group%2Ccategory%2Cassigned_to%2Csubcategory%2Creassignment_count%2Cimpact%2Curgency%2Cpriority%2Cshort_description%2Cdescription%2Cu_duplicate_ticket_number%2Cproblem_id%2Crfc%2Ccaused_by&sysparm_query=sys_id%3D",
-	"IN_Approval_Url":"/api/now/table/sysapproval_group?sysparm_display_value=true&sysparm_exclude_reference_link=true&sysparm_fields=sys_updated_by%2Csys_created_by%2Csys_id%2Cstate%2Cdue_date%2Csys_updated_on%2Csys_created_on&sysparm_query=parent%3D",
-	"IN_sysid_url":"/api/now/table/incident?sysparm_display_value=true&sysparm_exclude_reference_link=true&sysparm_fields=sys_id&sysparm_query=active%3Dtrue%5Esys_updated_onBETWEENjavascript%3Ags.dateGenerate(",
+	"IN_Url": "/api/now/table/incident?sysparm_display_value=true&sysparm_exclude_reference_link=true&sysparm_fields=sys_tags%2Cnumber%2Csys_created_on%2Ccaller_id%2Ccontact_type%2Cstate%2Clocation%2Cassignment_group%2Ccategory%2Cassigned_to%2Csubcategory%2Creassignment_count%2Cimpact%2Curgency%2Cpriority%2Cshort_description%2Cdescription%2Cu_duplicate_ticket_number%2Cproblem_id%2Crfc%2Ccaused_by&sysparm_query=sys_id%3D",
+	"IN_Approval_Url": "/api/now/table/sysapproval_group?sysparm_display_value=true&sysparm_exclude_reference_link=true&sysparm_fields=sys_updated_by%2Csys_created_by%2Csys_id%2Cstate%2Cdue_date%2Csys_updated_on%2Csys_created_on&sysparm_query=parent%3D",
+	"IN_sysid_url": "/api/now/table/incident?sysparm_display_value=true&sysparm_exclude_reference_link=true&sysparm_fields=sys_id%2Csys_tags%2Csys_created_on&sysparm_query=active%3Dtrue%5Esys_updated_onBETWEENjavascript%3Ags.dateGenerate(",
 	"baseUrl": "#service-now.com",
 	"userid": "username",
 	"passwd": "",
-	"isDebugAllowed" : false,
-	"loggingSetting" : {
-		"logLevel" : "INFO",
-		"maxBytes" : 5000000,
-		"backupCount" : 10
+	"isDebugAllowed": false,
+	"loggingSetting": {
+		"logLevel": "INFO",
+		"maxBytes": 5000000,
+		"backupCount": 10
 	},
-	 
-	"enableProxy":false,
-  	"proxies":{
-    	"http":"",
-    	"https":""
-    }
+	"enableProxy": false,
+	"proxies": {
+		"http": "",
+		"https": ""
+	}
 }

@@ -42,29 +42,30 @@ public class PublishEventTest {
 
 	@BeforeTest
 	public void init() throws Exception {
+		try (FileReader reader = new FileReader("src/test/resources/properties.prop")) {
+			p = new Properties();
 
-		FileReader reader = new FileReader("src/test/resources/properties.prop");
+			p.load(reader);
 
-		p = new Properties();
-
-		p.load(reader);
-
-		AppProperties.mqHost = p.getProperty("mqHost");
-		AppProperties.port = Integer.parseInt(p.getProperty("port"));
-		AppProperties.mqUser = p.getProperty("mqUser");
-		AppProperties.mqPassword = p.getProperty("mqPassword");
-		AppProperties.mqExchangeName = p.getProperty("mqExchangeName");
-		AppProperties.instanceName = "testInstance";
-		AppProperties.providerName = p.getProperty("providerName");
-		AppProperties.awsAccessKey = p.getProperty("awsAccessKey");
-		AppProperties.awsSecretKey = p.getProperty("awsSecretKey");
-		AppProperties.awsRegion = p.getProperty("awsRegion");
-		if (AppProperties.getProviderName().equals("AWSSQS")) {
-			messageFactory = new WebhookMessagePublisherSQS();
-		} else {
-			messageFactory = new WebHookMessagePublisherMQ();
+			AppProperties.mqHost = p.getProperty("mqHost");
+			AppProperties.port = Integer.parseInt(p.getProperty("port"));
+			AppProperties.mqUser = p.getProperty("mqUser");
+			AppProperties.mqPassword = p.getProperty("mqPassword");
+			AppProperties.mqExchangeName = p.getProperty("mqExchangeName");
+			AppProperties.instanceName = "testInstance";
+			AppProperties.providerName = p.getProperty("providerName");
+			AppProperties.awsAccessKey = p.getProperty("awsAccessKey");
+			AppProperties.awsSecretKey = p.getProperty("awsSecretKey");
+			AppProperties.awsRegion = p.getProperty("awsRegion");
+			if (AppProperties.getProviderName().equals("AWSSQS")) {
+				messageFactory = new WebhookMessagePublisherSQS();
+			} else {
+				messageFactory = new WebHookMessagePublisherMQ();
+			}
+			messageFactory.initializeConnection();
+		} catch (Exception e) {
+			log.error("Error while initialization {} ", e.getMessage());
 		}
-		messageFactory.initializeConnection();
 	}
 
 	@Test

@@ -21,61 +21,58 @@
 source /etc/environment
 source /etc/profile
 
+#Form Neo4j token
+neo4jToken=$(echo -n $INSIGHTS_NEO4J_USERNAME:$INSIGHTS_NEO4J_PASSWORD | base64)
+
 #Framing Endpoint Url
-neo4jEndpoint=http://$neo4jIP:$neo4jHttpPort
-neo4jBoltEndpoint=http://$neo4jIP:$neo4jBoltPort
-neo4jToken=$(echo -n $neo4jUser:$neo4jPassword | base64)
-grafanaDBEndpoint=jdbc:postgresql://$postgresIP:$postgresPort/grafana
-insightsDBUrl=jdbc:postgresql://$postgresIP:$postgresPort/insight
-grafanaDBUrl=jdbc:postgresql://$postgresIP:$postgresPort/grafana
+grafanaDBEndpoint=jdbc:postgresql://$POSTGRES_HOST:$POSTGRES_PORT/grafana
+insightsDBUrl=jdbc:postgresql://$POSTGRES_HOST:$POSTGRES_PORT/insight
+grafanaDBUrl=jdbc:postgresql://$POSTGRES_HOST:$POSTGRES_PORT/grafana
+# if [[ ! -z $enablespin ]]
+# then
+#     hostname="insightsdomain.subdomain.com"
+# else
+#     hostname=$UI_ENDPOINT
+# fi
 
-if [[ ! -z $enablespin ]]
-then
-    hostname="insightsdomain.subdomain.com"
-else
-    hostname=$hostPublicIP
-fi
 
-ServiceEndpoint=http://$hostname:$servicePort
-insightsServiceURL=http://$hostname:$servicePort/
-insightsUIURL=http://$hostname:$uiPort/
-grafanaEndpoint=http://$hostPrivateIP:$grafanaPort
-
-#UPDATE ServiceEndpoint - uiConfig.json and server-config.json
+#UPDATE server-config.json
 configPath='/usr/INSIGHTS_HOME/.InSights/server-config.json'
 dos2unix $configPath
 
 
-jq --arg grafanaEndpoint $grafanaEndpoint '(.grafana.grafanaEndpoint) |= $grafanaEndpoint' $configPath  > INPUT.tmp && mv INPUT.tmp $configPath
+jq --arg grafanaEndpoint $GRAFANA_ENDPOINT_PRIVATE '(.grafana.grafanaEndpoint) |= $grafanaEndpoint' $configPath  > INPUT.tmp && mv INPUT.tmp $configPath
 jq --arg grafanaDBEndpoint $grafanaDBEndpoint '(.grafana.grafanaDBEndpoint) |= $grafanaDBEndpoint' $configPath  > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg postgresIP $postgresIP --arg hostPublicIP $hostPublicIP --arg insightsUIURL $insightsUIURL '(.trustedHosts) |= .+ [$postgresIP,$hostPublicIP,$insightsUIURL]' $configPath  > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg neo4jEndpoint $neo4jEndpoint '(.graph.endpoint) |= $neo4jEndpoint' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
+jq --arg postgresIP $POSTGRES_HOST --arg ServiceEndpoint $SERVICE_ENDPOINT --arg ServiceHostPublic $SERVICE_HOST_PUBLIC --arg insightsUIURL $UI_ENDPOINT '(.trustedHosts) |= .+ [$postgresIP,$ServiceEndpoint,$ServiceHostPublic,$insightsUIURL]' $configPath  > INPUT.tmp && mv INPUT.tmp $configPath
+jq --arg neo4jEndpoint $INSIGHTS_NEO4J_ENDPOINT '(.graph.endpoint) |= $neo4jEndpoint' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
 jq --arg neo4jToken $neo4jToken '(.graph.authToken) |= $neo4jToken' $configPath  > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg neo4jBoltEndpoint $neo4jBoltEndpoint '(.graph.boltEndPoint) |= $neo4jBoltEndpoint' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg grafanaDBUser $grafanaDBUser '(.postgre.userName) |= $grafanaDBUser' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg grafanaDBPass $grafanaDBPass '(.postgre.password) |= $grafanaDBPass' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
+jq --arg neo4jBoltEndpoint $INSIGHTS_NEO4J_BOLTENDPOINT '(.graph.boltEndPoint) |= $neo4jBoltEndpoint' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
+jq --arg grafanaDBUser $GRAFANA_DB_USERNAME '(.postgre.userName) |= $grafanaDBUser' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
+jq --arg grafanaDBPass $GRAFANA_DB_PASSWORD '(.postgre.password) |= $grafanaDBPass' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
 jq --arg insightsDBUrl $insightsDBUrl '(.postgre.insightsDBUrl) |= $insightsDBUrl' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
 jq --arg grafanaDBUrl $grafanaDBUrl '(.postgre.grafanaDBUrl) |= $grafanaDBUrl' $configPath  > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg rabbitmqIP $rabbitmqIP '(.messageQueue.host) |= $rabbitmqIP' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg rabbitMqUser $rabbitMqUser '(.messageQueue.user) |= $rabbitMqUser' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg rabbitMqPassword $rabbitMqPassword '(.messageQueue.password) |= $rabbitMqPassword' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg rabbitMqPort $rabbitMqPort '(.messageQueue.port) |= $rabbitMqPort' $configPath  > INPUT.tmp && mv INPUT.tmp $configPath
-jq --arg insightsServiceURL $ServiceEndpoint '(.insightsServiceURL) |= $insightsServiceURL' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
+jq --arg rabbitmqIP $RABBITMQ_HOST '(.messageQueue.host) |= $rabbitmqIP' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
+jq --arg rabbitMqUser $RABBITMQ_USERNAME '(.messageQueue.user) |= $rabbitMqUser' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
+jq --arg rabbitMqPassword $RABBITMQ_PASSWORD '(.messageQueue.password) |= $rabbitMqPassword' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
+jq --arg rabbitMqPort $RABBITMQ_PORT '(.messageQueue.port) |= $rabbitMqPort' $configPath  > INPUT.tmp && mv INPUT.tmp $configPath
+jq --arg insightsServiceURL $SERVICE_ENDPOINT '(.insightsServiceURL) |= $insightsServiceURL' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
+jq --arg offlineAgentPath '/opt/insightsagents/offline' '(.agentDetails.offlineAgentPath) |= $offlineAgentPath' $configPath  > INPUT.tmp && mv INPUT.tmp $configPath
+jq --arg unzipPath '/opt/insightsagents/unzip' '(.agentDetails.unzipPath) |= $unzipPath' $configPath > INPUT.tmp && mv INPUT.tmp $configPath
 
 sed -i "s/\r$//g" $configPath
 
 PROMTAIL_PORT=${PROMTAIL_LISTEN_PORT} yq e  -i '.server.http_listen_port = env(PROMTAIL_PORT)' /opt/InSights/Promtail/promtail-local-config.yaml
-LOKI="http://${LOKI_HOST}:${LOKI_PORT}/loki/api/v1/push" yq e  -i '.clients[0].url = strenv(LOKI)' /opt/InSights/Promtail/promtail-local-config.yaml
+LOKI="$LOKI_ENDPOINT/loki/api/v1/push" yq e  -i '.clients[0].url = strenv(LOKI)' /opt/InSights/Promtail/promtail-local-config.yaml
 
 
-until `nc -z $hostname $grafanaPort`; do
+until `nc -z $GRAFANA_HOST $GRAFANA_PORT`; do
     echo "Waiting on Grafana to come up..."
     sleep 10
 done
   # add some delay after port is up to validate that services are all up
 sleep 10
 
-until `nc -z $neo4jIP $neo4jHttpPort`; do
+until `nc -z $INSIGHTS_NEO4J_HOST $INSIGHTS_NEO4J_PORT`; do
     echo "Waiting on neo4j to come up..."
     sleep 10
 done
@@ -88,7 +85,7 @@ source /etc/profile
 
 #starting services
 cd /opt/PlatformService/ && nohup java  -Xmx1024M -Xms512M  -jar /opt/PlatformService/PlatformService.jar  > /dev/null 2>&1 &
-if [ "$enablePromtail" == true ]
+if [ "$PROMTAIL_ENABLE" == true ]
 then
  sh +x /etc/init.d/InsightsPromtail start
 fi

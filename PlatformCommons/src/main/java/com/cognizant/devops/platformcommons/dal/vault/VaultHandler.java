@@ -86,7 +86,6 @@ public class VaultHandler {
 			JsonObject requestJson = new JsonObject();
 			requestJson.addProperty(PlatformServiceConstants.VAULT_DATA_VALUE, dataJson);
 			log.debug("url  {} ", url);
-			//log.debug("Request body for vault {} -- ", requestJson);
 			response = RestApiHandler.doPost(url, requestJson, headers);
 
 		} catch (Exception e) {
@@ -106,8 +105,6 @@ public class VaultHandler {
 				headers.put(PlatformServiceConstants.VAULT_TOKEN, vaultToken);
 				JsonObject requestJson = new JsonObject();
 				requestJson.addProperty(PlatformServiceConstants.VAULT_DATA_VALUE, String.valueOf(dataJson));
-			//	log.debug("url  {} ", vaultServerConfigURL);
-				//log.debug("Request body for vault {} -- ", requestJson);
 				response = RestApiHandler.doPost(vaultServerConfigURL, requestJson, headers);
 			}else {
 				throw new InsightsCustomException("Vault_sealed : Vault is not ready, make sure vault is unsealed ");
@@ -128,7 +125,6 @@ public class VaultHandler {
 				String vaultServerConfigURL = vaultUrl
 						+ "/sys/raw/" + vaultSecretEngine+ "/"
 						+ clientId + "/serverConfig";
-				//log.debug(" vaultServerConfigURL {} ", vaultServerConfigURL);
 				String dataFromVault = fetchFromVaultDB(vaultServerConfigURL,vaultToken);
 				if(dataFromVault !=null) {
 					JsonObject parsedJson = JsonUtils.parseStringAsJsonObject(dataFromVault);
@@ -140,6 +136,7 @@ public class VaultHandler {
 						log.error("Reading server config from Vault is not proper format {} ");
 					}
 				}else {
+		
 					log.debug("No Data found in vault ");
 				}
 			}else {

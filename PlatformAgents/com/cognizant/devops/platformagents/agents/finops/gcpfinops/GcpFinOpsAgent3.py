@@ -183,7 +183,7 @@ class GcpFinOpsAgent(BaseAgent):
         WHERE export_time >= '"""+str(self.periodStartDate)+"""'              
         GROUP BY """+groupbyList+"""      
         """
-        self.baseLogger.info('select query: '+ query)
+        self.baseLogger.info('select query')
         self.df = BQ.query(query).result().to_dataframe()        
         
 

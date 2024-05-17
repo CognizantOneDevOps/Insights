@@ -1,0 +1,10 @@
+[Unit]
+Description=Ubuntu InSightsReplicaDaemon Service
+
+[Service]
+Type=forking
+ExecStart=/bin/bash /opt/insightsagents/ReplicaDaemon/InSightsReplicaDaemon.sh start
+ExecStop=/bin/bash /opt/insightsagents/ReplicaDaemon/InSightsReplicaDaemon.sh stop
+
+[Install]
+WantedBy=multi-user.target

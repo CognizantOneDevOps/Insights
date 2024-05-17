@@ -29,7 +29,7 @@ public class GrafanaUserDetailsTestData extends AbstractTestNGSpringContextTests
 	Map<String, String> testAuthData = new HashMap<>();
 	String AUTHORIZATION = "authorization";
 	String accept = "application/json, text/plain, */*";
-	String authorization = "";
+	String authorizationToken = "";
 	String origin = "http://localhost:8181";
 	String referer = "http://localhost:8181/app";
 	String contentType = "application/json";
@@ -37,5 +37,4 @@ public class GrafanaUserDetailsTestData extends AbstractTestNGSpringContextTests
 	String authorizationException = "";
 	String host = "insights.cogdevops.com";
 	String contentTypeException = "application/json";
-//	String invalidToken = "asfghjdvshagasdhkajs";
 }

@@ -260,7 +260,8 @@ class BaseAgent(object):
 
         def callback(ch, method, properties, data):
             # Update the config file and cache.
-            action = data
+            actionData = json.loads(data.decode('utf-8'))
+            action = actionData["action"]
             if "STOP" == action:
                 self.shouldAgentRun = False
                 self.publishHealthData(self.generateHealthData(note="Agent is in STOP mode"))
@@ -380,7 +381,7 @@ class BaseAgent(object):
                     errorFlag = True
                     showErrorMessage = True
                     self.baseLogger.error(
-                        'Value is not in expected format, nested JSON encountered.Rejecting: ' + str(filtered_json))
+                        'Value is not in expected format, nested JSON encountered.Rejecting')
                     break
             if not errorFlag:
                 corrected_json_array.append(each_json)

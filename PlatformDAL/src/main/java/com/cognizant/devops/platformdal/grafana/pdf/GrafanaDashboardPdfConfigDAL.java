@@ -183,4 +183,19 @@ public class GrafanaDashboardPdfConfigDAL extends BaseDAL {
 		}
 	}
 	
+	public GrafanaDashboardPdfConfig fetchGrafanaDashboardDetailsByTitle(String title) {
+		try {
+			log.debug(title);
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("title", title);
+			GrafanaDashboardPdfConfig result = getUniqueResult( "FROM GrafanaDashboardPdfConfig a WHERE a.title = :title",
+					GrafanaDashboardPdfConfig.class,
+					parameters);
+			return result;
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
+	}
+	
 }

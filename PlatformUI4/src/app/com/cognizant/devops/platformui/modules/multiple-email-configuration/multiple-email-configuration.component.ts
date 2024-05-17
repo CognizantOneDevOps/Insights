@@ -105,7 +105,6 @@ export class MultipleEmailConfigurationComponent implements OnInit {
       this.source = params.source;
     });
     this.getAllConfig();
-    console.log("arr" + this.selectedEmailConfig);
   }
 
   async getAllConfig() {
@@ -122,9 +121,6 @@ export class MultipleEmailConfigurationComponent implements OnInit {
     );
     this.emailConfigSourceList.data = this.responseForMailConfig.data;
 
-    console.log(this.responseForMailConfig);
-    console.log("emailConfigSrc");
-    console.log(this.emailConfigSourceList.data);
     if (
       this.responseForMailConfig.data != null &&
       this.responseForMailConfig.status == "success"
@@ -134,6 +130,7 @@ export class MultipleEmailConfigurationComponent implements OnInit {
       //this.showPagination = true;
       var dataArray = this.mailConfigList;
       if (dataArray != undefined) {
+        this.detailedRecords = [];
         dataArray.forEach((key) => {
           var obj = key;
           if (typeof obj["lastRun"] !== "undefined") {
@@ -162,7 +159,6 @@ export class MultipleEmailConfigurationComponent implements OnInit {
           }
           this.detailedRecords.push(obj);
         });
-
         this.userDataSource.data = this.detailedRecords;
         this.userDataSource.paginator = this.paginator;
 
@@ -341,8 +337,8 @@ export class MultipleEmailConfigurationComponent implements OnInit {
       this.dialog.open(WorkflowHistoryDetailsDialog, {
         disableClose: true,
         panelClass: "custom-dialog-container",
-        height: "1170px",
-        width: "550px",
+        height: "85%",
+        width: "85%",
         data: {
           reportName: batchName,
           workflowId: workflowId
@@ -380,12 +376,15 @@ export class MultipleEmailConfigurationComponent implements OnInit {
           .setActiveStatus(JSON.stringify(setStatusForEmail))
           .then(function (data) {
             if (data.status == "success") {
-              console.log("status changed");
-            } else {
-              this.messageDialog.openSnackBar(
-                "Failed to update state.Please check logs for more details.",
-                "error"
+              self.messageDialog.openSnackBar(
+                "Successfully updated state",
+                data.status
               );
+            } else {
+                self.messageDialog.openSnackBar(
+                  "Failed to update state.Please check logs for more details.",
+                  "error"
+               );
             }
           });
       } else {

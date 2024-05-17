@@ -163,7 +163,7 @@
         </mat-form-field>
       </div>
       <div class="grid-item">
-        <div class="lblCss">Pdf Type<span class="asteriskText">*</span></div>
+        <div class="lblCss">Type<span class="asteriskText">*</span></div>
         <mat-form-field appearance="fill" class="columnComponent">
           <mat-select
             [(ngModel)]="pdfType"
@@ -173,8 +173,9 @@
             (ngModelChange)="changePdftype($event)"
             id="Select PdfType"
           >
-            <mat-option value="Dashboard">Dashboard View</mat-option>
-            <mat-option value="Printable">Printable View</mat-option>
+            <mat-option value="Dashboard">Dashboard PDF View</mat-option>
+            <mat-option value="Printable">Printable PDF View</mat-option>
+            <mat-option value="Spreadsheet">Spreadsheet View</mat-option>
           </mat-select>
           <mat-icon
             matSuffix

@@ -31,10 +31,10 @@ RUN apk update && \
     apk add --no-cache bash && \
     apk add --update openjdk11 && \
     set -ex && apk --no-cache add sudo && \
-    mkdir /opt/offlineAgent && \
     mkdir /opt/PlatformAgent && \
     mkdir /opt/PlatformService && \
-    mkdir /usr/INSIGHTS_HOME /opt/grafana /opt/insightsengine/ /opt/InSights/  mkdir /opt/insightsWebhook/ /opt/InSights/Promtail
+    mkdir /usr/INSIGHTS_HOME /opt/InSights/ /opt/InSights/Promtail /opt/insightsagents /opt/insightsagents/offline /opt/insightsagents/unzip
+
 
 #Install jq - json processor
 RUN wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && \

@@ -249,7 +249,7 @@ public class WebhookEngineTest {
 	}
 	
 	@Test(priority = 11)
-	public void testNeo4jData() {
+	public void testNeo4jDataQuery() {
 		GraphDBHandler dbHandler = new GraphDBHandler();
 		String query = "MATCH (n:GIT_UNTEST) where exists(n.execId) return count(n) as Total";
 		GraphResponse neo4jResponse;

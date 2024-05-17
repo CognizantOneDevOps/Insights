@@ -702,9 +702,8 @@ class ElasticTransferAgent(BaseAgent):
               docker_auth={'username':'','password':''}
               docker_auth['username']=self.getCredential('docker_repo_username')
               docker_auth['password']=self.getCredential('docker_repo_passwd')
-              for line in cli.pull(dockerImage, auth_config=docker_auth, stream=True):
-                  self.baseLogger.error(json.dumps(json.loads(line), indent=4 ))
-            
+#               for line in cli.pull(dockerImage, auth_config=docker_auth, stream=True):
+#                   self.baseLogger.error(json.dumps(json.loads(line), indent=4 ))          
             #fetch the import volume mapping for temporary container      
             temp_volume_bind = []
             for volume_config in volume:

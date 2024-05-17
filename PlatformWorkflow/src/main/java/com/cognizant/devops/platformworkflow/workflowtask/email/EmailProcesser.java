@@ -110,18 +110,18 @@ public class EmailProcesser implements Callable<JsonObject> {
 			sendFinalEmail(session, msg);
 			isMailSent = true;
 			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-			logDebugStatement(mail,processingTime,"-");			
+			logDebugStatement(mail, processingTime, "-");
 		} catch (MessagingException e) {
 			log.error("Workflow Detail ==== ReportEmailSubscriber Unable to create Mime Message ===== ", e);
-			logErrorStatement(mail,e.getMessage());		
+			logErrorStatement(mail, e.getMessage());
 			throw new InsightsCustomException("Unable to create Mime Message");
 		} catch (UnsupportedEncodingException e) {
 			log.error("Workflow Detail ==== ReportEmailSubscriber Message Encoding not supported ===== ", e);
-			logErrorStatement(mail,e.getMessage());			
+			logErrorStatement(mail, e.getMessage());
 			throw new InsightsCustomException("Message Encoding not supported!");
 		} catch (Exception e) {
 			log.error("Workflow Detail ==== ReportEmailSubscriber Message ", e);
-			logErrorStatement(mail,e.getMessage());				
+			logErrorStatement(mail, e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
 		}
 		return isMailSent;
@@ -133,18 +133,25 @@ public class EmailProcesser implements Callable<JsonObject> {
 			String htmlText = mail.getMailBody();
 			Multipart multipart = new MimeMultipart();
 			// Create the attachment part
-			if (mail.getMailAttachments()!= null && mail.getMailAttachments().size() > 0) {
+			if (mail.getMailAttachments() != null && mail.getMailAttachments().size() > 0) {
 				for (Entry<String, byte[]> entry : mail.getMailAttachments().entrySet()) {
 					BodyPart messageBodyPart = new MimeBodyPart();
 					InputStream inputStream = new ByteArrayInputStream(entry.getValue());
-					ByteArrayDataSource bds = new ByteArrayDataSource(inputStream, "application/pdf");
-					log.debug("Workflow Detail ==== Attaching file from {} ", mail.getReportFilePath());
-					messageBodyPart.setDataHandler(new DataHandler(bds));
-					messageBodyPart.setFileName(entry.getKey() + ".pdf");
+					if (entry.getKey().contains(".xlsx")) {
+						ByteArrayDataSource bds = new ByteArrayDataSource(inputStream, "application/xlsx");
+						log.debug("Workflow Detail ==== Attaching file from {} ", mail.getReportFilePath());
+						messageBodyPart.setDataHandler(new DataHandler(bds));
+						messageBodyPart.setFileName(entry.getKey());
+					} else {
+						ByteArrayDataSource bds = new ByteArrayDataSource(inputStream, "application/pdf");
+						log.debug("Workflow Detail ==== Attaching file from {} ", mail.getReportFilePath());
+						messageBodyPart.setDataHandler(new DataHandler(bds));
+						messageBodyPart.setFileName(entry.getKey() + ".pdf");
+					}
 					multipart.addBodyPart(messageBodyPart);
 				}
-			}	
-		
+			}
+
 			// Create the HTML Part
 			BodyPart htmlBodyPart = new MimeBodyPart();
 			htmlBodyPart.setContent(htmlText, "text/html");
@@ -153,10 +160,10 @@ public class EmailProcesser implements Callable<JsonObject> {
 			msg.setContent(multipart);
 			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
 			log.debug("Workflow Detail ==== ReportEmailSubscriber  Mime Message created =====  ");
-			logDebugStatement(mail,processingTime,"-");			
+			logDebugStatement(mail, processingTime, "-");
 		} catch (MessagingException | IOException e) {
 			log.error("Workflow Detail ==== ReportEmailSubscriber Unable to create Mime Message =====  ", e);
-			logErrorStatement(mail,e.getMessage());			
+			logErrorStatement(mail, e.getMessage());
 			throw new InsightsCustomException("Unable to create Mime Message");
 		}
 		return msg;
@@ -188,25 +195,25 @@ public class EmailProcesser implements Callable<JsonObject> {
 			}
 		}
 	}
-	
-	private void logDebugStatement(MailReport mail,long processingTime,String message)
-	{
+
+	private void logDebugStatement(MailReport mail, long processingTime, String message) {
 		mail.getMailAttachments().forEach((attachmentName, fileData) -> {
-			log.debug("Type = EmailProcesser mailTo={}  mailCC={} mailBCC={} emailAttachmentName={} "
-					+ "reportFilePath={} processingTime={} message={}" ,mail.getMailTo()
-					,mail.getMailCC(),mail.getMailBCC(), attachmentName
-					,mail.getReportFilePath(),processingTime,message);
+			log.debug(
+					"Type = EmailProcesser mailTo={}  mailCC={} mailBCC={} emailAttachmentName={} "
+							+ "reportFilePath={} processingTime={} message={}",
+					mail.getMailTo(), mail.getMailCC(), mail.getMailBCC(), attachmentName, mail.getReportFilePath(),
+					processingTime, message);
 		});
-		
+
 	}
-	
-	private void logErrorStatement(MailReport mail,String message)
-	{
+
+	private void logErrorStatement(MailReport mail, String message) {
 		mail.getMailAttachments().forEach((attachmentName, fileData) -> {
-		log.error("Type = EmailProcesser mailTo={}  mailCC={} mailBCC={} emailAttachmentName={} "
-				+ "reportFilePath={}  processingTime={} message={}" ,mail.getMailTo()
-				,mail.getMailCC(),mail.getMailBCC(), attachmentName
-				,mail.getReportFilePath(),0,message);
+			log.error(
+					"Type = EmailProcesser mailTo={}  mailCC={} mailBCC={} emailAttachmentName={} "
+							+ "reportFilePath={}  processingTime={} message={}",
+					mail.getMailTo(), mail.getMailCC(), mail.getMailBCC(), attachmentName, mail.getReportFilePath(), 0,
+					message);
 		});
 	}
 

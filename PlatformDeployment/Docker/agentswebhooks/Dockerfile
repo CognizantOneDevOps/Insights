@@ -26,7 +26,7 @@ RUN apk update && \
     apk --no-cache add procps && \
     apk add --no-cache bash && \
     set -ex && apk --no-cache add sudo && \
-    mkdir /usr/INSIGHTS_HOME /opt/insightsagents /opt/insightsagents/AgentDaemon /opt/insightsagents/PlatformAgents /opt/insightsWebhook
+    mkdir -p /usr/INSIGHTS_HOME /opt/insightsagents /opt/insightsagents/AgentDaemon /opt/insightsagents/PlatformAgents /opt/insightsWebhook
 
 ENV INSIGHTS_AGENT_HOME=/opt/insightsagents
 
@@ -52,7 +52,7 @@ RUN cd /usr/INSIGHTS_HOME && \
 
 ENV INSIGHTS_HOME=/usr/INSIGHTS_HOME
 
-RUN pip install pika  requests apscheduler python-dateutil xmltodict pytz requests_ntlm boto3 urllib3 neotime neo4j neobolt elasticsearch
+RUN pip install pika==1.3.2 requests==2.31.0 apscheduler==3.10.1 python-dateutil==2.8.2 xmltodict==0.13.0 pytz requests_ntlm==1.2.0 boto3==1.34.75 urllib3 neotime neo4j==4.4.4 neobolt elasticsearch pathvalidate==3.2.0
 
 # Installing Agents config
 WORKDIR /opt/insightsagents

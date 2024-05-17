@@ -17,6 +17,7 @@ ARG BASE_IMAGE=grafana-oss:10.0.0
 FROM grafana/${BASE_IMAGE} as grafanaalpine
 
 FROM alpine:latest
+ARG INSIGHTSRELEASE=9.7
 
 RUN apk update && \
     apk add wget unzip vim && \
@@ -32,14 +33,13 @@ ENV GRAFANA_HOME=/opt/grafana
 WORKDIR /opt/grafana
 
 RUN chmod -R 766 /opt/grafana && echo GRAFANA_HOME=`pwd` | tee -a /etc/environment && echo "export" GRAFANA_HOME=`pwd` | tee -a /etc/profile && \
-    mkdir /opt/Insightsrepo && cd /opt/Insightsrepo && wget https://github.com/CognizantOneDevOps/Insights/archive/refs/heads/master.zip -O Insightsrepo.zip && \
-    unzip Insightsrepo.zip && \
+    mkdir /opt/Grafanaplugins && cd /opt/Grafanaplugins && wget https://github.com/CognizantOneDevOps/Insights/releases/download/v${INSIGHTSRELEASE}/grafanaplugins-${INSIGHTSRELEASE}.zip -O Grafanaplugins.zip && \
+    unzip Grafanaplugins.zip && \
     mkdir /opt/grafana/data && \
     mkdir /opt/grafana/data/plugins && \
     chmod -R 777 /opt/grafana/data && \
-    cp -r /opt/Insightsrepo/Insights-master/PlatformGrafanaPlugins/Panels/* /opt/grafana/data/plugins/ && \
-    cp -r /opt/Insightsrepo/Insights-master/PlatformGrafanaPlugins/DataSources/* /opt/grafana/data/plugins/ && \
-    rm -rf /opt/Insightsrepo/* && \
+    cp -r /opt/Grafanaplugins/* /opt/grafana/data/plugins/ && \
+    rm -rf /opt/Grafanaplugins/* && \
     cd /opt/grafana/public/dashboards && \
     wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformGrafanaPlugins/ScriptedDashboard/iSight_ui3.js && \
     cd /opt/grafana/conf && \

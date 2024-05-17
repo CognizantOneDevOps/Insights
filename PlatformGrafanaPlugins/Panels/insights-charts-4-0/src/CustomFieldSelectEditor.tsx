@@ -1,6 +1,6 @@
 import React, { FormEvent, useState, useEffect } from "react";
 import { StandardEditorProps, FieldType, SelectableValue, PanelModel } from "@grafana/data";
-import { Select, TextArea, Button, useTheme2 } from "@grafana/ui";
+import { Select, TextArea, Button, useTheme2, Field, Switch } from "@grafana/ui";
 import jquery from 'jquery';
 import _ from 'lodash';
 import { ColumnModel, ChartData } from 'models/ChartModel';
@@ -18,6 +18,7 @@ interface ChartModelMapping {
   columnModel: ColumnModel[];
   transformDataInstruction: string;
   joinInstructions: string;
+  enableTrend: boolean;
   dataArray: ChartData[];
   panel: PanelModel;
 }
@@ -43,6 +44,7 @@ export const CustomFieldSelectEditor: React.FC<Props> = ({
   const [chartType, setChartType] = useState<string>("");
   const [columnModel, setColumnModel] = useState<ColumnModel[]>([]);
   const [chartDataArray, setChartDataArray] = useState<ChartData[]>([]);
+  const [enableTrend, setEnableTrend] = useState<boolean>(false);
 
   useEffect(() => {
     if (context.options.hasOwnProperty("chartFields")) {
@@ -82,6 +84,9 @@ export const CustomFieldSelectEditor: React.FC<Props> = ({
       if ('columnModel' in context.options.chartFields) {
         setColumnModel(context.options.chartFields.columnModel);
       }
+      if('enableTrend' in context.options.chartFields){
+        setEnableTrend(context.options.chartFields.enableTrend)
+      }
       else {
         setColumnModel([new ColumnModel("", "")]);
       }
@@ -103,11 +108,16 @@ export const CustomFieldSelectEditor: React.FC<Props> = ({
     onChange({ ...value, chartOptions: event.currentTarget.value });
   };
 
+  const onEnableTrendChange = (index: number) => () => {
+   setEnableTrend((prev) => !prev)
+   onChange({ ...value, enableTrend: !enableTrend });
+  }
+
   const onColumnModelChange = (columnName: string, refId: string) => (option: SelectableValue<string>) => {
     const i = columnModel.findIndex(element => element.name === columnName && element.refId === refId);
-    if (i > -1){
-		columnModel[i].type = option.value;
-	}
+    if (i > -1) {
+      columnModel[i].type = option.value;
+    }
     else {
       columnModel.push(new ColumnModel(columnName, option.value, refId))
     }
@@ -323,6 +333,14 @@ export const CustomFieldSelectEditor: React.FC<Props> = ({
           <div>
             {itemrows}
           </div>
+          <br />
+          {chartType === "LineChart" && <Field label="Enable Trend indicator">
+            <label>
+              <Switch value={enableTrend} disabled={false} transparent={true}
+              onChange={onEnableTrendChange(1)}
+              />
+            </label>
+          </Field>}
           <div style={{ paddingBottom: "20px;" }}>
             <label>Data Transformation Instructions</label>
             <TextArea placeholder="Data Transformation Instructions" cols={10} value={dataTransform}

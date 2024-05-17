@@ -65,6 +65,8 @@ public class InsightsResponseHeaderWriterFilter extends OncePerRequestFilter {
 			response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
 			response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
 			
+			// Adding Strict-Transport-Security header
+			response.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
 			if ("JWT".equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
 				response.setHeader("X-Frame-Options", "ALLOW-FROM "
 					+ ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getJwtTokenOriginServerURL());

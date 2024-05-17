@@ -16,10 +16,14 @@
 
 
 
-FROM centos:7
+FROM centos:8
 LABEL maintainer="Onedevops Insights"
 
 ARG INSIGHTSRELEASE=9.7
+
+RUN cd /etc/yum.repos.d/
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
 
 # Creating cofig folders
 
@@ -30,13 +34,23 @@ RUN yum update -y && \
     yum install -y java-11-openjdk-devel && \
     yum install -y bash && \
     yum install -y libXcomposite libXdamage libXtst cups libXScrnSaver pango atk adwaita-cursor-theme adwaita-icon-theme at at-spi2-atk at-spi2-core cairo-gobject colord-libs dconf desktop-file-utils ed emacs-filesystem gdk-pixbuf2 glib-networking gnutls gsettings-desktop-schemas gtk-update-icon-cache gtk3 hicolor-icon-theme jasper-libs json-glib libappindicator-gtk3 libdbusmenu libdbusmenu-gtk3 libepoxy liberation-fonts liberation-narrow-fonts liberation-sans-fonts liberation-serif-fonts libgusb libindicator-gtk3 libmodman libproxy libsoup libwayland-cursor libwayland-egl libxkbcommon m4 mailx nettle patch psmisc redhat-lsb-core redhat-lsb-submod-security rest spax time trousers xdg-utils xkeyboard-config alsa-lib  && \
+    yum install -y libnotify.so.4 libopus.so.0 libwoff2dec.so.1.0.2 libharfbuzz-icu.so.0 libgcrypt.so.20 libgstapp-1.0.so.0 libgstbase-1.0.so.0 libgstreamer-1.0.so.0 libgstpbutils-1.0.so.0 libgstaudio-1.0.so.0 libgsttag-1.0.so.0 libgstvideo-1.0.so.0 libgstgl-1.0.so.0 libgstcodecparsers-1.0.so.0 libgstfft-1.0.so.0 libpng16.so.16 libwebpdemux.so.2 libenchant.so.1 libsecret-1.so.0 libhyphen.so.0 libGLESv2.so.2 && \
     set -ex && yum install -y sudo && \
-    mkdir /usr/INSIGHTS_HOME  /opt/insightsengine/ /opt/InSights/ /opt/insightsWorkflow/ /usr/INSIGHTS_HOME/workflowjar/ /opt/InSights/Promtail/
+    mkdir /usr/INSIGHTS_HOME  /opt/insightsengine/ /opt/InSights/ /opt/insightsWorkflow/ /usr/INSIGHTS_HOME/workflowjar/ /usr/INSIGHTS_HOME/assessmentReportPdfTemplate/ /usr/INSIGHTS_HOME/assessmentReportPdfTemplate/executionsDetail/ /opt/InSights/Promtail/
+
+#Install lib req for playwright
+RUN cd /opt && \
+    wget http://mirror.centos.org/centos/8-stream/AppStream/x86_64/os/Packages/libwebp-1.0.0-1.el8.x86_64.rpm && \
+    yum install -y libwebp-1.0.0-1.el8.x86_64.rpm
 
 #Install jq - json processor
 RUN wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && \
     chmod +x ./jq && \
     cp jq /usr/bin
+
+RUN mkdir /usr/INSIGHTS_HOME/dashboardReportTemplate/ && \
+    cd /usr/INSIGHTS_HOME/dashboardReportTemplate && \
+    wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformReports/src/main/resources/dashboardReportElement.json
 
 
 # Initial Setup

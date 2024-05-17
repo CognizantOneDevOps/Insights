@@ -314,17 +314,30 @@ export class DashboardListComponent implements OnInit {
   }
 
   async downloadPDF() {
-    var PDFRequestJson = {};
+    var requestJson = {};
     let executionRecords = await this.grafanaService.getExecutionId(
       this.selectedDashboard.workflowId
     );
-    var pdfFileName = this.selectedDashboard.title + ".pdf";
-    PDFRequestJson["pdfName"] = this.selectedDashboard.title + ".pdf";
-    PDFRequestJson["workflowId"] = this.selectedDashboard.workflowId;
-    PDFRequestJson["executionId"] = executionRecords.data.executionId;
-    var request = btoa(JSON.stringify(PDFRequestJson));
+    if (this.selectedDashboard.pdfType=="Spreadsheet")
+    {
+      console.log("PDF Type is spreadsheet");
+      var FileName = this.selectedDashboard.title + ".xlsx";
+      requestJson["pdfName"] = this.selectedDashboard.title + ".xlsx";
+      requestJson["workflowId"] = this.selectedDashboard.workflowId;
+      requestJson["executionId"] = executionRecords.data.executionId;
+      requestJson["pdfType"] = this.selectedDashboard.pdfType;
+      var request = btoa(JSON.stringify(requestJson));
+    }
+    else{
+      var FileName = this.selectedDashboard.title + ".pdf";
+      requestJson["pdfName"] = this.selectedDashboard.title + ".pdf";
+      requestJson["workflowId"] = this.selectedDashboard.workflowId;
+      requestJson["executionId"] = executionRecords.data.executionId;
+      requestJson["pdfType"] = this.selectedDashboard.pdfType;
+    var request = btoa(JSON.stringify(requestJson));
+    }
     this.grafanaService.downloadPDF(request).then(function (data) {
-      importedSaveAs(data, pdfFileName);
+      importedSaveAs(data, FileName);
     });
   }
 

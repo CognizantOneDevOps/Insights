@@ -59,14 +59,14 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("SAVE_TASK_DETAIL", '/PlatformService/insights/workflow/saveWorkflowTask');
         this.addEndPoint("UPDATE_TASK_DETAIL", '/PlatformService/insights/workflow/updateWorkflowTask');
         this.addEndPoint("GET_ALL_WORKFLOW_TYPE", '/PlatformService/insights/workflow/getAllWorkflowType');
-        this.addEndPoint("DELETE_TASK_DETAIL", '/PlatformService/insights/workflow/deleteTaskList');       
+        this.addEndPoint("DELETE_TASK_DETAIL", '/PlatformService/insights/workflow/deleteTaskList');
         //this.addEndPoint("GET_WORKFLOW_EXECUTION_RECORDS", '/PlatformService/insights/workflow/workFlowExecutionRecords');
         this.addEndPoint("GET_WORKFLOW_EXECUTION_RECORDS", '/PlatformService/insights/workflow/workFlowExecutionRecordsByWorkflowId');
         this.addEndPoint("SET_REPORT_STATUS", '/PlatformService/insights/report/setReportStatus');
         this.addEndPoint("DOWNLOAD_REPORT_PDF", '/PlatformService/insights/workflow/downloadReportPDF');
         this.addEndPoint("GET_PDF_EXECUTIONID", '/PlatformService/insights/workflow/maxExecutionIDs');
         this.addEndPoint("UPDATE_NOTIFICATION_STATUS", '/PlatformService/insights/workflow/updateHealthNotification');
-        this.addEndPoint("GET_HEALTH_NOTIFICATION_STATUS",'/PlatformService/insights/workflow/getHealthNotificationStatus');
+        this.addEndPoint("GET_HEALTH_NOTIFICATION_STATUS", '/PlatformService/insights/workflow/getHealthNotificationStatus');
 
         //Grafana Data Collection
         //this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_ORGS", '/PlatformService/accessGrpMgmt/getOrgs');
@@ -89,7 +89,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("GET_DASHBOARD_LIST_BY_ORG", '/PlatformService/accessGrpMgmt/getDashboardByOrg');
 
         //Business Mapping module under Admin section
-        
+
         this.addEndPoint("SAVE_TOOL_MAPPING", '/PlatformService/admin/businessmapping/saveToolsMapping');
         this.addEndPoint("GET_TOOL_MAPPING", '/PlatformService/admin/businessmapping/getToolsMapping');
         this.addEndPoint("EDIT_TOOL_MAPPING", '/PlatformService/admin/businessmapping/editToolsMapping');
@@ -101,13 +101,13 @@ export class RestAPIurlService implements IRestAPIUrlService {
         //this.addEndPoint("SAVE_DATAPURGING_SETTING", '/PlatformService/admin/settings/saveSettingsConfiguration');
         this.addEndPoint("GET_DASHBOARD_BY_UID", '/PlatformService/accessGrpMgmt/getDashboardByUid');
         this.addEndPoint("GET_TEMPLATE_BY_QUERY", '/PlatformService/accessGrpMgmt/getTemplateQueryResults');
-        this.addEndPoint("SAVE_GRAFANA_DASHBOARD_CONFIG",'/PlatformService/dashboardReport/exportPDF/saveDashboardAsPDF')
-        this.addEndPoint("FETCH_DASHBOARD_CONFIGS",'/PlatformService/dashboardReport/exportPDF/fetchGrafanaDashboardConfigs')
-        this.addEndPoint("UPDATE_DASHBOARD_CONFIGS",'/PlatformService/dashboardReport/exportPDF/updateDashboardConfig')
-        this.addEndPoint("DELETE_DASHBOARD_CONFIGS",'/PlatformService/dashboardReport/exportPDF/deleteDashboardConfig')
-        this.addEndPoint("DOWNLOAD_DASHBOARD_REPORT_PDF",'/PlatformService/datasource/exportPDF/downloadReportPDF'),
-        this.addEndPoint("SET_DASHBOARD_STATUS",'/PlatformService/dashboardReport/updateDasboardStatus'),
-        this.addEndPoint("GET_EXECUTIONID",'/PlatformService/insights/workflow/getLatestExecutionId')
+        this.addEndPoint("SAVE_GRAFANA_DASHBOARD_CONFIG", '/PlatformService/dashboardReport/exportPDF/saveDashboardAsPDF')
+        this.addEndPoint("FETCH_DASHBOARD_CONFIGS", '/PlatformService/dashboardReport/exportPDF/fetchGrafanaDashboardConfigs')
+        this.addEndPoint("UPDATE_DASHBOARD_CONFIGS", '/PlatformService/dashboardReport/exportPDF/updateDashboardConfig')
+        this.addEndPoint("DELETE_DASHBOARD_CONFIGS", '/PlatformService/dashboardReport/exportPDF/deleteDashboardConfig')
+        this.addEndPoint("DOWNLOAD_DASHBOARD_REPORT_PDF", '/PlatformService/datasource/exportPDF/downloadReportPDF'),
+            this.addEndPoint("SET_DASHBOARD_STATUS", '/PlatformService/dashboardReport/updateDasboardStatus'),
+            this.addEndPoint("GET_EXECUTIONID", '/PlatformService/insights/workflow/getLatestExecutionId')
         this.addEndPoint("GET_EMAIL_CONFIGURATION_STATUS", '/PlatformService/dashboardReport/getEmailConfigurationStatus');
         this.addEndPoint("SET_DASHBOARD_ACTIVE_STATE", '/PlatformService/dashboardReport/setDashboardActiveState');
 
@@ -218,7 +218,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("DELETE_KPI", '/PlatformService/insights/report/deleteKpiDefinition');
         this.addEndPoint("UPLOAD_BULK_KPI", '/PlatformService/insights/report/saveBulkKpiDefinition');
         this.addEndPoint("REFRESH_GRAFANA_ORG_TOKEN", '/PlatformService/insights/report/refreshGrafanaOrgToken');
-        
+
         //content
         this.addEndPoint("LIST_CONTENT", '/PlatformService/insights/report/getAllActiveContentList');
         this.addEndPoint("SAVE_DATA_CONTENT", '/PlatformService/insights/report/saveContentDefinition');
@@ -252,7 +252,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("GET_CONFIG_FILES", '/PlatformService/filemanagement/getConfigurationFiles');
         this.addEndPoint("DELETE_CONFIG_FILE", '/PlatformService/filemanagement/deleteConfigFile');
         this.addEndPoint("DOWNLOAD_CONFIG_FILE", '/PlatformService/filemanagement/downloadConfigFile');
-               
+
         //offline data
         this.addEndPoint("LIST_OFFLINE_DATA", '/PlatformService/insights/offlinedataprocessing/getAllOfflineDataList');
         this.addEndPoint("UPLOAD_BULK_OFFLINE_DATA", '/PlatformService/insights/offlinedataprocessing/saveBulkOfflineData');
@@ -260,15 +260,15 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("UPDATE_OFFLINE_DATA", '/PlatformService/insights/offlinedataprocessing/updateOfflineDefinition');
         this.addEndPoint("DELETE_QUERY", '/PlatformService/insights/offlinedataprocessing/deleteOfflineDefinition');
         this.addEndPoint("UPDATE_OFFLINE_CONFIG_STATUS", '/PlatformService/insights/offlinedataprocessing/updateOfflineConfigStatus');
-        
+
         //Offline Alerting
         this.addEndPoint("OFFLINE_ALERTS_LIST", '/PlatformService/insights/offlineAlerting/fetchOfflineAlertList');
-        this.addEndPoint("SAVE_ALERT_CONFIG",'/PlatformService/insights/offlineAlerting/saveAlertData')
-        this.addEndPoint("UPDATE_ALERT_CONFIG",'/PlatformService/insights/offlineAlerting/updateAlertData')
+        this.addEndPoint("SAVE_ALERT_CONFIG", '/PlatformService/insights/offlineAlerting/saveAlertData')
+        this.addEndPoint("UPDATE_ALERT_CONFIG", '/PlatformService/insights/offlineAlerting/updateAlertData')
         this.addEndPoint("DELETE_ALERT", '/PlatformService/insights/offlineAlerting/deleteOfflineAlert');
         this.addEndPoint("UPDATE_OFFLINE_ALERT_STATUS", '/PlatformService/insights/offlineAlerting/updateOfflineAlertStatus');
         this.addEndPoint("GET_ALERT_EXECUTION_RECORDS", '/PlatformService/insights/offlineAlerting/alertExecutionRecordsByWorkflowId');
-       
+
         //Outcome
         this.addEndPoint("SAVE_OUTCOME_CONFIG", '/PlatformService/outcome/saveOutcomeConfig');
         this.addEndPoint("FETCH_OUTCOME_TOOL_CONFIG", '/PlatformService/outcome/fetchMileStoneTools');
@@ -276,7 +276,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("DELETE_OUTCOME_CONFIG", '/PlatformService/outcome/deleteOutcomeConfig');
         this.addEndPoint("LIST_OUTCOME", '/PlatformService/outcome/getAllActiveOutcome');
         this.addEndPoint("UPDATE_OUTCOME_CONFIG_STATUS", '/PlatformService/outcome/updateOutcomeConfigStatus');
-        
+
         //MileStone
         this.addEndPoint("SAVE_MILESTONE_CONFIG", '/PlatformService/milestone/saveMileStoneConfig');
         this.addEndPoint("FETCH_MILESTONE_CONFIG", '/PlatformService/milestone/fetchMileStoneConfig');
@@ -295,6 +295,15 @@ export class RestAPIurlService implements IRestAPIUrlService {
         //User Preference
         this.addEndPoint("UPDATE_UESRS_PREFERENCE", '/PlatformService/admin/userMgmt/updateThemePreference');
         this.addEndPoint("GET_USER_PREFERENCE_THEME", '/PlatformService/admin/userMgmt/getThemePreference');
+
+        //Neo4j Scaling
+        this.addEndPoint("GET_SCALING_CONFIG", '/PlatformService/neo4jScaling/configs');
+        this.addEndPoint("SAVE_NEO4J_SCALING_CONFIG", '/PlatformService/neo4jScaling/saveScalingConfigs');
+        this.addEndPoint("GET_ALL_REPLICAS", '/PlatformService/neo4jScaling/replicas');
+        this.addEndPoint("DELETE_REPLICA", '/PlatformService/neo4jScaling/deleteReplica');
+        this.addEndPoint("RESYNC_REPLICAS", '/PlatformService/neo4jScaling/resyncReplicas');
+        this.addEndPoint("LOG_DETAILS", '/PlatformService/neo4jScaling/logDetails');
+
     }
 
     public addEndPoint(name: String, url: String) {

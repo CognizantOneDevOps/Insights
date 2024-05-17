@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2020 Cognizant Technology Solutions
+ * Copyright 2024 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -60,6 +60,10 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
@@ -67,6 +71,7 @@ import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum.Workflow
 import com.cognizant.devops.platformcommons.core.util.AES256Cryptor;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.core.util.JsonUtils;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformcommons.exception.InsightsJobFailedException;
 import com.cognizant.devops.platformcommons.util.InsightsReportPdfTableConfig;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentConfiguration;
@@ -113,6 +118,8 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 	private static final String HEADER_HTML = "header.html";
 	private static final String FOOTER_HTML = "footer.html";
 	private static final String DASHBOARD = "Dashboard";
+	private static final String SPREADSHEET = "Spreadsheet";
+	private static final String GRAFANA_URL = "GRAFANA_URL";
 
 	private static final String PDF_TYPE = " PDFType: ";
 	private static final String SCHEDULE = " Schedule: ";
@@ -252,20 +259,17 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			String pdfType = pdfconfigDto.getPdfType();
 			if (pdfType.equals(DASHBOARD)) {
 				grafanaDashboardAsPdf(assessmentReportDTO, exportedFilePath);
+			} else if (pdfType.equals(SPREADSHEET)) {
+				grafanaDashboardAsExcel(assessmentReportDTO);
 			} else {
 				printableDashboardAsPdf(assessmentReportDTO, exportedFilePath);
 			}
 			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
 			log.debug("Worlflow Detail ==== PDF generation completed for Type : ===== {} ", pdfType);
-			log.debug(
-					LOG_MESSAGE,
-					assessmentReportDTO.getExecutionId(), assessmentReportDTO.getWorkflowId(),
-					assessmentReportDTO.getConfigId(), pdfconfigDto.getWorkflowType(),
-					"-", "-", processingTime,
-					PDF_TYPE + pdfconfigDto.getPdfType() + SCHEDULE
-							+ pdfconfigDto.getScheduleType() + SOURCE
-							+ pdfconfigDto.getSource() 
-							+ " PDF generation completed");
+			log.debug(LOG_MESSAGE, assessmentReportDTO.getExecutionId(), assessmentReportDTO.getWorkflowId(),
+					assessmentReportDTO.getConfigId(), pdfconfigDto.getWorkflowType(), "-", "-", processingTime,
+					PDF_TYPE + pdfconfigDto.getPdfType() + SCHEDULE + pdfconfigDto.getScheduleType() + SOURCE
+							+ pdfconfigDto.getSource() + " PDF generation completed");
 			log.debug(LOG_MESSAGE, assessmentReportDTO.getExecutionId(), assessmentReportDTO.getWorkflowId(),
 					assessmentReportDTO.getConfigId(), pdfconfigDto.getWorkflowType(), "-", "-", processingTime,
 					PDF_TYPE + pdfconfigDto.getPdfType() + SCHEDULE + pdfconfigDto.getScheduleType() + SOURCE
@@ -291,6 +295,52 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 	 * @param incomingTaskMessageJson
 	 * @param exportedFilePath
 	 */
+	private void grafanaDashboardAsExcel(InsightsAssessmentConfigurationDTO assessmentReportDTO) {
+
+		JsonElement config = JsonUtils.parseStringAsJsonElement(pdfconfigDto.getDashboardJson());
+		String grafanaEndpoint = getGrafanaEndPoint();
+
+		String grafanaUrl = config.getAsJsonObject().get("dashUrl").getAsString().replace(GRAFANA_URL, grafanaEndpoint);
+		log.debug("Worlflow Detail ==== grafanadashboard Url ===== {} ", grafanaUrl);
+
+		long startTime = System.nanoTime();
+
+		try {
+
+			// TablePanelList and TablePanelTitleList
+			List<String> grafanaTablePanelList = processTablePanelPDFData(config).get(1);
+			List<String> grafanaTablePanelTitleList = processTablePanelPDFData(config).get(0);
+
+			byte[] finalExcel = null;
+			if (!grafanaTablePanelList.isEmpty()) {
+				Map<String, List<String>> variableMap = processGrafanaVariables(config);
+				Workbook tablePanelList = addExcel(grafanaTablePanelList, grafanaTablePanelTitleList, variableMap);
+
+				finalExcel = excelToByteArray(tablePanelList);
+
+				if (Boolean.FALSE.equals(pdfconfigDto.getIsAssessmentReport())) {
+					pdfExecutionUtils.saveToVisualizationContainer(assessmentReportDTO, finalExcel);
+
+				}
+			} else {
+				throw new InsightsCustomException("Dashboard doesn't contains table panel");
+			}
+			long processingTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+			log.debug(LOG_MESSAGE, assessmentReportDTO.getExecutionId(), assessmentReportDTO.getWorkflowId(),
+					assessmentReportDTO.getConfigId(), pdfconfigDto.getWorkflowType(), "-", "-", processingTime,
+					PDF_TYPE + pdfconfigDto.getPdfType() + SCHEDULE + pdfconfigDto.getScheduleType() + SOURCE
+							+ pdfconfigDto.getSource());
+		} catch (Exception e) {
+			log.error("Worlflow Detail ==== Grafana Dashboard export as Excel Completed with error {} ",
+					e.getMessage());
+			log.error(LOG_MESSAGE, assessmentReportDTO.getExecutionId(), assessmentReportDTO.getWorkflowId(),
+					assessmentReportDTO.getConfigId(), "-", "-", "-", 0,
+					" Grafana Dashboard export as Excel Completed with error " + e.getMessage());
+			log.error(e);
+			throw new InsightsJobFailedException(e.getMessage());
+		}
+	}
+
 	private void grafanaDashboardAsPdf(InsightsAssessmentConfigurationDTO assessmentReportDTO,
 			String exportedFilePath) {
 
@@ -299,8 +349,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 		int loadTime = config.getAsJsonObject().get("loadTime").getAsInt() * 1000;
 
 		log.debug("Worlflow Detail ==== LoadTIme configured for Grafana in milliseconds ===== {} ", loadTime);
-		String grafanaUrl = config.getAsJsonObject().get("dashUrl").getAsString().replace("GRAFANA_URL",
-				grafanaEndpoint);
+		String grafanaUrl = config.getAsJsonObject().get("dashUrl").getAsString().replace(GRAFANA_URL, grafanaEndpoint);
 		log.debug("Worlflow Detail ==== grafanadashboard Url ===== {} ", grafanaUrl);
 
 		Playwright playwright = null;
@@ -316,19 +365,17 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 
 		Browser browser = browserType.launch(launchOptions);
 
-		try (BrowserContext context = browser.newContext(); Page page = context.newPage();) {
+		try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setIgnoreHTTPSErrors(true)); Page page = context.newPage();) {
 
-			//TablePanelList and TablePanelTitleList
+			// TablePanelList and TablePanelTitleList
 			List<String> grafanaTablePanelList = processTablePanelPDFData(config).get(1);
 			List<String> grafanaTablePanelTitleList = processTablePanelPDFData(config).get(0);
-			
+
 			InsightsReportPdfTableConfig insightsReportPdfTableConfig = new InsightsReportPdfTableConfig();
-			
-			
+
 			// original dashboard view code starts from here
 			Map<String, String> headers = getGrafanaHeaders(config);
 			String theme = config.getAsJsonObject().get("theme").getAsString();
-			
 
 			page.setExtraHTTPHeaders(headers);
 			page.onRequest(request -> log.debug("Request >> {} {} ", request.method(), request.url()));
@@ -382,7 +429,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 
 			byte[] pdfbytes = null;
 			if (!grafanaTablePanelList.isEmpty()) {
-				Map<String,List<String>> variableMap = processGrafanaVariables(config);
+				Map<String, List<String>> variableMap = processGrafanaVariables(config);
 				PDDocument tablePanelList = addTablePanels(grafanaTablePanelList, grafanaTablePanelTitleList,
 						variableMap, assessmentReportDTO, theme, pdfconfigDto.getPdfType());
 				// add footer
@@ -408,7 +455,6 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			browser.close();
 
 			byte[] finalPdf = mergePDFFiles(frontPagePdf, dashboardPdf, exportedFilePath);
-			
 
 			if (Boolean.FALSE.equals(pdfconfigDto.getIsAssessmentReport())) {
 				if (!grafanaTablePanelList.isEmpty()) {
@@ -453,8 +499,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 		GrafanaOrgToken grafanaOrgToken = grafanaDashboardConfigDAL
 				.getTokenByOrgId(config.getAsJsonObject().get(ORGANISATION).getAsInt());
 		String token = "Bearer " + AES256Cryptor.decrypt(grafanaOrgToken.getApiKey(),
-				ApplicationConfigProvider.getInstance().getSingleSignOnConfig()
-				.getTokenSigningKey());
+				ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getTokenSigningKey());
 		Map<String, String> headers = new HashMap<>();
 		headers.put("Authorization", token);
 		return headers;
@@ -483,22 +528,22 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 		NavigateOptions navigateOptions = new NavigateOptions();
 		navigateOptions.setWaitUntil(WaitUntilState.NETWORKIDLE);
 
-		try (BrowserContext context = browser.newContext(); Page page = context.newPage();) {
+		try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setIgnoreHTTPSErrors(true)); Page page = context.newPage();) {
 			JsonElement config = JsonUtils.parseStringAsJsonElement(pdfconfigDto.getDashboardJson());
 			int loadTime = config.getAsJsonObject().get("loadTime").getAsInt() * 1000;
 			log.debug("Worlflow Detail ==== LoadTIme configured for Grafana in milliseconds ===== {} ", loadTime);
 			String grafanaEndpoint = getGrafanaEndPoint();
 			log.debug("Worlflow Detail ==== grafanaEndpoint from config ===== {} ", grafanaEndpoint);
 			String theme = config.getAsJsonObject().get("theme").getAsString();
-			
-			//TablePanelList and TablePanelTitleList
+
+			// TablePanelList and TablePanelTitleList
 			List<String> grafanaTablePanelList = processTablePanelPDFData(config).get(1);
 			List<String> grafanaTablePanelTitleList = processTablePanelPDFData(config).get(0);
-			
+
 			InsightsReportPdfTableConfig insightsReportPdfTableConfig = new InsightsReportPdfTableConfig();
-			
-			Map<String,List<String>> variableMap = processGrafanaVariables(config);
-			
+
+			Map<String, List<String>> variableMap = processGrafanaVariables(config);
+
 			byte[] finalTablePanelPDF = null;
 			if (!grafanaTablePanelList.isEmpty()) {
 
@@ -521,9 +566,9 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 
 			List<String> grafanaPanelList = new ArrayList<>();
 			JsonArray panelUrlArray = config.getAsJsonObject().get("panelUrlArray").getAsJsonArray();
-			
+
 			panelUrlArray.forEach(e -> {
-				String panelUrl = e.getAsJsonObject().get("panelURL").getAsString().replace("GRAFANA_URL",
+				String panelUrl = e.getAsJsonObject().get("panelURL").getAsString().replace(GRAFANA_URL,
 						grafanaEndpoint);
 				log.debug("Worlflow Detail ==== Panel url ===== {} ", panelUrl);
 				if (((e.getAsJsonObject().get("type").getAsString()).equals("table"))
@@ -594,7 +639,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			browser.close();
 
 			byte[] finalPdf = mergePDFFiles(frontPagePdf, dashboardPdf, exportedFilePath);
-			
+
 			if (!grafanaTablePanelList.isEmpty()) {
 				byte[] finalPdfWithTables = mergePDFFiles(finalPdf, finalTablePanelPDF, exportedFilePath);
 
@@ -627,12 +672,11 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 			}
 		}
 	}
-	
+
 	private Map<String, List<String>> processGrafanaVariables(JsonElement config) {
 		String grafanaVariables = config.getAsJsonObject().get("variables").getAsString();
 		List<String> variableList = Arrays.asList(grafanaVariables.split(","));
 		Map<String, List<String>> variableMap = new HashMap<>();
-		
 
 		// creating Variable map
 		variableList.stream().forEach(var -> {
@@ -650,8 +694,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 		});
 		return variableMap;
 	}
-	
-	
+
 	private List<List<String>> processTablePanelPDFData(JsonElement config) {
 		// processing grafana variables // For panel Url
 		List<String> grafanaTablePanelList = new ArrayList<>();
@@ -675,6 +718,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 		return listOfPanelAndTitles;
 
 	}
+
 	private PDDocument setImageHeader(PDDocument doc, String pdfType) {
 		try {
 			PDPageTree pages = doc.getPages();
@@ -723,6 +767,95 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 		}
 		return doc;
 
+	}
+
+	public List<JsonObject> processTableData(String query,Map<String, List<String>> variableMap) {
+
+		String updatedQuery = query;
+		List<JsonObject> tableData = null;
+		updatedQuery = (updatedQuery.replace("\n", " "));
+		List<String> queryStringList = Arrays.asList(updatedQuery.split(" "));
+		Stream<String> s = queryStringList.stream().filter(name -> name.startsWith("$"));
+		List<String> paramList = s.collect(Collectors.toList());
+		if (!paramList.isEmpty()) {
+			for (String filterQueryParam : queryStringList) {
+				String grafanaQueryParam = filterQueryParam;
+				String queryParamForMap = (filterQueryParam.replace("$", ""));
+				if (variableMap.containsKey(queryParamForMap)) {
+					List<String> arrayOfFilterString = variableMap.get(queryParamForMap);
+					String arrayOfString = "[" + arrayOfFilterString.stream().map(str -> "\"" + str + "\"")
+							.collect(Collectors.joining(", ")) + "]";
+					updatedQuery = updatedQuery.replace(grafanaQueryParam, arrayOfString);
+				}
+			}
+
+			if (updatedQuery.contains(ALL_VAR) || updatedQuery.contains(ALL_VAR2) || updatedQuery.contains(ALL_VAR3)) {
+				updatedQuery = updatedQuery.replace(ALL_VAR, REGEX);
+				updatedQuery = updatedQuery.replace(ALL_VAR2, REGEX);
+				updatedQuery = updatedQuery.replace(ALL_VAR3, REGEX);
+			}
+
+			tableData = reportGraphDataHandler.fetchData(updatedQuery);
+		}
+
+		else {
+			tableData = reportGraphDataHandler.fetchData(updatedQuery);
+		}
+		return tableData;
+	}
+
+	public Workbook addExcel(List<String> tablePanelQuery, List<String> tablePanelTitles,
+			Map<String, List<String>> variableMap) {
+
+		Workbook workbook = null;
+		try {
+
+			workbook = new XSSFWorkbook();
+			String cellValue = "";
+			int titleCount = 0;
+			for (String query : tablePanelQuery) {
+
+				List<JsonObject> tableData = processTableData(query,variableMap);
+
+				JsonObject tableHeader = tableData.get(0);
+				JsonObject columnData = tableHeader.getAsJsonArray("results").get(0).getAsJsonObject();
+				JsonArray columnsArray = columnData.get("columns").getAsJsonArray();
+				JsonArray rowsElement = columnData.get("data").getAsJsonArray();
+
+				Sheet sheet = workbook.createSheet(tablePanelTitles.get(titleCount));
+				int rowNum = 0;
+				org.apache.poi.ss.usermodel.Row headingRow = sheet.createRow(rowNum++);
+				int i = 0;
+				for (JsonElement element : columnsArray) {
+					org.apache.poi.ss.usermodel.Cell cell = headingRow.createCell(i);
+					cell.setCellValue(element.getAsString());
+					i++;
+				}
+				for (JsonElement data : rowsElement) {
+					org.apache.poi.ss.usermodel.Row row = sheet.createRow(rowNum++);
+					JsonObject dataObject = data.getAsJsonObject();
+					JsonArray rowObject = dataObject.getAsJsonArray("row");
+					int j = 0;
+					for (JsonElement element : rowObject) {
+						if (element.isJsonNull()) {
+							cellValue = "";
+						} else {
+							cellValue = element.getAsString();
+						}
+						org.apache.poi.ss.usermodel.Cell cell = row.createCell(j);
+						cell.setCellValue(cellValue);
+						j++;
+					}
+
+				}
+
+				titleCount++;
+			}
+		} catch (Exception e) {
+			log.error(" Worlflow Detail ==== unable to Workbook, {}", e.getMessage());
+		}
+
+		return workbook;
 	}
 
 	public PDDocument addTablePanels(List<String> tablePanelQuery, List<String> tablePanelTitles,
@@ -812,6 +945,17 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 		} catch (Exception ex) {
 			log.error(" Worlflow Detail ====  Error while converting table panel PDF into byte array, {} ",
 					ex.getMessage());
+		}
+		return out.toByteArray();
+	}
+
+	private static byte[] excelToByteArray(Workbook excel) throws IOException {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+		try {
+			excel.write(out);
+		} catch (Exception ex) {
+			log.error(" Worlflow Detail ====  Error while converting Excel into byte array, {} ", ex.getMessage());
 		}
 		return out.toByteArray();
 	}
@@ -1108,7 +1252,7 @@ public class GrafanaPDFHandler implements BasePDFProcessor {
 		}
 		return render.toString();
 	}
-	
+
 	/**
 	 * Method use to fetch footer template file from resource.
 	 * 

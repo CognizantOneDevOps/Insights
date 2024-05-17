@@ -22,7 +22,7 @@ positions:
   filename: ./positions.yaml
 
 clients:
-  - url: http://${LOKI_HOST}:${LOKI_PORT}/loki/api/v1/push
+  - url: ${LOKI_ENDPOINT}/loki/api/v1/push
     tenant_id: "machine1"
 
 scrape_configs:

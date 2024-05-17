@@ -18,21 +18,19 @@
 # source /etc/environment
 # source /etc/profile
 
-if [[ ! -z $enablespin ]]
-then
-    hostname="insightsdomain.subdomain.com"
-else
-    hostname=$hostPublicIP
-fi
+# if [[ ! -z $enablespin ]]
+# then
+#     hostname="insightsdomain.subdomain.com"
+# else
+#     hostname=$hostPublicIP
+# fi
 
 #Framing Endpoint Url
-grafanaPublicHost=http://$hostPublicIP:$grafanaPort
-ServiceEndpoint=http://$hostname:$servicePort
 uiConfigPath='/opt/UI/UI/insights/config/uiConfig.json'
 
 #update uiconfig
-echo $(jq --arg serviceHost $ServiceEndpoint '(.serviceHost) |= $serviceHost' $uiConfigPath) > $uiConfigPath
-echo $(jq --arg grafanaHost $grafanaPublicHost '(.grafanaHost) |= $grafanaHost' $uiConfigPath) > $uiConfigPath
+echo $(jq --arg serviceHost $SERVICE_ENDPOINT '(.serviceHost) |= $serviceHost' $uiConfigPath) > $uiConfigPath
+echo $(jq --arg grafanaHost $GRAFANA_ENDPOINT '(.grafanaHost) |= $grafanaHost' $uiConfigPath) > $uiConfigPath
 
 jq . $uiConfigPath > $uiConfigPath.tmp
 mv $uiConfigPath.tmp $uiConfigPath
@@ -40,7 +38,7 @@ mv $uiConfigPath.tmp $uiConfigPath
 
 #starting services
 cd /opt/UI/UI/
-sudo node UI.js  >UIlog.txt 2>UIerrorlog.txt
+sudo node UI.js & > UIlog.txt 2> UIerrorlog.txt
 #assign tails pid to docker to keep it running continuously
 
 tail -f /dev/null

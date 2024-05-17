@@ -98,7 +98,6 @@ public final class AssessmentReportAndWorkflowConstants {
 	public static final String VQUERY = "vQuery";
 	public static final String DASHBOARDTEMPLATEJSON = "dashboardTemplate.json";
 	
-	//public static final String GRAFANA_PDF_TOKEN_SIGNING_KEY = "insights_Grafana_PDF_Token_string";
 	
 	public static final Set<String> validReportTemplateFileExtention = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList("html", "json", "css", "webp")));
 	public static final String ISWOKFLOWTASKRETRY="isWorkflowTaskRetry";

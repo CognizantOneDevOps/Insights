@@ -1,0 +1,132 @@
+{
+  "vault": {
+    "getFromVault": false,
+    "secretEngine": "insights-kv",
+    "readToken": "vault_secret_token",
+    "vaultUrl": "http://Vault_Host:port/v1/"
+  },
+  "mqConfig": {
+    "providerName": "rabbitMQ",
+    "user": "iSight",
+    "password": "",
+    "host": "127.0.0.1",
+    "exchange": "iSight",
+    "agentControlXchg": "iAgent",
+    "port": 5672,
+    "enableDeadLetterExchange": true,
+    "prefetchCount": 5,
+    "awsAccessKey": "",
+		"awsSecretKey": "",
+		"awsRegion": ""
+  },
+  "subscribe": {
+    "config": "APPMONITORING.AWSRESILIENCEHUB.CONFIG"
+  },
+  "publish": {
+    "data": "APPMONITORING.AWSRESILIENCEHUB.DATA",
+    "health": "APPMONITORING.AWSRESILIENCEHUB.HEALTH"
+  },
+  "communication": {
+    "type": "REST",
+    "sslVerify": false,
+    "responseType": "JSON"
+  },
+  "dynamicTemplate": {
+    "timeFieldMapping": {
+      "startDate": "%Y-%m-%d"
+    },
+    "metaData":{
+      "app":{
+        "labels": ["RESILIENCE_APP"],
+        "dataUpdateSupported": true,
+        "uniqueKey": ["appName"]
+      },
+      "assessment":{
+        "labels": ["RESILIENCE_ASSESSMENT"],
+        "dataUpdateSupported": true,
+        "uniqueKey": ["assessmentName"]
+      }
+    },
+    "appResponseTemplate": {
+      "name" :  "appName"
+    },
+    "assessmentResponseTemplate" : {
+      "assessmentName" : "assessmentName",
+      "complianceStatus" : "complianceStatus",
+      "assessmentStatus" : "assessmentStatus",
+      "driftStatus" :  "driftStatus",
+      "resiliencyScore" :  "resiliencyScore"
+    },
+    "relationMetadata": {
+      "appAssessment": {
+        "relation": {
+          "properties": ["appName"],
+          "name": "APP_HAS_ASSESSMENTS",
+          "source": {
+            "labels": [
+              "RESILIENCE_APP"
+            ],
+            "constraints": [
+              "appName"
+            ]
+          },
+          "destination": {
+            "labels": [
+              "RESILIENCE_ASSESSMENT"
+            ],
+            "constraints": [
+              "assessmentName"
+            ],
+            "selectedProperties": [
+              "assessmentName",
+              "complianceStatus",
+              "assessmentStatus",
+              "driftStatus",
+              "resiliencyScore",
+              "startTime",
+              "endTime"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "agentId": "awsResilienceHubAgent",
+  "enableDataValidation": true,
+  "toolCategory": "APPMONITORING",
+  "toolsTimeZone": "UTC",
+  "insightsTimeZone": "Asia/Kolkata",
+  "enableValueArray": false,
+  "useResponseTemplate": true,
+  "auth": "base64",
+  "runSchedule": 2,
+  "timeStampField": "commitTime",
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%S.",
+  "isEpochTimeFormat": false,
+  "agentSecretDetails": [
+		"accessKey",
+    "secretKey",
+    "regionName"
+	],
+  "accessKey": "",
+  "secretKey": "",
+  "regionName": "",
+  "startFrom": "1900-01-01 01:00:00",
+  "historicalBatchCount" : 100,
+  "currentBatchCount" : 10,
+  "isDebugAllowed": false,
+  "labelName": "AWSRESILIENCEHUB",
+  "toolName": "AWSRESILIENCEHUB",
+  "loggingSetting": {
+    "logLevel": "INFO",
+    "maxBytes": 5000000,
+    "backupCount": 10
+  },
+  "auditing": false,
+  "enableProxy": false,
+  "proxies": {
+    "http": "",
+    "https": ""
+  },
+  "webhookEnabled": false
+}

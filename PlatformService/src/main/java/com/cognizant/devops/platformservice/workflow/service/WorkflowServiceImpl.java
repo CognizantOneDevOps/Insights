@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.workflow.service;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -46,6 +47,9 @@ import com.cognizant.devops.platformdal.workflow.InsightsWorkflowType;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 @Service("workflowService")
 public class WorkflowServiceImpl {
@@ -173,7 +177,26 @@ public class WorkflowServiceImpl {
 		return workflowConfig;
 
 	}
-
+	
+	/**
+	 * converts byteArray to workbook
+	 * 
+	 * @param byteArray
+	 * @return Workbook
+	 * @throws InsightsCustomException 
+	 * @throws Exception
+	 */
+	public static Workbook byteArrayToWorkbook(byte[] byteArray) throws InsightsCustomException{
+		Workbook workBook=null;
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(byteArray)) {
+        	workBook = WorkbookFactory.create(inputStream);
+        } catch (Exception e) {
+        	log.error("Error while deleting assesment report", e);
+			throw new InsightsCustomException(e.toString());
+        }
+        return workBook; 
+    }
+	
 	/**
 	 * Fetching get the task lists from the table
 	 * 
